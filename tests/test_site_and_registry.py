@@ -5,14 +5,15 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "site"))
+sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "review"))
-import build as site_build  # noqa: E402
+import build_site as site_build  # noqa: E402
 import defects as registry  # noqa: E402
 
 from docsdrift.targets import TARGETS  # noqa: E402
 
-PAGE = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
+PAGE = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+PRS = json.loads((ROOT / "review" / "upstream_prs.json").read_text(encoding="utf-8"))
 REG = json.loads((ROOT / "review" / "defects.json").read_text(encoding="utf-8"))
 LABELS = json.loads((ROOT / "review" / "labels_v2.json").read_text(encoding="utf-8"))
 
@@ -77,7 +78,8 @@ def test_page_has_no_scripts_or_remote_assets():
     assert "<script" not in PAGE
     assert re.findall(r'(?:src|href)="(https?://[^"]+)"', PAGE) == [u for u in re.findall(r'href="(https?://[^"]+)"', PAGE)]
     assert all(u.startswith("https://github.com/") for u in re.findall(r'href="(https?://[^"]+)"', PAGE))
-    assert 'href="style.css"' in PAGE and (ROOT / "site" / "style.css").exists()
+    assert 'href="style.css"' in PAGE and (ROOT / "docs" / "style.css").exists()
+    assert (ROOT / "docs" / ".nojekyll").exists()      # GitHub Pages serves docs/ as it is
 
 
 def test_readme_numbers_match_the_recount():
@@ -92,6 +94,35 @@ def test_readme_numbers_match_the_recount():
     assert row("tuning", "reported_true", "reported") in readme
     assert row("validation", "reported_true", "reported") in readme
     assert f"{s['all']['pairs_compared']:,} pairs" in readme
-    assert "16 contradictions in 6\nprojects" in readme or "16 contradictions in 6 projects" in readme
+    assert "**16 defects in 6 of" in readme and "**15 open-source projects**" in readme
     n_tests = sum(len(re.findall(r"^def test_", p.read_text(encoding="utf-8"), re.M)) for p in (ROOT / "tests").glob("test_*.py"))
-    assert n_tests >= 60
+    declared = int(re.search(r"# (\d+) tests, no network", readme).group(1))
+    assert declared >= n_tests      # parametrized tests add to the count pytest reports
+
+
+def test_upstream_pr_table_is_on_the_page_and_in_the_readme():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    registered = {d["id"] for d in REG["defects"]}
+    covered = []
+    for pr in PRS["pull_requests"]:
+        assert pr["status"] in ("open", "merged", "closed")
+        assert pr["url"] == f"https://github.com/{pr['repo']}/pull/{pr['number']}"
+        assert pr["url"] in PAGE and pr["url"] in readme
+        row = readme[readme.index(pr["url"]):].splitlines()[0]
+        assert f"| {pr['status']} |" in row
+        covered += pr["defects"]
+    for p in PRS["not_opened_yet"]:
+        covered += p["defects"]
+    assert sorted(covered) == sorted(registered)        # every defect is in exactly one row
+
+
+def test_page_does_not_claim_merges_that_have_not_happened():
+    merged = [p for p in PRS["pull_requests"] if p["status"] == "merged"]
+    if not merged:
+        assert "merged" not in PAGE.lower()
+
+
+def test_first_screen_states_what_it_is_and_how_often_it_is_wrong():
+    top = PAGE[:PAGE.index('<section class="hero"')]
+    assert "not a verdict" in top
+    assert "0 of 8" in top and "11 of 21" in top

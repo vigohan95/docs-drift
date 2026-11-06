@@ -40,33 +40,63 @@ def detect_repo(path: Path) -> tuple[str, str]:
     return (m.group(1) if m else ""), commit
 
 
-def print_report(rep: dict, show_all: bool = False, out=sys.stdout):
+TIER_WORDS = {
+    "confirmed": "both checks agree",
+    "likely": "one check agrees",
+    "unchecked": "not checked",
+    "weak": "not listed: neither check agrees",
+    "out_of_scope": "not listed: /compare calls it a scope or name difference",
+}
+KIND_WORDS = {"value": "a value", "date_or_version": "a version", "rule_or_condition": "a rule",
+              "scope": "scope", "name": "a name"}
+LISTED = ("confirmed", "likely", "unchecked")
+
+
+def _short(text: str, limit: int = 150) -> str:
+    text = " ".join(text.split())
+    return text if len(text) <= limit else text[:limit - 1].rstrip() + "…"
+
+
+def print_report(rep: dict, show_all: bool = False, out=None):
+    """The list a maintainer reads: what was read, what was kept, and each item with both passages."""
     st = rep["stats"]
-    w = out.write
-    w(f"\n{rep['project']}  {rep.get('repo', '')}@{(rep.get('commit') or '')[:10]}\n")
-    w(f"  {st['files']} files, {st['passages']} passages, {st['pairs_compared']} pairs compared, "
-      f"{st['findings']} raw conflict findings\n")
+    w = (out or sys.stdout).write
     tiers = Counter(f["tier"] for f in rep["findings"])
-    w(f"  reported: {tiers.get('confirmed', 0)} confirmed, {tiers.get('likely', 0)} likely; "
-      f"not reported: {tiers.get('weak', 0)} weak, {tiers.get('out_of_scope', 0)} scope/name differences\n")
-    w(f"  credits: {st['credits_total']:.0f} at list price ({st['live_credits']:.0f} spent now, "
-      f"{st['cache_hits']} answers replayed from recordings)\n")
+    listed = sum(tiers.get(t, 0) for t in LISTED)
+    where = f"{rep.get('repo') or rep['project']} @ {(rep.get('commit') or '')[:10]}".rstrip(" @")
+    w(f"\n{where}\n")
+    w(f"  {st['passages']:>5} passages in {st['files']} files\n")
+    w(f"  {st['pairs_compared']:>5} pairs of passages read\n")
+    w(f"  {st['findings']:>5} flagged by /compare\n")
+    detail = f"  ({tiers.get('confirmed', 0)} where both checks agree, {tiers.get('likely', 0)} where one does)" if listed else ""
+    w(f"  {listed:>5} listed for review{detail}\n")
+    w(f"  credits: {st['credits_total']:.0f} at list price, {st['live_credits']:.0f} spent now "
+      f"({st['cache_hits']} answers replayed from recordings)\n")
     order = {"confirmed": 0, "likely": 1, "unchecked": 2, "weak": 3, "out_of_scope": 4}
+    n = 0
     for f in sorted(rep["findings"], key=lambda f: (order.get(f["tier"], 9), -(f.get("confidence") or 0))):
-        if f["tier"] in ("weak", "out_of_scope") and not show_all:
+        if f["tier"] not in LISTED and not show_all:
             continue
-        w(f"\n  [{f['tier'].upper()}] {f['kind']}  (id {f['id']})\n")
+        n += 1
+        w(f"\n{n:>3}. The two passages disagree on {KIND_WORDS.get(f['kind'], f['kind'])}"
+          f"   [{TIER_WORDS.get(f['tier'], f['tier'])}]\n")
         for side in ("a", "b"):
             s = f[side]
-            text = s["statement"] or (s["quote"] or "")[:300]
-            w(f"    {s['path']}:{s['line_start']}\n      {text}\n")
+            w(f"     {s['path']}:{s['line_start']}\n         {_short(s['statement'] or s['quote'] or '')}\n")
         e = f.get("elsewhere") or {}
+        names = {"a": "the first passage", "b": "the second passage"}
         for pl in e.get("places", []):
             if pl["agrees_with"]:
-                w(f"    also stated at {pl['path']}:{pl['line']} (agrees with side {pl['agrees_with'].upper()})\n")
+                w(f"     also stated at {pl['path']}:{pl['line']}, which agrees with {names[pl['agrees_with']]}\n")
         if e.get("outlier"):
-            w(f"    -> side {e['outlier'].upper()} is the outlier ({e['votes']['a']} vs {e['votes']['b']} places)\n")
-    w("\n")
+            w(f"     {names[e['outlier']]} is probably the stale one "
+              f"({e['votes'][e['outlier']]} place for it, {e['votes']['b' if e['outlier'] == 'a' else 'a']} for the other)\n")
+        if rep.get("repo"):
+            w(f"     {f['a']['url']}\n     {f['b']['url']}\n")
+    if listed:
+        w("\nThis is a list to review, not a verdict. Read both passages and the code before changing anything.\n")
+    else:
+        w("\nNothing listed. That means no pair passed the checks, not that the docs are free of contradictions.\n")
 
 
 def _run(args, project, root, includes, excludes, repo, commit):
@@ -82,12 +112,14 @@ def _run(args, project, root, includes, excludes, repo, commit):
         print(f"offline replay failed: {e}\nThis tree (or these options) was never scanned live.", file=sys.stderr)
         return 2
     rep["generated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    out = Path(args.out) if args.out else REPORTS / f"{project}.json"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
+    # A replay reproduces a report that is already in reports/, so it only writes a file when asked to.
+    out = Path(args.out) if args.out else (None if args.offline else REPORTS / f"{project}.json")
+    if out:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")
     if not args.quiet:
         print_report(rep, args.all)
-        print(f"report written to {out}")
+        print(f"JSON report: {out}" if out else "Replay only: nothing written. Add --out FILE to save the JSON report.")
     return 0
 
 
@@ -144,8 +176,16 @@ def main(argv=None) -> int:
         print(f"not a directory: {root}", file=sys.stderr)
         return 2
     repo, commit = detect_repo(root)
+    repo, commit = args.repo or repo, args.commit or commit
+    if not (args.include or args.exclude or args.name):
+        # A clone of one of the pinned demo targets: use the file selection it was measured with,
+        # so that `scan <clone> --offline` replays the recorded run.
+        from .targets import TARGETS
+        for name, t in TARGETS.items():
+            if t["repo"] == repo and t["commit"] == commit:
+                return _run(args, name, root, t["includes"], t["excludes"], repo, commit)
     return _run(args, args.name or root.resolve().name, root, args.include or DEFAULT_INCLUDES,
-                args.exclude or DEFAULT_EXCLUDES, args.repo or repo, args.commit or commit)
+                args.exclude or DEFAULT_EXCLUDES, repo, commit)
 
 
 if __name__ == "__main__":

@@ -77,8 +77,38 @@ def test_stages_can_be_switched_off(tmp_path):
     assert f["tier"] == "unchecked" and "gate" not in f and "swap" not in f
 
 
+def test_printed_list_says_what_was_read_and_what_it_is(tmp_path, capsys):
+    args = [a for a in ARGS if a != "--quiet"]
+    assert cli.main(["scan", str(FIX), *args, "--out", str(tmp_path / "r.json")]) == 0
+    out = capsys.readouterr().out
+    assert "pairs of passages read" in out and "flagged by /compare" in out
+    assert "1 listed for review" in out and "[both checks agree]" in out
+    assert "README.md:9" in out and "docs/configuration.md:5" in out
+    assert "not a verdict" in out
+
+
+def test_a_replay_writes_no_file_unless_asked(tmp_path, capsys, monkeypatch):
+    monkeypatch.setattr(cli, "REPORTS", tmp_path / "reports")
+    args = [a for a in ARGS if a != "--quiet"]
+    assert cli.main(["scan", str(FIX), *args]) == 0
+    assert "Replay only: nothing written" in capsys.readouterr().out
+    assert not (tmp_path / "reports").exists()
+
+
 def _have(name):
     return (TARGETS_ROOT / name / ".git").exists() and (ROOT / "reports" / f"{name}.json").exists()
+
+
+def test_scanning_a_clone_of_a_pinned_target_uses_its_measured_file_selection(tmp_path):
+    """`docsdrift scan ../targets/fastify --offline` must replay the recorded run, not start a new one."""
+    if not _have("fastify"):
+        pytest.skip("targets/fastify is not cloned")
+    out = tmp_path / "r.json"
+    assert cli.main(["scan", str(TARGETS_ROOT / "fastify"), "--offline", "--quiet", "--out", str(out)]) == 0
+    rep = json.loads(out.read_text(encoding="utf-8"))
+    stored = json.loads((ROOT / "reports" / "fastify.json").read_text(encoding="utf-8"))
+    assert rep["project"] == "fastify" and rep["stats"]["live_calls"] == 0
+    assert sorted(f["id"] for f in rep["findings"]) == sorted(f["id"] for f in stored["findings"])
 
 
 @pytest.mark.parametrize("name", list(TARGETS))
