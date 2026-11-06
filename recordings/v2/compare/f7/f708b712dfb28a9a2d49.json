@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f7/f708b712dfb28a9a2d49",
+ "request_hash": "f708b712dfb28a9a2d4999e427b54835c6b965c60b32efc21b1f38880c54275c",
+ "recorded_at": "2026-11-06T14:39:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1063,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "160.604572",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=352"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#36",
+    "text": "## Default Config\n\n```go\nvar ConfigDefault = Config{\n    Next:                 nil,\n    ModifyRequest:        nil,\n    ModifyResponse:       nil,\n    MaxConnsPerHost:      1024,\n    MaxResponseBodySize:  100 << 20,\n    Timeout:              fasthttp.DefaultLBClientTimeout,\n    KeepConnectionHeader: false,\n}\n```\n\n`Servers` (or `Client`) is required: `proxy.Balancer()` without a `Config` panics at startup, as `proxy.Balancer(proxy.Config{})` does, and so does a `Client` without `Clients`."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#115",
+    "text": "### Proxy\n\nThe proxy middleware has been updated to improve consistency with Go naming conventions. The `TlsConfig` field in the configuration struct has been renamed to `TLSConfig`. Additionally, the `WithTlsConfig` method has been removed; you should now configure TLS directly via the `TLSConfig` property within the `Config` struct.\n\nThe new `KeepConnectionHeader` option (default `false`) drops the `Connection` header unless explicitly enabled to retain it.\n\nThe headers a request lists in `Connection` are removed before it is forwarded, and a request whose `Connection` fields list more than 32 names is answered with `431 Request Header Fields Too Large`; an upstream response that does is answered with `502 Bad Gateway`. Under `DisableHeaderNormalizing`, further spellings of a removed name count toward the same limit; `Balancer`, `Forward`, `DomainForward` and `BalancerForward` also answer `431` to a request that spells `X-Real-IP` in more than 32 further ways, and `DoRedirects` fails a redirect with `431` when the fields it drops are spelled in more than 32 further ways. See [hop-by-hop header stripping](./middleware/proxy.md#rfc-9110-hop-by-hop-header-stripping) and [redirect method and body](./middleware/proxy.md#redirect-method-and-body).\n\n`proxy.Balancer` takes its `proxy.Config` as an optional variadic argument, like the other middleware constructors. `Servers` (or a custom `Client` with `Clients`) is required, so `proxy.Balancer()` without a config panics at startup, as `proxy.Balancer(proxy.Config{})` does, and so does a `Client` without `Clients`. A server without a port is dialed on the port of its scheme, and each server is reached with its own scheme, so an `https` upstream works behind a plain-HTTP listener."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#36",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#115"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#115",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/proxy.md#36"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/proxy.md#36",
+    "b": "fiber:docs/whats_new.md#115",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0105,
+     "overlapping": 0.983,
+     "conflicting": 0.004,
+     "unrelated": 0.0024
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.7076,
+       "restated": 0.2619,
+       "elaborated": 0.0159,
+       "different": 0.0147
+      },
+      "confidence": 0.9853,
+      "a": {
+       "document": "fiber:docs/middleware/proxy.md#36",
+       "quote": "```",
+       "start": 309,
+       "end": 312,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#115",
+       "quote": "`Servers` (or a custom `Client` with `Clients`) is required, so `proxy.Balancer()` without a config panics at startup, as `proxy.Balancer(proxy.Config{})` does, and so does a `Client` without `Clients`.",
+       "start": 1381,
+       "end": 1583,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 1,
+   "counterparts_ms": 62
+  },
+  "timing": {
+   "read_ms": 169,
+   "total_ms": 171
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/10/102c0e3fb7e1767fa90f",
+ "request_hash": "102c0e3fb7e1767fa90f33d7e441a165fe6230789dd2f03b56ed398366eb9f7a",
+ "recorded_at": "2026-11-06T14:37:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1204,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "96.631777",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=216"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#14",
+    "text": "### load\n\n|  |  |\n| --: | :-- |\n| Type: | `(id: string, options: Options) => LoadResult` |\n| Kind: | async, first |\n| Previous: | [`resolveId`](#resolveid) or [`resolveDynamicImport`](#resolvedynamicimport) where the loaded id was resolved. Additionally, this hook can be triggered at any time from plugin hooks by calling [`this.load`](#this-load) to preload the module corresponding to an id |\n| Next: | [`transform`](#transform) to transform the loaded file if no cache was used, or there was no cached copy with the same `code`, otherwise [`shouldTransformCachedModule`](#shouldtransformcachedmodule) |\n\n```typescript\ntype Options = {\n\tattributes: Record<string, string>;\n};\n\ntype LoadResult = string | null | SourceDescription;\n\ninterface SourceDescription {\n\tcode: string;\n\tmap?: string | SourceMap;\n\tast?: ESTree.Program;\n\tmeta?: { [plugin: string]: any } | null;\n\tmoduleSideEffects?: boolean | 'no-treeshake' | null;\n\tsyntheticNamedExports?: boolean | string | null;\n}\n```\n\nDefines a custom loader. `options.attributes` contain the import attributes that were used when this module was imported, which is determined by the first `resolveId` hook that resolved this module or the attributes present in the first import. Returning `null` defers to other `load` functions (and eventually the default behavior of loading from the file system). To prevent additional parsing overhead in case e.g. this hook already used [`this.parse`](#this-parse) to generate an AST for some reason, this hook can optionally return a `{ code, ast, map }` object. The `ast` must be a standard ESTree AST with `start` and `end` properties for each node. If the transformation does not move code, you can preserve existing sourcemaps by setting `map` to `null`. Otherwise, you might need to generate the source map. See the section on [source code transformations](#source-code-transformations)."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#97",
+    "text": "### Source Code Transformations\n\nIf a plugin transforms source code, it should generate a sourcemap automatically, unless there's a specific `sourceMap: false` option. Rollup only cares about the `mappings` property (or, for an index source map, its `sections`); everything else is handled automatically. [magic-string](https://github.com/Rich-Harris/magic-string) provides a simple way to generate such a map for elementary transformations like adding or removing code snippets.\n\nIf it doesn't make sense to generate a sourcemap, (e.g. [rollup-plugin-string](https://github.com/TrySound/rollup-plugin-string)), return an empty sourcemap:\n\n```js\nreturn {\n\tcode: transformedCode,\n\tmap: { mappings: '' }\n};\n```\n\nIf the transformation does not move code, you can preserve existing sourcemaps by returning `null`:\n\n```js\nreturn {\n\tcode: transformedCode,\n\tmap: null\n};\n```\n\nIf you create a plugin that you think would be useful to others, please publish it to NPM and add submit it to [github.com/rollup/awesome](https://github.com/rollup/awesome)!"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#97",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/plugin-development/index.md#14",
+    "b": "rollup:docs/plugin-development/index.md#97",
+    "relation": "overlapping",
+    "related": 0.9971,
+    "probabilities": {
+     "same": 0.0066,
+     "overlapping": 0.9853,
+     "conflicting": 0.0052,
+     "unrelated": 0.0029
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 104,
+   "total_ms": 107
+  }
+ }
+}

@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1a/1a4ec8866ea4b0ea79c0",
+ "request_hash": "1a4ec8866ea4b0ea79c0ae2b34e1c0db5096f5e87f038d041891e687d0a48bc3",
+ "recorded_at": "2026-11-06T14:39:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3922,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "169.881086",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=367"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/adaptor.md#1",
+    "text": "## Features\n\n- Convert `net/http` handlers and middleware to Fiber handlers\n- Convert Fiber handlers to `net/http` handlers\n- Convert a Fiber context (`fiber.Ctx`) into an `http.Request`\n- Copy values stored in a `context.Context` onto a `fasthttp.RequestCtx`\n\n:::note Body size limits when running Fiber from net/http\nWhen Fiber is executed from a `net/http` server through `FiberHandler`, `FiberHandlerFunc`,\nor `FiberApp`, the adaptor enforces the app's configured `BodyLimit`. The app's `BodyLimit` defaults to **4 MiB** if a non-positive value is provided during configuration. `FiberHandler` and `FiberHandlerFunc` run the handler on a fresh app with the default configuration, so they always apply the 4 MiB default; pass your own app to `FiberApp` to use a different `BodyLimit`. Requests exceeding the active limit receive `413 Request Entity Too Large`.\n:::\n\n:::note Streamed request bodies\n`HTTPHandler`, `HTTPHandlerFunc`, `HTTPHandlerWithContext`, `HTTPMiddleware` and `ConvertRequest` buffer the request body to build the `http.Request`. With [`StreamRequestBody`](../api/fiber.md#streamrequestbody) they read it within the app's `BodyLimit` and answer a larger one with `413 Request Entity Too Large`, and a body that fails to read, such as a malformed chunk, with `400 Bad Request` (`ConvertRequest` returns `fiber.ErrRequestEntityTooLarge` or `fiber.ErrBadRequest`). A read error that already carries a `*fiber.Error` keeps its status.\n:::"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#78",
+    "text": "### Adaptor\n\nThe adaptor middleware has been significantly optimized for performance and efficiency. Key improvements include reduced response times, lower memory usage, and fewer memory allocations. These changes make the middleware more reliable and capable of handling higher loads effectively. Enhancements include the introduction of a `sync.Pool` for managing `fasthttp.RequestCtx` instances and better HTTP request and response handling between net/http and fasthttp contexts.\n\nIncoming body sizes now respect the Fiber app's configured `BodyLimit` (falling back to the default when unset) when running Fiber from `net/http` through the adaptor, returning `413 Request Entity Too Large` for oversized payloads. `FiberHandler` and `FiberHandlerFunc` run the handler on a fresh app, so they always apply the default limit; pass your own app to `FiberApp` to configure it.\n\nThe adaptor also propagates the request's protocol version, normalized to Fiber's convention (`HTTP/2.0` → `HTTP/2`, `HTTP/3.0` → `HTTP/3`), so `c.Protocol()` reports the real version instead of always `HTTP/1.1`. Interim responses such as `SendEarlyHints`' `103` are silently skipped through the adaptor — there is no client connection to write them to — while the `Link` headers still reach the final response.\n\n`FiberHandler`, `FiberHandlerFunc` and `FiberApp` keep the order `net/http` received a header's repeated lines in for `c.IP()`, `c.Scheme()` and the proxy middleware, even after a header line was removed: removing one could move a front proxy's `X-Forwarded-For` line in front of the client's."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/adaptor.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#78",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/adaptor.md#1",
+    "b": "fiber:docs/whats_new.md#78",
+    "relation": "overlapping",
+    "related": 0.9986,
+    "probabilities": {
+     "same": 0.0039,
+     "overlapping": 0.9923,
+     "conflicting": 0.0025,
+     "unrelated": 0.0014
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 94,
+   "passages": 1,
+   "counterparts_ms": 53
+  },
+  "timing": {
+   "read_ms": 178,
+   "total_ms": 182
+  }
+ }
+}

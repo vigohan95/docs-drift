@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/7e/7ed8b4d021abde0fc4ff",
+ "request_hash": "7ed8b4d021abde0fc4ffc65ff608d5308e209f844de6ebb721762b0f9446904e",
+ "recorded_at": "2026-11-06T14:41:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 912,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.921055",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=208"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#1",
+    "text": "## Serializing data\n\nPydantic allows models (and any other type using [type adapters](./type_adapter.md)) to be serialized in *two* modes:\n[Python](#python-mode) and [JSON](#json-mode). The Python output may contain non-JSON serializable data (although this\ncan be emulated).\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#modelmodel_dump}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#15",
+    "text": "These constraints can be provided using the [`Field()`][pydantic.Field] function.\nThe `Le`, `Ge`, `Lt`, `Gt` and `MultipleOf` metadata types from the [`annotated-types`](https://github.com/annotated-types/annotated-types)\nlibrary and the [`AllowInfNan`][pydantic.types.AllowInfNan] type can also be used.\n\n<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`decimal.Decimal`][] instances are accepted. In JSON mode, strict mode has no effect.\n\n<h4>Serialization</h4>\n\nIn [Python mode](../concepts/serialization.md#python-mode), [`Decimal`][decimal.Decimal] instances are\nserialized as is.\n\nIn [JSON mode](../concepts/serialization.md#json-mode), they are serialized as strings.\nA [serializer](../concepts/serialization.md#field-plain-serializer) can be used to override this behavior:\n\n```python\nfrom decimal import Decimal\nfrom typing import Annotated\n\nfrom pydantic import BaseModel, PlainSerializer\n\n\nclass Model(BaseModel):\n    f: Annotated[Decimal, PlainSerializer(float, when_used='json')]\n\n\nmy_model = Model(f=Decimal('2.1'))\n\nprint(my_model.model_dump())  # (1)!\n#> {'f': Decimal('2.1')}\nprint(my_model.model_dump_json())  # (2)!\n#> {\"f\":2.1}\n```\n\n1. In Python mode, `f`remains a [`Decimal`][decimal.Decimal] instance.\n2. In JSON mode, `f` is serialized as a float.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#complex}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#1",
+    "b": "pydantic:docs/api/standard_library_types.md#15",
+    "relation": "overlapping",
+    "related": 0.9913,
+    "probabilities": {
+     "same": 0.0057,
+     "overlapping": 0.9794,
+     "conflicting": 0.0063,
+     "unrelated": 0.0087
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 96,
+   "total_ms": 98
+  }
+ }
+}

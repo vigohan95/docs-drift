@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/72/728ed2ca61ec38ff6a40",
+ "request_hash": "728ed2ca61ec38ff6a40a24cef09f40b427b28ff92480dd5b11fb0b7f293633f",
+ "recorded_at": "2026-11-06T14:39:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1383,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "226.783878",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=460"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/static.md#8",
+    "text": "### SPA (Single Page Application)\n\n```go\napp.Use(\"/web\", static.New(\"\", static.Config{\n    FS: os.DirFS(\"dist\"),\n}))\n\napp.Get(\"/web*\", func(c fiber.Ctx) error {\n    return c.SendFile(\"dist/index.html\")\n})\n```\n\n<details>\n<summary>Test</summary>\n\n```sh\ncurl http://localhost:3000/web/css/style.css\ncurl http://localhost:3000/web/index.html\ncurl http://localhost:3000/web\n```\n\n</details>\n\n:::caution\nTo define static routes using `Get`, append the wildcard (`*`) operator at the end of the route. Under a `/static*` or `/static+` route the rest of the path must start at a segment boundary, so `/static-v2/app.js` or `/staticapp.js` are no longer served; only `/static` and paths below `/static/` are.\n\nA route whose first parameter is a wildcard strips the text before it, as `/static*` does: under `/assets/*.js` the path `/assets/app.js` serves `app.js`. After a named parameter, a directory root takes the file name from the wildcard that ends the route: under `/:lang/*` the path `/en/app.js` serves `app.js`. A parameter there that matched an empty segment, as in `//app.js` under `/:lang?/*`, is answered with `404 Not Found`, as an empty first segment is on a root mount. A route with a named parameter and no trailing wildcard, such as `app.Use(\"/:tenant\", ...)` or a sub-app mounted on it, does not tell where the file name starts, so a directory root serves nothing there; register it as `Get(\"/*\", ...)` inside the sub-app instead. A root that is a single file is served on such a route.\n:::"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#133",
+    "text": "#### Static\n\nSince we've removed `app.Static()`, you need to move methods to static middleware like the example below:\n\n```go\n// Before\napp.Static(\"/\", \"./public\")\napp.Static(\"/prefix\", \"./public\")\napp.Static(\"/prefix\", \"./public\", Static{\n    Index: \"index.htm\",\n})\napp.Static(\"*\", \"./public/index.html\")\n```\n\n```go\n// After\napp.Get(\"/*\", static.New(\"./public\"))\napp.Get(\"/prefix*\", static.New(\"./public\"))\napp.Get(\"/prefix*\", static.New(\"./public\", static.Config{\n    IndexNames: []string{\"index.htm\", \"index.html\"},\n}))\napp.Get(\"*\", static.New(\"./public/index.html\"))\n```\n\n:::caution\nYou have to put `*` to the end of the route if you don't define static route with `app.Use`. Under a `/prefix*` or `/prefix+` route such as `/static*`, only `/static` and paths below `/static/` are served; `/static-v2/app.js` or `/staticapp.js` are no longer served. A route whose first parameter is a wildcard strips the text before it (`/assets/*.js` serves `app.js` for `/assets/app.js`). After a named parameter, a directory root takes the file name from the trailing wildcard (`/:lang/*` serves `app.js` for `/en/app.js`, and `//app.js` under `/:lang?/*` is `404`), and on a route with a named parameter but no trailing wildcard it serves nothing.\n:::\n\nThe static middleware opens the name the router matched and does not percent-decode it a second time. Escapes the router keeps encoded, such as `%20`, stay encoded in the file name unless `UnescapePath` is enabled, and an escape of an unreserved character left in the routed path, which only a stray `%` can forge, is answered with `404` rather than decoded into a different file, so `/static/%%370rivate/secret.txt` never opens `private/secret.txt`. A path with an empty first segment, such as `//private/secret.txt` on a root mount, is `404` too, since the router keeps it apart from `/private/secret.txt`; [Static](./middleware/static.md) shows how to collapse a doubled slash for clients that send one. On Windows a path segment ending in a dot or a space is `404` as well, since the OS strips both when it opens a file. With `StrictRouting`, which keeps `/x` and `/x/` apart, a directory requested without its trailing slash is redirected to it with `302 Found` and a file requested with one is `404`. With `Browse`, a directory listing links below the routed path rather than the request target; on a route whose prefix holds a parameter, such as `/:lang/*`, the file cache is then off for files and listings alike, and a prefix that holds `%`, `\\`, `?`, `#` or a control character is `404`. See [Static](./middleware/static.md)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/static.md#8",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#133"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#133",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/static.md#8"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/static.md#8",
+    "b": "fiber:docs/whats_new.md#133",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0041,
+     "overlapping": 0.9914,
+     "conflicting": 0.0028,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.3407,
+       "restated": 0.6301,
+       "elaborated": 0.0161,
+       "different": 0.0131
+      },
+      "confidence": 0.9869,
+      "a": {
+       "document": "fiber:docs/middleware/static.md#8",
+       "quote": "Under a `/static*` or `/static+` route the rest of the path must start at a segment boundary, so `/static-v2/app.js` or `/staticapp.js` are no longer served; only `/static` and paths below `/static/` are.",
+       "start": 494,
+       "end": 698,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#133",
+       "quote": "Under a `/prefix*` or `/prefix+` route such as `/static*`, only `/static` and paths below `/static/` are served; `/static-v2/app.js` or `/staticapp.js` are no longer served.",
+       "start": 680,
+       "end": 853,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0393,
+       "restated": 0.935,
+       "elaborated": 0.0139,
+       "different": 0.0117
+      },
+      "confidence": 0.9883,
+      "a": {
+       "document": "fiber:docs/middleware/static.md#8",
+       "quote": "A route whose first parameter is a wildcard strips the text before it, as `/static*` does: under `/assets/*.js` the path `/assets/app.js` serves `app.js`.",
+       "start": 700,
+       "end": 854,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#133",
+       "quote": "A route whose first parameter is a wildcard strips the text before it (`/assets/*.js` serves `app.js` for `/assets/app.js`).",
+       "start": 854,
+       "end": 978,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 118,
+   "passage_reads": 1,
+   "passages_ms": 120,
+   "passages": 2,
+   "counterparts_ms": 83
+  },
+  "timing": {
+   "read_ms": 321,
+   "total_ms": 324
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ab/ab532d5a4c9a8c55c695",
+ "request_hash": "ab532d5a4c9a8c55c69589be976526e2351bdb65b7f75809c5575d7eec7323ad",
+ "recorded_at": "2026-11-06T14:39:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1608,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "150.553146",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=274"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#139",
+    "text": "### End\n\nEnd immediately flushes the current response and closes the underlying connection.\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) End() error\nfunc (r fiber.Res) End() error\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func(c fiber.Ctx) error {\n    c.SendString(\"Hello World!\")\n    return c.End()\n})\n```\n\n:::caution\nCalling `c.End()` will disallow further writes to the underlying connection.\n:::\n\n:::warning\n`c.End()` does **not** work in streaming mode (e.g. when using `fasthttp`'s `HijackConn` or `SendStream`).\nIn streaming mode the connection is managed asynchronously and `ctx.Conn()` may return `nil`,\nso `c.End()` will return `nil` without flushing or closing the connection.\n:::\n\nEnd can be used to stop a middleware from modifying a response of a handler/other middleware down the method chain\nwhen they regain control after calling `c.Next()`.\n\n```go title=\"Example\"\n// Error Logging/Responding middleware\napp.Use(func(c fiber.Ctx) error {\n    err := c.Next()\n\n    // Log errors & write the error to the response\n    if err != nil {\n        log.Printf(\"Got error in middleware: %v\", err)\n        return c.SendString(fmt.Sprintf(\"(got error %v)\", err))\n    }\n\n    // No errors occurred\n    return nil\n})\n\n// Handler with simulated error\napp.Get(\"/\", func(c fiber.Ctx) error {\n    // Closes the connection instantly after writing from this handler\n    // and disallow further modification of its response\n    defer c.End()\n\n    c.SendString(\"Hello, ... I forgot what comes next!\")\n    return errors.New(\"some error\")\n})\n```"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#41",
+    "text": "### New Methods\n\n- **AutoFormat**: Similar to Express.js, automatically formats the response based on the request's `Accept` header.\n- **Deadline**: For implementing `context.Context`.\n- **Done**: For implementing `context.Context`.\n- **Err**: For implementing `context.Context`.\n- **Host**: Similar to Express.js, returns the host name of the request.\n- **Port**: Similar to Express.js, returns the port number of the request.\n- **IsProxyTrusted**: Checks the trustworthiness of the remote IP.\n- **Reset**: Resets context fields for server handlers.\n- **Scheme**: Similar to Express.js, returns the scheme (`http` or `https`) of the request.\n- **SendEarlyHints**: Sends `HTTP 103 Early Hints` status code with `Link` headers so browsers can preload resources while the final response is being prepared.\n- **SendStream**: Similar to Express.js, sends a stream as the response.\n- **SendStreamWriter**: Sends a stream using a writer function.\n- **SendString**: Similar to Express.js, sends a string as the response.\n- **String**: Similar to Express.js, converts a value to a string.\n- **Value**: For implementing `context.Context`. Returns request-scoped value from Locals.\n- **Context()**: Returns a `context.Context` that can be used outside the handler.\n- **SetContext**: Sets the base `context.Context` returned by `Context()` for propagating deadlines or values.\n- **SetLocal**: Stores a request-scoped value like `Locals(key, value)`, without building the one-element slice the variadic call allocates through the `Ctx` interface.\n- **ViewBind**: Binds data to a view, replacing the old `Bind` method.\n- **CBOR**: Introducing [CBOR](https://cbor.io/) binary encoding format for both request & response body. CBOR is a binary data serialization format which is both compact and efficient, making it ideal for use in web applications.\n- **MsgPack**: Introducing [MsgPack](https://msgpack.org/) binary encoding format for both request & response body. MsgPack is a binary serialization format that is more efficient than JSON, making it ideal for high-performance applications.\n- **Drop**: Terminates the client connection silently without sending any HTTP headers or response body. This can be used for scenarios where you want to block certain requests without notifying the client, such as mitigating DDoS attacks or protecting sensitive endpoints from unauthorized access.\n- **End**: Similar to Express.js, immediately flushes the current response and closes the underlying connection.\n- **AcceptsLanguagesExtended**: Matches language ranges using RFC 4647 Extended Filtering with wildcard subtags.\n- **FullURL**: Returns the full request URL (scheme + host + original URL).\n- **RequestID**: Returns the request identifier from the response or request headers.\n- **UserAgent**: Returns the `User-Agent` request header.\n- **Referer**: Returns the `Referer` request header.\n- **AcceptLanguage**: Returns the `Accept-Language` request header.\n- **AcceptEncoding**: Returns the `Accept-Encoding` request header.\n- **HasHeader**: Reports whether the request includes a header with the given key.\n- **HasHeaderValue**: Reports whether a comma-separated request header such as `Cache-Control` lists a member on any of its field lines, case-insensitively and respecting quoted arguments.\n- **MediaType**: Returns the MIME type from the `Content-Type` header without parameters.\n- **Charset**: Returns the `charset` parameter from the `Content-Type` header, or an empty string when the first `charset` value is not a valid token."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#139",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#41",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#139",
+    "b": "fiber:docs/whats_new.md#41",
+    "relation": "overlapping",
+    "related": 0.9966,
+    "probabilities": {
+     "same": 0.0105,
+     "overlapping": 0.9817,
+     "conflicting": 0.0044,
+     "unrelated": 0.0034
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 39,
+   "passage_reads": 1,
+   "passages_ms": 119,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 158,
+   "total_ms": 161
+  }
+ }
+}

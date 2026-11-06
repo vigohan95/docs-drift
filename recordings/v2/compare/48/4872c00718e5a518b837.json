@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/48/4872c00718e5a518b837",
+ "request_hash": "4872c00718e5a518b837ae80ac5b28965ee47439546cc7c93fb3b49a5c14a185",
+ "recorded_at": "2026-11-06T14:42:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2845,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "131.661663",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=262"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#20",
+    "text": "#### `@validate_arguments` has been renamed to `@validate_call`\n\nIn Pydantic V2, the `@validate_arguments` decorator has been renamed to `@validate_call`.\n\nIn Pydantic V1, the decorated function had various attributes added, such as `raw_function`, and `validate`\n(which could be used to validate arguments without actually calling the decorated function). Due to limited use of\nthese attributes, and performance-oriented changes in implementation, we have not preserved this functionality in\n`@validate_call`."
+   },
+   {
+    "id": "pydantic:docs/concepts/experimental.md#16",
+    "text": "## Validation of a callable's arguments\n\nPydantic provides the [`@validate_call`][pydantic.validate_call] decorator to perform validation on the provided\narguments (and additionally return type) of a callable. However, it only allows arguments to be provided\nby actually calling the decorated callable. In some situations, you may want to just *validate* the arguments,\nsuch as when loading from other data sources such as JSON data.\n\nFor this reason, the experimental [`generate_arguments_schema()`][pydantic.experimental.arguments_schema.generate_arguments_schema]\nfunction can be used to construct a core schema, which can later be used with a [`SchemaValidator`][pydantic_core.SchemaValidator].\n\n```python\nfrom pydantic_core import SchemaValidator\n\nfrom pydantic.experimental.arguments_schema import generate_arguments_schema\n\n\ndef func(p: bool, *args: str, **kwargs: int) -> None: ...\n\n\narguments_schema = generate_arguments_schema(func=func)\n\nval = SchemaValidator(arguments_schema, config={'coerce_numbers_to_str': True})\n\nargs, kwargs = val.validate_json(\n    '{\"p\": true, \"args\": [\"arg1\", 1], \"kwargs\": {\"extra\": 1}}'\n)\nprint(args, kwargs)  # (1)!\n#> (True, 'arg1', '1') {'extra': 1}\n```\n\n1. If you want the validated arguments as a dictionary, you can use the [`Signature.bind()`][inspect.Signature.bind]\n   method:"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#20",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/concepts/experimental.md#16"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/experimental.md#16",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/migration.md#20"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#20",
+    "b": "pydantic:docs/concepts/experimental.md#16",
+    "relation": "overlapping",
+    "related": 0.9912,
+    "probabilities": {
+     "same": 0.0072,
+     "overlapping": 0.9785,
+     "conflicting": 0.0054,
+     "unrelated": 0.0088
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0184,
+       "restated": 0.5784,
+       "elaborated": 0.0969,
+       "different": 0.3063
+      },
+      "confidence": 0.6937,
+      "a": {
+       "document": "pydantic:docs/migration.md#20",
+       "quote": "these attributes, and performance-oriented changes in implementation, we have not preserved this functionality in",
+       "start": 379,
+       "end": 492,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/concepts/experimental.md#16",
+       "quote": "However, it only allows arguments to be provided\nby actually calling the decorated callable.",
+       "start": 210,
+       "end": 302,
+       "confidence": 0.997
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 69,
+   "passages": 1,
+   "counterparts_ms": 45
+  },
+  "timing": {
+   "read_ms": 138,
+   "total_ms": 141
+  }
+ }
+}

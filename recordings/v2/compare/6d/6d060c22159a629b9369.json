@@ -1,0 +1,213 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6d/6d060c22159a629b9369",
+ "request_hash": "6d060c22159a629b936924e1000ae7326c03d373cf06032514e88cefb1cea7dc",
+ "recorded_at": "2026-11-06T14:42:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1904,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "227.669859",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=365"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/integrations/logfire.md#1",
+    "text": "## Record failed validations\n\nYou need a [free Logfire account](https://logfire.pydantic.dev/login) and project. From your project\ndirectory, install the SDK and sign in:\n\n```bash\npip install logfire\nlogfire auth\n```\n\nCall `instrument_pydantic()` before defining or importing the models you want to monitor:\n\n```python {test=\"skip\"}\nfrom datetime import date\n\nimport logfire\n\nfrom pydantic import BaseModel\n\nlogfire.configure()\nlogfire.instrument_pydantic(record='failure')  # (1)!\n\n\nclass User(BaseModel):\n    name: str\n    country_code: str\n    dob: date\n\n\nUser(name='Anne', country_code='USA', dob='not-a-date')  # (2)!\n```\n\n1. Successful validations stay as aggregate metrics. Failed validations create individual warning\n   records with their structured errors.\n2. Run the example and choose or create a Logfire project when prompted. The invalid date produces\n   a warning record in Logfire's Live view.\n\n!!! warning \"Review validation data before exporting it\"\n    Failed-validation records contain the rejected values from Pydantic's structured errors. Logfire\n    [scrubs common sensitive values](https://pydantic.dev/docs/logfire/instrument/scrubbing/) before\n    export, but Logfire stores every rejected value under the key `input` inside the serialized\n    `errors` attribute, separately from its field path. If those values can contain secrets or personal\n    data, pass `scrubbing=logfire.ScrubbingOptions(extra_patterns=[r'(?:^input$|\"input\"\\s*:)'])` to\n    `logfire.configure()`. The two alternatives tell the scrubber to inspect serialized validation\n    errors and redact every value whose exact key is `input`; neither refers to your model's field\n    names. Alternatively, use `record='metrics'` so individual failures are not exported.\n\n![A failed Pydantic validation recorded in the Logfire live view](../img/logfire-validation-live-view.png)\n\nOpen the warning to inspect the rejected values, error type and field path, and any request or job\ntrace active when validation ran. For a deeper walkthrough, see\n[Troubleshooting Validation Errors](../errors/troubleshooting.md)."
+   },
+   {
+    "id": "pydantic:docs/errors/troubleshooting.md#2",
+    "text": "To see where a rejected value came from, instrument the part of the application that feeds the model\nas well. Logfire's [framework and library integrations](https://pydantic.dev/docs/logfire/integrations/)\nput the failed-validation record inside the active request, task, or job trace. You can then follow the\nsame trace across the caller, model validation, database work, and response instead of reconstructing\nthe path from separate logs.\n\n!!! warning \"Review validation data before exporting it\"\n    Failed-validation records contain the rejected values from Pydantic's structured errors. The\n    Logfire SDK [scrubs common sensitive values](https://pydantic.dev/docs/logfire/instrument/scrubbing/)\n    before export, but Logfire stores every rejected value under the key `input` inside the serialized\n    `errors` attribute, separately from its field path. If those values can contain secrets or personal\n    data, pass `scrubbing=logfire.ScrubbingOptions(extra_patterns=[r'(?:^input$|\"input\"\\s*:)'])` to\n    `logfire.configure()`. The two alternatives tell the scrubber to inspect serialized validation\n    errors and redact every value whose exact key is `input`; neither refers to your model's field\n    names. Alternatively, use `record='metrics'` so individual failures are not exported.\n\n![A failed Pydantic validation recorded in the Logfire live view](../img/logfire-validation-live-view.png)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/integrations/logfire.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/errors/troubleshooting.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/errors/troubleshooting.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/integrations/logfire.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/integrations/logfire.md#1",
+    "b": "pydantic:docs/errors/troubleshooting.md#2",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0096,
+     "overlapping": 0.9835,
+     "conflicting": 0.0052,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9907,
+       "restated": 0.0032,
+       "elaborated": 0.0035,
+       "different": 0.0026
+      },
+      "confidence": 0.9974,
+      "a": {
+       "document": "pydantic:docs/integrations/logfire.md#1",
+       "quote": "!!!",
+       "start": 911,
+       "end": 914,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/errors/troubleshooting.md#2",
+       "quote": "warning \"Review validation data before exporting it\"\n    Failed-validation records contain the rejected values from Pydantic's structured errors.",
+       "start": 446,
+       "end": 591,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.99,
+       "restated": 0.0031,
+       "elaborated": 0.0037,
+       "different": 0.0032
+      },
+      "confidence": 0.9968,
+      "a": {
+       "document": "pydantic:docs/integrations/logfire.md#1",
+       "quote": "export, but Logfire stores every rejected value under the key `input` inside the serialized",
+       "start": 1174,
+       "end": 1265,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/errors/troubleshooting.md#2",
+       "quote": "The\n    Logfire SDK [scrubs common sensitive values](https://pydantic.dev/docs/logfire/instrument/scrubbing/)\n    before export, but Logfire stores every rejected value under the key `input` inside the serialized\n    `errors` attribute, separately from its field path.",
+       "start": 592,
+       "end": 860,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9902,
+       "restated": 0.0032,
+       "elaborated": 0.0035,
+       "different": 0.0031
+      },
+      "confidence": 0.9969,
+      "a": {
+       "document": "pydantic:docs/integrations/logfire.md#1",
+       "quote": "If those values can contain secrets or personal",
+       "start": 1322,
+       "end": 1369,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/errors/troubleshooting.md#2",
+       "quote": "If those values can contain secrets or personal\n    data, pass `scrubbing=logfire.ScrubbingOptions(extra_patterns=[r'(?:^input$|\"input\"\\s*:)'])` to\n    `logfire.configure()`.",
+       "start": 861,
+       "end": 1035,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9902,
+       "restated": 0.0037,
+       "elaborated": 0.0031,
+       "different": 0.003
+      },
+      "confidence": 0.997,
+      "a": {
+       "document": "pydantic:docs/integrations/logfire.md#1",
+       "quote": "The two alternatives tell the scrubber to inspect serialized validation",
+       "start": 1497,
+       "end": 1568,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/errors/troubleshooting.md#2",
+       "quote": "The two alternatives tell the scrubber to inspect serialized validation\n    errors and redact every value whose exact key is `input`; neither refers to your model's field\n    names.",
+       "start": 1036,
+       "end": 1217,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9827,
+       "restated": 0.0066,
+       "elaborated": 0.0061,
+       "different": 0.0045
+      },
+      "confidence": 0.9955,
+      "a": {
+       "document": "pydantic:docs/integrations/logfire.md#1",
+       "quote": "Alternatively, use `record='metrics'` so individual failures are not exported.",
+       "start": 1679,
+       "end": 1757,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/errors/troubleshooting.md#2",
+       "quote": "Alternatively, use `record='metrics'` so individual failures are not exported.\n\n![A failed Pydantic validation recorded in the Logfire live view](../img/logfire-validation-live-view.png)",
+       "start": 1218,
+       "end": 1404,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 94,
+   "passages": 5,
+   "counterparts_ms": 110
+  },
+  "timing": {
+   "read_ms": 236,
+   "total_ms": 239
+  }
+ }
+}

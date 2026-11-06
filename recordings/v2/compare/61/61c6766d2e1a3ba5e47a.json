@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/61/61c6766d2e1a3ba5e47a",
+ "request_hash": "61c6766d2e1a3ba5e47ab7cb0e38e0157780ae95016c1e34711329009f9dbaeb",
+ "recorded_at": "2026-11-06T14:37:25Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1357,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "196.393635",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=337"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#55",
+    "text": "### resolveFileUrl\n\n|  |  |\n| --: | :-- |\n| Type: | `ResolveFileUrlHook` |\n| Kind: | sync, first |\n| Previous: | [`renderDynamicImport`](#renderdynamicimport) for each dynamic import expression in the current chunk |\n| Next: | [`banner`](#banner), [`footer`](#footer), [`intro`](#intro), [`outro`](#outro) in parallel for the current chunk |\n\n```typescript\ntype ResolveFileUrlHook = (options: {\n\tattributes: Record<string, string>;\n\tchunkId: string;\n\tfileName: string;\n\tformat: InternalModuleFormat;\n\tmoduleId: string;\n\treferenceId: string;\n\trelativePath: string;\n}) => string | NullValue;\n```\n\nAllows to customize how Rollup resolves URLs of files that were emitted by plugins via `this.emitFile`. By default, Rollup will generate code for `import.meta.ROLLUP_FILE_URL_referenceId` that should correctly generate absolute URLs of emitted files independent of the output format and the host system where the code is deployed.\n\nFor that, all formats except CommonJS and UMD assume that they run in a browser environment where `URL` and `document` are available. In case that fails or to generate more optimized code, this hook can be used to customize this behaviour. To do that, the following information is available:\n\n- `attributes`: The import attributes of the module that references this file.\n- `chunkId`: The id of the chunk this file is referenced from. If the chunk file name would contain a hash, this id will contain a placeholder instead. Rollup will replace this placeholder with the actual file name if it ends up in the generated code.\n- `fileName`: The path and file name of the emitted file, relative to `output.dir` without a leading `./`. Again if this is a chunk that would have a hash in its name, it will contain a placeholder instead.\n- `format`: The rendered output format.\n- `moduleId`: The id of the original module this file is referenced from. Useful for conditionally resolving certain assets differently.\n- `referenceId`: The reference id of the file.\n- `relativePath`: The path and file name of the emitted file, relative to the chunk the file is referenced from. This will path will contain no leading `./` but may contain a leading `../`."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#91",
+    "text": "## File URLs\n\nTo reference a file URL reference from within JS code, use the `import.meta.ROLLUP_FILE_URL_referenceId` replacement. This will generate code that depends on the output format and generates a URL that points to the emitted file in the target environment. Note that all formats except CommonJS and UMD assume that they run in a browser environment where `URL` and `document` are available.\n\nThe following example will detect imports of `.svg` files, emit the imported files as assets, and return their URLs to be used e.g. as the `src` attribute of an `img` tag:\n\n```js twoslash\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nfunction svgResolverPlugin() {\n\treturn {\n\t\tname: 'svg-resolver',\n\t\tresolveId(source, importer) {\n\t\t\tif (source.endsWith('.svg')) {\n\t\t\t\treturn path.resolve(path.dirname(importer), source);\n\t\t\t}\n\t\t},\n\t\tload(id) {\n\t\t\tif (id.endsWith('.svg')) {\n\t\t\t\tconst referenceId = this.emitFile({\n\t\t\t\t\ttype: 'asset',\n\t\t\t\t\tname: path.basename(id),\n\t\t\t\t\tsource: fs.readFileSync(id)\n\t\t\t\t});\n\t\t\t\treturn `export default import.meta.ROLLUP_FILE_URL_${referenceId};`;\n\t\t\t}\n\t\t}\n\t};\n}\n```\n\nUsage:\n\n```js\nimport logo from '../images/logo.svg';\nconst image = document.createElement('img');\nimage.src = logo;\ndocument.body.appendChild(image);\n```\n\nSometimes, the code which referenced this asset is only used conditionally like in the following example:"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#55",
+    "duplicates": [],
+    "overlaps": [
+     "rollup:docs/plugin-development/index.md#91"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#91",
+    "duplicates": [],
+    "overlaps": [
+     "rollup:docs/plugin-development/index.md#55"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/plugin-development/index.md#55",
+    "b": "rollup:docs/plugin-development/index.md#91",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0056,
+     "overlapping": 0.989,
+     "conflicting": 0.0037,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0093,
+       "restated": 0.972,
+       "elaborated": 0.0093,
+       "different": 0.0093
+      },
+      "confidence": 0.9907,
+      "a": {
+       "document": "rollup:docs/plugin-development/index.md#55",
+       "quote": "By default, Rollup will generate code for `import.meta.ROLLUP_FILE_URL_referenceId` that should correctly generate absolute URLs of emitted files independent of the output format and the host system where the code is deployed.",
+       "start": 699,
+       "end": 925,
+       "confidence": 1
+      },
+      "b": {
+       "document": "rollup:docs/plugin-development/index.md#91",
+       "quote": "## File URLs\n\nTo reference a file URL reference from within JS code, use the `import.meta.ROLLUP_FILE_URL_referenceId` replacement.",
+       "start": 0,
+       "end": 131,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0126,
+       "restated": 0.9482,
+       "elaborated": 0.0236,
+       "different": 0.0156
+      },
+      "confidence": 0.9844,
+      "a": {
+       "document": "rollup:docs/plugin-development/index.md#55",
+       "quote": "By default, Rollup will generate code for `import.meta.ROLLUP_FILE_URL_referenceId` that should correctly generate absolute URLs of emitted files independent of the output format and the host system where the code is deployed.",
+       "start": 699,
+       "end": 925,
+       "confidence": 1
+      },
+      "b": {
+       "document": "rollup:docs/plugin-development/index.md#91",
+       "quote": "This will generate code that depends on the output format and generates a URL that points to the emitted file in the target environment.",
+       "start": 132,
+       "end": 268,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0208,
+       "restated": 0.8847,
+       "elaborated": 0.0336,
+       "different": 0.0609
+      },
+      "confidence": 0.9391,
+      "a": {
+       "document": "rollup:docs/plugin-development/index.md#55",
+       "quote": "For that, all formats except CommonJS and UMD assume that they run in a browser environment where `URL` and `document` are available.",
+       "start": 927,
+       "end": 1060,
+       "confidence": 1
+      },
+      "b": {
+       "document": "rollup:docs/plugin-development/index.md#91",
+       "quote": "Note that all formats except CommonJS and UMD assume that they run in a browser environment where `URL` and `document` are available.\n\nThe following example will detect imports of `.svg` files, emit the imported files as assets, and return their URLs to be used e.g. as the `src` attribute of an `img` tag:\n\n```js twoslash\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nfunction svgResolverPlugin() {\n\treturn {\n\t\tname: 'svg-resolver',\n\t\tresolveId(source, importer) {\n\t\t\tif (source.endsWith('.svg')) {\n\t\t\t\treturn path.resolve(path.dirname(importer), source);\n\t\t\t}\n\t\t},\n\t\tload(id) {\n\t\t\tif (id.endsWith('.svg')) {\n\t\t\t\tconst referenceId = this.emitFile({\n\t\t\t\t\ttype: 'asset',\n\t\t\t\t\tname: path.basename(id),\n\t\t\t\t\tsource: fs.readFileSync(id)\n\t\t\t\t});\n\t\t\t\treturn `export default import.meta.ROLLUP_FILE_URL_${referenceId};`;\n\t\t\t}\n\t\t}\n\t};\n}\n```\n\nUsage:\n\n```js\nimport logo from '../images/logo.svg';\nconst image = document.createElement('img');\nimage.src = logo;\ndocument.body.appendChild(image);\n```\n\nSometimes, the code which referenced this asset is only used conditionally like in the following example:",
+       "start": 269,
+       "end": 1395,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 3,
+   "counterparts_ms": 89
+  },
+  "timing": {
+   "read_ms": 205,
+   "total_ms": 210
+  }
+ }
+}

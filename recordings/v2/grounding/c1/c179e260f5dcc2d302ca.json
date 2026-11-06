@@ -1,0 +1,76 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/c1/c179e260f5dcc2d302ca",
+ "request_hash": "c179e260f5dcc2d302cab31b030d6bee06a606e808d3fef27195def05a679536",
+ "recorded_at": "2026-11-06T14:40:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3725,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "88.046017",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=220"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "text": "## Config\n\n| Property | Type                  | Description                                           | Default    |\n|:---------|:----------------------|:------------------------------------------------------|:-----------|\n| Next     | `func(fiber.Ctx) bool` | Skip when function returns `true`.                    | `nil`      |\n| RuleList | `[]Rule`          | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures. | nil |\n| Rules    | `map[string]string`   | **Deprecated.** Use `RuleList`. A map has no order, so precedence is decided by a heuristic. | nil |\n\nSet one of `RuleList` or `Rules`. With neither, the middleware rewrites nothing.\n\nA rule's `From` is path text: `*` matches a run of any bytes but a newline, and\nevery other byte stands for itself, so `/preis-1.000-euro` rewrites that path\nand not `/preis-1X000-euro`. There is no escape for a literal `*`.\n\nA rule matches the whole path, trailing slash and letter case included: `/old` rewrites `/old`, but not `/old/`, `/OLD`, `/old/x` or `/very/old`.\n\nIn `To`, `$1`, `$2` and so on stand for what the asterisks of `From` captured, in order. `$10` is the tenth capture in a rule with ten or more asterisks; in a rule with fewer it reads as `$1` followed by `0`.\n\nSetting both `RuleList` and `Rules` panics.\n\nRules match `c.Path()`, the path as the router normalized it, and the rewritten\npath goes through the same normalization. With `UnescapePath` that path is the\ndecoded one, so a capture is escaped again before it is inserted: the `%2e%2e`\nthat `/files/%252e%252e/secret` decoded to stays that name in `/public/$1`\nrather than being decoded a second time into `..` and resolving out of\n`/public/`.\n\nA capture cannot add a `.` or `..` segment either. `{From: \"/@*\", To: \"/users/$1\"}`\ncuts `../admin` out of `/@../admin`, a path with no dot segment for the router to\nresolve, so a rewritten path holding more dot segments than `To` itself is not\nused: the next rule is tried and the path stays as it was. `%2e` counts as a dot\nthere, and a backslash, `%2f` and `%5c` as a slash."
+   }
+  ],
+  "answer": "`From` reaches the compiled pattern as a regular expression, so the other regexp metacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also matches `/fa`.",
+  "claims": [
+   "`From` reaches the compiled pattern as a regular expression, so the other regexp metacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also matches `/fa`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0115,
+  "ungrounded": 0.9885,
+  "verdict": "contradicted",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "share": 1,
+    "share_of_answer": 0.0115,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "`From` reaches the compiled pattern as a regular expression, so the other regexp metacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also matches `/fa`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0115,
+    "contradicted": 0.9024,
+    "not_stated": 0.0775,
+    "not_a_claim": 0.0086,
+    "verdict": "contradicted",
+    "sources": {
+     "fiber:docs/middleware/rewrite.md#2": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0115
+  },
+  "timing": {
+   "read_ms": 94,
+   "total_ms": 96
+  }
+ }
+}

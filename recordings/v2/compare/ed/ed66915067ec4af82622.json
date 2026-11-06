@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ed/ed66915067ec4af82622",
+ "request_hash": "ed66915067ec4af82622e2ee9d0802aa1a4f3a5c12dea59364f68513866a0bfe",
+ "recorded_at": "2026-11-06T14:37:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1978,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "146.802557",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=285"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/command-line-interface/index.md#6",
+    "text": "## Differences to the JavaScript API\n\nWhile config files provide an easy way to configure Rollup, they also limit how Rollup can be invoked and configured. Especially if you are bundling Rollup into another build tool or want to integrate it into an advanced build process, it may be better to directly invoke Rollup programmatically from your scripts.\n\nIf you want to switch from config files to using the [JavaScript API](../javascript-api/index.md) at some point, there are some important differences to be aware of:\n\n- When using the JavaScript API, the configuration passed to `rollup.rollup` must be an object and cannot be wrapped in a Promise or a function.\n- You can no longer use an array of configurations. Instead, you should run `rollup.rollup` once for each set of `inputOptions`.\n- The `output` option will be ignored. Instead, you should run `bundle.generate(outputOptions)` or `bundle.write(outputOptions)` once for each set of `outputOptions`."
+   },
+   {
+    "id": "rollup:docs/javascript-api/index.md#1",
+    "text": "## rollup.rollup\n\nThe `rollup.rollup` function receives an input options object as parameter and returns a Promise that resolves to a `bundle` object with various properties and methods as shown below. During this step, Rollup will build the module graph and perform tree-shaking, but will not generate any output.\n\nOn a `bundle` object, you can call `bundle.generate` multiple times with different output options objects to generate different bundles in-memory. If you directly want to write them to disk, use `bundle.write` instead.\n\nOnce you're finished with the `bundle` object, you should call `bundle.close()`, which will let plugins clean up their external processes or services via the [`closeBundle`](../plugin-development/index.md#closebundle) hook.\n\nIf an error occurs at either stage, it will return a Promise rejected with an Error, which you can identify via their `code` property. Besides `code` and `message`, many errors have additional properties you can use for custom reporting, see [`utils/logs.ts`](https://github.com/rollup/rollup/blob/master/src/utils/logs.ts) for a complete list of errors and logs together with their codes and properties.\n\n<!-- prettier-ignore-start -->\n```javascript twoslash\nimport { rollup } from 'rollup';\n\n// see below for details on these options\n// ---cut-start---\n/** @type {import('rollup').InputOptions} */\n// ---cut-end---\nconst inputOptions = {\n\t/* ... */\n};\n\n// you can create multiple outputs from the same input to generate e.g.\n// different formats like CommonJS and ESM\n// ---cut-start---\n/** @type {import('rollup').OutputOptions[]} */\n// ---cut-end---\nconst outputOptionsList = [\n\t{\n\t\t/* ... */\n\t},\n\t{\n\t\t/* ... */\n\t}\n];\n\nbuild();\n\nasync function build() {\n// ---cut-start---\n\t/** @type {import('rollup').RollupBuild} */\n// ---cut-end---\n\tlet bundle;\n\tlet buildFailed = false;\n\ttry {\n\t\t// Create a bundle. If you are using TypeScript or a runtime that\n\t\t// supports it, you can write\n\t\t//\n\t\t// await using bundle = await rollup(inputOptions);\n\t\t//\n\t\t// instead and do not need to close the bundle explicitly below.\n\t\tbundle = await rollup(inputOptions);\n\n\t\t// an array of file names this bundle depends on\n\t\tconsole.log(bundle.watchFiles);"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/command-line-interface/index.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/javascript-api/index.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/command-line-interface/index.md#6",
+    "b": "rollup:docs/javascript-api/index.md#1",
+    "relation": "overlapping",
+    "related": 0.9957,
+    "probabilities": {
+     "same": 0.0147,
+     "overlapping": 0.9745,
+     "conflicting": 0.0065,
+     "unrelated": 0.0043
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 122,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 155,
+   "total_ms": 159
+  }
+ }
+}

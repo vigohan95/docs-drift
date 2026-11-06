@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/e5/e577808aca8aeb60e8cd",
+ "request_hash": "e577808aca8aeb60e8cdd33fe93db49aabe69f7230201ebaf5887752e44683ae",
+ "recorded_at": "2026-11-06T14:43:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3981,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "100.23629",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=225"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/unions.md#11",
+    "text": "## Union Validation Errors\n\nWhen union validation fails, error messages can be quite verbose, as they will produce validation errors for\neach case in the union.\nThis is especially noticeable when dealing with recursive models, where reasons may be generated at each level of\nrecursion.\nDiscriminated unions help to simplify error messages in this case, as validation errors are only produced for\nthe case with a matching discriminator value.\n\nMaking sense of a union failure means working out which member *should* have matched. A\n[`ValidationError`][pydantic_core.ValidationError] includes each member's errors and rejected values;\nwhen the failure happens in a deployed service, [Logfire retains those details with the surrounding\ntrace](../errors/troubleshooting.md), so you can make that comparison after the fact.\n\nYou can also customize the error type, message, and context for a `Discriminator` by passing\nthese specifications as parameters to the `Discriminator` constructor, as seen in the example below.\n\n```python {lint=\"skip\"}\nfrom typing import Annotated\n\nfrom pydantic import BaseModel, Discriminator, Tag, ValidationError\n\n\n# Errors are quite verbose with a normal union:\nclass Model(BaseModel):\n    x: 'str | Model'\n\n\ntry:\n    Model.model_validate({'x': {'x': {'x': 1}}})\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    4 validation errors for Model\n    x.str\n      Input should be a valid string [type=string_type, input_value={'x': {'x': 1}}, input_type=dict]\n    x.Model.x.str\n      Input should be a valid string [type=string_type, input_value={'x': 1}, input_type=dict]\n    x.Model.x.Model.x.str\n      Input should be a valid string [type=string_type, input_value=1, input_type=int]\n    x.Model.x.Model.x.Model\n      Input should be a valid dictionary or instance of Model [type=model_type, input_value=1, input_type=int]\n    \"\"\"\n\ntry:\n    Model.model_validate({'x': {'x': {'x': {}}}})\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    4 validation errors for Model\n    x.str\n      Input should be a valid string [type=string_type, input_value={'x': {'x': {}}}, input_type=dict]\n    x.Model.x.str\n      Input should be a valid string [type=string_type, input_value={'x': {}}, input_type=dict]\n    x.Model.x.Model.x.str\n      Input should be a valid string [type=string_type, input_value={}, input_type=dict]\n    x.Model.x.Model.x.Model.x\n      Field required [type=missing, input_value={}, input_type=dict]\n    \"\"\""
+   }
+  ],
+  "answer": "with pytest.raises(TypeError): Model(x=1) ``` ### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details).",
+  "claims": [
+   "with pytest.raises(TypeError): Model(x=1) ```",
+   "### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details)."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0267,
+  "ungrounded": 0.9733,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/unions.md#11",
+    "share": 1,
+    "share_of_answer": 0.0267,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "with pytest.raises(TypeError): Model(x=1) ```",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.1779,
+    "supported": 0.004,
+    "contradicted": 0.0139,
+    "not_stated": 0.9729,
+    "not_a_claim": 0.0091,
+    "verdict": "not_stated",
+    "sources": {
+     "pydantic:docs/concepts/unions.md#11": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details).",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.8221,
+    "supported": 0.0315,
+    "contradicted": 0.0185,
+    "not_stated": 0.9345,
+    "not_a_claim": 0.0154,
+    "verdict": "not_stated",
+    "sources": {
+     "pydantic:docs/concepts/unions.md#11": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.004
+  },
+  "timing": {
+   "read_ms": 108,
+   "total_ms": 110
+  }
+ }
+}

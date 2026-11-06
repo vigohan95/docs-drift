@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b9/b935ee9767aec680e22c",
+ "request_hash": "b935ee9767aec680e22c383f8e70e9208fb2c7ceaf95cf1c48c5940785cffd9c",
+ "recorded_at": "2026-11-06T14:41:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1426,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "160.2031",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=397"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#4",
+    "text": "## Default values\n\nDefault values for fields can be provided using the normal assignment syntax or by providing a value\nto the `default` argument:\n\n```python\nfrom pydantic import BaseModel, Field\n\n\nclass User(BaseModel):\n    # Both fields aren't required:\n    name: str = 'John Doe'\n    age: int = Field(default=20)\n```\n\nYou can also pass a callable to the `default_factory` argument that will be called to generate a default value:\n\n```python\nfrom uuid import uuid4\n\nfrom pydantic import BaseModel, Field\n\n\nclass User(BaseModel):\n    id: str = Field(default_factory=lambda: uuid4().hex)\n```\n\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#default-factory-validated-data}\n\nThe default factory can also take a single required argument, in which case the already validated data will be passed as a dictionary.\n\n```python\nfrom pydantic import BaseModel, EmailStr, Field\n\n\nclass User(BaseModel):\n    email: EmailStr\n    username: str = Field(default_factory=lambda data: data['email'])\n\n\nuser = User(email='user@example.com')\nprint(user.username)\n#> user@example.com\n```\n\nThe `data` argument will *only* contain the already validated data, based on the [order of model fields](./models.md#field-ordering)\n(the above example would fail if `username` were to be defined before `email`).\n\n/// version-added | v2.10\nDefault factories can take already validated data as an argument.\n///\n\n/// version-added | v2.13\nDefault factories for [private attributes](./models.md#private-model-attributes) can take the validated data as an argument.\n///"
+   },
+   {
+    "id": "pydantic:docs/concepts/models.md#43",
+    "text": "### Private model attributes\n\n??? api \"API Documentation\"\n    [`pydantic.fields.PrivateAttr`][pydantic.fields.PrivateAttr]<br>\n\nAttributes whose name has a leading underscore are not treated as fields by Pydantic, and are not included in the\nmodel schema. Instead, these are converted into a \"private attribute\" which is not validated or even set during\ncalls to `__init__`, `model_validate`, etc.\n\nHere is an example of usage:\n\n```python\nfrom datetime import datetime\nfrom random import randint\nfrom typing import Any\n\nfrom pydantic import BaseModel, PrivateAttr\n\n\nclass TimeAwareModel(BaseModel):\n    _processed_at: datetime = PrivateAttr(default_factory=datetime.now)\n    _secret_value: str\n\n    def model_post_init(self, context: Any) -> None:\n        # this could also be done with `default_factory`:\n        self._secret_value = randint(1, 5)\n\n\nm = TimeAwareModel()\nprint(m._processed_at)\n#> 2032-01-02 03:04:05.000006\nprint(m._secret_value)\n#> 3\n```\n\nPrivate attribute names must start with underscore to prevent conflicts with model fields. However, dunder names\n(such as `__attr__`) are not supported, and will be completely ignored from the model definition.\n\n/// version-added | v2.13\nDefault factories can take the validated model data as an argument.\n///"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/models.md#43",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#4",
+    "b": "pydantic:docs/concepts/models.md#43",
+    "relation": "overlapping",
+    "related": 0.9951,
+    "probabilities": {
+     "same": 0.0281,
+     "overlapping": 0.9557,
+     "conflicting": 0.0113,
+     "unrelated": 0.0049
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 1,
+   "counterparts_ms": 57
+  },
+  "timing": {
+   "read_ms": 170,
+   "total_ms": 173
+  }
+ }
+}

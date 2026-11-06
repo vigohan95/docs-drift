@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6b/6bb0e6746a55c548812f",
+ "request_hash": "6bb0e6746a55c548812f75dc871f40f2def3c3b77b024e3686414105334346f1",
+ "recorded_at": "2026-11-06T14:38:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1923,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "107.748644",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=260"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/06-v4-migration-guide.md#4",
+    "text": "## Stricter types for Svelte functions\n\nThere are now stricter types for `createEventDispatcher`, `Action`, `ActionReturn`, and `onMount`:\n\n- `createEventDispatcher` now supports specifying that a payload is optional, required, or non-existent, and the call sites are checked accordingly ([#7224](https://github.com/sveltejs/svelte/issues/7224))\n\n```ts\n// @errors: 2554 2345\nimport { createEventDispatcher } from 'svelte';\n\nconst dispatch = createEventDispatcher<{\n\toptional: number | null;\n\trequired: string;\n\tnoArgument: null;\n}>();\n\n// Svelte version 3:\ndispatch('optional');\ndispatch('required'); // I can still omit the detail argument\ndispatch('noArgument', 'surprise'); // I can still add a detail argument\n\n// Svelte version 4 using TypeScript strict mode:\ndispatch('optional');\ndispatch('required'); // error, missing argument\ndispatch('noArgument', 'surprise'); // error, cannot pass an argument\n```\n\n- `Action` and `ActionReturn` have a default parameter type of `undefined` now, which means you need to type the generic if you want to specify that this action receives a parameter. The migration script will migrate this automatically ([#7442](https://github.com/sveltejs/svelte/pull/7442))\n\n```ts\n// @noErrors\n---const action: Action = (node, params) => { ... } // this is now an error if you use params in any way---\n+++const action: Action<HTMLElement, string> = (node, params) => { ... } // params is of type string+++\n```\n\n- `onMount` now shows a type error if you return a function asynchronously from it, because this is likely a bug in your code where you expect the callback to be called on destroy, which it will only do for synchronously returned functions ([#8136](https://github.com/sveltejs/svelte/issues/8136))\n\n```js\n// @noErrors\n// Example where this change reveals an actual bug\nonMount(\n---\t// someCleanup() not called because function handed to onMount is async\n\tasync () => {\n\t\tconst something = await foo();---\n+++\t// someCleanup() is called because function handed to onMount is sync\n\t() => {\n\t\tfoo().then(something => {...});\n\t\t// ...\n\t\treturn () => someCleanup();\n\t}\n);\n```"
+   },
+   {
+    "id": "svelte:documentation/docs/99-legacy/10-legacy-on.md#2",
+    "text": "## Component events\n\nComponents can dispatch events by creating a _dispatcher_ when they are initialised:\n\n```svelte\n<!--- file: Stepper.svelte -->\n<script>\n\timport { createEventDispatcher } from 'svelte';\n\tconst dispatch = createEventDispatcher();\n</script>\n\n<button on:click={() => dispatch('decrement')}>decrement</button>\n<button on:click={() => dispatch('increment')}>increment</button>\n```\n\n`dispatch` creates a [`CustomEvent`](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent). If a second argument is provided, it becomes the `detail` property of the event object.\n\nA consumer of this component can listen for the dispatched events:\n\n```svelte\n<script>\n\timport Stepper from './Stepper.svelte';\n\n\tlet n = 0;\n</script>\n\n<Stepper\n\ton:decrement={() => n -= 1}\n\ton:increment={() => n += 1}\n/>\n\n<p>n: {n}</p>\n```\n\nComponent events do not bubble — a parent component can only listen for events on its immediate children.\n\nOther than `once`, modifiers are not valid on component event handlers.\n\n> [!NOTE]\n> If you're planning an eventual migration to Svelte 5, use callback props instead. This will make upgrading easier as `createEventDispatcher` is deprecated:\n>\n> ```svelte\n> <!--- file: Stepper.svelte --->\n> <script>\n> \texport let decrement;\n> \texport let increment;\n> </script>\n>\n> <button on:click={decrement}>decrement</button>\n> <button on:click={increment}>increment</button>\n> ```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/06-v4-migration-guide.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/99-legacy/10-legacy-on.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/07-misc/06-v4-migration-guide.md#4",
+    "b": "svelte:documentation/docs/99-legacy/10-legacy-on.md#2",
+    "relation": "overlapping",
+    "related": 0.9962,
+    "probabilities": {
+     "same": 0.0083,
+     "overlapping": 0.9843,
+     "conflicting": 0.0036,
+     "unrelated": 0.0038
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 114,
+   "total_ms": 117
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e8/e8fbddbc4a1455698a2e",
+ "request_hash": "e8fbddbc4a1455698a2ebe29a83ab3a0cb7ddf863b2b1e37678d7feffefe9b27",
+ "recorded_at": "2026-11-06T14:41:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2522,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.389376",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=149"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#17",
+    "text": "## Immutability\n\nThe parameter `frozen` is used to emulate the frozen dataclass behaviour. It is used to prevent the field from being\nassigned a new value after the model is created (immutability).\n\nSee the [frozen dataclass documentation] for more details.\n\n```python\nfrom pydantic import BaseModel, Field, ValidationError\n\n\nclass User(BaseModel):\n    name: str = Field(frozen=True)\n    age: int\n\n\nuser = User(name='John', age=42)\n\ntry:\n    user.name = 'Jane'  # (1)!\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for User\n    name\n      Field is frozen [type=frozen_field, input_value='Jane', input_type=str]\n    \"\"\"\n```\n\n1. Since `name` field is frozen, the assignment is not allowed.\n\nFields can also be made immutable using the [`Final`][typing.Final] type qualifier (e.g. `name: Final[str]`).\nIf no type is provided (e.g. `name: Final = 'John'`), it is inferred from the default value.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#exclude}"
+   },
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "text": "### Python mode\n\nWhen using the Python mode, Pydantic models (and model-like types such as [dataclasses][]) (1) will be (recursively) converted to dictionaries. This is achievable by using the [`model_dump()`][pydantic.BaseModel.model_dump] method:\n{ .annotate }\n\n1. With the exception of [root models](./models.md#rootmodel-and-custom-root-types), where the root value is dumped directly.\n\n```python {group=\"python-dump\"}\nfrom pydantic import BaseModel, Field\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    banana: float | None = 1.1\n    foo: str = Field(serialization_alias='foo_alias')\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': (1, 2)})\n\n# returns a dictionary:\nprint(m.model_dump())\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': (1, 2)}}\n\nprint(m.model_dump(by_alias=True))\n#> {'banana': 3.14, 'foo_alias': 'hello', 'bar': {'whatever': (1, 2)}}\n```\n\nNotice that the value of `whatever` was dumped as tuple, which isn't a known JSON type. The `mode` argument can be set to `'json'`\nto ensure JSON-compatible types are used:\n\n```python {group=\"python-dump\"}\nprint(m.model_dump(mode='json'))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': [1, 2]}}\n```\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_python()`][pydantic.TypeAdapter.dump_python] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#modelmodel_dump_json}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#17",
+    "b": "pydantic:docs/concepts/serialization.md#2",
+    "relation": "unrelated",
+    "related": 0.0041,
+    "probabilities": {
+     "same": 0.0016,
+     "overlapping": 0.0013,
+     "conflicting": 0.0012,
+     "unrelated": 0.9959
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 35
+  }
+ }
+}

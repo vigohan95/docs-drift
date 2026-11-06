@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c4/c403e96ba6bc9328e79b",
+ "request_hash": "c403e96ba6bc9328e79bddbd6f4c10e84b7d2e7161b0fa337dfd0d5f496e05d9",
+ "recorded_at": "2026-11-06T14:39:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 5004,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "156.931293",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=174,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#6",
+    "text": "### Component events\n\nIn Svelte 4, components could emit events by creating a dispatcher with `createEventDispatcher`.\n\nThis function is deprecated in Svelte 5. Instead, components should accept _callback props_ — which means you then pass functions as properties to these components:\n\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport Pump from './Pump.svelte';\n\n\tlet size = $state(15);\n\tlet burst = $state(false);\n\n\tfunction reset() {\n\t\tsize = 15;\n\t\tburst = false;\n\t}\n</script>\n\n<Pump\n\t---on:---inflate={(power) => {\n\t\tsize += power---.detail---;\n\t\tif (size > 75) burst = true;\n\t}}\n\t---on:---deflate={(power) => {\n\t\tif (size > 0) size -= power---.detail---;\n\t}}\n/>\n\n{#if burst}\n\t<button onclick={reset}>new balloon</button>\n\t<span class=\"boom\">💥</span>\n{:else}\n\t<span class=\"balloon\" style=\"scale: {0.01 * size}\">\n\t\t🎈\n\t</span>\n{/if}\n```\n\n```svelte\n<!--- file: Pump.svelte --->\n<script>\n\t---import { createEventDispatcher } from 'svelte';---\n\t---const dispatch = createEventDispatcher();---\n\n\t+++let { inflate, deflate } = $props();+++\n\tlet power = $state(5);\n</script>\n\n<button onclick={() => ---dispatch('inflate', power)---+++inflate(power)+++}>\n\tinflate\n</button>\n<button onclick={() => ---dispatch('deflate', power)---+++deflate(power)+++}>\n\tdeflate\n</button>\n<button onclick={() => power--}>-</button>\nPump power: {power}\n<button onclick={() => power++}>+</button>\n```"
+   },
+   {
+    "id": "svelte:documentation/docs/99-legacy/10-legacy-on.md#2",
+    "text": "## Component events\n\nComponents can dispatch events by creating a _dispatcher_ when they are initialised:\n\n```svelte\n<!--- file: Stepper.svelte -->\n<script>\n\timport { createEventDispatcher } from 'svelte';\n\tconst dispatch = createEventDispatcher();\n</script>\n\n<button on:click={() => dispatch('decrement')}>decrement</button>\n<button on:click={() => dispatch('increment')}>increment</button>\n```\n\n`dispatch` creates a [`CustomEvent`](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent). If a second argument is provided, it becomes the `detail` property of the event object.\n\nA consumer of this component can listen for the dispatched events:\n\n```svelte\n<script>\n\timport Stepper from './Stepper.svelte';\n\n\tlet n = 0;\n</script>\n\n<Stepper\n\ton:decrement={() => n -= 1}\n\ton:increment={() => n += 1}\n/>\n\n<p>n: {n}</p>\n```\n\nComponent events do not bubble — a parent component can only listen for events on its immediate children.\n\nOther than `once`, modifiers are not valid on component event handlers.\n\n> [!NOTE]\n> If you're planning an eventual migration to Svelte 5, use callback props instead. This will make upgrading easier as `createEventDispatcher` is deprecated:\n>\n> ```svelte\n> <!--- file: Stepper.svelte --->\n> <script>\n> \texport let decrement;\n> \texport let increment;\n> </script>\n>\n> <button on:click={decrement}>decrement</button>\n> <button on:click={increment}>increment</button>\n> ```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "svelte:documentation/docs/99-legacy/10-legacy-on.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/99-legacy/10-legacy-on.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#6",
+    "b": "svelte:documentation/docs/99-legacy/10-legacy-on.md#2",
+    "relation": "overlapping",
+    "related": 0.997,
+    "probabilities": {
+     "same": 0.0072,
+     "overlapping": 0.9857,
+     "conflicting": 0.0041,
+     "unrelated": 0.003
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0084,
+       "restated": 0.9462,
+       "elaborated": 0.0279,
+       "different": 0.0175
+      },
+      "confidence": 0.9825,
+      "a": {
+       "document": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#6",
+       "quote": "This function is deprecated in Svelte 5.",
+       "start": 120,
+       "end": 160,
+       "confidence": 1
+      },
+      "b": {
+       "document": "svelte:documentation/docs/99-legacy/10-legacy-on.md#2",
+       "quote": "This will make upgrading easier as `createEventDispatcher` is deprecated:\n>\n> ```svelte\n> <!--- file: Stepper.svelte --->\n> <script>\n> \texport let decrement;\n> \texport let increment;\n> </script>\n>\n> <button on:click={decrement}>decrement</button>\n> <button on:click={increment}>increment</button>\n> ```",
+       "start": 1102,
+       "end": 1404,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 1,
+   "counterparts_ms": 52
+  },
+  "timing": {
+   "read_ms": 165,
+   "total_ms": 168
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/73/735ffe723dd3a9fc9d91",
+ "request_hash": "735ffe723dd3a9fc9d910b90bc55c2757d32aeccec5c07575da2911aa57fd41e",
+ "recorded_at": "2026-11-06T14:40:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1805,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.034048",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=150"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/encryptcookie.md#3",
+    "text": "## Config\n\n| Property  | Type                                                | Description                                                                                           | Default                      |\n|:----------|:----------------------------------------------------|:------------------------------------------------------------------------------------------------------|:-----------------------------|\n| Next      | `func(fiber.Ctx) bool`                             | A function to skip this middleware when it returns true.                                                | `nil`                        |\n| Except    | `[]string`                                          | Array of cookie keys that should not be encrypted.                                                    | `[]`                         |\n| Key       | `string`                                            | A base64-encoded unique key to encode & decode cookies. Required. The decoded key must be 16, 24, or 32 bytes long; `New` panics otherwise. | (No default, required field) |\n| Encryptor | `func(name, decryptedString, key string) (string, error)` | A custom function to encrypt cookies.                                                                 | `EncryptCookie`              |\n| Decryptor | `func(name, encryptedString, key string) (string, error)` | A custom function to decrypt cookies.                                                                 | `DecryptCookie`              |"
+   },
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "text": "## Config\n\n| Property | Type                  | Description                                           | Default    |\n|:---------|:----------------------|:------------------------------------------------------|:-----------|\n| Next     | `func(fiber.Ctx) bool` | Skip when function returns `true`.                    | `nil`      |\n| RuleList | `[]Rule`          | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures. | nil |\n| Rules    | `map[string]string`   | **Deprecated.** Use `RuleList`. A map has no order, so precedence is decided by a heuristic. | nil |\n\nSet one of `RuleList` or `Rules`. With neither, the middleware rewrites nothing.\n\nA rule's `From` is path text: `*` matches a run of any bytes but a newline, and\nevery other byte stands for itself, so `/preis-1.000-euro` rewrites that path\nand not `/preis-1X000-euro`. There is no escape for a literal `*`.\n\nA rule matches the whole path, trailing slash and letter case included: `/old` rewrites `/old`, but not `/old/`, `/OLD`, `/old/x` or `/very/old`.\n\nIn `To`, `$1`, `$2` and so on stand for what the asterisks of `From` captured, in order. `$10` is the tenth capture in a rule with ten or more asterisks; in a rule with fewer it reads as `$1` followed by `0`.\n\nSetting both `RuleList` and `Rules` panics.\n\nRules match `c.Path()`, the path as the router normalized it, and the rewritten\npath goes through the same normalization. With `UnescapePath` that path is the\ndecoded one, so a capture is escaped again before it is inserted: the `%2e%2e`\nthat `/files/%252e%252e/secret` decoded to stays that name in `/public/$1`\nrather than being decoded a second time into `..` and resolving out of\n`/public/`.\n\nA capture cannot add a `.` or `..` segment either. `{From: \"/@*\", To: \"/users/$1\"}`\ncuts `../admin` out of `/@../admin`, a path with no dot segment for the router to\nresolve, so a rewritten path holding more dot segments than `To` itself is not\nused: the next rule is tried and the path stays as it was. `%2e` counts as a dot\nthere, and a backslash, `%2f` and `%5c` as a slash."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/encryptcookie.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/encryptcookie.md#3",
+    "b": "fiber:docs/middleware/rewrite.md#2",
+    "relation": "unrelated",
+    "related": 0.0115,
+    "probabilities": {
+     "same": 0.0043,
+     "overlapping": 0.0036,
+     "conflicting": 0.0036,
+     "unrelated": 0.9885
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 36
+  }
+ }
+}

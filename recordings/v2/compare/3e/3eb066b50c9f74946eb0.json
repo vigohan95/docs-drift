@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3e/3eb066b50c9f74946eb0",
+ "request_hash": "3eb066b50c9f74946eb0373fa685cbd331334bd73f7545d3967f30abed28fb2b",
+ "recorded_at": "2026-11-06T14:42:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3963,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.958719",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=190"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#21",
+    "text": "### Input types are not preserved\n\nIn Pydantic V1 we made great efforts to preserve the types of all field inputs for generic collections when they were\nproper subtypes of the field annotations. For example, given the annotation `Mapping[str, int]` if you passed in a\n`collection.Counter()` you'd get a `collection.Counter()` as the value.\n\nSupporting this behavior in V2 would have negative performance implications for the general case\n(we'd have to check types every time) and would add a lot of complexity to validation. Further, even in V1 this behavior\nwas inconsistent and partially broken: it did not work for many types (`str`, `UUID`, etc.), and for generic\ncollections it's impossible to re-build the original input correctly without a lot of special casing\n(consider `ChainMap`; rebuilding the input is necessary because we need to replace values after validation, e.g.\nif coercing strings to ints).\n\nIn Pydantic V2 we no longer attempt to preserve the input type in all cases; instead, we only promise that the output\ntype will match the type annotations.\n\nGoing back to the `Mapping` example, we promise the output will be a valid `Mapping`, and in practice it will be a\nplain `dict`:\n\n```python\nfrom collections.abc import Mapping\n\nfrom pydantic import TypeAdapter\n\n\nclass MyDict(dict):\n    pass\n\n\nta = TypeAdapter(Mapping[str, int])\nv = ta.validate_python(MyDict())\nprint(type(v))\n#> <class 'dict'>\n```"
+   },
+   {
+    "id": "pydantic:docs/concepts/serialization.md#3",
+    "text": "### JSON mode\n\nPydantic allows data to be serialized directly to a JSON-encoded string, by trying its best to convert Python values to valid\nJSON data. This is achievable by using the [`model_dump_json()`][pydantic.BaseModel.model_dump_json] method:\n\n```python\nfrom datetime import datetime\n\nfrom pydantic import BaseModel\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    foo: datetime\n    bar: BarModel\n\n\nm = FooBarModel(foo=datetime(2032, 6, 1, 12, 13, 14), bar={'whatever': (1, 2)})\n\nprint(m.model_dump_json(indent=2))\n\"\"\"\n{\n  \"foo\": \"2032-06-01T12:13:14\",\n  \"bar\": {\n    \"whatever\": [\n      1,\n      2\n    ]\n  }\n}\n\"\"\"\n```\n\nIn addition to the [supported types][json.JSONEncoder] by the standard library [`json`][] module, Pydantic supports a wide\nvariety of types ([date and time types][datetime], [`UUID`][uuid.UUID] objects, [sets][set], etc). If an unsupported type\nis used and can't be serialized to JSON, a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError] exception\nis raised.\n\nA serialization error like this often only shows up when a particular object reaches the point of being\nserialized (commonly when building a response), so it can be easy to miss until it happens in\nproduction. Like any exception, it's captured by [Logfire](../integrations/logfire.md) if you've\ninstrumented your application, in the context of the request that triggered it, and grouped with other\noccurrences so you can tell a one-off from a recurring problem.\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_json()`][pydantic.TypeAdapter.dump_json] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#dictmodel-and-iteration}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/serialization.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#21",
+    "b": "pydantic:docs/concepts/serialization.md#3",
+    "relation": "unrelated",
+    "related": 0.0041,
+    "probabilities": {
+     "same": 0.0014,
+     "overlapping": 0.0013,
+     "conflicting": 0.0014,
+     "unrelated": 0.9959
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 42
+  },
+  "timing": {
+   "read_ms": 42,
+   "total_ms": 45
+  }
+ }
+}

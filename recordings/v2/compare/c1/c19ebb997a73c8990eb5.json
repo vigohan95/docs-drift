@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c1/c19ebb997a73c8990eb5",
+ "request_hash": "c19ebb997a73c8990eb59e4fa1bb91fdbcd1a82dbe95ce9e918f0cc800f675cc",
+ "recorded_at": "2026-11-06T14:40:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1071,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "171.867743",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=297"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#7",
+    "text": "### RouteChain\n\nReturns an instance of a single route, which you can then use to handle HTTP verbs with optional middleware.\n\nSimilar to [`Express`](https://expressjs.com/en/api.html#app.route).\n\n```go title=\"Signature\"\nfunc (app *App) RouteChain(path string) Register\n```\n\n<details>\n<summary>Click here to see the `Register` interface</summary>\n\n```go\ntype Register interface {\n    All(handler any, handlers ...any) Register\n    Get(handler any, handlers ...any) Register\n    Head(handler any, handlers ...any) Register\n    Post(handler any, handlers ...any) Register\n    Put(handler any, handlers ...any) Register\n    Delete(handler any, handlers ...any) Register\n    Connect(handler any, handlers ...any) Register\n    Options(handler any, handlers ...any) Register\n    Trace(handler any, handlers ...any) Register\n    Patch(handler any, handlers ...any) Register\n    Query(handler any, handlers ...any) Register\n\n    Add(methods []string, handler any, handlers ...any) Register\n\n    RouteChain(path string) Register\n}\n```\n\n</details>\n\n```go title=\"Example\"\npackage main\n\nimport (\n    \"log\"\n\n    \"github.com/gofiber/fiber/v3\"\n)\n\nfunc main() {\n    app := fiber.New()\n\n    // Use `RouteChain` as a chainable route declaration method\n    app.RouteChain(\"/test\").Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /test\")\n    })\n\n    app.RouteChain(\"/events\").All(func(c fiber.Ctx) error {\n        // Runs for all HTTP verbs first\n        // Think of it as route-specific middleware!\n        return c.Next()\n    }).\n    Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /events\")\n    }).\n    Post(func(c fiber.Ctx) error {\n        // Maybe add a new event...\n        return c.SendString(\"POST /events\")\n    })\n\n    // Combine multiple routes\n    app.RouteChain(\"/reports\").RouteChain(\"/daily\").Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /reports/daily\")\n    })\n\n    // Use multiple methods\n    app.RouteChain(\"/api\").Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /api\")\n    }).Post(func(c fiber.Ctx) error {\n        return c.SendString(\"POST /api\")\n    })\n\n    log.Fatal(app.Listen(\":3000\"))\n}\n```"
+   },
+   {
+    "id": "fiber:docs/guide/grouping.md#4",
+    "text": "## RouteChain\n\nWhen several HTTP methods share the **same path**, [`RouteChain`](../api/app.md#routechain) lets you declare the path once and chain the verb handlers. Handlers run in the order you declare them, so an `All` declared before the verb handlers runs ahead of them on that path, acting as route-specific middleware.\n\n```go\napp.RouteChain(\"/events\").\n    All(func(c fiber.Ctx) error { return c.Next() }). // route-local middleware\n    Get(func(c fiber.Ctx) error { return c.SendString(\"GET /events\") }).\n    Post(func(c fiber.Ctx) error { return c.SendString(\"POST /events\") })\n```\n\n:::note\nWithin a chain, `All` registers prefix-matched middleware (like [`app.Use`](../api/app.md#use)), not the exact-path `App.All`, so it also runs for sub-paths of the chain path.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/guide/grouping.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/guide/grouping.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/app.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/app.md#7",
+    "b": "fiber:docs/guide/grouping.md#4",
+    "relation": "overlapping",
+    "related": 0.9982,
+    "probabilities": {
+     "same": 0.005,
+     "overlapping": 0.9906,
+     "conflicting": 0.0026,
+     "unrelated": 0.0018
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0122,
+       "restated": 0.6586,
+       "elaborated": 0.0531,
+       "different": 0.276
+      },
+      "confidence": 0.724,
+      "a": {
+       "document": "fiber:docs/api/app.md#7",
+       "quote": "app.RouteChain(\"/events\").All(func(c fiber.Ctx) error {",
+       "start": 1344,
+       "end": 1399,
+       "confidence": 0.996
+      },
+      "b": {
+       "document": "fiber:docs/guide/grouping.md#4",
+       "quote": "Handlers run in the order you declare them, so an `All` declared before the verb handlers runs ahead of them on that path, acting as route-specific middleware.\n\n```go\napp.RouteChain(\"/events\").\n    All(func(c fiber.Ctx) error { return c.Next() }).",
+       "start": 167,
+       "end": 414,
+       "confidence": 0.991
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 69,
+   "passages": 2,
+   "counterparts_ms": 79
+  },
+  "timing": {
+   "read_ms": 179,
+   "total_ms": 183
+  }
+ }
+}

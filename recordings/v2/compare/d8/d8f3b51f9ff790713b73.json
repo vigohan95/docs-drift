@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d8/d8f3b51f9ff790713b73",
+ "request_hash": "d8f3b51f9ff790713b73e2144e9a3fd738d308b5942c1bf90c2d93a5774a01a9",
+ "recorded_at": "2026-11-06T14:37:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1700,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.230848",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=174"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/browser/index.md#3",
+    "text": "## Using plugins to resolve and load modules\n\nYou can also resolve and load all modules via plugins. Here is how you could do this:\n\n```js twoslash\n/** @type {import('rollup')} */\nvar rollup;\n// ---cut---\nconst modules = {\n\t'main.js': \"import foo from 'foo.js'; console.log(foo);\",\n\t'foo.js': 'export default 42;'\n};\n\nrollup\n\t.rollup({\n\t\tinput: 'main.js',\n\t\tplugins: [\n\t\t\t{\n\t\t\t\tname: 'loader',\n\t\t\t\tresolveId(source) {\n\t\t\t\t\tif (modules.hasOwnProperty(source)) {\n\t\t\t\t\t\treturn source;\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t\tload(id) {\n\t\t\t\t\tif (modules.hasOwnProperty(id)) {\n\t\t\t\t\t\treturn modules[id];\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t]\n\t})\n\t.then(bundle => bundle.generate({ format: 'es' }))\n\t.then(({ output }) => console.log(output[0].code));\n```\n\nThis example only supports two imports, `\"main.js\"` and `\"foo.js\"`, and no relative imports. Here is another example that uses absolute URLs as entry points and supports relative imports. In that case, we are just re-bundling Rollup itself, but it could be used on any other URL that exposes an ES module:\n\n```js twoslash\n/** @type {import('rollup')} */\nvar rollup;\n// ---cut---\nrollup\n\t.rollup({\n\t\tinput: 'https://unpkg.com/rollup/dist/es/rollup.js',\n\t\tplugins: [\n\t\t\t{\n\t\t\t\tname: 'url-resolver',\n\t\t\t\tresolveId(source, importer) {\n\t\t\t\t\tif (source[0] !== '.') {\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tnew URL(source);\n\t\t\t\t\t\t\t// If it is a valid URL, return it\n\t\t\t\t\t\t\treturn source;\n\t\t\t\t\t\t} catch {\n\t\t\t\t\t\t\t// Otherwise make it external\n\t\t\t\t\t\t\treturn { id: source, external: true };\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\treturn new URL(source, importer).href;\n\t\t\t\t},\n\t\t\t\tasync load(id) {\n\t\t\t\t\tconst response = await fetch(id);\n\t\t\t\t\treturn response.text();\n\t\t\t\t}\n\t\t\t}\n\t\t]\n\t})\n\t.then(bundle => bundle.generate({ format: 'es' }))\n\t.then(({ output }) => console.log(output));\n```"
+   },
+   {
+    "id": "rollup:docs/faqs/index.md#6",
+    "text": "This does not affect code execution order or behaviour, but it will speed up how your code is loaded and parsed. Without this optimization, a JavaScript engine needs to perform the following steps to run `main.js`:\n\n1. Load and parse `main.js`. At the end, an import to `other-entry.js` will be discovered.\n2. Load and parse `other-entry.js`. At the end, an import to `external` will be discovered.\n3. Load and parse `external`.\n4. Execute `main.js`.\n\nWith this optimization, a JavaScript engine will discover all transitive dependencies after parsing an entry module, avoiding the waterfall:\n\n1. Load and parse `main.js`. At the end, imports to `other-entry.js` and `external` will be discovered.\n2. Load and parse `other-entry.js` and `external`. The import of `external` from `other-entry.js` is already loaded and parsed.\n3. Execute `main.js`.\n\nThere may be situations where this optimization is not desired, in which case you can turn it off via the [`output.hoistTransitiveImports`](../configuration-options/index.md#output-hoisttransitiveimports) option. This optimization is also never applied when using the [`output.preserveModules`](../configuration-options/index.md#output-preservemodules) option."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/browser/index.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/faqs/index.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/browser/index.md#3",
+    "b": "rollup:docs/faqs/index.md#6",
+    "relation": "unrelated",
+    "related": 0.0039,
+    "probabilities": {
+     "same": 0.0013,
+     "overlapping": 0.0013,
+     "conflicting": 0.0013,
+     "unrelated": 0.9961
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 35
+  }
+ }
+}

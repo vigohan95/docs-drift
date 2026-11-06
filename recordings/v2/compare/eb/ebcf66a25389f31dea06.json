@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/eb/ebcf66a25389f31dea06",
+ "request_hash": "ebcf66a25389f31dea06461b18b26555d888038c3e595c3e17ba8a38a1667487",
+ "recorded_at": "2026-11-06T14:42:29Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2017,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.122784",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=194"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#4",
+    "text": "## Iterating over models\n\nPydantic models can also be iterated over, yielding `(field_name, field_value)` pairs. Note that field values\nare left as is, so sub-models will *not* be converted to dictionaries:\n\n```python {group=\"iterating-model\"}\nfrom pydantic import BaseModel\n\n\nclass BarModel(BaseModel):\n    whatever: int\n\n\nclass FooBarModel(BaseModel):\n    banana: float\n    foo: str\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': 123})\n\nfor name, value in m:\n    print(f'{name}: {value}')\n    #> banana: 3.14\n    #> foo: hello\n    #> bar: whatever=123\n```\n\nThis means that calling [`dict()`][dict] on a model can be used to construct a dictionary of the model:\n\n```python {group=\"iterating-model\"}\nprint(dict(m))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': BarModel(whatever=123)}\n```\n\n!!! note\n    [Root models](models.md#rootmodel-and-custom-root-types) *does* get converted to a dictionary with the key `'root'`.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#pickledumpsmodel}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`Counter`][collections.Counter] instances are valid. Strict mode does *not* apply to the keys and values of the counters.\nThe strict constraint must be applied to the parameter types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom collections import Counter\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    x: Counter[str]\n\n\nm = Model(x={'foo': '1'})\nprint(m.model_dump())\n#> {'x': Counter({'foo': 1})}\n\ntry:\n    Model(x='test')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid Counter [type=counter_type, input_value='test', input_type=str]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typeddict}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#4",
+    "b": "pydantic:docs/api/standard_library_types.md#45",
+    "relation": "unrelated",
+    "related": 0.007,
+    "probabilities": {
+     "same": 0.003,
+     "overlapping": 0.0023,
+     "conflicting": 0.0017,
+     "unrelated": 0.993
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26
+  },
+  "timing": {
+   "read_ms": 25,
+   "total_ms": 27
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e8/e827fe9340bb50368b62",
+ "request_hash": "e827fe9340bb50368b625c806b32addb9d2fdc2db99189c0edd393b2ea36fc78",
+ "recorded_at": "2026-11-06T14:42:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1098,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.169408",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=175"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/dataclasses.md#9",
+    "text": "### Using custom types\n\nAs said above, validation is applied on standard library dataclasses. If you make use\nof custom types, you will get an error when trying to refer to the dataclass. To circumvent\nthe issue, you can set the [`arbitrary_types_allowed`][pydantic.ConfigDict.arbitrary_types_allowed]\nconfiguration value on the dataclass:\n\n```python\nimport dataclasses\n\nfrom pydantic import BaseModel, ConfigDict\nfrom pydantic.errors import PydanticSchemaGenerationError\n\n\nclass ArbitraryType:\n    def __init__(self, value):\n        self.value = value\n\n    def __repr__(self):\n        return f'ArbitraryType(value={self.value!r})'\n\n\n@dataclasses.dataclass\nclass DC:\n    a: ArbitraryType\n    b: str\n\n\n# valid as it is a stdlib dataclass without validation:\nmy_dc = DC(a=ArbitraryType(value=3), b='qwe')\n\ntry:\n\n    class Model(BaseModel):\n        dc: DC\n        other: str\n\n    # invalid as dc is now validated with pydantic, and ArbitraryType is not a known type\n    Model(dc=my_dc, other='other')\n\nexcept PydanticSchemaGenerationError as e:\n    print(e.message)\n    \"\"\"\n    Unable to generate pydantic-core schema for <class '__main__.ArbitraryType'>. Set `arbitrary_types_allowed=True` in the model_config to ignore this error or implement `__get_pydantic_core_schema__` on your type to fully support it.\n\n    If you got this error by calling handler(<some type>) within `__get_pydantic_core_schema__` then you likely need to call `handler.generate_schema(<some type>)` since we do not call `__get_pydantic_core_schema__` on `<some type>` otherwise to avoid infinite recursion.\n    \"\"\"\n\n\n# valid as we set arbitrary_types_allowed=True, and that config pushes down to the nested vanilla dataclass\nclass Model(BaseModel):\n    model_config = ConfigDict(arbitrary_types_allowed=True)\n\n    dc: DC\n    other: str\n\n\nm = Model(dc=my_dc, other='other')\nprint(repr(m))\n#> Model(dc=DC(a=ArbitraryType(value=3), b='qwe'), other='other')\n```"
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#15",
+    "text": "### Implementing `__get_pydantic_core_schema__` <a name=\"implementing_get_pydantic_core_schema\"></a>\n\nCustom types (used as `field_name: TheType` or `field_name: Annotated[TheType, ...]`) as well as `Annotated` metadata\n(used as `field_name: Annotated[int, SomeMetadata]`)\ncan modify or override the generated schema by implementing `__get_pydantic_core_schema__`.\nThis method receives two positional arguments:\n\n1. The type annotation that corresponds to this type (so in the case of `TheType[T][int]` it would be `TheType[int]`).\n2. A handler/callback to call the next implementer of `__get_pydantic_core_schema__`.\n\nThe handler system works just like [*wrap* field validators](validators.md#field-wrap-validator).\nIn this case the input is the type and the output is a `core_schema`.\n\nHere is an example of a custom type that *overrides* the generated `core_schema`:\n\n```python\nfrom dataclasses import dataclass\nfrom typing import Any\n\nfrom pydantic_core import core_schema\n\nfrom pydantic import BaseModel, GetCoreSchemaHandler\n\n\n@dataclass\nclass CompressedString:\n    dictionary: dict[int, str]\n    text: list[int]\n\n    def build(self) -> str:\n        return ' '.join([self.dictionary[key] for key in self.text])\n\n    @classmethod\n    def __get_pydantic_core_schema__(\n        cls, source: type[Any], handler: GetCoreSchemaHandler\n    ) -> core_schema.CoreSchema:\n        assert source is CompressedString\n        return core_schema.no_info_after_validator_function(\n            cls._validate,\n            core_schema.str_schema(),\n            serialization=core_schema.plain_serializer_function_ser_schema(\n                cls._serialize,\n                info_arg=False,\n                return_schema=core_schema.str_schema(),\n            ),\n        )\n\n    @staticmethod\n    def _validate(value: str) -> 'CompressedString':\n        inverse_dictionary: dict[str, int] = {}\n        text: list[int] = []\n        for word in value.split(' '):\n            if word not in inverse_dictionary:\n                inverse_dictionary[word] = len(inverse_dictionary)\n            text.append(inverse_dictionary[word])\n        return CompressedString(\n            {v: k for k, v in inverse_dictionary.items()}, text\n        )"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/dataclasses.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/dataclasses.md#9",
+    "b": "pydantic:docs/concepts/json_schema.md#15",
+    "relation": "unrelated",
+    "related": 0.4742,
+    "probabilities": {
+     "same": 0.0117,
+     "overlapping": 0.4542,
+     "conflicting": 0.0083,
+     "unrelated": 0.5258
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 52
+  },
+  "timing": {
+   "read_ms": 51,
+   "total_ms": 54
+  }
+ }
+}

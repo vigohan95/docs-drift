@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/75/7527c2cdf3738da8c52e",
+ "request_hash": "7527c2cdf3738da8c52e3823e32699a358024963b6bd30a9009cb4cc4508a916",
+ "recorded_at": "2026-11-06T14:42:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2047,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "171.698755",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=63,cfOrigin;dur=0,cfWorker;dur=311"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#35",
+    "text": "## Dynamic model creation\n\n??? api \"API Documentation\"\n    [`pydantic.main.create_model`][pydantic.main.create_model]<br>\n\nThere are some occasions where it is desirable to create a model using runtime information to specify the fields.\nPydantic provides the [`create_model()`][pydantic.create_model] function to allow models to be created dynamically:\n\n```python\nfrom pydantic import BaseModel, create_model\n\nDynamicFoobarModel = create_model('DynamicFoobarModel', foo=str, bar=(int, 123))\n\n# Equivalent to:\n\n\nclass StaticFoobarModel(BaseModel):\n    foo: str\n    bar: int = 123\n```\n\nField definitions are specified as keyword arguments, and should either be:\n\n* A single element, representing the type annotation of the field.\n* A two-tuple, the first element being the type and the second element the assigned value\n  (either a default or the [`Field()`][pydantic.Field] function).\n\n/// version-changed | v2.11\nWhen providing a single element for field definitions, any type can be used\n(previously, only an [`Annotated`][typing.Annotated] form could be provided).\n///\n\nHere is a more advanced example:\n\n```python\nfrom typing import Annotated\n\nfrom pydantic import BaseModel, Field, PrivateAttr, create_model\n\nDynamicModel = create_model(\n    'DynamicModel',\n    foo=(str, Field(alias='FOO')),\n    bar=Annotated[str, Field(description='Bar field')],\n    _private=(int, PrivateAttr(default=1)),\n)\n\n\nclass StaticModel(BaseModel):\n    foo: str = Field(alias='FOO')\n    bar: Annotated[str, Field(description='Bar field')]\n    _private: int = PrivateAttr(default=1)\n```"
+   },
+   {
+    "id": "pydantic:docs/examples/dynamic_models.md#0",
+    "text": "Models can be [created dynamically](../concepts/models.md#dynamic-model-creation) using the [`create_model()`][pydantic.create_model]\nfactory function.\n\nIn this example, we will show how to dynamically derive a model from an existing one, making every field optional. To achieve this,\nwe will make use of the [`model_fields`][pydantic.main.BaseModel.model_fields] model class attribute, and derive new annotations\nfrom the field definitions to be passed to the [`create_model()`][pydantic.create_model] factory. Of course, this example can apply\nto any use case where you need to derive a new model from another (remove default values, add aliases, etc).\n\n=== \"Python 3.10\"\n\n    ```python {lint=\"skip\" linenums=\"1\"}\n    from typing import Annotated\n\n    from pydantic import BaseModel, Field, create_model\n\n\n    def make_fields_optional(model_cls: type[BaseModel]) -> type[BaseModel]:\n        new_fields = {}\n\n        for f_name, f_info in model_cls.model_fields.items():\n            f_dct = f_info.asdict()\n            new_fields[f_name] = (\n                Annotated[(f_dct['annotation'] | None, *f_dct['metadata'], Field(**f_dct['attributes']))],\n                None,\n            )\n\n        return create_model(\n            f'{model_cls.__name__}Optional',\n            __base__=model_cls,  # (1)!\n            **new_fields,\n        )\n    ```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#35",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/examples/dynamic_models.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/examples/dynamic_models.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/concepts/models.md#35"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/models.md#35",
+    "b": "pydantic:docs/examples/dynamic_models.md#0",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0082,
+     "overlapping": 0.9855,
+     "conflicting": 0.004,
+     "unrelated": 0.0024
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0193,
+       "restated": 0.6981,
+       "elaborated": 0.0371,
+       "different": 0.2455
+      },
+      "confidence": 0.7545,
+      "a": {
+       "document": "pydantic:docs/concepts/models.md#35",
+       "quote": "Pydantic provides the [`create_model()`][pydantic.create_model] function to allow models to be created dynamically:",
+       "start": 237,
+       "end": 352,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/examples/dynamic_models.md#0",
+       "quote": "Models can be [created dynamically](../concepts/models.md#dynamic-model-creation) using the [`create_model()`][pydantic.create_model]\nfactory function.\n\nIn this example, we will show how to dynamically derive a model from an existing one, making every field optional.",
+       "start": 0,
+       "end": 267,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 1,
+   "counterparts_ms": 67
+  },
+  "timing": {
+   "read_ms": 179,
+   "total_ms": 182
+  }
+ }
+}

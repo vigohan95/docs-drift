@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/62/62e3c22acc9f1db68fc5",
+ "request_hash": "62e3c22acc9f1db68fc59bc7f38faadeb459c099de62fdaed4871b71f87fd61e",
+ "recorded_at": "2026-11-06T14:37:45Z",
+ "status": 200,
+ "attempts": 2,
+ "round_trip_ms": 1373,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "110.367651",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=233"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#1",
+    "text": "When given as a command line argument, it should be a comma-separated list of IDs:\n\n```bash\nrollup -i src/main.js ... -e foo,bar,baz\n```\n\nWhen providing a function, it is called with three parameters `(id, parent, isResolved)` that can give you more fine-grained control:\n\n- `id` is the id of the module in question\n- `parent` is the id of the module doing the import\n- `isResolved` signals whether the `id` has been resolved by e.g. plugins\n\nWhen creating an `iife` or `umd` bundle, you will need to provide global variable names to replace your external imports via the [`output.globals`](#output-globals) option.\n\nNote that [source phase imports](../es-module-syntax/index.md#source-phase-import) (`import source x from 'y'`) are required to be external. Rollup will raise an error if a source phase import resolves to a module that is not external.\n\nIf a relative import, i.e. starting with `./` or `../`, is marked as \"external\", rollup will internally resolve the id to an absolute file system location so that different imports of the external module can be merged. When the resulting bundle is written, the import will again be converted to a relative import. Example:\n\n```js\n// input\n// src/main.js (entry point)\nimport x from '../external.js';\nimport './nested/nested.js';\nconsole.log(x);\n\n// src/nested/nested.js\n// the import would point to the same file if it existed\nimport x from '../../external.js';\nconsole.log(x);\n\n// output\n// the different imports are merged\nimport x from '../external.js';\n\nconsole.log(x);\n\nconsole.log(x);\n```"
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#16",
+    "text": "### output.globals\n\n|  |  |\n| --: | :-- |\n| Type: | `{ [id: string]: string } \\| ((id: string) => string)` |\n| CLI: | `-g`/`--globals <external-id:variableName,another-external-id:anotherVariableName,...>` |\n\nSpecifies `id: variableName` pairs necessary for external imports in `umd`/`iife` bundles. For example, in a case like this…\n\n```js\nimport $ from 'jquery';\n```\n\n…we want to tell Rollup that `jquery` is external and the `jquery` module ID equates to the global `$` variable:\n\n```js twoslash\n// rollup.config.js\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\t// ...\n\texternal: ['jquery'],\n\toutput: {\n\t\tformat: 'iife',\n\t\tname: 'MyBundle',\n\t\tglobals: {\n\t\t\tjquery: '$'\n\t\t}\n\t}\n};\n\n/*\nvar MyBundle = (function ($) {\n  // code goes here\n}($));\n*/\n```\n\nAlternatively, supply a function that will turn an external module ID into a global variable name.\n\nWhen given as a command line argument, it should be a comma-separated list of `id:variableName` pairs:\n\n```shell\nrollup -i src/main.js ... -g jquery:$,underscore:_\n```\n\nTo tell Rollup that a local file should be replaced by a global variable, use an absolute id:\n\n```js twoslash\n// rollup.config.js\nimport { fileURLToPath } from 'node:url';\nconst externalId = fileURLToPath(\n\tnew URL(\n\t\t'src/some-local-file-that-should-not-be-bundled.js',\n\t\timport.meta.url\n\t)\n);\n\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\t//...,\n\texternal: [externalId],\n\toutput: {\n\t\tformat: 'iife',\n\t\tname: 'MyBundle',\n\t\tglobals: {\n\t\t\t[externalId]: 'globalVariable'\n\t\t}\n\t}\n};\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/configuration-options/index.md#1",
+    "b": "rollup:docs/configuration-options/index.md#16",
+    "relation": "overlapping",
+    "related": 0.9841,
+    "probabilities": {
+     "same": 0.0186,
+     "overlapping": 0.9524,
+     "conflicting": 0.0132,
+     "unrelated": 0.0159
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 118,
+   "total_ms": 121
+  }
+ }
+}

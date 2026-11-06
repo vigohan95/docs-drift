@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/30/302c155d76ccec851788",
+ "request_hash": "302c155d76ccec85178869c886195f4637ea149a5cf8fdf2fb054bcd358407b5",
+ "recorded_at": "2026-11-06T14:38:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3333,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "96.786179",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=362"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/06-runtime/02-context.md#0",
+    "text": "---\ntitle: Context\n---\n\nContext allows components to access values owned by parent components without passing them down as props (potentially through many layers of intermediate components, known as 'prop-drilling').\n\nBy creating a `[get, set, has]` triplet of functions with `createContext`, you can set the context in a parent component and get it in a child component:\n\n<!-- codeblock:start {\"title\":\"Context\",\"selected\":\"context.ts\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport Parent from './Parent.svelte';\n\timport Child from './Child.svelte';\n</script>\n\n<Parent>\n\t<Child />\n</Parent>\n```\n\n```svelte\n<!--- file: Parent.svelte --->\n<script>\n\timport { setUserContext } from './context';\n\n\tlet { children } = $props();\n\n\tsetUserContext({ name: 'world' });\n</script>\n\n{@render children()}\n```\n\n```svelte\n<!--- file: Child.svelte --->\n<script>\n\timport { getUserContext } from './context';\n\n\tconst user = getUserContext();\n</script>\n\n<h1>hello {user.name}, inside Child.svelte</h1>\n```\n\n```ts\n/// file: context.ts\nimport { createContext } from 'svelte';\n\ninterface User {\n\tname: string;\n}\n\nexport const [getUserContext, setUserContext] = createContext<User>();\n```\n<!-- codeblock:end -->\n\n> [!NOTE] `createContext` was added in version 5.40. If you are using an earlier version of Svelte, you must use `setContext` and `getContext` instead.\n\nThis is particularly useful when `Parent.svelte` is not directly aware of `Child.svelte`, but instead renders it as part of a `children` [snippet](snippet) as shown above."
+   },
+   {
+    "id": "svelte:documentation/docs/06-runtime/02-context.md#2",
+    "text": "## Using context with state\n\nYou can store reactive state in context...\n\n<!-- codeblock:start {\"title\":\"Context with state\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport { setCounter } from './context.ts';\n\timport Child from './Child.svelte';\n\n\tlet counter = $state({\n\t\tcount: 0\n\t});\n\n\tsetCounter(counter);\n</script>\n\n<button onclick={() => counter.count += 1}>\n\tincrement\n</button>\n\n<Child />\n<Child />\n<Child />\n\n<button onclick={() => counter.count = 0}>\n\treset\n</button>\n```\n\n```svelte\n<!--- file: Child.svelte --->\n<script>\n\timport { getCounter } from './context.ts';\n\n\tconst counter = getCounter();\n</script>\n\n<p>{counter.count}</p>\n```\n\n```ts\n/// file: context.ts\nimport { createContext } from 'svelte';\n\ninterface Counter {\n\tcount: number;\n}\n\nexport const [getCounter, setCounter] = createContext<Counter>();\n```\n<!-- codeblock:end -->\n\n...though note that if you _reassign_ `counter` instead of updating it, you will 'break the link' — in other words instead of this...\n\n```svelte\n<button onclick={() => counter = { count: 0 } }>\n\treset\n</button>\n```\n\n...you must do this:\n\n```svelte\n<button onclick={() => +++counter.count = 0+++}>\n\treset\n</button>\n```\n\nSvelte will warn you if you get it wrong.\n\nSimilarly, to pass primitive values through context, use functions as described in [Passing state into functions]($state#Passing-state-into-functions)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/06-runtime/02-context.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/06-runtime/02-context.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/06-runtime/02-context.md#0",
+    "b": "svelte:documentation/docs/06-runtime/02-context.md#2",
+    "relation": "overlapping",
+    "related": 0.9962,
+    "probabilities": {
+     "same": 0.0161,
+     "overlapping": 0.9747,
+     "conflicting": 0.0054,
+     "unrelated": 0.0038
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 71,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 103,
+   "total_ms": 106
+  }
+ }
+}

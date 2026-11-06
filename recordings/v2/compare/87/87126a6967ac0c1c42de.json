@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/87/87126a6967ac0c1c42de",
+ "request_hash": "87126a6967ac0c1c42de74ec8e669cf25fd0d217c1f1d2edf310571d94b1156f",
+ "recorded_at": "2026-11-06T14:41:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1060,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "169.010242",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=297"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#9",
+    "text": "### Changes to `pydantic.generics.GenericModel`\n\nThe `pydantic.generics.GenericModel` class is no longer necessary, and has been removed. Instead, you can now\ncreate generic `BaseModel` subclasses by just adding `Generic` as a parent class on a `BaseModel` subclass directly.\nThis looks like `class MyGenericModel(BaseModel, Generic[T]): ...`.\n\nMixing of V1 and V2 models is not supported which means that type parameters of such generic `BaseModel` (V2)\ncannot be V1 models.\n\nWhile it may not raise an error, we strongly advise against using *parametrized* generics in `isinstance` checks.\n\n* For example, you should not do `isinstance(my_model, MyGenericModel[int])`.\n    However, it is fine to do `isinstance(my_model, MyGenericModel)`. (Note that for standard generics, it would raise\n    an error to do a subclass check with a parameterized generic.)\n* If you need to perform `isinstance` checks against parametrized generics, you can do this by subclassing the\n    parametrized generic class. This looks like `class MyIntModel(MyGenericModel[int]): ...` and\n    `isinstance(my_model, MyIntModel)`.\n\nFind more information in the [Generic models](concepts/models.md#generic-models) documentation."
+   },
+   {
+    "id": "pydantic:docs/concepts/models.md#29",
+    "text": "1. The `OuterT` model is parametrized with `int`, but the data associated with the `T` annotations during validation is of type `str`, leading to validation errors.\n\n!!! warning\n    While it may not raise an error, we strongly advise against using parametrized generics in [`isinstance()`](https://docs.python.org/3/library/functions.html#isinstance) checks.\n\n    For example, you should not do `isinstance(my_model, MyGenericModel[int])`. However, it is fine to do `isinstance(my_model, MyGenericModel)` (note that, for standard generics, it would raise an error to do a subclass check with a parameterized generic class).\n\n    If you need to perform [`isinstance()`](https://docs.python.org/3/library/functions.html#isinstance) checks against parametrized generics, you can do this by subclassing the parametrized generic class:\n\n    ```python {test=\"skip\" lint=\"skip\"}\n    class MyIntModel(MyGenericModel[int]): ...\n\n    isinstance(my_model, MyIntModel)\n    ```\n\n??? note \"Implementation Details\"\n    When using nested generic models, Pydantic sometimes performs revalidation in an attempt to produce the most intuitive validation result.\n    Specifically, if you have a field of type `GenericModel[SomeType]` and you validate data like `GenericModel[SomeCompatibleType]` against this field,\n    we will inspect the data, recognize that the input data is sort of a \"loose\" subclass of `GenericModel`, and revalidate the contained `SomeCompatibleType` data."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/concepts/models.md#29"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/models.md#29",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/migration.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#9",
+    "b": "pydantic:docs/concepts/models.md#29",
+    "relation": "overlapping",
+    "related": 0.9954,
+    "probabilities": {
+     "same": 0.0238,
+     "overlapping": 0.9648,
+     "conflicting": 0.0068,
+     "unrelated": 0.0046
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9471,
+       "restated": 0.0355,
+       "elaborated": 0.0108,
+       "different": 0.0066
+      },
+      "confidence": 0.9934,
+      "a": {
+       "document": "pydantic:docs/migration.md#9",
+       "quote": "While it may not raise an error, we strongly advise against using *parametrized* generics in `isinstance` checks.",
+       "start": 477,
+       "end": 590,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/concepts/models.md#29",
+       "quote": "warning\n    While it may not raise an error, we strongly advise against using parametrized generics in [`isinstance()`](https://docs.python.org/3/library/functions.html#isinstance) checks.\n\n    For example, you should not do `isinstance(my_model, MyGenericModel[int])`.",
+       "start": 170,
+       "end": 439,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.2554,
+       "restated": 0.7071,
+       "elaborated": 0.0286,
+       "different": 0.0088
+      },
+      "confidence": 0.9912,
+      "a": {
+       "document": "pydantic:docs/migration.md#9",
+       "quote": "However, it is fine to do `isinstance(my_model, MyGenericModel)`.",
+       "start": 674,
+       "end": 739,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/concepts/models.md#29",
+       "quote": "However, it is fine to do `isinstance(my_model, MyGenericModel)` (note that, for standard generics, it would raise an error to do a subclass check with a parameterized generic class).\n\n    If you need to perform [`isinstance()`](https://docs.python.org/3/library/functions.html#isinstance) checks against parametrized generics, you can do this by subclassing the parametrized generic class:\n\n    ```python {test=\"skip\" lint=\"skip\"}\n    class MyIntModel(MyGenericModel[int]): ...\n\n    isinstance(my_model, MyIntModel)\n    ```\n\n???",
+       "start": 440,
+       "end": 969,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 2,
+   "counterparts_ms": 80
+  },
+  "timing": {
+   "read_ms": 177,
+   "total_ms": 181
+  }
+ }
+}

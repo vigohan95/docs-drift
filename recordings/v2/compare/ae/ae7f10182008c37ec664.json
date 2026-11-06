@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ae/ae7f10182008c37ec664",
+ "request_hash": "ae7f10182008c37ec6647a1197f471901ce1beb888dff609a545dd1b2a0f3136",
+ "recorded_at": "2026-11-06T14:39:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2596,
+ "response_headers": {
+  "x-clocked-credits": "12",
+  "x-clocked-model-ms": "278.060699",
+  "x-clocked-cost-usd": "0.002390",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=13,cfOrigin;dur=0,cfWorker;dur=496"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/etag.md#3",
+    "text": "## Config\n\n| Property | Type                    | Description                                                                                                        | Default |\n|:---------|:------------------------|:-------------------------------------------------------------------------------------------------------------------|:--------|\n| Weak     | `bool`                  | Enables weak validators. Weak ETags are easier to generate but less reliable for comparisons. | `false` |\n| Next     | `func(fiber.Ctx) bool` | Next defines a function to skip this middleware when it returns true.                                                | `nil`   |"
+   },
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "text": "## Config\n\n| Property               | Type                      | Description                                                                                 | Default                                  |\n|:-----------------------|:--------------------------|:--------------------------------------------------------------------------------------------|:-----------------------------------------|\n| Next                   | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when it returns true. It runs before `MaxFunc`. | `nil`                                    |\n| Max                    | `int`                     | Maximum number of recent connections within `Expiration` seconds before sending a 429 response. A value of `0` or less selects the default. | 5                                        |\n| MaxFunc                | `func(fiber.Ctx) int`     | Function that calculates the maximum number of recent connections within `Expiration` seconds before sending a 429 response. Returning `0` skips the limiter for that request; a negative value rejects every request. | A function that returns `cfg.Max`    |\n| KeyGenerator           | `func(fiber.Ctx) string` | Function to generate custom keys; uses `c.IP()` by default. A key longer than 192 bytes, or starting with `sha256:`, is replaced by its SHA-256 digest (`sha256:<hex>`) before it reaches the storage, so oversized keys are still limited per client. | A function using `c.IP()` as the default   |\n| Expiration             | `time.Duration`           | Duration to keep request records in memory, which is also the length of the window. It is counted in whole seconds: a positive value below one second is floored to one second, and zero or a negative value selects the default. | 1 * time.Minute                          |\n| ExpirationFunc         | `func(fiber.Ctx) time.Duration` | Function that calculates the expiration duration dynamically. Positive values below one second are floored to one second; non-positive values fall back to `Expiration`. Requests that share a key share a window, which keeps the length given by the request that opened it. | A function that returns `cfg.Expiration` |\n| LimitReached           | `fiber.Handler`           | Called when a request exceeds the limit.                                       | A function sending a 429 response          |\n| SkipFailedRequests     | `bool`                    | When set to `true`, requests with status code ≥ 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| SkipSuccessfulRequests | `bool`                    | When set to `true`, requests with status code < 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| DisableHeaders         | `bool`                    | When set to `true`, the middleware omits rate limit headers (`X-RateLimit-*` and `Retry-After`). Otherwise a request that passes carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the window ends), and a rejected one carries `Retry-After` (seconds). | false                                    |\n| DisableValueRedaction  | `bool`                    | Disables redaction of limiter keys in error messages and logs. A key longer than 192 bytes is shown as its SHA-256 digest. | false                                    |"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/etag.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/limiter.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/etag.md#3"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/etag.md#3",
+    "b": "fiber:docs/middleware/limiter.md#7",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0062,
+     "overlapping": 0.9866,
+     "conflicting": 0.0044,
+     "unrelated": 0.0027
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.3227,
+       "restated": 0.4989,
+       "elaborated": 0.1618,
+       "different": 0.0166
+      },
+      "confidence": 0.9834,
+      "a": {
+       "document": "fiber:docs/middleware/etag.md#3",
+       "quote": "| Next     | `func(fiber.Ctx) bool` | Next defines a function to skip this middleware when it returns true.",
+       "start": 488,
+       "end": 595,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/limiter.md#7",
+       "quote": "## Config\n\n| Property               | Type                      | Description                                                                                 | Default                                  |\n|:-----------------------|:--------------------------|:--------------------------------------------------------------------------------------------|:-----------------------------------------|\n| Next                   | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when it returns true.",
+       "start": 0,
+       "end": 518,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 191,
+   "passages": 1,
+   "counterparts_ms": 120
+  },
+  "timing": {
+   "read_ms": 344,
+   "total_ms": 349
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/90/90d76558d9110307f146",
+ "request_hash": "90d76558d9110307f146f0e10109ab8c0cd672a126446ee3f2822f0372d59035",
+ "recorded_at": "2026-11-06T14:37:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 910,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.444256",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=147"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/migration/index.md#4",
+    "text": "## Changes to the Plugin API\n\nAn important change is that [`this.resolve()`](../plugin-development/index.md#this-resolve) will now by default add `skipSelf: true`. That means when calling `this.resolve()` from a [`resolveId`](../plugin-development/index.md#resolveid) hook, this hook will not be called again by this or further nested `this.resolve()` calls from other plugins unless they use a different `source` or `importer`. We found that this is a reasonable default for most plugins that prevents unintended infinite loops. To get the old behaviour, you can manually add `skipSelf: false`.\n\nAnother important change is that Rollup watch mode will no longer watch ids of files that have been loaded via a plugin [`load`](../plugin-development/index.md#load) hook. So this mainly affects \"virtual\" files, where it really does not make sense to watch a hard drive location for changes. Instead, it is now up to plugins that use a `load` hook to manually call [`this.addWatchFile()`](../plugin-development/index.md#this-addwatchfile) for all the files they depend on to handle the `load` hook.\n\nIf your plugin handles import assertions, note that in the [`resolveId`](../plugin-development/index.md#resolveid) hook and other places, `assertions` have been replaced with `attributes` as the JavaScript feature was also renamed. Also, the abstract syntax tree representation of import attributes now follows the [ESTree spec](https://github.com/estree/estree/blob/7a0c8fb02a33a69fa16dbe3ca35beeaa8f58f1e3/experimental/import-attributes.md) again.\n\nIf you want to emit warnings from your plugin, you can no longer call `options.onwarn()` in the [`buildStart`](../plugin-development/index.md#buildstart) hook. Instead, either use [`this.warn()`](../plugin-development/index.md#load) or [`options.onLog()`](../configuration-options/index.md#onlog)."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#31",
+    "text": "Note that in watch mode or when using the cache explicitly, the result of this hook is cached when rebuilding and the hook is only triggered again for a module `id` if either the `code` of the module has changed or a file has changed that was added via `this.addWatchFile` or `this.emitFile` the last time the hook was triggered for this module.\n\nIn all other cases, the [`shouldTransformCachedModule`](#shouldtransformcachedmodule) hook is triggered instead, which gives access to the cached module. Returning `true` from `shouldTransformCachedModule` will remove the module from cache and instead call `transform` again.\n\nYou can also use the object form of the return value to configure additional properties of the module. Note that it's possible to return only properties and no code transformations.\n\nIf `false` is returned for `moduleSideEffects` and no other module imports anything from this module, then this module will not be included even if the module would have side effects.\n\nIf `true` is returned, Rollup will use its default algorithm to include all statements in the module that have side effects (such as modifying a global or exported variable).\n\nIf `\"no-treeshake\"` is returned, treeshaking will be turned off for this module and it will also be included in one of the generated chunks even if it is empty."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/migration/index.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/migration/index.md#4",
+    "b": "rollup:docs/plugin-development/index.md#31",
+    "relation": "unrelated",
+    "related": 0.0084,
+    "probabilities": {
+     "same": 0.0028,
+     "overlapping": 0.0028,
+     "conflicting": 0.0028,
+     "unrelated": 0.9916
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 36
+  }
+ }
+}

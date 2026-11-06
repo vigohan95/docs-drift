@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ff/ff2c22f5c09ac14d59ed",
+ "request_hash": "ff2c22f5c09ac14d59ed252bafff46ca65527f142517cd433587305803b68a41",
+ "recorded_at": "2026-11-06T14:40:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1034,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "166.068861",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=303"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/bind.md#3",
+    "text": "#### Precedence Order\n\nThe binding sources have the following precedence:\n\n1. **URL Parameters (URI)**\n2. **Request Body (e.g., JSON or form data)**\n3. **Query Parameters**\n4. **Request Headers**\n5. **Cookies**\n\n:::info\nThe request body is only included as a binding source when the request has both a non-empty body **and** a non-empty `Content-Type` header. Without a `Content-Type` the body is not read, so a streamed body stays available to [`BodyStream`](./ctx.md#bodystream).\n:::\n\nEach source fills only the top-level fields of `out` that are still at their zero value, so the first source in the order that provides a non-zero value for a field wins. A non-zero value you set on `out` before the call is never overwritten. A zero one counts as unset, so a source can fill it, and a zero value from an earlier source (`0`, `\"\"`, `false`) does not stop a later source from filling the field. A nested struct, slice or map that an earlier source set, even partly, is kept as a whole, so a later source cannot fill its remaining zero fields. A configured [`StructValidator`](#validation) runs once, on the merged struct.\n\n`out` must be a non-nil pointer to a struct. Anything else, such as a map, returns `fiber.ErrUnprocessableEntity`. If a source fails to bind, `All` stops and returns that error without trying the remaining sources.\n\n```go title=\"Signature\"\nfunc (b *Bind) All(out any) error\n```\n\n```go title=\"Example\"\ntype User struct {\n    Name      string                `query:\"name\" json:\"name\" form:\"name\"`\n    Email     string                `json:\"email\" form:\"email\"`\n    Role      string                `header:\"X-User-Role\"`\n    SessionID string                `json:\"session_id\" cookie:\"session_id\"`\n    ID        int                   `uri:\"id\" query:\"id\" json:\"id\" form:\"id\"`\n}\n\napp.Post(\"/users\", func(c fiber.Ctx) error {\n    user := new(User)\n\n    if err := c.Bind().All(user); err != nil {\n        return err\n    }\n\n    // All available data is now bound to the user struct\n    return c.JSON(user)\n})\n```"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#4",
+    "text": "## 🚀 App\n\nWe have made several changes to the Fiber app, including:\n\n- **Listen**: The `Listen` method has been unified with the configuration, allowing for more streamlined setup.\n- **Static**: The `Static` method has been removed and its functionality has been moved to the [static middleware](./middleware/static.md).\n- **app.Config properties**: Several properties have been moved to the listen configuration:\n  - `DisableStartupMessage`\n  - `EnablePrefork` (previously `Prefork`)\n  - `EnablePrintRoutes`\n  - `ListenerNetwork` (previously `Network`)\n- **Trusted Proxy Configuration**: The `EnabledTrustedProxyCheck` has been moved to `app.Config.TrustProxy`, and `TrustedProxies` has been moved to `TrustProxyConfig.Proxies`. Additionally, `ProxyHeader` must be set to read client IPs from proxy headers (e.g., `X-Forwarded-For`).\n- **XMLDecoder Config Property**: The `XMLDecoder` property has been added to allow usage of 3rd-party XML libraries in XML binder.\n- **SkipUnmatchedRoutes Config Property**: Opt-in flag that answers requests with no matching route with `404`/`405` before the middleware chain runs. Note that middleware (loggers, static or catch-all responders) does not run for these requests; CORS preflight requests are exempt so cors middleware keeps working. Customize the responses via `ErrorHandler`.\n- **StreamRequestBody**: A `multipart/form-data` body is no longer parsed by the server before the handlers run, as if\n  `DisablePreParseMultipartForm` were set: the pre-parse ignored `BodyLimit` and stored an upload of any declared length\n  before a middleware could refuse it. `FormFile`, `MultipartForm` and `Bind().Form()` parse it on demand within\n  `BodyLimit`, so an app that takes larger uploads this way has to raise the limit or read `BodyStream()`. `Body()`,\n  `BodyRaw()` and `FormValue()` now read a streamed body within `BodyLimit` too and answer a larger one\n  `413 Request Entity Too Large` while no response body was written, and the body binders fail on it; only `BodyStream()` reads past the limit.\n  `Bind().All()` reads the body only when the request has a `Content-Type`. `net/http` handlers, registered directly or\n  through the adaptor, and `adaptor.ConvertRequest` answer a streamed body larger than `BodyLimit` with `413` as well,\n  and the cache middleware leaves a request whose streamed body is chunked or longer than `BodyLimit` uncached instead\n  of reading it to build the key. The logger's `${body}` and `${form:}` read it within `BodyLimit` too, without\n  changing the handler's response.\n- **Buffer sizes**: The default `ReadBufferSize` and `WriteBufferSize` are now `8192` bytes (they were `4096` in v2). The read buffer also limits the size of the request headers, so requests with larger headers or cookies are accepted by default. Set either field to keep a different size."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/bind.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/bind.md#3",
+    "b": "fiber:docs/whats_new.md#4",
+    "relation": "overlapping",
+    "related": 0.8967,
+    "probabilities": {
+     "same": 0.0163,
+     "overlapping": 0.8625,
+     "conflicting": 0.0179,
+     "unrelated": 0.1033
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 55,
+   "passage_reads": 1,
+   "passages_ms": 121,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 175,
+   "total_ms": 180
+  }
+ }
+}

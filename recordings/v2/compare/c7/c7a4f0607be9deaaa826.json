@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c7/c7a4f0607be9deaaa826",
+ "request_hash": "c7a4f0607be9deaaa82672c29fea3a33f769b38d2604b68a5832b4da789653b9",
+ "recorded_at": "2026-11-06T14:40:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1802,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.534876",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=14,cfOrigin;dur=0,cfWorker;dur=213"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#5",
+    "text": "### Context\n\nReturns a `context.Context` that was previously set with [`SetContext`](#setcontext).\nIf no context was set, it returns `context.Background()`. Unlike `fiber.Ctx` itself,\nthe returned context is safe to use after the handler completes.\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) Context() context.Context\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func(c fiber.Ctx) error {\n  ctx := c.Context()\n  go doWork(ctx)\n  return nil\n})\n```\n\n:::info Graceful shutdown\nThe default `Context()` is **not** canceled when the app shuts down. In-flight handlers that pass `c.Context()` to database clients or other cancellation-aware work keep running until they finish (or until you cancel a derived context yourself).\n\n[`RequestCtx`](#requestctx) implements `context.Context` differently: its `Done()` channel is closed when the underlying fasthttp server starts shutting down. Prefer `c.Context()` (or a context you derive with `context.WithCancel` / timeouts) for work that must outlive the start of graceful shutdown.\n:::"
+   },
+   {
+    "id": "fiber:docs/guide/context.md#14",
+    "text": "## Summary\n\n- `fiber.Ctx` satisfies `context.Context` but its `Deadline`, `Done`, and `Err`\n  methods are currently no-ops.\n- `RequestCtx` exposes the raw `fasthttp` context. Its `Done` channel\n  closes only on server shutdown, not on client disconnect.\n- Use `fiber.StoreInContext(c, key, value)` to store request-scoped values in\n  `c.Locals()` and, when `fiber.Config.PassLocalsToContext` is enabled, in\n  `c.Context()` as well, so they are available through either API.\n- Middleware helpers like `requestid.FromContext` or `session.FromContext`\n  make it easy to retrieve request-scoped data. Copy a string that comes from\n  the request, or set `Immutable`, before a goroutine keeps it.\n- Standard helpers such as `context.WithTimeout` should wrap `c.Context()`,\n  not `fiber.Ctx`, to create derived contexts that honor deadlines and can\n  outlive the handler.\n- `fiber.Config.PassLocalsToContext` controls whether Fiber context helpers\n  also propagate values into the request `context.Context` for Fiber-backed\n  contexts when using `StoreInContext`. It defaults to `false` for backward\n  compatibility, while `ValueFromContext` keeps reading from `c.Locals()`.\n- Use `c.Context()` to obtain a `context.Context` that can outlive the handler,\n  and `c.SetContext()` to customize it with additional values or deadlines.\n\nWith these tools, you can seamlessly integrate Fiber applications with\nGo's context-based APIs and manage request-scoped data effectively."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/guide/context.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#5",
+    "b": "fiber:docs/guide/context.md#14",
+    "relation": "overlapping",
+    "related": 0.9989,
+    "probabilities": {
+     "same": 0.0024,
+     "overlapping": 0.9943,
+     "conflicting": 0.0022,
+     "unrelated": 0.0011
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 98,
+   "total_ms": 101
+  }
+ }
+}

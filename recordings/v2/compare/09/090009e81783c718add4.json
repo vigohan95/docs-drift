@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/09/090009e81783c718add4",
+ "request_hash": "090009e81783c718add4a82d85254350e40e8c784a51936ab21d1fc38b800620",
+ "recorded_at": "2026-11-06T14:40:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1037,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "162.717024",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=295"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/client/rest.md#48",
+    "text": "### SetMaxResponseBodySize\n\nSets the largest response body the client buffers, in bytes. A response that declares or sends more fails with `fasthttp.ErrBodyTooLarge`. A client from `New`, the default client behind the package-level helpers included, starts at 100 MiB; a client built around a `fasthttp.Client`, `HostClient` or `LBClient` keeps that client's `MaxResponseBodySize`, which `fasthttp` leaves unlimited. Zero or less removes the limit. Call it before the first request: a `fasthttp.Client` gives each host the limit it has when it first serves that host. A body read through [response streaming](#response-streaming) is not buffered and not limited, which makes streaming the way to receive a larger one.\n\n```go title=\"Signature\"\nfunc (c *Client) SetMaxResponseBodySize(size int) *Client\n```\n\n:::caution\n`fasthttp` allocates a buffered body from the `Content-Length` or chunk size the server declares, before the body arrives. Without a limit, a server can end the process with a response of a few bytes that declares a body too large to allocate: the Go runtime reports that as a fatal error, which `recover` cannot catch. Keep a limit for servers you do not control.\n:::"
+   },
+   {
+    "id": "fiber:docs/middleware/proxy.md#22",
+    "text": "The runtime helpers (`Do`, `DoRedirects`, `Forward`, `DomainForward` and `BalancerForward`) dispatch through a client that bounds every request: each request, and each hop `DoRedirects` follows, has 30 seconds for the whole exchange, the connect, the write and the read of the response included, in one attempt, and a response body of at most 100 MiB, which the proxy buffers whole or, for a response set to stream, relays up to that size, so an upstream that stalls or streams without end holds neither the handler nor the memory; a transfer that takes longer than the bound fails with it too. `DoTimeout` and `DoDeadline` set the bound of their own request, longer or shorter, and the time they allow, like `Config.Timeout`, covers the connect as well. For other bounds, hand the proxy a client with `ReadTimeout`, `WriteTimeout` and `MaxResponseBodySize` set, registered with `proxy.WithClient` or passed per call; it replaces the default client with its bounds, and fasthttp applies a client's read and write timeouts to each attempt it makes. A client that streams response bodies is held to its `MaxResponseBodySize` as well, which fasthttp ignores for a stream:\n\n```go\nproxy.WithClient(&fasthttp.Client{\n    NoDefaultUserAgentHeader: true,\n    DisablePathNormalizing:   true,\n    ReadTimeout:              30 * time.Second,\n    WriteTimeout:             10 * time.Second,\n    MaxResponseBodySize:      10 << 20, // 10 MiB\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/client/rest.md#48",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/proxy.md#22"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/proxy.md#22",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/client/rest.md#48"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/client/rest.md#48",
+    "b": "fiber:docs/middleware/proxy.md#22",
+    "relation": "overlapping",
+    "related": 0.9962,
+    "probabilities": {
+     "same": 0.0099,
+     "overlapping": 0.9784,
+     "conflicting": 0.0079,
+     "unrelated": 0.0038
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0133,
+       "restated": 0.8047,
+       "elaborated": 0.0446,
+       "different": 0.1374
+      },
+      "confidence": 0.619,
+      "a": {
+       "document": "fiber:docs/client/rest.md#48",
+       "quote": "A body read through [response streaming](#response-streaming) is not buffered and not limited, which makes streaming the way to receive a larger one.",
+       "start": 568,
+       "end": 717,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#22",
+       "quote": "A client that streams response bodies is held to its `MaxResponseBodySize` as well, which fasthttp ignores for a stream:\n\n```go\nproxy.WithClient(&fasthttp.Client{\n    NoDefaultUserAgentHeader: true,\n    DisablePathNormalizing:   true,\n    ReadTimeout:              30 * time.Second,\n    WriteTimeout:             10 * time.Second,\n    MaxResponseBodySize:      10 << 20, // 10 MiB\n})\n```",
+       "start": 1048,
+       "end": 1435,
+       "confidence": 0.619
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 71,
+   "passages": 1,
+   "counterparts_ms": 73
+  },
+  "timing": {
+   "read_ms": 171,
+   "total_ms": 174
+  }
+ }
+}

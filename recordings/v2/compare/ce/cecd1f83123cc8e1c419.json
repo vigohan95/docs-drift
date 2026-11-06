@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ce/cecd1f83123cc8e1c419",
+ "request_hash": "cecd1f83123cc8e1c41960a2a5f9d0621f2f5fd488f65323cdc2bfb2a2daf6a0",
+ "recorded_at": "2026-11-06T14:40:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1042,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.959551",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=157"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/extra/internal.md#16",
+    "text": "## Context Lifecycle Management\n\nFiber minimizes allocations by pooling Context objects. The lifecycle of a Context is as follows:\n\n1. **Acquisition:** When a new HTTP request arrives, a Context is retrieved from the pool via `App.AcquireCtx()`.\n2. **Reset:** The acquired Context is reset with the current `fasthttp.RequestCtx` to clear previous data and initialize new request‑specific values.\n3. **Processing:** The Context is passed along the middleware and handler chain.\n4. **Release:** After processing the request (or when an error occurs), the Context is released back to the pool via `App.ReleaseCtx()`, making it available for reuse.\n\n```mermaid\nflowchart TD\n    A[\"HTTP Request<br/>(fasthttp)\"]\n    B[\"Acquire Context<br/>(App.AcquireCtx())\"]\n    C[\"Reset Context<br/>(DefaultCtx.Reset())\"]\n    D[\"Process Request<br/>(Handlers & Middleware)\"]\n    E[\"Error Handling<br/>(if needed)\"]\n    F[\"Release Context<br/>(App.ReleaseCtx())\"]\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n```"
+   },
+   {
+    "id": "fiber:docs/guide/context.md#4",
+    "text": "## Working with `RequestCtx`\n\nThe underlying [`fasthttp.RequestCtx`](https://pkg.go.dev/github.com/valyala/fasthttp#RequestCtx)\ncan be accessed via `c.RequestCtx()`.\nThis exposes low-level APIs and a `context.Context` implementation of its own.\n\n```go title=\"Accessing RequestCtx\"\napp.Get(\"/raw\", func(c fiber.Ctx) error {\n    fctx := c.RequestCtx()\n    // use fasthttp APIs directly\n    fctx.Response.Header.Set(\"X-Engine\", \"fasthttp\")\n    return nil\n})\n```\n\n`fasthttp.RequestCtx` satisfies the `context.Context` interface itself.\n`Deadline` always reports no deadline. `Done` closes only when the server\nshuts down, and `Err` then returns `context.Canceled`. Note that this is the\n`fasthttp.RequestCtx`, not Fiber's `Ctx`, whose `Done` is always `nil`.\n\n:::caution\n`Done` does not fire when an individual client disconnects. To stop a\nlong-running handler at a deadline, wrap `c.Context()` with\n`context.WithTimeout` as shown below.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/extra/internal.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/guide/context.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/extra/internal.md#16",
+    "b": "fiber:docs/guide/context.md#4",
+    "relation": "unrelated",
+    "related": 0.4168,
+    "probabilities": {
+     "same": 0.0194,
+     "overlapping": 0.3808,
+     "conflicting": 0.0167,
+     "unrelated": 0.5832
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 45
+  },
+  "timing": {
+   "read_ms": 44,
+   "total_ms": 46
+  }
+ }
+}

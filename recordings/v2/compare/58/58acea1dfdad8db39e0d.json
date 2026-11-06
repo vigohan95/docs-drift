@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/58/58acea1dfdad8db39e0d",
+ "request_hash": "58acea1dfdad8db39e0d6a805cd3aebd2e2ae66d0dc05c6b415537d7d4bebf82",
+ "recorded_at": "2026-11-06T14:43:25Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3126,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "193.399199",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=341"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "text": "### Persist and Flush\n\nThere are 2 methods we should first describe to understand how persisting works in MikroORM: [`em.persist()`](/api/core/class/EntityManager#persist) and [`em.flush()`](/api/core/class/EntityManager#flush).\n\n[`em.persist(entity)`](/api/core/class/EntityManager#persist) is used to mark new entities for future persisting. It will make the entity managed by the [`EntityManager`](/api/core/class/EntityManager) and once `flush` will be called, it will be written to the database.\n\nWe use [`em.create()`](/api/core/class/EntityManager#create) to create entity instances.\n\n```ts\n// create a new user entity instance\nconst user = em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\n\n// em.create() automatically calls persist(), so we just need to flush\nawait em.flush();\n\n// alternatively, you can persist manually:\nconst user2 = em.create(UserSchema, { ... }, { persist: false });\nem.persist(user2);\nawait em.flush();\n```\n\nTo understand `flush`, let's first define what managed entity is: An entity is managed if it's fetched from the database (via [`em.find()`](/api/core/class/EntityManager#find)) or registered as new through [`em.persist()`](/api/core/class/EntityManager#persist) and flushed later (only after the `flush` it becomes managed).\n\n[`em.flush()`](/api/core/class/EntityManager#flush) will go through all managed entities, compute appropriate change sets and perform according database queries. As an entity loaded from the database becomes managed\nautomatically, you do not have to call persist on those, and flush is enough to update them."
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#6",
+    "text": "### Creating entity graph\n\nWe've been using [`em.create()`](/api/core/class/EntityManager#create) to create entity instances. This method allows you to create a deep entity graph, mapping foreign keys of your relations to entity references of the correct type. It will also call [`em.persist()`](/api/core/class/EntityManager#persist) on the created entity (unless disabled via `persistOnCreate` option).\n\n> You can wipe most of the contents of `server.ts` file and keep only the initial part with ORM init, up to the point where the first `User` entity gets flushed, plus the `orm.close()` call at the end. We won't be using this code going forward, it is just a playground for you.\n\n```ts title='server.ts'\n// fork first to have a separate context\nconst em = orm.em.fork();\n\n// create new user entity instance\nconst user = em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\n\n// em.create auto-persists, so just flush\nawait em.flush();\n\n// clear the context to simulate fresh request\nem.clear();\n\n// create the article instance\nconst article = em.create(ArticleSchema, {\n  slug: 'foo',\n  title: 'Foo',\n  text: 'Lorem impsum dolor sit amet',\n  description: 'Foo is bar',\n  author: user.id,\n});\n\n// `em.create` calls `em.persist` automatically, so flush is enough\nawait em.flush();\nconsole.log(article);\n```\n\n:::info `em.clear()`\n\nIf you carefully checked this snippet, you probably found that new mysterious [`em.clear()`](/api/core/class/EntityManager#clear) call. What does it do? It clears the context for the [`EntityManager`](/api/core/class/EntityManager), meaning it will detach all the entities it was managing. It will bring the [`EntityManager`](/api/core/class/EntityManager) to the same state as if you would create a fresh fork via [`em.fork()`](/api/core/class/EntityManager#fork). You won't usually need this in your app, but it is very handy for unit testing, to simulate new requests coming in. You may as well use forks explicitly if you want.\n\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/02-relationships.md#6"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/01-first-entity.md#12"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "b": "mikro-orm:docs/docs/guide/02-relationships.md#6",
+    "relation": "overlapping",
+    "related": 0.9982,
+    "probabilities": {
+     "same": 0.0088,
+     "overlapping": 0.9856,
+     "conflicting": 0.0037,
+     "unrelated": 0.0018
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0116,
+       "restated": 0.9689,
+       "elaborated": 0.0083,
+       "different": 0.0111
+      },
+      "confidence": 0.9889,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+       "quote": "We use [`em.create()`](/api/core/class/EntityManager#create) to create entity instances.",
+       "start": 502,
+       "end": 590,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/guide/02-relationships.md#6",
+       "quote": "### Creating entity graph\n\nWe've been using [`em.create()`](/api/core/class/EntityManager#create) to create entity instances.",
+       "start": 0,
+       "end": 125,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 118,
+   "passages": 1,
+   "counterparts_ms": 51
+  },
+  "timing": {
+   "read_ms": 202,
+   "total_ms": 206
+  }
+ }
+}

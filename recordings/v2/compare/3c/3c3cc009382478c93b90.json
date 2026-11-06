@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3c/3c3cc009382478c93b90",
+ "request_hash": "3c3cc009382478c93b90dba125b37e981171437a3b9cb42a35314c6453ab5171",
+ "recorded_at": "2026-11-06T14:39:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2106,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "246.595547",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=384"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#16",
+    "text": "### GetRouteURL\n\nGenerates URLs to named routes, with parameters. URLs are relative, for example: \"/user/1831\"\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) GetRouteURL(routeName string, params Map) (string, error)\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func(c fiber.Ctx) error {\n    return c.SendString(\"Home page\")\n}).Name(\"home\")\n\napp.Get(\"/user/:id\", func(c fiber.Ctx) error {\n    return c.SendString(c.Params(\"id\"))\n}).Name(\"user.show\")\n\napp.Get(\"/test\", func(c fiber.Ctx) error {\n    location, _ := c.GetRouteURL(\"user.show\", fiber.Map{\"id\": 1})\n    return c.SendString(location)\n})\n\n// /test returns \"/user/1\"\n```\n\n:::note\nEach `params` value is automatically percent-encoded with URL path-segment\nrules. Greedy parameters (`*` and `+`) preserve `/` inside the matched path\ntail; delimiters such as `?` and `#` remain parameter data instead of adding a\nquery or fragment. [`Route.URL`](./app.md#getroute) and\n[`Redirect().Route`](./redirect.md#route) apply the same encoding.\n\nThese take the value as data, not as URL text. Representable values use the same\nencoding under any configuration. With `UnescapePath` off (the default) `c.Params`\nreturns the value still percent-encoded, so forwarding it straight back encodes\nthe `%` a second time. Turn `UnescapePath` on, or decode with\n[`url.PathUnescape`](https://pkg.go.dev/net/url#PathUnescape) first.\nAn app with `UnescapePath` enabled decodes `%2F` before route matching, so an\nordinary single-segment parameter holding a `/` cannot round-trip and returns\n`ErrRouteNotRepresentable`. Greedy (`*` or `+`), adjacent single-byte parameters\nand required parameters with a single-byte non-slash terminator retain their\nexisting slash-matching rules. An optional parameter with such a terminator does\nnot match a `/`, so a decoded `/` in its value returns `ErrRouteNotRepresentable`.\nDot-containing values are also rejected when the composed path has a `.` or\n`..` segment that would be removed during normalization. Surrounding route\nconstants are considered: `:name.txt` with `name=\".\"` remains representable.\nPass a different value or use a route that can represent it; do not pre-encode it.\n:::"
+   },
+   {
+    "id": "fiber:docs/api/redirect.md#2",
+    "text": "### Route\n\nRedirects to a named route with parameters and queries.\n\n:::info\nTo send params and queries to a route, use the [`RedirectConfig`](#redirectconfig) struct.\n:::\n\n```go title=\"Signature\"\nfunc (r *Redirect) Route(name string, config ...RedirectConfig) error\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func(c fiber.Ctx) error {\n  // /user/fiber\n  return c.Redirect().Route(\"user\", fiber.RedirectConfig{\n    Params: fiber.Map{\n      \"name\": \"fiber\",\n    },\n  })\n})\n\napp.Get(\"/with-queries\", func(c fiber.Ctx) error {\n  // /user/fiber?data[0][name]=john&data[0][age]=10&test=doe\n  return c.Redirect().Route(\"user\", fiber.RedirectConfig{\n    Params: fiber.Map{\n      \"name\": \"fiber\",\n    },\n    Queries: map[string]string{\n      \"data[0][name]\": \"john\",\n      \"data[0][age]\":  \"10\",\n      \"test\":          \"doe\",\n    },\n  })\n})\n\napp.Get(\"/user/:name\", func(c fiber.Ctx) error {\n  return c.SendString(c.Params(\"name\"))\n}).Name(\"user\")\n```\n\n`Route` returns `fiber.ErrNotFound` when no route has the given name. Values in `Queries` are percent-encoded and keys are written as given. The order of the query parameters is not specified.\n\n:::note\nEach `Params` value is automatically percent-encoded with URL path-segment\nrules. Greedy parameters (`*` and `+`) preserve `/` inside the matched path\ntail; delimiters such as `?` and `#` remain parameter data instead of adding a\nquery or fragment, and cannot absorb or discard `Queries`.\n[`Route.URL`](./app.md#getroute) and [`GetRouteURL`](./ctx.md#getrouteurl) apply\nthe same encoding."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#16",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/redirect.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/api/redirect.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/ctx.md#16"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#16",
+    "b": "fiber:docs/api/redirect.md#2",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0049,
+     "overlapping": 0.9892,
+     "conflicting": 0.0035,
+     "unrelated": 0.0024
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0303,
+       "restated": 0.7489,
+       "elaborated": 0.1377,
+       "different": 0.0831
+      },
+      "confidence": 0.824,
+      "a": {
+       "document": "fiber:docs/api/ctx.md#16",
+       "quote": "Each `params` value is automatically percent-encoded with URL path-segment",
+       "start": 629,
+       "end": 703,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/api/redirect.md#2",
+       "quote": "The order of the query parameters is not specified.\n\n:::note\nEach `Params` value is automatically percent-encoded with URL path-segment\nrules.",
+       "start": 1081,
+       "end": 1223,
+       "confidence": 0.824
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0307,
+       "restated": 0.8312,
+       "elaborated": 0.1211,
+       "different": 0.0169
+      },
+      "confidence": 0.9831,
+      "a": {
+       "document": "fiber:docs/api/ctx.md#16",
+       "quote": "Greedy parameters (`*` and `+`) preserve `/` inside the matched path",
+       "start": 711,
+       "end": 779,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/api/redirect.md#2",
+       "quote": "Greedy parameters (`*` and `+`) preserve `/` inside the matched path\ntail; delimiters such as `?` and `#` remain parameter data instead of adding a\nquery or fragment, and cannot absorb or discard `Queries`.\n[`Route.URL`](./app.md#getroute) and [`GetRouteURL`](./ctx.md#getrouteurl) apply\nthe same encoding.",
+       "start": 1224,
+       "end": 1530,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 3,
+   "counterparts_ms": 138
+  },
+  "timing": {
+   "read_ms": 255,
+   "total_ms": 259
+  }
+ }
+}

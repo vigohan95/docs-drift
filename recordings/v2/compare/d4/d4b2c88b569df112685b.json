@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d4/d4b2c88b569df112685b",
+ "request_hash": "d4b2c88b569df112685b0b081ed41a1eb097a53cf61f1a7ca79707d1048f8726",
+ "recorded_at": "2026-11-06T14:38:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1571,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "71.558495",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=206"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/04-$effect.md#5",
+    "text": "## `$effect.pre`\n\nIn rare cases, you may need to run code _before_ the DOM updates. For this we can use the `$effect.pre` rune:\n\n```svelte\n<script>\n\timport { tick } from 'svelte';\n\n\tlet div = $state();\n\tlet messages = $state([]);\n\n\t// ...\n\n\t$effect.pre(() => {\n\t\tif (!div) return; // not yet mounted\n\n\t\t// reference `messages` array length so that this code re-runs whenever it changes\n\t\tmessages.length;\n\n\t\t// autoscroll when new messages are added\n\t\tif (div.offsetHeight + div.scrollTop > div.scrollHeight - 20) {\n\t\t\ttick().then(() => {\n\t\t\t\tdiv.scrollTo(0, div.scrollHeight);\n\t\t\t});\n\t\t}\n\t});\n</script>\n\n<div bind:this={div}>\n\t{#each messages as message}\n\t\t<p>{message}</p>\n\t{/each}\n</div>\n```\n\n`$effect.pre` runs before DOM updates that are scheduled after it, not before every DOM mutation in the flush - DOM of parent components may already be updated. When using [await expressions](await-expressions), block updates like `{#if ...}` and `{#each ...}` in the same component also run before `$effect.pre`.\n\nApart from the timing, `$effect.pre` works exactly like `$effect`."
+   },
+   {
+    "id": "svelte:documentation/docs/06-runtime/03-lifecycle-hooks.md#4",
+    "text": "## Deprecated: `beforeUpdate` / `afterUpdate`\n\nSvelte 4 contained hooks that ran before and after the component as a whole was updated. For backwards compatibility, these hooks were shimmed in Svelte 5 but not available inside components that use runes.\n\n```svelte\n<script>\n\timport { beforeUpdate, afterUpdate } from 'svelte';\n\n\tbeforeUpdate(() => {\n\t\tconsole.log('the component is about to update');\n\t});\n\n\tafterUpdate(() => {\n\t\tconsole.log('the component just updated');\n\t});\n</script>\n```\n\nInstead of `beforeUpdate` use `$effect.pre` and instead of `afterUpdate` use `$effect` instead — these runes offer more granular control and only react to the changes you're actually interested in."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/04-$effect.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/06-runtime/03-lifecycle-hooks.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/02-runes/04-$effect.md#5",
+    "b": "svelte:documentation/docs/06-runtime/03-lifecycle-hooks.md#4",
+    "relation": "overlapping",
+    "related": 0.9975,
+    "probabilities": {
+     "same": 0.0061,
+     "overlapping": 0.9872,
+     "conflicting": 0.0042,
+     "unrelated": 0.0025
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 77,
+   "total_ms": 79
+  }
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/20/20d59cffa5aa8512de09",
+ "request_hash": "20d59cffa5aa8512de09d036ef6a4561554ff9fa08b48f7fcc78a4c3f6056d39",
+ "recorded_at": "2026-11-06T14:42:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1737,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "241.666306",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=377"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#30",
+    "text": "### Introduction of `TypeAdapter`\n\nPydantic V1 had weak support for validating or serializing non-`BaseModel` types.\n\nTo work with them, you had to either create a \"root\" model or use the utility functions in `pydantic.tools`\n(namely, `parse_obj_as` and `schema_of`).\n\nIn Pydantic V2 this is *a lot* easier: the [`TypeAdapter`][pydantic.type_adapter.TypeAdapter] class lets you create an object\nwith methods for validating, serializing, and producing JSON schemas for arbitrary types.\nThis serves as a complete replacement for `parse_obj_as` and `schema_of` (which are now deprecated),\nand also covers some of the use cases of \"root\" models. ([`RootModel`](concepts/models.md#rootmodel-and-custom-root-types),\n[discussed above](#changes-to-pydanticbasemodel), covers the others.)\n\n```python\nfrom pydantic import TypeAdapter\n\nadapter = TypeAdapter(list[int])\nassert adapter.validate_python(['1', '2', '3']) == [1, 2, 3]\nprint(adapter.json_schema())\n#> {'items': {'type': 'integer'}, 'type': 'array'}\n```\n\nDue to limitations of inferring generic types with common type checkers, to get proper typing in some scenarios, you\nmay need to explicitly specify the generic parameter:\n\n```python {test=\"skip\"}\nfrom pydantic import TypeAdapter\n\nadapter = TypeAdapter[str | int](str | int)\n...\n```\n\nSee [Type Adapter](concepts/type_adapter.md) for more information."
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#3",
+    "text": "1. This produces a \"jsonable\" dict of `MainModel`'s schema.\n2. Calling `json.dumps` on the schema dict produces a JSON string.\n\nThe [`TypeAdapter`][pydantic.type_adapter.TypeAdapter] class lets you create an object with methods for validating, serializing,\nand producing JSON schemas for arbitrary types.\n\nHere's an example of generating JSON schema from a [`TypeAdapter`][pydantic.type_adapter.TypeAdapter]:\n\n```python\nfrom pydantic import TypeAdapter\n\nadapter = TypeAdapter(list[int])\nprint(adapter.json_schema())\n#> {'items': {'type': 'integer'}, 'type': 'array'}\n```\n\nYou can also generate JSON schemas for combinations of [`BaseModel`s][pydantic.main.BaseModel]\nand [`TypeAdapter`s][pydantic.type_adapter.TypeAdapter], as shown in this example:\n\n```python {output=\"json\"}\nimport json\n\nfrom pydantic import BaseModel, TypeAdapter\n\n\nclass Cat(BaseModel):\n    name: str\n    color: str\n\n\nclass Dog(BaseModel):\n    name: str\n    breed: str\n\n\nta = TypeAdapter(Cat | Dog)\nta_schema = ta.json_schema()\nprint(json.dumps(ta_schema, indent=2))\n\"\"\"\n{\n  \"$defs\": {\n    \"Cat\": {\n      \"properties\": {\n        \"name\": {\n          \"title\": \"Name\",\n          \"type\": \"string\"\n        },\n        \"color\": {\n          \"title\": \"Color\",\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"name\",\n        \"color\"\n      ],\n      \"title\": \"Cat\",\n      \"type\": \"object\"\n    },\n    \"Dog\": {\n      \"properties\": {\n        \"name\": {\n          \"title\": \"Name\",\n          \"type\": \"string\"\n        },\n        \"breed\": {\n          \"title\": \"Breed\",\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"name\",\n        \"breed\"\n      ],\n      \"title\": \"Dog\",\n      \"type\": \"object\"\n    }\n  },\n  \"anyOf\": [\n    {\n      \"$ref\": \"#/$defs/Cat\"\n    },\n    {\n      \"$ref\": \"#/$defs/Dog\"\n    }\n  ]\n}\n\"\"\"\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#30",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/concepts/json_schema.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/migration.md#30"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#30",
+    "b": "pydantic:docs/concepts/json_schema.md#3",
+    "relation": "overlapping",
+    "related": 0.9989,
+    "probabilities": {
+     "same": 0.0031,
+     "overlapping": 0.9939,
+     "conflicting": 0.0019,
+     "unrelated": 0.0011
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0209,
+       "restated": 0.6385,
+       "elaborated": 0.0286,
+       "different": 0.3119
+      },
+      "confidence": 0.6881,
+      "a": {
+       "document": "pydantic:docs/migration.md#30",
+       "quote": "In Pydantic V2 this is *a lot* easier: the [`TypeAdapter`][pydantic.type_adapter.TypeAdapter] class lets you create an object",
+       "start": 269,
+       "end": 394,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/concepts/json_schema.md#3",
+       "quote": "Calling `json.dumps` on the schema dict produces a JSON string.\n\nThe [`TypeAdapter`][pydantic.type_adapter.TypeAdapter] class lets you create an object with methods for validating, serializing,\nand producing JSON schemas for arbitrary types.\n\nHere's an example of generating JSON schema from a [`TypeAdapter`][pydantic.type_adapter.TypeAdapter]:\n\n```python\nfrom pydantic import TypeAdapter\n\nadapter = TypeAdapter(list[int])\nprint(adapter.json_schema())\n#> {'items': {'type': 'integer'}, 'type': 'array'}\n```\n\nYou can also generate JSON schemas for combinations of [`BaseModel`s][pydantic.main.BaseModel]\nand [`TypeAdapter`s][pydantic.type_adapter.TypeAdapter], as shown in this example:\n\n```python {output=\"json\"}\nimport json\n\nfrom pydantic import BaseModel, TypeAdapter\n\n\nclass Cat(BaseModel):\n    name: str\n    color: str\n\n\nclass Dog(BaseModel):\n    name: str\n    breed: str\n\n\nta = TypeAdapter(Cat | Dog)\nta_schema = ta.json_schema()\nprint(json.dumps(ta_schema, indent=2))\n\"\"\"\n{\n  \"$defs\": {\n    \"Cat\": {\n      \"properties\": {\n        \"name\": {\n          \"title\": \"Name\",\n          \"type\": \"string\"\n        },\n        \"color\": {\n          \"title\": \"Color\",\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"name\",\n        \"color\"\n      ],\n      \"title\": \"Cat\",\n      \"type\": \"object\"\n    },\n    \"Dog\": {\n      \"properties\": {\n        \"name\": {\n          \"title\": \"Name\",\n          \"type\": \"string\"\n        },\n        \"breed\": {\n          \"title\": \"Breed\",\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"name\",\n        \"breed\"\n      ],\n      \"title\": \"Dog\",\n      \"type\": \"object\"\n    }\n  },\n  \"anyOf\": [\n    {\n      \"$ref\": \"#/$defs/Cat\"\n    },\n    {\n      \"$ref\": \"#/$defs/Dog\"\n    }\n  ]\n}\n\"\"\"\n```",
+       "start": 63,
+       "end": 1816,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 1,
+   "counterparts_ms": 135
+  },
+  "timing": {
+   "read_ms": 249,
+   "total_ms": 252
+  }
+ }
+}

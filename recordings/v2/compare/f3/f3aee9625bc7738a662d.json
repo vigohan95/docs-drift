@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f3/f3aee9625bc7738a662d",
+ "request_hash": "f3aee9625bc7738a662d9354b1309705206688f594b469b8f50eb02210c1d31a",
+ "recorded_at": "2026-11-06T14:39:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1907,
+ "response_headers": {
+  "x-clocked-credits": "11",
+  "x-clocked-model-ms": "261.273468",
+  "x-clocked-cost-usd": "0.002191",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=489"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/adaptor.md#12",
+    "text": "- `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` put the original request line back once a buffered handler has returned, or panicked, so `c.OriginalURL()` in a middleware that runs afterwards is unchanged. A handler that flushed or hijacked is still running with a request whose URL aliases the request line, so the line is then left as the handler read it; `HTTPMiddleware` and `ConvertRequest` leave it as well.\n- A request that `net/http` served over TLS is seen as TLS by Fiber: `c.Scheme()` is `https`, `c.Secure()` is true and `c.RequestCtx().TLSConnectionState()` carries the state from `r.TLS`.\n- A request the [timeout middleware](./timeout.md) gave up on behind `FiberHandler`, `FiberHandlerFunc` or `FiberApp` is answered with its timeout response, as on Fiber's own server. Its `fasthttp.RequestCtx` is left to the handler that may still run on it and never goes back to the pool, so no later request shares it and the handler's `c.Context()` keeps reporting the timeout.\n- `FiberHandler`, `FiberHandlerFunc` and `FiberApp` close the body stream of a response to a `HEAD` request unread, as Fiber's own server does: `net/http` discards a `HEAD` body, so a stream writer or an [SSE](./sse.md) `Handler` would otherwise run with every write succeeding.\n- For a request that reaches Fiber through `FiberHandler`, `FiberHandlerFunc` or `FiberApp`, `c.StartTime()` marks the moment the adaptor took the request over, not the moment the `net/http` server began reading it, so `c.Elapsed()` leaves out the time spent before the handler was called.\n- Both parsers read the headers: `Header.Get` returns the first field line even when it is empty, `c.Get` the first line that holds a value. A `net/http` guard should strip a header or check every value rather than compare `Header.Get` with the empty string; see the caution in the `FiberApp` section above.\n- `HTTPMiddleware` routes the request the wrapped middleware hands to `next`, including a rewritten `r.URL` such as the one `http.StripPrefix` produces. The middleware must call `next` before it flushes or hijacks the response; after that the response has left Fiber's hands and the call is ignored.\n- `HTTPMiddleware` copies `r.Method`, `r.Host` and `r.Header`, as the wrapped middleware hands them to `next`, back onto the Fiber request, so a header it replaces or deletes (`r.Header.Set`, `r.Header.Del`) is replaced or gone for the handlers behind it, `c.IPs()` included. A changed `r.Method` reaches only the raw request (`c.Request().Header.Method()`): `c.Method()` and the route that is running keep the method the request was routed with, so a rewrite does not move it to another method's handlers. `Content-Length` and `Transfer-Encoding` are not copied back, so the body framing stays as received. Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so `r.Trailer` is empty and a trailer cannot stand in for a header the middleware removed or replaced. A `Connection` field written as several entries is joined with commas, and a `close` token anywhere in it closes the connection once the response is sent.\n- `FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI`, the request line as `net/http` received it, so a raw `/über` or `/a|b` is routed and its params are read as a Fiber server would read them. When `r.URL` no longer says what that line says, or there is no such line, they route the request line `net/http` would write for `r.URL` instead: the path an `http.StripPrefix` in front of them rewrote, the URL of a request built in code, which has no `RequestURI` at all, and, for a `CONNECT` request in the authority form, the authority rather than the `/` that `r.URL.RequestURI()` reads for it: `r.URL.Opaque` when set, else `r.Host`, else `r.URL.Host`, the order in which `net/http` itself writes such a request."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#79",
+    "text": "An adapted `net/http` handler, middleware or `ConvertRequest` request is built from the path the router matched, `c.Path()`, followed by the query as the client sent it, rather than from the request line as it arrived, so a `net/http` guard on `r.URL.Path` sees the `/admin/x` that `/a/../admin/x` was routed as. A byte a path may not carry raw is written as its escape, and the request keeps the host Fiber saw, including the one an absolute-form request line names. `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` answer `404 Not Found` for a routed path with an empty segment or an escaped slash, such as `//admin/x` or `/public/..%2Fadmin/x`, which `net/http` would otherwise decode and clean into a path no Fiber middleware ran for, and for one with a backslash, a dot segment carrying parameters (`..;`) or a segment of parameters alone before another (`/;x/admin`), which an upstream behind a handler such as `httputil.ReverseProxy` may resolve into another path; a handler that must serve such names can be wrapped with `HTTPMiddleware` instead. `HTTPMiddleware` answers `400 Bad Request`, and `ConvertRequest` returns `fiber.ErrBadRequest`, for a routed path fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, or one beginning with `//` on a request without a `Host` header. A routed path holding an escape of an unreserved character, which only a stray `%` can forge, is `404 Not Found` from the handler adapters and `400 Bad Request` from `HTTPMiddleware` and `ConvertRequest`, since `URL.Path` would read a forged `%2e%2e` as `..`. `FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI` as received, so a raw `/über` is routed as a Fiber server routes it, and when `r.URL` no longer matches that line, the request line `net/http` would write for `r`: a rewritten `r.URL`, as `http.StripPrefix` produces, a request built in code without a `RequestURI`, and the authority of a `CONNECT` request in the authority form. Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so a trailer no longer stands in for a header the wrapped middleware removed or replaced. See the adaptor's [notes and limitations](./middleware/adaptor.md#notes-and-limitations)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/adaptor.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#79"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#79",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/adaptor.md#12"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/adaptor.md#12",
+    "b": "fiber:docs/whats_new.md#79",
+    "relation": "overlapping",
+    "related": 0.9965,
+    "probabilities": {
+     "same": 0.0084,
+     "overlapping": 0.9825,
+     "conflicting": 0.0056,
+     "unrelated": 0.0035
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0087,
+       "restated": 0.9785,
+       "elaborated": 0.0083,
+       "different": 0.0045
+      },
+      "confidence": 0.967,
+      "a": {
+       "document": "fiber:docs/middleware/adaptor.md#12",
+       "quote": "- `FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI`, the request line as `net/http` received it, so a raw `/über` or `/a|b` is routed and its params are read as a Fiber server would read them.",
+       "start": 3178,
+       "end": 3391,
+       "confidence": 0.967
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#79",
+       "quote": "`FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI` as received, so a raw `/über` is routed as a Fiber server routes it, and when `r.URL` no longer matches that line, the request line `net/http` would write for `r`: a rewritten `r.URL`, as `http.StripPrefix` produces, a request built in code without a `RequestURI`, and the authority of a `CONNECT` request in the authority form.",
+       "start": 1606,
+       "end": 2005,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0636,
+       "restated": 0.9065,
+       "elaborated": 0.0159,
+       "different": 0.0139
+      },
+      "confidence": 0.9861,
+      "a": {
+       "document": "fiber:docs/middleware/adaptor.md#12",
+       "quote": "Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so `r.Trailer` is empty and a trailer cannot stand in for a header the middleware removed or replaced.",
+       "start": 2785,
+       "end": 3022,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#79",
+       "quote": "Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so a trailer no longer stands in for a header the wrapped middleware removed or replaced.",
+       "start": 2006,
+       "end": 2230,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 118,
+   "passage_reads": 1,
+   "passages_ms": 122,
+   "passages": 2,
+   "counterparts_ms": 109
+  },
+  "timing": {
+   "read_ms": 348,
+   "total_ms": 353
+  }
+ }
+}

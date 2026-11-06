@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/8b/8b7b97fefbf566e653fd",
+ "request_hash": "8b7b97fefbf566e653fd42c590081dae5d8240a895293f7d2fdeb37c8a546096",
+ "recorded_at": "2026-11-06T14:42:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 926,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.106561",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=179"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/dataclasses.md#9",
+    "text": "### Using custom types\n\nAs said above, validation is applied on standard library dataclasses. If you make use\nof custom types, you will get an error when trying to refer to the dataclass. To circumvent\nthe issue, you can set the [`arbitrary_types_allowed`][pydantic.ConfigDict.arbitrary_types_allowed]\nconfiguration value on the dataclass:\n\n```python\nimport dataclasses\n\nfrom pydantic import BaseModel, ConfigDict\nfrom pydantic.errors import PydanticSchemaGenerationError\n\n\nclass ArbitraryType:\n    def __init__(self, value):\n        self.value = value\n\n    def __repr__(self):\n        return f'ArbitraryType(value={self.value!r})'\n\n\n@dataclasses.dataclass\nclass DC:\n    a: ArbitraryType\n    b: str\n\n\n# valid as it is a stdlib dataclass without validation:\nmy_dc = DC(a=ArbitraryType(value=3), b='qwe')\n\ntry:\n\n    class Model(BaseModel):\n        dc: DC\n        other: str\n\n    # invalid as dc is now validated with pydantic, and ArbitraryType is not a known type\n    Model(dc=my_dc, other='other')\n\nexcept PydanticSchemaGenerationError as e:\n    print(e.message)\n    \"\"\"\n    Unable to generate pydantic-core schema for <class '__main__.ArbitraryType'>. Set `arbitrary_types_allowed=True` in the model_config to ignore this error or implement `__get_pydantic_core_schema__` on your type to fully support it.\n\n    If you got this error by calling handler(<some type>) within `__get_pydantic_core_schema__` then you likely need to call `handler.generate_schema(<some type>)` since we do not call `__get_pydantic_core_schema__` on `<some type>` otherwise to avoid infinite recursion.\n    \"\"\"\n\n\n# valid as we set arbitrary_types_allowed=True, and that config pushes down to the nested vanilla dataclass\nclass Model(BaseModel):\n    model_config = ConfigDict(arbitrary_types_allowed=True)\n\n    dc: DC\n    other: str\n\n\nm = Model(dc=my_dc, other='other')\nprint(repr(m))\n#> Model(dc=DC(a=ArbitraryType(value=3), b='qwe'), other='other')\n```"
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#5",
+    "text": "## Customizing JSON Schema\n\nThe generated JSON schema can be customized at both the [field level](#field-level-customization) and [model level](#model-level-customization).\n\nAt both the field and model levels, you can use the [`json_schema_extra` option](#using-json_schema_extra) to add extra information to the JSON schema.\n\nFor custom types, Pydantic offers other tools for customizing JSON schema generation:\n\n1. [`WithJsonSchema` annotation](#withjsonschema-annotation)\n2. [`SkipJsonSchema` annotation](#skipjsonschema-annotation)\n3. [Implementing `__get_pydantic_core_schema__`](#implementing_get_pydantic_core_schema)\n4. [Implementing `__get_pydantic_json_schema__`](#implementing_get_pydantic_json_schema)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/dataclasses.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/dataclasses.md#9",
+    "b": "pydantic:docs/concepts/json_schema.md#5",
+    "relation": "unrelated",
+    "related": 0.2749,
+    "probabilities": {
+     "same": 0.0235,
+     "overlapping": 0.2291,
+     "conflicting": 0.0223,
+     "unrelated": 0.7251
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 48
+  },
+  "timing": {
+   "read_ms": 48,
+   "total_ms": 50
+  }
+ }
+}

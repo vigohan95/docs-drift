@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/72/72d696936c5c08efc7ef",
+ "request_hash": "72d696936c5c08efc7ef09c0538c8fb10514d1a6143cd8325da638c874dd5b41",
+ "recorded_at": "2026-11-06T14:39:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3676,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "248.803934",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=37,cfOrigin;dur=0,cfWorker;dur=563"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "text": "## Config\n\n| Property | Type                  | Description                                           | Default    |\n|:---------|:----------------------|:------------------------------------------------------|:-----------|\n| Next     | `func(fiber.Ctx) bool` | Skip when function returns `true`.                    | `nil`      |\n| RuleList | `[]Rule`          | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures. | nil |\n| Rules    | `map[string]string`   | **Deprecated.** Use `RuleList`. A map has no order, so precedence is decided by a heuristic. | nil |\n\nSet one of `RuleList` or `Rules`. With neither, the middleware rewrites nothing.\n\nA rule's `From` is path text: `*` matches a run of any bytes but a newline, and\nevery other byte stands for itself, so `/preis-1.000-euro` rewrites that path\nand not `/preis-1X000-euro`. There is no escape for a literal `*`.\n\nA rule matches the whole path, trailing slash and letter case included: `/old` rewrites `/old`, but not `/old/`, `/OLD`, `/old/x` or `/very/old`.\n\nIn `To`, `$1`, `$2` and so on stand for what the asterisks of `From` captured, in order. `$10` is the tenth capture in a rule with ten or more asterisks; in a rule with fewer it reads as `$1` followed by `0`.\n\nSetting both `RuleList` and `Rules` panics.\n\nRules match `c.Path()`, the path as the router normalized it, and the rewritten\npath goes through the same normalization. With `UnescapePath` that path is the\ndecoded one, so a capture is escaped again before it is inserted: the `%2e%2e`\nthat `/files/%252e%252e/secret` decoded to stays that name in `/public/$1`\nrather than being decoded a second time into `..` and resolving out of\n`/public/`.\n\nA capture cannot add a `.` or `..` segment either. `{From: \"/@*\", To: \"/users/$1\"}`\ncuts `../admin` out of `/@../admin`, a path with no dot segment for the router to\nresolve, so a rewritten path holding more dot segments than `To` itself is not\nused: the next rule is tried and the path stays as it was. `%2e` counts as a dot\nthere, and a backslash, `%2f` and `%5c` as a slash."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#199",
+    "text": "#### Rewrite\n\n- **Captures decoded once**: with `UnescapePath` enabled a wildcard capture is escaped again before it is inserted into `To`, so the rewritten path is not decoded a second time. `/files/%252e%252e/secret` rewritten by `/files/*` to `/public/$1` now reaches the handler as `/public/%2e%2e/secret` instead of `/secret`.\n- **Ordered rules**: `Rules map[string]string` is deprecated in favor of `RuleList []Rule`. A map has no order, so which rule answered a path two rules both matched was decided by map iteration, which Go randomizes per run: the same request could be rewritten differently from one call to the next. Rules in a `RuleList` are tried in the order written and the first match wins, exactly as routes are matched.\n\n```go\n// Before\napp.Use(rewrite.New(rewrite.Config{\n    Rules: map[string]string{\n        \"/old\":   \"/new\",\n        \"/old/*\": \"/new/$1\",\n    },\n}))\n\n// After\napp.Use(rewrite.New(rewrite.Config{\n    RuleList: []rewrite.Rule{\n        {From: \"/old\", To: \"/new\"},\n        {From: \"/old/*\", To: \"/new/$1\"},\n    },\n}))\n```\n\n`Rules` keeps working for the whole of v3; its keys are ranked most path text before the first `*`, then most path text overall, then fewest asterisks, then the key. Setting both fields panics.\n\n- **A capture cannot leave `To`**: a rewritten path holding more `.` or `..` segments than `To` itself is skipped for that request, so `{From: \"/@*\", To: \"/users/$1\"}` no longer rewrites `/@../admin` to `/admin`.\n- **A rule is path text**: `From` is no longer compiled as an unescaped regular expression. `*` matches a run of any bytes but a newline and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and no longer also `/preis-1X000-euro`, and `/faq?` no longer rewrites `/fa`. This also completes the anchoring fix from #4476: `\"^\" + \"/a|/b\" + \"$\"` parsed as `(^/a)|(/b$)`, so a rule could match by prefix or suffix alone. Rules written with path text and `*` are unaffected; a rule relying on regular-expression syntax now matches the literal characters it spells."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#199"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#199",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/rewrite.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/rewrite.md#2",
+    "b": "fiber:docs/whats_new.md#199",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0062,
+     "overlapping": 0.986,
+     "conflicting": 0.0052,
+     "unrelated": 0.0027
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0057,
+       "restated": 0.9826,
+       "elaborated": 0.0065,
+       "different": 0.0051
+      },
+      "confidence": 0.936,
+      "a": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "With `UnescapePath` that path is the",
+       "start": 1419,
+       "end": 1455,
+       "confidence": 0.936
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#199",
+       "quote": "#### Rewrite\n\n- **Captures decoded once**: with `UnescapePath` enabled a wildcard capture is escaped again before it is inserted into `To`, so the rewritten path is not decoded a second time.",
+       "start": 0,
+       "end": 191,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0114,
+       "restated": 0.953,
+       "elaborated": 0.0212,
+       "different": 0.0145
+      },
+      "confidence": 0.844,
+      "a": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "With `UnescapePath` that path is the",
+       "start": 1419,
+       "end": 1455,
+       "confidence": 0.844
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#199",
+       "quote": "`/files/%252e%252e/secret` rewritten by `/files/*` to `/public/$1` now reaches the handler as `/public/%2e%2e/secret` instead of `/secret`.\n- **Ordered rules**: `Rules map[string]string` is deprecated in favor of `RuleList []Rule`.",
+       "start": 192,
+       "end": 423,
+       "confidence": 0.997
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.006,
+       "restated": 0.9771,
+       "elaborated": 0.0101,
+       "different": 0.0068
+      },
+      "confidence": 0.984,
+      "a": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "A rule's `From` is path text: `*` matches a run of any bytes but a newline, and",
+       "start": 669,
+       "end": 748,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#199",
+       "quote": "`*` matches a run of any bytes but a newline and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and no longer also `/preis-1X000-euro`, and `/faq?` no longer rewrites `/fa`.",
+       "start": 1559,
+       "end": 1763,
+       "confidence": 0.984
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 144,
+   "passage_reads": 1,
+   "passages_ms": 118,
+   "passages": 3,
+   "counterparts_ms": 106
+  },
+  "timing": {
+   "read_ms": 368,
+   "total_ms": 372
+  }
+ }
+}

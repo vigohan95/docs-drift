@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9b/9b13bce4575836a74928",
+ "request_hash": "9b13bce4575836a749280fdc56d33ff55092c5f7b293cd7d2e0fe256bd55e4b5",
+ "recorded_at": "2026-11-06T14:42:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1763,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.441216",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=162"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#11",
+    "text": "### Changes to dataclasses\n\nPydantic [dataclasses](concepts/dataclasses.md) continue to be useful for enabling the data validation on standard\ndataclasses without having to subclass `BaseModel`. Pydantic V2 introduces the following changes to this dataclass behavior:\n\n* When used as fields, dataclasses (Pydantic or vanilla) no longer accept tuples as validation inputs; dicts should be\n  used instead.\n* The `__post_init__` in Pydantic dataclasses will now be called *after* validation, rather than before.\n    * As a result, the `__post_init_post_parse__` method would have become redundant, so has been removed.\n* Pydantic no longer supports `extra='allow'` for Pydantic dataclasses, where extra fields passed to the initializer would be\n    stored as extra attributes on the dataclass. `extra='ignore'` is still supported for the purpose of ignoring\n    unexpected fields while parsing data, they just won't be stored on the instance.\n* Pydantic dataclasses no longer have an attribute `__pydantic_model__`, and no longer use an underlying `BaseModel`\n    to perform validation or provide other functionality.\n    * To perform validation, generate a JSON schema, or make use of\n        any other functionality that may have required `__pydantic_model__` in V1, you should now wrap the dataclass\n        with a [`TypeAdapter`][pydantic.type_adapter.TypeAdapter] ([discussed more below](#introduction-of-typeadapter)) and\n        make use of its methods.\n* In Pydantic V1, if you used a vanilla (i.e., non-Pydantic) dataclass as a field, the config of the parent type would\n    be used as though it was the config for the dataclass itself as well. In Pydantic V2, this is no longer the case.\n    * In Pydantic V2, to override the config (like you would with `model_config` on a `BaseModel`),\n        you can use the `config` parameter on the `@dataclass` decorator.\n        See [Dataclass Config](concepts/dataclasses.md#dataclass-config) for examples."
+   },
+   {
+    "id": "pydantic:docs/concepts/config.md#1",
+    "text": "## Configuration on Pydantic models\n\nOn Pydantic models, configuration can be specified in two ways:\n\n* Using the [`model_config`][pydantic.BaseModel.model_config] class attribute:\n\n    ```python\n    from pydantic import BaseModel, ConfigDict, ValidationError\n\n\n    class Model(BaseModel):\n        model_config = ConfigDict(str_max_length=5)  # (1)!\n\n        v: str\n\n\n    try:\n        m = Model(v='abcdef')\n    except ValidationError as e:\n        print(e)\n        \"\"\"\n        1 validation error for Model\n        v\n          String should have at most 5 characters [type=string_too_long, input_value='abcdef', input_type=str]\n        \"\"\"\n    ```\n\n    1. A plain dictionary (i.e. `{'str_max_length': 5}`) can also be used.\n\n* Using class arguments:\n\n    ```python\n    from pydantic import BaseModel\n\n\n    class Model(BaseModel, frozen=True):\n        a: str\n    ```\n\n  Unlike the [`model_config`][pydantic.BaseModel.model_config] class attribute,\n  static type checkers will recognize class arguments. For `frozen`, any instance\n  mutation will be flagged as a type checking error."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/config.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#11",
+    "b": "pydantic:docs/concepts/config.md#1",
+    "relation": "unrelated",
+    "related": 0.0171,
+    "probabilities": {
+     "same": 0.0055,
+     "overlapping": 0.0052,
+     "conflicting": 0.0064,
+     "unrelated": 0.9829
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

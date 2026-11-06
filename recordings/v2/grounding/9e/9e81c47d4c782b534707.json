@@ -1,0 +1,94 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/9e/9e81c47d4c782b534707",
+ "request_hash": "9e81c47d4c782b5347073cb992f9a200328156a95f9f9e6de91e495cfa808295",
+ "recorded_at": "2026-11-06T14:41:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3263,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "112.999043",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=14,cfOrigin;dur=0,cfWorker;dur=316"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/whats_new.md#199",
+    "text": "#### Rewrite\n\n- **Captures decoded once**: with `UnescapePath` enabled a wildcard capture is escaped again before it is inserted into `To`, so the rewritten path is not decoded a second time. `/files/%252e%252e/secret` rewritten by `/files/*` to `/public/$1` now reaches the handler as `/public/%2e%2e/secret` instead of `/secret`.\n- **Ordered rules**: `Rules map[string]string` is deprecated in favor of `RuleList []Rule`. A map has no order, so which rule answered a path two rules both matched was decided by map iteration, which Go randomizes per run: the same request could be rewritten differently from one call to the next. Rules in a `RuleList` are tried in the order written and the first match wins, exactly as routes are matched.\n\n```go\n// Before\napp.Use(rewrite.New(rewrite.Config{\n    Rules: map[string]string{\n        \"/old\":   \"/new\",\n        \"/old/*\": \"/new/$1\",\n    },\n}))\n\n// After\napp.Use(rewrite.New(rewrite.Config{\n    RuleList: []rewrite.Rule{\n        {From: \"/old\", To: \"/new\"},\n        {From: \"/old/*\", To: \"/new/$1\"},\n    },\n}))\n```\n\n`Rules` keeps working for the whole of v3; its keys are ranked most path text before the first `*`, then most path text overall, then fewest asterisks, then the key. Setting both fields panics.\n\n- **A capture cannot leave `To`**: a rewritten path holding more `.` or `..` segments than `To` itself is skipped for that request, so `{From: \"/@*\", To: \"/users/$1\"}` no longer rewrites `/@../admin` to `/admin`.\n- **A rule is path text**: `From` is no longer compiled as an unescaped regular expression. `*` matches a run of any bytes but a newline and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and no longer also `/preis-1X000-euro`, and `/faq?` no longer rewrites `/fa`. This also completes the anchoring fix from #4476: `\"^\" + \"/a|/b\" + \"$\"` parsed as `(^/a)|(/b$)`, so a rule could match by prefix or suffix alone. Rules written with path text and `*` are unaffected; a rule relying on regular-expression syntax now matches the literal characters it spells."
+   }
+  ],
+  "answer": "`From` reaches the compiled pattern as a regular expression, so the other regexp metacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also matches `/fa`. With neither, the middleware rewrites nothing. A rule's `From` is path text: `*` matches a run of any bytes but a newline, and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and not `/preis-1X000-euro`.",
+  "claims": [
+   "`From` reaches the compiled pattern as a regular expression, so the other regexp metacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also matches `/fa`.",
+   "With neither, the middleware rewrites nothing. A rule's `From` is path text: `*` matches a run of any bytes but a newline, and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and not `/preis-1X000-euro`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.3161,
+  "ungrounded": 0.6839,
+  "verdict": "contradicted",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fiber:docs/whats_new.md#199",
+    "share": 1,
+    "share_of_answer": 0.3161,
+    "claims": [
+     1
+    ]
+   }
+  ],
+  "claims": [
+   {
+    "claim": "`From` reaches the compiled pattern as a regular expression, so the other regexp metacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also matches `/fa`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4289,
+    "supported": 0.0016,
+    "contradicted": 0.9944,
+    "not_stated": 0.0023,
+    "not_a_claim": 0.0017,
+    "verdict": "contradicted",
+    "sources": {
+     "fiber:docs/whats_new.md#199": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "With neither, the middleware rewrites nothing. A rule's `From` is path text: `*` matches a run of any bytes but a newline, and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and not `/preis-1X000-euro`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5711,
+    "supported": 0.5523,
+    "contradicted": 0.4087,
+    "not_stated": 0.0303,
+    "not_a_claim": 0.0087,
+    "verdict": "supported",
+    "sources": {
+     "fiber:docs/whats_new.md#199": 1
+    },
+    "source": "fiber:docs/whats_new.md#199"
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0016
+  },
+  "timing": {
+   "read_ms": 120,
+   "total_ms": 123
+  }
+ }
+}

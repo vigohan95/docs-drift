@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bd/bd12407b581d59aea041",
+ "request_hash": "bd12407b581d59aea041631772c8f3d6cb09f5421b704d17c1a2646bfe862caf",
+ "recorded_at": "2026-11-06T14:39:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1679,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "34.706753",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=218"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/keyauth.md#7",
+    "text": "## Config\n\n| Property        | Type                                     | Description                                                                                            | Default                       |\n|:----------------|:-----------------------------------------|:-------------------------------------------------------------------------------------------------------|:------------------------------|\n| Next            | `func(fiber.Ctx) bool`                   | Next defines a function to skip this middleware when it returns true.                                    | `nil`                         |\n| SuccessHandler  | `fiber.Handler`                          | SuccessHandler defines a function which is executed for a valid key.                                   | `c.Next()`                         |\n| ErrorHandler    | `fiber.ErrorHandler`                     | ErrorHandler defines a function which is executed for an invalid key. It receives the extraction or validation error, which is `nil` when the `Validator` returned `false` without an error. By default a 401 response with the body `missing or invalid API Key` (`keyauth.ErrMissingOrMalformedAPIKey`) and a `WWW-Authenticate` challenge is sent. The challenge is also added when a custom handler returns a `*fiber.Error` instead of writing the response itself: as `WWW-Authenticate` for status 401, and as `Proxy-Authenticate` for status 407. | Default error handler  |\n| Validator       | `func(fiber.Ctx, string) (bool, error)`  | **Required.** Validator is a function to validate the key.                                                           | `nil` (panic) |\n| Extractor       | `extractors.Extractor`                 | Extractor defines how to retrieve the key from the request. Use helper functions from the shared extractors package, e.g. `extractors.FromAuthHeader(\"Bearer\")` or `extractors.FromCookie(\"access_token\")`. | `extractors.FromAuthHeader(\"Bearer\")` |\n| Realm           | `string`                                 | Realm specifies the protected area name used in the `WWW-Authenticate` header. | `\"Restricted\"` |\n| Challenge       | `string`                                 | Value of the `WWW-Authenticate` header when no `Authorization` scheme is present. | `ApiKey realm=\"Restricted\"` |\n| Error           | `string`                                 | Error code appended as the `error` parameter in Bearer challenges when the request presented credentials that were malformed or failed validation. It is omitted, together with `ErrorDescription`, `ErrorURI` and `Scope`, when the request carried no credentials or used an Authorization scheme other than Bearer, as RFC 6750 asks. Must be `invalid_request`, `invalid_token`, or `insufficient_scope`, available as the constants `keyauth.ErrorInvalidRequest`, `keyauth.ErrorInvalidToken`, and `keyauth.ErrorInsufficientScope`. Any other value panics. | `\"\"` |\n| ErrorDescription| `string`                                 | Human-readable text for the `error_description` parameter in Bearer challenges. Requires `Error`. | `\"\"` |\n| ErrorURI        | `string`                                 | URI identifying a human-readable web page with information about the `error` in Bearer challenges. Requires `Error` and must be an absolute URI. | `\"\"` |\n| Scope           | `string`                                 | Space-delimited list of scopes for the `scope` parameter in Bearer challenges. Each token must conform to the RFC 6750 `scope-token` syntax. Only valid with `Error` set to `insufficient_scope`, which in turn requires `Scope`. | `\"\"` |"
+   },
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "text": "## Config\n\n| Property               | Type                      | Description                                                                                 | Default                                  |\n|:-----------------------|:--------------------------|:--------------------------------------------------------------------------------------------|:-----------------------------------------|\n| Next                   | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when it returns true. It runs before `MaxFunc`. | `nil`                                    |\n| Max                    | `int`                     | Maximum number of recent connections within `Expiration` seconds before sending a 429 response. A value of `0` or less selects the default. | 5                                        |\n| MaxFunc                | `func(fiber.Ctx) int`     | Function that calculates the maximum number of recent connections within `Expiration` seconds before sending a 429 response. Returning `0` skips the limiter for that request; a negative value rejects every request. | A function that returns `cfg.Max`    |\n| KeyGenerator           | `func(fiber.Ctx) string` | Function to generate custom keys; uses `c.IP()` by default. A key longer than 192 bytes, or starting with `sha256:`, is replaced by its SHA-256 digest (`sha256:<hex>`) before it reaches the storage, so oversized keys are still limited per client. | A function using `c.IP()` as the default   |\n| Expiration             | `time.Duration`           | Duration to keep request records in memory, which is also the length of the window. It is counted in whole seconds: a positive value below one second is floored to one second, and zero or a negative value selects the default. | 1 * time.Minute                          |\n| ExpirationFunc         | `func(fiber.Ctx) time.Duration` | Function that calculates the expiration duration dynamically. Positive values below one second are floored to one second; non-positive values fall back to `Expiration`. Requests that share a key share a window, which keeps the length given by the request that opened it. | A function that returns `cfg.Expiration` |\n| LimitReached           | `fiber.Handler`           | Called when a request exceeds the limit.                                       | A function sending a 429 response          |\n| SkipFailedRequests     | `bool`                    | When set to `true`, requests with status code ≥ 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| SkipSuccessfulRequests | `bool`                    | When set to `true`, requests with status code < 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| DisableHeaders         | `bool`                    | When set to `true`, the middleware omits rate limit headers (`X-RateLimit-*` and `Retry-After`). Otherwise a request that passes carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the window ends), and a rejected one carries `Retry-After` (seconds). | false                                    |\n| DisableValueRedaction  | `bool`                    | Disables redaction of limiter keys in error messages and logs. A key longer than 192 bytes is shown as its SHA-256 digest. | false                                    |"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/keyauth.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/keyauth.md#7",
+    "b": "fiber:docs/middleware/limiter.md#7",
+    "relation": "unrelated",
+    "related": 0.0149,
+    "probabilities": {
+     "same": 0.0059,
+     "overlapping": 0.0046,
+     "conflicting": 0.0044,
+     "unrelated": 0.9851
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 41
+  },
+  "timing": {
+   "read_ms": 41,
+   "total_ms": 44
+  }
+ }
+}

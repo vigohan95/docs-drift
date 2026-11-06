@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/8f/8f50873c041298ffb37a",
+ "request_hash": "8f50873c041298ffb37a7f5743b1e36aa93fb095cec49b000b8c1c7d1a2e1ab8",
+ "recorded_at": "2026-11-06T14:39:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3014,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "159.970333",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=56,cfOrigin;dur=0,cfWorker;dur=349"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/session.md#21",
+    "text": "### v2 to v3 Breaking Changes\n\n1. **Function Signature**: `session.New()` now returns middleware handler, not store\n2. **Session ID Extraction**: `KeyLookup` replaced with `Extractor` functions\n3. **Lifecycle Management**: Manual `Release()` required for store pattern\n4. **Timeout Handling**: `Expiration` split into `IdleTimeout` and `AbsoluteTimeout`"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#200",
+    "text": "#### Session\n\n`session.New()` now returns a middleware handler. When using the store pattern,\ncreate a store with `session.NewStore()` or call `Store()` on the middleware.\nSessions obtained from a store must be released manually via `sess.Release()`.\nAdditionally, replace the deprecated `KeyLookup` option with extractor\nfunctions from the shared `extractors` package such as `extractors.FromCookie()`\nor `extractors.FromHeader()`. Multiple extractors can be combined with\n`extractors.Chain()`.\n\n```go\n// Before\napp.Use(session.New(session.Config{\n    KeyLookup: \"cookie:session_id\",\n    Store:     session.NewStore(),\n}))\n```\n\n```go\n// After\napp.Use(session.New(session.Config{\n    Extractor: extractors.FromCookie(\"session_id\"),\n    Store:     session.NewStore(),\n}))\n```\n\n`CookieSameSite` is now read the same way as it is for `Ctx.Cookie`:\n\n- **`\"Disabled\"` omits the attribute.** The session used to ignore\n  `CookieSameSiteDisabled` and send `SameSite=Lax`, while `Ctx.Cookie` honored\n  it, so one constant meant two things. A session cookie configured this way now\n  carries no `SameSite` attribute, which is weaker than what was sent before. Set\n  `CookieSameSite: \"Lax\"` explicitly to keep the old cookie.\n- **Any other value panics** during configuration instead of silently falling\n  back to `Lax`, matching how `AbsoluteTimeout` is already validated. `Disabled`,\n  `Lax`, `Strict` and `None` are accepted case-insensitively.\n\nSee the [Session Middleware Migration Guide](./middleware/session.md#migration-guide)\nfor complete details."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/session.md#21",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#200"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#200",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/session.md#21"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/session.md#21",
+    "b": "fiber:docs/whats_new.md#200",
+    "relation": "overlapping",
+    "related": 0.9982,
+    "probabilities": {
+     "same": 0.0095,
+     "overlapping": 0.9854,
+     "conflicting": 0.0033,
+     "unrelated": 0.0018
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0811,
+       "restated": 0.8827,
+       "elaborated": 0.0234,
+       "different": 0.0129
+      },
+      "confidence": 0.9871,
+      "a": {
+       "document": "fiber:docs/middleware/session.md#21",
+       "quote": "1.",
+       "start": 31,
+       "end": 33,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#200",
+       "quote": "#### Session\n\n`session.New()` now returns a middleware handler.",
+       "start": 0,
+       "end": 63,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0124,
+       "restated": 0.9162,
+       "elaborated": 0.06,
+       "different": 0.0115
+      },
+      "confidence": 0.9885,
+      "a": {
+       "document": "fiber:docs/middleware/session.md#21",
+       "quote": "2.",
+       "start": 116,
+       "end": 118,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#200",
+       "quote": "When using the store pattern,\ncreate a store with `session.NewStore()` or call `Store()` on the middleware.\nSessions obtained from a store must be released manually via `sess.Release()`.\nAdditionally, replace the deprecated `KeyLookup` option with extractor\nfunctions from the shared `extractors` package such as `extractors.FromCookie()`\nor `extractors.FromHeader()`.",
+       "start": 64,
+       "end": 432,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 79,
+   "passages": 2,
+   "counterparts_ms": 91
+  },
+  "timing": {
+   "read_ms": 195,
+   "total_ms": 198
+  }
+ }
+}

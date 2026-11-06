@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/99/99d6994c8660b8db96b0",
+ "request_hash": "99d6994c8660b8db96b073806453622fa3d5a00610849111f35f8c3fd8b43703",
+ "recorded_at": "2026-11-06T14:42:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 997,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "125.522753",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=263"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#1",
+    "text": "## The annotated pattern\n\nTo apply constraints or attach [`Field()`][pydantic.fields.Field] functions to a model field, Pydantic\nalso supports the [`Annotated`][typing.Annotated] typing construct to attach metadata to an annotation:\n\n```python\nfrom typing import Annotated\n\nfrom pydantic import BaseModel, Field, WithJsonSchema\n\n\nclass Model(BaseModel):\n    name: Annotated[str, Field(strict=True), WithJsonSchema({'extra': 'data'})]\n```\n\nAs far as static type checkers are concerned, `name` is still typed as `str`, but Pydantic leverages\nthe available metadata to add validation logic, type constraints, etc.\n\nUsing this pattern has some advantages:\n\n* Using the `f: <type> = Field(...)` form can be confusing and might trick users into thinking `f`\n  has a default value, while in reality it is still required.\n* You can provide an arbitrary amount of metadata elements for a field. As shown in the example above,\n  the [`Field()`][pydantic.fields.Field] function only supports a limited set of constraints/metadata,\n  and you may have to use different Pydantic utilities such as [`WithJsonSchema`][pydantic.WithJsonSchema]\n  in some cases.\n* Types can be made reusable (see the documentation on [custom types](./types.md#using-the-annotated-pattern)\n  using this pattern).\n\nHowever, note that certain arguments to the [`Field()`][pydantic.fields.Field] function (namely, `default`,\n`default_factory`, and `alias`) are taken into account by static type checkers to synthesize a correct\n`__init__()` method. The annotated pattern is *not* understood by them, so you should use the normal\nassignment form instead."
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#13",
+    "text": "### `WithJsonSchema` annotation\n\n!!! tip\n    Using [`WithJsonSchema`][pydantic.json_schema.WithJsonSchema] is preferred over\n    [implementing `__get_pydantic_json_schema__()`](#implementing_get_pydantic_json_schema) for custom types,\n    as it's more simple and less error-prone.\n\nAn annotation used to override the JSON Schema for a type.\n\nThis is useful when you want to set a JSON Schema for a type that don't produce any JSON Schemas by default\n(e.g. [`Callable`][collections.abc.Callable]). Note that this overrides the whole generated JSON Schema\nfor the type (in the following example, the `'type'` also needs to be provided).\n\n```python {output=\"json\"}\nimport json\nfrom typing import Annotated\n\nfrom pydantic import BaseModel, WithJsonSchema\n\nMyInt = Annotated[\n    int,\n    WithJsonSchema({'type': 'integer', 'examples': [1, 0, -1]}),\n]\n\n\nclass Model(BaseModel):\n    a: MyInt\n\n\nprint(json.dumps(Model.model_json_schema(), indent=2))\n\"\"\"\n{\n  \"properties\": {\n    \"a\": {\n      \"examples\": [\n        1,\n        0,\n        -1\n      ],\n      \"title\": \"A\",\n      \"type\": \"integer\"\n    }\n  },\n  \"required\": [\n    \"a\"\n  ],\n  \"title\": \"Model\",\n  \"type\": \"object\"\n}\n\"\"\"\n```\n\nSee the [API documentation][pydantic.json_schema.WithJsonSchema] for more details.\n\n!!! note\n    You might be tempted to use the [`WithJsonSchema`][pydantic.json_schema.WithJsonSchema] annotation\n    to fine-tune the JSON Schema of fields having [validators](./validators.md) attached. Instead, it\n    is recommended to use [the `json_schema_input_type` argument](./validators.md#json-schema-and-field-validators)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#1",
+    "b": "pydantic:docs/concepts/json_schema.md#13",
+    "relation": "overlapping",
+    "related": 0.9956,
+    "probabilities": {
+     "same": 0.0138,
+     "overlapping": 0.9752,
+     "conflicting": 0.0067,
+     "unrelated": 0.0044
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 99,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 133,
+   "total_ms": 136
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2f/2f1cf4fbb3a2561c8184",
+ "request_hash": "2f1cf4fbb3a2561c818423982d810f4a085fb18ebf179b8fb052ccd7023cb982",
+ "recorded_at": "2026-11-06T14:42:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 968,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.053247",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=186"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#20",
+    "text": "### Subclasses of model-like types\n\nWhen using model-like classes (Pydantic models, [dataclasses](./dataclasses.md), etc.) as field annotations,\nthe default behavior is to serialize the field value as though it was an instance of the class used as the\nannotation, even if it is a subclass. More specifically, only the fields declared on the type annotation\nwill be included in the serialization result:\n\n```python\nfrom pydantic import BaseModel\n\n\nclass User(BaseModel):\n    name: str\n\n\nclass UserLogin(User):\n    password: str\n\n\nclass OuterModel(BaseModel):\n    user: User\n\n\nuser = UserLogin(name='pydantic', password='hunter2')\n\nm = OuterModel(user=user)\nprint(m)\n#> user=UserLogin(name='pydantic', password='hunter2')\nprint(m.model_dump())  # (1)!\n#> {'user': {'name': 'pydantic'}}\n```\n\n1. Note: the password field is not included\n\n!!! note\n    The motivation behind this behavior is that it helps ensure that you know precisely which fields could be\n    included when serializing, even if subclasses get passed when instantiating the object. In particular, this can\n    help prevent surprises when adding sensitive information like secrets as fields of subclasses. To include all\n    (subclass) fields when serializing, refer to the next section.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#serializing-with-duck-typing}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`Counter`][collections.Counter] instances are valid. Strict mode does *not* apply to the keys and values of the counters.\nThe strict constraint must be applied to the parameter types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom collections import Counter\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    x: Counter[str]\n\n\nm = Model(x={'foo': '1'})\nprint(m.model_dump())\n#> {'x': Counter({'foo': 1})}\n\ntry:\n    Model(x='test')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid Counter [type=counter_type, input_value='test', input_type=str]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typeddict}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#20",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#20",
+    "b": "pydantic:docs/api/standard_library_types.md#45",
+    "relation": "unrelated",
+    "related": 0.006,
+    "probabilities": {
+     "same": 0.0024,
+     "overlapping": 0.0022,
+     "conflicting": 0.0014,
+     "unrelated": 0.994
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26
+  },
+  "timing": {
+   "read_ms": 26,
+   "total_ms": 27
+  }
+ }
+}

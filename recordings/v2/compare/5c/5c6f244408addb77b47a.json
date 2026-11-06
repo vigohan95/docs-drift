@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5c/5c6f244408addb77b47a",
+ "request_hash": "5c6f244408addb77b47a48337f271e532c0efc63aa6ef0d649d38a41c58936e5",
+ "recorded_at": "2026-11-06T14:37:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1055,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "124.688385",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=323"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#119",
+    "text": "## watch\n\n|          |                           |\n| -------: | :------------------------ |\n|    Type: | `WatcherOptions \\| false` |\n| Default: | `{}`                      |\n\n```typescript\ninterface WatcherOptions {\n\tallowInputInsideOutputPath?: boolean;\n\tbuildDelay?: number;\n\tchokidar?: ChokidarOptions;\n\tclearScreen?: boolean;\n\texclude?: string | RegExp | (string | RegExp)[];\n\tinclude?: string | RegExp | (string | RegExp)[];\n\tskipWrite?: boolean;\n\tonInvalidate?: (id: string) => void;\n}\n```\n\nSpecify options for watch mode or prevent this configuration from being watched. Specifying `false` is only really useful when an array of configurations is used. In that case, this configuration will not be built or rebuilt on change in watch mode, but it will be built when running Rollup regularly:\n\n```js twoslash\n// rollup.config.js\n// ---cut-start---\n/** @type {import('rollup').RollupOptions[]} */\n// ---cut-end---\nexport default [\n\t{\n\t\tinput: 'main.js',\n\t\toutput: { file: 'bundle.cjs.js', format: 'cjs' }\n\t},\n\t{\n\t\tinput: 'main.js',\n\t\twatch: false,\n\t\toutput: { file: 'bundle.es.js', format: 'es' }\n\t}\n];\n```\n\nThese options only take effect when running Rollup with the `--watch` flag, or using `rollup.watch`."
+   },
+   {
+    "id": "rollup:docs/javascript-api/index.md#5",
+    "text": "## rollup.watch\n\nRollup also provides a `rollup.watch` function that rebuilds your bundle when it detects that the individual modules have changed on disk. It is used internally when you run Rollup from the command line with the `--watch` flag. Note that when using watch mode via the JavaScript API, it is your responsibility to call `event.result.close()` in response to the `BUNDLE_END` event to allow plugins to clean up resources in the [`closeBundle`](../plugin-development/index.md#closebundle) hook, see below.\n\n```js twoslash\nconst rollup = require('rollup');\n\n// ---cut-start---\n/** @type {import('rollup').RollupWatchOptions} */\n// ---cut-end---\nconst watchOptions = {/*...*/};\nconst watcher = rollup.watch(watchOptions);\n\nwatcher.on('event', event => {\n\t// event.code can be one of:\n\t//   START        — the watcher is (re)starting\n\t//   BUNDLE_START — building an individual bundle\n\t//                  * event.input will be the input options object if present\n\t//                  * event.output contains an array of the \"file\" or\n\t//                    \"dir\" option values of the generated outputs\n\t//   BUNDLE_END   — finished building a bundle\n\t//                  * event.input will be the input options object if present\n\t//                  * event.output contains an array of the \"file\" or\n\t//                    \"dir\" option values of the generated outputs\n\t//                  * event.duration is the build duration in milliseconds\n\t//                  * event.result contains the bundle object that can be\n\t//                    used to generate additional outputs by calling\n\t//                    bundle.generate or bundle.write. This is especially\n\t//                    important when the watch.skipWrite option is used.\n\t//                  You should call \"event.result.close()\" once you are done\n\t//                  generating outputs, or if you do not generate outputs.\n\t//                  This will allow plugins to clean up resources via the\n\t//                  \"closeBundle\" hook.\n\t//   END          — finished building all bundles\n\t//   ERROR        — encountered an error while bundling\n\t//                  * event.error contains the error that was thrown\n\t//                  * event.result is null for build errors and contains the\n\t//                    bundle object for output generation errors. As with\n\t//                    \"BUNDLE_END\", you should call \"event.result.close()\" if\n\t//                    present once you are done.\n\t// If you return a Promise from your event handler, Rollup will wait until the\n\t// Promise is resolved before continuing.\n});"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#119",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/javascript-api/index.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/configuration-options/index.md#119",
+    "b": "rollup:docs/javascript-api/index.md#5",
+    "relation": "overlapping",
+    "related": 0.9947,
+    "probabilities": {
+     "same": 0.0085,
+     "overlapping": 0.9807,
+     "conflicting": 0.0055,
+     "unrelated": 0.0053
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 37,
+   "passage_reads": 1,
+   "passages_ms": 98,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 134,
+   "total_ms": 137
+  }
+ }
+}

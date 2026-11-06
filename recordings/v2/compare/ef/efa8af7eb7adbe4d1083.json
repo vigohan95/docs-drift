@@ -1,0 +1,189 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ef/efa8af7eb7adbe4d1083",
+ "request_hash": "efa8af7eb7adbe4d108351c4e0bd5026decca18d6bf20ea3523a5f7c06fd21dd",
+ "recorded_at": "2026-11-06T14:39:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3894,
+ "response_headers": {
+  "x-clocked-credits": "14",
+  "x-clocked-model-ms": "336.857151",
+  "x-clocked-cost-usd": "0.002789",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=646,cfOrigin;dur=0,cfWorker;dur=664"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/adaptor.md#11",
+    "text": "## Notes and limitations\n\n- An adapted `net/http` handler, middleware or `ConvertRequest` request is built from the path the router matched, `c.Path()`, followed by the query as the client sent it, not from the request line as it arrived. The two differ for an escaped or non-canonical request, and `net/http` reads the raw line its own way: `/public/..%2Fadmin/x` decodes into a `URL.Path` that `http.FileServer` cleans to `/admin/x`, although no middleware mounted on `/admin` has run for it. Routed, `/a/../admin/x` reaches the handler as `/admin/x` (after the `/admin` middleware ran), `%41` as `A`, a stray `%` as `%25`, a byte a path may not carry raw, such as `|` or a byte of UTF-8, as its escape, and with `UnescapePath` the decoded path is escaped again segment by segment. The query keeps its bytes unless a Fiber handler changed the arguments through `QueryArgs()`.\n- The adapted request keeps the host Fiber saw. For a request in the absolute form, such as `GET http://public.example/x` with `Host: admin.internal`, that is the host the request line names ([RFC 9112 Section 3.2.2](https://www.rfc-editor.org/rfc/rfc9112#section-3.2.2)): `r.Host` is `public.example`, as are `c.Hostname()` and the host `app.Domain` matches.\n- `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` answer `404 Not Found` for a routed path with an empty segment (`//admin/x`) or an escaped slash (`/public/..%2Fadmin/x`): `net/http` decodes `%2F` into a separator in `URL.Path` and its handlers clean `//` and `..` away, so the handler would serve a path the router never matched. They answer `404` as well for a backslash, raw or escaped as `%5C`, and for a `.` or `..` segment carrying parameters, such as `..;`, or a segment of parameters alone before another, such as `/;x/admin`, which a handler that passes the request on, such as `httputil.ReverseProxy`, would hand to an upstream that reads them as a separator (WHATWG URL parsers, IIS), as a dot segment or as an empty one (Tomcat, Jetty). A path parameter on a named segment, such as `/a;b/c`, is handed on, since `net/http` reads it as part of the name. A middleware mounted on `/admin` does not run for `/admin;x/secret`, so put an upstream that strips parameters, such as Tomcat or Jetty, behind the [proxy middleware](./proxy.md#request-target), which refuses it, rather than an adapted `httputil.ReverseProxy`. `HTTPMiddleware` and `ConvertRequest` hand all of these on, with an escaped slash kept in `URL.RawPath`; a Fiber route behind the middleware still receives its `%2F`. To serve names that hold one, such as a GitLab-style `group%2Fproject` id, wrap the handler with `HTTPMiddleware` as a middleware that does not call `next`, and read the name from `r.URL.EscapedPath()`.\n- `HTTPMiddleware` answers `400 Bad Request`, and `ConvertRequest` returns `fiber.ErrBadRequest`, for a routed path fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, which `..` resolution builds out of `//u:pw@evil.example/a:/x/..//b`, or any path beginning with `//` on a request without a `Host` header. Set as the request line, it would become the host of both the `net/http` request and the Fiber request behind the middleware.\n- A routed path holding an escape of an unreserved character, such as `%2e` or `%41`, is answered with `404 Not Found` by `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` and with `400 Bad Request` by `HTTPMiddleware` and `ConvertRequest`. The router decodes every such escape when it normalizes a path, so one still in `c.Path()` can only have been forged by a stray `%`, and `URL.Path` would read a forged `%2e%2e` as the `..` segment an `http.FileServer` cleans away."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#79",
+    "text": "An adapted `net/http` handler, middleware or `ConvertRequest` request is built from the path the router matched, `c.Path()`, followed by the query as the client sent it, rather than from the request line as it arrived, so a `net/http` guard on `r.URL.Path` sees the `/admin/x` that `/a/../admin/x` was routed as. A byte a path may not carry raw is written as its escape, and the request keeps the host Fiber saw, including the one an absolute-form request line names. `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` answer `404 Not Found` for a routed path with an empty segment or an escaped slash, such as `//admin/x` or `/public/..%2Fadmin/x`, which `net/http` would otherwise decode and clean into a path no Fiber middleware ran for, and for one with a backslash, a dot segment carrying parameters (`..;`) or a segment of parameters alone before another (`/;x/admin`), which an upstream behind a handler such as `httputil.ReverseProxy` may resolve into another path; a handler that must serve such names can be wrapped with `HTTPMiddleware` instead. `HTTPMiddleware` answers `400 Bad Request`, and `ConvertRequest` returns `fiber.ErrBadRequest`, for a routed path fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, or one beginning with `//` on a request without a `Host` header. A routed path holding an escape of an unreserved character, which only a stray `%` can forge, is `404 Not Found` from the handler adapters and `400 Bad Request` from `HTTPMiddleware` and `ConvertRequest`, since `URL.Path` would read a forged `%2e%2e` as `..`. `FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI` as received, so a raw `/über` is routed as a Fiber server routes it, and when `r.URL` no longer matches that line, the request line `net/http` would write for `r`: a rewritten `r.URL`, as `http.StripPrefix` produces, a request built in code without a `RequestURI`, and the authority of a `CONNECT` request in the authority form. Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so a trailer no longer stands in for a header the wrapped middleware removed or replaced. See the adaptor's [notes and limitations](./middleware/adaptor.md#notes-and-limitations)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/adaptor.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#79"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#79",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/adaptor.md#11"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/adaptor.md#11",
+    "b": "fiber:docs/whats_new.md#79",
+    "relation": "overlapping",
+    "related": 0.9979,
+    "probabilities": {
+     "same": 0.0084,
+     "overlapping": 0.9858,
+     "conflicting": 0.0037,
+     "unrelated": 0.0021
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0163,
+       "restated": 0.8744,
+       "elaborated": 0.0952,
+       "different": 0.014
+      },
+      "confidence": 0.986,
+      "a": {
+       "document": "fiber:docs/middleware/adaptor.md#11",
+       "quote": "- An adapted `net/http` handler, middleware or `ConvertRequest` request is built from the path the router matched, `c.Path()`, followed by the query as the client sent it, not from the request line as it arrived.",
+       "start": 26,
+       "end": 238,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#79",
+       "quote": "An adapted `net/http` handler, middleware or `ConvertRequest` request is built from the path the router matched, `c.Path()`, followed by the query as the client sent it, rather than from the request line as it arrived, so a `net/http` guard on `r.URL.Path` sees the `/admin/x` that `/a/../admin/x` was routed as.",
+       "start": 0,
+       "end": 312,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0126,
+       "restated": 0.8259,
+       "elaborated": 0.1486,
+       "different": 0.0129
+      },
+      "confidence": 0.9871,
+      "a": {
+       "document": "fiber:docs/middleware/adaptor.md#11",
+       "quote": "- `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` answer `404 Not Found` for a routed path with an empty segment (`//admin/x`) or an escaped slash (`/public/..%2Fadmin/x`): `net/http` decodes `%2F` into a separator in `URL.Path` and its handlers clean `//` and `..` away, so the handler would serve a path the router never matched.",
+       "start": 1238,
+       "end": 1583,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#79",
+       "quote": "`HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` answer `404 Not Found` for a routed path with an empty segment or an escaped slash, such as `//admin/x` or `/public/..%2Fadmin/x`, which `net/http` would otherwise decode and clean into a path no Fiber middleware ran for, and for one with a backslash, a dot segment carrying parameters (`..;`) or a segment of parameters alone before another (`/;x/admin`), which an upstream behind a handler such as `httputil.ReverseProxy` may resolve into another path; a handler that must serve such names can be wrapped with `HTTPMiddleware` instead.",
+       "start": 468,
+       "end": 1067,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0272,
+       "restated": 0.9311,
+       "elaborated": 0.0329,
+       "different": 0.0088
+      },
+      "confidence": 0.9912,
+      "a": {
+       "document": "fiber:docs/middleware/adaptor.md#11",
+       "quote": "- `HTTPMiddleware` answers `400 Bad Request`, and `ConvertRequest` returns `fiber.ErrBadRequest`, for a routed path fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, which `..` resolution builds out of `//u:pw@evil.example/a:/x/..//b`, or any path beginning with `//` on a request without a `Host` header.",
+       "start": 2749,
+       "end": 3103,
+       "confidence": 0.998
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#79",
+       "quote": "`HTTPMiddleware` answers `400 Bad Request`, and `ConvertRequest` returns `fiber.ErrBadRequest`, for a routed path fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, or one beginning with `//` on a request without a `Host` header.",
+       "start": 1068,
+       "end": 1345,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0151,
+       "restated": 0.879,
+       "elaborated": 0.097,
+       "different": 0.0088
+      },
+      "confidence": 0.9912,
+      "a": {
+       "document": "fiber:docs/middleware/adaptor.md#11",
+       "quote": "- A routed path holding an escape of an unreserved character, such as `%2e` or `%41`, is answered with `404 Not Found` by `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` and with `400 Bad Request` by `HTTPMiddleware` and `ConvertRequest`.",
+       "start": 3230,
+       "end": 3482,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#79",
+       "quote": "A routed path holding an escape of an unreserved character, which only a stray `%` can forge, is `404 Not Found` from the handler adapters and `400 Bad Request` from `HTTPMiddleware` and `ConvertRequest`, since `URL.Path` would read a forged `%2e%2e` as `..`.",
+       "start": 1346,
+       "end": 1605,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 224,
+   "passage_reads": 1,
+   "passages_ms": 140,
+   "passages": 5,
+   "counterparts_ms": 182
+  },
+  "timing": {
+   "read_ms": 545,
+   "total_ms": 550
+  }
+ }
+}

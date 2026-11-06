@@ -1,0 +1,108 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/af/afed99aab9721a4acaca",
+ "request_hash": "afed99aab9721a4acaca69b003ef17acf5fb4cb9d7f613b50444c547247d254d",
+ "recorded_at": "2026-11-06T14:41:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1126,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "102.226658",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=239"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/compress.md#1",
+    "text": "## Behavior\n\n- Skips compression for responses that already define `Content-Encoding`, for range requests, `206` responses, status codes without bodies, or when either side sends `Cache-Control: no-transform`. A request that repeats `Cache-Control` on several lines is read as one list (RFC 9110 §5.3), so the directive counts on any of them.\n- The encoding is negotiated from the `Accept-Encoding` header with its weights, wildcard and list syntax honored (RFC 9110 §12.5.3): the coding the client weighs highest wins, and among equal weights the middleware prefers `br`, then `zstd`, `gzip` and `deflate`. An element with no `q` parameter, or an unparsable one, carries the default weight of `1`. A request that repeats `Accept-Encoding` on several lines is read as one comma-separated list (RFC 9110 §5.3). A request without the header, or one that gives every supported coding a weight of `0`, is not compressed. The client's header is left untouched for later handlers.\n- `HEAD` requests are not compressed; only `Accept-Encoding` is merged into `Vary`.\n- When compression runs, strong `ETag` values are recomputed from the compressed bytes; a streamed body cannot be hashed without buffering it, so its strong `ETag` becomes a weak one (`W/`). When compression is skipped, `Accept-Encoding` is still merged into `Vary` unless the header is `*` or already present.\n- Request-body decompression is still handled by Fiber's request APIs (for example `c.Body()`), and those decoders enforce the app `BodyLimit` for compressed payloads."
+   }
+  ],
+  "answer": "// The request's Accept-Encoding header is left untouched either way, so the // compress middleware can still compress the response when this is false. The middleware will compress the response using `gzip`, `brotli`, or `zstd` compression depending on the [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) header.",
+  "claims": [
+   "// The request's Accept-Encoding header is left untouched either way, so the // compress middleware can still compress the response when this is false.",
+   "The middleware will compress the response using `gzip`, `brotli`, or `zstd` compression depending on the [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) header."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.5783,
+  "ungrounded": 0.4217,
+  "verdict": "partially_grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/compress.md#1",
+    "share": 1,
+    "share_of_answer": 0.5783,
+    "claims": [
+     1
+    ]
+   }
+  ],
+  "claims": [
+   {
+    "claim": "// The request's Accept-Encoding header is left untouched either way, so the // compress middleware can still compress the response when this is false.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4242,
+    "supported": 0.0417,
+    "contradicted": 0.1915,
+    "not_stated": 0.7508,
+    "not_a_claim": 0.016,
+    "verdict": "not_stated",
+    "sources": {
+     "fiber:docs/middleware/compress.md#1": 1
+    },
+    "source": null,
+    "evidence": {
+     "document": "fiber:docs/middleware/compress.md#1",
+     "quote": "The client's header is left untouched for later handlers.",
+     "start": 917,
+     "end": 974,
+     "confidence": 1
+    }
+   },
+   {
+    "claim": "The middleware will compress the response using `gzip`, `brotli`, or `zstd` compression depending on the [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) header.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5758,
+    "supported": 0.9735,
+    "contradicted": 0.0119,
+    "not_stated": 0.0109,
+    "not_a_claim": 0.0037,
+    "verdict": "supported",
+    "sources": {
+     "fiber:docs/middleware/compress.md#1": 1
+    },
+    "source": "fiber:docs/middleware/compress.md#1",
+    "evidence": {
+     "document": "fiber:docs/middleware/compress.md#1",
+     "quote": "the coding the client weighs highest wins, and among equal weights the middleware prefers `br`, then `zstd`, `gzip` and `deflate`.",
+     "start": 477,
+     "end": 607,
+     "confidence": 0.99
+    }
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0417
+  },
+  "timing": {
+   "read_ms": 109,
+   "total_ms": 111
+  }
+ }
+}

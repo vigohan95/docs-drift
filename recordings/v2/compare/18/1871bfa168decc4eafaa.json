@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/18/1871bfa168decc4eafaa",
+ "request_hash": "1871bfa168decc4eafaaa7abc8ff39d15b98c16743970b9f6f1b17f7be5c224e",
+ "recorded_at": "2026-11-06T14:39:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1592,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "108.973024",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=230"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/logger.md#10",
+    "text": "## Config\n\n| Property      | Type                                              | Description                                                                                                                                   | Default                                                               |\n| :------------ | :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------- |\n| Next          | `func(fiber.Ctx) bool`                            | Next defines a function to skip this middleware when it returns true.                                                                           | `nil`                                                                 |\n| Skip          | `func(fiber.Ctx) bool`                            | Skip is a function to determine if logging is skipped or written to Stream.                                                                   | `nil`                                                                 |\n| Done          | `func(fiber.Ctx, []byte)`                         | Done is a function that is called after the log string for a request is written to Stream, and pass the log string as parameter.              | `nil`                                                                 |\n| CustomTags    | `map[string]LogFunc`                              | Defines custom tag actions for this logger instance. These tags override built-in and globally registered tags with the same name.             | `nil`                                                                 |\n| `Format`   | `string`  | Defines the logging tags. See more in [Predefined Formats](#predefined-formats), or create your own using [Tags](#constants). | `[${time}] ${ip} ${status} - ${latency} ${method} ${path} ${error}\\n` (same as `DefaultFormat`) |\n| TimeFormat    | `string`                                          | TimeFormat defines the time format for log timestamps.                                                                                        | `15:04:05`                                                            |\n| TimeZone      | `string`                                          | TimeZone can be specified, such as \"UTC\" and \"America/New_York\" and \"Asia/Chongqing\", etc. An unknown name falls back to `Local`.                                                     | `\"Local\"`                                                             |\n| TimeInterval  | `time.Duration`                                   | TimeInterval is the delay before the timestamp is updated.                                                                                    | `500 * time.Millisecond`                                              |\n| Stream        | `io.Writer`                                       | Stream is a writer where logs are written.                                                                                                    | `os.Stdout`                                                           |\n| TimeDone      | `<-chan struct{}`                                 | TimeDone stops the background timestamp updater when it is closed.                                                                            | `nil`                                                                 |\n| BeforeHandlerFunc | `func(*Config)`                               | BeforeHandlerFunc runs once before the handler is built, letting you customize colors, template, etc.                                         | `beforeHandlerFunc`                                                   |"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#110",
+    "text": "The `requestid`, `basicauth`, `keyauth`, `csrf`, and `session` middlewares automatically register their respective context tags (`${requestid}`, `${request-id}`, `${username}`, `${api-key}`, `${csrf-token}`, `${session-id}`) on first `New(...)`. Empty stubs for the same names are pre-registered at package init, so a logger format that references one of them compiles even when the corresponding middleware has not been initialized. For `log.WithContext`, later registration rebuilds the active context template. For `middleware/logger` access logs, construct the producing middleware (or call `logger.RegisterTag`) before `logger.New(...)`; existing logger instances keep the function chain compiled at construction time and do not retroactively pick up later registrations.\n\nThe `Skip` is a function to determine if logging is skipped or written to `Stream`.\n\n<details>\n<summary>Example Usage</summary>\n\n```go\napp.Use(logger.New(logger.Config{\n    Skip: func(c fiber.Ctx) bool {\n        // Skip logging HTTP 200 requests\n        return c.Response().StatusCode() == fiber.StatusOK\n    },\n}))\n```\n\n```go\napp.Use(logger.New(logger.Config{\n    Skip: func(c fiber.Ctx) bool {\n        // Only log errors, similar to an error.log\n        return c.Response().StatusCode() < 400\n    },\n}))\n```\n\n</details>"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/logger.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#110",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/logger.md#10",
+    "b": "fiber:docs/whats_new.md#110",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0082,
+     "overlapping": 0.986,
+     "conflicting": 0.0033,
+     "unrelated": 0.0024
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 116,
+   "total_ms": 120
+  }
+ }
+}

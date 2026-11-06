@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/da/dad97125477659d6f585",
+ "request_hash": "dad97125477659d6f58532ed3d755b3c0d3b7ea13702691bc378cdd9ce4d0097",
+ "recorded_at": "2026-11-06T14:43:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 908,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.106144",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "eslint:docs/src/extend/custom-processors.md#3",
+    "text": "By default, ESLint does not perform autofixes when a custom processor is used, even when the `--fix` flag is enabled on the command line. To allow ESLint to autofix code when using your processor, you should take the following additional steps:\n\n1. Update the `postprocess` method to additionally transform the `fix` property of reported problems. All autofixable problems have a `fix` property, which is an object with the following schema:\n\n    ```typescript\n    {\n        range: [number, number],\n        text: string\n    }\n    ```\n\n    The `range` property contains two indexes in the code, referring to the start and end location of a contiguous section of text that will be replaced. The `text` property refers to the text that will replace the given range.\n\n    In the initial list of problems, the `fix` property will refer to a fix in the processed JavaScript. The `postprocess` method should transform the object to refer to a fix in the original, unprocessed file.\n\n2. Add a `supportsAutofix: true` property to the processor.\n\nYou can have both rules and custom processors in a single plugin. You can also have multiple processors in one plugin. To support multiple extensions, add each one to the `processors` element and point them to the same object."
+   },
+   {
+    "id": "eslint:docs/src/extend/custom-rules.md#11",
+    "text": "#### Applying Fixes\n\nIf you'd like ESLint to attempt to fix the problem you're reporting, you can do so by specifying the `fix` function when using `context.report()`. The `fix` function receives a single argument, a `fixer` object, that you can use to apply a fix. For example:\n\n```js\ncontext.report({\n\tnode: node,\n\tmessage: \"Missing semicolon\",\n\tfix(fixer) {\n\t\treturn fixer.insertTextAfter(node, \";\");\n\t},\n});\n```\n\nHere, the `fix()` function is used to insert a semicolon after the node. Note that a fix is not immediately applied, and may not be applied at all if there are conflicts with other fixes. After applying fixes, ESLint will run all the enabled rules again on the fixed code, potentially applying more fixes. This process will repeat up to 10 times, or until no more fixable problems are found. Afterward, any remaining problems will be reported as usual.\n\n**Important:** The `meta.fixable` property is mandatory for fixable rules. ESLint will throw an error if a rule that implements `fix` functions does not [export](#rule-structure) the `meta.fixable` property.\n\nThe `fixer` object has the following methods:\n\n- `insertTextAfter(nodeOrToken, text)`: Insert text after the given node or token.\n- `insertTextAfterRange(range, text)`: Insert text after the given range.\n- `insertTextBefore(nodeOrToken, text)`: Insert text before the given node or token.\n- `insertTextBeforeRange(range, text)`: Insert text before the given range.\n- `remove(nodeOrToken)`: Remove the given node or token.\n- `removeRange(range)`: Remove text in the given range.\n- `replaceText(nodeOrToken, text)`: Replace the text in the given node or token.\n- `replaceTextRange(range, text)`: Replace the text in the given range."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "eslint:docs/src/extend/custom-processors.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "eslint:docs/src/extend/custom-rules.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "eslint:docs/src/extend/custom-processors.md#3",
+    "b": "eslint:docs/src/extend/custom-rules.md#11",
+    "relation": "unrelated",
+    "related": 0.0168,
+    "probabilities": {
+     "same": 0.0043,
+     "overlapping": 0.0064,
+     "conflicting": 0.0061,
+     "unrelated": 0.9832
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31
+  },
+  "timing": {
+   "read_ms": 31,
+   "total_ms": 34
+  }
+ }
+}

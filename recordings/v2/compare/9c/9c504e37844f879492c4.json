@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9c/9c504e37844f879492c4",
+ "request_hash": "9c504e37844f879492c464763eee832792c45d760b5937f9cc05a8d3151c6600",
+ "recorded_at": "2026-11-06T14:40:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3468,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "206.895489",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=405"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#10",
+    "text": "Domain routing has **zero performance impact** on routes that don't use it — the hostname check is applied as a handler wrapper, not a change to the core router.\n\n:::note\nBecause domain filtering is applied at handler-execution time (not during route matching), Fiber's `405 Method Not Allowed` logic may advertise methods from domain-scoped routes even when the requesting host does not match the domain pattern. This is a known trade-off of the handler-wrapping approach — it avoids core router changes while keeping non-domain routes unaffected.\n:::\n\n:::note\nWhen mounting sub-applications via `Domain(...).Use(*fiber.App)`, routes are cloned from the sub-app at mount time. This means the same sub-app can safely be mounted on multiple domains without double-wrapping, but routes registered on the sub-app **after** mounting will not inherit domain filtering. Register all sub-app routes before mounting.\n\nApps that the sub-app has mounted itself are cloned along with it, so nested routes are domain-filtered as well. The same \"register before mounting\" rule applies to them.\n\nA domain-mounted sub-app's `ErrorHandler` and `Views` are host-scoped like its routes: they apply to requests whose hostname matches the pattern, and requests on other hosts fall back to the parent's. Two sub-apps mounted at the same path on different domains therefore keep their own configuration. A sub-app that sets none of its own inherits them from the app it is mounted inside, as with a plain mount; a separately mounted app that merely covers the same paths and hosts is not inherited from.\n:::"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#31",
+    "text": "### Domain routing\n\n`Domain` creates a router scoped to a specific hostname pattern. Routes registered through the returned `Router` only match requests whose hostname (from `c.Hostname()`) matches the pattern. When `TrustProxy` is enabled and the proxy is trusted (as defined by [`TrustProxyConfig`](./api/fiber#trustproxyconfig)), the hostname may be derived from the `X-Forwarded-Host` header. Be sure to configure `TrustProxyConfig` to restrict which proxies are trusted and prevent header spoofing when enabling `TrustProxy`.\n\nThe pattern can contain parameters prefixed with `:`, accessible via `fiber.DomainParam`.\n\nRoutes for one path registered through different `Domain` patterns stay separate routes, each with its own name and automatic `HEAD` route, even when they are registered one after another; [`c.Endpoint()`](./api/ctx#endpoint) reports a `Domain` route only for a hostname its pattern matches.\n\nDomain routing has **zero performance impact** on routes that don't use it because the hostname check is applied as a handler wrapper, not a change to the core router.\n\n> **Note:** Because domain filtering happens at handler-execution time, Fiber's `405 Method Not Allowed` responses may advertise methods from domain-scoped routes even when the requesting host does not match. This is a known trade-off of the handler-wrapping approach.\n>\n> When mounting sub-applications via `Domain(...).Use(*fiber.App)`, routes are cloned at mount time. The same sub-app can safely be mounted on multiple domains, but routes added to the sub-app after mounting will not inherit domain filtering. Register all sub-app routes before mounting."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#10",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#31"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#31",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/app.md#10"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/app.md#10",
+    "b": "fiber:docs/whats_new.md#31",
+    "relation": "overlapping",
+    "related": 0.9969,
+    "probabilities": {
+     "same": 0.0442,
+     "overlapping": 0.9466,
+     "conflicting": 0.0061,
+     "unrelated": 0.0031
+    },
+    "duplicates": [
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.0736,
+       "restated": 0.4097,
+       "elaborated": 0.5005,
+       "different": 0.0162
+      },
+      "confidence": 0.9838,
+      "a": {
+       "document": "fiber:docs/api/app.md#10",
+       "quote": "This is a known trade-off of the handler-wrapping approach — it avoids core router changes while keeping non-domain routes unaffected.",
+       "start": 414,
+       "end": 548,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#31",
+       "quote": "This is a known trade-off of the handler-wrapping approach.\n>\n> When mounting sub-applications via `Domain(...)",
+       "start": 1294,
+       "end": 1405,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.2442,
+       "restated": 0.2531,
+       "elaborated": 0.4886,
+       "different": 0.0141
+      },
+      "confidence": 0.9859,
+      "a": {
+       "document": "fiber:docs/api/app.md#10",
+       "quote": "When mounting sub-applications via `Domain(...",
+       "start": 562,
+       "end": 608,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#31",
+       "quote": "> When mounting sub-applications via `Domain(...).Use(*fiber.App)`, routes are cloned at mount time.",
+       "start": 1356,
+       "end": 1456,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.98,
+       "restated": 0.0065,
+       "elaborated": 0.0091,
+       "different": 0.0044
+      },
+      "confidence": 0.9956,
+      "a": {
+       "document": "fiber:docs/api/app.md#10",
+       "quote": "Register all sub-app routes before mounting.",
+       "start": 864,
+       "end": 908,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#31",
+       "quote": "Register all sub-app routes before mounting.",
+       "start": 1599,
+       "end": 1643,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 94,
+   "passages": 4,
+   "counterparts_ms": 90
+  },
+  "timing": {
+   "read_ms": 215,
+   "total_ms": 219
+  }
+ }
+}

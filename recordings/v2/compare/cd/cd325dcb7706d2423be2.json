@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/cd/cd325dcb7706d2423be2",
+ "request_hash": "cd325dcb7706d2423be2e8458df77302fb5955c608ef2bb806f5ebea364c15b2",
+ "recorded_at": "2026-11-06T14:41:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 905,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.956863",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=166"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "text": "### Python mode\n\nWhen using the Python mode, Pydantic models (and model-like types such as [dataclasses][]) (1) will be (recursively) converted to dictionaries. This is achievable by using the [`model_dump()`][pydantic.BaseModel.model_dump] method:\n{ .annotate }\n\n1. With the exception of [root models](./models.md#rootmodel-and-custom-root-types), where the root value is dumped directly.\n\n```python {group=\"python-dump\"}\nfrom pydantic import BaseModel, Field\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    banana: float | None = 1.1\n    foo: str = Field(serialization_alias='foo_alias')\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': (1, 2)})\n\n# returns a dictionary:\nprint(m.model_dump())\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': (1, 2)}}\n\nprint(m.model_dump(by_alias=True))\n#> {'banana': 3.14, 'foo_alias': 'hello', 'bar': {'whatever': (1, 2)}}\n```\n\nNotice that the value of `whatever` was dumped as tuple, which isn't a known JSON type. The `mode` argument can be set to `'json'`\nto ensure JSON-compatible types are used:\n\n```python {group=\"python-dump\"}\nprint(m.model_dump(mode='json'))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': [1, 2]}}\n```\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_python()`][pydantic.TypeAdapter.dump_python] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#modelmodel_dump_json}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#46",
+    "text": "### Typed dictionaries\n\nStandard library type: [`typing.TypedDict`][] (see also: the [typing specification](https://typing.python.org/en/latest/spec/typeddict.html)).\n\n!!! note\n    Because of runtime limitations, Pydantic will require using the [`TypedDict`][typing_extensions.TypedDict] type from\n    [`typing_extensions`][] when using Python 3.12 and lower.\n\n[`TypedDict`][typing.TypedDict] declares a dictionary type that expects all of its instances to have a certain set of keys\n where each key is associated with a value of a consistent type.\n\nThis type [supports configuration](../concepts/config.md#configuration-on-other-supported-types).\n\n<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`dict`][] instances are valid (unlike mappings in lax mode).\nStrict mode does *not* apply to the values of the typed dictionary. The strict constraint must be applied to the value types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom typing_extensions import TypedDict\n\nfrom pydantic import TypeAdapter, ValidationError\n\n\nclass User(TypedDict):\n    name: str\n    id: int\n\n\nta = TypeAdapter(User)\n\nprint(ta.validate_python({'name': 'foo', 'id': 1}))\n#> {'name': 'foo', 'id': 1}\n\ntry:\n    ta.validate_python({'name': 'foo'})\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for User\n    id\n      Field required [type=missing, input_value={'name': 'foo'}, input_type=dict]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typingiterable}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#46",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#2",
+    "b": "pydantic:docs/api/standard_library_types.md#46",
+    "relation": "unrelated",
+    "related": 0.0112,
+    "probabilities": {
+     "same": 0.0042,
+     "overlapping": 0.0039,
+     "conflicting": 0.0032,
+     "unrelated": 0.9888
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

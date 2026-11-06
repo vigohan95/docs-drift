@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/aa/aaa9b9360648e7c32fc7",
+ "request_hash": "aaa9b9360648e7c32fc78f6eb24e901c40b88337d21e16ebfc4c4526f22a3b93",
+ "recorded_at": "2026-11-06T14:42:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 871,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.128799",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=139"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#3",
+    "text": "## At the field level\n\nStrict mode can be enabled on specific fields, by setting the `strict` parameter of the\n[`Field()`][pydantic.Field] function to `True`. The [validation parameter](#as-a-validation-parameter)\ntakes priority over the field level setting.\n\n```python\nfrom pydantic import BaseModel, Field, ValidationError\n\n\nclass User(BaseModel):\n    name: str\n    age: int = Field(strict=True)  # (1)!\n\n\nuser = User(name='John', age=42)\nprint(user)\n#> name='John' age=42\n\n\ntry:\n    another_user = User(name='John', age='42')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for User\n    age\n      Input should be a valid integer [type=int_type, input_value='42', input_type=str]\n    \"\"\"\n\nprint(User.model_validate({'name': 'John', 'age': '42'}, strict=False))\n#> name='John' age=42\n```\n\n1. The strict constraint can also be applied using the [annotated pattern](./fields.md#the-annotated-pattern):\n   `Annotated[int, Field(strict=True)]`\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#strict-mode-with-annotated-strict}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`Counter`][collections.Counter] instances are valid. Strict mode does *not* apply to the keys and values of the counters.\nThe strict constraint must be applied to the parameter types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom collections import Counter\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    x: Counter[str]\n\n\nm = Model(x={'foo': '1'})\nprint(m.model_dump())\n#> {'x': Counter({'foo': 1})}\n\ntry:\n    Model(x='test')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid Counter [type=counter_type, input_value='test', input_type=str]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typeddict}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/strict_mode.md#3",
+    "b": "pydantic:docs/api/standard_library_types.md#45",
+    "relation": "unrelated",
+    "related": 0.0221,
+    "probabilities": {
+     "same": 0.0045,
+     "overlapping": 0.0085,
+     "conflicting": 0.009,
+     "unrelated": 0.9779
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26
+  },
+  "timing": {
+   "read_ms": 26,
+   "total_ms": 27
+  }
+ }
+}

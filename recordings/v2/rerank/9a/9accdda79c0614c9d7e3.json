@@ -1,0 +1,280 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/9a/9accdda79c0614c9d7e3",
+ "request_hash": "9accdda79c0614c9d7e369daf26ec6455bd0215a01fd0e1fdbac2f43591833e8",
+ "recorded_at": "2026-11-06T14:41:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2832,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "150.969757",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=330,cfOrigin;dur=0,cfWorker;dur=372"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) When the method changes, the body is dropped, including a form your handler already read, together with the fields that frame or describe it or expect it: `Content-Type`, `Content-Length`, `Content-Encoding`, `Content-Language`, `Content-Location`, `Transfer-Encoding`, `Trailer`, `Expect`, `Digest` and `Content-MD5`. (2) When the method changes, the body goes with it, and the fields that framed, described or expected it, for that hop: the request your handler holds keeps its method, body and credentials.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#15",
+    "title": "docs/middleware/proxy.md > Proxy > Security > RFC 9110 hop-by-hop header stripping",
+    "text": "The fields a client sends in the trailer section of a chunked request are dropped together with `Trailer`, as [RFC 9112 §7.1.2](https://www.rfc-editor.org/rfc/rfc9112#section-7.1.2) lets a recipient that removes the chunked coding do, instead of reaching the upstream as header lines: whatever screened the header section in front of this hop never saw them. Fiber drops them as the request arrives or, for a body streamed with `StreamRequestBody`, once that body has been read, including while the proxy forwards it. A header line sharing a name with a trailer field is kept. A streamed body whose trailer section names more than 16 fields also fails to read, which answers a request whose body the proxy reads with `431 Request Header Fields Too Large`. The trailer section of an upstream's chunked response is dropped the same way, whether its fields were announced in `Trailer` or not: the proxy answers with a sized body, which carries no trailer section, and a recipient must not merge trailer fields into the header section ([RFC 9110 §6.5.1](https://www.rfc-editor.org/rfc/rfc9110#section-6.5.1)); a response whose trailer section names more than 16 fields is answered with `502 Bad Gateway`. The section is gone before `ModifyResponse` runs and before `Do` or `Forward` return, so neither a hook nor a handler reads a trailer field of the upstream's response. A client that streams response bodies (`StreamResponseBody`, or a response whose `StreamBody` is set) receives the section only once the body has been read, after that point; the proxy reads such a body from a response of its own, which keeps the section, so it reaches neither the hook nor the client. It is discarded whatever its size: the limit of 16 fields applies to the names announced in the header section, which the proxy sees before it answers, not to fields that only arrive with the body. All of this holds with `KeepHopByHopHeaders` set."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#15",
+    "title": "docs/whats_new.md > 🚀 App > Protocol error responses",
+    "text": "### Protocol error responses\n\nRequests that the server refuses before routing, because of how they are framed or which method they use, are answered as [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) and [RFC 9112](https://www.rfc-editor.org/rfc/rfc9112) ask:\n\n- **`GETOnly`**: the `405 Method Not Allowed` sent for any other method now carries `Allow: GET, HEAD`, as every 405 must. Middleware registered with `Use` no longer runs for such a request: a handler that ends the chain, such as a proxy, used to carry out the method the client was told was not allowed.\n- **Unknown transfer coding**: a request whose `Transfer-Encoding` names a coding the server cannot decode (`gzip, chunked`, say) is answered `501 Not Implemented`; it used to be `400 Bad Request`, and the body no longer repeats the start of the request. A malformed message, such as a repeated `Transfer-Encoding` field or the field on an HTTP/1.0 request, is still `400`, and so is every one of these when `app.Server().SecureErrorLogMessage` is set, because fasthttp then no longer says which coding it saw.\n- **Status from the parser's error**: the status follows the error the parser reported, not text found anywhere in its message, so request bytes the message quotes, such as a malformed trailer, no longer turn a `400 Bad Request` into a `501` or a `408`.\n- **Middleware run for a refused request**: the body that middleware registered with `Use` wrote is dropped before the `ErrorHandler` runs, so an `ErrorHandler` that keeps a body, as `c.SendStatus` does, no longer sends a catch-all's answer with the refusal status, and `static` serves no file for such a request. Route handlers are skipped for it, and a guard registered as a route with them.\n- **`Content-Length` together with `Transfer-Encoding`**: the request is processed as before, by its `Transfer-Encoding` or, when the field says `identity`, which fasthttp ignores, by its `Content-Length`, and the connection is now closed after the response (`Connection: close`). The two fields are how a request-smuggling message looks, and the bytes behind it on the connection may belong to a request that another recipient framed differently. Fiber installs this check right before the server it starts begins to serve (`Listen`, `Listener`, `Test`), and keeps the `HeaderReceived` callback you set on `app.Server()` up to then, in `ListenConfig.BeforeServeFunc` too. A callback you set again between two starts is wrapped at the next one. A `fasthttp.Server` of your own that serves `app.Handler()` needs the same check in its own `HeaderReceived` callback."
+   },
+   {
+    "id": "fiber:docs/middleware/adaptor.md#12",
+    "title": "docs/middleware/adaptor.md > Adaptor > Notes and limitations",
+    "text": "- `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` put the original request line back once a buffered handler has returned, or panicked, so `c.OriginalURL()` in a middleware that runs afterwards is unchanged. A handler that flushed or hijacked is still running with a request whose URL aliases the request line, so the line is then left as the handler read it; `HTTPMiddleware` and `ConvertRequest` leave it as well.\n- A request that `net/http` served over TLS is seen as TLS by Fiber: `c.Scheme()` is `https`, `c.Secure()` is true and `c.RequestCtx().TLSConnectionState()` carries the state from `r.TLS`.\n- A request the [timeout middleware](./timeout.md) gave up on behind `FiberHandler`, `FiberHandlerFunc` or `FiberApp` is answered with its timeout response, as on Fiber's own server. Its `fasthttp.RequestCtx` is left to the handler that may still run on it and never goes back to the pool, so no later request shares it and the handler's `c.Context()` keeps reporting the timeout.\n- `FiberHandler`, `FiberHandlerFunc` and `FiberApp` close the body stream of a response to a `HEAD` request unread, as Fiber's own server does: `net/http` discards a `HEAD` body, so a stream writer or an [SSE](./sse.md) `Handler` would otherwise run with every write succeeding.\n- For a request that reaches Fiber through `FiberHandler`, `FiberHandlerFunc` or `FiberApp`, `c.StartTime()` marks the moment the adaptor took the request over, not the moment the `net/http` server began reading it, so `c.Elapsed()` leaves out the time spent before the handler was called.\n- Both parsers read the headers: `Header.Get` returns the first field line even when it is empty, `c.Get` the first line that holds a value. A `net/http` guard should strip a header or check every value rather than compare `Header.Get` with the empty string; see the caution in the `FiberApp` section above.\n- `HTTPMiddleware` routes the request the wrapped middleware hands to `next`, including a rewritten `r.URL` such as the one `http.StripPrefix` produces. The middleware must call `next` before it flushes or hijacks the response; after that the response has left Fiber's hands and the call is ignored.\n- `HTTPMiddleware` copies `r.Method`, `r.Host` and `r.Header`, as the wrapped middleware hands them to `next`, back onto the Fiber request, so a header it replaces or deletes (`r.Header.Set`, `r.Header.Del`) is replaced or gone for the handlers behind it, `c.IPs()` included. A changed `r.Method` reaches only the raw request (`c.Request().Header.Method()`): `c.Method()` and the route that is running keep the method the request was routed with, so a rewrite does not move it to another method's handlers. `Content-Length` and `Transfer-Encoding` are not copied back, so the body framing stays as received. Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so `r.Trailer` is empty and a trailer cannot stand in for a header the middleware removed or replaced. A `Connection` field written as several entries is joined with commas, and a `close` token anywhere in it closes the connection once the response is sent.\n- `FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI`, the request line as `net/http` received it, so a raw `/über` or `/a|b` is routed and its params are read as a Fiber server would read them. When `r.URL` no longer says what that line says, or there is no such line, they route the request line `net/http` would write for `r.URL` instead: the path an `http.StripPrefix` in front of them rewrote, the URL of a request built in code, which has no `RequestURI` at all, and, for a `CONNECT` request in the authority form, the authority rather than the `/` that `r.URL.RequestURI()` reads for it: `r.URL.Opaque` when set, else `r.Host`, else `r.URL.Host`, the order in which `net/http` itself writes such a request."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#47",
+    "title": "docs/whats_new.md > 🧠 Context > Changed Methods",
+    "text": "- **SendStatus()**: For a status that cannot carry a body — `1xx`, `204`, `205` and `304` — the response body and\n  any `Content-Length` already set are now dropped.\n  [RFC 9110, Section 8.6](https://www.rfc-editor.org/rfc/rfc9110#section-8.6) requires that for `1xx` and `204`;\n  Fiber also does it for `205` and `304`. `c.Set(fiber.HeaderContentLength, \"42\")`\n  followed by `c.SendStatus(204)` previously put `Content-Length: 42` on the wire, along with a `Content-Type`\n  fasthttp emits for a declared length; neither line is sent now. `205 Reset Content` still sends\n  `Content-Length: 0`: it has no content ([Section 15.3.6](https://www.rfc-editor.org/rfc/rfc9110#section-15.3.6)),\n  but unlike `1xx`, `204` and `304` it still has to be framed\n  ([RFC 9112, Section 6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)).\n  Unlike the two above, this applies under the default configuration. A streamed body counts as a body, so\n  `SendStatus` leaves it unread instead of reading it into memory to check its length.\n- **Body()**: A `Content-Encoding` that cannot be undone sets `415`, `501` or `413` only while the response has no\n  body yet. A middleware that reads `c.Body()` after `c.Next()`, such as the logger's `${body}` tag, no longer\n  replaces the status the handler sent.\n- **AcceptsEncodings()**: Follows [RFC 9110, Section 12.5.3](https://www.rfc-editor.org/rfc/rfc9110#section-12.5.3).\n  `identity`, the absence of a coding, is now acceptable when the `Accept-Encoding` header does not list it, unless\n  the header excludes it with `identity;q=0` or `*;q=0`: `c.AcceptsEncodings(\"br\", \"identity\")` answers `\"identity\"`\n  for `Accept-Encoding: gzip`, where it answered `\"\"`. An unlisted `identity` ranks below every coding the header does\n  list. A header that is present but empty now accepts only `identity`; it used to read as absent, which accepts the\n  first offer.\n- **Status()**: A code outside `100` to `999` cannot be written as a status line\n  ([RFC 9112, Section 4](https://www.rfc-editor.org/rfc/rfc9112#section-4)). `c.Status(99)` and `c.Status(1000)` used to\n  put a malformed line on the wire that clients refuse, and `c.Status(0)` or a negative code put `200 OK` there. They\n  now answer `500 Internal Server Error` and log the code. `SendStatus`, `Redirect().Status` and an error built with\n  `fiber.NewError` go through `Status`, so they follow. Codes from `600` to `999` are still sent as given.\n- **Cookie()**: A value with a space or a comma is now written in double quotes, as `net/http` does, because neither is\n  a `cookie-octet` ([RFC 6265, Section 4.1.1](https://www.rfc-editor.org/rfc/rfc6265#section-4.1.1)).\n  `c.Cookie(&fiber.Cookie{Name: \"n\", Value: \"hello world\"})` used to send `n=hello world` and sends `n=\"hello world\"`\n  now; the quotes frame the value, and `Cookies` and `GetCookie` return `hello world`. A value that already starts and\n  ends with a double quote is accepted and written quoted instead of being dropped as invalid. Values with a semicolon,\n  an inner double quote, a backslash, a control character or a non-ASCII character are still refused. Percent-encode a\n  value that has to pass through a strict parser.\n- **SendFile() and the static middleware, with `ByteRange`**: The file server answered one byte range and nothing\n  else. Fiber now applies the rest of [RFC 9110, Section 13.1.5 and Section 14.2](https://www.rfc-editor.org/rfc/rfc9110#section-14.2)\n  around it. A request for several ranges used to get `416`; it gets the whole file, as does one with a range unit the"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#116",
+    "title": "docs/whats_new.md > 🧬 Middlewares > Proxy",
+    "text": "The proxy is secure by default. Upstreams that resolve to loopback, private, link-local, multicast, unspecified, CGNAT or other special-use addresses (IPv6 transition forms included) are refused, and so are schemes other than `http` and `https` and HTTPS-to-HTTP redirects. Every request is bounded: `Balancer` takes at most `MaxResponseBodySize` of an upstream response, 100 MiB unless set, whether it buffers the body or streams it (a negative value lifts the bound; a `Config.Client` keeps the bounds of its own clients for the bodies they buffer, and a `MaxResponseBodySize` you set holds the body it streams, which fasthttp does not bound), and the client behind `Do`, `DoRedirects`, `Forward`, `DomainForward` and `BalancerForward` gives each request, and each redirect hop, 30 seconds for the whole exchange, connect and body included, unless `DoTimeout` or `DoDeadline` set the request's own bound, and takes at most 100 MiB of a response, one set to stream included, until `proxy.WithClient` replaces it; a client of your own that streams is held to its `MaxResponseBodySize`. A streamed body that declares more than the bound is refused before any of it is sent, and one that passes it without declaring its length ends the response early. Hop-by-hop headers are stripped, and `Balancer`, `Forward`, `DomainForward` and `BalancerForward` overwrite `X-Real-IP` with `c.IP()`; with `Do`, `DoTimeout`, `DoDeadline` and `DoRedirects` you set it yourself. The trailer section of a chunked request is dropped instead of reaching the upstream as header lines, the trailer section of an upstream's chunked response is dropped instead of reaching the client as header lines, whether the client buffers the response or streams it, and a forwarding header sent on several lines keeps them in the order they were received; a request carrying more than 64 forwarding lines, the `X-Real-IP` line the proxy writes included, is refused with `431 Request Header Fields Too Large`. To proxy to an internal host, relax the policy with `proxy.WithSecurityPolicy` (or `Config.SecurityPolicy` for `Balancer`), for example `proxy.SecurityPolicy{AllowPrivateIPs: true}`, before you build `DomainForward` or `BalancerForward`: they check their upstreams when the handler is built and panic on a rejected one. Keep the policy installed while they serve: `Forward`, `DomainForward` and `BalancerForward` read it on every request, whereas `Balancer` reads it once, when it is built. See [Security](./middleware/proxy.md#security)."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#91",
+    "title": "docs/whats_new.md > 🧬 Middlewares > Compression",
+    "text": "### Compression\n\n- Added support for `zstd` compression alongside `gzip`, `deflate`, and `brotli`.\n- Strong `ETag` values are now recomputed for compressed payloads so validators remain accurate.\n- Compression is bypassed for responses that already specify `Content-Encoding`, for range requests or `206` statuses, and when either side sends `Cache-Control: no-transform`.\n- `HEAD` requests still negotiate compression so `Content-Encoding`, `Content-Length`, `ETag`, and `Vary` match a corresponding `GET`, but the body is omitted.\n- `Vary: Accept-Encoding` is merged into responses even when compression is skipped, preventing caches from mixing encoded and unencoded variants.\n- Decoding compressed request bodies now enforces the app `BodyLimit` through fasthttp `WithLimit` helpers, including when the compression middleware is active.\n- Multipart form parsing now enforces the app `BodyLimit` by using fasthttp `MultipartFormWithLimit`."
+   },
+   {
+    "id": "fiber:docs/middleware/proxy.md#13",
+    "title": "docs/middleware/proxy.md > Proxy > Security > Redirect method and body",
+    "text": "A redirect that keeps the body of a request whose body is streamed (`StreamRequestBody`) is followed when the first hop left all of that body in memory: a body of known length that fits what the server reads ahead of the handler, 8 KiB, an empty one included. A chunked body or a longer one fails the redirect with `fasthttp.ErrRedirectBodyStream`, as in fasthttp's own redirect loop: the first hop consumed the stream, and what it left cannot be sent again. A redirect that drops the body goes on.\n\nWhen following the chain fails, `fasthttp.ErrTooManyRedirects` included, `DoRedirects` leaves the response empty: the redirect it stopped at, with its `Location`, its cookies and its hop-by-hop fields, does not go out with the error."
+   },
+   {
+    "id": "fiber:docs/api/ctx.md#124",
+    "title": "docs/api/ctx.md > Response > Add",
+    "text": "### Add\n\nAppends the given value to the response header field as a **new field line**, leaving any existing lines untouched.\n\nThis differs from [`Append`](#append), which folds values into a single comma-separated line: headers whose values may themselves contain commas — `WWW-Authenticate`, `Link` — have to be sent as separate lines to stay unambiguous (RFC 9110, Section 5.3).\n\n:::caution\n`Add` does not append for most of the headers fasthttp stores in a slot of their own: `Content-Type`, `Content-Encoding`, `Content-Length`, `Connection` and `Server` are **replaced**, and `Transfer-Encoding` and `Date` are **ignored** because fasthttp writes them itself. Use [`Set`](#set) for those. `Set-Cookie` is slotted too but does repeat, so `Add` appends a line — prefer [`Cookie`](#cookie), which builds the field value for you. `Trailer` accumulates as well: each `Add` extends the set of announced trailer fields.\n:::\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) Add(key, val string)\nfunc (r fiber.Res) Add(key, val string)\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func(c fiber.Ctx) error {\n  c.Add(fiber.HeaderWWWAuthenticate, `Basic realm=\"api\"`)\n  c.Add(fiber.HeaderWWWAuthenticate, `Bearer realm=\"api\"`)\n  // => WWW-Authenticate: Basic realm=\"api\"\n  // => WWW-Authenticate: Bearer realm=\"api\"\n\n  return c.SendStatus(fiber.StatusUnauthorized)\n})\n```"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#67",
+    "title": "docs/whats_new.md > 🌎 Client package > Fasthttp transport integration",
+    "text": "### Fasthttp transport integration\n\n- `client.NewWithHostClient` and `client.NewWithLBClient` allow you to plug existing `fasthttp` clients directly into Fiber while keeping retries, redirects, and hook logic consistent.\n- Dialer, TLS, and proxy helpers now update every host client inside a load balancer, so complex pools inherit the same configuration.\n- The Fiber client exposes `Do`, `DoTimeout`, `DoDeadline`, `DoRedirects`, and `CloseIdleConnections`, matching the surface area of the wrapped fasthttp transports.\n- Redirects are off by default (`MaxRedirects` is `0`). The `Request` methods follow them for `GET`, `HEAD` and `QUERY` requests only, while `Client.DoRedirects` follows any method. A redirect to a host that is neither the original hostname (on any port) nor one of its subdomains drops the credentials of the original request (`Authorization`, `Proxy-Authorization`, `Cookie` and related headers), and a redirect from HTTPS to HTTP fails with `client.ErrRedirectDowngrade`. Headers named with `Client.SetRedirectSensitiveHeaders`, `Request.SetRedirectSensitiveHeaders` or `Config.RedirectSensitiveHeaders` are dropped with them, and all of them are removed whatever case they are stored under; every other header is forwarded. A redirect that drops the body drops the request's trailer section with it, instead of sending its fields to the target as header lines, and fails with `client.ErrRedirectTrailers` when that section announces more than 16 names. With a retry configuration, a chain that fails is retried from the original request.\n- A client from `client.New`, the default client behind `client.Get` and the other package-level helpers included, buffers a response body of at most 100 MiB and fails a larger one with `fasthttp.ErrBodyTooLarge`. `SetMaxResponseBodySize` changes the limit, and `SetStreamResponseBody(true)` reads a body without buffering it. A wrapped `fasthttp` client keeps its own `MaxResponseBodySize`.\n- A timeout, set with `SetTimeout`, `Config.Timeout` or a context deadline, now bounds the transport as well as the caller: every attempt, retry and redirect hop gets what is left of it, the connection is closed when it passes, and retries stop once the call is over. On a client from `client.New` it also bounds the TLS handshake. With response streaming the deadline also ends reads from `Response.BodyStream()`, so leave it unset for a long-lived stream.\n- A canceled context, with or without a deadline, ends the exchange of a client from `client.New` at the transport too, unless the response is streamed: the connection the request was using is closed, so the goroutine and the connection no longer wait for a server that never answers once the connection is open; a dial still in progress runs to its end (3 seconds for the built-in dialer) and its connection is then closed. With `SetStreamResponseBody(true)`, and on a wrapped `fasthttp` client, the caller returns at once while the exchange ends on its own, as before; a timeout or deadline still bounds it, so give such requests one.\n- A `Request` sent again picks its cookies anew: it no longer carries the cookie jar's cookies for its previous URL or a cookie deleted or expired since, and a cookie written straight to `RawRequest` before the send is dropped. The cookie jar drops a cookie without a name and trims whitespace around a name, and only a host name matches a cookie `Domain` by suffix: an IP address, with or without an IPv6 zone, matches only itself.\n- `SetParam`, `SetParams`, `SetFormData` and `SetFormDataWithMap` on a `Request`, `SetParam`, `SetParams` and `SetHeader` on the `Client`, and `QueryParam.Set` and `FormData.Set` replace every value stored under the key, not only the first, so a value added before with `AddParam`, `AddFormData` or `AddHeader` is no longer sent next to the new one. The key moves to the end of the query string or form body."
+   },
+   {
+    "id": "fiber:docs/client/request.md#76",
+    "title": "docs/client/request.md > SetMaxRedirects",
+    "text": "## SetMaxRedirects\n\n**SetMaxRedirects** sets the maximum number of redirects to follow for the request. The default is `0`, which follows none: the redirect response is returned as-is. The client has no redirect limit of its own, so set one on each request or with `Config.MaxRedirects`.\n\n```go title=\"Signature\"\nfunc (r *Request) SetMaxRedirects(count int) *Request\n```\n\n:::info\nRedirects are followed only for `GET`, `HEAD` and `QUERY` requests. Other methods receive the redirect response as-is, whatever the limit.\n:::\n\nWhile redirects are followed:\n\n- After a `301`, `302` or `303` the request is repeated as a `GET` without its body; a `HEAD` stays a `HEAD`. A `307` or `308` keeps the method and the body. The trailer section goes with the body, instead of reaching the target as header lines; a request whose section announces more than 16 names fails the redirect with `ErrRedirectTrailers`.\n- When the target is on another host, the `Authorization`, `Proxy-Authorization`, `Proxy-Authenticate`, `WWW-Authenticate`, `Cookie` and `Cookie2` headers are dropped. They are removed whatever case they are stored under. The names set with [SetRedirectSensitiveHeaders](#setredirectsensitiveheaders) on the request or the client are dropped with them. The same host on any port, and its subdomains, keep them.\n- A redirect from `https` to `http` fails with `ErrRedirectDowngrade`. Leave the limit at `0` to take such a hop yourself.\n- A redirect without a `Location` fails with `fasthttp.ErrMissingLocation`. A `Location` that cannot be parsed or names a `scheme://` other than `http` or `https` fails with `fasthttp.ErrorInvalidURI` without being requested, as does a request URL that cannot be parsed. A chain longer than the limit fails with `fasthttp.ErrTooManyRedirects`.\n- With a [retry configuration](./rest.md#setretryconfig), a chain that fails, on one of the errors above or on a hop that cannot be sent, is retried from the request as it was sent: the original URL, method, body and headers. A request with a streamed body cannot be copied, so its retry starts from the hop the failed attempt reached. A chain that succeeds is not repeated."
+   },
+   {
+    "id": "fiber:docs/middleware/logger.md#14",
+    "title": "docs/middleware/logger.md > Logger > Predefined Formats",
+    "text": ":::tip\n`${bytesSent}` returns the value the `Content-Length` response header declares when the logger runs. For an ordinary buffered response fasthttp fills the header in on write, after the logger, so `0` is logged; a streaming response of unknown length (chunked encoding) logs `-1`. Likewise `${bytesReceived}` reports the request's declared `Content-Length`: `-2` for a request without a body and `-1` for a chunked one. Fiber does not calculate the actual body sizes for performance reasons.\n:::\n\n:::tip\n`${resBody}` logs nothing for a streamed response (`SendStream`, `SendStreamWriter`, and `SendFile` for a large file). Reading such a body would pull the whole stream into memory and turn the response into a buffered one — an SSE route would deliver nothing until its writer finished — so logging leaves it alone.\n:::\n\n:::tip\n`${body}` logs what `Ctx.Body()` returns, so a compressed request body is logged decoded and a `Content-Encoding` that cannot be undone logs the error text. With [`StreamRequestBody`](../api/fiber.md#streamrequestbody), `${body}` and `${form:}` read a streamed request body the handler left unread within `BodyLimit`, `${form:}` only a form body; for a larger one `${body}` logs the error message and `${form:}` searches only the query string. Unlike a call from a handler, the tags never answer such a request with `415`, `501` or `413`: the response goes out as the handler left it.\n:::"
+   },
+   {
+    "id": "fiber:docs/api/constants.md#7",
+    "title": "docs/api/constants.md > Errors",
+    "text": "    HeaderContentLength                      = \"Content-Length\"\n    HeaderContentLocation                    = \"Content-Location\"\n    HeaderContentType                        = \"Content-Type\"\n    HeaderForwarded                          = \"Forwarded\"\n    HeaderVia                                = \"Via\"\n    HeaderXForwardedFor                      = \"X-Forwarded-For\"\n    HeaderXForwardedHost                     = \"X-Forwarded-Host\"\n    HeaderXForwardedProto                    = \"X-Forwarded-Proto\"\n    HeaderXForwardedProtocol                 = \"X-Forwarded-Protocol\"\n    HeaderXForwardedSsl                      = \"X-Forwarded-Ssl\"\n    HeaderXUrlScheme                         = \"X-Url-Scheme\"\n    HeaderLocation                           = \"Location\"\n    HeaderFrom                               = \"From\"\n    HeaderHost                               = \"Host\"\n    HeaderReferer                            = \"Referer\"\n    HeaderReferrerPolicy                     = \"Referrer-Policy\"\n    HeaderUserAgent                          = \"User-Agent\"\n    HeaderAllow                              = \"Allow\"\n    HeaderServer                             = \"Server\"\n    HeaderAcceptRanges                       = \"Accept-Ranges\"\n    HeaderContentRange                       = \"Content-Range\"\n    HeaderIfRange                            = \"If-Range\"\n    HeaderRange                              = \"Range\"\n    HeaderContentSecurityPolicy              = \"Content-Security-Policy\"\n    HeaderContentSecurityPolicyReportOnly    = \"Content-Security-Policy-Report-Only\"\n    HeaderCrossOriginResourcePolicy          = \"Cross-Origin-Resource-Policy\"\n    HeaderExpectCT                           = \"Expect-CT\"\n    HeaderPermissionsPolicy                  = \"Permissions-Policy\"\n    HeaderPublicKeyPins                      = \"Public-Key-Pins\"\n    HeaderPublicKeyPinsReportOnly            = \"Public-Key-Pins-Report-Only\"\n    HeaderStrictTransportSecurity            = \"Strict-Transport-Security\"\n    HeaderUpgradeInsecureRequests            = \"Upgrade-Insecure-Requests\"\n    HeaderXContentTypeOptions                = \"X-Content-Type-Options\"\n    HeaderXDownloadOptions                   = \"X-Download-Options\"\n    HeaderXFrameOptions                      = \"X-Frame-Options\"\n    HeaderXPoweredBy                         = \"X-Powered-By\"\n    HeaderXXSSProtection                     = \"X-XSS-Protection\"\n    HeaderLastEventID                        = \"Last-Event-ID\"\n    HeaderNEL                                = \"NEL\"\n    HeaderPingFrom                           = \"Ping-From\"\n    HeaderPingTo                             = \"Ping-To\"\n    HeaderReportTo                           = \"Report-To\"\n    HeaderTE                                 = \"TE\"\n    HeaderTrailer                            = \"Trailer\"\n    HeaderTransferEncoding                   = \"Transfer-Encoding\"\n    HeaderSecFetchSite                       = \"Sec-Fetch-Site\"\n    HeaderSecWebSocketAccept                 = \"Sec-WebSocket-Accept\"\n    HeaderSecWebSocketExtensions             = \"Sec-WebSocket-Extensions\"\n    HeaderSecWebSocketKey                    = \"Sec-WebSocket-Key\"\n    HeaderSecWebSocketProtocol               = \"Sec-WebSocket-Protocol\"\n    HeaderSecWebSocketVersion                = \"Sec-WebSocket-Version\"\n    HeaderAcceptPatch                        = \"Accept-Patch\"\n    HeaderAcceptPushPolicy                   = \"Accept-Push-Policy\"\n    HeaderAcceptSignature                    = \"Accept-Signature\"\n    HeaderAltSvc                             = \"Alt-Svc\""
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "fiber:docs/middleware/adaptor.md#12",
+    "action": "use",
+    "relevance_score": 0.95,
+    "document_score": 0.9623,
+    "levels": {
+     "answers": 0.95,
+     "elsewhere": 0.0123,
+     "different_case": 0.0216,
+     "unrelated": 0.0161
+    }
+   },
+   {
+    "index": 9,
+    "id": "fiber:docs/client/request.md#76",
+    "action": "use",
+    "relevance_score": 0.8401,
+    "document_score": 0.8603,
+    "levels": {
+     "answers": 0.8401,
+     "elsewhere": 0.0203,
+     "different_case": 0.088,
+     "unrelated": 0.0517
+    }
+   },
+   {
+    "index": 6,
+    "id": "fiber:docs/middleware/proxy.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0362,
+    "document_score": 0.0589,
+    "levels": {
+     "answers": 0.0362,
+     "elsewhere": 0.0227,
+     "different_case": 0.2289,
+     "unrelated": 0.7122
+    }
+   },
+   {
+    "index": 1,
+    "id": "fiber:docs/whats_new.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0091,
+    "document_score": 0.0228,
+    "levels": {
+     "answers": 0.0091,
+     "elsewhere": 0.0137,
+     "different_case": 0.0449,
+     "unrelated": 0.9323
+    }
+   },
+   {
+    "index": 3,
+    "id": "fiber:docs/whats_new.md#47",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0083,
+    "document_score": 0.0314,
+    "levels": {
+     "answers": 0.0083,
+     "elsewhere": 0.023,
+     "different_case": 0.0544,
+     "unrelated": 0.9143
+    }
+   },
+   {
+    "index": 5,
+    "id": "fiber:docs/whats_new.md#91",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0041,
+    "document_score": 0.0121,
+    "levels": {
+     "answers": 0.0041,
+     "elsewhere": 0.008,
+     "different_case": 0.0207,
+     "unrelated": 0.9672
+    }
+   },
+   {
+    "index": 0,
+    "id": "fiber:docs/middleware/proxy.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0109,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0074,
+     "different_case": 0.0366,
+     "unrelated": 0.9526
+    }
+   },
+   {
+    "index": 8,
+    "id": "fiber:docs/whats_new.md#67",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.009,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0056,
+     "different_case": 0.0131,
+     "unrelated": 0.9778
+    }
+   },
+   {
+    "index": 10,
+    "id": "fiber:docs/middleware/logger.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0128,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0095,
+     "different_case": 0.0167,
+     "unrelated": 0.9704
+    }
+   },
+   {
+    "index": 11,
+    "id": "fiber:docs/api/constants.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0109,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0082,
+     "different_case": 0.0183,
+     "unrelated": 0.9708
+    }
+   },
+   {
+    "index": 4,
+    "id": "fiber:docs/whats_new.md#116",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0062,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0038,
+     "different_case": 0.0095,
+     "unrelated": 0.9842
+    }
+   },
+   {
+    "index": 7,
+    "id": "fiber:docs/api/ctx.md#124",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0059,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0036,
+     "different_case": 0.0089,
+     "unrelated": 0.9852
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 9554
+  },
+  "timing": {
+   "total_ms": 170,
+   "rerank_ms": 154,
+   "questions_ms": 0,
+   "model_ms": 141,
+   "engine": {
+    "rows": 9830,
+    "branches": 12,
+    "forwards": 2,
+    "bins": 2,
+    "bucket_rows": 10240,
+    "long": 0,
+    "total_ms": 141,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 139,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 224
+   }
+  }
+ }
+}

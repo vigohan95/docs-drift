@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/cb/cbcef2943e074d1c85ba",
+ "request_hash": "cbcef2943e074d1c85ba578e66047fbabc89150d90654885cdd0cb5bb67d1c8a",
+ "recorded_at": "2026-11-06T14:39:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3808,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "193.937725",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=345"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#9",
+    "text": "### Domain\n\nCreates a router scoped to a specific hostname pattern. Routes registered through the returned `Router` only match requests whose hostname (from `c.Hostname()`) matches the pattern. Domain names are matched case-insensitively per [RFC 4343](https://www.rfc-editor.org/rfc/rfc4343).\n\nWhen `TrustProxy` is enabled and the proxy is trusted, the hostname may be derived from the `X-Forwarded-Host` header instead of the `Host` header. To prevent header spoofing, you must both enable `TrustProxy` and configure [`TrustProxyConfig`](https://docs.gofiber.io/api/fiber#trustproxyconfig) with the IPs or ranges of your trusted proxies. See the [TrustProxy documentation](https://docs.gofiber.io/api/fiber#trustproxy) for details.\n\nThe pattern can contain parameters prefixed with `:`. Use [`DomainParam`](#domainparam) to retrieve them inside handlers. `Domain` panics when the pattern is empty, has an empty label, has more than 16 labels or 253 characters, has a constant label of more than 63 characters, or has a label with a character other than an ASCII letter, a digit or `-` (a parameter name may also contain `_`). A request hostname that breaks the same limits never matches.\n\nGroups offer `Domain` too: `api.Domain(\"api.example.com\")` keeps the group prefix and adds the host filter.\n\nRoutes for one path registered through different `Domain` patterns stay separate routes, each with its own name and automatic `HEAD` route, even when they are registered one after another; [`c.Endpoint()`](./ctx.md#endpoint) reports a `Domain` route only for a hostname its pattern matches."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#31",
+    "text": "### Domain routing\n\n`Domain` creates a router scoped to a specific hostname pattern. Routes registered through the returned `Router` only match requests whose hostname (from `c.Hostname()`) matches the pattern. When `TrustProxy` is enabled and the proxy is trusted (as defined by [`TrustProxyConfig`](./api/fiber#trustproxyconfig)), the hostname may be derived from the `X-Forwarded-Host` header. Be sure to configure `TrustProxyConfig` to restrict which proxies are trusted and prevent header spoofing when enabling `TrustProxy`.\n\nThe pattern can contain parameters prefixed with `:`, accessible via `fiber.DomainParam`.\n\nRoutes for one path registered through different `Domain` patterns stay separate routes, each with its own name and automatic `HEAD` route, even when they are registered one after another; [`c.Endpoint()`](./api/ctx#endpoint) reports a `Domain` route only for a hostname its pattern matches.\n\nDomain routing has **zero performance impact** on routes that don't use it because the hostname check is applied as a handler wrapper, not a change to the core router.\n\n> **Note:** Because domain filtering happens at handler-execution time, Fiber's `405 Method Not Allowed` responses may advertise methods from domain-scoped routes even when the requesting host does not match. This is a known trade-off of the handler-wrapping approach.\n>\n> When mounting sub-applications via `Domain(...).Use(*fiber.App)`, routes are cloned at mount time. The same sub-app can safely be mounted on multiple domains, but routes added to the sub-app after mounting will not inherit domain filtering. Register all sub-app routes before mounting."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#31"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#31",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/app.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/app.md#9",
+    "b": "fiber:docs/whats_new.md#31",
+    "relation": "overlapping",
+    "related": 0.9987,
+    "probabilities": {
+     "same": 0.0046,
+     "overlapping": 0.9917,
+     "conflicting": 0.0025,
+     "unrelated": 0.0013
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0556,
+       "restated": 0.8973,
+       "elaborated": 0.0354,
+       "different": 0.0117
+      },
+      "confidence": 0.9883,
+      "a": {
+       "document": "fiber:docs/api/app.md#9",
+       "quote": "### Domain",
+       "start": 0,
+       "end": 10,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#31",
+       "quote": "### Domain routing\n\n`Domain` creates a router scoped to a specific hostname pattern.",
+       "start": 0,
+       "end": 84,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9906,
+       "restated": 0.0033,
+       "elaborated": 0.0035,
+       "different": 0.0026
+      },
+      "confidence": 0.9974,
+      "a": {
+       "document": "fiber:docs/api/app.md#9",
+       "quote": "Routes registered through the returned `Router` only match requests whose hostname (from `c.Hostname()`) matches the pattern.",
+       "start": 68,
+       "end": 193,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#31",
+       "quote": "Routes registered through the returned `Router` only match requests whose hostname (from `c.Hostname()`) matches the pattern.",
+       "start": 85,
+       "end": 210,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0086,
+       "restated": 0.9575,
+       "elaborated": 0.0266,
+       "different": 0.0073
+      },
+      "confidence": 0.9927,
+      "a": {
+       "document": "fiber:docs/api/app.md#9",
+       "quote": "When `TrustProxy` is enabled and the proxy is trusted, the hostname may be derived from the `X-Forwarded-Host` header instead of the `Host` header.",
+       "start": 295,
+       "end": 442,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#31",
+       "quote": "When `TrustProxy` is enabled and the proxy is trusted (as defined by [`TrustProxyConfig`](./api/fiber#trustproxyconfig)), the hostname may be derived from the `X-Forwarded-Host` header.",
+       "start": 211,
+       "end": 396,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 3,
+   "counterparts_ms": 75
+  },
+  "timing": {
+   "read_ms": 203,
+   "total_ms": 207
+  }
+ }
+}

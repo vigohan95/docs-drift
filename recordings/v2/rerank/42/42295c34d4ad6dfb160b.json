@@ -1,0 +1,279 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/42/42295c34d4ad6dfb160b",
+ "request_hash": "42295c34d4ad6dfb160ba525a706367f820eb4b9c516b5a5d4371bb2bc9367c0",
+ "recorded_at": "2026-11-06T14:41:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2351,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "116.744865",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=175,cfOrigin;dur=0,cfWorker;dur=332"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) // The request's Accept-Encoding header is left untouched either way, so the // compress middleware can still compress the response when this is false. (2) The middleware will compress the response using `gzip`, `brotli`, or `zstd` compression depending on the [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) header.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/compress.md#0",
+    "title": "docs/middleware/compress.md > Compress",
+    "text": "# Compress\n\nCompression middleware for [Fiber](https://github.com/gofiber/fiber) that automatically compresses responses with `gzip`, `deflate`, `brotli`, or `zstd` based on the client's [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) header.\n\n:::note\nBodies smaller than 200 bytes remain uncompressed because compression would likely increase their size and waste CPU cycles. [See the fasthttp source](https://github.com/valyala/fasthttp/blob/497922a21ef4b314f393887e9c6147b8c3e3eda4/http.go#L1713-L1715).\n:::"
+   },
+   {
+    "id": "fiber:docs/api/constants.md#10",
+    "title": "docs/api/constants.md > Content coding names",
+    "text": "### Content coding names\n\nContent coding names, as they appear in `Content-Encoding` and `Accept-Encoding` header values. Fiber reads them when it decodes a request body and when it negotiates an encoding.\n\n```go\nconst (\n    StrGzip     = \"gzip\"\n    StrCompress = \"compress\"\n    StrIdentity = \"identity\"\n    StrBr       = \"br\"\n    StrDeflate  = \"deflate\"\n    StrBrotli   = \"brotli\"\n    StrZstd     = \"zstd\"\n)\n```"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#91",
+    "title": "docs/whats_new.md > 🧬 Middlewares > Compression",
+    "text": "### Compression\n\n- Added support for `zstd` compression alongside `gzip`, `deflate`, and `brotli`.\n- Strong `ETag` values are now recomputed for compressed payloads so validators remain accurate.\n- Compression is bypassed for responses that already specify `Content-Encoding`, for range requests or `206` statuses, and when either side sends `Cache-Control: no-transform`.\n- `HEAD` requests still negotiate compression so `Content-Encoding`, `Content-Length`, `ETag`, and `Vary` match a corresponding `GET`, but the body is omitted.\n- `Vary: Accept-Encoding` is merged into responses even when compression is skipped, preventing caches from mixing encoded and unencoded variants.\n- Decoding compressed request bodies now enforces the app `BodyLimit` through fasthttp `WithLimit` helpers, including when the compression middleware is active.\n- Multipart form parsing now enforces the app `BodyLimit` by using fasthttp `MultipartFormWithLimit`."
+   },
+   {
+    "id": "fiber:docs/middleware/compress.md#1",
+    "title": "docs/middleware/compress.md > Compress > Behavior",
+    "text": "## Behavior\n\n- Skips compression for responses that already define `Content-Encoding`, for range requests, `206` responses, status codes without bodies, or when either side sends `Cache-Control: no-transform`. A request that repeats `Cache-Control` on several lines is read as one list (RFC 9110 §5.3), so the directive counts on any of them.\n- The encoding is negotiated from the `Accept-Encoding` header with its weights, wildcard and list syntax honored (RFC 9110 §12.5.3): the coding the client weighs highest wins, and among equal weights the middleware prefers `br`, then `zstd`, `gzip` and `deflate`. An element with no `q` parameter, or an unparsable one, carries the default weight of `1`. A request that repeats `Accept-Encoding` on several lines is read as one comma-separated list (RFC 9110 §5.3). A request without the header, or one that gives every supported coding a weight of `0`, is not compressed. The client's header is left untouched for later handlers.\n- `HEAD` requests are not compressed; only `Accept-Encoding` is merged into `Vary`.\n- When compression runs, strong `ETag` values are recomputed from the compressed bytes; a streamed body cannot be hashed without buffering it, so its strong `ETag` becomes a weak one (`W/`). When compression is skipped, `Accept-Encoding` is still merged into `Vary` unless the header is `*` or already present.\n- Request-body decompression is still handled by Fiber's request APIs (for example `c.Body()`), and those decoders enforce the app `BodyLimit` for compressed payloads."
+   },
+   {
+    "id": "fiber:README.md#27",
+    "title": "README.md > 🧬 Internal Middleware",
+    "text": "## 🧬 Internal Middleware\n\nHere is a list of middleware that are included within the Fiber framework.\n\n| Middleware                                                                           | Description                                                                                                                                                             |\n|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| [adaptor](https://github.com/gofiber/fiber/tree/main/middleware/adaptor)             | Converter for net/http handlers to/from Fiber request handlers.                                                                                                         |\n| [basicauth](https://github.com/gofiber/fiber/tree/main/middleware/basicauth)         | Provides HTTP basic authentication. It calls the next handler for valid credentials and 401 Unauthorized for missing or invalid credentials.                            |\n| [cache](https://github.com/gofiber/fiber/tree/main/middleware/cache)                 | Intercept and cache HTTP responses.                                                                                                                                     |\n| [compress](https://github.com/gofiber/fiber/tree/main/middleware/compress)           | Compression middleware for Fiber, with support for `deflate`, `gzip`, `brotli` and `zstd`.                                                                             |\n| [cors](https://github.com/gofiber/fiber/tree/main/middleware/cors)                   | Enable cross-origin resource sharing (CORS) with various options.                                                                                                       |\n| [csrf](https://github.com/gofiber/fiber/tree/main/middleware/csrf)                   | Protect from CSRF exploits.                                                                                                                                             |\n| [earlydata](https://github.com/gofiber/fiber/tree/main/middleware/earlydata)         | Adds support for TLS 1.3's early data (\"0-RTT\") feature.                                                                                                                |\n| [encryptcookie](https://github.com/gofiber/fiber/tree/main/middleware/encryptcookie) | Encrypt middleware which encrypts cookie values.                                                                                                                        |\n| [envvar](https://github.com/gofiber/fiber/tree/main/middleware/envvar)               | Expose environment variables with providing an optional config.                                                                                                         |\n| [etag](https://github.com/gofiber/fiber/tree/main/middleware/etag)                   | Allows for caches to be more efficient and save bandwidth, as a web server does not need to resend a full response if the content has not changed.                      |\n| [expvar](https://github.com/gofiber/fiber/tree/main/middleware/expvar)               | Serves via its HTTP server runtime exposed variables in the JSON format.                                                                                                 |\n| [favicon](https://github.com/gofiber/fiber/tree/main/middleware/favicon)             | Ignore favicon from logs or serve from memory if a file path is provided.                                                                                               |"
+   },
+   {
+    "id": "fiber:docs/api/ctx.md#154",
+    "title": "docs/api/ctx.md > Response > SendFile",
+    "text": "```go title=\"Signature\" title=\"Signature\"\nfunc (c fiber.Ctx) SendFile(file string, config ...SendFile) error\nfunc (r fiber.Res) SendFile(file string, config ...SendFile) error\n```\n\n```go title=\"Example\"\napp.Get(\"/not-found\", func(c fiber.Ctx) error {\n  return c.SendFile(\"./public/404.html\")\n\n  // Serve pre-compressed copies, caching them to save CPU. This is the file\n  // server's own compression, not the compress middleware, which keeps\n  // compressing the response either way.\n  return c.SendFile(\"./static/index.html\", fiber.SendFile{\n    Compress: true,\n  })\n})\n```\n\n:::info\nThe name is taken as it is, the way `os.Open` takes it: a `%`, `?` or `#` in it is part of the name, so `c.SendFile(\"hash_sign_#.txt\")` serves that file and nothing needs escaping. The exceptions are a name holding an ASCII control byte, which is not found, and a directory named without a trailing slash, which is not found either; with the slash, its `index.html` is served. A name built from request input is served from wherever it points, so confine it yourself. Lexical cleaning such as `filepath.Join(root, filepath.Clean(\"/\"+name))` keeps the name under `root` but does not stop a symbolic link inside `root` from pointing outside it, and neither does `os.DirFS`. To confine the file itself, open the directory with `os.OpenRoot` and serve through the `FS` option with `root.FS()`, which refuses any link that escapes the root. An encoded separator that a route parameter still holds, as in `..%2Fsecret.txt`, stays one name and is not found rather than decoded into a step out of the directory.\n:::"
+   },
+   {
+    "id": "fiber:docs/api/ctx.md#48",
+    "title": "docs/api/ctx.md > Request > Accepts",
+    "text": "```go title=\"Example 5\"\n// Accept: text/plain;format=flowed;q=0.9, text/plain\n// i.e., \"I prefer text/plain;format=flowed less than other forms of text/plain\"\n\napp.Get(\"/\", func(c fiber.Ctx) error {\n  // The offer text/plain;format=flowed is weighed by the most specific range\n  // that matches it, text/plain;format=flowed;q=0.9, while text/plain is weighed\n  // by text/plain (q=1). The client's preference wins in either order.\n  c.Accepts(\"text/plain;format=flowed\", \"text/plain\") // \"text/plain\"\n  c.Accepts(\"text/plain\", \"text/plain;format=flowed\") // \"text/plain\"\n})\n```\n\nFiber provides similar functions for the other accept headers.\n\nFor `Accept-Language`, Fiber uses the [Basic Filtering](https://www.rfc-editor.org/rfc/rfc4647#section-3.3.1) algorithm. A language range matches an offer only if it exactly equals the tag or is a prefix followed by a hyphen. For example, the range `en` matches `en-US`, but `en-US` does not match `en`.\n\n`AcceptsLanguagesExtended` applies [Extended Filtering](https://www.rfc-editor.org/rfc/rfc4647#section-3.3.2) where `*` may match zero or more subtags and wildcard matches can slide across subtags unless blocked by a singleton like `x`.\n\n```go\n// Accept-Charset: utf-8, iso-8859-1;q=0.2\n// Accept-Encoding: gzip, compress;q=0.2\n// Accept-Language: en;q=0.8, nl, ru\n\napp.Get(\"/\", func(c fiber.Ctx) error {\n  c.AcceptsCharsets(\"utf-16\", \"iso-8859-1\")\n  // \"iso-8859-1\"\n\n  c.AcceptsEncodings(\"compress\", \"br\")\n  // \"compress\"\n\n  c.AcceptsLanguages(\"pt\", \"nl\", \"ru\")\n  // \"nl\"\n\n  c.AcceptsLanguagesExtended(\"en-US\", \"fr-CA\")\n  // depends on extended ranges in the request header\n  // ...\n})\n```"
+   },
+   {
+    "id": "fiber:docs/middleware/proxy.md#35",
+    "title": "docs/middleware/proxy.md > Proxy > Config",
+    "text": "| TLSConfig       | `*tls.Config` | TLS config for the HTTP client. Cloned with `MinVersion: tls.VersionTLS12` when no minimum is set. | `nil`           |\n| DialDualStack   | `bool`                                         | Client will attempt to connect to both IPv4 and IPv6 host addresses if set to true.                                                                                                                                                | `false`         |\n| Client          | `*fasthttp.LBClient`                           | Client is a custom client when client config is complex. Each `*fasthttp.HostClient` among its `Clients` gets `DisablePathNormalizing` set when the balancer is built, unless it has it set already, in which case it is left alone; see [Request target](#request-target). When it is set, `Servers`, `Timeout`, `MaxConnsPerHost`, `ReadBufferSize`, `WriteBufferSize`, `MaxResponseBodySize`, `TLSConfig` and `DialDualStack` are not used, and its dialers are yours to guard (see [SSRF protection](#ssrf-protection)); a `MaxResponseBodySize` you set still holds a body the client streams, which fasthttp does not bound.                                                                                                                                                                           | `nil`           |\n| SecurityPolicy  | `*SecurityPolicy`                              | Overrides the default SSRF, redirect, and hop-by-hop header rules for this balancer. When `nil`, the package-level policy set via `WithSecurityPolicy` is used. Either way it is settled once, when the balancer is built. See [Security](#security).                                          | `nil`           |\n| MaxResponseBodySize | `int`                                       | Maximum upstream response body size in bytes, a streamed body included. `0` takes the default of 100 MiB; a negative value removes the bound, as fasthttp's unlimited default does.                                                                                                                                                | `100 << 20`     |"
+   },
+   {
+    "id": "fiber:docs/api/fiber.md#5",
+    "title": "docs/api/fiber.md > Server start > Config > Config fields",
+    "text": "| <Reference id=\"compressedfilesuffixes\">CompressedFileSuffixes</Reference>             | `map[string]string`                                             | Adds a suffix to the original file name and tries saving the resulting compressed file under the new file name.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | `{\"gzip\": \".fiber.gz\", \"br\": \".fiber.br\", \"zstd\": \".fiber.zst\"}`       |\n| <Reference id=\"concurrency\">Concurrency</Reference>                                   | `int`                                                           | Maximum number of concurrent connections. Zero or negative values fall back to the default, `fiber.DefaultConcurrency`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `256 * 1024`                                                           |\n| <Reference id=\"disabledefaultcontenttype\">DisableDefaultContentType</Reference>       | `bool`                                                          | When true, omits the default Content-Type header from the response.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `false`                                                                |\n| <Reference id=\"disabledefaultdate\">DisableDefaultDate</Reference>                     | `bool`                                                          | When true, omits the Date header from the response.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `false`                                                                |"
+   },
+   {
+    "id": "fiber:docs/middleware/cache.md#17",
+    "title": "docs/middleware/cache.md > Cache > Examples > Per-user entries and a cache in front of the app",
+    "text": "### Per-user entries and a cache in front of the app\n\nA hit is sent with the stored response's `Vary`, whether or not\n`StoreResponseHeaders` is set, so a cache in front of the app that honors `Vary`\nkeys the hit the way this middleware did.\n\nWhen the entry carries no `Cache-Control` of its own and `DisableCacheControl`\nis `false`, a hit is sent with `Cache-Control: public, max-age=<remaining>`. An\nentry keyed by a cookie or credential holds one user's response, so such a hit\nis sent with `Cache-Control: private, max-age=<remaining>` instead: a shared\ncache in front of the app does not store it, while the user's own browser still\nmay. The entry counts as keyed by a credential when the response's `Vary` lists\n`Authorization`, `Cookie`, `Proxy-Authorization`, `X-API-Key`, `X-Auth-Token`,\n`X-Access-Token` or a header named in `KeyCredentialHeaders`, when `KeyCookies` or\n`KeyCredentialHeaders` is set, or when `KeyHeaders` names one of those headers.\n`DisableVaryHeaders` does not change this: a response whose `Vary` lists `Cookie`\nis one user's whether or not this middleware partitions on it.\n\nA handler that sends its own `Cache-Control` keeps it on hits. On a per-user\nroute that says `max-age` without `private`, add `private` yourself if a cache\nin front of the app ignores `Vary`. A custom `KeyGenerator` that keys on a\ncookie or credential is not visible to this middleware either: send\n`Cache-Control: private` from those handlers, set `DisableCacheControl`, or\nname the header in `KeyCredentialHeaders`, which marks the hits of the requests\nthat send it."
+   },
+   {
+    "id": "fiber:docs/api/ctx.md#44",
+    "title": "docs/api/ctx.md > Request > AcceptEncoding",
+    "text": "### AcceptEncoding\n\nReturns the `Accept-Encoding` request header. Repeated field lines are combined into one comma-joined list ([RFC 9110 Section 5.2](https://www.rfc-editor.org/rfc/rfc9110#section-5.2)), which is the list [`AcceptsEncodings`](#accepts) negotiates on.\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) AcceptEncoding() string\nfunc (r fiber.Req) AcceptEncoding() string\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func(c fiber.Ctx) error {\n  c.AcceptEncoding() // \"gzip, br\"\n  return nil\n})\n```"
+   },
+   {
+    "id": "fiber:docs/middleware/cache.md#10",
+    "title": "docs/middleware/cache.md > Cache > Examples > Header names",
+    "text": "### Header names\n\nResponse field names are matched case-insensitively, as\n[RFC 9110 §5.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.1)\nrequires, so a handler is free to write `cache-control` or `expires` in lower\ncase under\n[`DisableHeaderNormalizing`](../api/fiber.md#config). Those values decide what\nthey would decide either way, and the fields this middleware writes itself —\n`Cache-Control`, `Age`, `Date`, `ETag`, `Expires`, `Vary` — replace whatever\nspelling the response already carries rather than being added beside it. For\n`Date`, fasthttp writes one header line with the server's current date."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "fiber:README.md#27",
+    "action": "use",
+    "relevance_score": 0.9257,
+    "document_score": 0.9399,
+    "levels": {
+     "answers": 0.9257,
+     "elsewhere": 0.0142,
+     "different_case": 0.0231,
+     "unrelated": 0.037
+    }
+   },
+   {
+    "index": 3,
+    "id": "fiber:docs/middleware/compress.md#1",
+    "action": "use",
+    "relevance_score": 0.8534,
+    "document_score": 0.8681,
+    "levels": {
+     "answers": 0.8534,
+     "elsewhere": 0.0147,
+     "different_case": 0.0782,
+     "unrelated": 0.0537
+    }
+   },
+   {
+    "index": 0,
+    "id": "fiber:docs/middleware/compress.md#0",
+    "action": "use",
+    "relevance_score": 0.8118,
+    "document_score": 0.8755,
+    "levels": {
+     "answers": 0.8118,
+     "elsewhere": 0.0637,
+     "different_case": 0.0374,
+     "unrelated": 0.0871
+    }
+   },
+   {
+    "index": 5,
+    "id": "fiber:docs/api/ctx.md#154",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.15,
+    "document_score": 0.1642,
+    "levels": {
+     "answers": 0.15,
+     "elsewhere": 0.0142,
+     "different_case": 0.0278,
+     "unrelated": 0.808
+    }
+   },
+   {
+    "index": 2,
+    "id": "fiber:docs/whats_new.md#91",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.1261,
+    "document_score": 0.1571,
+    "levels": {
+     "answers": 0.1261,
+     "elsewhere": 0.0309,
+     "different_case": 0.0697,
+     "unrelated": 0.7733
+    }
+   },
+   {
+    "index": 1,
+    "id": "fiber:docs/api/constants.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0273,
+    "document_score": 0.1017,
+    "levels": {
+     "answers": 0.0273,
+     "elsewhere": 0.0743,
+     "different_case": 0.048,
+     "unrelated": 0.8503
+    }
+   },
+   {
+    "index": 10,
+    "id": "fiber:docs/api/ctx.md#44",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0162,
+    "document_score": 0.0784,
+    "levels": {
+     "answers": 0.0162,
+     "elsewhere": 0.0622,
+     "different_case": 0.0377,
+     "unrelated": 0.8839
+    }
+   },
+   {
+    "index": 6,
+    "id": "fiber:docs/api/ctx.md#48",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0127,
+    "document_score": 0.049,
+    "levels": {
+     "answers": 0.0127,
+     "elsewhere": 0.0362,
+     "different_case": 0.0424,
+     "unrelated": 0.9087
+    }
+   },
+   {
+    "index": 8,
+    "id": "fiber:docs/api/fiber.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0039,
+    "document_score": 0.0121,
+    "levels": {
+     "answers": 0.0039,
+     "elsewhere": 0.0082,
+     "different_case": 0.0156,
+     "unrelated": 0.9723
+    }
+   },
+   {
+    "index": 11,
+    "id": "fiber:docs/middleware/cache.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0021,
+     "different_case": 0.0053,
+     "unrelated": 0.9905
+    }
+   },
+   {
+    "index": 9,
+    "id": "fiber:docs/middleware/cache.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0016,
+     "different_case": 0.003,
+     "unrelated": 0.9938
+    }
+   },
+   {
+    "index": 7,
+    "id": "fiber:docs/middleware/proxy.md#35",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.002,
+     "different_case": 0.0036,
+     "unrelated": 0.9932
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6059
+  },
+  "timing": {
+   "total_ms": 135,
+   "rerank_ms": 119,
+   "questions_ms": 0,
+   "model_ms": 108,
+   "engine": {
+    "rows": 6719,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 108,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 192
+   }
+  }
+ }
+}

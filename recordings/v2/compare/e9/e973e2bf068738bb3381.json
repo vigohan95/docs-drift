@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e9/e973e2bf068738bb3381",
+ "request_hash": "e973e2bf068738bb3381539b6830d5a93ff2e7e3147ed67d8f147e06d71146ad",
+ "recorded_at": "2026-11-06T14:39:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 932,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.648031",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=207"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "text": "## Config\n\n| Property               | Type                      | Description                                                                                 | Default                                  |\n|:-----------------------|:--------------------------|:--------------------------------------------------------------------------------------------|:-----------------------------------------|\n| Next                   | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when it returns true. It runs before `MaxFunc`. | `nil`                                    |\n| Max                    | `int`                     | Maximum number of recent connections within `Expiration` seconds before sending a 429 response. A value of `0` or less selects the default. | 5                                        |\n| MaxFunc                | `func(fiber.Ctx) int`     | Function that calculates the maximum number of recent connections within `Expiration` seconds before sending a 429 response. Returning `0` skips the limiter for that request; a negative value rejects every request. | A function that returns `cfg.Max`    |\n| KeyGenerator           | `func(fiber.Ctx) string` | Function to generate custom keys; uses `c.IP()` by default. A key longer than 192 bytes, or starting with `sha256:`, is replaced by its SHA-256 digest (`sha256:<hex>`) before it reaches the storage, so oversized keys are still limited per client. | A function using `c.IP()` as the default   |\n| Expiration             | `time.Duration`           | Duration to keep request records in memory, which is also the length of the window. It is counted in whole seconds: a positive value below one second is floored to one second, and zero or a negative value selects the default. | 1 * time.Minute                          |\n| ExpirationFunc         | `func(fiber.Ctx) time.Duration` | Function that calculates the expiration duration dynamically. Positive values below one second are floored to one second; non-positive values fall back to `Expiration`. Requests that share a key share a window, which keeps the length given by the request that opened it. | A function that returns `cfg.Expiration` |\n| LimitReached           | `fiber.Handler`           | Called when a request exceeds the limit.                                       | A function sending a 429 response          |\n| SkipFailedRequests     | `bool`                    | When set to `true`, requests with status code ≥ 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| SkipSuccessfulRequests | `bool`                    | When set to `true`, requests with status code < 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| DisableHeaders         | `bool`                    | When set to `true`, the middleware omits rate limit headers (`X-RateLimit-*` and `Retry-After`). Otherwise a request that passes carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the window ends), and a rejected one carries `Retry-After` (seconds). | false                                    |\n| DisableValueRedaction  | `bool`                    | Disables redaction of limiter keys in error messages and logs. A key longer than 192 bytes is shown as its SHA-256 digest. | false                                    |"
+   },
+   {
+    "id": "fiber:docs/middleware/paginate.md#7",
+    "text": "## Config\n\n| Property     | Type                     | Description                                                        | Default    |\n|:-------------|:-------------------------|:-------------------------------------------------------------------|:-----------|\n| Next         | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when returned true. | `nil`      |\n| PageKey      | `string`                 | Query string key for page number.                                  | `\"page\"`   |\n| DefaultPage  | `int`                    | Default page number.                                               | `1`        |\n| LimitKey     | `string`                 | Query string key for limit.                                        | `\"limit\"`  |\n| DefaultLimit | `int`                    | Default items per page. It is capped at `MaxLimit`, and a limit below 1 in the request also falls back to it. | `10`       |\n| SortKey      | `string`                 | Query string key for sort. While it is empty, the query string cannot change the sort order. | `\"\"`       |\n| DefaultSort  | `string`                 | Default sort field, applied in ascending order when the request names no allowed sort field. | `\"id\"`     |\n| AllowedSorts | `[]string`               | Whitelist of allowed sort fields. If nil or empty, request sort fields are ignored and the default sort is used.  | `nil`      |\n| OffsetKey    | `string`                 | Query string key for offset.                                       | `\"offset\"` |\n| CursorKey    | `string`                 | Query string key for cursor-based pagination.                      | `\"cursor\"` |\n| CursorParam  | `string`                 | Optional alias for the cursor query key.                           | `\"\"`       |\n| MaxLimit     | `int`                    | Maximum items per page. A value below 1 selects the default.       | `100` (`paginate.DefaultMaxLimit`) |"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/paginate.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/limiter.md#7",
+    "b": "fiber:docs/middleware/paginate.md#7",
+    "relation": "unrelated",
+    "related": 0.0172,
+    "probabilities": {
+     "same": 0.0058,
+     "overlapping": 0.0056,
+     "conflicting": 0.0058,
+     "unrelated": 0.9828
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

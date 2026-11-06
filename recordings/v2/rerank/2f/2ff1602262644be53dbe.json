@@ -1,0 +1,280 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/2f/2ff1602262644be53dbe",
+ "request_hash": "2ff1602262644be53dbe4264956f15d65dab42faf52c76d12203864e90d09572",
+ "recorded_at": "2026-11-06T14:38:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2337,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "117.585953",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=175,cfOrigin;dur=0,cfWorker;dur=252"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) That way you can make sure you do not rely on features that may have been removed in Rollup 4. (2) That way you can make sure you do not rely on features that may have been removed in Rollup 3.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#128",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Deprecated options",
+    "text": "## Deprecated options\n\n☢️ These options have been deprecated and may be removed in a future Rollup version."
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#112",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Experimental options",
+    "text": "## Experimental options\n\nThese options reflect new features that have not yet been fully finalized. Availability, behaviour and usage may therefore be subject to change between minor versions."
+   },
+   {
+    "id": "rollup:docs/migration/index.md#3",
+    "title": "docs/migration/index.md > {{ $frontmatter.title }} > Configuration Changes",
+    "text": "## Configuration Changes\n\nWhile some options that were already deprecated in Rollup 3 have been removed, the only major change here is that we no longer have the `acorn` and `acornInjectPlugin` options available. This means, unfortunately, that you can no longer add plugins for unsupported syntax. Depending on demand, we consider supporting JSX syntax again as the SWC parser would support that."
+   },
+   {
+    "id": "rollup:docs/migration/index.md#0",
+    "title": "docs/migration/index.md > {{ $frontmatter.title }}",
+    "text": "# {{ $frontmatter.title }}\n\n[[toc]]\n\nThis is a list of the most important topics you may encounter when migrating from Rollup 3 to Rollup 4. For a full list of breaking changes, we advise you to consult the\n\n- [Rollup 4 changelog](https://github.com/rollup/rollup/blob/master/CHANGELOG.md#400)\n\nFor how to migrate from earlier versions, [see below](#migrating-to-rollup-3)."
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#103",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Danger zone > treeshake > treeshake.correctVarValueBeforeDeclaration",
+    "text": "#### treeshake.correctVarValueBeforeDeclaration\n\n|  |  |\n| --: | :-- |\n| Type: | `boolean` |\n| CLI: | `--treeshake.correctVarValueBeforeDeclaration`/`--no-treeshake.correctVarValueBeforeDeclaration` |\n| Default: | `false` |\n\nIn some edge cases if a variable is accessed before its declaration assignment and is not reassigned, then Rollup may incorrectly assume that variable is constant throughout the program, as in the example below. This is not true if the variable is declared with `var`, however, as those variables can be accessed before their declaration where they will evaluate to `undefined`. Choosing `true` will make sure Rollup does not make any assumptions about the value of variables declared with `var`. Note though that this can have a noticeable negative impact on tree-shaking results.\n\n```js\n// everything will be tree-shaken unless treeshake.correctVarValueBeforeDeclaration === true\nlet logBeforeDeclaration = false;\n\nfunction logIfEnabled() {\n\tif (logBeforeDeclaration) {\n\t\tlog();\n\t}\n\n\tvar value = true;\n\n\tfunction log() {\n\t\tif (!value) {\n\t\t\tconsole.log('should be retained, value is undefined');\n\t\t}\n\t}\n}\n\nlogIfEnabled(); // could be removed\nlogBeforeDeclaration = true;\nlogIfEnabled(); // needs to be retained as it displays a log\n```"
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#110",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Danger zone > treeshake > treeshake.tryCatchDeoptimization",
+    "text": "#### treeshake.tryCatchDeoptimization\n\n|  |  |\n| --: | :-- |\n| Type: | `boolean` |\n| CLI: | `--treeshake.tryCatchDeoptimization`/`--no-treeshake.tryCatchDeoptimization` |\n| Default: | `true` |\n\nBy default, Rollup assumes that many builtin globals of the runtime behave according to the latest specs when tree-shaking and do not throw unexpected errors. In order to support e.g. feature detection workflows that rely on those errors being thrown, Rollup will by default deactivate tree-shaking inside try-statements. If a function parameter is called from within a try-statement, this parameter will be deoptimized as well. Set `treeshake.tryCatchDeoptimization` to `false` if you do not need this feature and want to have tree-shaking inside try-statements.\n\n```js\nfunction otherFn() {\n\t// even though this function is called from a try-statement, the next line\n\t// will be removed as side-effect-free\n\tObject.create(null);\n}\n\nfunction test(callback) {\n\ttry {\n\t\t// calls to otherwise side-effect-free global functions are\n\t\t// retained inside try-statements for tryCatchDeoptimization: true\n\t\tObject.create(null);\n\n\t\t// calls to other function are retained as well but the body of\n\t\t// this function may again be subject to tree-shaking\n\t\totherFn();\n\n\t\t// if a parameter is called, then all arguments passed to that\n\t\t// function parameter will be deoptimized\n\t\tcallback();\n\t} catch {}\n}\n\ntest(() => {\n\t// will be ratained\n\tObject.create(null);\n});\n\n// call will be retained but again, otherFn is not deoptimized\ntest(otherFn);\n```"
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#81",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Plugin Context > this.load",
+    "text": "Note that with regard to the `attributes`, `meta`, `moduleSideEffects` and `syntheticNamedExports` options, the same restrictions apply as for the `resolveId` hook: Their values only have an effect if the module has not been loaded yet. Thus, it is very important to use `this.resolve` first to find out if any plugins want to set special values for these options in their `resolveId` hook, and pass these options on to `this.load` if appropriate. The example below showcases how this can be handled to add a proxy module for modules containing a special code comment. Note the special handling for re-exporting the default export:\n\n```js twoslash\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nexport default function addProxyPlugin() {\n\treturn {\n\t\tasync resolveId(source, importer, options) {\n\t\t\tif (importer?.endsWith('?proxy')) {\n\t\t\t\t// Do not proxy ids used in proxies\n\t\t\t\treturn null;\n\t\t\t}\n\t\t\t// We make sure to pass on any resolveId options to\n\t\t\t// this.resolve to get the module id\n\t\t\tconst resolution = await this.resolve(source, importer, options);\n\t\t\t// We can only pre-load existing and non-external ids\n\t\t\tif (resolution && !resolution.external) {\n\t\t\t\t// we pass on the entire resolution information\n\t\t\t\tconst moduleInfo = await this.load(resolution);\n\t\t\t\tif (moduleInfo.code.includes('/* use proxy */')) {\n\t\t\t\t\treturn `${resolution.id}?proxy`;\n\t\t\t\t}\n\t\t\t}\n\t\t\t// As we already fully resolved the module, there is no reason\n\t\t\t// to resolve it again\n\t\t\treturn resolution;\n\t\t},\n\t\tload(id) {\n\t\t\tif (id.endsWith('?proxy')) {\n\t\t\t\tconst importee = id.slice(0, -'?proxy'.length);\n\t\t\t\t// Note that namespace reexports do not reexport default\n\t\t\t\t// exports\n\t\t\t\tlet code = `console.log('proxy for ${importee}'); export * from ${JSON.stringify(\n\t\t\t\t\timportee\n\t\t\t\t)};`;\n\t\t\t\t// We know that while resolving the proxy, importee was\n\t\t\t\t// already fully loaded and parsed, so we can rely on\n\t\t\t\t// hasDefaultExport\n\t\t\t\tif (this.getModuleInfo(importee).hasDefaultExport) {\n\t\t\t\t\tcode += `export { default } from ${JSON.stringify(importee)};`;\n\t\t\t\t}\n\t\t\t\treturn code;\n\t\t\t}\n\t\t\treturn null;\n\t\t}\n\t};\n}\n```"
+   },
+   {
+    "id": "rollup:docs/migration/index.md#11",
+    "title": "docs/migration/index.md > {{ $frontmatter.title }} > Migrating to Rollup 3 > Changes to the Plugin API",
+    "text": "### Changes to the Plugin API\n\nThen general output generation flow has been reworked, see the [Output Generation Hooks](../plugin-development/index.md#output-generation-hooks) graph for the new plugin hook order. Probably the most obvious change is that the [`banner`](../plugin-development/index.md#banner)/[`footer`](../plugin-development/index.md#footer)/[`intro`](../plugin-development/index.md#intro)/[`outro`](../plugin-development/index.md#outro) are no longer invoked once at the beginning but rather per chunk. On the other hand, [`augmentChunkHash`](../plugin-development/index.md#augmentchunkhash) is now evaluated after [`renderChunk`](../plugin-development/index.md#renderchunk) when the hash is created.\n\nAs file hashes are now based on the actual content of the file after `renderChunk`, we no longer know exact file names before hashes are generated. Instead, the logic now relies on hash placeholders of the form `!~{001}~`. That means that all file names available to the `renderChunk` hook may contain placeholders and may not correspond to the final file names. This is not a problem though if you plan on using these files names within the chunks as Rollup will replace all placeholders before [`generateBundle`](../plugin-development/index.md#generatebundle) runs.\n\nNot necessarily a breaking change, but plugins that add or remove imports in [`renderChunk`](../plugin-development/index.md#renderchunk) should make sure they also update the corresponding `chunk` information that is passed to this hook. This will enable other plugins to rely on accurate chunk information without the need to pare the chunk themselves. See the [documentation](../plugin-development/index.md#renderchunk) of the hook for more information."
+   },
+   {
+    "id": "rollup:docs/command-line-interface/index.md#23",
+    "title": "docs/command-line-interface/index.md > {{ $frontmatter.title }} > Command line flags > `--no-stdin`",
+    "text": "### `--no-stdin`\n\nDo not read files from `stdin`. Setting this flag will prevent piping content to Rollup and make sure Rollup interprets `-` and `-.[ext]` as a regular file names instead of interpreting these as the name of `stdin`. See also [Reading a file from stdin](#reading-a-file-from-stdin)."
+   },
+   {
+    "id": "rollup:docs/faqs/index.md#6",
+    "title": "docs/faqs/index.md > {{ $frontmatter.title }} > Why do additional imports turn up in my entry chunks when code-splitting?",
+    "text": "This does not affect code execution order or behaviour, but it will speed up how your code is loaded and parsed. Without this optimization, a JavaScript engine needs to perform the following steps to run `main.js`:\n\n1. Load and parse `main.js`. At the end, an import to `other-entry.js` will be discovered.\n2. Load and parse `other-entry.js`. At the end, an import to `external` will be discovered.\n3. Load and parse `external`.\n4. Execute `main.js`.\n\nWith this optimization, a JavaScript engine will discover all transitive dependencies after parsing an entry module, avoiding the waterfall:\n\n1. Load and parse `main.js`. At the end, imports to `other-entry.js` and `external` will be discovered.\n2. Load and parse `other-entry.js` and `external`. The import of `external` from `other-entry.js` is already loaded and parsed.\n3. Execute `main.js`.\n\nThere may be situations where this optimization is not desired, in which case you can turn it off via the [`output.hoistTransitiveImports`](../configuration-options/index.md#output-hoisttransitiveimports) option. This optimization is also never applied when using the [`output.preserveModules`](../configuration-options/index.md#output-preservemodules) option."
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#37",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Advanced functionality > output.generatedCode",
+    "text": "### output.generatedCode\n\n|  |  |\n| --: | :-- |\n| Type: | `\"es5\" \\| \"es2015\" \\| { arrowFunctions?: boolean, constBindings?: boolean, objectShorthand?: boolean, preset?: \"es5\" \\| \"es2015\", reservedNamesAsProps?: boolean, symbols?: boolean }` |\n| CLI: | `--generatedCode <preset>` |\n| Default: | `\"es5\"` |\n\nWhich language features Rollup can safely use in generated code. This will not transpile any user code but only change the code Rollup uses in wrappers and helpers. You may choose one of several presets:\n\n- `\"es5\"`: Do not use ES2015+ features like arrow functions, but do not quote reserved names used as props.\n- `\"es2015\"`: Use any JavaScript features up to ES2015."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#24",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Build Hooks > resolveId",
+    "text": "```js\nimport { foo } from '../bar.js';\n```\n\nthe source will be `\"../bar.js\"`.\n\nThe `importer` is the fully resolved id of the importing module. When resolving entry points, importer will usually be `undefined`. An exception here are entry points generated via [`this.emitFile`](#this-emitfile) as here, you can provide an `importer` argument.\n\nThe `importerAttributes` are the import attributes of the importing module. When resolving entry points, `importerAttributes` will usually be `undefined`.\n\nFor those cases, the `isEntry` option will tell you if we are resolving a user defined entry point, an emitted chunk, or if the `isEntry` parameter was provided for the [`this.resolve`](#this-resolve) context function.\n\nYou can use this for instance as a mechanism to define custom proxy modules for entry points. The following plugin will proxy all entry points to inject a polyfill import.\n\n```js twoslash\n// We prefix the polyfill id with \\0 to tell other plugins not to try to load or\n// transform it\nconst POLYFILL_ID = '\\0polyfill';\nconst PROXY_SUFFIX = '?inject-polyfill-proxy';\n\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nfunction injectPolyfillPlugin() {\n\treturn {\n\t\tname: 'inject-polyfill',\n\t\tasync resolveId(source, importer, options) {\n\t\t\tif (source === POLYFILL_ID) {\n\t\t\t\t// It is important that side effects are always respected\n\t\t\t\t// for polyfills, otherwise using\n\t\t\t\t// \"treeshake.moduleSideEffects: false\" may prevent the\n\t\t\t\t// polyfill from being included.\n\t\t\t\treturn { id: POLYFILL_ID, moduleSideEffects: true };\n\t\t\t}\n\t\t\tif (options.isEntry) {\n\t\t\t\t// Determine what the actual entry would have been.\n\t\t\t\tconst resolution = await this.resolve(source, importer, options);\n\t\t\t\t// If it cannot be resolved or is external, just return it\n\t\t\t\t// so that Rollup can display an error\n\t\t\t\tif (!resolution || resolution.external) return resolution;\n\t\t\t\t// In the load hook of the proxy, we need to know if the\n\t\t\t\t// entry has a default export. There, however, we no longer\n\t\t\t\t// have the full \"resolution\" object that may contain\n\t\t\t\t// meta-data from other plugins that is only added on first\n\t\t\t\t// load. Therefore we trigger loading here.\n\t\t\t\tconst moduleInfo = await this.load(resolution);\n\t\t\t\t// We need to make sure side effects in the original entry\n\t\t\t\t// point are respected even for\n\t\t\t\t// treeshake.moduleSideEffects: false. \"moduleSideEffects\"\n\t\t\t\t// is a writable property on ModuleInfo.\n\t\t\t\tmoduleInfo.moduleSideEffects = true;\n\t\t\t\t// It is important that the new entry does not start with\n\t\t\t\t// \\0 and has the same directory as the original one to not\n\t\t\t\t// mess up relative external import generation. Also\n\t\t\t\t// keeping the name and just adding a \"?query\" to the end\n\t\t\t\t// ensures that preserveModules will generate the original\n\t\t\t\t// entry name for this entry.\n\t\t\t\treturn `${resolution.id}${PROXY_SUFFIX}`;\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tload(id) {\n\t\t\tif (id === POLYFILL_ID) {\n\t\t\t\t// Replace with actual polyfill\n\t\t\t\treturn \"console.log('polyfill');\";\n\t\t\t}\n\t\t\tif (id.endsWith(PROXY_SUFFIX)) {\n\t\t\t\tconst entryId = id.slice(0, -PROXY_SUFFIX.length);\n\t\t\t\t// We know ModuleInfo.hasDefaultExport is reliable because\n\t\t\t\t// we awaited this.load in resolveId\n\t\t\t\tconst { hasDefaultExport } = this.getModuleInfo(entryId);\n\t\t\t\tlet code =\n\t\t\t\t\t`import ${JSON.stringify(POLYFILL_ID)};` +\n\t\t\t\t\t`export * from ${JSON.stringify(entryId)};`;\n\t\t\t\t// Namespace reexports do not reexport default, so we need\n\t\t\t\t// special handling here\n\t\t\t\tif (hasDefaultExport) {\n\t\t\t\t\tcode += `export { default } from ${JSON.stringify(entryId)};`;"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "rollup:docs/migration/index.md#3",
+    "action": "use",
+    "relevance_score": 0.9646,
+    "document_score": 0.9738,
+    "levels": {
+     "answers": 0.9646,
+     "elsewhere": 0.0092,
+     "different_case": 0.0132,
+     "unrelated": 0.013
+    }
+   },
+   {
+    "index": 1,
+    "id": "rollup:docs/configuration-options/index.md#112",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.017,
+    "document_score": 0.0833,
+    "levels": {
+     "answers": 0.017,
+     "elsewhere": 0.0663,
+     "different_case": 0.0272,
+     "unrelated": 0.8895
+    }
+   },
+   {
+    "index": 0,
+    "id": "rollup:docs/configuration-options/index.md#128",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0156,
+    "document_score": 0.1755,
+    "levels": {
+     "answers": 0.0156,
+     "elsewhere": 0.1599,
+     "different_case": 0.0315,
+     "unrelated": 0.793
+    }
+   },
+   {
+    "index": 3,
+    "id": "rollup:docs/migration/index.md#0",
+    "action": "expand",
+    "relevance_score": 0.0113,
+    "document_score": 0.6767,
+    "levels": {
+     "answers": 0.0113,
+     "elsewhere": 0.6654,
+     "different_case": 0.0317,
+     "unrelated": 0.2916
+    }
+   },
+   {
+    "index": 7,
+    "id": "rollup:docs/migration/index.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.0147,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.0098,
+     "different_case": 0.0126,
+     "unrelated": 0.9727
+    }
+   },
+   {
+    "index": 4,
+    "id": "rollup:docs/configuration-options/index.md#103",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0023,
+     "different_case": 0.0085,
+     "unrelated": 0.9872
+    }
+   },
+   {
+    "index": 10,
+    "id": "rollup:docs/configuration-options/index.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.006,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0041,
+     "different_case": 0.0089,
+     "unrelated": 0.9851
+    }
+   },
+   {
+    "index": 5,
+    "id": "rollup:docs/configuration-options/index.md#110",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0022,
+     "different_case": 0.0063,
+     "unrelated": 0.9898
+    }
+   },
+   {
+    "index": 8,
+    "id": "rollup:docs/command-line-interface/index.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0021,
+     "different_case": 0.0048,
+     "unrelated": 0.9912
+    }
+   },
+   {
+    "index": 6,
+    "id": "rollup:docs/plugin-development/index.md#81",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0011,
+     "different_case": 0.0031,
+     "unrelated": 0.9943
+    }
+   },
+   {
+    "index": 11,
+    "id": "rollup:docs/plugin-development/index.md#24",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0017,
+     "different_case": 0.0042,
+     "unrelated": 0.9925
+    }
+   },
+   {
+    "index": 9,
+    "id": "rollup:docs/faqs/index.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0012,
+     "different_case": 0.0024,
+     "unrelated": 0.9951
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5138
+  },
+  "timing": {
+   "total_ms": 137,
+   "rerank_ms": 121,
+   "questions_ms": 0,
+   "model_ms": 110,
+   "engine": {
+    "rows": 6182,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 110,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

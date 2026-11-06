@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b7/b7f00a421f0eda5af49e",
+ "request_hash": "b7f00a421f0eda5af49e67c929091d095954504904d0e54a521f3703294e9915",
+ "recorded_at": "2026-11-06T14:41:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2289,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.953376",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=176"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "text": "### Python mode\n\nWhen using the Python mode, Pydantic models (and model-like types such as [dataclasses][]) (1) will be (recursively) converted to dictionaries. This is achievable by using the [`model_dump()`][pydantic.BaseModel.model_dump] method:\n{ .annotate }\n\n1. With the exception of [root models](./models.md#rootmodel-and-custom-root-types), where the root value is dumped directly.\n\n```python {group=\"python-dump\"}\nfrom pydantic import BaseModel, Field\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    banana: float | None = 1.1\n    foo: str = Field(serialization_alias='foo_alias')\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': (1, 2)})\n\n# returns a dictionary:\nprint(m.model_dump())\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': (1, 2)}}\n\nprint(m.model_dump(by_alias=True))\n#> {'banana': 3.14, 'foo_alias': 'hello', 'bar': {'whatever': (1, 2)}}\n```\n\nNotice that the value of `whatever` was dumped as tuple, which isn't a known JSON type. The `mode` argument can be set to `'json'`\nto ensure JSON-compatible types are used:\n\n```python {group=\"python-dump\"}\nprint(m.model_dump(mode='json'))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': [1, 2]}}\n```\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_python()`][pydantic.TypeAdapter.dump_python] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#modelmodel_dump_json}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#21",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`datetime`][datetime.datetime] instances are accepted. In JSON mode, only strings complying to the\n[RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format (*only* datetime) or as unix timestamps are accepted.\n\n<h4>Example</h4>\n\n```python\nfrom datetime import datetime\nfrom typing import Annotated\n\nfrom pydantic import AwareDatetime, BaseModel, Field\n\n\nclass Event(BaseModel):\n    dt: Annotated[AwareDatetime, Field(gt=datetime(2000, 1, 1))]\n\n\nevent = Event(dt='2032-04-23T10:20:30.400+02:30')\n\nprint(event.model_dump())\n\"\"\"\n{'dt': datetime.datetime(2032, 4, 23, 10, 20, 30, 400000, tzinfo=TzInfo(9000))}\n\"\"\"\nprint(event.model_dump_json())\n#> {\"dt\":\"2032-04-23T10:20:30.400000+02:30\"}\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#datetimedate}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#2",
+    "b": "pydantic:docs/api/standard_library_types.md#21",
+    "relation": "unrelated",
+    "related": 0.1685,
+    "probabilities": {
+     "same": 0.0169,
+     "overlapping": 0.1331,
+     "conflicting": 0.0186,
+     "unrelated": 0.8315
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 49
+  },
+  "timing": {
+   "read_ms": 49,
+   "total_ms": 51
+  }
+ }
+}

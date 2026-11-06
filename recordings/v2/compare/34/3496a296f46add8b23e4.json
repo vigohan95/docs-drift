@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/34/3496a296f46add8b23e4",
+ "request_hash": "3496a296f46add8b23e4812f9d88d5a3d3cc28becf57edb6b8c9e9d9c931b9ec",
+ "recorded_at": "2026-11-06T14:39:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1693,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "111.356609",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=308"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/cache.md#21",
+    "text": "| KeyGenerator         | `func(fiber.Ctx) string`                       | KeyGenerator allows you to generate custom keys. The HTTP method, a key-format version and, when the request carries `Authorization`, a digest of that header are partitioned internally by the middleware. | structured key from scheme + host + path + canonical query + selected headers/cookies |\n| DisableQueryKeys     | `bool`                                         | Disables canonicalized query params in keys. | `false` |\n| KeyHeaders           | `[]string`                                     | Header allow-list used for key partitioning. Names are normalized case-insensitively and sorted. Use `[]string{}` to disable header-based partitioning. | `[]string{\"accept\",\"accept-encoding\",\"accept-language\"}` |\n| KeyCookies           | `[]string`                                     | Optional cookie allow-list for key partitioning. Explicit opt-in only; names remain case-sensitive. Hits on entries keyed this way are sent with `Cache-Control: private`. The values in the key are hashed, so an external `Storage` does not show them; a cookie that is missing and one that is empty share a key. | `nil` |\n| KeyCredentialHeaders | `[]string`                                     | Request headers that carry a client's credential, such as a token in a header of your own. They partition entries like `KeyHeaders`; hits on entries keyed this way are sent with `Cache-Control: private` and are not served stale unless `AllowStaleCredentialResponses` is set, and a revalidation the origin refuses with `401`, `403` or `407` ends the entry and the credential's other variants of the URL. The values of the credential headers in the key are hashed, so an external `Storage` does not show them. Names are normalized case-insensitively and sorted. With a custom `KeyGenerator` they take no part in the key, but a hit for a request that sends one is still sent as `private` and not served stale, since the middleware cannot tell which entries hold it; name every credential header its key holds, as a refusal ends its entries only for a request that sends `Authorization` or one of them. | `nil` |\n| Methods              | `[]string`                                     | HTTP methods eligible for caching. Requests whose method is not in this list bypass the cache and are answered with `unreachable` in the cache header. Names are normalized to uppercase. `nil` selects the default, and an empty slice disables caching for every method. | `[]string{fiber.MethodGet, fiber.MethodHead}` |\n| DisableVaryHeaders   | `bool`                                         | Disables response `Vary` dimensions in cache lookup/storage partitioning. | `false` |\n| ExpirationGenerator  | `func(fiber.Ctx, *cache.Config) time.Duration` | ExpirationGenerator allows you to generate a custom expiration per request. It overrides `Expiration` and any lifetime the response sets with `Cache-Control` or `Expires`, Lifetimes are counted in whole seconds: a duration of zero or less leaves the response uncached, and one under a second never produces a hit.                                                                                                                                                                                                                        | `nil`                                                            |\n| Storage              | `fiber.Storage`                                | Storage is used to store the state of the middleware. Entries are namespaced by a key-format version, so an external store that survives an upgrade starts cold rather than serving entries an older version partitioned by different rules. Every key starts with that version, so the storage can be shared with other middleware.                                                                                                                                                                                                                                                            | In-memory store                                                  |"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#184",
+    "text": "#### Cache\n\nThe deprecated `Store` and `Key` fields were removed. Use `Storage` and\n`KeyGenerator` instead to configure caching backends and cache keys.\n\nDefaults also changed: the middleware now emits `Cache-Control` headers, the default `Expiration` increased to `5 minutes` (from `1 minute`), and a new `MaxBytes` limit of `1 MB` (previously unlimited) now caps cached payloads when you call `cache.New()` without a `Config`. A `Config` that leaves `MaxBytes` unset stores bodies without a limit, as in v2.\n\nTo restore v2 behavior:\n\n- Set `DisableCacheControl` to `true` to suppress automatic `Cache-Control` headers.\n- Configure `Expiration` to `1*time.Minute`.\n- Set `MaxBytes` to `0` (or a higher value) when caching large responses.\n- Disable structured key dimensions as needed (for example `DisableQueryKeys: true`), or provide a custom `KeyGenerator`.\n\nAdditional v3 cache key options:\n\n- `Methods`: HTTP methods eligible for caching (default `GET`, `HEAD`)\n- `DisableQueryKeys`: disable canonicalized query args in keys (default `false`)\n- `KeyHeaders`: request header allow-list for key partitioning\n- `KeyCookies`: explicit cookie allow-list for key partitioning; the values are hashed in the key\n- `KeyCredentialHeaders`: request headers that carry a client's credential; they partition entries like `KeyHeaders`, and hits on them are sent with `Cache-Control: private`\n- `DisableVaryHeaders`: disable response `Vary` dimensions in lookup/storage partitioning (default `false`)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/cache.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#184",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/cache.md#21",
+    "b": "fiber:docs/whats_new.md#184",
+    "relation": "overlapping",
+    "related": 0.9975,
+    "probabilities": {
+     "same": 0.0066,
+     "overlapping": 0.9872,
+     "conflicting": 0.0037,
+     "unrelated": 0.0025
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 119,
+   "total_ms": 123
+  }
+ }
+}

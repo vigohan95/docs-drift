@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/40/409a9172eca3e2b37471",
+ "request_hash": "409a9172eca3e2b374718c4cdd03e796263aae1bf8c9aa59f388d98c8b00f0af",
+ "recorded_at": "2026-11-06T14:39:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1232,
+ "response_headers": {
+  "x-clocked-credits": "11",
+  "x-clocked-model-ms": "258.542271",
+  "x-clocked-cost-usd": "0.002191",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=490"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#49",
+    "text": "For `Accept-Encoding`, [RFC 9110 §12.5.3](https://www.rfc-editor.org/rfc/rfc9110#section-12.5.3) adds three rules to the weights:\n\n- A request without the header accepts any coding, so the first offer is returned.\n- A request whose header is present but empty wants no content coding, so only an `identity` offer matches.\n- `identity` (no coding) is acceptable even when the header does not list it, unless the header excludes it with `identity;q=0`, or with `*;q=0` and no entry of its own for `identity`. An unlisted `identity` ranks below every coding the header does list.\n\n```go title=\"Example 6\"\n// Accept-Encoding: gzip\nc.AcceptsEncodings(\"gzip\", \"identity\") // \"gzip\"\nc.AcceptsEncodings(\"br\", \"identity\")   // \"identity\": br is not listed, identity is acceptable unless excluded\n\n// Accept-Encoding: gzip, identity;q=0\nc.AcceptsEncodings(\"br\", \"identity\")   // \"\": identity is excluded\n\n// Accept-Encoding: (present, empty)\nc.AcceptsEncodings(\"gzip\", \"identity\") // \"identity\": the client wants no coding\n```"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#47",
+    "text": "- **SendStatus()**: For a status that cannot carry a body — `1xx`, `204`, `205` and `304` — the response body and\n  any `Content-Length` already set are now dropped.\n  [RFC 9110, Section 8.6](https://www.rfc-editor.org/rfc/rfc9110#section-8.6) requires that for `1xx` and `204`;\n  Fiber also does it for `205` and `304`. `c.Set(fiber.HeaderContentLength, \"42\")`\n  followed by `c.SendStatus(204)` previously put `Content-Length: 42` on the wire, along with a `Content-Type`\n  fasthttp emits for a declared length; neither line is sent now. `205 Reset Content` still sends\n  `Content-Length: 0`: it has no content ([Section 15.3.6](https://www.rfc-editor.org/rfc/rfc9110#section-15.3.6)),\n  but unlike `1xx`, `204` and `304` it still has to be framed\n  ([RFC 9112, Section 6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)).\n  Unlike the two above, this applies under the default configuration. A streamed body counts as a body, so\n  `SendStatus` leaves it unread instead of reading it into memory to check its length.\n- **Body()**: A `Content-Encoding` that cannot be undone sets `415`, `501` or `413` only while the response has no\n  body yet. A middleware that reads `c.Body()` after `c.Next()`, such as the logger's `${body}` tag, no longer\n  replaces the status the handler sent.\n- **AcceptsEncodings()**: Follows [RFC 9110, Section 12.5.3](https://www.rfc-editor.org/rfc/rfc9110#section-12.5.3).\n  `identity`, the absence of a coding, is now acceptable when the `Accept-Encoding` header does not list it, unless\n  the header excludes it with `identity;q=0` or `*;q=0`: `c.AcceptsEncodings(\"br\", \"identity\")` answers `\"identity\"`\n  for `Accept-Encoding: gzip`, where it answered `\"\"`. An unlisted `identity` ranks below every coding the header does\n  list. A header that is present but empty now accepts only `identity`; it used to read as absent, which accepts the\n  first offer.\n- **Status()**: A code outside `100` to `999` cannot be written as a status line\n  ([RFC 9112, Section 4](https://www.rfc-editor.org/rfc/rfc9112#section-4)). `c.Status(99)` and `c.Status(1000)` used to\n  put a malformed line on the wire that clients refuse, and `c.Status(0)` or a negative code put `200 OK` there. They\n  now answer `500 Internal Server Error` and log the code. `SendStatus`, `Redirect().Status` and an error built with\n  `fiber.NewError` go through `Status`, so they follow. Codes from `600` to `999` are still sent as given.\n- **Cookie()**: A value with a space or a comma is now written in double quotes, as `net/http` does, because neither is\n  a `cookie-octet` ([RFC 6265, Section 4.1.1](https://www.rfc-editor.org/rfc/rfc6265#section-4.1.1)).\n  `c.Cookie(&fiber.Cookie{Name: \"n\", Value: \"hello world\"})` used to send `n=hello world` and sends `n=\"hello world\"`\n  now; the quotes frame the value, and `Cookies` and `GetCookie` return `hello world`. A value that already starts and\n  ends with a double quote is accepted and written quoted instead of being dropped as invalid. Values with a semicolon,\n  an inner double quote, a backslash, a control character or a non-ASCII character are still refused. Percent-encode a\n  value that has to pass through a strict parser.\n- **SendFile() and the static middleware, with `ByteRange`**: The file server answered one byte range and nothing\n  else. Fiber now applies the rest of [RFC 9110, Section 13.1.5 and Section 14.2](https://www.rfc-editor.org/rfc/rfc9110#section-14.2)\n  around it. A request for several ranges used to get `416`; it gets the whole file, as does one with a range unit the"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#49",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#47"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#47",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/ctx.md#49"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#49",
+    "b": "fiber:docs/whats_new.md#47",
+    "relation": "overlapping",
+    "related": 0.9975,
+    "probabilities": {
+     "same": 0.0095,
+     "overlapping": 0.9833,
+     "conflicting": 0.0047,
+     "unrelated": 0.0025
+    },
+    "duplicates": [
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9857,
+       "restated": 0.0053,
+       "elaborated": 0.0047,
+       "different": 0.0043
+      },
+      "confidence": 0.9957,
+      "a": {
+       "document": "fiber:docs/api/ctx.md#49",
+       "quote": "An unlisted `identity` ranks below every coding the header does list.",
+       "start": 507,
+       "end": 576,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#47",
+       "quote": "An unlisted `identity` ranks below every coding the header does\n  list.",
+       "start": 1695,
+       "end": 1766,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 39,
+   "passage_reads": 1,
+   "passages_ms": 173,
+   "passages": 1,
+   "counterparts_ms": 56
+  },
+  "timing": {
+   "read_ms": 268,
+   "total_ms": 272
+  }
+ }
+}

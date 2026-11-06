@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ce/ce4807f080b388da4c87",
+ "request_hash": "ce4807f080b388da4c87b84c3323a4f230fb9d59a104ac02a562b1f289042079",
+ "recorded_at": "2026-11-06T14:42:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1419,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.747616",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=143"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#21",
+    "text": "### Input types are not preserved\n\nIn Pydantic V1 we made great efforts to preserve the types of all field inputs for generic collections when they were\nproper subtypes of the field annotations. For example, given the annotation `Mapping[str, int]` if you passed in a\n`collection.Counter()` you'd get a `collection.Counter()` as the value.\n\nSupporting this behavior in V2 would have negative performance implications for the general case\n(we'd have to check types every time) and would add a lot of complexity to validation. Further, even in V1 this behavior\nwas inconsistent and partially broken: it did not work for many types (`str`, `UUID`, etc.), and for generic\ncollections it's impossible to re-build the original input correctly without a lot of special casing\n(consider `ChainMap`; rebuilding the input is necessary because we need to replace values after validation, e.g.\nif coercing strings to ints).\n\nIn Pydantic V2 we no longer attempt to preserve the input type in all cases; instead, we only promise that the output\ntype will match the type annotations.\n\nGoing back to the `Mapping` example, we promise the output will be a valid `Mapping`, and in practice it will be a\nplain `dict`:\n\n```python\nfrom collections.abc import Mapping\n\nfrom pydantic import TypeAdapter\n\n\nclass MyDict(dict):\n    pass\n\n\nta = TypeAdapter(Mapping[str, int])\nv = ta.validate_python(MyDict())\nprint(type(v))\n#> <class 'dict'>\n```"
+   },
+   {
+    "id": "pydantic:docs/why.md#6",
+    "text": "## Strict mode and data coercion {#strict-lax}\n\nBy default, Pydantic is tolerant to common incorrect types and coerces data to the right type &mdash;\ne.g. a numeric string passed to an `int` field will be parsed as an `int`.\n\nPydantic also has as [strict mode](concepts/strict_mode.md), where types are not coerced and a\nvalidation error is raised unless the input data exactly matches the expected schema.\n\nBut strict mode would be pretty useless when validating JSON data since JSON doesn't have types matching\nmany common Python types like [`datetime`][datetime.datetime], [`UUID`][uuid.UUID] or [`bytes`][].\n\nTo solve this, Pydantic can parse and validate JSON in one step. This allows sensible data conversion\n(e.g. when parsing strings into [`datetime`][datetime.datetime] objects). Since the JSON parsing is\nimplemented in Rust, it's also very performant.\n\n??? example \"Example - Strict mode that's actually useful\"\n\n    ```python\n    from datetime import datetime\n\n    from pydantic import BaseModel, ValidationError\n\n\n    class Meeting(BaseModel):\n        when: datetime\n        where: bytes\n\n\n    m = Meeting.model_validate({'when': '2020-01-01T12:00', 'where': 'home'})\n    print(m)\n    #> when=datetime.datetime(2020, 1, 1, 12, 0) where=b'home'\n    try:\n        m = Meeting.model_validate(\n            {'when': '2020-01-01T12:00', 'where': 'home'}, strict=True\n        )\n    except ValidationError as e:\n        print(e)\n        \"\"\"\n        2 validation errors for Meeting\n        when\n          Input should be a valid datetime [type=datetime_type, input_value='2020-01-01T12:00', input_type=str]\n        where\n          Input should be a valid bytes [type=bytes_type, input_value='home', input_type=str]\n        \"\"\"\n\n    m_json = Meeting.model_validate_json(\n        '{\"when\": \"2020-01-01T12:00\", \"where\": \"home\"}'\n    )\n    print(m_json)\n    #> when=datetime.datetime(2020, 1, 1, 12, 0) where=b'home'\n    ```\n\n!!! tip \"Learn more\"\n    See the [documentation on strict mode](concepts/strict_mode.md)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/why.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#21",
+    "b": "pydantic:docs/why.md#6",
+    "relation": "unrelated",
+    "related": 0.0044,
+    "probabilities": {
+     "same": 0.0014,
+     "overlapping": 0.0016,
+     "conflicting": 0.0014,
+     "unrelated": 0.9956
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

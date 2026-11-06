@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/0e/0e62174f14b55085414a",
+ "request_hash": "0e62174f14b55085414af7b54adc7d9ae0d0842d22c703b8d1e9265d4f5044aa",
+ "recorded_at": "2026-11-06T14:41:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2472,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "115.857437",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=316,cfOrigin;dur=0,cfWorker;dur=252"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) `From` reaches the compiled pattern as a regular expression, so the other regexp metacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also matches `/fa`. (2) With neither, the middleware rewrites nothing. A rule's `From` is path text: `*` matches a run of any bytes but a newline, and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and not `/preis-1X000-euro`.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "fiber:docs/whats_new.md#199",
+    "title": "docs/whats_new.md > 📋 Migration guide > 🧬 Middlewares > Rewrite",
+    "text": "#### Rewrite\n\n- **Captures decoded once**: with `UnescapePath` enabled a wildcard capture is escaped again before it is inserted into `To`, so the rewritten path is not decoded a second time. `/files/%252e%252e/secret` rewritten by `/files/*` to `/public/$1` now reaches the handler as `/public/%2e%2e/secret` instead of `/secret`.\n- **Ordered rules**: `Rules map[string]string` is deprecated in favor of `RuleList []Rule`. A map has no order, so which rule answered a path two rules both matched was decided by map iteration, which Go randomizes per run: the same request could be rewritten differently from one call to the next. Rules in a `RuleList` are tried in the order written and the first match wins, exactly as routes are matched.\n\n```go\n// Before\napp.Use(rewrite.New(rewrite.Config{\n    Rules: map[string]string{\n        \"/old\":   \"/new\",\n        \"/old/*\": \"/new/$1\",\n    },\n}))\n\n// After\napp.Use(rewrite.New(rewrite.Config{\n    RuleList: []rewrite.Rule{\n        {From: \"/old\", To: \"/new\"},\n        {From: \"/old/*\", To: \"/new/$1\"},\n    },\n}))\n```\n\n`Rules` keeps working for the whole of v3; its keys are ranked most path text before the first `*`, then most path text overall, then fewest asterisks, then the key. Setting both fields panics.\n\n- **A capture cannot leave `To`**: a rewritten path holding more `.` or `..` segments than `To` itself is skipped for that request, so `{From: \"/@*\", To: \"/users/$1\"}` no longer rewrites `/@../admin` to `/admin`.\n- **A rule is path text**: `From` is no longer compiled as an unescaped regular expression. `*` matches a run of any bytes but a newline and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and no longer also `/preis-1X000-euro`, and `/faq?` no longer rewrites `/fa`. This also completes the anchoring fix from #4476: `\"^\" + \"/a|/b\" + \"$\"` parsed as `(^/a)|(/b$)`, so a rule could match by prefix or suffix alone. Rules written with path text and `*` are unaffected; a rule relying on regular-expression syntax now matches the literal characters it spells."
+   },
+   {
+    "id": "fiber:docs/guide/error-handling.md#4",
+    "title": "docs/guide/error-handling.md > Custom Error Handler",
+    "text": "A sub-app mounted with `app.Use` can set its own `ErrorHandler`. It answers every error raised under the mount path, including the **404** for a path that matches none of the sub-app's routes. An app mounted inside it without a handler of its own uses it too, and any other request falls back to the parent's handler. This needs a literal mount path, taken from the top-level app down: the lookup compares the request path with the mount path as text, so under a parameter, as in `app.Use(\"/t/:tenant\", tenantApp)`, the sub-app's routes still match and run but its handler is not found, and neither is the handler of an app mounted inside it. The handler of the nearest enclosing mount with a literal path answers instead, or the top-level app's handler when there is none. A sub-app mounted through [`Domain`](../api/app.md#domain) matches a parameterized mount path as a pattern and keeps its own handler."
+   },
+   {
+    "id": "fiber:docs/middleware/expvar.md#2",
+    "title": "docs/middleware/expvar.md > ExpVar > Examples",
+    "text": "## Examples\n\nImport the middleware package:\n\n```go\nimport (\n    \"expvar\"\n    \"fmt\"\n\n    \"github.com/gofiber/fiber/v3\"\n    expvarmw \"github.com/gofiber/fiber/v3/middleware/expvar\"\n)\n```\n\nOnce your Fiber app is initialized, use the middleware as shown:\n\n```go\nvar count = expvar.NewInt(\"count\")\n\napp.Use(expvarmw.New())\napp.Get(\"/\", func(c fiber.Ctx) error {\n    count.Add(1)\n\n    return c.SendString(fmt.Sprintf(\"hello expvar count %d\", count.Value()))\n})\n```\n\nVisit `/debug/vars` to see all variables, and append `?r=<regexp>` to keep only the variables whose names match the regular expression; an invalid expression is answered with `400 Bad Request`. Any path beneath `/debug/vars/` is redirected to `/debug/vars` with `303 See Other`, and every other path continues down the handler chain.\n\n```bash\ncurl 127.0.0.1:3000\nhello expvar count 1\n\ncurl 127.0.0.1:3000/debug/vars\n{\n    \"cmdline\": [\"xxx\"],\n    \"count\": 1,\n    \"expvarHandlerCalls\": 33,\n    \"expvarRegexpErrors\": 0,\n    \"memstats\": {...}\n}\n\ncurl 127.0.0.1:3000/debug/vars?r=c\n{\n    \"cmdline\": [\"xxx\"],\n    \"count\": 1\n}\n```"
+   },
+   {
+    "id": "fiber:docs/middleware/rewrite.md#3",
+    "title": "docs/middleware/rewrite.md > Rewrite > Rule order",
+    "text": "## Rule order\n\nRules are tried in the order you write them and the first one whose `From`\nmatches answers, exactly as [routes](../guide/routing.md) are matched. Nothing\nreorders a `RuleList`. Put the specific rules before the catch-alls:\n\n```go\nRuleList: []rewrite.Rule{\n    {From: \"/api/users\", To: \"/v2/users\"},  // checked first\n    {From: \"/api/*\", To: \"/v2/$1\"},         // takes everything else\n}\n```\n\nWritten the other way round, `/api/*` answers `/api/users` too and the second\nrule never fires.\n\n:::note\nThe deprecated `Rules` map has no order of its own, so Fiber sorts it: most path\ntext before the first `*` wins, then most path text overall, then fewest\nasterisks, then the key itself. That is a rough reading of \"most specific\", not\nan exact one, so a long wildcard rule can still outrank a shorter exact one.\n`RuleList` is the exact control.\n:::"
+   },
+   {
+    "id": "fiber:docs/middleware/redirect.md#5",
+    "title": "docs/middleware/redirect.md > Redirect > Rule order",
+    "text": "## Rule order\n\nRules are tried in the order you write them and the first one whose `From`\nmatches answers, exactly as [routes](../guide/routing.md) are matched. Nothing\nreorders a `RuleList`. Put the specific rules before the catch-alls:\n\n```go\nRuleList: []redirect.Rule{\n    {From: \"/api/users\", To: \"/v2/users\"},  // checked first\n    {From: \"/api/*\", To: \"/v2/$1\"},         // takes everything else\n}\n```\n\nWritten the other way round, `/api/*` answers `/api/users` too and the second\nrule never fires. For lists of 100 rules or fewer, Fiber logs a warning at startup naming any rule\nan earlier one shadows outright, so a dead rule tells you rather than going\nquiet.\n\nThe deprecated `Rules` map has no order of its own, so Fiber sorts it: most path\ntext pinned before the first `*` or other regular-expression character wins,\nthen most path text overall, then fewest asterisks, then the key itself. That\ncovers rules written with path text and `*`. Rules relying on\nregular-expression syntax beyond `*` may order differently. Use `RuleList`,\nwhere the order is yours."
+   },
+   {
+    "id": "fiber:docs/guide/routing.md#13",
+    "title": "docs/guide/routing.md > Parameters > Constraints",
+    "text": "### Constraints\n\nRoute constraints execute when a match has occurred to the incoming URL and the URL path is tokenized into route values by parameters. The feature was introduced in `v2.37.0` and inspired by [.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-6.0#route-constraints).\n\n:::caution\nConstraints are matching rules, not input validation: if a value fails a constraint, the route simply does not match and Fiber returns **404 Not Found**.\n:::\n\n| Constraint        | Example                          | Example matches                                                                             |\n| ----------------- | -------------------------------- | ------------------------------------------------------------------------------------------- |\n| int               | `:id<int>`                       | 123456789, -123456789                                                                       |\n| bool              | `:active<bool>`                  | true, false (and the other values `strconv.ParseBool` reads, such as 1 and 0)               |\n| guid              | `:id<guid>`                      | CD2C1638-1638-72D5-1638-DEADBEEF1638                                                        |\n| float             | `:weight<float>`                 | 1.234, -1001.01e8, 3.14                                                                     |\n| minLen(value)     | `:username<minLen(4)>`           | Test (must be at least 4 bytes)                                                             |\n| maxLen(value)     | `:filename<maxLen(8)>`           | MyFile (must be no more than 8 bytes)                                                       |\n| len(length)       | `:filename<len(12)>`             | somefile.txt (exactly 12 bytes)                                                             |\n| betweenLen(min,max) | `:name<betweenLen(3,8)>`       | MyFile (must be at least 3 and no more than 8 bytes)                                        |\n| min(value)        | `:age<min(18)>`                  | 19 (Integer value must be at least 18)                                                      |\n| max(value)        | `:age<max(120)>`                 | 91 (Integer value must be no more than 120)                                                 |\n| range(min,max)    | `:age<range(18,120)>`            | 91 (Integer value must be at least 18 but no more than 120)                                 |\n| alpha             | `:name<alpha>`                   | Rick (String must consist of one or more letters: a-z in either case, and other Unicode letters when the path reaches the router as UTF-8, which a percent-encoded path does only with [`UnescapePath`](../api/fiber.md#unescapepath) enabled) |\n| datetime          | `:dob<datetime(2006\\\\-01\\\\-02)>` | 2005-11-01                                                                                  |\n| regex(expression) | `:date<regex(\\d{4}-\\d{2}-\\d{2})>` | 2022-08-27 (Must match regular expression)                                                  |"
+   },
+   {
+    "id": "fiber:README.md#5",
+    "title": "README.md > Zero Allocation",
+    "text": "## Zero Allocation\n\nFiber is optimized for **high-performance**, meaning values returned from **fiber.Ctx** are **not** immutable by default and **will** be reused across requests. As a rule of thumb, you **must** only use context values within the handler and **must not** keep any references. Once you return from the handler, any values obtained from the context will be reused in future requests. Visit our [documentation](https://docs.gofiber.io/#zero-allocation) to learn more."
+   },
+   {
+    "id": "fiber:docs/api/app.md#10",
+    "title": "docs/api/app.md > Routing > Domain",
+    "text": "Domain routing has **zero performance impact** on routes that don't use it — the hostname check is applied as a handler wrapper, not a change to the core router.\n\n:::note\nBecause domain filtering is applied at handler-execution time (not during route matching), Fiber's `405 Method Not Allowed` logic may advertise methods from domain-scoped routes even when the requesting host does not match the domain pattern. This is a known trade-off of the handler-wrapping approach — it avoids core router changes while keeping non-domain routes unaffected.\n:::\n\n:::note\nWhen mounting sub-applications via `Domain(...).Use(*fiber.App)`, routes are cloned from the sub-app at mount time. This means the same sub-app can safely be mounted on multiple domains without double-wrapping, but routes registered on the sub-app **after** mounting will not inherit domain filtering. Register all sub-app routes before mounting.\n\nApps that the sub-app has mounted itself are cloned along with it, so nested routes are domain-filtered as well. The same \"register before mounting\" rule applies to them.\n\nA domain-mounted sub-app's `ErrorHandler` and `Views` are host-scoped like its routes: they apply to requests whose hostname matches the pattern, and requests on other hosts fall back to the parent's. Two sub-apps mounted at the same path on different domains therefore keep their own configuration. A sub-app that sets none of its own inherits them from the app it is mounted inside, as with a plain mount; a separately mounted app that merely covers the same paths and hosts is not inherited from.\n:::"
+   },
+   {
+    "id": "fiber:docs/api/app.md#4",
+    "title": "docs/api/app.md > Routing > Mounting",
+    "text": "A sub-app's own [`ErrorHandler`](#errorhandler), `Views` and `ViewsLayout` still apply to the requests under its mount path, but only when the whole mount path, from the top-level app down, is literal. Under a parameter, as in `app.Use(\"/t/:tenant\", tenantApp)`, the routes match and run while the nearest enclosing mount with a literal path, or the top-level app, supplies the error handler and the view engine. A [`Domain`](#domain) mount matches a parameterized path as a pattern, so its sub-app keeps its own. The [`RegexHandler`](./fiber.md#regexhandler) of a sub-app mounted on the top-level app compiles the `regex()` constraints in the full path of every route below it, the mount prefix included, so an app mounted deeper does not use its own.\n:::"
+   },
+   {
+    "id": "fiber:docs/guide/routing.md#14",
+    "title": "docs/guide/routing.md > Parameters > Constraints",
+    "text": "The length constraints (`minLen`, `maxLen`, `len` and `betweenLen`) count bytes, not characters, of the value the router matched: a non-ASCII character counts as its UTF-8 bytes, or as its longer `%XX` form while the path keeps it percent-encoded, which is the default (see [`UnescapePath`](../api/fiber.md#unescapepath)).\n\nConstraint names and arguments are always taken from the pattern as written, even with the default case-insensitive routing: `:code<regex([A-Z]{2})>` keeps matching uppercase codes only, a `datetime` layout keeps its `T` and `Z`, and a custom constraint registered under a mixed-case name is found. A built-in name matches in any letter case (`minLen(4)` and `MinLen(4)` are the same constraint), while a custom constraint name must match exactly.\n\n:::note\nA constraint with a missing or malformed argument (`:id<min>` or `:id<min(abc)>`) never matches, so the route answers **404** for every request. A name that is neither built in nor a registered [custom constraint](#custom-constraint) is ignored and leaves the parameter unconstrained, so a misspelled constraint does not reject anything. Only `regex(...)` expressions are checked when the route is registered: an invalid one panics.\n:::"
+   },
+   {
+    "id": "fiber:docs/middleware/static.md#11",
+    "title": "docs/middleware/static.md > Static > Examples > SPA (Single Page Application)",
+    "text": "A root that is a single file looks nothing up by the path, so it serves its file for every other path the route matches, whatever its spelling, and no spelling of a path can select another file. An empty segment further in is an ordinary part of a name there, as in `/web/https://example.com`.\n:::\n\n:::tip\nA client that puts a doubled slash in front of a path, such as a base URL that ends in `/` joined to a path that starts with `/`, gets `404 Not Found` from a root mount. To keep serving it, collapse the slash with the [Rewrite](./rewrite.md) middleware before any middleware that matches a path prefix runs. The middleware registered after it, one guarding `/private` included, then sees `/private/secret.txt`:\n\n```go\napp.Use(rewrite.New(rewrite.Config{\n    RuleList: []rewrite.Rule{{From: \"//*\", To: \"/$1\"}},\n}))\n```\n\n:::\n\n:::caution\nThe file server opens the name the router matched, so it is only as strict as the filesystem underneath. On Windows a path component loses its trailing dots and spaces when it is opened, so `/static/private./secret.txt` would reach `private/secret.txt` without passing middleware mounted on `/static/private`; the file server answers such a segment with `404 Not Found` on Windows, whatever the root: an `fs.FS` may be OS-backed (`os.DirFS`) and cannot be told apart from a virtual one such as `embed.FS`, so an embedded name ending in a dot or a space is not served on Windows either. Case is a different matter: on a case-insensitive filesystem (Windows, and macOS by default) `/static/PRIVATE/secret.txt` opens `private/secret.txt`, and with [`CaseSensitive`](../api/fiber.md#config) enabled the router keeps the two apart, so middleware mounted on `/static/private` does not run. Leave `CaseSensitive` off (the default) for a static root with guarded directories, or serve it from a case-sensitive filesystem.\n:::"
+   },
+   {
+    "id": "fiber:docs/middleware/basicauth.md#3",
+    "title": "docs/middleware/basicauth.md > BasicAuth > Examples > Password hashes",
+    "text": "### Password hashes\n\nPasswords must be supplied in pre-hashed form. The middleware detects the\nhashing algorithm from a prefix:\n\n- `\"{SHA512}\"` or `\"{SHA256}\"` followed by a base64-encoded digest\n- standard bcrypt strings beginning with `$2`\n\nIf no prefix is present, the value is interpreted as a SHA-256 digest encoded in\nhex or base64. Plaintext passwords are rejected.\n\nThe middleware decodes the credentials as UTF-8 and normalizes them to Unicode\nNFC before it compares them, so hash a password that contains non-ASCII\ncharacters in its NFC form. Credentials that are not valid UTF-8, or that\ncontain control characters, are answered with `400 Bad Request`.\n\nThe decoded digest must be exactly the size of the named algorithm — 32 bytes\nfor SHA-256, 64 bytes for SHA-512. A digest of any other length could never\nmatch a password, so it is rejected at startup: `New()` panics with\n`ErrInvalidSHA256PasswordLength` or `ErrInvalidSHA512PasswordLength` rather than\nstarting with an account that can never authenticate. The most common cause is\na truncated copy/paste, or a SHA-256 digest stored under the `{SHA512}` prefix.\n\nEvery attempt runs one check per configured hash tier, meaning each algorithm\nand each bcrypt cost in `Users`, whether the user exists or not, so response\ntime reveals neither. A setup with a single tier pays for one check. A mixed\none, for example while migrating from SHA-256 to bcrypt or to a higher bcrypt\ncost, pays for one check per tier on every attempt."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fiber:docs/whats_new.md#199",
+    "action": "use",
+    "relevance_score": 0.9864,
+    "document_score": 0.9904,
+    "levels": {
+     "answers": 0.9864,
+     "elsewhere": 0.004,
+     "different_case": 0.0054,
+     "unrelated": 0.0041
+    }
+   },
+   {
+    "index": 4,
+    "id": "fiber:docs/middleware/redirect.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0089,
+    "document_score": 0.1321,
+    "levels": {
+     "answers": 0.0089,
+     "elsewhere": 0.1232,
+     "different_case": 0.1021,
+     "unrelated": 0.7658
+    }
+   },
+   {
+    "index": 10,
+    "id": "fiber:docs/middleware/static.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0072,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0037,
+     "different_case": 0.0129,
+     "unrelated": 0.9799
+    }
+   },
+   {
+    "index": 3,
+    "id": "fiber:docs/middleware/rewrite.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0032,
+    "document_score": 0.0467,
+    "levels": {
+     "answers": 0.0032,
+     "elsewhere": 0.0435,
+     "different_case": 0.0219,
+     "unrelated": 0.9315
+    }
+   },
+   {
+    "index": 1,
+    "id": "fiber:docs/guide/error-handling.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0057,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0033,
+     "different_case": 0.0105,
+     "unrelated": 0.9838
+    }
+   },
+   {
+    "index": 8,
+    "id": "fiber:docs/api/app.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0088,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0065,
+     "different_case": 0.0158,
+     "unrelated": 0.9754
+    }
+   },
+   {
+    "index": 2,
+    "id": "fiber:docs/middleware/expvar.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0033,
+     "different_case": 0.0098,
+     "unrelated": 0.9848
+    }
+   },
+   {
+    "index": 9,
+    "id": "fiber:docs/guide/routing.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.009,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.007,
+     "different_case": 0.0122,
+     "unrelated": 0.9788
+    }
+   },
+   {
+    "index": 5,
+    "id": "fiber:docs/guide/routing.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0032,
+     "different_case": 0.0071,
+     "unrelated": 0.9878
+    }
+   },
+   {
+    "index": 6,
+    "id": "fiber:README.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0011,
+     "different_case": 0.0031,
+     "unrelated": 0.9942
+    }
+   },
+   {
+    "index": 7,
+    "id": "fiber:docs/api/app.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.0029,
+     "unrelated": 0.9946
+    }
+   },
+   {
+    "index": 11,
+    "id": "fiber:docs/middleware/basicauth.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.0035,
+     "unrelated": 0.9939
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6600
+  },
+  "timing": {
+   "total_ms": 119,
+   "rerank_ms": 118,
+   "questions_ms": 0,
+   "model_ms": 108,
+   "engine": {
+    "rows": 6876,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 108,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 224
+   }
+  }
+ }
+}

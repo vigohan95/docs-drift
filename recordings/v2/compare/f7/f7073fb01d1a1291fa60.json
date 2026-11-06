@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f7/f7073fb01d1a1291fa60",
+ "request_hash": "f7073fb01d1a1291fa60005c91a79dc896801d78d6dfe4c6cd94b1dcdd973de0",
+ "recorded_at": "2026-11-06T14:39:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3582,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.450209",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=171,cfOrigin;dur=0,cfWorker;dur=319"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/basicauth.md#5",
+    "text": "## Config\n\n| Property        | Type                        | Description                                                                                                                                                           | Default               |\n|:----------------|:----------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|\n| Next            | `func(fiber.Ctx) bool`     | Next defines a function to skip this middleware when it returns true.                                                                                                   | `nil`                 |\n| Users           | `map[string]string`         | Users maps usernames to **hashed** passwords (e.g. bcrypt, `{SHA256}`). | `map[string]string{}` |\n| Realm           | `string`                    | Realm is a string to define the realm attribute of BasicAuth. The realm identifies the system to authenticate against and can be used by clients to save credentials. | `\"Restricted\"`        |\n| Charset         | `string`                    | Charset sent in the `WWW-Authenticate` header. Only `\"UTF-8\"` is supported (case-insensitive). | `\"UTF-8\"` |\n| HeaderLimit     | `int`                       | Maximum allowed length of the `Authorization` header. Requests exceeding this limit are rejected. | `8192` |\n| Authorizer      | `func(string, string, fiber.Ctx) bool` | Authorizer defines a function to check the credentials. It will be called with a username, password, and the current context and is expected to return true or false to indicate approval. When set, it replaces the check against `Users`, which is then neither consulted nor validated.  | `nil`                 |\n| Unauthorized    | `fiber.Handler`             | Unauthorized defines the response body for unauthorized responses.                                                                                                    | `nil`                 |\n| BadRequest      | `fiber.Handler`             | BadRequest defines the response for malformed `Authorization` headers, a request carrying the field on more than one line included.                        | `nil`                 |"
+   },
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "text": "## Config\n\n| Property               | Type                      | Description                                                                                 | Default                                  |\n|:-----------------------|:--------------------------|:--------------------------------------------------------------------------------------------|:-----------------------------------------|\n| Next                   | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when it returns true. It runs before `MaxFunc`. | `nil`                                    |\n| Max                    | `int`                     | Maximum number of recent connections within `Expiration` seconds before sending a 429 response. A value of `0` or less selects the default. | 5                                        |\n| MaxFunc                | `func(fiber.Ctx) int`     | Function that calculates the maximum number of recent connections within `Expiration` seconds before sending a 429 response. Returning `0` skips the limiter for that request; a negative value rejects every request. | A function that returns `cfg.Max`    |\n| KeyGenerator           | `func(fiber.Ctx) string` | Function to generate custom keys; uses `c.IP()` by default. A key longer than 192 bytes, or starting with `sha256:`, is replaced by its SHA-256 digest (`sha256:<hex>`) before it reaches the storage, so oversized keys are still limited per client. | A function using `c.IP()` as the default   |\n| Expiration             | `time.Duration`           | Duration to keep request records in memory, which is also the length of the window. It is counted in whole seconds: a positive value below one second is floored to one second, and zero or a negative value selects the default. | 1 * time.Minute                          |\n| ExpirationFunc         | `func(fiber.Ctx) time.Duration` | Function that calculates the expiration duration dynamically. Positive values below one second are floored to one second; non-positive values fall back to `Expiration`. Requests that share a key share a window, which keeps the length given by the request that opened it. | A function that returns `cfg.Expiration` |\n| LimitReached           | `fiber.Handler`           | Called when a request exceeds the limit.                                       | A function sending a 429 response          |\n| SkipFailedRequests     | `bool`                    | When set to `true`, requests with status code ≥ 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| SkipSuccessfulRequests | `bool`                    | When set to `true`, requests with status code < 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| DisableHeaders         | `bool`                    | When set to `true`, the middleware omits rate limit headers (`X-RateLimit-*` and `Retry-After`). Otherwise a request that passes carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the window ends), and a rejected one carries `Retry-After` (seconds). | false                                    |\n| DisableValueRedaction  | `bool`                    | Disables redaction of limiter keys in error messages and logs. A key longer than 192 bytes is shown as its SHA-256 digest. | false                                    |"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/basicauth.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/basicauth.md#5",
+    "b": "fiber:docs/middleware/limiter.md#7",
+    "relation": "unrelated",
+    "related": 0.0219,
+    "probabilities": {
+     "same": 0.0065,
+     "overlapping": 0.0072,
+     "conflicting": 0.0081,
+     "unrelated": 0.9781
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 176
+  },
+  "timing": {
+   "read_ms": 176,
+   "total_ms": 180
+  }
+ }
+}

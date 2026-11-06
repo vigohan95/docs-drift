@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/43/432e6af2f2f7b1345e52",
+ "request_hash": "432e6af2f2f7b1345e52dfb43d458b0fad578a31d09d91a816d8fa7d47f938ff",
+ "recorded_at": "2026-11-06T14:41:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2239,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.965088",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=158"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "text": "### Python mode\n\nWhen using the Python mode, Pydantic models (and model-like types such as [dataclasses][]) (1) will be (recursively) converted to dictionaries. This is achievable by using the [`model_dump()`][pydantic.BaseModel.model_dump] method:\n{ .annotate }\n\n1. With the exception of [root models](./models.md#rootmodel-and-custom-root-types), where the root value is dumped directly.\n\n```python {group=\"python-dump\"}\nfrom pydantic import BaseModel, Field\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    banana: float | None = 1.1\n    foo: str = Field(serialization_alias='foo_alias')\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': (1, 2)})\n\n# returns a dictionary:\nprint(m.model_dump())\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': (1, 2)}}\n\nprint(m.model_dump(by_alias=True))\n#> {'banana': 3.14, 'foo_alias': 'hello', 'bar': {'whatever': (1, 2)}}\n```\n\nNotice that the value of `whatever` was dumped as tuple, which isn't a known JSON type. The `mode` argument can be set to `'json'`\nto ensure JSON-compatible types are used:\n\n```python {group=\"python-dump\"}\nprint(m.model_dump(mode='json'))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': [1, 2]}}\n```\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_python()`][pydantic.TypeAdapter.dump_python] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#modelmodel_dump_json}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#23",
+    "text": "These constraints can be provided using the [`Field()`][pydantic.Field] function.\nThe `Le`, `Ge`, `Lt` and `Gt` metadata types from the [`annotated-types`](https://github.com/annotated-types/annotated-types)\nlibrary can also be used.\n\nPydantic also provides the following types to further constrain the allowed date values:\n\n* [`PastDate`][pydantic.types.PastDate]: Requires the input to be in the past when validated.\n* [`FutureDate`][pydantic.types.FutureDate]: Requires the input to be in the future when validated.\n\n<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`date`][datetime.date] instances are accepted. In JSON mode, only strings complying to the\n[RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format (*only* date) or as unix timestamps are accepted.\n\n<h4>Example</h4>\n\n```python\nfrom datetime import date\n\nfrom pydantic import BaseModel\n\n\nclass Birthday(BaseModel):\n    d: date\n\n\nmy_birthday = Birthday(d=1679616000.0)\n\nprint(my_birthday.model_dump())\n#> {'d': datetime.date(2023, 3, 24)}\nprint(my_birthday.model_dump_json())\n#> {\"d\":\"2023-03-24\"}\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#datetimetime}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#2",
+    "b": "pydantic:docs/api/standard_library_types.md#23",
+    "relation": "unrelated",
+    "related": 0.0141,
+    "probabilities": {
+     "same": 0.0044,
+     "overlapping": 0.0046,
+     "conflicting": 0.0051,
+     "unrelated": 0.9859
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

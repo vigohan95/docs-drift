@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ff/fffbefa482c7044dcd5a",
+ "request_hash": "fffbefa482c7044dcd5a19eb70489b0bc8ddaf60f3c89176c9f6c719f4092ce2",
+ "recorded_at": "2026-11-06T14:38:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1659,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "122.552155",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=263"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/03-typescript.md#10",
+    "text": "## The `Component` type\n\nSvelte components are of type `Component`. You can use it and its related types to express a variety of constraints.\n\nUsing it together with dynamic components to restrict what kinds of component can be passed to it:\n\n```svelte\n<script lang=\"ts\">\n\timport type { Component } from 'svelte';\n\n\tinterface Props {\n\t\t// only components that have at most the \"prop\"\n\t\t// property required can be passed\n\t\tDynamicComponent: Component<{ prop: string }>;\n\t}\n\n\tlet { DynamicComponent }: Props = $props();\n</script>\n\n<DynamicComponent prop=\"foo\" />\n```\n\n> [!LEGACY] In Svelte 4, components were of type `SvelteComponent`\n\nTo extract the properties from a component, use `ComponentProps`.\n\n```ts\nimport type { Component, ComponentProps } from 'svelte';\nimport MyComponent from './MyComponent.svelte';\n\nfunction withProps<TComponent extends Component<any>>(\n\tcomponent: TComponent,\n\tprops: ComponentProps<TComponent>\n) {}\n\n// Errors if the second argument is not the correct props expected\n// by the component in the first argument.\nwithProps(MyComponent, { foo: 'bar' });\n```\n\nTo declare that a variable expects the constructor or instance type of a component:\n\n```svelte\n<script lang=\"ts\">\n\timport MyComponent from './MyComponent.svelte';\n\n\tlet componentConstructor: typeof MyComponent = MyComponent;\n\tlet componentInstance: MyComponent;\n</script>\n\n<MyComponent bind:this={componentInstance} />\n```"
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#22",
+    "text": "### Component typing changes\n\nThe change from classes towards functions is also reflected in the typings: `SvelteComponent`, the base class from Svelte 4, is deprecated in favour of the new `Component` type which defines the function shape of a Svelte component. To manually define a component shape in a `d.ts` file:\n\n```ts\nimport type { Component } from 'svelte';\nexport declare const MyComponent: Component<{\n\tfoo: string;\n}>;\n```\n\nTo declare that a component of a certain type is required:\n\n```js\nimport { ComponentA, ComponentB } from 'component-library';\n---import type { SvelteComponent } from 'svelte';---\n+++import type { Component } from 'svelte';+++\n\n---let C: typeof SvelteComponent<{ foo: string }> = $state(---\n+++let C: Component<{ foo: string }> = $state(+++\n\tMath.random() ? ComponentA : ComponentB\n);\n```\n\nThe two utility types `ComponentEvents` and `ComponentType` are also deprecated. `ComponentEvents` is obsolete because events are defined as callback props now, and `ComponentType` is obsolete because the new `Component` type is the component type already (i.e. `ComponentType<SvelteComponent<{ prop: string }>>` is equivalent to `Component<{ prop: string }>`)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/03-typescript.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#22",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/07-misc/03-typescript.md#10",
+    "b": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#22",
+    "relation": "overlapping",
+    "related": 0.9979,
+    "probabilities": {
+     "same": 0.0074,
+     "overlapping": 0.9868,
+     "conflicting": 0.0038,
+     "unrelated": 0.0021
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 1,
+   "counterparts_ms": 34
+  },
+  "timing": {
+   "read_ms": 130,
+   "total_ms": 133
+  }
+ }
+}

@@ -1,0 +1,213 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4f/4f62117f1d3e1cad1d71",
+ "request_hash": "4f62117f1d3e1cad1d710b58958fde8c0714cf50668bf492da2d3b0a6b22ba02",
+ "recorded_at": "2026-11-06T14:39:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2258,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "220.240164",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=389"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/client/request.md#79",
+    "text": "## SetRedirectSensitiveHeaders\n\n**SetRedirectSensitiveHeaders** names request headers that must not follow a redirect to another host, such as a credential of your own like `X-Api-Key`. When the target is on a host that is neither the original hostname (on any port) nor one of its subdomains, they are dropped with `Authorization`, `Proxy-Authorization`, `Proxy-Authenticate`, `WWW-Authenticate`, `Cookie` and `Cookie2`; every other header is forwarded, as `net/http` does. Names match case-insensitively, and surrounding whitespace and empty entries are ignored. The names are added to the client's own list ([SetRedirectSensitiveHeaders](./rest.md#setredirectsensitiveheaders)). The default is none, and it matters only while redirects are followed, see [SetMaxRedirects](#setmaxredirects). Calling it with no names clears the request's list.\n\n```go title=\"Signature\"\nfunc (r *Request) SetRedirectSensitiveHeaders(names ...string) *Request\n```\n\n```go title=\"Example\"\nresp, err := client.New().Get(\"https://api.example.com/items\", client.Config{\n    Header:                   map[string]string{\"X-Api-Key\": os.Getenv(\"UPSTREAM_API_KEY\")},\n    MaxRedirects:             3,\n    RedirectSensitiveHeaders: []string{\"X-Api-Key\"},\n})\n```"
+   },
+   {
+    "id": "fiber:docs/client/rest.md#79",
+    "text": "### SetRedirectSensitiveHeaders\n\nNames request headers that must not follow a redirect to another host, such as a credential of your own like `X-Api-Key`, for every request of the client. A redirect to a host that is neither the original hostname (on any port) nor one of its subdomains drops them with the built-in sensitive headers; every other header is forwarded. Names match case-insensitively, and surrounding whitespace and empty entries are ignored. A request can add names of its own with [SetRedirectSensitiveHeaders](./request.md#setredirectsensitiveheaders). The list applies to [DoRedirects](#doredirects) too. It is empty by default, calling the method with no names clears it, and `Reset` clears it. It matters only while redirects are followed, see [SetMaxRedirects](./request.md#setmaxredirects).\n\nThe boundary is the hostname, as in `net/http`: a redirect of the same host to another port or scheme keeps the headers. [proxy.DoRedirects](../middleware/proxy.md#headers-on-a-cross-origin-redirect) is stricter and drops them whenever the scheme, host or port changes.\n\n```go title=\"Signature\"\nfunc (c *Client) SetRedirectSensitiveHeaders(names ...string) *Client\n```\n\n```go title=\"Example\"\ncli := client.New().\n    SetHeader(\"X-Api-Key\", os.Getenv(\"UPSTREAM_API_KEY\")).\n    SetRedirectSensitiveHeaders(\"X-Api-Key\")\n\nresp, err := cli.Get(\"https://api.example.com/items\", client.Config{MaxRedirects: 3})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/client/request.md#79",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/client/rest.md#79"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/client/rest.md#79",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/client/request.md#79"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/client/request.md#79",
+    "b": "fiber:docs/client/rest.md#79",
+    "relation": "overlapping",
+    "related": 0.997,
+    "probabilities": {
+     "same": 0.0071,
+     "overlapping": 0.9813,
+     "conflicting": 0.0085,
+     "unrelated": 0.003
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0143,
+       "restated": 0.9212,
+       "elaborated": 0.0227,
+       "different": 0.0417
+      },
+      "confidence": 0.9583,
+      "a": {
+       "document": "fiber:docs/client/request.md#79",
+       "quote": "## SetRedirectSensitiveHeaders",
+       "start": 0,
+       "end": 30,
+       "confidence": 0.994
+      },
+      "b": {
+       "document": "fiber:docs/client/rest.md#79",
+       "quote": "### SetRedirectSensitiveHeaders\n\nNames request headers that must not follow a redirect to another host, such as a credential of your own like `X-Api-Key`, for every request of the client.",
+       "start": 0,
+       "end": 187,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9877,
+       "restated": 0.0057,
+       "elaborated": 0.0036,
+       "different": 0.0029
+      },
+      "confidence": 0.9971,
+      "a": {
+       "document": "fiber:docs/client/request.md#79",
+       "quote": "Names match case-insensitively, and surrounding whitespace and empty entries are ignored.",
+       "start": 475,
+       "end": 564,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/client/rest.md#79",
+       "quote": "Names match case-insensitively, and surrounding whitespace and empty entries are ignored.",
+       "start": 368,
+       "end": 457,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0185,
+       "restated": 0.9084,
+       "elaborated": 0.0394,
+       "different": 0.0338
+      },
+      "confidence": 0.829,
+      "a": {
+       "document": "fiber:docs/client/request.md#79",
+       "quote": "The names are added to the client's own list ([SetRedirectSensitiveHeaders](./rest.md#setredirectsensitiveheaders)).",
+       "start": 565,
+       "end": 681,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/client/rest.md#79",
+       "quote": "A request can add names of its own with [SetRedirectSensitiveHeaders](./request.md#setredirectsensitiveheaders).",
+       "start": 458,
+       "end": 570,
+       "confidence": 0.829
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0096,
+       "restated": 0.8475,
+       "elaborated": 0.0309,
+       "different": 0.112
+      },
+      "confidence": 0.888,
+      "a": {
+       "document": "fiber:docs/client/request.md#79",
+       "quote": "The default is none, and it matters only while redirects are followed, see [SetMaxRedirects](#setmaxredirects).",
+       "start": 682,
+       "end": 793,
+       "confidence": 0.938
+      },
+      "b": {
+       "document": "fiber:docs/client/rest.md#79",
+       "quote": "It is empty by default, calling the method with no names clears it, and `Reset` clears it.",
+       "start": 624,
+       "end": 714,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0161,
+       "restated": 0.59,
+       "elaborated": 0.0517,
+       "different": 0.3422
+      },
+      "confidence": 0.6578,
+      "a": {
+       "document": "fiber:docs/client/request.md#79",
+       "quote": "The default is none, and it matters only while redirects are followed, see [SetMaxRedirects](#setmaxredirects).",
+       "start": 682,
+       "end": 793,
+       "confidence": 0.981
+      },
+      "b": {
+       "document": "fiber:docs/client/rest.md#79",
+       "quote": "It matters only while redirects are followed, see [SetMaxRedirects](./request.md#setmaxredirects).\n\nThe boundary is the hostname, as in `net/http`: a redirect of the same host to another port or scheme keeps the headers.",
+       "start": 715,
+       "end": 935,
+       "confidence": 0.949
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 6,
+   "counterparts_ms": 166
+  },
+  "timing": {
+   "read_ms": 275,
+   "total_ms": 280
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/07/07030b159828c1508602",
+ "request_hash": "07030b159828c1508602f121b1b9b0dcba869c24ee5ec53064490fe0b00f422e",
+ "recorded_at": "2026-11-06T14:38:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1211,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "107.683487",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=237"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/04-$effect.md#8",
+    "text": "## `$effect.root`\n\nThe `$effect.root` rune is an advanced feature that creates a non-tracked scope that doesn't auto-cleanup. This is useful for nested effects that you want to manually control. This rune also allows for the creation of effects outside of the component initialisation phase.\n\n```js\nconst destroy = $effect.root(() => {\n\t$effect(() => {\n\t\t// setup\n\t});\n\n\treturn () => {\n\t\t// cleanup\n\t};\n});\n\n// later...\ndestroy();\n```"
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/02-testing.md#2",
+    "text": "### Using runes inside your test files\n\nSince Vitest processes your test files the same way as your source files, you can use runes inside your tests as long as the filename includes `.svelte`:\n\n```js\n/// file: multiplier.svelte.test.js\n// @filename: multiplier.svelte.ts\nexport function multiplier(getCount: () => number, k: number) {\n\treturn {\n\t\tget value() {\n\t\t\treturn getCount() * k;\n\t\t}\n\t};\n}\n// @filename: multiplier.svelte.test.js\n// ---cut---\nimport { flushSync } from 'svelte';\nimport { expect, test } from 'vitest';\nimport { multiplier } from './multiplier.svelte.js';\n\ntest('Multiplier', () => {\n\tlet count = $state(0);\n\tlet double = multiplier(() => count, 2);\n\n\texpect(double.value).toEqual(0);\n\n\tcount = 5;\n\n\texpect(double.value).toEqual(10);\n});\n```\n\n```js\n/// file: multiplier.svelte.js\n/**\n * @param {() => number} getCount\n * @param {number} k\n */\nexport function multiplier(getCount, k) {\n\treturn {\n\t\tget value() {\n\t\t\treturn getCount() * k;\n\t\t}\n\t};\n}\n```\n\nIf the code being tested uses effects, you need to wrap the test inside `$effect.root`:\n\n```js\n/// file: logger.svelte.test.js\n// @filename: logger.svelte.ts\nexport function logger(fn: () => void) {}\n// @filename: logger.svelte.test.js\n// ---cut---\nimport { flushSync } from 'svelte';\nimport { expect, test } from 'vitest';\nimport { logger } from './logger.svelte.js';\n\ntest('Effect', () => {\n\tconst cleanup = $effect.root(() => {\n\t\tlet count = $state(0);\n\n\t\t// logger uses an $effect to log updates of its input\n\t\tlet log = logger(() => count);\n\n\t\t// effects normally run after a microtask,\n\t\t// use flushSync to execute all pending effects synchronously\n\t\tflushSync();\n\t\texpect(log).toEqual([0]);\n\n\t\tcount = 1;\n\t\tflushSync();\n\n\t\texpect(log).toEqual([0, 1]);\n\t});\n\n\tcleanup();\n});\n```\n\n```js\n/// file: logger.svelte.js\n/**\n * @param {() => any} getValue\n */\nexport function logger(getValue) {\n\t/** @type {any[]} */\n\tlet log = [];\n\n\t$effect(() => {\n\t\tlog.push(getValue());\n\t});\n\n\treturn log;\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/04-$effect.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/02-testing.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/02-runes/04-$effect.md#8",
+    "b": "svelte:documentation/docs/07-misc/02-testing.md#2",
+    "relation": "overlapping",
+    "related": 0.9851,
+    "probabilities": {
+     "same": 0.0096,
+     "overlapping": 0.9694,
+     "conflicting": 0.0061,
+     "unrelated": 0.0149
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 114,
+   "total_ms": 117
+  }
+ }
+}

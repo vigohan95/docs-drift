@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/50/5059e329d5642ebe2b5a",
+ "request_hash": "5059e329d5642ebe2b5af83cf5404d12d791b31f960b3af3a0849c1a7ceb105d",
+ "recorded_at": "2026-11-06T14:39:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1060,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "34.224159",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=155"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "text": "## Config\n\n| Property               | Type                      | Description                                                                                 | Default                                  |\n|:-----------------------|:--------------------------|:--------------------------------------------------------------------------------------------|:-----------------------------------------|\n| Next                   | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when it returns true. It runs before `MaxFunc`. | `nil`                                    |\n| Max                    | `int`                     | Maximum number of recent connections within `Expiration` seconds before sending a 429 response. A value of `0` or less selects the default. | 5                                        |\n| MaxFunc                | `func(fiber.Ctx) int`     | Function that calculates the maximum number of recent connections within `Expiration` seconds before sending a 429 response. Returning `0` skips the limiter for that request; a negative value rejects every request. | A function that returns `cfg.Max`    |\n| KeyGenerator           | `func(fiber.Ctx) string` | Function to generate custom keys; uses `c.IP()` by default. A key longer than 192 bytes, or starting with `sha256:`, is replaced by its SHA-256 digest (`sha256:<hex>`) before it reaches the storage, so oversized keys are still limited per client. | A function using `c.IP()` as the default   |\n| Expiration             | `time.Duration`           | Duration to keep request records in memory, which is also the length of the window. It is counted in whole seconds: a positive value below one second is floored to one second, and zero or a negative value selects the default. | 1 * time.Minute                          |\n| ExpirationFunc         | `func(fiber.Ctx) time.Duration` | Function that calculates the expiration duration dynamically. Positive values below one second are floored to one second; non-positive values fall back to `Expiration`. Requests that share a key share a window, which keeps the length given by the request that opened it. | A function that returns `cfg.Expiration` |\n| LimitReached           | `fiber.Handler`           | Called when a request exceeds the limit.                                       | A function sending a 429 response          |\n| SkipFailedRequests     | `bool`                    | When set to `true`, requests with status code ≥ 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| SkipSuccessfulRequests | `bool`                    | When set to `true`, requests with status code < 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| DisableHeaders         | `bool`                    | When set to `true`, the middleware omits rate limit headers (`X-RateLimit-*` and `Retry-After`). Otherwise a request that passes carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the window ends), and a rejected one carries `Retry-After` (seconds). | false                                    |\n| DisableValueRedaction  | `bool`                    | Disables redaction of limiter keys in error messages and logs. A key longer than 192 bytes is shown as its SHA-256 digest. | false                                    |"
+   },
+   {
+    "id": "fiber:docs/middleware/static.md#12",
+    "text": "## Config\n\n| Property   | Type                    | Description                                                                                                                | Default                |\n|:-----------|:------------------------|:---------------------------------------------------------------------------------------------------------------------------|:-----------------------|\n| Next       | `func(fiber.Ctx) bool` | Next defines a function to skip this middleware when it returns true.                                                                              | `nil`                  |\n| FS       | `fs.FS` | FS is the file system to serve the static files from.<br /><br />You can use interfaces compatible with fs.FS like embed.FS, os.DirFS etc. With `FS` set, the `root` argument of `New` names a directory inside it, and `\"\"` serves its root.                                                 | `nil`                  |\n| Compress       | `bool` | When set to true, the server tries minimizing CPU usage by caching compressed files. The middleware will compress the response using `gzip`, `brotli`, or `zstd` compression depending on the [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) header. <br /><br />This works differently than the github.com/gofiber/compression middleware.                                                                              | `false`                  |\n| ByteRange       | `bool` | When set to true, enables byte range requests. A request for several ranges, or whose `If-Range` does not match, gets the whole file. | `false`                  |\n| Browse       | `bool` | When set to true, enables directory browsing.                                                                             | `false`                  |\n| Download       | `bool` | When set to true, enables direct download.                                                                             | `false`                  |\n| AllowSymlinksOutsideRoot       | `bool` | When set to true, symbolic links that leave the root, and absolute ones, are followed. Has no effect with `FS`.                                                                             | `false`                  |\n| IndexNames       | `[]string` | The names of the index files for serving a directory.                                                                             | `[]string{\"index.html\"}`                  |\n| CacheDuration       | `time.Duration` | Expiration duration for inactive file handlers.<br /><br />Use a negative time.Duration to disable it.                                                                             | `10 * time.Second`                  |\n| MaxAge       | `int` | The value for the Cache-Control HTTP-header that is set on the file response. MaxAge is defined in seconds.                                                                             | `0`                  |\n| ModifyResponse       | `fiber.Handler` | ModifyResponse defines a function that allows you to alter the response.                                                                             | `nil`                  |\n| NotFoundHandler       | `fiber.Handler` | NotFoundHandler defines a function to handle when the path is not found.                                                                             | `nil`                  |"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/static.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/limiter.md#7",
+    "b": "fiber:docs/middleware/static.md#12",
+    "relation": "unrelated",
+    "related": 0.008,
+    "probabilities": {
+     "same": 0.0025,
+     "overlapping": 0.0023,
+     "conflicting": 0.0032,
+     "unrelated": 0.992
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 41
+  },
+  "timing": {
+   "read_ms": 41,
+   "total_ms": 44
+  }
+ }
+}

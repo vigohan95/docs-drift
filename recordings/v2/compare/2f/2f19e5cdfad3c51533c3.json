@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2f/2f19e5cdfad3c51533c3",
+ "request_hash": "2f19e5cdfad3c51533c39b28be86d77186311578da779de319c471b1a1324f69",
+ "recorded_at": "2026-11-06T14:40:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2031,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.825727",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=188"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/extra/internal.md#16",
+    "text": "## Context Lifecycle Management\n\nFiber minimizes allocations by pooling Context objects. The lifecycle of a Context is as follows:\n\n1. **Acquisition:** When a new HTTP request arrives, a Context is retrieved from the pool via `App.AcquireCtx()`.\n2. **Reset:** The acquired Context is reset with the current `fasthttp.RequestCtx` to clear previous data and initialize new request‑specific values.\n3. **Processing:** The Context is passed along the middleware and handler chain.\n4. **Release:** After processing the request (or when an error occurs), the Context is released back to the pool via `App.ReleaseCtx()`, making it available for reuse.\n\n```mermaid\nflowchart TD\n    A[\"HTTP Request<br/>(fasthttp)\"]\n    B[\"Acquire Context<br/>(App.AcquireCtx())\"]\n    C[\"Reset Context<br/>(DefaultCtx.Reset())\"]\n    D[\"Process Request<br/>(Handlers & Middleware)\"]\n    E[\"Error Handling<br/>(if needed)\"]\n    F[\"Release Context<br/>(App.ReleaseCtx())\"]\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n```"
+   },
+   {
+    "id": "fiber:docs/middleware/adaptor.md#1",
+    "text": "## Features\n\n- Convert `net/http` handlers and middleware to Fiber handlers\n- Convert Fiber handlers to `net/http` handlers\n- Convert a Fiber context (`fiber.Ctx`) into an `http.Request`\n- Copy values stored in a `context.Context` onto a `fasthttp.RequestCtx`\n\n:::note Body size limits when running Fiber from net/http\nWhen Fiber is executed from a `net/http` server through `FiberHandler`, `FiberHandlerFunc`,\nor `FiberApp`, the adaptor enforces the app's configured `BodyLimit`. The app's `BodyLimit` defaults to **4 MiB** if a non-positive value is provided during configuration. `FiberHandler` and `FiberHandlerFunc` run the handler on a fresh app with the default configuration, so they always apply the 4 MiB default; pass your own app to `FiberApp` to use a different `BodyLimit`. Requests exceeding the active limit receive `413 Request Entity Too Large`.\n:::\n\n:::note Streamed request bodies\n`HTTPHandler`, `HTTPHandlerFunc`, `HTTPHandlerWithContext`, `HTTPMiddleware` and `ConvertRequest` buffer the request body to build the `http.Request`. With [`StreamRequestBody`](../api/fiber.md#streamrequestbody) they read it within the app's `BodyLimit` and answer a larger one with `413 Request Entity Too Large`, and a body that fails to read, such as a malformed chunk, with `400 Bad Request` (`ConvertRequest` returns `fiber.ErrRequestEntityTooLarge` or `fiber.ErrBadRequest`). A read error that already carries a `*fiber.Error` keeps its status.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/extra/internal.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/adaptor.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/extra/internal.md#16",
+    "b": "fiber:docs/middleware/adaptor.md#1",
+    "relation": "unrelated",
+    "related": 0.0132,
+    "probabilities": {
+     "same": 0.004,
+     "overlapping": 0.0049,
+     "conflicting": 0.0043,
+     "unrelated": 0.9868
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 54
+  },
+  "timing": {
+   "read_ms": 54,
+   "total_ms": 56
+  }
+ }
+}

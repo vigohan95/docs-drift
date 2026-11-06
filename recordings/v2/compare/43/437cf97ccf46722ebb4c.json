@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/43/437cf97ccf46722ebb4c",
+ "request_hash": "437cf97ccf46722ebb4ce7e1b26847efbc53a32352f7d9e09c5699d67695b64a",
+ "recorded_at": "2026-11-06T14:41:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1062,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "160.794947",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=342"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#7",
+    "text": "* We have changed the behavior related to serializing subclasses of models when they occur as nested fields in a parent\n  model. In V1, we would always include all fields from the subclass instance. In V2, when we dump a model, we only\n  include the fields that are defined on the annotated type of the field. This helps prevent some accidental security\n  bugs. You can read more about this (including how to opt out of this behavior) in the\n  [relevant section](concepts/serialization.md#subclasses-of-model-like-types) of the model exporting docs.\n* `GetterDict` has been removed as it was just an implementation detail of `orm_mode`, which has been removed.\n* In many cases, arguments passed to the constructor will be **copied** in order to perform validation and, where necessary, coercion\n  (see the [documentation](./concepts/models.md#attribute-copies)).\n  This is notable in the case of passing mutable objects as arguments to a constructor.\n* The `.json()` method is deprecated, and attempting to use this deprecated method with arguments such as\n`indent` or `ensure_ascii` may lead to confusing errors. For best results, switch to V2's equivalent, `model_dump_json()`.\nIf you'd still like to use said arguments, you can use [this workaround](https://github.com/pydantic/pydantic/issues/8825#issuecomment-1946206415).\n* JSON serialization of non-string key values is generally done with `str(key)`, leading to some changes in behavior such as the following:"
+   },
+   {
+    "id": "pydantic:docs/concepts/models.md#46",
+    "text": "## Attribute copies\n\nIn many cases, arguments passed to the constructor will be copied in order to perform validation and, where necessary,\ncoercion.\n\nIn this example, note that the ID of the list changes after the class is constructed because it has been\ncopied during validation:\n\n```python\nfrom pydantic import BaseModel\n\n\nclass C1:\n    arr = []\n\n    def __init__(self, in_arr):\n        self.arr = in_arr\n\n\nclass C2(BaseModel):\n    arr: list[int]\n\n\narr_orig = [1, 9, 10, 3]\n\n\nc1 = C1(arr_orig)\nc2 = C2(arr=arr_orig)\nprint(f'{id(c1.arr) == id(c2.arr)=}')\n#> id(c1.arr) == id(c2.arr)=False\n```\n\n!!! note\n    There are some situations where Pydantic does not copy attributes, such as when passing models &mdash; we use the\n    model as is. You can override this behaviour by setting\n    [`model_config['revalidate_instances'] = 'always'`](../api/config.md#pydantic.config.ConfigDict.revalidate_instances)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/concepts/models.md#46"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/models.md#46",
+    "duplicates": [],
+    "overlaps": [
+     "pydantic:docs/migration.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#7",
+    "b": "pydantic:docs/concepts/models.md#46",
+    "relation": "overlapping",
+    "related": 0.9971,
+    "probabilities": {
+     "same": 0.0193,
+     "overlapping": 0.9732,
+     "conflicting": 0.0046,
+     "unrelated": 0.0029
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0192,
+       "restated": 0.7633,
+       "elaborated": 0.1928,
+       "different": 0.0246
+      },
+      "confidence": 0.9754,
+      "a": {
+       "document": "pydantic:docs/migration.md#7",
+       "quote": "* In many cases, arguments passed to the constructor will be **copied** in order to perform validation and, where necessary, coercion",
+       "start": 661,
+       "end": 794,
+       "confidence": 1
+      },
+      "b": {
+       "document": "pydantic:docs/concepts/models.md#46",
+       "quote": "## Attribute copies\n\nIn many cases, arguments passed to the constructor will be copied in order to perform validation and, where necessary,\ncoercion.\n\nIn this example, note that the ID of the list changes after the class is constructed because it has been\ncopied during validation:\n\n```python\nfrom pydantic import BaseModel\n\n\nclass C1:\n    arr = []\n\n    def __init__(self, in_arr):\n        self.arr = in_arr\n\n\nclass C2(BaseModel):\n    arr: list[int]\n\n\narr_orig = [1, 9, 10, 3]\n\n\nc1 = C1(arr_orig)\nc2 = C2(arr=arr_orig)\nprint(f'{id(c1.arr) == id(c2.arr)=}')\n#> id(c1.arr) == id(c2.arr)=False\n```\n\n!!!",
+       "start": 0,
+       "end": 599,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 59,
+   "passages": 1,
+   "counterparts_ms": 84
+  },
+  "timing": {
+   "read_ms": 168,
+   "total_ms": 171
+  }
+ }
+}

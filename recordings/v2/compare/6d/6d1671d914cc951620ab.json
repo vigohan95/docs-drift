@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6d/6d1671d914cc951620ab",
+ "request_hash": "6d1671d914cc951620ab72bbd6551923f991abaec05dbca055414b77c401ee96",
+ "recorded_at": "2026-11-06T14:39:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1410,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "169.846144",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/guide/context.md#6",
+    "text": "- A string that comes from the request, such as the request ID when the client sent one or the key that `keyauth` extracted, points into a buffer that fasthttp reuses for the next request on the connection. Unless [`Immutable`](../api/fiber.md#immutable) is set, a goroutine that reads it later can see another request's ID or token. Copy it with `strings.Clone` before you hand it over; see [Zero Allocation](../intro.md#zero-allocation).\n- A context you keep stops resolving a session when its request ends: `session.FromContext` returns `nil` for it from then on, so a goroutine that outlives the handler cannot reach the session, and never another user's. The `*session.Middleware` it returned while the request was running is only valid until the handler returns, so do not hand that pointer to a goroutine that may outlive the handler either. Read what you need inside the handler, for example the session ID, and hand that to the goroutine; see the [Store Pattern](../middleware/session.md#store-pattern-advanced) for background work on a session.\n\n:::\n\nUse the same pair for your own values:\n\n```go\ntype userKey struct{}\n\nfiber.StoreInContext(c, userKey{}, \"john\")\nname, ok := fiber.ValueFromContext[string](c, userKey{})\n```"
+   },
+   {
+    "id": "fiber:docs/middleware/session.md#25",
+    "text": "### Middleware Methods (Recommended)\n\n```go\nsess := session.FromContext(c)\n\n// Data operations\nsess.Get(key any) any\nsess.Set(key, value any)\nsess.Delete(key any)\nsess.Keys() []any\n\n// Session management\nsess.ID() string\nsess.Fresh() bool\nsess.Regenerate() error  // Change ID, keep data\nsess.Reset() error       // Change ID, clear data\nsess.Destroy() error     // Delete from storage, expire the cookie\n\n// Context-aware variants propagate cancellation/deadlines to storage I/O.\n// Pass a context.Context to control timeouts; a nil context is treated as\n// context.Background().\nsess.RegenerateWithContext(ctx context.Context) error\nsess.ResetWithContext(ctx context.Context) error\nsess.DestroyWithContext(ctx context.Context) error\n\n// Store access\nsess.Store() *session.Store\n```\n\n`FromContext` accepts a `fiber.CustomCtx`, `fiber.Ctx`, a `*fasthttp.RequestCtx`, or a `context.Context`.\n\nThe returned `*session.Middleware` is only valid while the request is being handled. A context you kept from `c.Context()` (with `PassLocalsToContext` enabled) stops resolving it when the request ends: `FromContext` returns `nil` for that context from then on, so a goroutine that outlives the handler cannot reach the session, and never another request's. Do not hand the pointer itself to such a goroutine. Pass it the session ID and use the [Store Pattern](#store-pattern-advanced) instead."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/guide/context.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/session.md#25"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/session.md#25",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/guide/context.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/guide/context.md#6",
+    "b": "fiber:docs/middleware/session.md#25",
+    "relation": "overlapping",
+    "related": 0.9982,
+    "probabilities": {
+     "same": 0.0044,
+     "overlapping": 0.9907,
+     "conflicting": 0.0031,
+     "unrelated": 0.0018
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.006,
+       "restated": 0.9801,
+       "elaborated": 0.0089,
+       "different": 0.0049
+      },
+      "confidence": 0.9951,
+      "a": {
+       "document": "fiber:docs/guide/context.md#6",
+       "quote": "- A context you keep stops resolving a session when its request ends: `session.FromContext` returns `nil` for it from then on, so a goroutine that outlives the handler cannot reach the session, and never another user's.",
+       "start": 440,
+       "end": 659,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/session.md#25",
+       "quote": "A context you kept from `c.Context()` (with `PassLocalsToContext` enabled) stops resolving it when the request ends: `FromContext` returns `nil` for that context from then on, so a goroutine that outlives the handler cannot reach the session, and never another request's. Do not hand the pointer itself to such a goroutine.",
+       "start": 977,
+       "end": 1300,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0074,
+       "restated": 0.9747,
+       "elaborated": 0.0098,
+       "different": 0.0081
+      },
+      "confidence": 0.9919,
+      "a": {
+       "document": "fiber:docs/guide/context.md#6",
+       "quote": "Read what you need inside the handler, for example the session ID, and hand that to the goroutine; see the [Store Pattern](../middleware/session.md#store-pattern-advanced) for background work on a session.",
+       "start": 849,
+       "end": 1054,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/session.md#25",
+       "quote": "Pass it the session ID and use the [Store Pattern](#store-pattern-advanced) instead.",
+       "start": 1301,
+       "end": 1385,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 2,
+   "counterparts_ms": 81
+  },
+  "timing": {
+   "read_ms": 177,
+   "total_ms": 181
+  }
+ }
+}

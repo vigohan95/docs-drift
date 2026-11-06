@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c2/c2dba0453704f4e9f6bc",
+ "request_hash": "c2dba0453704f4e9f6bc1014d1bbe0385640242e196fa7ae6a20820b8b1e7a36",
+ "recorded_at": "2026-11-06T14:40:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3158,
+ "response_headers": {
+  "x-clocked-credits": "16",
+  "x-clocked-model-ms": "379.060627",
+  "x-clocked-cost-usd": "0.003187",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=546"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#159",
+    "text": "### SendStatus\n\nSets the status code and the correct status message in the body if the response body is **empty**. A streamed body counts as a body and is left unread.\n\nA status that cannot carry a body (`1xx`, `204`, `205` and `304`) empties the response body instead, and drops a `Content-Length` header the handler had set. [RFC 9110 Section 8.6](https://www.rfc-editor.org/rfc/rfc9110#section-8.6) requires that for `1xx` and `204`; Fiber also does it for `205` and `304`. A `205` still goes out with `Content-Length: 0`: it has no content ([Section 15.3.6](https://www.rfc-editor.org/rfc/rfc9110#section-15.3.6)), but unlike `1xx`, `204` and `304` it still has to be framed ([RFC 9112 Section 6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)).\n\n:::tip\nYou can find all used status codes and messages [in the Fiber source code](https://github.com/gofiber/fiber/blob/dffab20bcdf4f3597d2c74633a7705a517d2c8c2/utils.go#L183-L244).\n:::\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) SendStatus(status int) error\nfunc (r fiber.Res) SendStatus(status int) error\n```\n\n```go title=\"Example\"\napp.Get(\"/not-found\", func(c fiber.Ctx) error {\n  return c.SendStatus(415)\n  // => 415 \"Unsupported Media Type\"\n\n  c.SendString(\"Hello, World!\")\n  return c.SendStatus(415)\n  // => 415 \"Hello, World!\"\n})\n```"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#47",
+    "text": "- **SendStatus()**: For a status that cannot carry a body — `1xx`, `204`, `205` and `304` — the response body and\n  any `Content-Length` already set are now dropped.\n  [RFC 9110, Section 8.6](https://www.rfc-editor.org/rfc/rfc9110#section-8.6) requires that for `1xx` and `204`;\n  Fiber also does it for `205` and `304`. `c.Set(fiber.HeaderContentLength, \"42\")`\n  followed by `c.SendStatus(204)` previously put `Content-Length: 42` on the wire, along with a `Content-Type`\n  fasthttp emits for a declared length; neither line is sent now. `205 Reset Content` still sends\n  `Content-Length: 0`: it has no content ([Section 15.3.6](https://www.rfc-editor.org/rfc/rfc9110#section-15.3.6)),\n  but unlike `1xx`, `204` and `304` it still has to be framed\n  ([RFC 9112, Section 6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)).\n  Unlike the two above, this applies under the default configuration. A streamed body counts as a body, so\n  `SendStatus` leaves it unread instead of reading it into memory to check its length.\n- **Body()**: A `Content-Encoding` that cannot be undone sets `415`, `501` or `413` only while the response has no\n  body yet. A middleware that reads `c.Body()` after `c.Next()`, such as the logger's `${body}` tag, no longer\n  replaces the status the handler sent.\n- **AcceptsEncodings()**: Follows [RFC 9110, Section 12.5.3](https://www.rfc-editor.org/rfc/rfc9110#section-12.5.3).\n  `identity`, the absence of a coding, is now acceptable when the `Accept-Encoding` header does not list it, unless\n  the header excludes it with `identity;q=0` or `*;q=0`: `c.AcceptsEncodings(\"br\", \"identity\")` answers `\"identity\"`\n  for `Accept-Encoding: gzip`, where it answered `\"\"`. An unlisted `identity` ranks below every coding the header does\n  list. A header that is present but empty now accepts only `identity`; it used to read as absent, which accepts the\n  first offer.\n- **Status()**: A code outside `100` to `999` cannot be written as a status line\n  ([RFC 9112, Section 4](https://www.rfc-editor.org/rfc/rfc9112#section-4)). `c.Status(99)` and `c.Status(1000)` used to\n  put a malformed line on the wire that clients refuse, and `c.Status(0)` or a negative code put `200 OK` there. They\n  now answer `500 Internal Server Error` and log the code. `SendStatus`, `Redirect().Status` and an error built with\n  `fiber.NewError` go through `Status`, so they follow. Codes from `600` to `999` are still sent as given.\n- **Cookie()**: A value with a space or a comma is now written in double quotes, as `net/http` does, because neither is\n  a `cookie-octet` ([RFC 6265, Section 4.1.1](https://www.rfc-editor.org/rfc/rfc6265#section-4.1.1)).\n  `c.Cookie(&fiber.Cookie{Name: \"n\", Value: \"hello world\"})` used to send `n=hello world` and sends `n=\"hello world\"`\n  now; the quotes frame the value, and `Cookies` and `GetCookie` return `hello world`. A value that already starts and\n  ends with a double quote is accepted and written quoted instead of being dropped as invalid. Values with a semicolon,\n  an inner double quote, a backslash, a control character or a non-ASCII character are still refused. Percent-encode a\n  value that has to pass through a strict parser.\n- **SendFile() and the static middleware, with `ByteRange`**: The file server answered one byte range and nothing\n  else. Fiber now applies the rest of [RFC 9110, Section 13.1.5 and Section 14.2](https://www.rfc-editor.org/rfc/rfc9110#section-14.2)\n  around it. A request for several ranges used to get `416`; it gets the whole file, as does one with a range unit the"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#159",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#47"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#47",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/ctx.md#159"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#159",
+    "b": "fiber:docs/whats_new.md#47",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0058,
+     "overlapping": 0.988,
+     "conflicting": 0.0042,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.006,
+       "restated": 0.9825,
+       "elaborated": 0.0077,
+       "different": 0.0038
+      },
+      "confidence": 0.9962,
+      "a": {
+       "document": "fiber:docs/api/ctx.md#159",
+       "quote": "A status that cannot carry a body (`1xx`, `204`, `205` and `304`) empties the response body instead, and drops a `Content-Length` header the handler had set.",
+       "start": 169,
+       "end": 326,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#47",
+       "quote": "- **SendStatus()**: For a status that cannot carry a body — `1xx`, `204`, `205` and `304` — the response body and\n  any `Content-Length` already set are now dropped.\n  [RFC 9110, Section 8.6](https://www.rfc-editor.org/rfc/rfc9110#section-8.6) requires that for `1xx` and `204`;\n  Fiber also does it for `205` and `304`.",
+       "start": 0,
+       "end": 320,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0259,
+       "restated": 0.6523,
+       "elaborated": 0.0563,
+       "different": 0.2655
+      },
+      "confidence": 0.568,
+      "a": {
+       "document": "fiber:docs/api/ctx.md#159",
+       "quote": "A status that cannot carry a body (`1xx`, `204`, `205` and `304`) empties the response body instead, and drops a `Content-Length` header the handler had set.",
+       "start": 169,
+       "end": 326,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#47",
+       "quote": "`c.Set(fiber.HeaderContentLength, \"42\")`\n  followed by `c.SendStatus(204)` previously put `Content-Length: 42` on the wire, along with a `Content-Type`\n  fasthttp emits for a declared length; neither line is sent now.",
+       "start": 321,
+       "end": 538,
+       "confidence": 0.568
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0175,
+       "restated": 0.9585,
+       "elaborated": 0.0157,
+       "different": 0.0083
+      },
+      "confidence": 0.9917,
+      "a": {
+       "document": "fiber:docs/api/ctx.md#159",
+       "quote": "A `205` still goes out with `Content-Length: 0`: it has no content ([Section 15.3.6](https://www.rfc-editor.org/rfc/rfc9110#section-15.3.6)), but unlike `1xx`, `204` and `304` it still has to be framed ([RFC 9112 Section 6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)).",
+       "start": 477,
+       "end": 756,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#47",
+       "quote": "`205 Reset Content` still sends\n  `Content-Length: 0`: it has no content ([Section 15.3.6](https://www.rfc-editor.org/rfc/rfc9110#section-15.3.6)),\n  but unlike `1xx`, `204` and `304` it still has to be framed\n  ([RFC 9112, Section 6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)).\n  Unlike the two above, this applies under the default configuration.",
+       "start": 539,
+       "end": 899,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 42,
+   "passage_reads": 1,
+   "passages_ms": 177,
+   "passages": 4,
+   "counterparts_ms": 172
+  },
+  "timing": {
+   "read_ms": 390,
+   "total_ms": 395
+  }
+ }
+}

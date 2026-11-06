@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/fd/fdfa93faa689f4089798",
+ "request_hash": "fdfa93faa689f40897984c37af02805120cacf3baa54402cef3bb17816159eaf",
+ "recorded_at": "2026-11-06T14:37:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1055,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "155.39299",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=353"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#19",
+    "text": "```js twoslash\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nfunction plugin1() {\n\treturn {\n\t\tname: 'plugin1',\n\t\tbuildStart() {\n\t\t\tthis.info({ message: 'Hey', pluginCode: 'SPECIAL_CODE' });\n\t\t},\n\t\tonLog(level, log) {\n\t\t\tif (log.plugin === 'plugin1' && log.pluginCode === 'SPECIAL_CODE') {\n\t\t\t\t// We turn logs into warnings based on their code. This warnings\n\t\t\t\t// will not be passed back to the same plugin to avoid an\n\t\t\t\t// infinite loop, but other plugins will still receive it.\n\t\t\t\tthis.warn(log);\n\t\t\t\treturn false;\n\t\t\t}\n\t\t}\n\t};\n}\n\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nfunction plugin2() {\n\treturn {\n\t\tname: 'plugin2',\n\t\tonLog(level, log) {\n\t\t\tif (log.plugin === 'plugin1' && log.pluginCode === 'SPECIAL_CODE') {\n\t\t\t\t// You can modify logs in this hooks as well\n\t\t\t\tlog.meta = 'processed by plugin 2';\n\t\t\t\t// This turns the log back to \"info\". If this happens in\n\t\t\t\t// response to the first plugin, it will not be passed back to\n\t\t\t\t// either plugin to avoid an infinite loop. If both plugins are\n\t\t\t\t// active, the log will be an info log if the second plugin is\n\t\t\t\t// placed after the first one\n\t\t\t\tthis.info(log);\n\t\t\t\treturn false;\n\t\t\t}\n\t\t}\n\t};\n}\n```\n\nLike the [`options`](#options) hook, this hook does not have access to most [plugin context](#plugin-context) utility functions as it may be run before Rollup is fully configured. The only supported properties are [`this.meta`](#this-meta) as well as [`this.error`](#this-error), [`this.warn`](#this-warn), [`this.info`](#this-info) and [`this.debug`](#this-debug) for logging and errors."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#20",
+    "text": "### options\n\n|           |                                                   |\n| --------: | :------------------------------------------------ |\n|     Type: | `(options: InputOptions) => InputOptions \\| null` |\n|     Kind: | async, sequential                                 |\n| Previous: | This is the first hook of the build phase         |\n|     Next: | [`buildStart`](#buildstart)                       |\n\nReplaces or manipulates the options object passed to `rollup.rollup`. Returning `null` does not replace anything. If you just need to read the options, it is recommended to use the [`buildStart`](#buildstart) hook as that hook has access to the options after the transformations from all `options` hooks have been taken into account.\n\nLike the [`onLog`](#onlog) hook, this hook does not have access to most [plugin context](#plugin-context) utility functions as it is run before Rollup is fully configured. The only supported properties are [`this.meta`](#this-meta) as well as [`this.error`](#this-error), [`this.warn`](#this-warn), [`this.info`](#this-info) and [`this.debug`](#this-debug) for logging and errors."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#19",
+    "duplicates": [],
+    "overlaps": [
+     "rollup:docs/plugin-development/index.md#20"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#20",
+    "duplicates": [],
+    "overlaps": [
+     "rollup:docs/plugin-development/index.md#19"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/plugin-development/index.md#19",
+    "b": "rollup:docs/plugin-development/index.md#20",
+    "relation": "overlapping",
+    "related": 0.9905,
+    "probabilities": {
+     "same": 0.0143,
+     "overlapping": 0.9668,
+     "conflicting": 0.0094,
+     "unrelated": 0.0095
+    },
+    "duplicates": [
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.1068,
+       "restated": 0.7896,
+       "elaborated": 0.0606,
+       "different": 0.043
+      },
+      "confidence": 0.957,
+      "a": {
+       "document": "rollup:docs/plugin-development/index.md#19",
+       "quote": "The only supported properties are [`this.meta`](#this-meta) as well as [`this.error`](#this-error), [`this.warn`](#this-warn), [`this.info`](#this-info) and [`this.debug`](#this-debug) for logging and errors.",
+       "start": 1415,
+       "end": 1623,
+       "confidence": 1
+      },
+      "b": {
+       "document": "rollup:docs/plugin-development/index.md#20",
+       "quote": "The only supported properties are [`this.meta`](#this-meta) as well as [`this.error`](#this-error), [`this.warn`](#this-warn), [`this.info`](#this-info) and [`this.debug`](#this-debug) for logging and errors.",
+       "start": 917,
+       "end": 1125,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 55,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 1,
+   "counterparts_ms": 63
+  },
+  "timing": {
+   "read_ms": 199,
+   "total_ms": 202
+  }
+ }
+}

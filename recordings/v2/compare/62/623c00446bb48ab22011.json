@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/62/623c00446bb48ab22011",
+ "request_hash": "623c00446bb48ab220113598fa98025902bf5e11102fd118dd7d3bc55ffe0898",
+ "recorded_at": "2026-11-06T14:43:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1059,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "157.94813",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=340"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/atlas-search.md#11",
+    "text": "## Hybrid Search\n\nCombine text search and vector search to leverage both keyword relevance and semantic similarity.\n\nUse `$rankFusion` to run `$vectorSearch` and `$search` as separate subpipelines and merge their results using [Reciprocal Rank Fusion (RRF)](https://www.mongodb.com/docs/vector-search/hybrid-search/hybrid-search/). Note that `$search` must be the first stage in its subpipeline, which is why it cannot be used directly after `$vectorSearch` in the same pipeline.\n\n*This example uses the `generateEmbedding()` function from the [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html#using-third-party-embedding-models) guide.*\n\n```javascript\n// See the Vector Search guide for details on generating embeddings\nconst queryEmbedding = await generateEmbedding('charming animals with adventurous tone');\n\nconst results = await Movie.aggregate([\n  {\n    $rankFusion: {\n      input: {\n        pipelines: {\n          // Semantic search subpipeline\n          vector: [\n            {\n              $vectorSearch: {\n                index: 'vector_index',  // Name of your vector search index\n                path: 'plot_embedding_voyage_3_large',  // Name of the field containing the embeddings\n                queryVector: queryEmbedding,\n                numCandidates: 100,\n                limit: 50\n              }\n            }\n          ],\n          // Keyword search subpipeline\n          text: [\n            {\n              $search: {\n                index: 'movie_search',\n                text: { query: 'adventure animals', path: 'fullplot' }\n              }\n            },\n            { $limit: 50 }\n          ]\n        }\n      },\n      combination: {\n        weights: {\n          vector: 0.7,  // 70% weight to semantic relevance\n          text: 0.3     // 30% weight to keyword relevance\n        }\n      }\n    }\n  },\n  { $limit: 10 }\n]);\n```\n\nFor more details, see the [Atlas Hybrid Search documentation](https://www.mongodb.com/docs/vector-search/hybrid-search/hybrid-search/)."
+   },
+   {
+    "id": "mongoose:docs/atlas-vector-search.md#9",
+    "text": "## Querying with $vectorSearch\n\nOnce your vector search index is created, and your embeddings are generated, you can perform vector similarity searches using the `$vectorSearch` aggregation stage.\n\n```javascript\n// Your query embedding (if not using Automated Embeddings)\nconst queryEmbedding = await generateEmbedding('space adventure about friendship');\n\n// Perform vector search\nconst results = await Movie.aggregate([\n  {\n    $vectorSearch: {\n      index: 'vector_index',     // Name of your vector search index\n      path: 'plot_embedding_voyage_3_large',     // Field containing the vectors\n      queryVector: queryEmbedding, // Your query as an array of numbers (not binData when searching)\n      numCandidates: 100,         // Number of candidates to consider (should be >= limit)\n      limit: 10                   // Number of results to return\n    }\n  },\n  {\n    $project: {\n      title: 1,\n      plot: 1,\n      score: { $meta: 'vectorSearchScore' }  // Include similarity score\n    }\n  }\n]);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/atlas-search.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/atlas-vector-search.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/atlas-search.md#11",
+    "b": "mongoose:docs/atlas-vector-search.md#9",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0066,
+     "overlapping": 0.9864,
+     "conflicting": 0.0043,
+     "unrelated": 0.0027
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 73,
+   "passage_reads": 1,
+   "passages_ms": 63,
+   "passages": 1,
+   "counterparts_ms": 71
+  },
+  "timing": {
+   "read_ms": 207,
+   "total_ms": 210
+  }
+ }
+}

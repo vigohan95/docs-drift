@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/84/84887355efc5cbed800a",
+ "request_hash": "84887355efc5cbed800af0256973da64b9c77e3c8dc86dd553b27a607c520104",
+ "recorded_at": "2026-11-06T14:38:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2163,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "168.802721",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=298"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/03-$derived.md#2",
+    "text": "## Understanding dependencies\n\nAnything read synchronously inside the `$derived` expression (or `$derived.by` function body) is considered a _dependency_ of the derived state. When the state changes, the derived will be marked as _dirty_ and recalculated when it is next read.\n\nIn addition, if an expression contains an [`await`](await-expressions), Svelte transforms it such that any state _after_ the `await` is also tracked — in other words, in a case like this...\n\n```js\nlet a = Promise.resolve(1);\nlet b = 2;\n// ---cut---\nlet total = $derived(await a + b);\n```\n\n...both `a` and `b` are tracked, even though `b` is only read once `a` has resolved, after the initial execution. (This does not apply to `await` in functions that are called by the expression, only the expression itself.)\n\nTo exempt a piece of state from being treated as a dependency, use [`untrack`](svelte#untrack)."
+   },
+   {
+    "id": "svelte:documentation/docs/98-reference/.generated/client-warnings.md#2",
+    "text": "### await_reactivity_loss\n\n```\nDetected reactivity loss when reading `%name%`. This happens when state is read in an async function after an earlier `await`\n```\n\nSvelte's signal-based reactivity works by tracking which bits of state are read when a template or `$derived(...)` expression executes. If an expression contains an `await`, Svelte transforms it such that any state _after_ the `await` is also tracked — in other words, in a case like this...\n\n```js\nlet a = Promise.resolve(1);\nlet b = 2;\n// ---cut---\nlet total = $derived(await a + b);\n```\n\n...both `a` and `b` are tracked, even though `b` is only read once `a` has resolved, after the initial execution.\n\nThis does _not_ apply to an `await` that is not 'visible' inside the expression. In a case like this...\n\n```js\nlet a = Promise.resolve(1);\nlet b = 2;\n// ---cut---\nasync function sum() {\n\treturn await a + b;\n}\n\nlet total = $derived(await sum());\n```\n\n...`total` will depend on `a` (which is read immediately) but not `b` (which is not). The solution is to pass the values into the function:\n\n```js\nlet a = Promise.resolve(1);\nlet b = 2;\n// ---cut---\n/**\n * @param {Promise<number>} a\n * @param {number} b\n */\nasync function sum(a, b) {\n\treturn await a + b;\n}\n\nlet total = $derived(await sum(a, b));\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/03-$derived.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "svelte:documentation/docs/98-reference/.generated/client-warnings.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/98-reference/.generated/client-warnings.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "svelte:documentation/docs/02-runes/03-$derived.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/02-runes/03-$derived.md#2",
+    "b": "svelte:documentation/docs/98-reference/.generated/client-warnings.md#2",
+    "relation": "overlapping",
+    "related": 0.9981,
+    "probabilities": {
+     "same": 0.008,
+     "overlapping": 0.9868,
+     "conflicting": 0.0034,
+     "unrelated": 0.0019
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0153,
+       "restated": 0.8855,
+       "elaborated": 0.0574,
+       "different": 0.0418
+      },
+      "confidence": 0.635,
+      "a": {
+       "document": "svelte:documentation/docs/02-runes/03-$derived.md#2",
+       "quote": "In addition, if an expression contains an [`await`](await-expressions), Svelte transforms it such that any state _after_ the `await` is also tracked — in other words, in a case like this...",
+       "start": 278,
+       "end": 467,
+       "confidence": 1
+      },
+      "b": {
+       "document": "svelte:documentation/docs/98-reference/.generated/client-warnings.md#2",
+       "quote": "This happens when state is read in an async function after an earlier `await`\n```\n\nSvelte's signal-based reactivity works by tracking which bits of state are read when a template or `$derived(...)",
+       "start": 79,
+       "end": 275,
+       "confidence": 0.635
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0238,
+       "restated": 0.5003,
+       "elaborated": 0.414,
+       "different": 0.0619
+      },
+      "confidence": 0.9381,
+      "a": {
+       "document": "svelte:documentation/docs/02-runes/03-$derived.md#2",
+       "quote": "In addition, if an expression contains an [`await`](await-expressions), Svelte transforms it such that any state _after_ the `await` is also tracked — in other words, in a case like this...",
+       "start": 278,
+       "end": 467,
+       "confidence": 1
+      },
+      "b": {
+       "document": "svelte:documentation/docs/98-reference/.generated/client-warnings.md#2",
+       "quote": "If an expression contains an `await`, Svelte transforms it such that any state _after_ the `await` is also tracked — in other words, in a case like this...\n\n```js\nlet a = Promise.resolve(1);\nlet b = 2;\n// ---cut---\nlet total = $derived(await a + b);\n```\n\n...both `a` and `b` are tracked, even though `b` is only read once `a` has resolved, after the initial execution.\n\nThis does _not_ apply to an `await` that is not 'visible' inside the expression.",
+       "start": 298,
+       "end": 748,
+       "confidence": 0.982
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 2,
+   "counterparts_ms": 70
+  },
+  "timing": {
+   "read_ms": 184,
+   "total_ms": 186
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bd/bd7be39af06f799674c3",
+ "request_hash": "bd7be39af06f799674c3c7a8de54612e17d1c59b41e52e6c04841b5370eeebff",
+ "recorded_at": "2026-11-06T14:42:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2083,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.186722",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=168,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#6",
+    "text": "### Changes to `pydantic.BaseModel`\n\nVarious method names have been changed; all non-deprecated `BaseModel` methods now have names matching either the\nformat `model_.*` or `__.*pydantic.*__`. Where possible, we have retained the deprecated methods with their old names\nto help ease migration, but calling them will emit `DeprecationWarning`s.\n\n| Pydantic V1 | Pydantic V2  |\n| ----------- | ------------ |\n| `__fields__` | `model_fields` |\n| `__private_attributes__` | `__pydantic_private__` |\n| `__validators__` | `__pydantic_validator__` |\n| `construct()` | `model_construct()` |\n| `copy()` | `model_copy()` |\n| `dict()` | `model_dump()` |\n| `json_schema()` | `model_json_schema()` |\n| `json()` | `model_dump_json()` |\n| `parse_obj()` | `model_validate()` |\n| `update_forward_refs()` | `model_rebuild()` |\n\n* Some of the built-in data-loading functionality has been slated for removal. In particular,\n    `parse_raw` and `parse_file` are now deprecated. In Pydantic V2, `model_validate_json` works like `parse_raw`. Otherwise, you should load the data and then pass it to `model_validate`.\n* The `from_orm` method has been deprecated; you can now just use `model_validate` (equivalent to `parse_obj` from\n  Pydantic V1) to achieve something similar, as long as you've set `from_attributes=True` in the model config.\n* The `__eq__` method has changed for models.\n    * Models can only be equal to other `BaseModel` instances.\n    * For two model instances to be equal, they must have the same:\n        * Type (or, in the case of generic models, non-parametrized generic origin type)\n        * Field values\n        * Extra values (only relevant when `model_config['extra'] == 'allow'`)\n        * Private attribute values; models with different values of private attributes are no longer equal.\n        * Models are no longer equal to the dicts containing their data.\n        * Non-generic models of different types are never equal.\n        * Generic models with different origin types are never equal. We don't require *exact* type equality so that,\n            for example, instances of `MyGenericModel[Any]` could be equal to instances of `MyGenericModel[int]`.\n* We have replaced the use of the `__root__` field to specify a \"custom root model\" with a new type called\n    [`RootModel`](concepts/models.md#rootmodel-and-custom-root-types) which is intended to replace the functionality of\n    using a field called `__root__` in Pydantic V1. Note, `RootModel` types no longer support the `arbitrary_types_allowed`\n    config setting. See [this issue comment](https://github.com/pydantic/pydantic/issues/6710#issuecomment-1700948167) for an explanation.\n* We have significantly expanded Pydantic's capabilities related to customizing serialization. In particular, we have\n    added the [`@field_serializer`](api/functional_serializers.md#pydantic.functional_serializers.field_serializer),\n    [`@model_serializer`](api/functional_serializers.md#pydantic.functional_serializers.model_serializer), and\n    [`@computed_field`](api/fields.md#pydantic.fields.computed_field) decorators, which each address various\n    shortcomings from Pydantic V1.\n    * See [Custom serializers](concepts/serialization.md#serializers) for the usage docs of these new decorators.\n    * Due to performance overhead and implementation complexity, we have now deprecated support for specifying\n        `json_encoders` in the model config. This functionality was originally added for the purpose of achieving custom\n        serialization logic, and we think the new serialization decorators are a better choice in most common scenarios."
+   },
+   {
+    "id": "pydantic:docs/concepts/fields.md#16",
+    "text": "## Discriminator\n\nThe parameter `discriminator` can be used to control the field that will be used to discriminate between different\nmodels in a union. It takes either the name of a field or a `Discriminator` instance. The `Discriminator`\napproach can be useful when the discriminator fields aren't the same for all the models in the union.\n\nThe following example shows how to use `discriminator` with a field name:\n\n```python\nfrom typing import Literal\n\nfrom pydantic import BaseModel, Field\n\n\nclass Cat(BaseModel):\n    pet_type: Literal['cat']\n    age: int\n\n\nclass Dog(BaseModel):\n    pet_type: Literal['dog']\n    age: int\n\n\nclass Model(BaseModel):\n    pet: Cat | Dog = Field(discriminator='pet_type')\n\n\nprint(Model.model_validate({'pet': {'pet_type': 'cat', 'age': 12}}))  # (1)!\n#> pet=Cat(pet_type='cat', age=12)\n```\n\n1. See more about `model_validate()` in the [Validating data](./models.md#validating-data) documentation.\n\nThe following example shows how to use the `discriminator` keyword argument with a `Discriminator` instance:\n\n```python\nfrom typing import Annotated, Literal\n\nfrom pydantic import BaseModel, Discriminator, Field, Tag\n\n\nclass Cat(BaseModel):\n    pet_type: Literal['cat']\n    age: int\n\n\nclass Dog(BaseModel):\n    pet_kind: Literal['dog']\n    age: int\n\n\ndef pet_discriminator(v):\n    if isinstance(v, dict):\n        return v.get('pet_type', v.get('pet_kind'))\n    return getattr(v, 'pet_type', getattr(v, 'pet_kind', None))\n\n\nclass Model(BaseModel):\n    pet: Annotated[Cat, Tag('cat')] | Annotated[Dog, Tag('dog')] = Field(\n        discriminator=Discriminator(pet_discriminator)\n    )\n\n\nprint(repr(Model.model_validate({'pet': {'pet_type': 'cat', 'age': 12}})))\n#> Model(pet=Cat(pet_type='cat', age=12))\n\nprint(repr(Model.model_validate({'pet': {'pet_kind': 'dog', 'age': 12}})))\n#> Model(pet=Dog(pet_kind='dog', age=12))\n```\n\nYou can also take advantage of `Annotated` to define your discriminated unions.\nSee the [Discriminated Unions](./unions.md#discriminated-unions) documentation for more details."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/fields.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#6",
+    "b": "pydantic:docs/concepts/fields.md#16",
+    "relation": "unrelated",
+    "related": 0.0074,
+    "probabilities": {
+     "same": 0.003,
+     "overlapping": 0.0021,
+     "conflicting": 0.0023,
+     "unrelated": 0.9926
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 41
+  },
+  "timing": {
+   "read_ms": 41,
+   "total_ms": 44
+  }
+ }
+}

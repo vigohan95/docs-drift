@@ -1,0 +1,278 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/26/26877ff4b80257d34e44",
+ "request_hash": "26877ff4b80257d34e445b6df5cfe61d113e5f68cd8ac3be3ff702240b26277c",
+ "recorded_at": "2026-11-06T14:38:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3078,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "118.495331",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=165,cfOrigin;dur=0,cfWorker;dur=414"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) If you supply a function, `chunk` contains additional information about the chunk using a `RenderedChunk` type that is a reduced version of the `OutputChunk` type used in [`generateBundle`](../plugin-development/index.md#generatebundle) hook with the following differences: (2) If you change code in this hook and want to support source maps, you need to return a `map` describing your changes, see [the section on source code transformations](#source-code-transformations). `chunk` contains additional information about the chunk using the same `OutputChunk` type as the [`generateBundle`](#generatebundle) hook with the following differences:",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#37",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Output Generation Hooks > augmentChunkHash",
+    "text": "### augmentChunkHash\n\n|  |  |\n| --: | :-- |\n| Type: | `(chunkInfo: RenderedChunk) => string` |\n| Kind: | sync, sequential |\n| Previous: | [`renderChunk`](#renderchunk) |\n| Next: | [`renderChunk`](#renderchunk) if there are other chunks that still need to be processed, otherwise [`generateBundle`](#generatebundle) |\n\nSee the [`renderChunk`](../plugin-development/index.md#renderchunk) hook for the `RenderedChunk` type.\n\nCan be used to augment the hash of individual chunks. Called for each Rollup output chunk. Returning a falsy value will not modify the hash. Truthy values will be passed to [`hash.update`](https://nodejs.org/dist/latest-v12.x/docs/api/crypto.html#crypto_hash_update_data_inputencoding). The `RenderedChunk` type is a reduced version of the `OutputChunk` type in [`generateBundle`](#generatebundle) without `code` and `map` and using placeholders for hashes in file names.\n\nThe following plugin will invalidate the hash of chunk `foo` with the current timestamp:\n\n```js twoslash\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nfunction augmentWithDatePlugin() {\n\treturn {\n\t\tname: 'augment-with-date',\n\t\taugmentChunkHash(chunkInfo) {\n\t\t\tif (chunkInfo.name === 'foo') {\n\t\t\t\treturn Date.now().toString();\n\t\t\t}\n\t\t}\n\t};\n}\n```"
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#31",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Advanced functionality > output.chunkFileNames",
+    "text": "The pattern to use for naming shared chunks created when code-splitting, or a function that is called per chunk to return such a pattern. Patterns support the following placeholders:\n\n- `[format]`: The rendering format defined in the output options, e.g. `es` or `cjs`.\n- `[hash]`: A hash based only on the content of the final generated chunk, including transformations in [`renderChunk`](../plugin-development/index.md#renderchunk) and any referenced file hashes. You can also set a specific hash length via e.g. `[hash:10]`. By default, it will create a base-64 hash. If you need a reduced character sets, see [`output.hashCharacters`](#output-hashcharacters)\n- `[name]`: The name of the chunk. This can be explicitly set via the [`output.manualChunks`](#output-manualchunks) option or when the chunk is created by a plugin via [`this.emitFile`](../plugin-development/index.md#this-emitfile). Otherwise, it will be derived from the chunk contents.\n\nForward slashes `/` can be used to place files in sub-directories. When using a function, `PreRenderedChunk` is a reduced version of the `OutputChunk` type in [`generateBundle`](../plugin-development/index.md#generatebundle) without properties that depend on file names and no information about the rendered modules as rendering only happens after file names have been generated. You can however access a list of included `moduleIds`. See also [`output.assetFileNames`](#output-assetfilenames), [`output.entryFileNames`](#output-entryfilenames)."
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#34",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Advanced functionality > output.entryFileNames",
+    "text": "### output.entryFileNames\n\n|          |                                                       |\n| -------: | :---------------------------------------------------- |\n|    Type: | `string \\| ((chunkInfo: PreRenderedChunk) => string)` |\n|     CLI: | `--entryFileNames <pattern>`                          |\n| Default: | `\"[name].js\"`                                         |\n\nSee [`output.chunkFileNames`](#output-chunkfilenames) for the `PreRenderedChunk` type.\n\nThe pattern to use for chunks created from entry points, or a function that is called per entry chunk to return such a pattern. Patterns support the following placeholders:\n\n- `[format]`: The rendering format defined in the output options, e.g. `es` or `cjs`.\n- `[hash]`: A hash based only on the content of the final generated entry chunk, including transformations in [`renderChunk`](../plugin-development/index.md#renderchunk) and any referenced file hashes. You can also set a specific hash length via e.g. `[hash:10]`. By default, it will create a base-64 hash. If you need a reduced character sets, see [`output.hashCharacters`](#output-hashcharacters)\n- `[name]`: The file name (without extension) of the entry point, unless the object form of input was used to define a different name.\n\nForward slashes `/` can be used to place files in sub-directories. When using a function, `PreRenderedChunk` is a reduced version of the `OutputChunk` type in [`generateBundle`](../plugin-development/index.md#generatebundle) without properties that depend on file names and no information about the rendered modules as rendering only happens after file names have been generated. You can however access a list of included `moduleIds`. See also [`output.assetFileNames`](#output-assetfilenames), [`output.chunkFileNames`](#output-chunkfilenames).\n\nThis pattern will also be used for every file when setting the [`output.preserveModules`](#output-preservemodules) option. Note that in this case, `[name]` will include the relative path from the output root and possibly the original file extension if it was not one of `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts`, or `.cts`."
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#68",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Advanced functionality > output.sourcemapFileNames",
+    "text": "### output.sourcemapFileNames\n\n|       |                                                       |\n| ----: | :---------------------------------------------------- |\n| Type: | `string \\| ((chunkInfo: PreRenderedChunk) => string)` |\n|  CLI: | `--sourcemapFileNames <pattern>`                      |\n\nSee [`output.chunkFileNames`](#output-chunkfilenames) for the `PreRenderedChunk` type.\n\nThe pattern to use for sourcemaps, or a function that is called per sourcemap to return such a pattern. Patterns support the following placeholders:\n\n- `[format]`: The rendering format defined in the output options, e.g. `es` or `cjs`.\n- `[hash]`: A hash based only on the content of the final generated sourcemap. You can also set a specific hash length via e.g. `[hash:10]`. By default, it will create a base-64 hash. If you need a reduced character sets, see [`output.hashCharacters`](#output-hashcharacters)\n- `[chunkhash]`: The same hash as the one used for the corresponding generated chunk (if any).\n- `[name]`: The file name (without extension) of the entry point, unless the object form of input was used to define a different name.\n\nForward slashes `/` can be used to place files in sub-directories. When using a function, `chunkInfo` is a reduced version of the one in [`generateBundle`](../plugin-development/index.md#generatebundle) without properties that depend on file names and no information about the rendered modules as rendering only happens after file names have been generated. You can however access a list of included `moduleIds`. See also [`output.assetFileNames`](#output-assetfilenames), [`output.chunkFileNames`](#output-chunkfilenames)."
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#28",
+    "title": "docs/configuration-options/index.md > {{ $frontmatter.title }} > Advanced functionality > output.assetFileNames",
+    "text": "### output.assetFileNames\n\n|          |                                                       |\n| -------: | :---------------------------------------------------- |\n|    Type: | `string \\| ((assetInfo: PreRenderedAsset) => string)` |\n|     CLI: | `--assetFileNames <pattern>`                          |\n| Default: | `\"assets/[name]-[hash][extname]\"`                     |\n\n```typescript\ninterface PreRenderedAsset {\n\tnames: string[];\n\toriginalFileNames: string[];\n\tsource: string | Uint8Array;\n\ttype: 'asset';\n}\n```\n\nThe pattern to use for naming custom emitted assets to include in the build output, or a function that is called per asset to return such a pattern. Patterns support the following placeholders:\n\n- `[extname]`: The file extension of the asset including a leading dot, e.g. `.css`.\n- `[ext]`: The file extension without a leading dot, e.g. `css`.\n- `[hash]`: A hash based on the content of the asset. You can also set a specific hash length via e.g. `[hash:10]`. By default, it will create a base-64 hash. If you need a reduced character sets, see [`output.hashCharacters`](#output-hashcharacters)\n- `[name]`: The file name of the asset excluding any extension.\n\nForward slashes `/` can be used to place files in sub-directories. When using a function, `PreRenderedAsset` is a reduced version of the `OutputAsset` type in [`generateBundle`](../plugin-development/index.md#generatebundle) without the `fileName`. See also [`output.chunkFileNames`](#output-chunkfilenames), [`output.entryFileNames`](#output-entryfilenames)."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#47",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Output Generation Hooks > renderChunk",
+    "text": "- `code` and `map` are not set. Instead, use the `code` parameter of this hook.\n- all referenced chunk file names that would contain hashes will contain hash placeholders instead. This includes `fileName`, `imports`, `importedBindings`, `dynamicImports` and `implicitlyLoadedBefore`. When you use such a placeholder file name or part of it in the code returned from this hook, Rollup will replace the placeholder with the actual hash before `generateBundle`, making sure the hash reflects the actual content of the final generated chunk including all referenced file hashes.\n\n`chunk` is mutable and changes applied in this hook will propagate to other plugins and to the generated bundle. That means if you add or remove imports or exports in this hook, you should update `imports`, `importedBindings` and/or `exports`.\n\n`meta.chunks` contains information about all the chunks Rollup is generating and gives you access to their `RenderedChunk` information, again using placeholders for hashes. That means you can explore the entire chunk graph in this hook."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#14",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Build Hooks > load",
+    "text": "### load\n\n|  |  |\n| --: | :-- |\n| Type: | `(id: string, options: Options) => LoadResult` |\n| Kind: | async, first |\n| Previous: | [`resolveId`](#resolveid) or [`resolveDynamicImport`](#resolvedynamicimport) where the loaded id was resolved. Additionally, this hook can be triggered at any time from plugin hooks by calling [`this.load`](#this-load) to preload the module corresponding to an id |\n| Next: | [`transform`](#transform) to transform the loaded file if no cache was used, or there was no cached copy with the same `code`, otherwise [`shouldTransformCachedModule`](#shouldtransformcachedmodule) |\n\n```typescript\ntype Options = {\n\tattributes: Record<string, string>;\n};\n\ntype LoadResult = string | null | SourceDescription;\n\ninterface SourceDescription {\n\tcode: string;\n\tmap?: string | SourceMap;\n\tast?: ESTree.Program;\n\tmeta?: { [plugin: string]: any } | null;\n\tmoduleSideEffects?: boolean | 'no-treeshake' | null;\n\tsyntheticNamedExports?: boolean | string | null;\n}\n```\n\nDefines a custom loader. `options.attributes` contain the import attributes that were used when this module was imported, which is determined by the first `resolveId` hook that resolved this module or the attributes present in the first import. Returning `null` defers to other `load` functions (and eventually the default behavior of loading from the file system). To prevent additional parsing overhead in case e.g. this hook already used [`this.parse`](#this-parse) to generate an AST for some reason, this hook can optionally return a `{ code, ast, map }` object. The `ast` must be a standard ESTree AST with `start` and `end` properties for each node. If the transformation does not move code, you can preserve existing sourcemaps by setting `map` to `null`. Otherwise, you might need to generate the source map. See the section on [source code transformations](#source-code-transformations)."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#30",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Build Hooks > transform",
+    "text": "### transform\n\n|  |  |\n| --: | :-- |\n| Type: | `(code: string, id: string, options: Options) => TransformResult` |\n| Kind: | async, sequential |\n| Previous: | [`load`](#load) where the currently handled file was loaded. If caching is used and there was a cached copy of that module, [`shouldTransformCachedModule`](#shouldtransformcachedmodule) if a plugin returned `true` for that hook |\n| Next: | [`moduleParsed`](#moduleparsed) once the file has been processed and parsed |\n\n```typescript\ntype Options = {\n\tattributes: Record<string, string>;\n};\n\ntype TransformResult = string | null | Partial<SourceDescription>;\n\ninterface SourceDescription {\n\tcode: string;\n\tmap?: string | SourceMap;\n\tast?: ESTree.Program;\n\tmeta?: { [plugin: string]: any } | null;\n\tmoduleSideEffects?: boolean | 'no-treeshake' | null;\n\tsyntheticNamedExports?: boolean | string | null;\n}\n```\n\nCan be used to transform individual modules. `options.attributes` contain the import attributes that were used when this module was imported, which is determined by the first `resolveId` hook that resolved this module or the attributes present in the first import. To prevent additional parsing overhead in case e.g. this hook already used [`this.parse`](#this-parse) to generate an AST for some reason, this hook can optionally return a `{ code, ast, map }` object. The `ast` must be a standard ESTree AST with `start` and `end` properties for each node. If the transformation does not move code, you can preserve existing sourcemaps by setting `map` to `null`. Otherwise, you might need to generate the source map. See [the section on source code transformations](#source-code-transformations)."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#6",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Build Hooks",
+    "text": "  ```js twoslash\n  // ---cut-start---\n  /** @returns {import('rollup').Plugin} */\n  // ---cut-end---\n  export default function resolveFirst() {\n  \treturn {\n  \t\tname: 'resolve-first',\n  \t\tresolveId: {\n  \t\t\torder: 'pre',\n  \t\t\thandler(source) {\n  \t\t\t\tif (source === 'external') {\n  \t\t\t\t\treturn { id: source, external: true };\n  \t\t\t\t}\n  \t\t\t\treturn null;\n  \t\t\t}\n  \t\t}\n  \t};\n  }\n  ```\n\n  If several plugins use `\"pre\"` or `\"post\"`, Rollup runs them in the user-specified order. This option can be used for all plugin hooks. For parallel hooks, it changes the order in which the synchronous part of the hook is run.\n\n- `sequential: boolean`<br> Do not run this hook in parallel with the same hook of other plugins. Can only be used for `parallel` hooks. Using this option will make Rollup await the results of all previous plugins, then execute the plugin hook, and then run the remaining plugins in parallel again. E.g. when you have plugins `A`, `B`, `C`, `D`, `E` that all implement the same parallel hook and the middle plugin `C` has `sequential: true`, then Rollup will first run `A + B` in parallel, then `C` on its own, then `D + E` in parallel.\n\n  This can be useful when you need to run several command line tools in different [`writeBundle`](#writebundle) hooks that depend on each other (note that if possible, it is recommended to add/remove files in the sequential [`generateBundle`](#generatebundle) hook, though, which is faster, works with pure in-memory builds and permits other in-memory build plugins to see the files). You can combine this option with `order` for additional sorting."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#41",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Output Generation Hooks > generateBundle",
+    "text": "### generateBundle\n\n|  |  |\n| --: | :-- |\n| Type: | `(options: OutputOptions, bundle: { [fileName: string]: OutputAsset \\| OutputChunk }, isWrite: boolean) => void` |\n| Kind: | async, sequential |\n| Previous: | [`augmentChunkHash`](#augmentchunkhash) |\n| Next: | [`writeBundle`](#writebundle) if the output was generated via `bundle.write(...)`, otherwise this is the last hook of the output generation phase and may again be followed by [`outputOptions`](#outputoptions) if another output is generated |\n\n```typescript\ninterface OutputAsset {\n\tfileName: string;\n\tnames: string[];\n\tneedsCodeReference: boolean;\n\toriginalFileNames: string[];\n\tsource: string | Uint8Array;\n\ttype: 'asset';\n}\n\ninterface OutputChunk {\n\tcode: string;\n\tdynamicImports: string[];\n\texports: string[];\n\tfacadeModuleId: string | null;\n\tfileName: string;\n\timplicitlyLoadedBefore: string[];\n\timports: string[];\n\timportedBindings: { [imported: string]: string[] };\n\tisDynamicEntry: boolean;\n\tisEntry: boolean;\n\tisImplicitEntry: boolean;\n\tmap: SourceMap | null;\n\tmodules: {\n\t\t[id: string]: {\n\t\t\trenderedExports: string[];\n\t\t\tremovedExports: string[];\n\t\t\trenderedLength: number;\n\t\t\toriginalLength: number;\n\t\t\tcode: string | null;\n\t\t};\n\t};\n\tmoduleIds: string[];\n\tname: string;\n\tpreliminaryFileName: string;\n\treferencedFiles: string[];\n\tsourcemapFileName: string | null;\n\ttype: 'chunk';\n}\n```"
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#89",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Plugin Context > this.warn",
+    "text": "### this.warn\n\n|  |  |\n| --: | :-- |\n| Type: | `(log: string \\| RollupLog \\| (() => RollupLog \\| string), position?: number \\| { column: number; line: number }) => void` |\n\nUsing this method will generate warnings for a build, which are logs with log level `\"warn\"`. See the [`onLog`](../configuration-options/index.md#onlog) option for information about the `RollupLog` type. To generate other logs, see also [`this.info`](#this-info) and [`this.debug`](#this-debug). To generate errors, see [`this.error`](#this-error).\n\nJust like internally generated warnings, these logs will be first passed to and filtered by plugin [`onLog`](#onlog) hooks before they are forwarded to custom [`onLog`](../configuration-options/index.md#onlog) or [`onwarn`](../configuration-options/index.md#onwarn) handlers or printed to the console.\n\nThe `warning` argument can be a `string` or an object with (at minimum) a `message` property:\n\n```js\nthis.warn('hmm...');\n// is equivalent to\nthis.warn({\n\tmessage: 'hmm...',\n\tpluginCode: 'CODE_TO_IDENTIFY_LOG',\n\tmeta: 'Additional plugin specific information'\n});\n```\n\nWe encourage you to use objects with a `pluginCode` property as that will allow users to easily filter for those logs in an `onLog` handler. If you need to add additional information, you can use the `meta` property. If the log contains a `code` and does not yet have a `pluginCode` property, it will be renamed to `pluginCode` as plugin warnings always get a `code` of `PLUGIN_WARNING` added by Rollup. To prevent this behavior, plugins can instead use the normalized `onLog` option passed to the [`buildStart`](#buildstart) hook. Calling this option from a plugin will not change properties when passing the log to plugin `onLog` handlers and `onLog` or `onwarn` handlers."
+   },
+   {
+    "id": "rollup:docs/migration/index.md#11",
+    "title": "docs/migration/index.md > {{ $frontmatter.title }} > Migrating to Rollup 3 > Changes to the Plugin API",
+    "text": "### Changes to the Plugin API\n\nThen general output generation flow has been reworked, see the [Output Generation Hooks](../plugin-development/index.md#output-generation-hooks) graph for the new plugin hook order. Probably the most obvious change is that the [`banner`](../plugin-development/index.md#banner)/[`footer`](../plugin-development/index.md#footer)/[`intro`](../plugin-development/index.md#intro)/[`outro`](../plugin-development/index.md#outro) are no longer invoked once at the beginning but rather per chunk. On the other hand, [`augmentChunkHash`](../plugin-development/index.md#augmentchunkhash) is now evaluated after [`renderChunk`](../plugin-development/index.md#renderchunk) when the hash is created.\n\nAs file hashes are now based on the actual content of the file after `renderChunk`, we no longer know exact file names before hashes are generated. Instead, the logic now relies on hash placeholders of the form `!~{001}~`. That means that all file names available to the `renderChunk` hook may contain placeholders and may not correspond to the final file names. This is not a problem though if you plan on using these files names within the chunks as Rollup will replace all placeholders before [`generateBundle`](../plugin-development/index.md#generatebundle) runs.\n\nNot necessarily a breaking change, but plugins that add or remove imports in [`renderChunk`](../plugin-development/index.md#renderchunk) should make sure they also update the corresponding `chunk` information that is passed to this hook. This will enable other plugins to rely on accurate chunk information without the need to pare the chunk themselves. See the [documentation](../plugin-development/index.md#renderchunk) of the hook for more information."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "rollup:docs/plugin-development/index.md#37",
+    "action": "use",
+    "relevance_score": 0.9839,
+    "document_score": 0.9883,
+    "levels": {
+     "answers": 0.9839,
+     "elsewhere": 0.0043,
+     "different_case": 0.006,
+     "unrelated": 0.0057
+    }
+   },
+   {
+    "index": 1,
+    "id": "rollup:docs/configuration-options/index.md#31",
+    "action": "use",
+    "relevance_score": 0.9681,
+    "document_score": 0.9781,
+    "levels": {
+     "answers": 0.9681,
+     "elsewhere": 0.0101,
+     "different_case": 0.0142,
+     "unrelated": 0.0077
+    }
+   },
+   {
+    "index": 2,
+    "id": "rollup:docs/configuration-options/index.md#34",
+    "action": "use",
+    "relevance_score": 0.9673,
+    "document_score": 0.9759,
+    "levels": {
+     "answers": 0.9673,
+     "elsewhere": 0.0086,
+     "different_case": 0.0152,
+     "unrelated": 0.0089
+    }
+   },
+   {
+    "index": 3,
+    "id": "rollup:docs/configuration-options/index.md#68",
+    "action": "use",
+    "relevance_score": 0.9495,
+    "document_score": 0.9636,
+    "levels": {
+     "answers": 0.9495,
+     "elsewhere": 0.0141,
+     "different_case": 0.0225,
+     "unrelated": 0.0139
+    }
+   },
+   {
+    "index": 9,
+    "id": "rollup:docs/plugin-development/index.md#41",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.3137,
+    "document_score": 0.4291,
+    "levels": {
+     "answers": 0.3137,
+     "elsewhere": 0.1154,
+     "different_case": 0.0722,
+     "unrelated": 0.4987
+    }
+   },
+   {
+    "index": 4,
+    "id": "rollup:docs/configuration-options/index.md#28",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0702,
+    "document_score": 0.1248,
+    "levels": {
+     "answers": 0.0702,
+     "elsewhere": 0.0547,
+     "different_case": 0.1311,
+     "unrelated": 0.7441
+    }
+   },
+   {
+    "index": 5,
+    "id": "rollup:docs/plugin-development/index.md#47",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0223,
+    "document_score": 0.0965,
+    "levels": {
+     "answers": 0.0223,
+     "elsewhere": 0.0742,
+     "different_case": 0.0578,
+     "unrelated": 0.8457
+    }
+   },
+   {
+    "index": 11,
+    "id": "rollup:docs/migration/index.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.011,
+    "document_score": 0.0927,
+    "levels": {
+     "answers": 0.011,
+     "elsewhere": 0.0816,
+     "different_case": 0.0423,
+     "unrelated": 0.865
+    }
+   },
+   {
+    "index": 7,
+    "id": "rollup:docs/plugin-development/index.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0045,
+    "document_score": 0.0516,
+    "levels": {
+     "answers": 0.0045,
+     "elsewhere": 0.0471,
+     "different_case": 0.0909,
+     "unrelated": 0.8575
+    }
+   },
+   {
+    "index": 6,
+    "id": "rollup:docs/plugin-development/index.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0099,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.0068,
+     "different_case": 0.0309,
+     "unrelated": 0.9591
+    }
+   },
+   {
+    "index": 8,
+    "id": "rollup:docs/plugin-development/index.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0022,
+     "different_case": 0.0063,
+     "unrelated": 0.9894
+    }
+   },
+   {
+    "index": 10,
+    "id": "rollup:docs/plugin-development/index.md#89",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.001,
+     "different_case": 0.0026,
+     "unrelated": 0.995
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 7551
+  },
+  "timing": {
+   "total_ms": 237,
+   "rerank_ms": 224,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 7635,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 240
+   }
+  }
+ }
+}

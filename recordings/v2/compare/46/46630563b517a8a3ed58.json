@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/46/46630563b517a8a3ed58",
+ "request_hash": "46630563b517a8a3ed58052fd18e453435b777c91039a76b7a2f51c43c9c8bea",
+ "recorded_at": "2026-11-06T14:41:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1274,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.327583",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=62,cfOrigin;dur=0,cfWorker;dur=305"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#23",
+    "text": "## Model copy\n\n??? api \"API Documentation\"\n    [`pydantic.main.BaseModel.model_copy`][pydantic.main.BaseModel.model_copy]<br>\n\nThe [`model_copy()`][pydantic.BaseModel.model_copy] method allows models to be duplicated (with optional updates that *aren't* validated),\nwhich is particularly useful when working with frozen models.\n\n```python\nfrom pydantic import BaseModel\n\n\nclass BarModel(BaseModel):\n    whatever: int\n\n\nclass FooBarModel(BaseModel):\n    banana: float\n    foo: str\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': 123})\n\nprint(m.model_copy(update={'banana': 0}))\n#> banana=0 foo='hello' bar=BarModel(whatever=123)\n\n# normal copy gives the same object reference for bar:\nprint(id(m.bar) == id(m.model_copy().bar))\n#> True\n# deep copy gives a new object reference for `bar`:\nprint(id(m.bar) == id(m.model_copy(deep=True).bar))\n#> False\n```"
+   },
+   {
+    "id": "pydantic:docs/concepts/serialization.md#4",
+    "text": "## Iterating over models\n\nPydantic models can also be iterated over, yielding `(field_name, field_value)` pairs. Note that field values\nare left as is, so sub-models will *not* be converted to dictionaries:\n\n```python {group=\"iterating-model\"}\nfrom pydantic import BaseModel\n\n\nclass BarModel(BaseModel):\n    whatever: int\n\n\nclass FooBarModel(BaseModel):\n    banana: float\n    foo: str\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': 123})\n\nfor name, value in m:\n    print(f'{name}: {value}')\n    #> banana: 3.14\n    #> foo: hello\n    #> bar: whatever=123\n```\n\nThis means that calling [`dict()`][dict] on a model can be used to construct a dictionary of the model:\n\n```python {group=\"iterating-model\"}\nprint(dict(m))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': BarModel(whatever=123)}\n```\n\n!!! note\n    [Root models](models.md#rootmodel-and-custom-root-types) *does* get converted to a dictionary with the key `'root'`.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#pickledumpsmodel}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/serialization.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/models.md#23",
+    "b": "pydantic:docs/concepts/serialization.md#4",
+    "relation": "unrelated",
+    "related": 0.0106,
+    "probabilities": {
+     "same": 0.0041,
+     "overlapping": 0.0033,
+     "conflicting": 0.0032,
+     "unrelated": 0.9894
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 164
+  },
+  "timing": {
+   "read_ms": 164,
+   "total_ms": 166
+  }
+ }
+}

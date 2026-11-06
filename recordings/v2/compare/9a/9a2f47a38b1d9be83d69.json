@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9a/9a2f47a38b1d9be83d69",
+ "request_hash": "9a2f47a38b1d9be83d69bd5055f6165d117f611c31f834cf9d93911d28fdd065",
+ "recorded_at": "2026-11-06T14:40:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3028,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "180.478785",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=462"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/cache.md#11",
+    "text": "### Responses that are never stored\n\nOne entry is served to every client whose request matches its key, so a response\nthat identifies a single client is not stored at all:\n\n- **A response that sets a cookie.** `Set-Cookie` means the response has been\n  personalized for the client that caused the miss, and the body — not just the\n  header — is what would be replayed to everyone else. The response still\n  reaches that client normally; only the entry is skipped, and `X-Cache` reads\n  `unreachable`.\n- **A response to a request carrying `Authorization`,** unless the response\n  permits shared caching, per\n  [RFC 9111 §3.5](https://www.rfc-editor.org/rfc/rfc9111.html#section-3.5).\n- **`Cache-Control: no-store`, `private`, `no-cache`, or `Vary: *`.**\n\nA request the server refused while reading it, such as one declaring a body over `BodyLimit`, is neither served from the cache nor stored, and `X-Cache` reads `unreachable`. Fiber runs the `Use` chain for such a request without its route (see [Errors Before a Handler Runs](../guide/error-handling.md#errors-before-a-handler-runs)), so what the chain produces is not the URL's response.\n\nWhen revalidation returns `private`, `no-cache`, `no-store`, or `Vary: *`, the middleware removes the previous cached entry and its Vary manifest. A concurrently replaced entry keeps its manifest. Cleanup errors are logged and the origin response is still returned; if storage fails during cleanup, the old entry can still be served until it expires, and it keeps counting toward `MaxBytes` until a later eviction retries the delete. A plain miss answered with `no-store` preserves the shared Vary manifest, so existing sibling variants remain reachable."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#84",
+    "text": "A request the server refused while reading it, such as one over `BodyLimit`, is neither served from the cache nor stored: its route never ran. With `QUERY` in `Methods`, the default key includes `Content-Type` and `Content-Encoding` besides the body. With an external `Storage`, a response past the size limits an entry is decoded under is not stored (`X-Cache: unreachable`) instead of making every later lookup of its key fail with `500`.\n\nCredential headers named in `KeyHeaders` (`Cookie`, `Authorization`, `Proxy-Authorization`, `X-API-Key`, `X-Auth-Token`, `X-Access-Token` or a header named in `KeyCredentialHeaders`) and the values of the cookies named in `KeyCookies` are hashed in the cache key, so a key listing of an external `Storage` no longer shows them, and the key version moves with that change: every cache starts cold after the upgrade, whatever its config, since the entries of the earlier version are not read. With an external `Storage` they expire on their own, or a shared store can drop them by the earlier version's key prefix (`v4|`). The body an external `Storage` keeps beside an entry, and the entry's `Vary` manifest, now have keys of their own (`v7|body|...` and `v7|manifest|...`) instead of the entry key plus a suffix, which a request could spell to overwrite the body of another entry. A custom `KeyGenerator`'s key is stored with `\\`, `|` and `:` escaped as `\\\\`, `\\p` and `\\c`, so client text it copies cannot spell the key of another entry's `Vary` variant."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/cache.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#84"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#84",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/cache.md#11"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/cache.md#11",
+    "b": "fiber:docs/whats_new.md#84",
+    "relation": "overlapping",
+    "related": 0.9965,
+    "probabilities": {
+     "same": 0.0062,
+     "overlapping": 0.9868,
+     "conflicting": 0.0035,
+     "unrelated": 0.0035
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.009,
+       "restated": 0.9595,
+       "elaborated": 0.0251,
+       "different": 0.0064
+      },
+      "confidence": 0.9936,
+      "a": {
+       "document": "fiber:docs/middleware/cache.md#11",
+       "quote": "A request the server refused while reading it, such as one declaring a body over `BodyLimit`, is neither served from the cache nor stored, and `X-Cache` reads `unreachable`.",
+       "start": 754,
+       "end": 927,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#84",
+       "quote": "A request the server refused while reading it, such as one over `BodyLimit`, is neither served from the cache nor stored: its route never ran.",
+       "start": 0,
+       "end": 142,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 93,
+   "passages": 1,
+   "counterparts_ms": 85
+  },
+  "timing": {
+   "read_ms": 210,
+   "total_ms": 213
+  }
+ }
+}

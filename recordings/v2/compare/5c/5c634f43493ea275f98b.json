@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5c/5c634f43493ea275f98b",
+ "request_hash": "5c634f43493ea275f98bd4f1f104dc45eaa72d2e80d5195c19045baa3a9601fc",
+ "recorded_at": "2026-11-06T14:38:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1083,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "142.36051",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=286"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/03-$derived.md#1",
+    "text": "## `$derived.by`\n\nSometimes you need to create complex derivations that don't fit inside a short expression. In these cases, you can use `$derived.by` which accepts a function as its argument.\n\n```svelte\n<script>\n\tlet numbers = $state([1, 2, 3]);\n\tlet total = $derived.by(() => {\n\t\tlet total = 0;\n\t\tfor (const n of numbers) {\n\t\t\ttotal += n;\n\t\t}\n\t\treturn total;\n\t});\n</script>\n\n<button onclick={() => numbers.push(numbers.length + 1)}>\n\t{numbers.join(' + ')} = {total}\n</button>\n```\n\nIn essence, `$derived(expression)` is equivalent to `$derived.by(() => expression)`."
+   },
+   {
+    "id": "svelte:documentation/docs/02-runes/04-$effect.md#9",
+    "text": "## When not to use `$effect`\n\nIn general, `$effect` is best considered something of an escape hatch — useful for things like analytics and direct DOM manipulation — rather than a tool you should use frequently. In particular, avoid using it to synchronise state. Instead of this...\n\n```svelte\n<script>\n\tlet count = $state(0);\n\tlet doubled = $state();\n\n\t// don't do this!\n\t$effect(() => {\n\t\tdoubled = count * 2;\n\t});\n</script>\n```\n\n...do this:\n\n```svelte\n<script>\n\tlet count = $state(0);\n\tlet doubled = $derived(count * 2);\n</script>\n```\n\n> [!NOTE] For things that are more complicated than a simple expression like `count * 2`, you can also use `$derived.by`.\n\nIf you're using an effect because you want to be able to reassign the derived value (to build an optimistic UI, for example) note that [deriveds can be directly overridden]($derived#Overriding-derived-values) as of Svelte 5.25.\n\nYou might be tempted to do something convoluted with effects to link one value to another. The following example shows two inputs for \"money spent\" and \"money left\" that are connected to each other. If you update one, the other should update accordingly. Instead of using effects for this...\n\n<!-- codeblock:start {\"title\":\"Setting state in effects (don't do this!)\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\tconst total = 100;\n\tlet spent = $state(0);\n\tlet left = $state(total);\n\n\t$effect(() => {\n\t\tleft = total - spent;\n\t});\n\n\t$effect(() => {\n\t\tspent = total - left;\n\t});\n</script>\n\n<label>\n\t<input type=\"range\" bind:value={spent} max={total} />\n\t{spent}/{total} spent\n</label>\n\n<label>\n\t<input type=\"range\" bind:value={left} max={total} />\n\t{left}/{total} left\n</label>\n\n<style>\n\tlabel {\n\t\tdisplay: flex;\n\t\tgap: 0.5em;\n\t}\n</style>\n```\n<!-- codeblock:end -->"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/03-$derived.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/02-runes/04-$effect.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/02-runes/03-$derived.md#1",
+    "b": "svelte:documentation/docs/02-runes/04-$effect.md#9",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0045,
+     "overlapping": 0.9912,
+     "conflicting": 0.0023,
+     "unrelated": 0.002
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 117,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 148,
+   "total_ms": 151
+  }
+ }
+}

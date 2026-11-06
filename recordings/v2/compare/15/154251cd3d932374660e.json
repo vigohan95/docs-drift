@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/15/154251cd3d932374660e",
+ "request_hash": "154251cd3d932374660e4d332aa6b3f4e8585688bf64df3e99321c86396ce601",
+ "recorded_at": "2026-11-06T14:40:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1233,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.040031",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=260"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#59",
+    "text": "### BodyRaw\n\nReturns the raw request **body**. Under [`StreamRequestBody`](./fiber.md#streamrequestbody), a body larger than the app [BodyLimit](./fiber.md#bodylimit) sets `413 Request Entity Too Large` while no response body was written, and the returned slice holds the error message instead of request data.\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) BodyRaw() []byte\nfunc (r fiber.Req) BodyRaw() []byte\n```\n\n```go title=\"Example\"\n// curl -X POST http://localhost:8080 -d user=john\n\napp.Post(\"/\", func(c fiber.Ctx) error {\n  // Get raw body from POST request:\n  return c.Send(c.BodyRaw()) // []byte(\"user=john\")\n})\n```\n\n:::info\nThe returned value is valid only within the handler. Do not store references.\nMake copies or use the [**`Immutable`**](./fiber.md#immutable) setting instead. [Read more...](../#zero-allocation)\n:::"
+   },
+   {
+    "id": "fiber:docs/api/redirect.md#14",
+    "text": "#### WithInput\n\nSend input data with `WithInput`, which stores them in a cookie.\n\nIt captures form, multipart, or query data depending on the request content type.\n\n:::caution\n\n`WithInput` copies the whole submitted body into the `fiber_flash` cookie — a\nrejected login carries the password the user just typed. The payload is\nhex-encoded, not encrypted or signed, so anything sensitive in the request goes\nback to the browser as a cookie value. Prefer `With` for the specific fields you\nneed to carry across the redirect.\n\nThe cookie is `HttpOnly`, and `Secure` when the request that produced it arrived\nover TLS — so script cannot read it and it is not replayed in the clear. Neither\nattribute protects the payload from whoever is at the browser.\n\nBrowsers typically drop a cookie larger than about 4 KB, and Fiber sets no flash\ncookie at all when a redirect carries more than 256 entries (messages plus input\nfields), so a large form does not make the round trip.\n\n:::\n\n```go title=\"Signature\"\nfunc (r *Redirect) WithInput() *Redirect\n```\n\n```go title=\"Example\"\n// curl -X POST http://localhost:3000/login -d \"name=John\"\napp.Post(\"/login\", func(c fiber.Ctx) error {\n  return c.Redirect().WithInput().Route(\"name\")\n})\n\napp.Get(\"/name\", func(c fiber.Ctx) error {\n  // => John\n  return c.SendString(c.Redirect().OldInput(\"name\").Value)\n}).Name(\"name\")\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#59",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/api/redirect.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#59",
+    "b": "fiber:docs/api/redirect.md#14",
+    "relation": "unrelated",
+    "related": 0.0048,
+    "probabilities": {
+     "same": 0.0019,
+     "overlapping": 0.0016,
+     "conflicting": 0.0013,
+     "unrelated": 0.9952
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 138
+  },
+  "timing": {
+   "read_ms": 138,
+   "total_ms": 139
+  }
+ }
+}

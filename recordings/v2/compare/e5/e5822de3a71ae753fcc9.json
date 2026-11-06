@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e5/e5822de3a71ae753fcc9",
+ "request_hash": "e5822de3a71ae753fcc9ac7083d0ec1b0c71f0f98e1194c419e8d04172fd8d0a",
+ "recorded_at": "2026-11-06T14:37:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 948,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.209088",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=187"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/tools/index.md#5",
+    "text": "## Babel\n\nMany developers use [Babel](https://babeljs.io/) in their projects in order to use the latest JavaScript features that aren't yet supported by browsers and Node.js.\n\nThe easiest way to use both Babel and Rollup is with [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel). First, install the plugin:\n\n```shell\nnpm i -D @rollup/plugin-babel @rollup/plugin-node-resolve\n```\n\nAdd it to `rollup.config.js`:\n\n```js twoslash\n// rollup.config.js\nimport resolve from '@rollup/plugin-node-resolve';\nimport babel from '@rollup/plugin-babel';\n\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\tinput: 'src/main.js',\n\toutput: {\n\t\tfile: 'bundle.js',\n\t\tformat: 'cjs'\n\t},\n\tplugins: [resolve(), babel({ babelHelpers: 'bundled' })]\n};\n```\n\nBefore Babel will actually compile your code, it needs to be configured. Create a new file, `src/.babelrc.json`:\n\n```json\n{\n\t\"presets\": [\"@babel/env\"]\n}\n```\n\nWe're putting our `.babelrc.json` file in `src`, rather than the project root. This allows us to have a different `.babelrc.json` for things like tests, if we need that later – See the [Babel documentation](https://babeljs.io/docs/en/config-files#project-wide-configuration) for more information on both project wide and file relative configuration.\n\nNow, before we run rollup, we need to install [`babel-core`](https://babeljs.io/docs/en/babel-core) and the [`env`](https://babeljs.io/docs/en/babel-preset-env) preset:\n\n```shell\nnpm i -D @babel/core @babel/preset-env\n```\n\nRunning Rollup now will create a bundle - except we're not actually using any ES2015 features. Let's change that by editing `src/main.js`:\n\n```js\n// src/main.js\nimport answer from 'the-answer';\n\nexport default () => {\n\tconsole.log(`the answer is ${answer}`);\n};\n```\n\nRun Rollup with `npm run build`, and check the bundle:\n\n```js\n'use strict';\n\nvar index = 42;\n\nvar main = function () {\n\tconsole.log('the answer is ' + index);\n};\n\nmodule.exports = main;\n```"
+   },
+   {
+    "id": "rollup:docs/tutorial/index.md#3",
+    "text": "## Using plugins\n\nSo far, we've created a simple bundle from an entry point and a module imported via a relative path. As you build more complex bundles, you'll often need more flexibility – importing modules installed with NPM, compiling code with Babel, working with JSON files and so on.\n\nFor that, we use _plugins_, which change the behaviour of Rollup at key points in the bundling process. A list of awesome plugins is maintained on [the Rollup Awesome List](https://github.com/rollup/awesome).\n\nFor this tutorial, we'll use [@rollup/plugin-json](https://github.com/rollup/plugins/tree/master/packages/json), which allows Rollup to import data from a JSON file.\n\nCreate a file in the project root called `package.json`, and add the following content:\n\n```json\n{\n\t\"name\": \"rollup-tutorial\",\n\t\"version\": \"1.0.0\",\n\t\"scripts\": {\n\t\t\"build\": \"rollup -c\"\n\t}\n}\n```\n\nInstall @rollup/plugin-json as a development dependency:\n\n```shell\nnpm install --save-dev @rollup/plugin-json\n```\n\n(We're using `--save-dev` rather than `--save` because our code doesn't actually depend on the plugin when it runs – only when we're building the bundle.)\n\nUpdate your `src/main.js` file so that it imports from your package.json instead of `src/foo.js`:\n\n```js\n// src/main.js\nimport { version } from '../package.json';\n\nexport default function () {\n\tconsole.log('version ' + version);\n}\n```\n\nEdit your `rollup.config.mjs` file to include the JSON plugin:\n\n```js twoslash\n// rollup.config.mjs\nimport json from '@rollup/plugin-json';\n\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\tinput: 'src/main.js',\n\toutput: {\n\t\tfile: 'bundle.js',\n\t\tformat: 'cjs'\n\t},\n\tplugins: [json()]\n};\n```\n\nRun Rollup with `npm run build`. The result should look like this:\n\n```js\n'use strict';\n\nvar version = '1.0.0';\n\nfunction main() {\n\tconsole.log('version ' + version);\n}\n\nmodule.exports = main;\n```\n\n_Note: Only the data we actually need gets imported – `name` and `devDependencies` and other parts of `package.json` are ignored. That's **tree-shaking** in action._"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/tools/index.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/tutorial/index.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/tools/index.md#5",
+    "b": "rollup:docs/tutorial/index.md#3",
+    "relation": "unrelated",
+    "related": 0.47,
+    "probabilities": {
+     "same": 0.0223,
+     "overlapping": 0.4257,
+     "conflicting": 0.0221,
+     "unrelated": 0.53
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 52
+  },
+  "timing": {
+   "read_ms": 51,
+   "total_ms": 54
+  }
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d6/d615f23b6fb605d02638",
+ "request_hash": "d615f23b6fb605d0263870ac7b14b94c74699ea7cbe77501c3ca08c5080d84a6",
+ "recorded_at": "2026-11-06T14:39:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1953,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "141.359299",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=30,cfOrigin;dur=0,cfWorker;dur=575"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/cache.md#0",
+    "text": "# Cache\n\nCache middleware for [Fiber](https://github.com/gofiber/fiber) that intercepts responses and stores the body, `Content-Type`, and status code under a deterministic key derived from request dimensions. Special thanks to [@codemicro](https://github.com/codemicro/fiber-cache) for contributing this middleware to Fiber core.\n\nBy default, cached responses expire after five minutes and the middleware stores up to 1 MB of responses, counting each entry's body, key and stored headers. That size limit is the default of `cache.New()` called without a `Config`: a `Config` that leaves `MaxBytes` unset stores bodies without a limit. A streamed response (`SendStream`, `SendStreamWriter`, `SendFile`, `static`) is judged by the length it declares instead of being read to measure it: one that declares more than `MaxBytes`, or no length at all, is passed on as a stream, is not stored and reports `unreachable`. So is a stream that ends early, fails or runs past the length it declares. Middleware that encodes a stream as it is sent leaves it without a declared length, so `compress` registered between the cache and a file handler keeps those files out of the cache: register `compress.New()` before `cache.New()`, or serve the files with `static.Config{Compress: true}`, to keep caching them."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#184",
+    "text": "#### Cache\n\nThe deprecated `Store` and `Key` fields were removed. Use `Storage` and\n`KeyGenerator` instead to configure caching backends and cache keys.\n\nDefaults also changed: the middleware now emits `Cache-Control` headers, the default `Expiration` increased to `5 minutes` (from `1 minute`), and a new `MaxBytes` limit of `1 MB` (previously unlimited) now caps cached payloads when you call `cache.New()` without a `Config`. A `Config` that leaves `MaxBytes` unset stores bodies without a limit, as in v2.\n\nTo restore v2 behavior:\n\n- Set `DisableCacheControl` to `true` to suppress automatic `Cache-Control` headers.\n- Configure `Expiration` to `1*time.Minute`.\n- Set `MaxBytes` to `0` (or a higher value) when caching large responses.\n- Disable structured key dimensions as needed (for example `DisableQueryKeys: true`), or provide a custom `KeyGenerator`.\n\nAdditional v3 cache key options:\n\n- `Methods`: HTTP methods eligible for caching (default `GET`, `HEAD`)\n- `DisableQueryKeys`: disable canonicalized query args in keys (default `false`)\n- `KeyHeaders`: request header allow-list for key partitioning\n- `KeyCookies`: explicit cookie allow-list for key partitioning; the values are hashed in the key\n- `KeyCredentialHeaders`: request headers that carry a client's credential; they partition entries like `KeyHeaders`, and hits on them are sent with `Cache-Control: private`\n- `DisableVaryHeaders`: disable response `Vary` dimensions in lookup/storage partitioning (default `false`)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/cache.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#184"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#184",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/cache.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/cache.md#0",
+    "b": "fiber:docs/whats_new.md#184",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0081,
+     "overlapping": 0.9828,
+     "conflicting": 0.0063,
+     "unrelated": 0.0027
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0074,
+       "restated": 0.9418,
+       "elaborated": 0.0164,
+       "different": 0.0343
+      },
+      "confidence": 0.92,
+      "a": {
+       "document": "fiber:docs/middleware/cache.md#0",
+       "quote": "By default, cached responses expire after five minutes and the middleware stores up to 1 MB of responses, counting each entry's body, key and stored headers.",
+       "start": 332,
+       "end": 489,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#184",
+       "quote": "Use `Storage` and\n`KeyGenerator` instead to configure caching backends and cache keys.\n\nDefaults also changed: the middleware now emits `Cache-Control` headers, the default `Expiration` increased to `5 minutes` (from `1 minute`), and a new `MaxBytes` limit of `1 MB` (previously unlimited) now caps cached payloads when you call `cache.New()` without a `Config`.",
+       "start": 66,
+       "end": 428,
+       "confidence": 0.92
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 1,
+   "counterparts_ms": 53
+  },
+  "timing": {
+   "read_ms": 150,
+   "total_ms": 154
+  }
+ }
+}

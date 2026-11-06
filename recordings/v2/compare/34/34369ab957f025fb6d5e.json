@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/34/34369ab957f025fb6d5e",
+ "request_hash": "34369ab957f025fb6d5e940bdfbf418b21aa13cbe6745107d1020cf6e85394f7",
+ "recorded_at": "2026-11-06T14:38:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2370,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.116833",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=223"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#2",
+    "text": "### let → $state\n\nIn Svelte 4, a `let` declaration at the top level of a component was implicitly reactive. In Svelte 5, things are more explicit: a variable is reactive when created using the `$state` rune. Let's migrate the counter to runes mode by wrapping the counter in `$state`:\n\n```svelte\n<script>\n\tlet count = +++$state(0)+++;\n</script>\n```\n\nNothing else changes. `count` is still the number itself, and you read and write directly to it, without a wrapper like `.value` or `getCount()`.\n\n> [!DETAILS] Why we did this\n> `let` being implicitly reactive at the top level worked great, but it meant that reactivity was constrained — a `let` declaration anywhere else was not reactive. This forced you to resort to using stores when refactoring code out of the top level of components for reuse. This meant you had to learn an entirely separate reactivity model, and the result often wasn't as nice to work with. Because reactivity is more explicit in Svelte 5, you can keep using the same API outside the top level of components. Head to [the tutorial](/tutorial) to learn more."
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#3",
+    "text": "### $: → $derived/$effect\n\nIn Svelte 4, a `$:` statement at the top level of a component could be used to declare a derivation, i.e. state that is entirely defined through a computation of other state. In Svelte 5, this is achieved using the `$derived` rune:\n\n```svelte\n<script>\n\tlet count = $state(0);\n\t---$:--- +++const+++ double = +++$derived(count * 2)+++;\n</script>\n```\n\nAs with `$state`, nothing else changes. `double` is still the number itself, and you read it directly, without a wrapper like `.value` or `getDouble()`.\n\nA `$:` statement could also be used to create side effects. In Svelte 5, this is achieved using the `$effect` rune:\n\n```svelte\n<script>\n\tlet count = $state(0);\n\n\t---$:---+++$effect(() =>+++ {\n\t\tif (count > 5) {\n\t\t\talert('Count is too high!');\n\t\t}\n\t}+++);+++\n</script>\n```\n\nNote that [when `$effect` runs is different]($effect#Understanding-dependencies) than when `$:` runs.\n\n> [!DETAILS] Why we did this\n> `$:` was a great shorthand and easy to get started with: you could slap a `$:` in front of most code and it would somehow work. This intuitiveness was also its drawback the more complicated your code became, because it wasn't as easy to reason about. Was the intent of the code to create a derivation, or a side effect? With `$derived` and `$effect`, you have a bit more up-front decision making to do (spoiler alert: 90% of the time you want `$derived`), but future-you and other developers on your team will have an easier time.\n>\n> There were also gotchas that were hard to spot:\n>\n> - `$:` only updated directly before rendering, which meant you could read stale values in-between rerenders\n> - `$:` only ran once per tick, which meant that statements may run less often than you think\n> - `$:` dependencies were determined through static analysis of the dependencies. This worked in most cases, but could break in subtle ways during a refactoring where dependencies would be for example moved into a function and no longer be visible as a result\n> - `$:` statements were also ordered by using static analysis of the dependencies. In some cases there could be ties and the ordering would be wrong as a result, needing manual interventions. Ordering could also break while refactoring code and some dependencies no longer being visible as a result.\n>\n> Lastly, it wasn't TypeScript-friendly (our editor tooling had to jump through some hoops to make it valid for TypeScript), which was a blocker for making Svelte's reactivity model truly universal.\n>\n> `$derived` and `$effect` fix all of these by\n>\n> - always returning the latest value\n> - running as often as needed to be stable\n> - determining the dependencies at runtime, and therefore being immune to refactorings\n> - executing dependencies as needed and therefore being immune to ordering problems\n> - being TypeScript-friendly"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#2",
+    "b": "svelte:documentation/docs/07-misc/07-v5-migration-guide.md#3",
+    "relation": "unrelated",
+    "related": 0.0194,
+    "probabilities": {
+     "same": 0.0062,
+     "overlapping": 0.0076,
+     "conflicting": 0.0056,
+     "unrelated": 0.9806
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35
+  },
+  "timing": {
+   "read_ms": 35,
+   "total_ms": 37
+  }
+ }
+}

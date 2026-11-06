@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/47/47b864b0fe04c3575cd1",
+ "request_hash": "47b864b0fe04c3575cd1a430cab3f9112419fe2056143cc92255c94de9c315e7",
+ "recorded_at": "2026-11-06T14:39:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1058,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "178.411587",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=319"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#29",
+    "text": "A request with a `TLS` state, which `httptest.NewRequest` sets for an `https://` target, is served as a TLS connection: `c.Scheme()` is `https`, `c.Secure()` is `true` and `c.RequestCtx().TLSConnectionState()` returns that state.\n\nIf not provided, TestConfig is set to the following defaults:\n\n```go title=\"Default TestConfig\"\nconfig := fiber.TestConfig{\n  Timeout:      time.Second,\n  FailOnTimeout: true,\n}\n```\n\nWhen the handler has not answered within `Timeout`, `Test` returns `os.ErrDeadlineExceeded` if `FailOnTimeout` is `true`. If it is `false`, `Test` waits up to one more second and then reads whatever the handler has written by then. When the handler sends no response at all, for example after `c.Drop()`, `Test` returns `fiber.ErrTestGotEmptyResponse`.\n\n:::caution\n\nCalling `app.Test(req)` uses the defaults above. Supplying an empty `fiber.TestConfig{}` instead is **not** equivalent; it is the same as supplying:\n\n```go title=\"Empty TestConfig\"\ncfg := fiber.TestConfig{\n  Timeout:      0,\n  FailOnTimeout: false,\n}\n```\n\nThis would make a Test that has no timeout.\n\n:::"
+   },
+   {
+    "id": "fiber:docs/middleware/adaptor.md#12",
+    "text": "- `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` put the original request line back once a buffered handler has returned, or panicked, so `c.OriginalURL()` in a middleware that runs afterwards is unchanged. A handler that flushed or hijacked is still running with a request whose URL aliases the request line, so the line is then left as the handler read it; `HTTPMiddleware` and `ConvertRequest` leave it as well.\n- A request that `net/http` served over TLS is seen as TLS by Fiber: `c.Scheme()` is `https`, `c.Secure()` is true and `c.RequestCtx().TLSConnectionState()` carries the state from `r.TLS`.\n- A request the [timeout middleware](./timeout.md) gave up on behind `FiberHandler`, `FiberHandlerFunc` or `FiberApp` is answered with its timeout response, as on Fiber's own server. Its `fasthttp.RequestCtx` is left to the handler that may still run on it and never goes back to the pool, so no later request shares it and the handler's `c.Context()` keeps reporting the timeout.\n- `FiberHandler`, `FiberHandlerFunc` and `FiberApp` close the body stream of a response to a `HEAD` request unread, as Fiber's own server does: `net/http` discards a `HEAD` body, so a stream writer or an [SSE](./sse.md) `Handler` would otherwise run with every write succeeding.\n- For a request that reaches Fiber through `FiberHandler`, `FiberHandlerFunc` or `FiberApp`, `c.StartTime()` marks the moment the adaptor took the request over, not the moment the `net/http` server began reading it, so `c.Elapsed()` leaves out the time spent before the handler was called.\n- Both parsers read the headers: `Header.Get` returns the first field line even when it is empty, `c.Get` the first line that holds a value. A `net/http` guard should strip a header or check every value rather than compare `Header.Get` with the empty string; see the caution in the `FiberApp` section above.\n- `HTTPMiddleware` routes the request the wrapped middleware hands to `next`, including a rewritten `r.URL` such as the one `http.StripPrefix` produces. The middleware must call `next` before it flushes or hijacks the response; after that the response has left Fiber's hands and the call is ignored.\n- `HTTPMiddleware` copies `r.Method`, `r.Host` and `r.Header`, as the wrapped middleware hands them to `next`, back onto the Fiber request, so a header it replaces or deletes (`r.Header.Set`, `r.Header.Del`) is replaced or gone for the handlers behind it, `c.IPs()` included. A changed `r.Method` reaches only the raw request (`c.Request().Header.Method()`): `c.Method()` and the route that is running keep the method the request was routed with, so a rewrite does not move it to another method's handlers. `Content-Length` and `Transfer-Encoding` are not copied back, so the body framing stays as received. Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so `r.Trailer` is empty and a trailer cannot stand in for a header the middleware removed or replaced. A `Connection` field written as several entries is joined with commas, and a `close` token anywhere in it closes the connection once the response is sent.\n- `FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI`, the request line as `net/http` received it, so a raw `/über` or `/a|b` is routed and its params are read as a Fiber server would read them. When `r.URL` no longer says what that line says, or there is no such line, they route the request line `net/http` would write for `r.URL` instead: the path an `http.StripPrefix` in front of them rewrote, the URL of a request built in code, which has no `RequestURI` at all, and, for a `CONNECT` request in the authority form, the authority rather than the `/` that `r.URL.RequestURI()` reads for it: `r.URL.Opaque` when set, else `r.Host`, else `r.URL.Host`, the order in which `net/http` itself writes such a request."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#29",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/adaptor.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/app.md#29",
+    "b": "fiber:docs/middleware/adaptor.md#12",
+    "relation": "overlapping",
+    "related": 0.9964,
+    "probabilities": {
+     "same": 0.013,
+     "overlapping": 0.9789,
+     "conflicting": 0.0045,
+     "unrelated": 0.0036
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 41,
+   "passage_reads": 1,
+   "passages_ms": 146,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 187,
+   "total_ms": 191
+  }
+ }
+}

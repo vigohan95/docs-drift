@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4c/4c4f5a465a0f0528d33d",
+ "request_hash": "4c4f5a465a0f0528d33dbb9c3da889b56e787a17c31ca6a456d637db7c95ef52",
+ "recorded_at": "2026-11-06T14:38:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1968,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "199.714785",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=403"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/14-transition.md#6",
+    "text": "A custom transition function can also return a `tick` function, which is called _during_ the transition with the same `t` and `u` arguments.\n\n> [!NOTE] If it's possible to use `css` instead of `tick`, do so — web animations can run off the main thread, preventing jank on slower devices.\n\n```svelte\n<!--- file: App.svelte --->\n<script>\n\texport let visible = false;\n\n\t/**\n\t * @param {HTMLElement} node\n\t * @param {{ speed?: number }} params\n\t */\n\tfunction typewriter(node, { speed = 1 }) {\n\t\tconst valid = node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE;\n\n\t\tif (!valid) {\n\t\t\tthrow new Error(`This transition only works on elements with a single text node child`);\n\t\t}\n\n\t\tconst text = node.textContent;\n\t\tconst duration = text.length / (speed * 0.01);\n\n\t\treturn {\n\t\t\tduration,\n\t\t\ttick: (t) => {\n\t\t\t\tconst i = ~~(text.length * t);\n\t\t\t\tnode.textContent = text.slice(0, i);\n\t\t\t}\n\t\t};\n\t}\n</script>\n\n{#if visible}\n\t<p in:typewriter={{ speed: 1 }}>The quick brown fox jumps over the lazy dog</p>\n{/if}\n```\n\nIf a transition returns a function instead of a transition object, the function will be called in the next microtask. This allows multiple transitions to coordinate, making [crossfade effects](/tutorial/deferred-transitions) possible.\n\nTransition functions also receive a third argument, `options`, which contains information about the transition."
+   },
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/16-animate.md#3",
+    "text": "```svelte\n<!--- file: App.svelte --->\n<script>\n\timport { cubicOut } from 'svelte/easing';\n\n\t/**\n\t * @param {HTMLElement} node\n\t * @param {{ from: DOMRect; to: DOMRect }} states\n\t * @param {any} params\n\t */\n\tfunction whizz(node, { from, to }, params) {\n\t\tconst dx = from.left - to.left;\n\t\tconst dy = from.top - to.top;\n\n\t\tconst d = Math.sqrt(dx * dx + dy * dy);\n\n\t\treturn {\n\t\t\tdelay: 0,\n\t\t\tduration: Math.sqrt(d) * 120,\n\t\t\teasing: cubicOut,\n\t\t\tcss: (t, u) => `transform: translate(${u * dx}px, ${u * dy}px) rotate(${t * 360}deg);`\n\t\t};\n\t}\n</script>\n\n{#each list as item, index (item)}\n\t<div animate:whizz>{item}</div>\n{/each}\n```\n\nA custom animation function can also return a `tick` function, which is called _during_ the animation with the same `t` and `u` arguments.\n\n> [!NOTE] If it's possible to use `css` instead of `tick`, do so — web animations can run off the main thread, preventing jank on slower devices.\n\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport { cubicOut } from 'svelte/easing';\n\n\t/**\n\t * @param {HTMLElement} node\n\t * @param {{ from: DOMRect; to: DOMRect }} states\n\t * @param {any} params\n\t */\n\tfunction whizz(node, { from, to }, params) {\n\t\tconst dx = from.left - to.left;\n\t\tconst dy = from.top - to.top;\n\n\t\tconst d = Math.sqrt(dx * dx + dy * dy);\n\n\t\treturn {\n\t\t\tdelay: 0,\n\t\t\tduration: Math.sqrt(d) * 120,\n\t\t\teasing: cubicOut,\n\t\t\ttick: (t, u) => Object.assign(node.style, { color: t > 0.5 ? 'Pink' : 'Blue' })\n\t\t};\n\t}\n</script>\n\n{#each list as item, index (item)}\n\t<div animate:whizz>{item}</div>\n{/each}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/14-transition.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/16-animate.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/03-template-syntax/14-transition.md#6",
+    "b": "svelte:documentation/docs/03-template-syntax/16-animate.md#3",
+    "relation": "overlapping",
+    "related": 0.9959,
+    "probabilities": {
+     "same": 0.0179,
+     "overlapping": 0.9704,
+     "conflicting": 0.0076,
+     "unrelated": 0.0041
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 1,
+   "counterparts_ms": 92
+  },
+  "timing": {
+   "read_ms": 209,
+   "total_ms": 212
+  }
+ }
+}

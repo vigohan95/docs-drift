@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0f/0fa0cba5b3afbb54611f",
+ "request_hash": "0fa0cba5b3afbb54611f70f778adaad7ac91d38b5f3eb8e227e64822dba89634",
+ "recorded_at": "2026-11-06T14:42:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3039,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.238751",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=181"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#9",
+    "text": "        1. `'plain'` is the default mode for the decorator, and can be omitted.\n        2. Pydantic will *not* validate that the serialized value complies with the `int` type.\n\n* ***Wrap* serializers**: give more flexibility to customize the serialization behavior. You can run code before or after\n  the Pydantic serialization logic.\n  {#field-wrap-serializer}\n\n    Such serializers must be defined with a **mandatory** extra *handler* parameter: a callable taking the value to be serialized\n    as an argument. Internally, this handler will delegate serialization of the value to Pydantic. You are free to *not* call the\n    handler at all.\n\n    === \"Annotated pattern\"\n\n        ```python\n        from typing import Annotated, Any\n\n        from pydantic import BaseModel, SerializerFunctionWrapHandler, WrapSerializer\n\n\n        def ser_number(value: Any, handler: SerializerFunctionWrapHandler) -> int:\n            return handler(value) + 1\n\n\n        class Model(BaseModel):\n            number: Annotated[int, WrapSerializer(ser_number)]\n\n\n        print(Model(number=4).model_dump())\n        #> {'number': 5}\n        ```\n\n    === \"Decorator\"\n\n        ```python\n        from typing import Any\n\n        from pydantic import BaseModel, SerializerFunctionWrapHandler, field_serializer\n\n\n        class Model(BaseModel):\n            number: int\n\n            @field_serializer('number', mode='wrap')\n            def ser_number(\n                self, value: Any, handler: SerializerFunctionWrapHandler\n            ) -> int:\n                return handler(value) + 1\n\n\n        print(Model(number=4).model_dump())\n        #> {'number': 5}\n        ```"
+   },
+   {
+    "id": "pydantic:docs/concepts/validators.md#3",
+    "text": "        1. `'after'` is the default mode for the decorator, and can be omitted.\n        2. Note that it is important to return the validated value.\n\n    ??? example \"Example mutating the value\"\n        Here is an example of a validator making changes to the validated value (no exception is raised).\n\n        === \"Annotated pattern\"\n\n            ```python\n            from typing import Annotated\n\n            from pydantic import AfterValidator, BaseModel\n\n\n            def double_number(value: int) -> int:\n                return value * 2\n\n\n            class Model(BaseModel):\n                number: Annotated[int, AfterValidator(double_number)]\n\n\n            print(Model(number=2))\n            #> number=4\n            ```\n\n        === \"Decorator\"\n\n            ```python\n            from pydantic import BaseModel, field_validator\n\n\n            class Model(BaseModel):\n                number: int\n\n                @field_validator('number', mode='after')  # (1)!\n                @classmethod\n                def double_number(cls, value: int) -> int:\n                    return value * 2\n\n\n            print(Model(number=2))\n            #> number=4\n            ```\n\n            1. `'after'` is the default mode for the decorator, and can be omitted.\n\n* ***Before* validators**: run before Pydantic's internal parsing and validation (e.g. coercion of a `str` to an `int`).\n  These are more flexible than [*after* validators](#field-after-validator), but they also have to deal with the raw input, which\n  in theory could be any arbitrary object. You should also avoid mutating the value directly if you are raising a\n  [validation error](#raising-validation-errors) later in your validator function, as the mutated value may be passed to other\n  validators if using [unions](./unions.md).\n  {#field-before-validator}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/validators.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#9",
+    "b": "pydantic:docs/concepts/validators.md#3",
+    "relation": "unrelated",
+    "related": 0.0932,
+    "probabilities": {
+     "same": 0.0146,
+     "overlapping": 0.058,
+     "conflicting": 0.0206,
+     "unrelated": 0.9068
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 49
+  },
+  "timing": {
+   "read_ms": 48,
+   "total_ms": 51
+  }
+ }
+}

@@ -1,0 +1,101 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/95/9510d9de2f18b9347a3e",
+ "request_hash": "9510d9de2f18b9347a3ebfa866b1ae28d23f6a68764368f011b85b4be4440521",
+ "recorded_at": "2026-11-06T14:43:08Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1996,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "77.069344",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=259"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#20",
+    "text": "## Error handling\n\nPydantic will raise a [`ValidationError`][pydantic_core.ValidationError] exception whenever it finds an error in the data it's validating.\n\nA single exception will be raised regardless of the number of errors found, and that validation error\nwill contain information about all of the errors and how they happened.\n\nSee [Error Handling](../errors/errors.md) for details on standard and custom errors.\n\nAs a demonstration:\n\n```python\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    list_of_ints: list[int]\n    a_float: float\n\n\ndata = {\n    'list_of_ints': ['1', 2, 'bad'],\n    'a_float': 'not a float',\n}\n\ntry:\n    Model(**data)\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    2 validation errors for Model\n    list_of_ints.2\n      Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='bad', input_type=str]\n    a_float\n      Input should be a valid number, unable to parse string as a number [type=float_parsing, input_value='not a float', input_type=str]\n    \"\"\"\n```\n\nIn an example like this one, the offending `data` is right there in the code. A\n[`ValidationError`][pydantic_core.ValidationError] includes the value rejected at each failing\nlocation, but in a running application you may also need those details in their request or job\ncontext. [Logfire records failed validations](../errors/troubleshooting.md) with both."
+   }
+  ],
+  "answer": "with pytest.raises(TypeError): Model(x=1) ``` ### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details).",
+  "claims": [
+   "with pytest.raises(TypeError): Model(x=1) ```",
+   "### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details)."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.7995,
+  "ungrounded": 0.2005,
+  "verdict": "partially_grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#20",
+    "share": 1,
+    "share_of_answer": 0.7995,
+    "claims": [
+     1
+    ]
+   }
+  ],
+  "claims": [
+   {
+    "claim": "with pytest.raises(TypeError): Model(x=1) ```",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.1779,
+    "supported": 0.0094,
+    "contradicted": 0.4699,
+    "not_stated": 0.5066,
+    "not_a_claim": 0.0141,
+    "verdict": "not_stated",
+    "sources": {
+     "pydantic:docs/concepts/models.md#20": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details).",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.8221,
+    "supported": 0.9704,
+    "contradicted": 0.0067,
+    "not_stated": 0.0183,
+    "not_a_claim": 0.0045,
+    "verdict": "supported",
+    "sources": {
+     "pydantic:docs/concepts/models.md#20": 1
+    },
+    "source": "pydantic:docs/concepts/models.md#20",
+    "evidence": {
+     "document": "pydantic:docs/concepts/models.md#20",
+     "quote": "Pydantic will raise a [`ValidationError`][pydantic_core.ValidationError] exception whenever it finds an error in the data it's validating.",
+     "start": 19,
+     "end": 157,
+     "confidence": 1
+    }
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0094
+  },
+  "timing": {
+   "read_ms": 84,
+   "total_ms": 87
+  }
+ }
+}

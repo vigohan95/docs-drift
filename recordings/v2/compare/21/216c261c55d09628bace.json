@@ -1,0 +1,271 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/21/216c261c55d09628bace",
+ "request_hash": "216c261c55d09628bace6c3f93ff1d6a1135cf0a0c3e4b60a6989bdd0653d455",
+ "recorded_at": "2026-11-06T14:40:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1309,
+ "response_headers": {
+  "x-clocked-credits": "14",
+  "x-clocked-model-ms": "336.257578",
+  "x-clocked-cost-usd": "0.002789",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=545"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/whats_new.md#118",
+    "text": "\n`Balancer`, `Forward`, `DomainForward` and `BalancerForward` no longer forward a request the server refused while reading it, such as one over `BodyLimit`: the client is answered with the refusal, and the upstream used to run a copy of the request without its body.\n\n`DoRedirects` rewrites the request for each hop as RFC 9110 §15.4 describes: a `303` turns every method but `GET` and `HEAD` into `GET`, a `301` or `302` turns `POST` into `GET`, and a `307` or `308` repeats the request. When the method changes, the body goes with it, and the fields that framed, described or expected it, for that hop: the request your handler holds keeps its method, body and credentials. A hop sent as a copy keeps the request timeout, the user values and the body of a multipart form the server parsed ahead of the handler. A redirect that would repeat the body of a streamed request is followed when the first hop left all of it in memory, as it does for a body of known length up to 8 KiB, and fails with `fasthttp.ErrRedirectBodyStream` for a chunked or a longer one. A `DoRedirects` that fails while following the chain, `fasthttp.ErrTooManyRedirects` included, leaves the response empty, where it used to keep the redirect it stopped at, `Location` and `Set-Cookie` included. `Authorization`, `Cookie` and the related credential headers are dropped when a redirect leaves the origin ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454)): another scheme now counts as leaving it, as another host or port did, and a default port spelled out in `Location`, `http://example.com/` to `http://example.com:80/`, no longer does. Every other header the request still carries is forwarded, application-defined credentials such as `X-Api-Key` included; the new `SecurityPolicy.RedirectSensitiveHeaders` lists extra names to drop on such a redirect, and is empty by default, so nothing changes until it is set. See [Headers on a cross-origin redirect](./middleware/proxy.md#headers-on-a-cross-origin-redirect) and [Redirect method and body](./middleware/proxy.md#redirect-method-and-body)."
+   },
+   {
+    "id": "fiber:docs/middleware/proxy.md#12",
+    "text": "### Redirect method and body\n\n`DoRedirects` rewrites the request for each hop according to the status that sent it there ([RFC 9110 §15.4](https://www.rfc-editor.org/rfc/rfc9110#section-15.4)). A `303 See Other` turns every method except `GET` and `HEAD` into `GET`. A `301 Moved Permanently` or `302 Found` turns `POST` into `GET`, as browsers and fasthttp do, and leaves any other method alone. A `307 Temporary Redirect` or `308 Permanent Redirect` repeats the request as it was. When the method changes, the body is dropped, including a form your handler already read, together with the fields that frame or describe it or expect it: `Content-Type`, `Content-Length`, `Content-Encoding`, `Content-Language`, `Content-Location`, `Transfer-Encoding`, `Trailer`, `Expect`, `Digest` and `Content-MD5`. A hop that differs from the request your handler holds goes out as a copy, so that request keeps its method, body, form, uploaded files and credentials. The copy keeps what it is sent with: the request timeout, the user values and the body of a multipart form the server parsed before your handler ran.\n\nWhere header names are kept as sent (`DisableHeaderNormalizing`), each spelling of a field a redirect drops costs a pass over every header line. The fields above, and separately the credentials a [cross-origin redirect](#headers-on-a-cross-origin-redirect) drops, may therefore take one spelling per field and 32 more between them; a request that spells them in more ways fails the redirect with `431 Request Header Fields Too Large`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/whats_new.md#118",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/proxy.md#12"
+    ],
+    "conflicts": [
+     "fiber:docs/middleware/proxy.md#12"
+    ]
+   },
+   {
+    "id": "fiber:docs/middleware/proxy.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#118"
+    ],
+    "conflicts": [
+     "fiber:docs/whats_new.md#118"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/whats_new.md#118",
+    "b": "fiber:docs/middleware/proxy.md#12",
+    "relation": "conflicting",
+    "related": 0.9947,
+    "probabilities": {
+     "same": 0.0081,
+     "overlapping": 0.0161,
+     "conflicting": 0.9706,
+     "unrelated": 0.0053
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.011,
+       "restated": 0.9605,
+       "elaborated": 0.0206,
+       "different": 0.0079
+      },
+      "confidence": 0.9921,
+      "a": {
+       "document": "fiber:docs/whats_new.md#118",
+       "quote": "`DoRedirects` rewrites the request for each hop as RFC 9110 §15.4 describes: a `303` turns every method but `GET` and `HEAD` into `GET`, a `301` or `302` turns `POST` into `GET`, and a `307` or `308` repeats the request.",
+       "start": 267,
+       "end": 487,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#12",
+       "quote": "### Redirect method and body\n\n`DoRedirects` rewrites the request for each hop according to the status that sent it there ([RFC 9110 §15.4](https://www.rfc-editor.org/rfc/rfc9110#section-15.4)).",
+       "start": 0,
+       "end": 193,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0146,
+       "restated": 0.9618,
+       "elaborated": 0.0137,
+       "different": 0.01
+      },
+      "confidence": 0.99,
+      "a": {
+       "document": "fiber:docs/whats_new.md#118",
+       "quote": "`DoRedirects` rewrites the request for each hop as RFC 9110 §15.4 describes: a `303` turns every method but `GET` and `HEAD` into `GET`, a `301` or `302` turns `POST` into `GET`, and a `307` or `308` repeats the request.",
+       "start": 267,
+       "end": 487,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#12",
+       "quote": "A `303 See Other` turns every method except `GET` and `HEAD` into `GET`.",
+       "start": 194,
+       "end": 266,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0114,
+       "restated": 0.9507,
+       "elaborated": 0.023,
+       "different": 0.0149
+      },
+      "confidence": 0.865,
+      "a": {
+       "document": "fiber:docs/whats_new.md#118",
+       "quote": "`DoRedirects` rewrites the request for each hop as RFC 9110 §15.4 describes: a `303` turns every method but `GET` and `HEAD` into `GET`, a `301` or `302` turns `POST` into `GET`, and a `307` or `308` repeats the request.",
+       "start": 267,
+       "end": 487,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#12",
+       "quote": "A `301 Moved Permanently` or `302 Found` turns `POST` into `GET`, as browsers and fasthttp do, and leaves any other method alone.",
+       "start": 267,
+       "end": 396,
+       "confidence": 0.865
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.012,
+       "restated": 0.9677,
+       "elaborated": 0.011,
+       "different": 0.0092
+      },
+      "confidence": 0.9908,
+      "a": {
+       "document": "fiber:docs/whats_new.md#118",
+       "quote": "`DoRedirects` rewrites the request for each hop as RFC 9110 §15.4 describes: a `303` turns every method but `GET` and `HEAD` into `GET`, a `301` or `302` turns `POST` into `GET`, and a `307` or `308` repeats the request.",
+       "start": 267,
+       "end": 487,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#12",
+       "quote": "A `307 Temporary Redirect` or `308 Permanent Redirect` repeats the request as it was.",
+       "start": 397,
+       "end": 482,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.008,
+       "restated": 0.9669,
+       "elaborated": 0.0152,
+       "different": 0.0099
+      },
+      "confidence": 0.9901,
+      "a": {
+       "document": "fiber:docs/whats_new.md#118",
+       "quote": "A hop sent as a copy keeps the request timeout, the user values and the body of a multipart form the server parsed ahead of the handler.",
+       "start": 675,
+       "end": 811,
+       "confidence": 0.998
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#12",
+       "quote": "A hop that differs from the request your handler holds goes out as a copy, so that request keeps its method, body, form, uploaded files and credentials.",
+       "start": 802,
+       "end": 954,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0185,
+       "restated": 0.8931,
+       "elaborated": 0.0335,
+       "different": 0.0549
+      },
+      "confidence": 0.9451,
+      "a": {
+       "document": "fiber:docs/whats_new.md#118",
+       "quote": "A hop sent as a copy keeps the request timeout, the user values and the body of a multipart form the server parsed ahead of the handler.",
+       "start": 675,
+       "end": 811,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#12",
+       "quote": "The copy keeps what it is sent with: the request timeout, the user values and the body of a multipart form the server parsed before your handler ran.\n\nWhere header names are kept as sent (`DisableHeaderNormalizing`), each spelling of a field a redirect drops costs a pass over every header line.",
+       "start": 955,
+       "end": 1250,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": [
+     {
+      "kind": "rule_or_condition",
+      "kinds": {
+       "value": 0.0037,
+       "date_or_version": 0.0031,
+       "rule_or_condition": 0.9632,
+       "scope": 0.022,
+       "name": 0.0029,
+       "no_conflict": 0.0052
+      },
+      "confidence": 0.9948,
+      "a": {
+       "document": "fiber:docs/whats_new.md#118",
+       "quote": "When the method changes, the body goes with it, and the fields that framed, described or expected it, for that hop: the request your handler holds keeps its method, body and credentials.",
+       "start": 488,
+       "end": 674,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/proxy.md#12",
+       "quote": "When the method changes, the body is dropped, including a form your handler already read, together with the fields that frame or describe it or expect it: `Content-Type`, `Content-Length`, `Content-Encoding`, `Content-Language`, `Content-Location`, `Transfer-Encoding`, `Trailer`, `Expect`, `Digest` and `Content-MD5`.",
+       "start": 483,
+       "end": 801,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 8,
+   "counterparts_ms": 203,
+   "kinds_ms": 19
+  },
+  "timing": {
+   "read_ms": 350,
+   "total_ms": 355
+  }
+ }
+}

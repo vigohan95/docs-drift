@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9d/9de2eec4d50c40ddd33c",
+ "request_hash": "9de2eec4d50c40ddd33cdfe6422c89dbdad1efe5b47ad8d09dcd856bf5a313df",
+ "recorded_at": "2026-11-06T14:42:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 967,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "107.112669",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=242"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/errors/usage_errors.md#27",
+    "text": "## Unrecognized `field_serializer` signature {#field-serializer-signature}\n\nThis error is raised when the `field_serializer` function has the wrong signature.\n\n```python\nfrom pydantic import BaseModel, PydanticUserError, field_serializer\n\ntry:\n\n    class Model(BaseModel):\n        x: int\n\n        @field_serializer('x')\n        def no_args():\n            return 'x'\n\nexcept PydanticUserError as exc_info:\n    assert exc_info.code == 'field-serializer-signature'\n```\n\nValid field serializer signatures are:\n\n```python {test=\"skip\" lint=\"skip\" upgrade=\"skip\"}\nfrom pydantic import FieldSerializationInfo, SerializerFunctionWrapHandler, field_serializer\n\n# an instance method with the default mode or `mode='plain'`\n@field_serializer('x')  # or @field_serializer('x', mode='plain')\ndef ser_x(self, value: Any, info: FieldSerializationInfo): ...\n\n# a static method or function with the default mode or `mode='plain'`\n@field_serializer('x')  # or @field_serializer('x', mode='plain')\n@staticmethod\ndef ser_x(value: Any, info: FieldSerializationInfo): ...\n\n# equivalent to\ndef ser_x(value: Any, info: FieldSerializationInfo): ...\nserializer('x')(ser_x)\n\n# an instance method with `mode='wrap'`\n@field_serializer('x', mode='wrap')\ndef ser_x(self, value: Any, nxt: SerializerFunctionWrapHandler, info: FieldSerializationInfo): ...\n\n# a static method or function with `mode='wrap'`\n@field_serializer('x', mode='wrap')\n@staticmethod\ndef ser_x(value: Any, nxt: SerializerFunctionWrapHandler, info: FieldSerializationInfo): ...\n\n# equivalent to\ndef ser_x(value: Any, nxt: SerializerFunctionWrapHandler, info: FieldSerializationInfo): ...\nserializer('x')(ser_x)\n\n# For all of these, you can also choose to omit the `info` argument, for example:\n@field_serializer('x')\ndef ser_x(self, value: Any): ...\n\n@field_serializer('x', mode='wrap')\ndef ser_x(self, value: Any, handler: SerializerFunctionWrapHandler): ...\n```"
+   },
+   {
+    "id": "pydantic:docs/internals/architecture.md#3",
+    "text": "To illustrate what a core schema looks like, we will take the example of the\n[`bool`][pydantic_core.core_schema.bool_schema] core schema:\n\n```python {lint=\"skip\" test=\"skip\"}\nclass BoolSchema(TypedDict, total=False):\n    type: Required[Literal['bool']]\n    strict: bool\n    ref: str\n    metadata: Any\n    serialization: SerSchema\n```\n\nWhen defining a Pydantic model with a boolean field:\n\n```python\nfrom pydantic import BaseModel, Field\n\n\nclass Model(BaseModel):\n    foo: bool = Field(strict=True)\n```\n\nThe core schema for the `foo` field will look like:\n\n```python\n{\n    'type': 'bool',\n    'strict': True,\n}\n```\n\nAs seen in the [`BoolSchema`][pydantic_core.core_schema.bool_schema] definition,\nthe serialization logic is also defined in the core schema.\nIf we were to define a custom serialization function for `foo` (1), the `serialization` key would look like:\n{ .annotate }\n\n1. For example using the [`field_serializer`][pydantic.functional_serializers.field_serializer] decorator:\n\n    ```python {test=\"skip\" lint=\"skip\"}\n    class Model(BaseModel):\n        foo: bool = Field(strict=True)\n\n        @field_serializer('foo', mode='plain')\n        def serialize_foo(self, value: bool) -> Any:\n            ...\n    ```\n\n```python {lint=\"skip\" test=\"skip\"}\n{\n    'type': 'function-plain',\n    'function': <function Model.serialize_foo at 0x111>,\n    'is_field_serializer': True,\n    'info_arg': False,\n    'return_schema': {'type': 'int'},\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/errors/usage_errors.md#27",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/internals/architecture.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/errors/usage_errors.md#27",
+    "b": "pydantic:docs/internals/architecture.md#3",
+    "relation": "overlapping",
+    "related": 0.9913,
+    "probabilities": {
+     "same": 0.0146,
+     "overlapping": 0.971,
+     "conflicting": 0.0056,
+     "unrelated": 0.0087
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 113,
+   "total_ms": 116
+  }
+ }
+}

@@ -1,0 +1,237 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/02/02c7e3d7f23cfd3c1856",
+ "request_hash": "02c7e3d7f23cfd3c18566ee5c335e286dfaaaa3ee1a75694c420a3623da2e4c5",
+ "recorded_at": "2026-11-06T14:39:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2804,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "249.190857",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=391"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/bind.md#46",
+    "text": "### Setup Your Validator in the Config\n\n```go title=\"Example\"\nimport \"github.com/go-playground/validator/v10\"\n\ntype structValidator struct {\n    validate *validator.Validate\n}\n\n// Validate method implementation\nfunc (v *structValidator) Validate(out any) error {\n    return v.validate.Struct(out)\n}\n\n// Setup your validator in the Fiber config\napp := fiber.New(fiber.Config{\n    StructValidator: &structValidator{validate: validator.New()},\n})\n```\n\nFiber only runs `StructValidator` for struct destinations (or pointers to structs).\nBinding into maps and other non-struct types skips the validator step.\n\nValidation runs after a bind succeeds, on the value you passed in. If binding fails, the validator is not called. [`All`](#all) validates once, on the merged struct. The validator's error is returned as is: it is not wrapped in a [`BindError`](#validation-vs-binding-errors), and the default error handler answers it with `500 Internal Server Error` (only [`All`](#all) under [`WithAutoHandling`](#withautohandling) converts it to a `400 Bad Request`), so return a client error yourself when the request is at fault, as shown in the [Validation guide](../guide/validation.md). To bypass the validator, use [`SkipValidation`](#skipvalidation)."
+   },
+   {
+    "id": "fiber:docs/guide/validation.md#4",
+    "text": "### Step 3: Bind and validate in one call\n\nTag your structs with the validator's rules. Every bind method (`Body`, `Query`, `Form`, and the rest) now triggers validation and returns its errors alongside binding errors:\n\n```go\ntype User struct {\n    Name string `json:\"name\" form:\"name\" query:\"name\" validate:\"required\"`\n    Age  int    `json:\"age\" form:\"age\" query:\"age\" validate:\"gte=0,lte=100\"`\n}\n\napp.Post(\"/\", func(c fiber.Ctx) error {\n    user := new(User)\n\n    // Works with all bind methods: Body, Query, Form, ...\n    if err := c.Bind().Body(user); err != nil { // validation errors are returned here\n        return err\n    }\n\n    return c.JSON(user)\n})\n```\n\nReturned as-is, a validation error surfaces through Fiber's [error handling](./error-handling.md), so you can also shape it globally in a custom error handler. It is not wrapped in a [`fiber.BindError`](../api/bind.md#binderror), which is reserved for binding failures, and a plain `error` carries no status, so the default error handler answers it with `500 Internal Server Error`. Step 4 shows how to answer with a client error instead.\n\n:::note\nValidation runs only after binding succeeds, on the value you passed to the bind method. When parsing fails, the validator is not called. `Bind().All` validates once, on the struct merged from all sources.\n\nTo bypass the validator for part of a request, use [`SkipValidation`](../api/bind.md#skipvalidation). The setting stays in effect for the rest of the request until you turn validation back on with `SkipValidation(false)`.\n\n[`WithAutoHandling`](../api/bind.md#withautohandling) converts a validation error into `400 Bad Request` only for `Bind().All`. The other bind methods return the validator's error unchanged.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/bind.md#46",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/guide/validation.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/guide/validation.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/bind.md#46"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/bind.md#46",
+    "b": "fiber:docs/guide/validation.md#4",
+    "relation": "overlapping",
+    "related": 0.997,
+    "probabilities": {
+     "same": 0.017,
+     "overlapping": 0.9744,
+     "conflicting": 0.0057,
+     "unrelated": 0.003
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0131,
+       "restated": 0.8979,
+       "elaborated": 0.0309,
+       "different": 0.058
+      },
+      "confidence": 0.533,
+      "a": {
+       "document": "fiber:docs/api/bind.md#46",
+       "quote": "The validator's error is returned as is: it is not wrapped in a [`BindError`](#validation-vs-binding-errors), and the default error handler answers it with `500 Internal Server Error` (only [`All`](#all) under [`WithAutoHandling`](#withautohandling) converts it to a `400 Bad Request`), so return a client error yourself when the request is at fault, as shown in the [Validation guide](../guide/validation.md).",
+       "start": 771,
+       "end": 1181,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/guide/validation.md#4",
+       "quote": "Every bind method (`Body`, `Query`, `Form`, and the rest) now triggers validation and returns its errors alongside binding errors:\n\n```go\ntype User struct {\n    Name string `json:\"name\" form:\"name\" query:\"name\" validate:\"required\"`\n    Age  int    `json:\"age\" form:\"age\" query:\"age\" validate:\"gte=0,lte=100\"`\n}\n\napp.Post(\"/\", func(c fiber.Ctx) error {\n    user := new(User)\n\n    // Works with all bind methods: Body, Query, Form, ...\n    if err := c.Bind().Body(user); err != nil { // validation errors are returned here\n        return err\n    }\n\n    return c.JSON(user)\n})\n```\n\nReturned as-is, a validation error surfaces through Fiber's [error handling](./error-handling.md), so you can also shape it globally in a custom error handler.",
+       "start": 88,
+       "end": 826,
+       "confidence": 0.533
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0075,
+       "restated": 0.9776,
+       "elaborated": 0.0087,
+       "different": 0.0062
+      },
+      "confidence": 0.9938,
+      "a": {
+       "document": "fiber:docs/api/bind.md#46",
+       "quote": "The validator's error is returned as is: it is not wrapped in a [`BindError`](#validation-vs-binding-errors), and the default error handler answers it with `500 Internal Server Error` (only [`All`](#all) under [`WithAutoHandling`](#withautohandling) converts it to a `400 Bad Request`), so return a client error yourself when the request is at fault, as shown in the [Validation guide](../guide/validation.md).",
+       "start": 771,
+       "end": 1181,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/guide/validation.md#4",
+       "quote": "It is not wrapped in a [`fiber.BindError`](../api/bind.md#binderror), which is reserved for binding failures, and a plain `error` carries no status, so the default error handler answers it with `500 Internal Server Error`.",
+       "start": 827,
+       "end": 1049,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0072,
+       "restated": 0.9731,
+       "elaborated": 0.0112,
+       "different": 0.0084
+      },
+      "confidence": 0.775,
+      "a": {
+       "document": "fiber:docs/api/bind.md#46",
+       "quote": "Validation runs after a bind succeeds, on the value you passed in.",
+       "start": 605,
+       "end": 671,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/guide/validation.md#4",
+       "quote": "Step 4 shows how to answer with a client error instead.\n\n:::note\nValidation runs only after binding succeeds, on the value you passed to the bind method.",
+       "start": 1050,
+       "end": 1203,
+       "confidence": 0.775
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0048,
+       "restated": 0.9809,
+       "elaborated": 0.0071,
+       "different": 0.0073
+      },
+      "confidence": 0.9927,
+      "a": {
+       "document": "fiber:docs/api/bind.md#46",
+       "quote": "If binding fails, the validator is not called.",
+       "start": 672,
+       "end": 718,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/guide/validation.md#4",
+       "quote": "When parsing fails, the validator is not called.",
+       "start": 1204,
+       "end": 1252,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0083,
+       "restated": 0.9592,
+       "elaborated": 0.0216,
+       "different": 0.0109
+      },
+      "confidence": 0.9891,
+      "a": {
+       "document": "fiber:docs/api/bind.md#46",
+       "quote": "[`All`](#all) validates once, on the merged struct.",
+       "start": 719,
+       "end": 770,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/guide/validation.md#4",
+       "quote": "`Bind().All` validates once, on the struct merged from all sources.\n\nTo bypass the validator for part of a request, use [`SkipValidation`](../api/bind.md#skipvalidation).",
+       "start": 1253,
+       "end": 1423,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0317,
+       "restated": 0.6967,
+       "elaborated": 0.0788,
+       "different": 0.1928
+      },
+      "confidence": 0.8072,
+      "a": {
+       "document": "fiber:docs/api/bind.md#46",
+       "quote": "The validator's error is returned as is: it is not wrapped in a [`BindError`](#validation-vs-binding-errors), and the default error handler answers it with `500 Internal Server Error` (only [`All`](#all) under [`WithAutoHandling`](#withautohandling) converts it to a `400 Bad Request`), so return a client error yourself when the request is at fault, as shown in the [Validation guide](../guide/validation.md).",
+       "start": 771,
+       "end": 1181,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "fiber:docs/guide/validation.md#4",
+       "quote": "The other bind methods return the validator's error unchanged.\n:::",
+       "start": 1673,
+       "end": 1739,
+       "confidence": 0.947
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 94,
+   "passages": 6,
+   "counterparts_ms": 132
+  },
+  "timing": {
+   "read_ms": 258,
+   "total_ms": 261
+  }
+ }
+}

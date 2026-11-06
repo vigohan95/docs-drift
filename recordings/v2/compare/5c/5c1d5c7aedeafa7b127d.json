@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5c/5c1d5c7aedeafa7b127d",
+ "request_hash": "5c1d5c7aedeafa7b127d576a47d35b3590093a9961f967e8b6603c33efa19640",
+ "recorded_at": "2026-11-06T14:42:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1801,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.635136",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=172"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#3",
+    "text": "### JSON mode\n\nPydantic allows data to be serialized directly to a JSON-encoded string, by trying its best to convert Python values to valid\nJSON data. This is achievable by using the [`model_dump_json()`][pydantic.BaseModel.model_dump_json] method:\n\n```python\nfrom datetime import datetime\n\nfrom pydantic import BaseModel\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    foo: datetime\n    bar: BarModel\n\n\nm = FooBarModel(foo=datetime(2032, 6, 1, 12, 13, 14), bar={'whatever': (1, 2)})\n\nprint(m.model_dump_json(indent=2))\n\"\"\"\n{\n  \"foo\": \"2032-06-01T12:13:14\",\n  \"bar\": {\n    \"whatever\": [\n      1,\n      2\n    ]\n  }\n}\n\"\"\"\n```\n\nIn addition to the [supported types][json.JSONEncoder] by the standard library [`json`][] module, Pydantic supports a wide\nvariety of types ([date and time types][datetime], [`UUID`][uuid.UUID] objects, [sets][set], etc). If an unsupported type\nis used and can't be serialized to JSON, a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError] exception\nis raised.\n\nA serialization error like this often only shows up when a particular object reaches the point of being\nserialized (commonly when building a response), so it can be easy to miss until it happens in\nproduction. Like any exception, it's captured by [Logfire](../integrations/logfire.md) if you've\ninstrumented your application, in the context of the request that triggered it, and grouped with other\noccurrences so you can tell a one-off from a recurring problem.\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_json()`][pydantic.TypeAdapter.dump_json] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#dictmodel-and-iteration}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`Counter`][collections.Counter] instances are valid. Strict mode does *not* apply to the keys and values of the counters.\nThe strict constraint must be applied to the parameter types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom collections import Counter\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    x: Counter[str]\n\n\nm = Model(x={'foo': '1'})\nprint(m.model_dump())\n#> {'x': Counter({'foo': 1})}\n\ntry:\n    Model(x='test')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid Counter [type=counter_type, input_value='test', input_type=str]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typeddict}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#3",
+    "b": "pydantic:docs/api/standard_library_types.md#45",
+    "relation": "unrelated",
+    "related": 0.0045,
+    "probabilities": {
+     "same": 0.0016,
+     "overlapping": 0.0012,
+     "conflicting": 0.0016,
+     "unrelated": 0.9955
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

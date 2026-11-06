@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/40/40322ece676a88b07cdb",
+ "request_hash": "40322ece676a88b07cdb65c5160d1d133c2783bcc3980023f9c69a4a233b0e5a",
+ "recorded_at": "2026-11-06T14:40:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 4080,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "144.59277",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=283"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#7",
+    "text": "### RouteChain\n\nReturns an instance of a single route, which you can then use to handle HTTP verbs with optional middleware.\n\nSimilar to [`Express`](https://expressjs.com/en/api.html#app.route).\n\n```go title=\"Signature\"\nfunc (app *App) RouteChain(path string) Register\n```\n\n<details>\n<summary>Click here to see the `Register` interface</summary>\n\n```go\ntype Register interface {\n    All(handler any, handlers ...any) Register\n    Get(handler any, handlers ...any) Register\n    Head(handler any, handlers ...any) Register\n    Post(handler any, handlers ...any) Register\n    Put(handler any, handlers ...any) Register\n    Delete(handler any, handlers ...any) Register\n    Connect(handler any, handlers ...any) Register\n    Options(handler any, handlers ...any) Register\n    Trace(handler any, handlers ...any) Register\n    Patch(handler any, handlers ...any) Register\n    Query(handler any, handlers ...any) Register\n\n    Add(methods []string, handler any, handlers ...any) Register\n\n    RouteChain(path string) Register\n}\n```\n\n</details>\n\n```go title=\"Example\"\npackage main\n\nimport (\n    \"log\"\n\n    \"github.com/gofiber/fiber/v3\"\n)\n\nfunc main() {\n    app := fiber.New()\n\n    // Use `RouteChain` as a chainable route declaration method\n    app.RouteChain(\"/test\").Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /test\")\n    })\n\n    app.RouteChain(\"/events\").All(func(c fiber.Ctx) error {\n        // Runs for all HTTP verbs first\n        // Think of it as route-specific middleware!\n        return c.Next()\n    }).\n    Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /events\")\n    }).\n    Post(func(c fiber.Ctx) error {\n        // Maybe add a new event...\n        return c.SendString(\"POST /events\")\n    })\n\n    // Combine multiple routes\n    app.RouteChain(\"/reports\").RouteChain(\"/daily\").Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /reports/daily\")\n    })\n\n    // Use multiple methods\n    app.RouteChain(\"/api\").Get(func(c fiber.Ctx) error {\n        return c.SendString(\"GET /api\")\n    }).Post(func(c fiber.Ctx) error {\n        return c.SendString(\"POST /api\")\n    })\n\n    log.Fatal(app.Listen(\":3000\"))\n}\n```"
+   },
+   {
+    "id": "fiber:docs/guide/routing.md#24",
+    "text": "### RouteChain\n\nWhen several HTTP methods share the **same path**, [`RouteChain`](../api/app.md#routechain) lets you declare the path once and chain the verb handlers. Handlers run in the order you declare them, so an `All` declared before the verb handlers runs ahead of them on that path, acting as route-specific middleware.\n\n```go\napp.RouteChain(\"/events\").\n    All(func(c fiber.Ctx) error { return c.Next() }). // route-local middleware\n    Get(func(c fiber.Ctx) error { return c.SendString(\"GET /events\") }).\n    Post(func(c fiber.Ctx) error { return c.SendString(\"POST /events\") })\n```\n\n:::note\nWithin a chain, `All` registers prefix-matched middleware (like [`Use`](#use)), not the exact-path `App.All`, so it also runs for sub-paths of the chain path.\n:::\n\nPick the helper that fits: a single endpoint uses `Get`/`Post`/…; a fixed set of methods on one path uses [`Add`](#route-handlers); one path with many methods (fluently) uses `RouteChain`; many paths under a shared prefix use [`Group`](#grouping) or `Route`; routes that must answer only for certain hostnames use [`Domain`](../api/app.md#domain)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/app.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/guide/routing.md#24"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/guide/routing.md#24",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/app.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/app.md#7",
+    "b": "fiber:docs/guide/routing.md#24",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0053,
+     "overlapping": 0.9898,
+     "conflicting": 0.0034,
+     "unrelated": 0.0015
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0098,
+       "restated": 0.9085,
+       "elaborated": 0.0306,
+       "different": 0.0511
+      },
+      "confidence": 0.9489,
+      "a": {
+       "document": "fiber:docs/api/app.md#7",
+       "quote": "### RouteChain",
+       "start": 0,
+       "end": 14,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/guide/routing.md#24",
+       "quote": "### RouteChain\n\nWhen several HTTP methods share the **same path**, [`RouteChain`](../api/app.md#routechain) lets you declare the path once and chain the verb handlers.",
+       "start": 0,
+       "end": 167,
+       "confidence": 0.983
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 71,
+   "passages": 1,
+   "counterparts_ms": 50
+  },
+  "timing": {
+   "read_ms": 154,
+   "total_ms": 158
+  }
+ }
+}

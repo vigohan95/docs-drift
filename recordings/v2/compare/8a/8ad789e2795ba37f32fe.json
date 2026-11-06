@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/8a/8ad789e2795ba37f32fe",
+ "request_hash": "8ad789e2795ba37f32fef48e114883d0a6f1cddb429467db20ec5169daeef1f7",
+ "recorded_at": "2026-11-06T14:41:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2494,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.65456",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=212"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "text": "### Python mode\n\nWhen using the Python mode, Pydantic models (and model-like types such as [dataclasses][]) (1) will be (recursively) converted to dictionaries. This is achievable by using the [`model_dump()`][pydantic.BaseModel.model_dump] method:\n{ .annotate }\n\n1. With the exception of [root models](./models.md#rootmodel-and-custom-root-types), where the root value is dumped directly.\n\n```python {group=\"python-dump\"}\nfrom pydantic import BaseModel, Field\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    banana: float | None = 1.1\n    foo: str = Field(serialization_alias='foo_alias')\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': (1, 2)})\n\n# returns a dictionary:\nprint(m.model_dump())\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': (1, 2)}}\n\nprint(m.model_dump(by_alias=True))\n#> {'banana': 3.14, 'foo_alias': 'hello', 'bar': {'whatever': (1, 2)}}\n```\n\nNotice that the value of `whatever` was dumped as tuple, which isn't a known JSON type. The `mode` argument can be set to `'json'`\nto ensure JSON-compatible types are used:\n\n```python {group=\"python-dump\"}\nprint(m.model_dump(mode='json'))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': [1, 2]}}\n```\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_python()`][pydantic.TypeAdapter.dump_python] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#modelmodel_dump_json}"
+   },
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#2",
+    "text": "## As a validation parameter\n\nStrict mode can be enabled on a per-validation-call basis, when using the [validation methods](./models.md#validating-data)\non [Pydantic models](./models.md) and [type adapters](./type_adapter.md).\n\n```python\nfrom datetime import date\n\nfrom pydantic import TypeAdapter, ValidationError\n\nprint(TypeAdapter(date).validate_python('2000-01-01'))  # OK: lax\n#> 2000-01-01\n\ntry:\n    # Not OK: strict:\n    TypeAdapter(date).validate_python('2000-01-01', strict=True)\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for date\n      Input should be a valid date [type=date_type, input_value='2000-01-01', input_type=str]\n    \"\"\"\n\nTypeAdapter(date).validate_json('\"2000-01-01\"', strict=True)  # (1)!\n#> 2000-01-01\n```\n\n1. As mentioned, strict mode is looser when validating from JSON.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#strict-mode-with-field}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#2",
+    "b": "pydantic:docs/concepts/strict_mode.md#2",
+    "relation": "unrelated",
+    "related": 0.0064,
+    "probabilities": {
+     "same": 0.0023,
+     "overlapping": 0.0022,
+     "conflicting": 0.002,
+     "unrelated": 0.9936
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 33
+  }
+ }
+}

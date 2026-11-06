@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5f/5fd53d767e6dc4ad8be0",
+ "request_hash": "5fd53d767e6dc4ad8be07715bc994b746443aa7691740eed0c2826ff402b9d62",
+ "recorded_at": "2026-11-06T14:38:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 864,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.305536",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=156"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/02-testing.md#1",
+    "text": "## Unit and component tests with Vitest\n\nUnit tests allow you to test small isolated parts of your code. Integration tests allow you to test parts of your application to see if they work together. If you're using Vite (including via SvelteKit), we recommend using [Vitest](https://vitest.dev/). You can use the Svelte CLI to [setup Vitest](/docs/cli/vitest) either during project creation or later on.\n\nTo setup Vitest manually, first install it:\n\n```sh\nnpm install -D vitest\n```\n\nThen adjust your `vite.config.js`:\n\n<!-- prettier-ignore -->\n```js\n/// file: vite.config.js\nimport { defineConfig } from +++'vitest/config'+++;\n\nexport default defineConfig({\n\t// ...\n\t// Tell Vitest to use the `browser` entry points in `package.json` files, even though it's running in Node\n\tresolve: process.env.VITEST\n\t\t? {\n\t\t\t\tconditions: ['browser']\n\t\t\t}\n\t\t: undefined\n});\n```\n\n> [!NOTE] If loading the browser version of all your packages is undesirable, because (for example) you also test backend libraries, [you may need to resort to an alias configuration](https://github.com/testing-library/svelte-testing-library/issues/222#issuecomment-1909993331)\n\nYou can now write unit tests for code inside your `.js/.ts` files:\n\n```js\n/// file: multiplier.svelte.test.js\n// @filename: multiplier.svelte.ts\nexport function multiplier(initial: number, k: number) {\n\tlet count = $state(initial);\n\n\treturn {\n\t\tget value() {\n\t\t\treturn count * k;\n\t\t},\n\t\tset: (c: number) => {\n\t\t\tcount = c;\n\t\t}\n\t};\n}\n// @filename: multiplier.svelte.test.js\n// ---cut---\nimport { flushSync } from 'svelte';\nimport { expect, test } from 'vitest';\nimport { multiplier } from './multiplier.svelte.js';\n\ntest('Multiplier', () => {\n\tlet double = multiplier(0, 2);\n\n\texpect(double.value).toEqual(0);\n\n\tdouble.set(5);\n\n\texpect(double.value).toEqual(10);\n});\n```\n\n```js\n/// file: multiplier.svelte.js\n/**\n * @param {number} initial\n * @param {number} k\n */\nexport function multiplier(initial, k) {\n\tlet count = $state(initial);\n\n\treturn {\n\t\tget value() {\n\t\t\treturn count * k;\n\t\t},\n\t\t/** @param {number} c */\n\t\tset: (c) => {\n\t\t\tcount = c;\n\t\t}\n\t};\n}\n```"
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/02-testing.md#7",
+    "text": "## End-to-end tests with Playwright\n\nE2E (short for 'end to end') tests allow you to test your full application through the eyes of the user. This section uses [Playwright](https://playwright.dev/) as an example, but you can also use other solutions like [Cypress](https://www.cypress.io/) or [NightwatchJS](https://nightwatchjs.org/).\n\nYou can use the Svelte CLI to [setup Playwright](/docs/cli/playwright) either during project creation or later on. You can also [set it up with `npm init playwright`](https://playwright.dev/docs/intro). Additionally, you may also want to install an IDE plugin such as [the VS Code extension](https://playwright.dev/docs/getting-started-vscode) to be able to execute tests from inside your IDE.\n\nIf you've run `npm init playwright` or are not using Vite, you may need to adjust the Playwright config to tell Playwright what to do before running the tests — mainly starting your application at a certain port. For example:\n\n```js\n/// file: playwright.config.js\nconst config = {\n\twebServer: {\n\t\tcommand: 'npm run build && npm run preview',\n\t\tport: 4173\n\t},\n\ttestDir: 'tests',\n\ttestMatch: /(.+\\.)?(test|spec)\\.[jt]s/\n};\n\nexport default config;\n```\n\nYou can now start writing tests. These are totally unaware of Svelte as a framework, so you mainly interact with the DOM and write assertions.\n\n```js\n// @errors: 2307 7031\n/// file: tests/hello-world.spec.js\nimport { expect, test } from '@playwright/test';\n\ntest('home page has expected h1', async ({ page }) => {\n\tawait page.goto('/');\n\tawait expect(page.locator('h1')).toBeVisible();\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/07-misc/02-testing.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/02-testing.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/07-misc/02-testing.md#1",
+    "b": "svelte:documentation/docs/07-misc/02-testing.md#7",
+    "relation": "unrelated",
+    "related": 0.0108,
+    "probabilities": {
+     "same": 0.0035,
+     "overlapping": 0.0043,
+     "conflicting": 0.003,
+     "unrelated": 0.9892
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 35
+  }
+ }
+}

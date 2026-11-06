@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2a/2a1fbd60513a63b9356f",
+ "request_hash": "2a1fbd60513a63b9356fadfd2e81fbe837f5fb1d6a42223c70e880c41cea50bb",
+ "recorded_at": "2026-11-06T14:39:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1083,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "215.061638",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=361"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#2",
+    "text": "## Examples\n\nImport the middleware package:\n\n```go\nimport (\n    \"time\"\n\n    \"github.com/gofiber/fiber/v3\"\n    \"github.com/gofiber/fiber/v3/middleware/limiter\"\n)\n```\n\nOnce your Fiber app is initialized, use the middleware like this:\n\n```go\n// Initialize default config\napp.Use(limiter.New())\n\n// Or extend your config for customization\napp.Use(limiter.New(limiter.Config{\n    Next: func(c fiber.Ctx) bool {\n        return c.IP() == \"127.0.0.1\"\n    },\n    Max:          20,\n    MaxFunc: func(c fiber.Ctx) int {\n      return 20\n    },\n    Expiration:     30 * time.Second,\n    ExpirationFunc: func(c fiber.Ctx) time.Duration {\n      // Use longer expiration for sensitive endpoints. A window keeps the length of the\n      // request that opened it, so give such a route its own key (see Dynamic expiration)\n      if c.Path() == \"/login\" {\n        return 60 * time.Second\n      }\n      return 30 * time.Second\n    },\n    KeyGenerator:          func(c fiber.Ctx) string {\n        return c.Get(\"x-forwarded-for\")\n    },\n    LimitReached: func(c fiber.Ctx) error {\n        return c.SendFile(\"./toofast.html\")\n    },\n    Storage: myCustomStorage{},\n}))\n```\n\n:::caution\nThe default `KeyGenerator` keys requests by `c.IP()`. Behind a reverse proxy, `c.IP()` only identifies a client if you configure `TrustProxy`, `TrustProxyConfig` and `ProxyHeader`, plus `EnableIPValidation` when the header is a chain your proxy appends to, such as `X-Forwarded-For`. Without them it is either the proxy's address, so every client shares one bucket, or the raw forwarded header, which a client can vary on every request to get a fresh bucket unless your proxy overwrites it with a single address. See the [reverse proxy guide](../guide/reverse-proxy.md#getting-the-real-client-ip-address).\n\nLimiter bounds its keys itself (see `KeyGenerator` below). For keys you build from client values for another store, see [Storage keys derived from client values](../guide/reverse-proxy.md#storage-keys-derived-from-client-values).\n:::"
+   },
+   {
+    "id": "fiber:docs/whats_new.md#48",
+    "text": "  server does not know and one with a method other than `GET` (a `HEAD` or `POST` with a `Range` used to get `206`).\n  The unit is case-insensitive (`Bytes=0-4` used to get `416`). `If-Range` was ignored, so a resumed download was\n  spliced onto a file that had changed; the range is now served only when the date in `If-Range` is exactly the file's\n  `Last-Modified` (and at least two seconds old), and the whole file is sent otherwise.\n- **Body()**: A `Content-Encoding` list of more than five codings, `identity` members included, is now answered\n  `415 Unsupported Media Type` before anything is decoded, since `BodyLimit` bounds each decoding step but not their\n  number. A chain of codings is now undone without replacing the request body, so slices returned by an earlier\n  `BodyRaw()` or by `Body()` stay valid for the whole handler, also under `ReduceMemoryUsage` and behind the adaptor\n  middleware.\n- **Render()**: The `fiber.Map` passed as `bind` is no longer modified. `ViewBind` values and, with\n  `PassLocalsToViews`, the `Locals` used to be written into it, so a map kept across requests carried the first\n  request's values into every later render, and a nil `fiber.Map` panicked. They are now merged into a copy, and a\n  key in the passed map still wins. Without a `Views` engine, `Render` now parses a copy of the template file, so\n  the output no longer depends on `Config.Immutable`.\n- **Context()**: Renamed to `RequestCtx()` to access the underlying `fasthttp.RequestCtx`.\n- **Host()**: Behind a trusted proxy, empty `X-Forwarded-Host` elements are skipped and repeated field lines are read in the order they were received, so `,example.com` answers `example.com`, and a value with no host left falls back to the `Host` header instead of an empty string. See [`Ctx.Host`](./api/ctx.md#host).\n- **IP()**: When `EnableIPValidation` is `true` and `TrustProxyConfig` is set, `c.IP()` now walks the `X-Forwarded-For` chain from right to left and returns the first non-trusted IP, instead of the leftmost syntactically valid IP. This closes an IP-spoofing vector where an attacker could prepend a fake address and have it returned by `c.IP()`. An entry that is not an IP address, such as `203.0.113.50:51234` or `unknown`, ends the walk, and `c.IP()` returns the last trusted proxy passed or the TCP remote address instead of an entry further left; a proxy that appends `IP:port` entries has to send the bare address. Repeated field lines of the proxy header are joined in the order they were received. Apps with `EnableIPValidation = false` (the default) are unaffected. See [`Ctx.IP`](./api/ctx.md#ip) and the [reverse proxy guide](./guide/reverse-proxy.md#getting-the-real-client-ip-address) for details.\n- **IPs()**: Empty `X-Forwarded-For` elements are now ignored after trimming spaces and tabs, even when `EnableIPValidation` is disabled. Repeated commas and whitespace-only elements no longer produce empty strings in the returned slice. See [`Ctx.IPs`](./api/ctx.md#ips).\n- **Links()**: Adds to a `Link` header that is already set, as `res.links` does in Express, instead of replacing it. A second call, or one after `SendEarlyHints`, keeps the earlier links; call `c.Del(fiber.HeaderLink)` first to replace them. See [`Ctx.Links`](./api/ctx.md#links).\n- **Scheme()**: Behind a trusted proxy, the scheme headers are ranked instead of read in the order they arrive: `X-Forwarded-Proto` wins over `X-Forwarded-Protocol`, then `X-Forwarded-Ssl: on`, then `X-Url-Scheme`, so a client can no longer override the proxy's `X-Forwarded-Proto` with one of the others. A proxy that sets only a lower-ranked header must drop the ones above it. Empty elements of an `X-Forwarded-Proto` or `X-Forwarded-Protocol` list are skipped, so `,https` announces `https`. See the [reverse proxy guide](./guide/reverse-proxy.md#scheme-and-host-behind-a-proxy)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#48",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/limiter.md#2",
+    "b": "fiber:docs/whats_new.md#48",
+    "relation": "overlapping",
+    "related": 0.9829,
+    "probabilities": {
+     "same": 0.0107,
+     "overlapping": 0.965,
+     "conflicting": 0.0072,
+     "unrelated": 0.0171
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 42,
+   "passage_reads": 1,
+   "passages_ms": 183,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 224,
+   "total_ms": 229
+  }
+ }
+}

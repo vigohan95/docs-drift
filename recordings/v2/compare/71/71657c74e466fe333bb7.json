@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/71/71657c74e466fe333bb7",
+ "request_hash": "71657c74e466fe333bb782c56369356dc8f480a21b4303ab93d6ead62ec5db91",
+ "recorded_at": "2026-11-06T14:38:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1430,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "106.293217",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=283"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/05-$props.md#4",
+    "text": "## Updating props\n\nReferences to a prop inside a component update when the prop itself updates — when `count` changes in `App.svelte`, it will also change inside `Child.svelte`. But the child component is able to temporarily override the prop value, which can be useful for unsaved ephemeral state:\n\n<!-- codeblock:start {\"title\":\"Temporarily updating props\",\"selected\":\"Child.svelte\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport Child from './Child.svelte';\n\n\tlet count = $state(0);\n</script>\n\n<button onclick={() => (count += 1)}>\n\tclicks (parent): {count}\n</button>\n\n<Child {count} />\n```\n\n```svelte\n<!--- file: Child.svelte --->\n<script>\n\tlet { count } = $props();\n</script>\n\n<button onclick={() => (count += 1)}>\n\tclicks (child): {count}\n</button>\n```\n<!-- codeblock:end -->\n\nWhile you can temporarily _reassign_ props, you should not _mutate_ props unless they are [bindable]($bindable).\n\nIf the prop is a regular object, the mutation will have no effect:\n\n<!-- codeblock:start {\"title\":\"Non-reactive props\",\"selected\":\"Child.svelte\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport Child from './Child.svelte';\n</script>\n\n<Child object={{ count: 0 }} />\n```\n\n```svelte\n<!--- file: Child.svelte --->\n<script>\n\tlet { object } = $props();\n</script>\n\n<button onclick={() => {\n\t// has no effect\n\tobject.count += 1\n}}>\n\tclicks: {object.count}\n</button>\n```\n<!-- codeblock:end -->"
+   },
+   {
+    "id": "svelte:documentation/docs/02-runes/05-$props.md#5",
+    "text": "If the prop is a reactive state proxy, however, then mutations _will_ have an effect but you will see an [`ownership_invalid_mutation`](runtime-warnings#Client-warnings-ownership_invalid_mutation) warning, because the component is mutating state that does not 'belong' to it:\n\n<!-- codeblock:start {\"title\":\"Invalid mutation\",\"selected\":\"Child.svelte\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport Child from './Child.svelte';\n\n\tlet object = $state({count: 0});\n</script>\n\n<Child {object} />\n```\n\n```svelte\n<!--- file: Child.svelte --->\n<script>\n\tlet { object } = $props();\n</script>\n\n<button onclick={() => {\n\t// will cause the count below to update,\n\t// but with a warning. Don't mutate\n\t// objects you don't own!\n\tobject.count += 1\n}}>\n\tclicks: {object.count}\n</button>\n```\n<!-- codeblock:end -->\n\nThe fallback value of a prop not declared with `$bindable` is left untouched — it is not turned into a reactive state proxy — meaning mutations will not cause updates:\n\n<!-- codeblock:start {\"title\":\"Non-reactive fallback props\",\"selected\":\"Child.svelte\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport Child from './Child.svelte';\n</script>\n\n<Child />\n```\n\n```svelte\n<!--- file: Child.svelte --->\n<script>\n\tlet { object = { count: 0 } } = $props();\n</script>\n\n<button onclick={() => {\n\t// has no effect if the fallback value is used\n\tobject.count += 1\n}}>\n\tclicks: {object.count}\n</button>\n```\n<!-- codeblock:end -->"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/02-runes/05-$props.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/02-runes/05-$props.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/02-runes/05-$props.md#4",
+    "b": "svelte:documentation/docs/02-runes/05-$props.md#5",
+    "relation": "overlapping",
+    "related": 0.9941,
+    "probabilities": {
+     "same": 0.0226,
+     "overlapping": 0.9611,
+     "conflicting": 0.0105,
+     "unrelated": 0.0059
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 112,
+   "total_ms": 115
+  }
+ }
+}

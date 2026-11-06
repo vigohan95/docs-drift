@@ -1,0 +1,247 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c6/c66204e8a8f68b48b65e",
+ "request_hash": "c66204e8a8f68b48b65eeec7e6624f054ba6188a8a3551bc3f5a2213db3b82ee",
+ "recorded_at": "2026-11-06T14:39:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1516,
+ "response_headers": {
+  "x-clocked-credits": "14",
+  "x-clocked-model-ms": "325.604025",
+  "x-clocked-cost-usd": "0.002789",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=551"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/redirect.md#4",
+    "text": "## Config\n\n| Property   | Type                | Description                               | Default                |\n|:-----------|:--------------------|:------------------------------------------|:-----------------------|\n| Next       | `func(fiber.Ctx) bool` | Skip when function returns true.          | nil                    |\n| RuleList   | `[]Rule`              | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures. | nil |\n| Rules      | `map[string]string`   | **Deprecated.** Use `RuleList`. A map has no order, so precedence is decided by a heuristic. | nil |\n| StatusCode | `int`                 | HTTP code for redirects.                  | 302 Temporary Redirect |\n\nA `Rule` is a pattern and a target:\n\n```go\ntype Rule struct {\n    From string // the path pattern, where \"*\" matches a run of any length\n    To   string // the target, where \"$1\", \"$2\" stand for what the asterisks captured\n}\n```\n\n`From` reaches the compiled pattern as a regular expression, so the other regexp\nmetacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also\nmatches `/fa`. Only `*` is a documented placeholder; write a rule out of path\ntext and `*` and it behaves as it reads. A `From` that is not a valid regular\nexpression, such as `/old(`, makes `New` panic. A rule matches the whole path,\nletter case included: `/old` answers `/old`, but not `/OLD`, `/old/x` or `/very/old`.\n\nIn `To`, `$10` is the tenth capture in a rule with ten or more captures, which counts every group of the regular expression and not only the asterisks; in a rule with fewer it reads as `$1` followed by `0`.\n\nSetting both `RuleList` and `Rules` panics: the two disagree about what decides\nprecedence, so there is no sensible way to honor them together."
+   },
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "text": "## Config\n\n| Property | Type                  | Description                                           | Default    |\n|:---------|:----------------------|:------------------------------------------------------|:-----------|\n| Next     | `func(fiber.Ctx) bool` | Skip when function returns `true`.                    | `nil`      |\n| RuleList | `[]Rule`          | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures. | nil |\n| Rules    | `map[string]string`   | **Deprecated.** Use `RuleList`. A map has no order, so precedence is decided by a heuristic. | nil |\n\nSet one of `RuleList` or `Rules`. With neither, the middleware rewrites nothing.\n\nA rule's `From` is path text: `*` matches a run of any bytes but a newline, and\nevery other byte stands for itself, so `/preis-1.000-euro` rewrites that path\nand not `/preis-1X000-euro`. There is no escape for a literal `*`.\n\nA rule matches the whole path, trailing slash and letter case included: `/old` rewrites `/old`, but not `/old/`, `/OLD`, `/old/x` or `/very/old`.\n\nIn `To`, `$1`, `$2` and so on stand for what the asterisks of `From` captured, in order. `$10` is the tenth capture in a rule with ten or more asterisks; in a rule with fewer it reads as `$1` followed by `0`.\n\nSetting both `RuleList` and `Rules` panics.\n\nRules match `c.Path()`, the path as the router normalized it, and the rewritten\npath goes through the same normalization. With `UnescapePath` that path is the\ndecoded one, so a capture is escaped again before it is inserted: the `%2e%2e`\nthat `/files/%252e%252e/secret` decoded to stays that name in `/public/$1`\nrather than being decoded a second time into `..` and resolving out of\n`/public/`.\n\nA capture cannot add a `.` or `..` segment either. `{From: \"/@*\", To: \"/users/$1\"}`\ncuts `../admin` out of `/@../admin`, a path with no dot segment for the router to\nresolve, so a rewritten path holding more dot segments than `To` itself is not\nused: the next rule is tried and the path stays as it was. `%2e` counts as a dot\nthere, and a backslash, `%2f` and `%5c` as a slash."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/redirect.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/rewrite.md#2"
+    ],
+    "conflicts": [
+     "fiber:docs/middleware/rewrite.md#2"
+    ]
+   },
+   {
+    "id": "fiber:docs/middleware/rewrite.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/redirect.md#4"
+    ],
+    "conflicts": [
+     "fiber:docs/middleware/redirect.md#4"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/redirect.md#4",
+    "b": "fiber:docs/middleware/rewrite.md#2",
+    "relation": "conflicting",
+    "related": 0.9892,
+    "probabilities": {
+     "same": 0.0115,
+     "overlapping": 0.195,
+     "conflicting": 0.7827,
+     "unrelated": 0.0108
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.1525,
+       "restated": 0.7953,
+       "elaborated": 0.0331,
+       "different": 0.0191
+      },
+      "confidence": 0.9809,
+      "a": {
+       "document": "fiber:docs/middleware/redirect.md#4",
+       "quote": "## Config",
+       "start": 0,
+       "end": 9,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "## Config\n\n| Property | Type                  | Description                                           | Default    |\n|:---------|:----------------------|:------------------------------------------------------|:-----------|\n| Next     | `func(fiber.Ctx) bool` | Skip when function returns `true`.",
+       "start": 0,
+       "end": 295,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9809,
+       "restated": 0.0081,
+       "elaborated": 0.0062,
+       "different": 0.0049
+      },
+      "confidence": 0.981,
+      "a": {
+       "document": "fiber:docs/middleware/redirect.md#4",
+       "quote": "| nil |",
+       "start": 448,
+       "end": 455,
+       "confidence": 0.981
+      },
+      "b": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "| `nil`      |\n| RuleList | `[]Rule`          | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures.",
+       "start": 315,
+       "end": 439,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9839,
+       "restated": 0.0066,
+       "elaborated": 0.0053,
+       "different": 0.0043
+      },
+      "confidence": 0.9957,
+      "a": {
+       "document": "fiber:docs/middleware/redirect.md#4",
+       "quote": "| Rules      | `map[string]string`   | **Deprecated.** Use `RuleList`.",
+       "start": 456,
+       "end": 526,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "| nil |\n| Rules    | `map[string]string`   | **Deprecated.** Use `RuleList`.",
+       "start": 440,
+       "end": 516,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9857,
+       "restated": 0.0058,
+       "elaborated": 0.0047,
+       "different": 0.0037
+      },
+      "confidence": 0.9963,
+      "a": {
+       "document": "fiber:docs/middleware/redirect.md#4",
+       "quote": "A map has no order, so precedence is decided by a heuristic.",
+       "start": 527,
+       "end": 587,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "A map has no order, so precedence is decided by a heuristic.",
+       "start": 517,
+       "end": 577,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0171,
+       "restated": 0.7431,
+       "elaborated": 0.1648,
+       "different": 0.0751
+      },
+      "confidence": 0.599,
+      "a": {
+       "document": "fiber:docs/middleware/redirect.md#4",
+       "quote": "| nil |",
+       "start": 448,
+       "end": 455,
+       "confidence": 0.873
+      },
+      "b": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "| nil |\n\nSet one of `RuleList` or `Rules`.",
+       "start": 578,
+       "end": 620,
+       "confidence": 0.599
+      }
+     }
+    ],
+    "conflicts": [
+     {
+      "kind": "rule_or_condition",
+      "kinds": {
+       "value": 0.0053,
+       "date_or_version": 0.0087,
+       "rule_or_condition": 0.9423,
+       "scope": 0.0218,
+       "name": 0.0083,
+       "no_conflict": 0.0136
+      },
+      "confidence": 0.9864,
+      "a": {
+       "document": "fiber:docs/middleware/redirect.md#4",
+       "quote": "`From` reaches the compiled pattern as a regular expression, so the other regexp",
+       "start": 935,
+       "end": 1015,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/middleware/rewrite.md#2",
+       "quote": "With neither, the middleware rewrites nothing.\n\nA rule's `From` is path text: `*` matches a run of any bytes but a newline, and\nevery other byte stands for itself, so `/preis-1.000-euro` rewrites that path\nand not `/preis-1X000-euro`.",
+       "start": 621,
+       "end": 855,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 120,
+   "passages": 7,
+   "counterparts_ms": 166,
+   "kinds_ms": 19
+  },
+  "timing": {
+   "read_ms": 338,
+   "total_ms": 343
+  }
+ }
+}

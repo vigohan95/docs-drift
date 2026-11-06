@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/90/90d74e608ef5e472f489",
+ "request_hash": "90d74e608ef5e472f489979c24543c00e30b4b1fa3650275b0e0d9dd01e55e6c",
+ "recorded_at": "2026-11-06T14:42:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3712,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.620031",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=152"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#9",
+    "text": "        1. `'plain'` is the default mode for the decorator, and can be omitted.\n        2. Pydantic will *not* validate that the serialized value complies with the `int` type.\n\n* ***Wrap* serializers**: give more flexibility to customize the serialization behavior. You can run code before or after\n  the Pydantic serialization logic.\n  {#field-wrap-serializer}\n\n    Such serializers must be defined with a **mandatory** extra *handler* parameter: a callable taking the value to be serialized\n    as an argument. Internally, this handler will delegate serialization of the value to Pydantic. You are free to *not* call the\n    handler at all.\n\n    === \"Annotated pattern\"\n\n        ```python\n        from typing import Annotated, Any\n\n        from pydantic import BaseModel, SerializerFunctionWrapHandler, WrapSerializer\n\n\n        def ser_number(value: Any, handler: SerializerFunctionWrapHandler) -> int:\n            return handler(value) + 1\n\n\n        class Model(BaseModel):\n            number: Annotated[int, WrapSerializer(ser_number)]\n\n\n        print(Model(number=4).model_dump())\n        #> {'number': 5}\n        ```\n\n    === \"Decorator\"\n\n        ```python\n        from typing import Any\n\n        from pydantic import BaseModel, SerializerFunctionWrapHandler, field_serializer\n\n\n        class Model(BaseModel):\n            number: int\n\n            @field_serializer('number', mode='wrap')\n            def ser_number(\n                self, value: Any, handler: SerializerFunctionWrapHandler\n            ) -> int:\n                return handler(value) + 1\n\n\n        print(Model(number=4).model_dump())\n        #> {'number': 5}\n        ```"
+   },
+   {
+    "id": "pydantic:docs/concepts/validators.md#7",
+    "text": "        1. Although `'invalid'` shouldn't validate against the `int` type, Pydantic accepts the input.\n\n* ***Wrap* validators**: are the most flexible of all. You can run code before or after Pydantic and other validators\n  process the input, or you can terminate validation immediately, either by returning the value early or by raising an\n  error.\n  {#field-wrap-validator}\n\n    Such validators must be defined with a **mandatory** extra *handler* parameter: a callable taking the value to be validated\n    as an argument. Internally, this handler will delegate validation of the value to Pydantic. You are free to wrap the call\n    to the handler in a [`try..except`][handling exceptions] block, or not call it at all.\n\n    [handling exceptions]: https://docs.python.org/3/tutorial/errors.html#handling-exceptions\n\n    === \"Annotated pattern\"\n\n        ```python {lint=\"skip\"}\n        from typing import Any\n\n        from typing import Annotated\n\n        from pydantic import BaseModel, Field, ValidationError, ValidatorFunctionWrapHandler, WrapValidator\n\n\n        def truncate(value: Any, handler: ValidatorFunctionWrapHandler) -> str:\n            try:\n                return handler(value)\n            except ValidationError as err:\n                if err.errors()[0]['type'] == 'string_too_long':\n                    return handler(value[:5])\n                else:\n                    raise\n\n\n        class Model(BaseModel):\n            my_string: Annotated[str, Field(max_length=5), WrapValidator(truncate)]\n\n\n        print(Model(my_string='abcde'))\n        #> my_string='abcde'\n        print(Model(my_string='abcdef'))\n        #> my_string='abcde'\n        ```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/validators.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#9",
+    "b": "pydantic:docs/concepts/validators.md#7",
+    "relation": "unrelated",
+    "related": 0.0286,
+    "probabilities": {
+     "same": 0.0088,
+     "overlapping": 0.0119,
+     "conflicting": 0.0079,
+     "unrelated": 0.9714
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

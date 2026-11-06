@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b9/b90c561f0638a1293165",
+ "request_hash": "b90c561f0638a1293165540cff4193f96869bd45b6ea014c3c941bf35c7502a0",
+ "recorded_at": "2026-11-06T14:40:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2041,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "108.563198",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=249"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#160",
+    "text": "### SendStream\n\nSets the response body to a stream of data and adds an optional body size.\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) SendStream(stream io.Reader, size ...int) error\nfunc (r fiber.Res) SendStream(stream io.Reader, size ...int) error\n```\n\n:::info\n`SendStream` operates asynchronously. The handler returns immediately after setting up the stream,\nbut the actual reading and sending of data happens **after** the handler completes. This is handled\nby the underlying `fasthttp` library.\n\nIf the provided stream implements `io.Closer`, it will be automatically closed by `fasthttp` after\nthe response is fully sent or if an error occurs.\n:::\n\n:::caution HTTP/1.0 clients\nA stream of unknown size is sent with chunked framing, which a server must not do in response to a request older than HTTP/1.1 ([RFC 9112 §6.1](https://www.rfc-editor.org/rfc/rfc9112#section-6.1)). Fiber does it on purpose: the RFC's alternative, ending the body by closing the connection ([§6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)), is not something fasthttp offers, and reading the stream to its end before replying would hold the handler for as long as the stream lasts, with no way to tell that the client left. Proxies that speak HTTP/1.0 to their upstream, such as nginx before 1.29.7 unless `proxy_http_version 1.1` is set, are the usual source of such requests. Pass the size when you know it: a stream of known size is sent with a `Content-Length` as it is read, whatever the HTTP version.\n:::"
+   },
+   {
+    "id": "fiber:docs/middleware/cache.md#0",
+    "text": "# Cache\n\nCache middleware for [Fiber](https://github.com/gofiber/fiber) that intercepts responses and stores the body, `Content-Type`, and status code under a deterministic key derived from request dimensions. Special thanks to [@codemicro](https://github.com/codemicro/fiber-cache) for contributing this middleware to Fiber core.\n\nBy default, cached responses expire after five minutes and the middleware stores up to 1 MB of responses, counting each entry's body, key and stored headers. That size limit is the default of `cache.New()` called without a `Config`: a `Config` that leaves `MaxBytes` unset stores bodies without a limit. A streamed response (`SendStream`, `SendStreamWriter`, `SendFile`, `static`) is judged by the length it declares instead of being read to measure it: one that declares more than `MaxBytes`, or no length at all, is passed on as a stream, is not stored and reports `unreachable`. So is a stream that ends early, fails or runs past the length it declares. Middleware that encodes a stream as it is sent leaves it without a declared length, so `compress` registered between the cache and a file handler keeps those files out of the cache: register `compress.New()` before `cache.New()`, or serve the files with `static.Config{Compress: true}`, to keep caching them."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#160",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/cache.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#160",
+    "b": "fiber:docs/middleware/cache.md#0",
+    "relation": "overlapping",
+    "related": 0.9924,
+    "probabilities": {
+     "same": 0.0053,
+     "overlapping": 0.9814,
+     "conflicting": 0.0057,
+     "unrelated": 0.0076
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 116,
+   "total_ms": 120
+  }
+ }
+}

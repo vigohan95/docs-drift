@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/da/dafded13272a9f343443",
+ "request_hash": "dafded13272a9f3434431567211df68b73c378f17207ce4d9ac9a23bca427c72",
+ "recorded_at": "2026-11-06T14:38:02Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1914,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "38.409697",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=168"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#23",
+    "text": "### maxParallelFileOps\n\n|          |                                 |\n| -------: | :------------------------------ |\n|    Type: | `number`                        |\n|     CLI: | `--maxParallelFileOps <number>` |\n| Default: | 1000                            |\n\nLimits the number of files rollup will open in parallel when reading modules or writing chunks. Without a limit or with a high enough value, builds can fail with an \"EMFILE: too many open files\". This depends on how many open file handles the operating system allows. If you set the limit too low and use plugins that rely on the [`this.load`](../plugin-development/index.md#this-load) context function, such as the `commonjs` plugin, then it can happen that builds stall without an error message as it limits the number of parallel `load` calls."
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#80",
+    "text": "### this.load\n\n|       |        |\n| ----: | :----- |\n| Type: | `Load` |\n\n```typescript\ntype Load = (options: {\n\tid: string;\n\tresolveDependencies?: boolean;\n\tattributes?: Record<string, string> | null;\n\tmeta?: CustomPluginOptions | null;\n\tmoduleSideEffects?: boolean | 'no-treeshake' | null;\n\tsyntheticNamedExports?: boolean | string | null;\n}) => Promise<ModuleInfo>;\n```\n\nLoads and parses the module corresponding to the given id, attaching additional meta information to the module if provided. This will trigger the same [`load`](#load), [`transform`](#transform) and [`moduleParsed`](#moduleparsed) hooks that would be triggered if the module were imported by another module.\n\nThis allows you to inspect the final content of modules before deciding how to resolve them in the [`resolveId`](#resolveid) hook and e.g. resolve to a proxy module instead. If the module becomes part of the graph later, there is no additional overhead from using this context function as the module will not be parsed again. The signature allows you to directly pass the return value of [`this.resolve`](#this-resolve) to this function as long as it is neither `null` nor external.\n\nThe returned Promise will resolve once the module has been fully transformed and parsed but before any imports have been resolved. That means that the resulting `ModuleInfo` will have empty `importedIds`, `dynamicallyImportedIds`, `importedIdResolutions` and `dynamicallyImportedIdResolutions`. This helps to avoid deadlock situations when awaiting `this.load` in a `resolveId` hook. If you are interested in `importedIds` and `dynamicallyImportedIds`, you can either implement a `moduleParsed` hook or pass the `resolveDependencies` flag, which will make the Promise returned by `this.load` wait until all dependency ids have been resolved."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#80",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/configuration-options/index.md#23",
+    "b": "rollup:docs/plugin-development/index.md#80",
+    "relation": "unrelated",
+    "related": 0.455,
+    "probabilities": {
+     "same": 0.0158,
+     "overlapping": 0.4255,
+     "conflicting": 0.0136,
+     "unrelated": 0.545
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 46
+  },
+  "timing": {
+   "read_ms": 46,
+   "total_ms": 48
+  }
+ }
+}

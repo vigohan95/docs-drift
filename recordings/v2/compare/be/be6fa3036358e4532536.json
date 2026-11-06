@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/be/be6fa3036358e4532536",
+ "request_hash": "be6fa3036358e453253636788e1f5f31577bc8c9dad95afd47ce565a7362b237",
+ "recorded_at": "2026-11-06T14:42:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 944,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "69.525856",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=195"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#14",
+    "text": "## Dataclass fields\n\nSome parameters of the [`Field()`][pydantic.Field] function can be used on [dataclasses](./dataclasses.md):\n\n* `init`: Whether the field should be included in the synthesized `__init__()` method of the dataclass.\n* `init_var`: Whether the field should be [init-only][dataclasses-init-only-variables] in the dataclass.\n* `kw_only`: Whether the field should be a keyword-only argument in the constructor of the dataclass.\n\nHere is an example:\n\n```python\nfrom pydantic import BaseModel, Field\nfrom pydantic.dataclasses import dataclass\n\n\n@dataclass\nclass Foo:\n    bar: str\n    baz: str = Field(init_var=True)\n    qux: str = Field(kw_only=True)\n\n\nclass Model(BaseModel):\n    foo: Foo\n\n\nmodel = Model(foo=Foo('bar', baz='baz', qux='qux'))\nprint(model.model_dump())  # (1)!\n#> {'foo': {'bar': 'bar', 'qux': 'qux'}}\n```\n\n1. The `baz` field is not included in the serialized output, since it is an init-only field."
+   },
+   {
+    "id": "pydantic:docs/errors/usage_errors.md#35",
+    "text": "## Incompatible `init` and `init_var` settings on `dataclass` field {#clashing-init-and-init-var}\n\nThe `init=False` and `init_var=True` settings are mutually exclusive. Doing so results in the `PydanticUserError` shown in the example below.\n\n```python {test=\"skip\"}\nfrom pydantic import Field\nfrom pydantic.dataclasses import dataclass\n\n\n@dataclass\nclass Foo:\n    bar: str = Field(init=False, init_var=True)\n\n\n\"\"\"\npydantic.errors.PydanticUserError: Dataclass field bar has init=False and init_var=True, but these are mutually exclusive.\n\"\"\"\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/errors/usage_errors.md#35",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#14",
+    "b": "pydantic:docs/errors/usage_errors.md#35",
+    "relation": "overlapping",
+    "related": 0.983,
+    "probabilities": {
+     "same": 0.016,
+     "overlapping": 0.9607,
+     "conflicting": 0.0062,
+     "unrelated": 0.017
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 50,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 75,
+   "total_ms": 76
+  }
+ }
+}

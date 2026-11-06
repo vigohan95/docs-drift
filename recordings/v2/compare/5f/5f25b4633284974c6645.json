@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5f/5f25b4633284974c6645",
+ "request_hash": "5f25b4633284974c66457e357b835b8455009e77308f0bbc7945cf8be2a14b63",
+ "recorded_at": "2026-11-06T14:42:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 5015,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "171.069086",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=296"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#1",
+    "text": "## The annotated pattern\n\nTo apply constraints or attach [`Field()`][pydantic.fields.Field] functions to a model field, Pydantic\nalso supports the [`Annotated`][typing.Annotated] typing construct to attach metadata to an annotation:\n\n```python\nfrom typing import Annotated\n\nfrom pydantic import BaseModel, Field, WithJsonSchema\n\n\nclass Model(BaseModel):\n    name: Annotated[str, Field(strict=True), WithJsonSchema({'extra': 'data'})]\n```\n\nAs far as static type checkers are concerned, `name` is still typed as `str`, but Pydantic leverages\nthe available metadata to add validation logic, type constraints, etc.\n\nUsing this pattern has some advantages:\n\n* Using the `f: <type> = Field(...)` form can be confusing and might trick users into thinking `f`\n  has a default value, while in reality it is still required.\n* You can provide an arbitrary amount of metadata elements for a field. As shown in the example above,\n  the [`Field()`][pydantic.fields.Field] function only supports a limited set of constraints/metadata,\n  and you may have to use different Pydantic utilities such as [`WithJsonSchema`][pydantic.WithJsonSchema]\n  in some cases.\n* Types can be made reusable (see the documentation on [custom types](./types.md#using-the-annotated-pattern)\n  using this pattern).\n\nHowever, note that certain arguments to the [`Field()`][pydantic.fields.Field] function (namely, `default`,\n`default_factory`, and `alias`) are taken into account by static type checkers to synthesize a correct\n`__init__()` method. The annotated pattern is *not* understood by them, so you should use the normal\nassignment form instead."
+   },
+   {
+    "id": "pydantic:docs/concepts/validation_decorator.md#4",
+    "text": "## Using the [`Field()`][pydantic.Field] function to describe function parameters\n\nThe [`Field()` function](fields.md) can also be used with the decorator to provide extra information about\nthe field and validations. If you don't make use of the `default` or `default_factory` parameter, it is\nrecommended to use the [annotated pattern](./fields.md#the-annotated-pattern) (so that type checkers\ninfer the parameter as being required). Otherwise, the [`Field()`][pydantic.Field] function can be used\nas a default value (again, to trick type checkers into thinking a default value is provided for the parameter).\n\n```python\nfrom typing import Annotated\n\nfrom pydantic import Field, ValidationError, validate_call\n\n\n@validate_call\ndef how_many(num: Annotated[int, Field(gt=10)]):\n    return num\n\n\ntry:\n    how_many(1)\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for how_many\n    0\n      Input should be greater than 10 [type=greater_than, input_value=1, input_type=int]\n    \"\"\"\n\n\n@validate_call\ndef return_value(value: str = Field(default='default value')):\n    return value\n\n\nprint(return_value())\n#> default value\n```\n\n[Aliases](fields.md#field-aliases) can be used with the decorator as normal:\n\n```python\nfrom typing import Annotated\n\nfrom pydantic import Field, validate_call\n\n\n@validate_call\ndef how_many(num: Annotated[int, Field(gt=10, alias='number')]):\n    return num\n\n\nhow_many(number=42)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/validation_decorator.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#1",
+    "b": "pydantic:docs/concepts/validation_decorator.md#4",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.0163,
+     "overlapping": 0.9721,
+     "conflicting": 0.0074,
+     "unrelated": 0.0042
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 1,
+   "counterparts_ms": 65
+  },
+  "timing": {
+   "read_ms": 179,
+   "total_ms": 182
+  }
+ }
+}

@@ -1,0 +1,213 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/31/317dfee187154cfd1106",
+ "request_hash": "317dfee187154cfd1106cf996a38f873246d4bb83eecb504a92218e86d5e3be8",
+ "recorded_at": "2026-11-06T14:39:08Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2666,
+ "response_headers": {
+  "x-clocked-credits": "16",
+  "x-clocked-model-ms": "391.132351",
+  "x-clocked-cost-usd": "0.003187",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=910"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#28",
+    "text": "- `Balancer` also answers `400 Bad Request` for a routed target fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, or any target beginning with `//` on a request without a `Host` header. The router never saw such a target as an authority, and it need not have arrived as one: `..` resolution builds `//u:pw@evil.example/a://b` out of `//u:pw@evil.example/a:/x/..//b`, and under `UnescapePath` a decoded `%3A%2F%2F` spells the `://`. Set as the request line, it would hand the upstream a `Host`, and a `Basic` `Authorization` header, taken from the path rather than from the application.\n- `Balancer`, `DomainForward` and `BalancerForward` answer `400 Bad Request` for a routed path an upstream could read as another path, one under a prefix whose middleware never ran for it. That is a path holding:\n  - an escaped slash (`%2F`) or an empty segment (`//`). An upstream that decodes `%2F` into a separator or merges repeated slashes before it matches routes, as a `net/http` file server or a fasthttp server does, would map `/public/..%2Fadmin/secret`, `/admin%2Fsecret` and `//admin/secret` to `/admin/secret`. An upstream that keeps both as sent can be reached with `SecurityPolicy.AllowAmbiguousSlashes`, described below.\n  - a backslash, raw or escaped as `%5C`. WHATWG URL parsers, as in Node.js, Bun, Deno and Cloudflare Workers, and IIS read it as a separator, so `/admin\\secret` and `/public/..%5Cadmin/secret` would reach `/admin`.\n  - a path parameter, a `;` in any segment, such as `/admin;x/secret`, `/admin;/secret`, `/;/admin/secret` or `/public/..;/admin/secret`. Servlet containers such as Tomcat and Jetty strip the parameters from every segment before they match routes and resolve dot segments, so each of these would reach `/admin/secret`. A `;` in the query is no path parameter, and a client that means a literal `;` in a name can send it as `%3B`, which is forwarded as sent, except behind a custom `BalancingClient` (see below). An upstream that relies on `;jsessionid` can be reached with `SecurityPolicy.AllowPathParameters`, described below.\n  - an escape of an unreserved character, such as `%2e` or `%70`. The router decodes every such escape when it normalizes a path, so one still in `c.Path()` can only have been forged by a stray `%`, and an upstream decoding it again would serve a name no middleware matched."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#117",
+    "text": "`ErrUpstreamHostUnresolvable` is new: a name that cannot be resolved, or that resolves to no address, is rejected with an error that matches it and `ErrUpstreamHostBlocked` both, and `errors.As` finds the `*net.DNSError` of the lookup. A host with only IPv6 addresses and `DialDualStack` off fails with an error that matches neither, where it matched `ErrUpstreamHostBlocked` before. An address `net/url` cannot parse is rejected with `ErrUpstreamHostInvalid` and the `*url.Error` wrapped beside it, so the message of that error carries the parse error. The time `DoTimeout`, `DoDeadline` or `Config.Timeout` allows bounds the lookup and the connects of the request as well; a connect that nothing bounds has five seconds, as before.\n\n`Balancer`, `DomainForward` and `BalancerForward` forward the path the router matched, `c.Path()`, followed by the query as the client sent it, instead of the request line as it arrived. Spellings such as `/public/..%2Fadmin/secret` and `//admin/secret`, which fasthttp's normalization of the raw request line turned into `/admin/secret` on the way to the upstream, are answered with `400 Bad Request`, since an upstream that decodes `%2F` or merges `//` before it matches routes would still serve a path no middleware matched; the new `SecurityPolicy.AllowAmbiguousSlashes` forwards them exactly as the router matched them, for an upstream that keeps both. A path parameter, a `;` in any segment, is answered with `400` as well: servlet containers such as Tomcat and Jetty strip the parameters from every segment before they match routes, so `/admin;x/secret`, `/admin;/secret` and `/;/admin/secret` are `/admin/secret` there. The new `SecurityPolicy.AllowPathParameters` forwards them, for an upstream that relies on `;jsessionid`; a client can also send a literal `;` as `%3B`. A path holding a backslash, a dot segment carrying parameters (`..;`), or an escape of an unreserved character, which only a stray `%` can forge, is answered with `400` regardless. A path with dot segments is forwarded resolved, and a byte a path may not carry raw is forwarded as its escape. Every entry in `Config.Servers` must be a scheme and host only; an entry with a path, userinfo, query or fragment panics at startup with `ErrUpstreamNotOrigin`. `Balancer` answers `400 Bad Request` for an absolute-form request, such as `GET http://public.example/x`, whose `Host` header names another host or is missing: `c.Host()`, `app.Domain` and `hostauthorization` went by the host of the request line, the upstream by the `Host` header ([RFC 9112 Section 3.2.2](https://www.rfc-editor.org/rfc/rfc9112#section-3.2.2)). The two are compared without regard to case or to a default port, and only a host name or an IP address, with an optional port, can match. An application that sets the `Host` header in a middleware before `Balancer` now gets `400` for an absolute-form request whose line names another host than the one it set, and an HTTP/1.0 absolute-form request without `Host` is refused before `ModifyRequest` runs; set the upstream `Host` in `ModifyRequest` instead. `DomainForward` and `BalancerForward` keep the escapes of the routed path and of their upstream URL's path as written, so `%3B` behind `http://backend/my%20app` is no longer sent as `;`. `Balancer` also answers `400 Bad Request` for a request whose `Host` header carries userinfo and for a routed target fasthttp would read as an authority rather than a path (one that begins with `//` and holds `://`, or one beginning with `//` on a request without a `Host` header). A path override without a leading slash is forwarded rooted. Every `*fasthttp.HostClient` in a custom `Client` gets `DisablePathNormalizing` set, and behind any other `BalancingClient` a target that normalization would change is answered with `400`. Path normalization is also disabled on the default client, on a client registered with `WithClient` and on every host client a per-call client creates once the proxy has it. See [Request target](./middleware/proxy.md#request-target)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#28",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#117"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#117",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/proxy.md#28"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/proxy.md#28",
+    "b": "fiber:docs/whats_new.md#117",
+    "relation": "overlapping",
+    "related": 0.9967,
+    "probabilities": {
+     "same": 0.0117,
+     "overlapping": 0.979,
+     "conflicting": 0.006,
+     "unrelated": 0.0033
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0064,
+       "restated": 0.9797,
+       "elaborated": 0.0082,
+       "different": 0.0058
+      },
+      "confidence": 0.9942,
+      "a": {
+       "document": "fiber:docs/middleware/proxy.md#28",
+       "quote": "An upstream that relies on `;jsessionid` can be reached with `SecurityPolicy.AllowPathParameters`, described below.",
+       "start": 2000,
+       "end": 2115,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#117",
+       "quote": "Spellings such as `/public/..%2Fadmin/secret` and `//admin/secret`, which fasthttp's normalization of the raw request line turned into `/admin/secret` on the way to the upstream, are answered with `400 Bad Request`, since an upstream that decodes `%2F` or merges `//` before it matches routes would still serve a path no middleware matched; the new `SecurityPolicy.AllowAmbiguousSlashes` forwards them exactly as the router matched them, for an upstream that keeps both.",
+       "start": 922,
+       "end": 1392,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0271,
+       "restated": 0.9517,
+       "elaborated": 0.0123,
+       "different": 0.0089
+      },
+      "confidence": 0.9911,
+      "a": {
+       "document": "fiber:docs/middleware/proxy.md#28",
+       "quote": "- a path parameter, a `;` in any segment, such as `/admin;x/secret`, `/admin;/secret`, `/;/admin/secret` or `/public/..;/admin/secret`.",
+       "start": 1490,
+       "end": 1625,
+       "confidence": 0.997
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#117",
+       "quote": "A path parameter, a `;` in any segment, is answered with `400` as well: servlet containers such as Tomcat and Jetty strip the parameters from every segment before they match routes, so `/admin;x/secret`, `/admin;/secret` and `/;/admin/secret` are `/admin/secret` there.",
+       "start": 1393,
+       "end": 1662,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0153,
+       "restated": 0.9641,
+       "elaborated": 0.0118,
+       "different": 0.0088
+      },
+      "confidence": 0.9912,
+      "a": {
+       "document": "fiber:docs/middleware/proxy.md#28",
+       "quote": "An upstream that relies on `;jsessionid` can be reached with `SecurityPolicy.AllowPathParameters`, described below.",
+       "start": 2000,
+       "end": 2115,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#117",
+       "quote": "The new `SecurityPolicy.AllowPathParameters` forwards them, for an upstream that relies on `;jsessionid`; a client can also send a literal `;` as `%3B`.",
+       "start": 1663,
+       "end": 1815,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0109,
+       "restated": 0.9299,
+       "elaborated": 0.0481,
+       "different": 0.011
+      },
+      "confidence": 0.989,
+      "a": {
+       "document": "fiber:docs/middleware/proxy.md#28",
+       "quote": "- an escape of an unreserved character, such as `%2e` or `%70`.",
+       "start": 2118,
+       "end": 2181,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#117",
+       "quote": "A path holding a backslash, a dot segment carrying parameters (`..;`), or an escape of an unreserved character, which only a stray `%` can forge, is answered with `400` regardless.",
+       "start": 1816,
+       "end": 1996,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0353,
+       "restated": 0.9154,
+       "elaborated": 0.0318,
+       "different": 0.0175
+      },
+      "confidence": 0.9825,
+      "a": {
+       "document": "fiber:docs/middleware/proxy.md#28",
+       "quote": "- `Balancer` also answers `400 Bad Request` for a routed target fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, or any target beginning with `//` on a request without a `Host` header.",
+       "start": 0,
+       "end": 234,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#117",
+       "quote": "`Balancer` also answers `400 Bad Request` for a request whose `Host` header carries userinfo and for a routed target fasthttp would read as an authority rather than a path (one that begins with `//` and holds `://`, or one beginning with `//` on a request without a `Host` header).",
+       "start": 3276,
+       "end": 3557,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 382,
+   "passage_reads": 1,
+   "passages_ms": 199,
+   "passages": 5,
+   "counterparts_ms": 178
+  },
+  "timing": {
+   "read_ms": 759,
+   "total_ms": 764
+  }
+ }
+}

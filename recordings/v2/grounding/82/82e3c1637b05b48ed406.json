@@ -1,0 +1,94 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/82/82e3c1637b05b48ed406",
+ "request_hash": "82e3c1637b05b48ed406778999a94e2eadc343f787132a576ce56c3a9118efc7",
+ "recorded_at": "2026-11-06T14:41:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1134,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "82.561119",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/whats_new.md#66",
+    "text": "### Configuration improvements\n\nThe v3 client centralizes common configuration on the client instance and lets you override it per request with `client.Config`.\nYou can define base URLs, defaults (headers, cookies, path parameters, timeouts), and toggle path normalization once, while still\nusing axios-style helpers for each call.\n\n```go\ncc := client.New().\n    SetBaseURL(\"https://api.service.local\").\n    AddHeader(\"Authorization\", \"Bearer <token>\").\n    SetTimeout(5 * time.Second).\n    SetPathParam(\"tenant\", \"acme\").\n    SetDisablePathNormalizing(true)\n\nresp, err := cc.Get(\"/users/:tenant/:id\", client.Config{\n    PathParam: map[string]string{\"id\": \"42\"},\n    Param:     map[string]string{\"include\": \"profile\"},\n})\nif err != nil {\n    panic(err)\n}\ndefer resp.Close()\nfmt.Println(resp.StatusCode(), resp.String())\n```\n\n:::caution\nA path parameter value now fills exactly one path segment. A value holding `/`\nor `\\`, a value that is exactly `.` or `..`, an empty value, and one of those\nfollowed by `;` parameters, such as `..;`, are rejected with\n`ErrPathParamInPath`; a value substituted into the host must already be a\nvalid host or the request fails with `ErrPathParamInHost`. Previously such a\nvalue was pasted in unchanged, so `SetPathParam(\"id\", \"../../admin\")` on\n`/api/:id` quietly sent the request to `/admin`. Call\n`SetDisablePathNormalizing(true)` on the client to send a multi-segment value on\npurpose (for a client from `NewWithClient`, create the fasthttp client with\n`DisablePathNormalizing: true` as well); the setting on a single request only\ncounts for a client that already sends paths as written. `.`, `..` and an empty\nvalue stay rejected either way, with or without `;` parameters, because a server\nresolves a dot segment and may merge slashes.\n:::\n\n:::note\n`Debug()` logs the raw request and response after each response through the\nclient's logger, which is Fiber's default logger unless `SetLogger` chose\nanother one. The text is logged as it is, `Authorization` and `Cookie` headers\nand bodies included. A request with no referer set carries no `Referer` header;\nit used to carry an empty one.\n:::"
+   }
+  ],
+  "answer": "A `fasthttp.Client` given to [NewWithClient](./rest.md#newwithclient) may have served hosts already and Fiber cannot tell, so it counts only when it was created with `DisablePathNormalizing: true`. It does not read the setting of a fasthttp client that was created with `DisablePathNormalizing: true`. ```go title=\"Signature\" func (c *Client) DisablePathNormalizing() bool ```",
+  "claims": [
+   "A `fasthttp.Client` given to [NewWithClient](./rest.md#newwithclient) may have served hosts already and Fiber cannot tell, so it counts only when it was created with `DisablePathNormalizing: true`.",
+   "It does not read the setting of a fasthttp client that was created with `DisablePathNormalizing: true`. ```go title=\"Signature\" func (c *Client) DisablePathNormalizing() bool ```"
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.3069,
+  "ungrounded": 0.6931,
+  "verdict": "partially_grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fiber:docs/whats_new.md#66",
+    "share": 1,
+    "share_of_answer": 0.3069,
+    "claims": [
+     0
+    ]
+   }
+  ],
+  "claims": [
+   {
+    "claim": "A `fasthttp.Client` given to [NewWithClient](./rest.md#newwithclient) may have served hosts already and Fiber cannot tell, so it counts only when it was created with `DisablePathNormalizing: true`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5253,
+    "supported": 0.5443,
+    "contradicted": 0.0223,
+    "not_stated": 0.4179,
+    "not_a_claim": 0.0156,
+    "verdict": "supported",
+    "sources": {
+     "fiber:docs/whats_new.md#66": 1
+    },
+    "source": "fiber:docs/whats_new.md#66"
+   },
+   {
+    "claim": "It does not read the setting of a fasthttp client that was created with `DisablePathNormalizing: true`. ```go title=\"Signature\" func (c *Client) DisablePathNormalizing() bool ```",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4747,
+    "supported": 0.0441,
+    "contradicted": 0.0764,
+    "not_stated": 0.8607,
+    "not_a_claim": 0.0187,
+    "verdict": "not_stated",
+    "sources": {
+     "fiber:docs/whats_new.md#66": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 1,
+   "supported": 0.0441
+  },
+  "timing": {
+   "read_ms": 90,
+   "total_ms": 93
+  }
+ }
+}

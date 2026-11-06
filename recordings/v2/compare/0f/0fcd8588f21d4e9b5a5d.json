@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0f/0fcd8588f21d4e9b5a5d",
+ "request_hash": "0fcd8588f21d4e9b5a5d2e0471ea1bc3c304d67fe9038c5a54683292e701c98a",
+ "recorded_at": "2026-11-06T14:40:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1923,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "145.509085",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=266"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#5",
+    "text": "### Context\n\nReturns a `context.Context` that was previously set with [`SetContext`](#setcontext).\nIf no context was set, it returns `context.Background()`. Unlike `fiber.Ctx` itself,\nthe returned context is safe to use after the handler completes.\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) Context() context.Context\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func(c fiber.Ctx) error {\n  ctx := c.Context()\n  go doWork(ctx)\n  return nil\n})\n```\n\n:::info Graceful shutdown\nThe default `Context()` is **not** canceled when the app shuts down. In-flight handlers that pass `c.Context()` to database clients or other cancellation-aware work keep running until they finish (or until you cancel a derived context yourself).\n\n[`RequestCtx`](#requestctx) implements `context.Context` differently: its `Done()` channel is closed when the underlying fasthttp server starts shutting down. Prefer `c.Context()` (or a context you derive with `context.WithCancel` / timeouts) for work that must outlive the start of graceful shutdown.\n:::"
+   },
+   {
+    "id": "fiber:docs/guide/context.md#4",
+    "text": "## Working with `RequestCtx`\n\nThe underlying [`fasthttp.RequestCtx`](https://pkg.go.dev/github.com/valyala/fasthttp#RequestCtx)\ncan be accessed via `c.RequestCtx()`.\nThis exposes low-level APIs and a `context.Context` implementation of its own.\n\n```go title=\"Accessing RequestCtx\"\napp.Get(\"/raw\", func(c fiber.Ctx) error {\n    fctx := c.RequestCtx()\n    // use fasthttp APIs directly\n    fctx.Response.Header.Set(\"X-Engine\", \"fasthttp\")\n    return nil\n})\n```\n\n`fasthttp.RequestCtx` satisfies the `context.Context` interface itself.\n`Deadline` always reports no deadline. `Done` closes only when the server\nshuts down, and `Err` then returns `context.Canceled`. Note that this is the\n`fasthttp.RequestCtx`, not Fiber's `Ctx`, whose `Done` is always `nil`.\n\n:::caution\n`Done` does not fire when an individual client disconnects. To stop a\nlong-running handler at a deadline, wrap `c.Context()` with\n`context.WithTimeout` as shown below.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/guide/context.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/guide/context.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/api/ctx.md#5"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#5",
+    "b": "fiber:docs/guide/context.md#4",
+    "relation": "overlapping",
+    "related": 0.9938,
+    "probabilities": {
+     "same": 0.0059,
+     "overlapping": 0.9701,
+     "conflicting": 0.0179,
+     "unrelated": 0.0062
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0093,
+       "restated": 0.9436,
+       "elaborated": 0.0224,
+       "different": 0.0246
+      },
+      "confidence": 0.886,
+      "a": {
+       "document": "fiber:docs/api/ctx.md#5",
+       "quote": "[`RequestCtx`](#requestctx) implements `context.Context` differently: its `Done()` channel is closed when the underlying fasthttp server starts shutting down.",
+       "start": 717,
+       "end": 875,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/guide/context.md#4",
+       "quote": "`Done` closes only when the server\nshuts down, and `Err` then returns `context.Canceled`.",
+       "start": 571,
+       "end": 660,
+       "confidence": 0.886
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 69,
+   "passages": 1,
+   "counterparts_ms": 58
+  },
+  "timing": {
+   "read_ms": 153,
+   "total_ms": 155
+  }
+ }
+}

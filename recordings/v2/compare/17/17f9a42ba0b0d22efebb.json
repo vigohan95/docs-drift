@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/17/17f9a42ba0b0d22efebb",
+ "request_hash": "17f9a42ba0b0d22efebb89a350b96264042fc8efaa8ddb8787dab0e4b5c719f6",
+ "recorded_at": "2026-11-06T14:42:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1289,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "21.899456",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=160"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#12",
+    "text": "## Field constraints\n\nThe [`Field()`][pydantic.Field] function can also be used to add constraints to specific types:\n\n```python\nfrom decimal import Decimal\n\nfrom pydantic import BaseModel, Field\n\n\nclass Model(BaseModel):\n    positive: int = Field(gt=0)\n    short_str: str = Field(max_length=3)\n    precise_decimal: Decimal = Field(max_digits=5, decimal_places=2)\n```\n\nThe available constraints for each type (and the way they affect the JSON Schema) are described\nin the [standard library types](../api/standard_library_types.md) documentation.\n\n!!! note\n    When adding constraints to a union type, if a member of the union is `None` or the [`MISSING` sentinel](./types.md#missing-sentinel),\n    the constraints will be automatically applied to the remaining type(s) of the union:\n\n    ```python\n    from typing import Annotated\n\n    from pydantic import BaseModel, Field\n\n\n    class Model(BaseModel):\n        positive: int | None = Field(gt=0)\n        # Also works with the annotated pattern:\n        negative: Annotated[int | None, Field(lt=0)]\n    ```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#strict-mode}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`Counter`][collections.Counter] instances are valid. Strict mode does *not* apply to the keys and values of the counters.\nThe strict constraint must be applied to the parameter types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom collections import Counter\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    x: Counter[str]\n\n\nm = Model(x={'foo': '1'})\nprint(m.model_dump())\n#> {'x': Counter({'foo': 1})}\n\ntry:\n    Model(x='test')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid Counter [type=counter_type, input_value='test', input_type=str]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typeddict}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#12",
+    "b": "pydantic:docs/api/standard_library_types.md#45",
+    "relation": "unrelated",
+    "related": 0.0141,
+    "probabilities": {
+     "same": 0.0053,
+     "overlapping": 0.0049,
+     "conflicting": 0.0038,
+     "unrelated": 0.9859
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26
+  },
+  "timing": {
+   "read_ms": 26,
+   "total_ms": 28
+  }
+ }
+}

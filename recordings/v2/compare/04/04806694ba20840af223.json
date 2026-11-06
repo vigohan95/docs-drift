@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/04/04806694ba20840af223",
+ "request_hash": "04806694ba20840af2231b0540a8631aeb62af44471b49cd3e92b55f04e37b59",
+ "recorded_at": "2026-11-06T14:40:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2076,
+ "response_headers": {
+  "x-clocked-credits": "12",
+  "x-clocked-model-ms": "282.554556",
+  "x-clocked-cost-usd": "0.002390",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=500"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/timeout.md#3",
+    "text": "## Known limitations\n\n- The timed-out handler keeps running in its own goroutine while the middleware returns `fiber.ErrServiceUnavailable` (or runs `OnTimeout`). A handler must stop using the context once `c.Context()` is done: the client never receives what it writes after that, and middleware registered before the timeout that uses the request or the response after `c.Next()` races with it, since even fasthttp's reads change state the two share. `c.IsAbandoned()` reports such a request.\n\n- When the deadline passes while the handler still runs, `OnTimeout` runs on a context of its own, so the timed-out handler cannot change the response it writes. That context carries the request, its locals, `c.Context()` and the response headers as they were when the handler started, but neither the request body nor the matched route: `c.Body()` is empty, `c.Params` returns the default value, and `c.Next()` is not available there (calling it answers `500`).\n\n- When `OnTimeout` writes the response and returns `nil` while the handler still runs, the middleware returns `fiber.ErrServiceUnavailable` instead, so middleware registered before it that skips its work on an error, such as `compress`, `etag` or `cache`, leaves the response to the timed-out handler. The client receives the response `OnTimeout` wrote.\n\n- The error is returned to the outer middleware, but the app's `ErrorHandler` is not run for a timed-out request: fasthttp already holds the response it will send, so the handler could not change it, and the timed-out handler may still be writing to the context."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#126",
+    "text": "### Timeout\n\nThe timeout middleware is now configurable. A new `Config` struct allows customizing the timeout duration, defining a handler that runs when a timeout occurs, and specifying errors to treat as timeouts. The `New` function now accepts a `Config` value instead of a duration.\n\n**Behavioral changes:**\n\n- **Status**: The default response for a timed-out handler is `503 Service Unavailable`, not `408 Request Timeout`. The request arrived complete and the handler is what is slow, whereas `408` means the server did not receive a complete request in time ([RFC 9110, Section 15.5.9](https://www.rfc-editor.org/rfc/rfc9110#section-15.5.9)) and tells the client it may send the request again, while the timed-out handler can still be running. Return `fiber.ErrRequestTimeout` (or `fiber.ErrGatewayTimeout` for a handler that waits on an upstream) from `OnTimeout` to keep or choose another status.\n- **Immediate return on timeout**: The middleware now returns immediately when a timeout occurs, without waiting for the handler to finish. This is achieved through the new **Abandon mechanism** which marks the context as abandoned so it won't be returned to the pool while the handler is still running.\n- **Context propagation**: The timeout context is properly propagated to the handler. Handlers can detect timeouts by listening on `c.Context().Done()` and return early.\n- **Panic handling**: Panics in the handler are caught and converted to `500 Internal Server Error` responses.\n- **Race-free design**: The implementation uses fasthttp's `TimeoutErrorWithResponse` combined with Fiber's Abandon mechanism to ensure complete race-freedom between the middleware, handler goroutine, and context pooling.\n- **HEAD**: The timeout response to a `HEAD` request carries no body, on the default path and the `OnTimeout` path alike, so a client reading the connection does not take a body for the start of the next response.\n- **Nesting**: Under an enclosing timeout middleware whose deadline comes no later than its own, such as a shorter timeout on `app.Use`, the middleware runs the handler on the calling goroutine and leaves the timeout to the enclosing one. A shorter deadline set any other way, such as with `c.SetContext`, still times the request out with this middleware's response. Nested timeouts that fire together write one timeout response, from the first to answer. `ScheduleReclaim` may be armed more than once per request; the context is reclaimed once every abandoned goroutine has finished.\n- **OnTimeout context**: When the deadline passes while the handler still runs, `OnTimeout` runs on a context of its own that carries the request, its locals, `c.Context()` and the response headers as they were when the handler started, so the timed-out handler can no longer change the response it writes. The request body, the matched route's parameters and `c.Next()` are not available there, and a panic in `OnTimeout` answers `500` as one in the handler does.\n- **Returned error**: When `OnTimeout` writes the response and returns `nil` while the handler still runs, the middleware returns `fiber.ErrServiceUnavailable`, so middleware before it, such as `compress`, `etag`, `cache` or `idempotency`, leaves the response to the timed-out handler. The client still receives the response `OnTimeout` wrote."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/timeout.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#126"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#126",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/timeout.md#3"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/timeout.md#3",
+    "b": "fiber:docs/whats_new.md#126",
+    "relation": "overlapping",
+    "related": 0.9969,
+    "probabilities": {
+     "same": 0.0093,
+     "overlapping": 0.9824,
+     "conflicting": 0.0052,
+     "unrelated": 0.0031
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0136,
+       "restated": 0.9147,
+       "elaborated": 0.0309,
+       "different": 0.0408
+      },
+      "confidence": 0.9592,
+      "a": {
+       "document": "fiber:docs/middleware/timeout.md#3",
+       "quote": "- When the deadline passes while the handler still runs, `OnTimeout` runs on a context of its own, so the timed-out handler cannot change the response it writes.",
+       "start": 496,
+       "end": 657,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#126",
+       "quote": "`ScheduleReclaim` may be armed more than once per request; the context is reclaimed once every abandoned goroutine has finished.\n- **OnTimeout context**: When the deadline passes while the handler still runs, `OnTimeout` runs on a context of its own that carries the request, its locals, `c.Context()` and the response headers as they were when the handler started, so the timed-out handler can no longer change the response it writes.",
+       "start": 2383,
+       "end": 2818,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0074,
+       "restated": 0.9726,
+       "elaborated": 0.0127,
+       "different": 0.0073
+      },
+      "confidence": 0.9927,
+      "a": {
+       "document": "fiber:docs/middleware/timeout.md#3",
+       "quote": "- When `OnTimeout` writes the response and returns `nil` while the handler still runs, the middleware returns `fiber.ErrServiceUnavailable` instead, so middleware registered before it that skips its work on an error, such as `compress`, `etag` or `cache`, leaves the response to the timed-out handler.",
+       "start": 960,
+       "end": 1261,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#126",
+       "quote": "The request body, the matched route's parameters and `c.Next()` are not available there, and a panic in `OnTimeout` answers `500` as one in the handler does.\n- **Returned error**: When `OnTimeout` writes the response and returns `nil` while the handler still runs, the middleware returns `fiber.ErrServiceUnavailable`, so middleware before it, such as `compress`, `etag`, `cache` or `idempotency`, leaves the response to the timed-out handler.",
+       "start": 2819,
+       "end": 3262,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0162,
+       "restated": 0.9631,
+       "elaborated": 0.0131,
+       "different": 0.0076
+      },
+      "confidence": 0.9924,
+      "a": {
+       "document": "fiber:docs/middleware/timeout.md#3",
+       "quote": "The client receives the response `OnTimeout` wrote.",
+       "start": 1262,
+       "end": 1313,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#126",
+       "quote": "The client still receives the response `OnTimeout` wrote.",
+       "start": 3263,
+       "end": 3320,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 145,
+   "passages": 3,
+   "counterparts_ms": 114
+  },
+  "timing": {
+   "read_ms": 292,
+   "total_ms": 297
+  }
+ }
+}

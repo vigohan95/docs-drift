@@ -77,6 +77,24 @@ for _fid, _why in {
 }.items():
     V[_fid] = (F, None, None, f"{SIBLING}: {_why}.")
 
+# ------------------------------------------------------------------ validation set
+# rollup, fiber, pydantic, svelte: scanned after the v2.1 rule was fixed.
+V.update({
+ "c4746c62b4": (T, "rollup-esm-node-support", "a", "README.md:71 says most browsers and Node.js support ES modules; docs/introduction/index.md:52, the same paragraph in an older wording, says the specification is only implemented in modern browsers and not finalised in Node.js."),
+ "8407eb8240": (F, None, None, "banner/footer function argument (configuration-options) and renderChunk hook argument (plugin-development) are both RenderedChunk in src/rollup/types.d.ts; the two descriptions word it differently but do not disagree."),
+ "94e16f0594": (F, None, None, "Two sections of docs/migration/index.md, one for migrating to Rollup 4 and one for Rollup 3."),
+ "c95bfd8b98": (F, None, None, "Same two version-scoped sections as 94e16f0594."),
+ "c22b986561": (F, None, None, "File-name placeholder vs chunk-hash placeholder: different things."),
+ "078c6a793b": (F, None, None, "SendFile's Compress option (ctx.md) vs the static middleware's Compress option (static.md): different APIs."),
+ "630cb0219f": (F, None, None, SIBLING + ": cors.md and limiter.md each have their own DisableValueRedaction."),
+ "ba9111191c": (F, None, None, "proxy.md:92 and whats_new.md:2036 say the same thing in different words: the body is dropped for the redirected hop, the request the handler holds keeps it."),
+ "c1357a057d": (F, None, None, "redirect's From is a regular expression (redirect.go:202 MustCompileRegexp), rewrite's From is path text (rewrite.go:30 MustCompilePath). Two middlewares, each documented correctly."),
+ "b5fd0ace88": (F, None, None, SIBLING + ": csrf.md and session.md config tables."),
+ "7b9f8de695": (F, None, None, "request.md is about when the path check is switched off; rest.md is about what the DisablePathNormalizing() getter reports. Different questions."),
+ "c322cb2b74": (F, None, None, "Client response streaming vs proxy body limit: different features."),
+ "36813d3446": (F, None, None, "migration.md: a TypeError raised inside a validator is no longer wrapped; validation_decorator.md: a validation failure raises ValidationError. Different situations."),
+})
+
 
 def write():
     out = {fid: {"label": l, "defect": d, "source_agrees_with": s, "reason": r} for fid, (l, d, s, r) in V.items()}

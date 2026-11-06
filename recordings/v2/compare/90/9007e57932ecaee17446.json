@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/90/9007e57932ecaee17446",
+ "request_hash": "9007e57932ecaee174460eccbcb2971ccf7c64f12aa9d393f87b2ef296b2af7e",
+ "recorded_at": "2026-11-06T14:42:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1072,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.581793",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=162"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#8",
+    "text": "## Data conversion\n\nPydantic may cast input data to force it to conform to model field types,\nand in some cases this may result in a loss of information.\nFor example:\n\n```python\nfrom pydantic import BaseModel\n\n\nclass Model(BaseModel):\n    a: int\n    b: float\n    c: str\n\n\nprint(Model(a=3.000, b='2.72', c=b'binary data').model_dump())\n#> {'a': 3, 'b': 2.72, 'c': 'binary data'}\n```\n\nThis is a deliberate decision of Pydantic, and is frequently the most useful approach. See\n[this issue](https://github.com/pydantic/pydantic/issues/578) for a longer discussion on the subject.\n\nNevertheless, Pydantic provides a [strict mode](strict_mode.md), where no data conversion is performed.\nValues must be of the same type as the declared field type.\n\nThis is also the case for collections. In most cases, you shouldn't make use of abstract container classes\nand just use a concrete type, such as [`list`][]:\n\n```python\nfrom pydantic import BaseModel\n\n\nclass Model(BaseModel):\n    items: list[int]  # (1)!\n\n\nprint(Model(items=(1, 2, 3)))\n#> items=[1, 2, 3]\n```\n\n1. In this case, you might be tempted to use the abstract [`Sequence`][collections.abc.Sequence] type\n   to allow both lists and tuples. But Pydantic takes care of converting the tuple input to a list, so\n   in most cases this isn't necessary.\n\nBesides, using these abstract types can also lead to [poor validation performance](./performance.md#sequence-vs-list-or-tuple-with-mapping-vs-dict), and in general using concrete container types\nwill avoid unnecessary checks.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#extra-fields}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`Counter`][collections.Counter] instances are valid. Strict mode does *not* apply to the keys and values of the counters.\nThe strict constraint must be applied to the parameter types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom collections import Counter\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    x: Counter[str]\n\n\nm = Model(x={'foo': '1'})\nprint(m.model_dump())\n#> {'x': Counter({'foo': 1})}\n\ntry:\n    Model(x='test')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid Counter [type=counter_type, input_value='test', input_type=str]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typeddict}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/models.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/models.md#8",
+    "b": "pydantic:docs/api/standard_library_types.md#45",
+    "relation": "unrelated",
+    "related": 0.4699,
+    "probabilities": {
+     "same": 0.0149,
+     "overlapping": 0.4222,
+     "conflicting": 0.0328,
+     "unrelated": 0.5301
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 49
+  },
+  "timing": {
+   "read_ms": 49,
+   "total_ms": 51
+  }
+ }
+}

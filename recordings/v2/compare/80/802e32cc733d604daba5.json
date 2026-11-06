@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/80/802e32cc733d604daba5",
+ "request_hash": "802e32cc733d604daba58e83f2e2eef69c6dd6a29c2d00567c281d9d89b86af2",
+ "recorded_at": "2026-11-06T14:40:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1160,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "171.50231",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=360"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/client/examples.md#6",
+    "text": "## Cookie jar\n\nThe client can store and reuse cookies between requests by attaching a cookie jar.\n\nThe jar follows RFC 6265 for storage and retrieval:\n\n- A `Set-Cookie` without a `Path` attribute is scoped to the **directory** of\n  the request that set it, not to the whole host. A cookie set by a response to\n  `/api/login` defaults to `Path=/api` and is not sent to `/`. Send an explicit\n  `Path=/` to scope it host-wide.\n- Cookies are identified by the triple (name, domain, path), so the same name\n  can be stored at several paths at once. When more than one applies to a\n  request, the one with the longest path wins.\n- Storage is bounded: at most 1024 storage keys, and at most 64 cookies per\n  key. A host-only cookie and a `Domain=` cookie are stored under different\n  keys, so a single host can occupy more than one. When a key is full the jar\n  drops expired entries first, then the least recently written — a session\n  cookie the server re-sends on each response is not evicted by a flood of\n  one-off cookies. A single request carries at most 64 cookies, the most\n  specific first, so a host cannot inflate the `Cookie` header by spreading\n  cookies across the `Domain=` keys of its parent labels.\n- Cookies are attached once per request, before any redirect is followed, so a\n  redirect chain carries the cookies selected for the original URL. A hop to an\n  unrelated host drops them, but a hop to a subdomain keeps them — matching\n  `net/http`, which permits `Cookie` from `foo.com` to `sub.foo.com`. That is\n  wider than the jar's own rule: a cookie set without a `Domain=` attribute is\n  host-only and the jar would not send it to `sub.foo.com`, yet a redirect\n  there carries it. This only arises once redirects are being followed, which\n  is not the default: leave `MaxRedirects` unset — or set `0`, via\n  `Request.SetMaxRedirects` or `Config{MaxRedirects: 0}` — and issue each hop\n  yourself, so the jar decides for each one. A header of your own that must not\n  follow a redirect to another host, such as `X-Api-Key`, can be named with\n  [SetRedirectSensitiveHeaders](./rest.md#setredirectsensitiveheaders)."
+   },
+   {
+    "id": "fiber:docs/client/request.md#79",
+    "text": "## SetRedirectSensitiveHeaders\n\n**SetRedirectSensitiveHeaders** names request headers that must not follow a redirect to another host, such as a credential of your own like `X-Api-Key`. When the target is on a host that is neither the original hostname (on any port) nor one of its subdomains, they are dropped with `Authorization`, `Proxy-Authorization`, `Proxy-Authenticate`, `WWW-Authenticate`, `Cookie` and `Cookie2`; every other header is forwarded, as `net/http` does. Names match case-insensitively, and surrounding whitespace and empty entries are ignored. The names are added to the client's own list ([SetRedirectSensitiveHeaders](./rest.md#setredirectsensitiveheaders)). The default is none, and it matters only while redirects are followed, see [SetMaxRedirects](#setmaxredirects). Calling it with no names clears the request's list.\n\n```go title=\"Signature\"\nfunc (r *Request) SetRedirectSensitiveHeaders(names ...string) *Request\n```\n\n```go title=\"Example\"\nresp, err := client.New().Get(\"https://api.example.com/items\", client.Config{\n    Header:                   map[string]string{\"X-Api-Key\": os.Getenv(\"UPSTREAM_API_KEY\")},\n    MaxRedirects:             3,\n    RedirectSensitiveHeaders: []string{\"X-Api-Key\"},\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/client/examples.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/client/request.md#79"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/client/request.md#79",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/client/examples.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/client/examples.md#6",
+    "b": "fiber:docs/client/request.md#79",
+    "relation": "overlapping",
+    "related": 0.9946,
+    "probabilities": {
+     "same": 0.0114,
+     "overlapping": 0.9765,
+     "conflicting": 0.0067,
+     "unrelated": 0.0054
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.008,
+       "restated": 0.9748,
+       "elaborated": 0.0086,
+       "different": 0.0086
+      },
+      "confidence": 0.9914,
+      "a": {
+       "document": "fiber:docs/client/examples.md#6",
+       "quote": "A header of your own that must not",
+       "start": 1945,
+       "end": 1979,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "fiber:docs/client/request.md#79",
+       "quote": "## SetRedirectSensitiveHeaders\n\n**SetRedirectSensitiveHeaders** names request headers that must not follow a redirect to another host, such as a credential of your own like `X-Api-Key`.",
+       "start": 0,
+       "end": 185,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 1,
+   "counterparts_ms": 64
+  },
+  "timing": {
+   "read_ms": 180,
+   "total_ms": 185
+  }
+ }
+}

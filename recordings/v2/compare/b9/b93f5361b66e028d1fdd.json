@@ -1,0 +1,237 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b9/b93f5361b66e028d1fdd",
+ "request_hash": "b93f5361b66e028d1fddbc54ee8f5bd71bdc4000f9e39b62d66f52e56005c728",
+ "recorded_at": "2026-11-06T14:39:29Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1252,
+ "response_headers": {
+  "x-clocked-credits": "12",
+  "x-clocked-model-ms": "293.953508",
+  "x-clocked-cost-usd": "0.002390",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=39,cfOrigin;dur=0,cfWorker;dur=422"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/guide/routing.md#7",
+    "text": "### Path normalization\n\nBefore a request is matched, Fiber normalizes its path as [RFC 3986 Section 6.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2) describes:\n\n- Percent-encoded unreserved characters (letters, digits, `-`, `.`, `_` and `~`) are decoded, so `/%70rivate` is matched as `/private`. Every other escape stays encoded with uppercase hex digits, so an encoded slash (`%2F`) never splits a segment and `/a%2fb` is matched as `/a%2Fb`. A stray `%` that begins no escape is kept as sent, so `/a%zzb` is matched as `/a%zzb` and `/files/./100%` as `/files/100%`, whatever else the path holds. The one exception is a stray `%` that an escape decoded after it would complete into a new escape: it is written as `%25`, so `/%%370rivate` is matched as `/%2570rivate`, never as `/%70rivate`. With [`UnescapePath`](../api/fiber.md#config) enabled, every escape is decoded instead and a malformed escape stays as sent.\n- `.` and `..` segments are resolved, so `/static/x/../private` and `/static/./private` are both matched as `/static/private`. A `..` never climbs above the root. Empty segments are kept: `/static//private` is a different path from `/static/private`.\n\nMiddleware mounted on a prefix therefore sees these spellings of a path under it, and [`c.Path()`](../api/ctx.md#path) returns the normalized path. Decoding happens exactly once: `/%2570rivate` is matched as `/%2570rivate` by default and as `/%70rivate` with `UnescapePath`, and neither becomes `/private`. Nor can a stray `%` forge an escape out of the bytes after it, so by default `c.Path()` never holds an escape of an unreserved character: the router decoded the genuine ones, and `/%%370rivate` is matched as `/%2570rivate`, never as `/%70rivate` or `/private`. Since that `%25` appears only next to a decoded escape, a route parameter holding a stray `%` comes out the same however the rest of the path is spelled: `/files/100%` and `/files/./100%` both give `c.Params(\"name\")` the value `100%`. It is still not a path to percent-decode again: an escape the router kept, such as `%2F`, is meant to stay one, and decoding it would make `/private%2Fsecret` into `/private/secret`. [`c.OriginalURL()`](../api/ctx.md#originalurl) still returns the request target as the client sent it."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#20",
+    "text": "### Path normalization\n\nThe router normalizes every request path before matching, as [RFC 3986 Section 6.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2) describes. Percent-encoded unreserved characters are decoded, so `/%70rivate` is matched as `/private`; every other escape keeps its encoding with uppercase hex digits; and `.` and `..` segments are removed, so `/static/x/../private` and `/static/./private` are both matched as `/static/private`. Middleware mounted on a prefix therefore sees those spellings of a path under it, and the static middleware serves the file that same path names. An encoded slash (`%2F`) still does not split a segment, so `/static%2Fprivate` does not match `/static/private`, and empty segments are kept, so neither does `/static//private`. `UnescapePath` decodes every escape, as before. Decoding happens exactly once, so `/%2570rivate` never becomes `/private`. A stray `%` that begins no escape is kept as sent, unless an escape decoded after it would complete a new escape with it: `/%%370rivate` is matched as `/%2570rivate`, never as `/%70rivate`, while `/files/100%` and `/files/./100%` both give the parameter `100%`. A request target that is not a rooted path, the asterisk form of `OPTIONS *` or an absolute-form URI with an empty path, is routed as the rooted path fasthttp reports for it (`/*` and `/`), so root-level middleware runs for it as for any other request; so is the authority form fasthttp admits for `CONNECT`, whose `admin//secret` is routed as `/admin//secret`. `RoutePatternMatch` takes a path rather than a request target: it reads the empty string as `/` and answers `false` for any other string without a leading slash; before, `RoutePatternMatch(\"*\", \"/*\")` was `true`.\n\n`c.Path()` returns the normalized path. `c.OriginalURL()` still returns the request target as the client sent it."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/guide/routing.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#20"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#20",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/guide/routing.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/guide/routing.md#7",
+    "b": "fiber:docs/whats_new.md#20",
+    "relation": "overlapping",
+    "related": 0.9981,
+    "probabilities": {
+     "same": 0.0052,
+     "overlapping": 0.9885,
+     "conflicting": 0.0043,
+     "unrelated": 0.0019
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0108,
+       "restated": 0.9697,
+       "elaborated": 0.0121,
+       "different": 0.0074
+      },
+      "confidence": 0.9926,
+      "a": {
+       "document": "fiber:docs/guide/routing.md#7",
+       "quote": "### Path normalization",
+       "start": 0,
+       "end": 22,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#20",
+       "quote": "### Path normalization\n\nThe router normalizes every request path before matching, as [RFC 3986 Section 6.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2) describes.",
+       "start": 0,
+       "end": 174,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0065,
+       "restated": 0.9547,
+       "elaborated": 0.0331,
+       "different": 0.0057
+      },
+      "confidence": 0.9943,
+      "a": {
+       "document": "fiber:docs/guide/routing.md#7",
+       "quote": "- Percent-encoded unreserved characters (letters, digits, `-`, `.`, `_` and `~`) are decoded, so `/%70rivate` is matched as `/private`.",
+       "start": 173,
+       "end": 308,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#20",
+       "quote": "Percent-encoded unreserved characters are decoded, so `/%70rivate` is matched as `/private`; every other escape keeps its encoding with uppercase hex digits; and `.` and `..` segments are removed, so `/static/x/../private` and `/static/./private` are both matched as `/static/private`.",
+       "start": 175,
+       "end": 460,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0081,
+       "restated": 0.9601,
+       "elaborated": 0.0171,
+       "different": 0.0147
+      },
+      "confidence": 0.936,
+      "a": {
+       "document": "fiber:docs/guide/routing.md#7",
+       "quote": "Every other escape stays encoded with uppercase hex digits, so an encoded slash (`%2F`) never splits a segment and `/a%2fb` is matched as `/a%2Fb`.",
+       "start": 309,
+       "end": 456,
+       "confidence": 0.936
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#20",
+       "quote": "An encoded slash (`%2F`) still does not split a segment, so `/static%2Fprivate` does not match `/static/private`, and empty segments are kept, so neither does `/static//private`.",
+       "start": 607,
+       "end": 785,
+       "confidence": 0.988
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0112,
+       "restated": 0.9357,
+       "elaborated": 0.0353,
+       "different": 0.0178
+      },
+      "confidence": 0.9822,
+      "a": {
+       "document": "fiber:docs/guide/routing.md#7",
+       "quote": "With [`UnescapePath`](../api/fiber.md#config) enabled, every escape is decoded instead and a malformed escape stays as sent.",
+       "start": 805,
+       "end": 929,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#20",
+       "quote": "`UnescapePath` decodes every escape, as before.",
+       "start": 786,
+       "end": 833,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.015,
+       "restated": 0.9221,
+       "elaborated": 0.0505,
+       "different": 0.0124
+      },
+      "confidence": 0.9876,
+      "a": {
+       "document": "fiber:docs/guide/routing.md#7",
+       "quote": "Decoding happens exactly once: `/%2570rivate` is matched as `/%2570rivate` by default and as `/%70rivate` with `UnescapePath`, and neither becomes `/private`.",
+       "start": 1330,
+       "end": 1488,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#20",
+       "quote": "Decoding happens exactly once, so `/%2570rivate` never becomes `/private`.",
+       "start": 834,
+       "end": 908,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9886,
+       "restated": 0.0048,
+       "elaborated": 0.0036,
+       "different": 0.003
+      },
+      "confidence": 0.997,
+      "a": {
+       "document": "fiber:docs/guide/routing.md#7",
+       "quote": "[`c.OriginalURL()`](../api/ctx.md#originalurl) still returns the request target as the client sent it.",
+       "start": 2168,
+       "end": 2270,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#20",
+       "quote": "`c.OriginalURL()` still returns the request target as the client sent it.",
+       "start": 1787,
+       "end": 1860,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 123,
+   "passages": 7,
+   "counterparts_ms": 148
+  },
+  "timing": {
+   "read_ms": 305,
+   "total_ms": 308
+  }
+ }
+}

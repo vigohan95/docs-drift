@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b0/b01a518e1ebf357378b0",
+ "request_hash": "b01a518e1ebf357378b0ceaf34fc15c5b61eee79bd44bfaee381a86ae4328caa",
+ "recorded_at": "2026-11-06T14:39:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2287,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "170.08346",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=313"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#14",
+    "text": "### RFC 9110 hop-by-hop header stripping\n\n`Connection`, `Keep-Alive`, `Proxy-Authenticate`, `Proxy-Authorization`, `TE`, `Trailer`, `Transfer-Encoding`, and `Upgrade` are stripped from both the outbound request and the inbound response, along with every header listed in the `Connection` field per RFC 9110 §7.6.1. This prevents request smuggling (`TE`/`Transfer-Encoding`), proxy-credential forwarding, and protocol-upgrade leaks. A request whose `Connection` fields list more than 32 names is refused with `431 Request Header Fields Too Large` before it is forwarded, and an upstream response that does is answered with `502 Bad Gateway`, since each name costs a pass over every header line. Where header names are kept as sent (`DisableHeaderNormalizing` for the request, a client with `DisableHeaderNamesNormalizing` for the response), further spellings of a removed name count toward the same 32: every spelling besides the one listed in `Connection` or the standard one, except that on the response the standard names share one free spelling each, whichever name uses it. `Balancer`, `Forward`, `DomainForward`, and `BalancerForward` likewise answer `431` to a request that spells `X-Real-IP` in more than 32 ways besides `X-Real-IP`, since they replace every one of them. The legacy `KeepConnectionHeader` option preserves only the literal `Connection` header for backwards compatibility; the other hop-by-hop headers are still stripped. To preserve every hop-by-hop header (not recommended), set `SecurityPolicy.KeepHopByHopHeaders = true`."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#115",
+    "text": "### Proxy\n\nThe proxy middleware has been updated to improve consistency with Go naming conventions. The `TlsConfig` field in the configuration struct has been renamed to `TLSConfig`. Additionally, the `WithTlsConfig` method has been removed; you should now configure TLS directly via the `TLSConfig` property within the `Config` struct.\n\nThe new `KeepConnectionHeader` option (default `false`) drops the `Connection` header unless explicitly enabled to retain it.\n\nThe headers a request lists in `Connection` are removed before it is forwarded, and a request whose `Connection` fields list more than 32 names is answered with `431 Request Header Fields Too Large`; an upstream response that does is answered with `502 Bad Gateway`. Under `DisableHeaderNormalizing`, further spellings of a removed name count toward the same limit; `Balancer`, `Forward`, `DomainForward` and `BalancerForward` also answer `431` to a request that spells `X-Real-IP` in more than 32 further ways, and `DoRedirects` fails a redirect with `431` when the fields it drops are spelled in more than 32 further ways. See [hop-by-hop header stripping](./middleware/proxy.md#rfc-9110-hop-by-hop-header-stripping) and [redirect method and body](./middleware/proxy.md#redirect-method-and-body).\n\n`proxy.Balancer` takes its `proxy.Config` as an optional variadic argument, like the other middleware constructors. `Servers` (or a custom `Client` with `Clients`) is required, so `proxy.Balancer()` without a config panics at startup, as `proxy.Balancer(proxy.Config{})` does, and so does a `Client` without `Clients`. A server without a port is dialed on the port of its scheme, and each server is reached with its own scheme, so an `https` upstream works behind a plain-HTTP listener."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#115",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/proxy.md#14",
+    "b": "fiber:docs/whats_new.md#115",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0037,
+     "overlapping": 0.9913,
+     "conflicting": 0.0036,
+     "unrelated": 0.0015
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 94,
+   "passages": 1,
+   "counterparts_ms": 53
+  },
+  "timing": {
+   "read_ms": 178,
+   "total_ms": 182
+  }
+ }
+}

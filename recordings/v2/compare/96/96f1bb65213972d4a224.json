@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/96/96f1bb65213972d4a224",
+ "request_hash": "96f1bb65213972d4a224c85d74ee8737c83c212215c9d140d13a40452233c16a",
+ "recorded_at": "2026-11-06T14:42:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1032,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.93875",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=299"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#1",
+    "text": "```python\nfrom pydantic import BaseModel, ValidationError\n\n\nclass MyModel(BaseModel):\n    x: int\n\n\nprint(MyModel.model_validate({'x': '123'}))  # lax mode\n#> x=123\n\ntry:\n    MyModel.model_validate({'x': '123'}, strict=True)  # strict mode\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for MyModel\n    x\n      Input should be a valid integer [type=int_type, input_value='123', input_type=str]\n    \"\"\"\n```\n\nOne caveat when enabling strict mode on models an existing application relies on: inputs that were\nbeing quietly coerced will start failing. If you can't audit every caller, it helps to watch validation\nfailures while you roll the change out. [Logfire](../integrations/logfire.md) counts successful and\nfailed validations as metrics, and can record the rejected values included in structured errors.\n\nStrict mode can be enabled in various ways:\n\n* [As a validation parameter](#as-a-validation-parameter), such as when using [`model_validate()`][pydantic.BaseModel.model_validate],\n  on Pydantic models.\n* [At the field level](#at-the-field-level).\n* [At the configuration level](#as-a-configuration-value) (with the possibility to override at the field level).\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#strict-mode-in-method-calls}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "text": "<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`Counter`][collections.Counter] instances are valid. Strict mode does *not* apply to the keys and values of the counters.\nThe strict constraint must be applied to the parameter types for this to work.\n\n<h4>Example</h4>\n\n```python\nfrom collections import Counter\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass Model(BaseModel):\n    x: Counter[str]\n\n\nm = Model(x={'foo': '1'})\nprint(m.model_dump())\n#> {'x': Counter({'foo': 1})}\n\ntry:\n    Model(x='test')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid Counter [type=counter_type, input_value='test', input_type=str]\n    \"\"\"\n```\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#typeddict}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/strict_mode.md#1",
+    "b": "pydantic:docs/api/standard_library_types.md#45",
+    "relation": "overlapping",
+    "related": 0.9113,
+    "probabilities": {
+     "same": 0.0121,
+     "overlapping": 0.8769,
+     "conflicting": 0.0223,
+     "unrelated": 0.0887
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 66,
+   "passage_reads": 1,
+   "passages_ms": 58,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 124,
+   "total_ms": 126
+  }
+ }
+}

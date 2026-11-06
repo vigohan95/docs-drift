@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ba/ba10b9a982e4d69c108c",
+ "request_hash": "ba10b9a982e4d69c108cb52a437717fe514d8b1e6cbfa7d1bfe25493ea50998c",
+ "recorded_at": "2026-11-06T14:42:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1156,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "50.170465",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=246"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#6",
+    "text": "### Changes to `pydantic.BaseModel`\n\nVarious method names have been changed; all non-deprecated `BaseModel` methods now have names matching either the\nformat `model_.*` or `__.*pydantic.*__`. Where possible, we have retained the deprecated methods with their old names\nto help ease migration, but calling them will emit `DeprecationWarning`s.\n\n| Pydantic V1 | Pydantic V2  |\n| ----------- | ------------ |\n| `__fields__` | `model_fields` |\n| `__private_attributes__` | `__pydantic_private__` |\n| `__validators__` | `__pydantic_validator__` |\n| `construct()` | `model_construct()` |\n| `copy()` | `model_copy()` |\n| `dict()` | `model_dump()` |\n| `json_schema()` | `model_json_schema()` |\n| `json()` | `model_dump_json()` |\n| `parse_obj()` | `model_validate()` |\n| `update_forward_refs()` | `model_rebuild()` |\n\n* Some of the built-in data-loading functionality has been slated for removal. In particular,\n    `parse_raw` and `parse_file` are now deprecated. In Pydantic V2, `model_validate_json` works like `parse_raw`. Otherwise, you should load the data and then pass it to `model_validate`.\n* The `from_orm` method has been deprecated; you can now just use `model_validate` (equivalent to `parse_obj` from\n  Pydantic V1) to achieve something similar, as long as you've set `from_attributes=True` in the model config.\n* The `__eq__` method has changed for models.\n    * Models can only be equal to other `BaseModel` instances.\n    * For two model instances to be equal, they must have the same:\n        * Type (or, in the case of generic models, non-parametrized generic origin type)\n        * Field values\n        * Extra values (only relevant when `model_config['extra'] == 'allow'`)\n        * Private attribute values; models with different values of private attributes are no longer equal.\n        * Models are no longer equal to the dicts containing their data.\n        * Non-generic models of different types are never equal.\n        * Generic models with different origin types are never equal. We don't require *exact* type equality so that,\n            for example, instances of `MyGenericModel[Any]` could be equal to instances of `MyGenericModel[int]`.\n* We have replaced the use of the `__root__` field to specify a \"custom root model\" with a new type called\n    [`RootModel`](concepts/models.md#rootmodel-and-custom-root-types) which is intended to replace the functionality of\n    using a field called `__root__` in Pydantic V1. Note, `RootModel` types no longer support the `arbitrary_types_allowed`\n    config setting. See [this issue comment](https://github.com/pydantic/pydantic/issues/6710#issuecomment-1700948167) for an explanation.\n* We have significantly expanded Pydantic's capabilities related to customizing serialization. In particular, we have\n    added the [`@field_serializer`](api/functional_serializers.md#pydantic.functional_serializers.field_serializer),\n    [`@model_serializer`](api/functional_serializers.md#pydantic.functional_serializers.model_serializer), and\n    [`@computed_field`](api/fields.md#pydantic.fields.computed_field) decorators, which each address various\n    shortcomings from Pydantic V1.\n    * See [Custom serializers](concepts/serialization.md#serializers) for the usage docs of these new decorators.\n    * Due to performance overhead and implementation complexity, we have now deprecated support for specifying\n        `json_encoders` in the model config. This functionality was originally added for the purpose of achieving custom\n        serialization logic, and we think the new serialization decorators are a better choice in most common scenarios."
+   },
+   {
+    "id": "pydantic:docs/concepts/alias.md#1",
+    "text": "## `AliasPath` and `AliasChoices`\n\n??? api \"API Documentation\"\n\n    [`pydantic.aliases.AliasPath`][pydantic.aliases.AliasPath]<br>\n    [`pydantic.aliases.AliasChoices`][pydantic.aliases.AliasChoices]<br>\n\nPydantic provides two special types for convenience when using `validation_alias`: `AliasPath` and `AliasChoices`.\n\nThe `AliasPath` is used to specify a path to a field using aliases. For example:\n\n```python {lint=\"skip\"}\nfrom pydantic import BaseModel, Field, AliasPath\n\n\nclass User(BaseModel):\n    first_name: str = Field(validation_alias=AliasPath('names', 0))\n    last_name: str = Field(validation_alias=AliasPath('names', 1))\n    address: str = Field(validation_alias=AliasPath('contact', 'address'))\n\nuser = User.model_validate({  # (1)!\n    'names': ['John', 'Doe'],\n    'contact': {'address': '221B Baker Street'}\n})\nprint(user)\n#> first_name='John' last_name='Doe' address='221B Baker Street'\n```\n\n1. We are using [`model_validate()`][pydantic.BaseModel.model_validate] to validate a dictionary using the field aliases.\n   Refer to documentation about [validating data](./models.md#validating-data) for more details.\n\nIn the `'first_name'` field, we are using the alias `'names'` and the index `0` to specify the path to the first name.\nIn the `'last_name'` field, we are using the alias `'names'` and the index `1` to specify the path to the last name."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/alias.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#6",
+    "b": "pydantic:docs/concepts/alias.md#1",
+    "relation": "unrelated",
+    "related": 0.4753,
+    "probabilities": {
+     "same": 0.0181,
+     "overlapping": 0.4411,
+     "conflicting": 0.0161,
+     "unrelated": 0.5247
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 58
+  },
+  "timing": {
+   "read_ms": 58,
+   "total_ms": 61
+  }
+ }
+}

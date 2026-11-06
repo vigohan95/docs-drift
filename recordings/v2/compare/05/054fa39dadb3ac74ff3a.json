@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/05/054fa39dadb3ac74ff3a",
+ "request_hash": "054fa39dadb3ac74ff3aac43975aa857426dfc1be038eedb0ce08eb6852a6859",
+ "recorded_at": "2026-11-06T14:40:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2920,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.171584",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=160,cfOrigin;dur=0,cfWorker;dur=178"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#160",
+    "text": "### SendStream\n\nSets the response body to a stream of data and adds an optional body size.\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) SendStream(stream io.Reader, size ...int) error\nfunc (r fiber.Res) SendStream(stream io.Reader, size ...int) error\n```\n\n:::info\n`SendStream` operates asynchronously. The handler returns immediately after setting up the stream,\nbut the actual reading and sending of data happens **after** the handler completes. This is handled\nby the underlying `fasthttp` library.\n\nIf the provided stream implements `io.Closer`, it will be automatically closed by `fasthttp` after\nthe response is fully sent or if an error occurs.\n:::\n\n:::caution HTTP/1.0 clients\nA stream of unknown size is sent with chunked framing, which a server must not do in response to a request older than HTTP/1.1 ([RFC 9112 §6.1](https://www.rfc-editor.org/rfc/rfc9112#section-6.1)). Fiber does it on purpose: the RFC's alternative, ending the body by closing the connection ([§6.3](https://www.rfc-editor.org/rfc/rfc9112#section-6.3)), is not something fasthttp offers, and reading the stream to its end before replying would hold the handler for as long as the stream lasts, with no way to tell that the client left. Proxies that speak HTTP/1.0 to their upstream, such as nginx before 1.29.7 unless `proxy_http_version 1.1` is set, are the usual source of such requests. Pass the size when you know it: a stream of known size is sent with a `Content-Length` as it is read, whatever the HTTP version.\n:::"
+   },
+   {
+    "id": "fiber:docs/middleware/idempotency.md#3",
+    "text": "## Behavior\n\n* A request passes through untouched when `Next` returns `true` or when it has no `KeyHeader` value. The header is optional: nothing rejects a request that omits it.\n* The first request with a key runs the handler. If the handler returns without an error, its status, body and headers are stored under the key for `Lifetime`, whatever the status code. A handler that returns an error is not stored, so the next request with that key runs the handler again.\n* Header lines already present before the handler runs are left out of the stored response when their name and value are unchanged. Earlier middleware runs on every request, so its CORS decisions and request IDs are not replayed from the first request. New or changed lines from the handler and downstream middleware are still stored, subject to `KeepResponseHeaders`; repeated identical lines are counted individually. This does not change how stored headers are added on replay or merge list-valued fields such as `Vary`.\n* Register middleware whose decisions must be made for every request, such as CORS and request ID, before idempotency. Middleware registered after it runs only on a cache miss, and its response headers are replayed with the stored response. Entries written before upstream header filtering was introduced retain their original headers until they expire; the storage keys are unchanged, so upgrading does not cause an already-recorded operation to run again.\n* A streamed response that declares no length (`SendStreamWriter`, or `SendStream` without a size) is sent as it is produced and not stored, since storing it would mean reading it to its end first. The next request with that key runs the handler again. A stream of known length, such as `SendFile` serves, is read and stored like any other response when it is no longer than 1 MiB and delivers that length without an error; otherwise it is sent as read and not stored.\n* Cookies are not stored: `Set-Cookie` and the obsolete `Set-Cookie2` are left out of the stored response unless `KeepResponseHeaders` names them. The client that caused the miss still receives them, and a replay does not, so a retry after a lost response does not set the cookie. A stored entry is replayed through the same filter, so one that holds a cookie, written by an earlier version or under a configuration that named it, is replayed without it.\n* Later requests with the same key receive the stored response and the handler does not run. A request that arrives while the first is still running waits for `Lock` and then receives the stored response.\n* The key alone identifies a request, unless `KeyScope` is set. The method, path and body are not compared, so a retry with the same key but a different payload, or on another route, gets the original response, and so does anyone else who sends the key.\n* With `KeyScope`, a response is stored under the scope and the key together. A request replays only what was stored in its own scope, and a request in another scope that sends the same key runs the handler and stores a response of its own.\n* A key that fails `KeyHeaderValidate` is returned as an error to the error handler, which answers `500` unless the validator returns a `*fiber.Error`.\n* A request the server refused while reading it, such as one declaring a body over `BodyLimit`, runs no handler, so nothing is stored under its key and the retry with that key runs the handler."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#160",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/idempotency.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#160",
+    "b": "fiber:docs/middleware/idempotency.md#3",
+    "relation": "unrelated",
+    "related": 0.0789,
+    "probabilities": {
+     "same": 0.0136,
+     "overlapping": 0.0481,
+     "conflicting": 0.0172,
+     "unrelated": 0.9211
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 51
+  },
+  "timing": {
+   "read_ms": 51,
+   "total_ms": 54
+  }
+ }
+}

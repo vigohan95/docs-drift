@@ -1,0 +1,76 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/3d/3d6cae4386475044462f",
+ "request_hash": "3d6cae4386475044462f79387623a7e9205f30c5bf0f1c4af7dadd23b9a04467",
+ "recorded_at": "2026-11-06T14:40:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 993,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "68.331358",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=39,cfOrigin;dur=0,cfWorker;dur=187"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/redirect.md#4",
+    "text": "## Config\n\n| Property   | Type                | Description                               | Default                |\n|:-----------|:--------------------|:------------------------------------------|:-----------------------|\n| Next       | `func(fiber.Ctx) bool` | Skip when function returns true.          | nil                    |\n| RuleList   | `[]Rule`              | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures. | nil |\n| Rules      | `map[string]string`   | **Deprecated.** Use `RuleList`. A map has no order, so precedence is decided by a heuristic. | nil |\n| StatusCode | `int`                 | HTTP code for redirects.                  | 302 Temporary Redirect |\n\nA `Rule` is a pattern and a target:\n\n```go\ntype Rule struct {\n    From string // the path pattern, where \"*\" matches a run of any length\n    To   string // the target, where \"$1\", \"$2\" stand for what the asterisks captured\n}\n```\n\n`From` reaches the compiled pattern as a regular expression, so the other regexp\nmetacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also\nmatches `/fa`. Only `*` is a documented placeholder; write a rule out of path\ntext and `*` and it behaves as it reads. A `From` that is not a valid regular\nexpression, such as `/old(`, makes `New` panic. A rule matches the whole path,\nletter case included: `/old` answers `/old`, but not `/OLD`, `/old/x` or `/very/old`.\n\nIn `To`, `$10` is the tenth capture in a rule with ten or more captures, which counts every group of the regular expression and not only the asterisks; in a rule with fewer it reads as `$1` followed by `0`.\n\nSetting both `RuleList` and `Rules` panics: the two disagree about what decides\nprecedence, so there is no sensible way to honor them together."
+   }
+  ],
+  "answer": "With neither, the middleware rewrites nothing. A rule's `From` is path text: `*` matches a run of any bytes but a newline, and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and not `/preis-1X000-euro`.",
+  "claims": [
+   "With neither, the middleware rewrites nothing. A rule's `From` is path text: `*` matches a run of any bytes but a newline, and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and not `/preis-1X000-euro`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.014,
+  "ungrounded": 0.986,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/redirect.md#4",
+    "share": 1,
+    "share_of_answer": 0.014,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "With neither, the middleware rewrites nothing. A rule's `From` is path text: `*` matches a run of any bytes but a newline, and every other byte stands for itself, so `/preis-1.000-euro` rewrites that path and not `/preis-1X000-euro`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.014,
+    "contradicted": 0.2288,
+    "not_stated": 0.7427,
+    "not_a_claim": 0.0145,
+    "verdict": "not_stated",
+    "sources": {
+     "fiber:docs/middleware/redirect.md#4": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.014
+  },
+  "timing": {
+   "read_ms": 74,
+   "total_ms": 76
+  }
+ }
+}

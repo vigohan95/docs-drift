@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0d/0d20be5a0262b8f6b177",
+ "request_hash": "0d20be5a0262b8f6b1779466bf6ea97931413a471dd4f232f56cf37f422012f4",
+ "recorded_at": "2026-11-06T14:42:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2172,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "70.953346",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=194"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/validation_decorator.md#10",
+    "text": "### Validation exception\n\nCurrently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised\n(see [model error handling](models.md#error-handling) for details). This is also true for missing required arguments,\nwhere Python normally raises a [`TypeError`][].\n\nThe error identifies the argument and value that were rejected. If you also need those details in the\nsurrounding trace context, [Logfire](../errors/troubleshooting.md) can record them when a decorated\ncall fails."
+   },
+   {
+    "id": "pydantic:docs/migration.md#17",
+    "text": "#### `TypeError` is no longer converted to `ValidationError` in validators\n\nPreviously, when raising a `TypeError` within a validator function, that error would be wrapped into a `ValidationError`\nand, in some cases (such as with FastAPI), these errors might be displayed to end users. This led to a variety of\nundesirable behavior &mdash; for example, calling a function with the wrong signature might produce a user-facing\n`ValidationError`.\n\nHowever, in Pydantic V2, when a `TypeError` is raised in a validator, it is no longer converted into a\n`ValidationError`:\n\n```python\nimport pytest\n\nfrom pydantic import BaseModel, field_validator\n\n\nclass Model(BaseModel):\n    x: int\n\n    @field_validator('x')\n    def val_x(cls, v: int) -> int:\n        return str.lower(v)  # raises a TypeError\n\n\nwith pytest.raises(TypeError):\n    Model(x=1)\n```\n\nThis applies to all validation decorators."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/validation_decorator.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/migration.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/validation_decorator.md#10",
+    "b": "pydantic:docs/migration.md#17",
+    "relation": "overlapping",
+    "related": 0.9865,
+    "probabilities": {
+     "same": 0.0291,
+     "overlapping": 0.8865,
+     "conflicting": 0.0709,
+     "unrelated": 0.0135
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 77,
+   "total_ms": 80
+  }
+ }
+}

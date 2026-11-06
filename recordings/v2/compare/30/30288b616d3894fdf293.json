@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/30/30288b616d3894fdf293",
+ "request_hash": "30288b616d3894fdf29344fb6fa8962f6f0fe8192c90dfa0460269baead9dcbc",
+ "recorded_at": "2026-11-06T14:40:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2119,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "112.442015",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=169,cfOrigin;dur=0,cfWorker;dur=252"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/fiber.md#6",
+    "text": "| <Reference id=\"disableflashmessages\">DisableFlashMessages</Reference>                 | `bool`                                                          | Disables redirect flash messages: `Redirect().With` and `WithInput` set no cookie, `Messages` and `OldInput` report nothing, and the scan of every request's headers for an incoming `fiber_flash` cookie is skipped. Flash messages travel in that cookie, so only clients that keep cookies across a redirect (browsers, typically) ever receive them; deployments whose clients do not can turn them off. | `false`                                                                |\n| <Reference id=\"disableheadautoregister\">DisableHeadAutoRegister</Reference>           | `bool`                          | Prevents Fiber from automatically registering `HEAD` routes for each `GET` route so you can supply custom `HEAD` handlers; manual `HEAD` routes still override the generated ones. A mounted sub-app that sets this option, or that leaves `HEAD` out of its `RequestMethods`, gets no generated `HEAD` routes for its routes, even when the app it is mounted on generates them for its own. | `false`                                                                |\n| <Reference id=\"disableheadernormalizing\">DisableHeaderNormalizing</Reference>         | `bool`                                                          | By default all header names are normalized: conteNT-tYPE -&gt; Content-Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `false`                                                                |\n| <Reference id=\"disablekeepalive\">DisableKeepalive</Reference>                         | `bool`                                                          | Disables keep-alive connections so the server closes each connection after the first response.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `false`                                                                |\n| <Reference id=\"disablepreparsemultipartform\">DisablePreParseMultipartForm</Reference> | `bool`                                                          | Will not pre parse Multipart Form data if set to true. This option is useful for servers that desire to treat multipart form data as a binary blob, or choose when to parse the data. Always in effect with `StreamRequestBody`: the form is then parsed on demand by [`Ctx.MultipartForm()`](./ctx.md#multipartform), within `BodyLimit`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | `false`                                                                |"
+   },
+   {
+    "id": "fiber:docs/api/redirect.md#14",
+    "text": "#### WithInput\n\nSend input data with `WithInput`, which stores them in a cookie.\n\nIt captures form, multipart, or query data depending on the request content type.\n\n:::caution\n\n`WithInput` copies the whole submitted body into the `fiber_flash` cookie — a\nrejected login carries the password the user just typed. The payload is\nhex-encoded, not encrypted or signed, so anything sensitive in the request goes\nback to the browser as a cookie value. Prefer `With` for the specific fields you\nneed to carry across the redirect.\n\nThe cookie is `HttpOnly`, and `Secure` when the request that produced it arrived\nover TLS — so script cannot read it and it is not replayed in the clear. Neither\nattribute protects the payload from whoever is at the browser.\n\nBrowsers typically drop a cookie larger than about 4 KB, and Fiber sets no flash\ncookie at all when a redirect carries more than 256 entries (messages plus input\nfields), so a large form does not make the round trip.\n\n:::\n\n```go title=\"Signature\"\nfunc (r *Redirect) WithInput() *Redirect\n```\n\n```go title=\"Example\"\n// curl -X POST http://localhost:3000/login -d \"name=John\"\napp.Post(\"/login\", func(c fiber.Ctx) error {\n  return c.Redirect().WithInput().Route(\"name\")\n})\n\napp.Get(\"/name\", func(c fiber.Ctx) error {\n  // => John\n  return c.SendString(c.Redirect().OldInput(\"name\").Value)\n}).Name(\"name\")\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/fiber.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/api/redirect.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/fiber.md#6",
+    "b": "fiber:docs/api/redirect.md#14",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.0078,
+     "overlapping": 0.9838,
+     "conflicting": 0.0043,
+     "unrelated": 0.0042
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 86,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 121,
+   "total_ms": 126
+  }
+ }
+}

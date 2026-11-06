@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ee/eef068c4c36395f34ffc",
+ "request_hash": "eef068c4c36395f34ffcc19740a26bae0db1db017be18936f3e90b5422bc548f",
+ "recorded_at": "2026-11-06T14:38:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2297,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "159.314941",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=361"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/06-runtime/02-context.md#0",
+    "text": "---\ntitle: Context\n---\n\nContext allows components to access values owned by parent components without passing them down as props (potentially through many layers of intermediate components, known as 'prop-drilling').\n\nBy creating a `[get, set, has]` triplet of functions with `createContext`, you can set the context in a parent component and get it in a child component:\n\n<!-- codeblock:start {\"title\":\"Context\",\"selected\":\"context.ts\"} -->\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport Parent from './Parent.svelte';\n\timport Child from './Child.svelte';\n</script>\n\n<Parent>\n\t<Child />\n</Parent>\n```\n\n```svelte\n<!--- file: Parent.svelte --->\n<script>\n\timport { setUserContext } from './context';\n\n\tlet { children } = $props();\n\n\tsetUserContext({ name: 'world' });\n</script>\n\n{@render children()}\n```\n\n```svelte\n<!--- file: Child.svelte --->\n<script>\n\timport { getUserContext } from './context';\n\n\tconst user = getUserContext();\n</script>\n\n<h1>hello {user.name}, inside Child.svelte</h1>\n```\n\n```ts\n/// file: context.ts\nimport { createContext } from 'svelte';\n\ninterface User {\n\tname: string;\n}\n\nexport const [getUserContext, setUserContext] = createContext<User>();\n```\n<!-- codeblock:end -->\n\n> [!NOTE] `createContext` was added in version 5.40. If you are using an earlier version of Svelte, you must use `setContext` and `getContext` instead.\n\nThis is particularly useful when `Parent.svelte` is not directly aware of `Child.svelte`, but instead renders it as part of a `children` [snippet](snippet) as shown above."
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/04-custom-elements.md#4",
+    "text": "## Caveats and limitations\n\nCustom elements can be a useful way to package components for consumption in a non-Svelte app, as they will work with vanilla HTML and JavaScript as well as [most frameworks](https://custom-elements-everywhere.com/). There are, however, some important differences to be aware of:\n\n- Styles are _encapsulated_, rather than merely _scoped_ (unless you set `shadow: \"none\"`). This means that any non-component styles (such as you might have in a `global.css` file) will not apply to the custom element, including styles with the `:global(...)` modifier\n- Instead of being extracted out as a separate .css file, styles are inlined into the component as a JavaScript string\n- Custom elements are not generally suitable for server-side rendering, as the shadow DOM is invisible until JavaScript loads\n- In Svelte, slotted content renders _lazily_. In the DOM, it renders _eagerly_. In other words, it will always be created even if the component's `<slot>` element is inside an `{#if ...}` block. Similarly, including a `<slot>` in an `{#each ...}` block will not cause the slotted content to be rendered multiple times\n- The deprecated `let:` directive has no effect, because custom elements do not have a way to pass data to the parent component that fills the slot\n- Polyfills are required to support older browsers\n- You can use Svelte's context feature between regular Svelte components within a custom element, but you can't use them across custom elements. In other words, you can't use `setContext` on a parent custom element and read that with `getContext` in a child custom element.\n- Don't declare properties or attributes starting with `on`, as their usage will be interpreted as an event listener. In other words, Svelte treats `<custom-element oneworld={true}></custom-element>` as `customElement.addEventListener('eworld', true)` (and not as `customElement.oneworld = true`)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/06-runtime/02-context.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/07-misc/04-custom-elements.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/06-runtime/02-context.md#0",
+    "b": "svelte:documentation/docs/07-misc/04-custom-elements.md#4",
+    "relation": "overlapping",
+    "related": 0.6228,
+    "probabilities": {
+     "same": 0.0127,
+     "overlapping": 0.5925,
+     "conflicting": 0.0175,
+     "unrelated": 0.3772
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 50,
+   "passage_reads": 1,
+   "passages_ms": 118,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 168,
+   "total_ms": 171
+  }
+ }
+}

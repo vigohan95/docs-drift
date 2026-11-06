@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/13/13099429f6ca6d51c49e",
+ "request_hash": "13099429f6ca6d51c49e1ab37b3246973d6bcd20affe72ca0149465d256c9da8",
+ "recorded_at": "2026-11-06T14:38:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3195,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "114.130692",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=184,cfOrigin;dur=0,cfWorker;dur=534"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) ## Prerequisites (2) ### Prerequisites Make sure you run at least Node 14.18.0 and update all your Rollup plugins to their latest versions. For larger configs, it can make sense to update to `rollup@2.79.1` first, add the [`strictDeprecations`](../configuration-options/index.md#strictdeprecations) option to your config and resolve any errors that pop up.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#39",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Output Generation Hooks > closeBundle",
+    "text": "### closeBundle\n\n|  |  |\n| --: | :-- |\n| Type: | `closeBundle: (error?: Error) => Promise<void> \\| void` |\n| Kind: | async, parallel |\n| Previous: | [`buildEnd`](#buildend) if there was a build error, otherwise when [`bundle.close()`](../javascript-api/index.md#rollup-rollup) is called, in which case this would be the last hook to be triggered |\n\nCan be used to clean up any external service that may be running. Rollup's CLI will make sure this hook is called after each run, but it is the responsibility of users of the JavaScript API to manually call `bundle.close()` once they are done generating bundles. For that reason, any plugin relying on this feature should carefully mention this in its documentation.\n\nIf a plugin wants to retain resources across builds in watch mode, they can check for [`this.meta.watchMode`](#this-meta) in this hook and perform the necessary cleanup for watch mode in [`closeWatcher`](#closewatcher).\n\nIf an error occurs during build or the `buildEnd` hook, it is passed to this hook as first argument. If `closeBundle` also throws an error, Rollup reports the earlier error. Errors from `closeBundle` are still reported when calling `bundle.close()` after a successful build."
+   },
+   {
+    "id": "rollup:docs/migration/index.md#10",
+    "title": "docs/migration/index.md > {{ $frontmatter.title }} > Migrating to Rollup 3 > Dynamic Import in CommonJS Output",
+    "text": "### Dynamic Import in CommonJS Output\n\nBy default, when generating `cjs` output, Rollup will now keep any external, i.e. non-bundled, dynamic imports as `import(…)` expressions in the output. This is supported in all Node versions starting with Node 14 and allows to load both CommonJS and ES modules from generated CommonJS output. If you need to support older Node versions, you can pass [`output.dynamicImportInCjs: false`](../configuration-options/index.md#output-dynamicimportincjs)."
+   },
+   {
+    "id": "rollup:docs/browser/index.md#1",
+    "title": "docs/browser/index.md > {{ $frontmatter.title }} > The browser build",
+    "text": "## The browser build\n\nWhile the regular Rollup build relies on some NodeJS builtin libraries, there is also a browser build available that only uses browser APIs. You can install it via\n\n```shell\nnpm install @rollup/browser\n```\n\nand in your script, import it via\n\n```js\nimport { rollup } from '@rollup/browser';\n```\n\nAlternatively, you can import from a CDN, e.g. for the ESM build\n\n```js\nimport * as rollup from 'https://unpkg.com/@rollup/browser/dist/es/rollup.browser.js';\n```\n\nand for the UMD build\n\n```html\n<script src=\"https://unpkg.com/@rollup/browser/dist/rollup.browser.js\"></script>\n```\n\nwhich will create a global variable `window.rollup`. Note that in each case, you need to make sure that the file `dist/bindings_wasm_bg.wasm` from the `@rollup/browser` package is served next to where the browser build is served.\n\nAs the browser build cannot access the file system, you either need to provide an [in-memory file system](#using-an-in-memory-file-system) via the [`fs`](../configuration-options/index.md#fs) option, or you need to [provide plugins](#using-plugins-to-resolve-and-load-modules) that resolve and load all modules you want to bundle."
+   },
+   {
+    "id": "rollup:docs/migration/index.md#4",
+    "title": "docs/migration/index.md > {{ $frontmatter.title }} > Changes to the Plugin API",
+    "text": "## Changes to the Plugin API\n\nAn important change is that [`this.resolve()`](../plugin-development/index.md#this-resolve) will now by default add `skipSelf: true`. That means when calling `this.resolve()` from a [`resolveId`](../plugin-development/index.md#resolveid) hook, this hook will not be called again by this or further nested `this.resolve()` calls from other plugins unless they use a different `source` or `importer`. We found that this is a reasonable default for most plugins that prevents unintended infinite loops. To get the old behaviour, you can manually add `skipSelf: false`.\n\nAnother important change is that Rollup watch mode will no longer watch ids of files that have been loaded via a plugin [`load`](../plugin-development/index.md#load) hook. So this mainly affects \"virtual\" files, where it really does not make sense to watch a hard drive location for changes. Instead, it is now up to plugins that use a `load` hook to manually call [`this.addWatchFile()`](../plugin-development/index.md#this-addwatchfile) for all the files they depend on to handle the `load` hook.\n\nIf your plugin handles import assertions, note that in the [`resolveId`](../plugin-development/index.md#resolveid) hook and other places, `assertions` have been replaced with `attributes` as the JavaScript feature was also renamed. Also, the abstract syntax tree representation of import attributes now follows the [ESTree spec](https://github.com/estree/estree/blob/7a0c8fb02a33a69fa16dbe3ca35beeaa8f58f1e3/experimental/import-attributes.md) again.\n\nIf you want to emit warnings from your plugin, you can no longer call `options.onwarn()` in the [`buildStart`](../plugin-development/index.md#buildstart) hook. Instead, either use [`this.warn()`](../plugin-development/index.md#load) or [`options.onLog()`](../configuration-options/index.md#onlog)."
+   },
+   {
+    "id": "rollup:docs/command-line-interface/index.md#14",
+    "title": "docs/command-line-interface/index.md > {{ $frontmatter.title }} > Command line flags > `--configPlugin <plugin>`",
+    "text": "### `--configPlugin <plugin>`\n\nAllows specifying Rollup plugins to transpile or otherwise control the parsing of your configuration file. The main benefit is that it allows you to use non-JavaScript configuration files. For instance the following will allow you to write your configuration in TypeScript, provided you have `@rollup/plugin-typescript` installed:\n\n```shell\nrollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript\n```\n\nNote for Typescript: make sure you have the Rollup config file in your `tsconfig.json`'s `include` paths. For example:\n\n```\n\"include\": [\"src/**/*\", \"rollup.config.ts\"],\n```\n\nThis option supports the same syntax as the [`--plugin`](#p-plugin-plugin-plugin) option i.e., you can specify the option multiple times, you can omit the `@rollup/plugin-` prefix and just write `typescript` and you can specify plugin options via `={...}`.\n\nUsing this option will make Rollup transpile your configuration file to an ES module first before executing it. To transpile to CommonJS instead, also pass the [`--bundleConfigAsCjs`](#bundleconfigascjs) option."
+   },
+   {
+    "id": "rollup:docs/tools/index.md#2",
+    "title": "docs/tools/index.md > {{ $frontmatter.title }} > With NPM Packages > @rollup/plugin-node-resolve",
+    "text": "### @rollup/plugin-node-resolve\n\nThe [@rollup/plugin-node-resolve](https://github.com/rollup/plugins/tree/master/packages/node-resolve) plugin teaches Rollup how to find external modules. Install it…\n\n```shell\nnpm install --save-dev @rollup/plugin-node-resolve\n```\n\n…and add it to your config file:\n\n```js twoslash\n// rollup.config.js\nimport resolve from '@rollup/plugin-node-resolve';\n\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\tinput: 'src/main.js',\n\toutput: {\n\t\tfile: 'bundle.js',\n\t\tformat: 'cjs'\n\t},\n\tplugins: [resolve()]\n};\n```\n\nThis time, when you `npm run build`, no warning is emitted — the bundle contains the imported module."
+   },
+   {
+    "id": "rollup:docs/tools/index.md#5",
+    "title": "docs/tools/index.md > {{ $frontmatter.title }} > Babel",
+    "text": "## Babel\n\nMany developers use [Babel](https://babeljs.io/) in their projects in order to use the latest JavaScript features that aren't yet supported by browsers and Node.js.\n\nThe easiest way to use both Babel and Rollup is with [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel). First, install the plugin:\n\n```shell\nnpm i -D @rollup/plugin-babel @rollup/plugin-node-resolve\n```\n\nAdd it to `rollup.config.js`:\n\n```js twoslash\n// rollup.config.js\nimport resolve from '@rollup/plugin-node-resolve';\nimport babel from '@rollup/plugin-babel';\n\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\tinput: 'src/main.js',\n\toutput: {\n\t\tfile: 'bundle.js',\n\t\tformat: 'cjs'\n\t},\n\tplugins: [resolve(), babel({ babelHelpers: 'bundled' })]\n};\n```\n\nBefore Babel will actually compile your code, it needs to be configured. Create a new file, `src/.babelrc.json`:\n\n```json\n{\n\t\"presets\": [\"@babel/env\"]\n}\n```\n\nWe're putting our `.babelrc.json` file in `src`, rather than the project root. This allows us to have a different `.babelrc.json` for things like tests, if we need that later – See the [Babel documentation](https://babeljs.io/docs/en/config-files#project-wide-configuration) for more information on both project wide and file relative configuration.\n\nNow, before we run rollup, we need to install [`babel-core`](https://babeljs.io/docs/en/babel-core) and the [`env`](https://babeljs.io/docs/en/babel-preset-env) preset:\n\n```shell\nnpm i -D @babel/core @babel/preset-env\n```\n\nRunning Rollup now will create a bundle - except we're not actually using any ES2015 features. Let's change that by editing `src/main.js`:\n\n```js\n// src/main.js\nimport answer from 'the-answer';\n\nexport default () => {\n\tconsole.log(`the answer is ${answer}`);\n};\n```\n\nRun Rollup with `npm run build`, and check the bundle:\n\n```js\n'use strict';\n\nvar index = 42;\n\nvar main = function () {\n\tconsole.log('the answer is ' + index);\n};\n\nmodule.exports = main;\n```"
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#33",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Build Hooks > watchChange",
+    "text": "### watchChange\n\n|  |  |\n| --: | :-- |\n| Type: | `watchChange: (id: string, change: {event: 'create' \\| 'update' \\| 'delete'}) => void` |\n| Kind: | async, parallel |\n| Previous/Next: | This hook can be triggered at any time both during the build and the output generation phases. If that is the case, the current build will still proceed but a new build will be scheduled to start once the current build has completed, starting again with [`options`](#options) |\n\nNotifies a plugin whenever Rollup has detected a change to a monitored file in `--watch` mode. If a build is currently running, this hook is called once the build finished. It will be called once for every file that changed. If a Promise is returned, Rollup will wait for the Promise to resolve before scheduling another build. This hook cannot be used by output plugins. The second argument contains additional details of the change event. If you need to be notified immediately when a file changed, you can use the [`watch.onInvalidate`](../configuration-options/index.md#watch-oninvalidate) configuration option."
+   },
+   {
+    "id": "rollup:docs/faqs/index.md#8",
+    "title": "docs/faqs/index.md > {{ $frontmatter.title }} > How do I add polyfills to a Rollup bundle?",
+    "text": "For most code this is not a problem, because Rollup can guarantee:\n\n> If module A imports module B and there are no circular imports, then B will always be executed before A.\n\nThis is however a problem for polyfills, as those usually need to be executed first but it is usually not desired to place an import of the polyfill in every single module. Luckily, this is not needed:\n\n1. If there are no external dependencies that depend on the polyfill, it is enough to add an import of the polyfill as first statement to each static entry point.\n2. Otherwise, additionally making the polyfill a separate entry or [manual chunk](../configuration-options/index.md#output-manualchunks) will always make sure it is executed first."
+   },
+   {
+    "id": "rollup:docs/javascript-api/index.md#7",
+    "title": "docs/javascript-api/index.md > {{ $frontmatter.title }} > rollup.watch > watchOptions",
+    "text": "### watchOptions\n\nThe `watchOptions` argument is a config (or an array of configs) that you would export from a config file.\n\n```js twoslash\n// ---cut-start---\n/** @type {import('rollup').RollupWatchOptions} */\n// ---cut-end---\nconst watchOptions = {\n\t...inputOptions,\n\toutput: [outputOptions],\n\twatch: {\n\t\tallowInputInsideOutputPath,\n\t\tbuildDelay,\n\t\tchokidar,\n\t\tclearScreen,\n\t\tskipWrite,\n\t\texclude,\n\t\tinclude\n\t}\n};\n```\n\nSee above for details on `inputOptions` and `outputOptions`, or consult the [big list of options](../configuration-options/index.md) for info on `chokidar`, `include` and `exclude`."
+   },
+   {
+    "id": "rollup:docs/tutorial/index.md#2",
+    "title": "docs/tutorial/index.md > {{ $frontmatter.title }} > Installing Rollup locally",
+    "text": "## Installing Rollup locally\n\nWhen working within teams or distributed environments it can be wise to add Rollup as a _local_ dependency. Installing Rollup locally prevents the requirement that multiple contributors install Rollup separately as an extra step, and ensures that all contributors are using the same version of Rollup.\n\nTo install Rollup locally with NPM:\n\n```shell\nnpm install rollup --save-dev\n```\n\nOr with Yarn:\n\n```shell\nyarn -D add rollup\n```\n\nAfter installing, Rollup can be run within the root directory of your project:\n\n```shell\nnpx rollup --config\n```\n\nOr with Yarn:\n\n```shell\nyarn rollup --config\n```\n\nOnce installed, it's common practice to add a single build script to `package.json`, providing a convenient command for all contributors. e.g.\n\n```json\n{\n\t\"scripts\": {\n\t\t\"build\": \"rollup --config\"\n\t}\n}\n```\n\n_Note: Once installed locally, both NPM and Yarn will resolve the dependency's bin file and execute Rollup when called from a package script._"
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#81",
+    "title": "docs/plugin-development/index.md > {{ $frontmatter.title }} > Plugin Context > this.load",
+    "text": "Note that with regard to the `attributes`, `meta`, `moduleSideEffects` and `syntheticNamedExports` options, the same restrictions apply as for the `resolveId` hook: Their values only have an effect if the module has not been loaded yet. Thus, it is very important to use `this.resolve` first to find out if any plugins want to set special values for these options in their `resolveId` hook, and pass these options on to `this.load` if appropriate. The example below showcases how this can be handled to add a proxy module for modules containing a special code comment. Note the special handling for re-exporting the default export:\n\n```js twoslash\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nexport default function addProxyPlugin() {\n\treturn {\n\t\tasync resolveId(source, importer, options) {\n\t\t\tif (importer?.endsWith('?proxy')) {\n\t\t\t\t// Do not proxy ids used in proxies\n\t\t\t\treturn null;\n\t\t\t}\n\t\t\t// We make sure to pass on any resolveId options to\n\t\t\t// this.resolve to get the module id\n\t\t\tconst resolution = await this.resolve(source, importer, options);\n\t\t\t// We can only pre-load existing and non-external ids\n\t\t\tif (resolution && !resolution.external) {\n\t\t\t\t// we pass on the entire resolution information\n\t\t\t\tconst moduleInfo = await this.load(resolution);\n\t\t\t\tif (moduleInfo.code.includes('/* use proxy */')) {\n\t\t\t\t\treturn `${resolution.id}?proxy`;\n\t\t\t\t}\n\t\t\t}\n\t\t\t// As we already fully resolved the module, there is no reason\n\t\t\t// to resolve it again\n\t\t\treturn resolution;\n\t\t},\n\t\tload(id) {\n\t\t\tif (id.endsWith('?proxy')) {\n\t\t\t\tconst importee = id.slice(0, -'?proxy'.length);\n\t\t\t\t// Note that namespace reexports do not reexport default\n\t\t\t\t// exports\n\t\t\t\tlet code = `console.log('proxy for ${importee}'); export * from ${JSON.stringify(\n\t\t\t\t\timportee\n\t\t\t\t)};`;\n\t\t\t\t// We know that while resolving the proxy, importee was\n\t\t\t\t// already fully loaded and parsed, so we can rely on\n\t\t\t\t// hasDefaultExport\n\t\t\t\tif (this.getModuleInfo(importee).hasDefaultExport) {\n\t\t\t\t\tcode += `export { default } from ${JSON.stringify(importee)};`;\n\t\t\t\t}\n\t\t\t\treturn code;\n\t\t\t}\n\t\t\treturn null;\n\t\t}\n\t};\n}\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "rollup:docs/migration/index.md#10",
+    "action": "use",
+    "relevance_score": 0.8376,
+    "document_score": 0.8637,
+    "levels": {
+     "answers": 0.8376,
+     "elsewhere": 0.0262,
+     "different_case": 0.0628,
+     "unrelated": 0.0734
+    }
+   },
+   {
+    "index": 10,
+    "id": "rollup:docs/tutorial/index.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0043,
+    "document_score": 0.0163,
+    "levels": {
+     "answers": 0.0043,
+     "elsewhere": 0.0119,
+     "different_case": 0.0123,
+     "unrelated": 0.9715
+    }
+   },
+   {
+    "index": 5,
+    "id": "rollup:docs/tools/index.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0041,
+    "document_score": 0.0104,
+    "levels": {
+     "answers": 0.0041,
+     "elsewhere": 0.0063,
+     "different_case": 0.0129,
+     "unrelated": 0.9767
+    }
+   },
+   {
+    "index": 3,
+    "id": "rollup:docs/migration/index.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0081,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0046,
+     "different_case": 0.0123,
+     "unrelated": 0.9795
+    }
+   },
+   {
+    "index": 6,
+    "id": "rollup:docs/tools/index.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0058,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0031,
+     "different_case": 0.0101,
+     "unrelated": 0.984
+    }
+   },
+   {
+    "index": 8,
+    "id": "rollup:docs/faqs/index.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0093,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0067,
+     "different_case": 0.0094,
+     "unrelated": 0.9813
+    }
+   },
+   {
+    "index": 2,
+    "id": "rollup:docs/browser/index.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0029,
+     "different_case": 0.0065,
+     "unrelated": 0.9883
+    }
+   },
+   {
+    "index": 9,
+    "id": "rollup:docs/javascript-api/index.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0074,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0051,
+     "different_case": 0.0069,
+     "unrelated": 0.9857
+    }
+   },
+   {
+    "index": 11,
+    "id": "rollup:docs/plugin-development/index.md#81",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0058,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0036,
+     "different_case": 0.0097,
+     "unrelated": 0.9845
+    }
+   },
+   {
+    "index": 7,
+    "id": "rollup:docs/plugin-development/index.md#33",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0063,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0042,
+     "different_case": 0.0065,
+     "unrelated": 0.9873
+    }
+   },
+   {
+    "index": 0,
+    "id": "rollup:docs/plugin-development/index.md#39",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0049,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0031,
+     "different_case": 0.0078,
+     "unrelated": 0.9873
+    }
+   },
+   {
+    "index": 4,
+    "id": "rollup:docs/command-line-interface/index.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0025,
+     "different_case": 0.0053,
+     "unrelated": 0.9905
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5873
+  },
+  "timing": {
+   "total_ms": 117,
+   "rerank_ms": 117,
+   "questions_ms": 0,
+   "model_ms": 108,
+   "engine": {
+    "rows": 6533,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 108,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 192
+   }
+  }
+ }
+}

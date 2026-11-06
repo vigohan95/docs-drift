@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/7d/7d278e9509e55040a2b7",
+ "request_hash": "7d278e9509e55040a2b724bc75ed39f0e6c7196e368ca365e152f484c4a7d52b",
+ "recorded_at": "2026-11-06T14:37:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1395,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "183.627781",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=390"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#25",
+    "text": "The function receives three arguments: the log level, the log object and the default handler. Log objects have, at a minimum, a `code` and a `message` property, allowing you to control how different kinds of logs are handled. Other properties are added depending on the type of log. See [`utils/logs.ts`](https://github.com/rollup/rollup/blob/master/src/utils/logs.ts) for a complete list of built-in errors and logs together with their codes and properties.\n\nIf the default handler is not invoked, the log will not be printed to the console. Moreover, you can change the log level by invoking the default handler with a different level. Using the additional level `\"error\"` will turn the log into a thrown error that has all properties of the log attached.\n\n```js twoslash\n// rollup.config.js\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\t//...\n\tonLog(level, log, handler) {\n\t\tif (log.code === 'CIRCULAR_DEPENDENCY') {\n\t\t\treturn; // Ignore circular dependency warnings\n\t\t}\n\t\tif (level === 'warn') {\n\t\t\thandler('error', log); // turn other warnings into errors\n\t\t} else {\n\t\t\thandler(level, log); // otherwise, just print the log\n\t\t}\n\t}\n};\n```\n\nThis handler will not be invoked if logs are filtered out by the [`logLevel`](#loglevel) option. I.e. by default, `\"debug\"` logs will be swallowed."
+   },
+   {
+    "id": "rollup:docs/javascript-api/index.md#1",
+    "text": "## rollup.rollup\n\nThe `rollup.rollup` function receives an input options object as parameter and returns a Promise that resolves to a `bundle` object with various properties and methods as shown below. During this step, Rollup will build the module graph and perform tree-shaking, but will not generate any output.\n\nOn a `bundle` object, you can call `bundle.generate` multiple times with different output options objects to generate different bundles in-memory. If you directly want to write them to disk, use `bundle.write` instead.\n\nOnce you're finished with the `bundle` object, you should call `bundle.close()`, which will let plugins clean up their external processes or services via the [`closeBundle`](../plugin-development/index.md#closebundle) hook.\n\nIf an error occurs at either stage, it will return a Promise rejected with an Error, which you can identify via their `code` property. Besides `code` and `message`, many errors have additional properties you can use for custom reporting, see [`utils/logs.ts`](https://github.com/rollup/rollup/blob/master/src/utils/logs.ts) for a complete list of errors and logs together with their codes and properties.\n\n<!-- prettier-ignore-start -->\n```javascript twoslash\nimport { rollup } from 'rollup';\n\n// see below for details on these options\n// ---cut-start---\n/** @type {import('rollup').InputOptions} */\n// ---cut-end---\nconst inputOptions = {\n\t/* ... */\n};\n\n// you can create multiple outputs from the same input to generate e.g.\n// different formats like CommonJS and ESM\n// ---cut-start---\n/** @type {import('rollup').OutputOptions[]} */\n// ---cut-end---\nconst outputOptionsList = [\n\t{\n\t\t/* ... */\n\t},\n\t{\n\t\t/* ... */\n\t}\n];\n\nbuild();\n\nasync function build() {\n// ---cut-start---\n\t/** @type {import('rollup').RollupBuild} */\n// ---cut-end---\n\tlet bundle;\n\tlet buildFailed = false;\n\ttry {\n\t\t// Create a bundle. If you are using TypeScript or a runtime that\n\t\t// supports it, you can write\n\t\t//\n\t\t// await using bundle = await rollup(inputOptions);\n\t\t//\n\t\t// instead and do not need to close the bundle explicitly below.\n\t\tbundle = await rollup(inputOptions);\n\n\t\t// an array of file names this bundle depends on\n\t\tconsole.log(bundle.watchFiles);"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#25",
+    "duplicates": [],
+    "overlaps": [
+     "rollup:docs/javascript-api/index.md#1"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/javascript-api/index.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "rollup:docs/configuration-options/index.md#25"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/configuration-options/index.md#25",
+    "b": "rollup:docs/javascript-api/index.md#1",
+    "relation": "overlapping",
+    "related": 0.9902,
+    "probabilities": {
+     "same": 0.0227,
+     "overlapping": 0.9563,
+     "conflicting": 0.0112,
+     "unrelated": 0.0098
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0117,
+       "restated": 0.9645,
+       "elaborated": 0.0124,
+       "different": 0.0114
+      },
+      "confidence": 0.9886,
+      "a": {
+       "document": "rollup:docs/configuration-options/index.md#25",
+       "quote": "Log objects have, at a minimum, a `code` and a `message` property, allowing you to control how different kinds of logs are handled.",
+       "start": 94,
+       "end": 225,
+       "confidence": 1
+      },
+      "b": {
+       "document": "rollup:docs/javascript-api/index.md#1",
+       "quote": "Besides `code` and `message`, many errors have additional properties you can use for custom reporting, see [`utils/logs.ts`](https://github.com/rollup/rollup/blob/master/src/utils/logs.ts) for a complete list of errors and logs together with their codes and properties.\n\n<!-- prettier-ignore-start -->\n```javascript twoslash\nimport { rollup } from 'rollup';\n\n// see below for details on these options\n// ---cut-start---\n/** @type {import('rollup').InputOptions} */\n// ---cut-end---\nconst inputOptions = {\n\t/* ...",
+       "start": 896,
+       "end": 1408,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 56,
+   "passage_reads": 1,
+   "passages_ms": 96,
+   "passages": 1,
+   "counterparts_ms": 110
+  },
+  "timing": {
+   "read_ms": 261,
+   "total_ms": 265
+  }
+ }
+}

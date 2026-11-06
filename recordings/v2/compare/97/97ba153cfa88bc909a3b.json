@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/97/97ba153cfa88bc909a3b",
+ "request_hash": "97ba153cfa88bc909a3b07a2cde9b3b034de4a48a0d0bfd41b8b200b951275ea",
+ "recorded_at": "2026-11-06T14:39:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1698,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "245.247551",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=390"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#28",
+    "text": "- `Balancer` also answers `400 Bad Request` for a routed target fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, or any target beginning with `//` on a request without a `Host` header. The router never saw such a target as an authority, and it need not have arrived as one: `..` resolution builds `//u:pw@evil.example/a://b` out of `//u:pw@evil.example/a:/x/..//b`, and under `UnescapePath` a decoded `%3A%2F%2F` spells the `://`. Set as the request line, it would hand the upstream a `Host`, and a `Basic` `Authorization` header, taken from the path rather than from the application.\n- `Balancer`, `DomainForward` and `BalancerForward` answer `400 Bad Request` for a routed path an upstream could read as another path, one under a prefix whose middleware never ran for it. That is a path holding:\n  - an escaped slash (`%2F`) or an empty segment (`//`). An upstream that decodes `%2F` into a separator or merges repeated slashes before it matches routes, as a `net/http` file server or a fasthttp server does, would map `/public/..%2Fadmin/secret`, `/admin%2Fsecret` and `//admin/secret` to `/admin/secret`. An upstream that keeps both as sent can be reached with `SecurityPolicy.AllowAmbiguousSlashes`, described below.\n  - a backslash, raw or escaped as `%5C`. WHATWG URL parsers, as in Node.js, Bun, Deno and Cloudflare Workers, and IIS read it as a separator, so `/admin\\secret` and `/public/..%5Cadmin/secret` would reach `/admin`.\n  - a path parameter, a `;` in any segment, such as `/admin;x/secret`, `/admin;/secret`, `/;/admin/secret` or `/public/..;/admin/secret`. Servlet containers such as Tomcat and Jetty strip the parameters from every segment before they match routes and resolve dot segments, so each of these would reach `/admin/secret`. A `;` in the query is no path parameter, and a client that means a literal `;` in a name can send it as `%3B`, which is forwarded as sent, except behind a custom `BalancingClient` (see below). An upstream that relies on `;jsessionid` can be reached with `SecurityPolicy.AllowPathParameters`, described below.\n  - an escape of an unreserved character, such as `%2e` or `%70`. The router decodes every such escape when it normalizes a path, so one still in `c.Path()` can only have been forged by a stray `%`, and an upstream decoding it again would serve a name no middleware matched."
+   },
+   {
+    "id": "fiber:docs/whats_new.md#79",
+    "text": "An adapted `net/http` handler, middleware or `ConvertRequest` request is built from the path the router matched, `c.Path()`, followed by the query as the client sent it, rather than from the request line as it arrived, so a `net/http` guard on `r.URL.Path` sees the `/admin/x` that `/a/../admin/x` was routed as. A byte a path may not carry raw is written as its escape, and the request keeps the host Fiber saw, including the one an absolute-form request line names. `HTTPHandler`, `HTTPHandlerFunc` and `HTTPHandlerWithContext` answer `404 Not Found` for a routed path with an empty segment or an escaped slash, such as `//admin/x` or `/public/..%2Fadmin/x`, which `net/http` would otherwise decode and clean into a path no Fiber middleware ran for, and for one with a backslash, a dot segment carrying parameters (`..;`) or a segment of parameters alone before another (`/;x/admin`), which an upstream behind a handler such as `httputil.ReverseProxy` may resolve into another path; a handler that must serve such names can be wrapped with `HTTPMiddleware` instead. `HTTPMiddleware` answers `400 Bad Request`, and `ConvertRequest` returns `fiber.ErrBadRequest`, for a routed path fasthttp would read as an authority rather than a path: one that begins with `//` and holds `://`, or one beginning with `//` on a request without a `Host` header. A routed path holding an escape of an unreserved character, which only a stray `%` can forge, is `404 Not Found` from the handler adapters and `400 Bad Request` from `HTTPMiddleware` and `ConvertRequest`, since `URL.Path` would read a forged `%2e%2e` as `..`. `FiberHandler`, `FiberHandlerFunc` and `FiberApp` route `r.RequestURI` as received, so a raw `/über` is routed as a Fiber server routes it, and when `r.URL` no longer matches that line, the request line `net/http` would write for `r`: a rewritten `r.URL`, as `http.StripPrefix` produces, a request built in code without a `RequestURI`, and the authority of a `CONNECT` request in the authority form. Fiber drops the trailer section of a chunked request as the request arrives or, with `StreamRequestBody`, once its body has been read, so a trailer no longer stands in for a header the wrapped middleware removed or replaced. See the adaptor's [notes and limitations](./middleware/adaptor.md#notes-and-limitations)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#28",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/whats_new.md#79"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/whats_new.md#79",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/middleware/proxy.md#28"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/proxy.md#28",
+    "b": "fiber:docs/whats_new.md#79",
+    "relation": "overlapping",
+    "related": 0.994,
+    "probabilities": {
+     "same": 0.0158,
+     "overlapping": 0.95,
+     "conflicting": 0.0282,
+     "unrelated": 0.006
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0081,
+       "restated": 0.9609,
+       "elaborated": 0.0198,
+       "different": 0.0112
+      },
+      "confidence": 0.9888,
+      "a": {
+       "document": "fiber:docs/middleware/proxy.md#28",
+       "quote": "- an escape of an unreserved character, such as `%2e` or `%70`.",
+       "start": 2118,
+       "end": 2181,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/whats_new.md#79",
+       "quote": "A routed path holding an escape of an unreserved character, which only a stray `%` can forge, is `404 Not Found` from the handler adapters and `400 Bad Request` from `HTTPMiddleware` and `ConvertRequest`, since `URL.Path` would read a forged `%2e%2e` as `..`.",
+       "start": 1346,
+       "end": 1605,
+       "confidence": 0.998
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 41,
+   "passage_reads": 1,
+   "passages_ms": 121,
+   "passages": 2,
+   "counterparts_ms": 93
+  },
+  "timing": {
+   "read_ms": 255,
+   "total_ms": 259
+  }
+ }
+}

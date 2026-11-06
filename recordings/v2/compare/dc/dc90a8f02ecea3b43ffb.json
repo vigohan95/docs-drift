@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/dc/dc90a8f02ecea3b43ffb",
+ "request_hash": "dc90a8f02ecea3b43ffbaae248ccd3d489ba2f59ad7dbd13a3026121606d4b08",
+ "recorded_at": "2026-11-06T14:42:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3498,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "248.189152",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=169,cfOrigin;dur=0,cfWorker;dur=375"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#6",
+    "text": "### Changes to `pydantic.BaseModel`\n\nVarious method names have been changed; all non-deprecated `BaseModel` methods now have names matching either the\nformat `model_.*` or `__.*pydantic.*__`. Where possible, we have retained the deprecated methods with their old names\nto help ease migration, but calling them will emit `DeprecationWarning`s.\n\n| Pydantic V1 | Pydantic V2  |\n| ----------- | ------------ |\n| `__fields__` | `model_fields` |\n| `__private_attributes__` | `__pydantic_private__` |\n| `__validators__` | `__pydantic_validator__` |\n| `construct()` | `model_construct()` |\n| `copy()` | `model_copy()` |\n| `dict()` | `model_dump()` |\n| `json_schema()` | `model_json_schema()` |\n| `json()` | `model_dump_json()` |\n| `parse_obj()` | `model_validate()` |\n| `update_forward_refs()` | `model_rebuild()` |\n\n* Some of the built-in data-loading functionality has been slated for removal. In particular,\n    `parse_raw` and `parse_file` are now deprecated. In Pydantic V2, `model_validate_json` works like `parse_raw`. Otherwise, you should load the data and then pass it to `model_validate`.\n* The `from_orm` method has been deprecated; you can now just use `model_validate` (equivalent to `parse_obj` from\n  Pydantic V1) to achieve something similar, as long as you've set `from_attributes=True` in the model config.\n* The `__eq__` method has changed for models.\n    * Models can only be equal to other `BaseModel` instances.\n    * For two model instances to be equal, they must have the same:\n        * Type (or, in the case of generic models, non-parametrized generic origin type)\n        * Field values\n        * Extra values (only relevant when `model_config['extra'] == 'allow'`)\n        * Private attribute values; models with different values of private attributes are no longer equal.\n        * Models are no longer equal to the dicts containing their data.\n        * Non-generic models of different types are never equal.\n        * Generic models with different origin types are never equal. We don't require *exact* type equality so that,\n            for example, instances of `MyGenericModel[Any]` could be equal to instances of `MyGenericModel[int]`.\n* We have replaced the use of the `__root__` field to specify a \"custom root model\" with a new type called\n    [`RootModel`](concepts/models.md#rootmodel-and-custom-root-types) which is intended to replace the functionality of\n    using a field called `__root__` in Pydantic V1. Note, `RootModel` types no longer support the `arbitrary_types_allowed`\n    config setting. See [this issue comment](https://github.com/pydantic/pydantic/issues/6710#issuecomment-1700948167) for an explanation.\n* We have significantly expanded Pydantic's capabilities related to customizing serialization. In particular, we have\n    added the [`@field_serializer`](api/functional_serializers.md#pydantic.functional_serializers.field_serializer),\n    [`@model_serializer`](api/functional_serializers.md#pydantic.functional_serializers.model_serializer), and\n    [`@computed_field`](api/fields.md#pydantic.fields.computed_field) decorators, which each address various\n    shortcomings from Pydantic V1.\n    * See [Custom serializers](concepts/serialization.md#serializers) for the usage docs of these new decorators.\n    * Due to performance overhead and implementation complexity, we have now deprecated support for specifying\n        `json_encoders` in the model config. This functionality was originally added for the purpose of achieving custom\n        serialization logic, and we think the new serialization decorators are a better choice in most common scenarios."
+   },
+   {
+    "id": "pydantic:docs/concepts/json.md#0",
+    "text": "## Json Parsing\n\n??? api \"API Documentation\"\n    [`pydantic.main.BaseModel.model_validate_json`][pydantic.main.BaseModel.model_validate_json]\n    [`pydantic.type_adapter.TypeAdapter.validate_json`][pydantic.type_adapter.TypeAdapter.validate_json]\n    [`pydantic_core.from_json`][pydantic_core.from_json]\n\nPydantic provides builtin JSON parsing, which helps achieve:\n\n* Significant performance improvements without the cost of using a 3rd party library\n* Support for custom errors\n* Support for `strict` specifications\n\nHere's an example of Pydantic's builtin JSON parsing via the [`model_validate_json`][pydantic.main.BaseModel.model_validate_json] method, showcasing the support for `strict` specifications while parsing JSON data that doesn't match the model's type annotations:\n\n```python\nfrom datetime import date\n\nfrom pydantic import BaseModel, ConfigDict, ValidationError\n\n\nclass Event(BaseModel):\n    model_config = ConfigDict(strict=True)\n\n    when: date\n    where: tuple[int, int]\n\n\njson_data = '{\"when\": \"1987-01-28\", \"where\": [51, -1]}'\nprint(Event.model_validate_json(json_data))  # (1)!\n#> when=datetime.date(1987, 1, 28) where=(51, -1)\n\ntry:\n    Event.model_validate({'when': '1987-01-28', 'where': [51, -1]})  # (2)!\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    2 validation errors for Event\n    when\n      Input should be a valid date [type=date_type, input_value='1987-01-28', input_type=str]\n    where\n      Input should be a valid tuple [type=tuple_type, input_value=[51, -1], input_type=list]\n    \"\"\"\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/json.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#6",
+    "b": "pydantic:docs/concepts/json.md#0",
+    "relation": "overlapping",
+    "related": 0.9971,
+    "probabilities": {
+     "same": 0.0085,
+     "overlapping": 0.9847,
+     "conflicting": 0.0039,
+     "unrelated": 0.0029
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 40,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 1,
+   "counterparts_ms": 132
+  },
+  "timing": {
+   "read_ms": 257,
+   "total_ms": 261
+  }
+ }
+}

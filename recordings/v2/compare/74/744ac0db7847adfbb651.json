@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/74/744ac0db7847adfbb651",
+ "request_hash": "744ac0db7847adfbb651219264e8927f4dbc00d930158ebae56c92a5e6731a05",
+ "recorded_at": "2026-11-06T14:38:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2822,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "121.355232",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=48,cfOrigin;dur=0,cfWorker;dur=274"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#46",
+    "text": "### renderChunk\n\n|  |  |\n| --: | :-- |\n| Type: | `RenderChunkHook` |\n| Kind: | async, sequential |\n| Previous: | [`banner`](#banner), [`footer`](#footer), [`intro`](#intro), [`outro`](#outro) of the last chunk |\n| Next: | [`augmentChunkHash`](#augmentchunkhash) |\n\n```typescript\ntype RenderChunkHook = (\n\tcode: string,\n\tchunk: RenderedChunk,\n\toptions: NormalizedOutputOptions,\n\tmeta: { chunks: Record<string, RenderedChunk> }\n) => { code: string; map?: SourceMapInput } | string | null;\n\ninterface RenderedChunk {\n\tdynamicImports: string[];\n\texports: string[];\n\tfacadeModuleId: string | null;\n\tfileName: string;\n\timplicitlyLoadedBefore: string[];\n\timportedBindings: {\n\t\t[imported: string]: string[];\n\t};\n\timports: string[];\n\tisDynamicEntry: boolean;\n\tisEntry: boolean;\n\tisImplicitEntry: boolean;\n\tmoduleIds: string[];\n\tmodules: {\n\t\t[id: string]: RenderedModule;\n\t};\n\tname: string;\n\treferencedFiles: string[];\n\ttype: 'chunk';\n}\n```\n\nCan be used to transform individual chunks. Called for each Rollup output chunk file. Returning `null` will apply no transformations. If you change code in this hook and want to support source maps, you need to return a `map` describing your changes, see [the section on source code transformations](#source-code-transformations).\n\n`chunk` contains additional information about the chunk using the same `OutputChunk` type as the [`generateBundle`](#generatebundle) hook with the following differences:"
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#29",
+    "text": "### output.banner/output.footer\n\n|  |  |\n| --: | :-- |\n| Type: | `string \\| ((chunk: RenderedChunk) => string \\| Promise<string>)` |\n| CLI: | `--banner`/`--footer <text>` |\n\nSee the [`renderChunk`](../plugin-development/index.md#renderchunk) hook for the `RenderedChunk` type.\n\nA string to prepend/append to the bundle. You can also supply a function that returns a `Promise` that resolves to a `string` to generate it asynchronously (Note: `banner` and `footer` options will not break sourcemaps).\n\nIf you supply a function, `chunk` contains additional information about the chunk using a `RenderedChunk` type that is a reduced version of the `OutputChunk` type used in [`generateBundle`](../plugin-development/index.md#generatebundle) hook with the following differences:\n\n- `code` and `map` are not set as the chunk has not been rendered yet.\n- all referenced chunk file names that would contain hashes will contain hash placeholders instead. This includes `fileName`, `imports`, `importedBindings`, `dynamicImports` and `implicitlyLoadedBefore`. When you use such a placeholder file name or part of it in the code returned from this option, Rollup will replace the placeholder with the actual hash before `generateBundle`, making sure the hash reflects the actual content of the final generated chunk including all referenced file hashes.\n\n`chunk` is mutable and changes applied in this hook will propagate to other plugins and to the generated bundle. That means if you add or remove imports or exports in this hook, you should update `imports`, `importedBindings` and/or `exports`.\n\n```js twoslash\n// rollup.config.js\n// ---cut-start---\n/** @type {import('rollup').RollupOptions} */\n// ---cut-end---\nexport default {\n\t// ...\n\toutput: {\n\t\t// ...\n\t\tbanner: '/* my-library version ' + version + ' */',\n\t\tfooter: '/* follow me on Twitter! @rich_harris */'\n\t}\n};\n```\n\nSee also [`output.intro/output.outro`](#output-intro-output-outro)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#46",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#29",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/plugin-development/index.md#46",
+    "b": "rollup:docs/configuration-options/index.md#29",
+    "relation": "overlapping",
+    "related": 0.991,
+    "probabilities": {
+     "same": 0.0203,
+     "overlapping": 0.9599,
+     "conflicting": 0.0107,
+     "unrelated": 0.009
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 129,
+   "total_ms": 132
+  }
+ }
+}

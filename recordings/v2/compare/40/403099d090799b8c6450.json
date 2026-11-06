@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/40/403099d090799b8c6450",
+ "request_hash": "403099d090799b8c6450f20409972fa7a0445432fa2fb44b8b1378377043738b",
+ "recorded_at": "2026-11-06T14:41:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1445,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "217.89418",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=396"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#32",
+    "text": "### Changes to JSON schema generation\n\nWe received many requests over the years to make changes to the JSON schemas that pydantic generates.\n\nIn Pydantic V2, we have tried to address many of the common requests:\n\n* The JSON schema for `Optional` fields now indicates that the value `null` is allowed.\n* The `Decimal` type is now exposed in JSON schema (and serialized) as a string.\n* The JSON schema no longer preserves namedtuples as namedtuples.\n* The JSON schema we generate by default now targets draft 2020-12 (with some OpenAPI extensions).\n* When they differ, you can now specify if you want the JSON schema representing the inputs to validation,\n    or the outputs from serialization.\n\nHowever, there have been many reasonable requests over the years for changes which we have not chosen to implement.\n\nIn Pydantic V1, even if you were willing to implement changes yourself, it was very difficult because the JSON schema\ngeneration process involved various recursive function calls; to override one, you'd have to copy and modify the whole\nimplementation.\n\nIn Pydantic V2, one of our design goals was to make it easier to customize JSON schema generation. To this end, we have\nintroduced the class [`GenerateJsonSchema`](api/json_schema.md#pydantic.json_schema.GenerateJsonSchema),\nwhich implements the translation of a type's pydantic-core schema into\na JSON schema. By design, this class breaks the JSON schema generation process into smaller methods that can be\neasily overridden in subclasses to modify the \"global\" approach to generating JSON schema.\n\nThe various methods that can be used to produce JSON schema (such as `BaseModel.model_json_schema` or\n`TypeAdapter.json_schema`) accept a keyword argument `schema_generator: type[GenerateJsonSchema] = GenerateJsonSchema`,\nand you can pass your custom subclass to these methods in order to use your own approach to generating JSON schema.\n\nHopefully this means that if you disagree with any of the choices we've made, or if you are reliant on behaviors in\nPydantic V1 that have changed in Pydantic V2, you can use a custom `schema_generator`, modifying the\n`GenerateJsonSchema` class as necessary for your application."
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#24",
+    "text": "## Customizing the JSON Schema Generation Process\n\n??? api \"API Documentation\"\n    [`pydantic.json_schema`][pydantic.json_schema.GenerateJsonSchema]<br>\n\nIf you need custom schema generation, you can use a `schema_generator`, modifying the\n[`GenerateJsonSchema`][pydantic.json_schema.GenerateJsonSchema] class as necessary for your application.\n\nThe various methods that can be used to produce JSON schema accept a keyword argument `schema_generator: type[GenerateJsonSchema] = GenerateJsonSchema`, and you can pass your custom subclass to these methods in order to use your own approach to generating JSON schema.\n\n`GenerateJsonSchema` implements the translation of a type's `pydantic-core` schema into a JSON schema.\nBy design, this class breaks the JSON schema generation process into smaller methods that can be easily overridden in\nsubclasses to modify the \"global\" approach to generating JSON schema.\n\n```python\nfrom pydantic import BaseModel\nfrom pydantic.json_schema import GenerateJsonSchema\n\n\nclass MyGenerateJsonSchema(GenerateJsonSchema):\n    def generate(self, schema, mode='validation'):\n        json_schema = super().generate(schema, mode=mode)\n        json_schema['title'] = 'Customize title'\n        json_schema['$schema'] = self.schema_dialect\n        return json_schema\n\n\nclass MyModel(BaseModel):\n    x: int\n\n\nprint(MyModel.model_json_schema(schema_generator=MyGenerateJsonSchema))\n\"\"\"\n{\n    'properties': {'x': {'title': 'X', 'type': 'integer'}},\n    'required': ['x'],\n    'title': 'Customize title',\n    'type': 'object',\n    '$schema': 'https://json-schema.org/draft/2020-12/schema',\n}\n\"\"\"\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/migration.md#32",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/json_schema.md#24",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/migration.md#32",
+    "b": "pydantic:docs/concepts/json_schema.md#24",
+    "relation": "overlapping",
+    "related": 0.9987,
+    "probabilities": {
+     "same": 0.0051,
+     "overlapping": 0.9906,
+     "conflicting": 0.0029,
+     "unrelated": 0.0013
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 76,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 1,
+   "counterparts_ms": 112
+  },
+  "timing": {
+   "read_ms": 269,
+   "total_ms": 273
+  }
+ }
+}

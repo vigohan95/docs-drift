@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/28/28eca7142f48876fc002",
+ "request_hash": "28eca7142f48876fc002046e8c83c0d32c676420bed26c815378a7f3fdf2034f",
+ "recorded_at": "2026-11-06T14:39:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1886,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "34.372959",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=371"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "text": "## Config\n\n| Property               | Type                      | Description                                                                                 | Default                                  |\n|:-----------------------|:--------------------------|:--------------------------------------------------------------------------------------------|:-----------------------------------------|\n| Next                   | `func(fiber.Ctx) bool`   | Next defines a function to skip this middleware when it returns true. It runs before `MaxFunc`. | `nil`                                    |\n| Max                    | `int`                     | Maximum number of recent connections within `Expiration` seconds before sending a 429 response. A value of `0` or less selects the default. | 5                                        |\n| MaxFunc                | `func(fiber.Ctx) int`     | Function that calculates the maximum number of recent connections within `Expiration` seconds before sending a 429 response. Returning `0` skips the limiter for that request; a negative value rejects every request. | A function that returns `cfg.Max`    |\n| KeyGenerator           | `func(fiber.Ctx) string` | Function to generate custom keys; uses `c.IP()` by default. A key longer than 192 bytes, or starting with `sha256:`, is replaced by its SHA-256 digest (`sha256:<hex>`) before it reaches the storage, so oversized keys are still limited per client. | A function using `c.IP()` as the default   |\n| Expiration             | `time.Duration`           | Duration to keep request records in memory, which is also the length of the window. It is counted in whole seconds: a positive value below one second is floored to one second, and zero or a negative value selects the default. | 1 * time.Minute                          |\n| ExpirationFunc         | `func(fiber.Ctx) time.Duration` | Function that calculates the expiration duration dynamically. Positive values below one second are floored to one second; non-positive values fall back to `Expiration`. Requests that share a key share a window, which keeps the length given by the request that opened it. | A function that returns `cfg.Expiration` |\n| LimitReached           | `fiber.Handler`           | Called when a request exceeds the limit.                                       | A function sending a 429 response          |\n| SkipFailedRequests     | `bool`                    | When set to `true`, requests with status code ≥ 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| SkipSuccessfulRequests | `bool`                    | When set to `true`, requests with status code < 400 aren't counted. A handler that returns an error other than a `*fiber.Error` counts as a 500 unless it already set an error status. | false                                    |\n| DisableHeaders         | `bool`                    | When set to `true`, the middleware omits rate limit headers (`X-RateLimit-*` and `Retry-After`). Otherwise a request that passes carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the window ends), and a rejected one carries `Retry-After` (seconds). | false                                    |\n| DisableValueRedaction  | `bool`                    | Disables redaction of limiter keys in error messages and logs. A key longer than 192 bytes is shown as its SHA-256 digest. | false                                    |"
+   },
+   {
+    "id": "fiber:docs/middleware/redirect.md#4",
+    "text": "## Config\n\n| Property   | Type                | Description                               | Default                |\n|:-----------|:--------------------|:------------------------------------------|:-----------------------|\n| Next       | `func(fiber.Ctx) bool` | Skip when function returns true.          | nil                    |\n| RuleList   | `[]Rule`              | Rules tried in order, first match wins; `$1`, `$2` insert wildcard captures. | nil |\n| Rules      | `map[string]string`   | **Deprecated.** Use `RuleList`. A map has no order, so precedence is decided by a heuristic. | nil |\n| StatusCode | `int`                 | HTTP code for redirects.                  | 302 Temporary Redirect |\n\nA `Rule` is a pattern and a target:\n\n```go\ntype Rule struct {\n    From string // the path pattern, where \"*\" matches a run of any length\n    To   string // the target, where \"$1\", \"$2\" stand for what the asterisks captured\n}\n```\n\n`From` reaches the compiled pattern as a regular expression, so the other regexp\nmetacharacters keep their meaning: `/a.b` also matches `/aXb`, and `/faq?` also\nmatches `/fa`. Only `*` is a documented placeholder; write a rule out of path\ntext and `*` and it behaves as it reads. A `From` that is not a valid regular\nexpression, such as `/old(`, makes `New` panic. A rule matches the whole path,\nletter case included: `/old` answers `/old`, but not `/OLD`, `/old/x` or `/very/old`.\n\nIn `To`, `$10` is the tenth capture in a rule with ten or more captures, which counts every group of the regular expression and not only the asterisks; in a rule with fewer it reads as `$1` followed by `0`.\n\nSetting both `RuleList` and `Rules` panics: the two disagree about what decides\nprecedence, so there is no sensible way to honor them together."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/limiter.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/redirect.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/middleware/limiter.md#7",
+    "b": "fiber:docs/middleware/redirect.md#4",
+    "relation": "unrelated",
+    "related": 0.0063,
+    "probabilities": {
+     "same": 0.0026,
+     "overlapping": 0.002,
+     "conflicting": 0.0017,
+     "unrelated": 0.9937
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 253
+  },
+  "timing": {
+   "read_ms": 253,
+   "total_ms": 255
+  }
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b7/b781b4427ea6d34ccb68",
+ "request_hash": "b781b4427ea6d34ccb68cda9309f2c1046ed61fa018e82d37d0564e0d4019eee",
+ "recorded_at": "2026-11-06T14:38:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1099,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "171.883266",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=315"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/14-transition.md#5",
+    "text": "## Custom transition functions\n\n```js\n/// copy: false\n// @noErrors\ntransition = (node: HTMLElement, params: any, options: { direction: 'in' | 'out' | 'both' }) => {\n\tdelay?: number,\n\tduration?: number,\n\teasing?: (t: number) => number,\n\tcss?: (t: number, u: number) => string,\n\ttick?: (t: number, u: number) => void\n}\n```\n\nTransitions can use custom functions. If the returned object has a `css` function, Svelte will generate keyframes for a [web animation](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API).\n\nThe `t` argument passed to `css` is a value between `0` and `1` after the `easing` function has been applied. _In_ transitions run from `0` to `1`, _out_ transitions run from `1` to `0` — in other words, `1` is the element's natural state, as though no transition had been applied. The `u` argument is equal to `1 - t`.\n\nThe function is called repeatedly _before_ the transition begins, with different `t` and `u` arguments.\n\n```svelte\n<!--- file: App.svelte --->\n<script>\n\timport { elasticOut } from 'svelte/easing';\n\n\t/** @type {boolean} */\n\texport let visible;\n\n\t/**\n\t * @param {HTMLElement} node\n\t * @param {{ delay?: number, duration?: number, easing?: (t: number) => number }} params\n\t */\n\tfunction whoosh(node, params) {\n\t\tconst existingTransform = getComputedStyle(node).transform.replace('none', '');\n\n\t\treturn {\n\t\t\tdelay: params.delay || 0,\n\t\t\tduration: params.duration || 400,\n\t\t\teasing: params.easing || elasticOut,\n\t\t\tcss: (t, u) => `transform: ${existingTransform} scale(${t})`\n\t\t};\n\t}\n</script>\n\n{#if visible}\n\t<div in:whoosh>whooshes in</div>\n{/if}\n```"
+   },
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/16-animate.md#2",
+    "text": "## Custom animation functions\n\n```js\n/// copy: false\n// @noErrors\nanimation = (node: HTMLElement, { from: DOMRect, to: DOMRect } , params: any) => {\n\tdelay?: number,\n\tduration?: number,\n\teasing?: (t: number) => number,\n\tcss?: (t: number, u: number) => string,\n\ttick?: (t: number, u: number) => void\n}\n```\n\nAnimations can use custom functions that provide the `node`, an `animation` object and any `parameters` as arguments. The `animation` parameter is an object containing `from` and `to` properties each containing a [DOMRect](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect#Properties) describing the geometry of the element in its `start` and `end` positions. The `from` property is the DOMRect of the element in its starting position, and the `to` property is the DOMRect of the element in its final position after the list has been reordered and the DOM updated.\n\nIf the returned object has a `css` method, Svelte will create a [web animation](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API) that plays on the element.\n\nThe `t` argument passed to `css` is a value that goes from `0` and `1` after the `easing` function has been applied. The `u` argument is equal to `1 - t`.\n\nThe function is called repeatedly _before_ the animation begins, with different `t` and `u` arguments.\n\n<!-- TODO: Types -->"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/14-transition.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "svelte:documentation/docs/03-template-syntax/16-animate.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "svelte:documentation/docs/03-template-syntax/16-animate.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "svelte:documentation/docs/03-template-syntax/14-transition.md#5"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "svelte:documentation/docs/03-template-syntax/14-transition.md#5",
+    "b": "svelte:documentation/docs/03-template-syntax/16-animate.md#2",
+    "relation": "overlapping",
+    "related": 0.9916,
+    "probabilities": {
+     "same": 0.0152,
+     "overlapping": 0.9625,
+     "conflicting": 0.0138,
+     "unrelated": 0.0084
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0544,
+       "restated": 0.9126,
+       "elaborated": 0.0204,
+       "different": 0.0126
+      },
+      "confidence": 0.9874,
+      "a": {
+       "document": "svelte:documentation/docs/03-template-syntax/14-transition.md#5",
+       "quote": "The function is called repeatedly _before_ the transition begins, with different `t` and `u` arguments.",
+       "start": 850,
+       "end": 953,
+       "confidence": 1
+      },
+      "b": {
+       "document": "svelte:documentation/docs/03-template-syntax/16-animate.md#2",
+       "quote": "The `u` argument is equal to `1 - t`.\n\nThe function is called repeatedly _before_ the animation begins, with different `t` and `u` arguments.\n\n<!-- TODO: Types -->",
+       "start": 1173,
+       "end": 1336,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 1,
+   "counterparts_ms": 66
+  },
+  "timing": {
+   "read_ms": 180,
+   "total_ms": 183
+  }
+ }
+}

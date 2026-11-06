@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e6/e6a9b2ae0f4dfc9e9fc8",
+ "request_hash": "e6a9b2ae0f4dfc9e9fc8ba3dee801ebe00dc73cac13469fb5b1c239db6379e45",
+ "recorded_at": "2026-11-06T14:42:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1359,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.285761",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=144"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#17",
+    "text": "## Immutability\n\nThe parameter `frozen` is used to emulate the frozen dataclass behaviour. It is used to prevent the field from being\nassigned a new value after the model is created (immutability).\n\nSee the [frozen dataclass documentation] for more details.\n\n```python\nfrom pydantic import BaseModel, Field, ValidationError\n\n\nclass User(BaseModel):\n    name: str = Field(frozen=True)\n    age: int\n\n\nuser = User(name='John', age=42)\n\ntry:\n    user.name = 'Jane'  # (1)!\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for User\n    name\n      Field is frozen [type=frozen_field, input_value='Jane', input_type=str]\n    \"\"\"\n```\n\n1. Since `name` field is frozen, the assignment is not allowed.\n\nFields can also be made immutable using the [`Final`][typing.Final] type qualifier (e.g. `name: Final[str]`).\nIf no type is provided (e.g. `name: Final = 'John'`), it is inferred from the default value.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#exclude}"
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#15",
+    "text": "These constraints can be provided using the [`Field()`][pydantic.Field] function.\nThe `Le`, `Ge`, `Lt`, `Gt` and `MultipleOf` metadata types from the [`annotated-types`](https://github.com/annotated-types/annotated-types)\nlibrary and the [`AllowInfNan`][pydantic.types.AllowInfNan] type can also be used.\n\n<h4>Strictness</h4>\n\nIn [strict mode](../concepts/strict_mode.md), only [`decimal.Decimal`][] instances are accepted. In JSON mode, strict mode has no effect.\n\n<h4>Serialization</h4>\n\nIn [Python mode](../concepts/serialization.md#python-mode), [`Decimal`][decimal.Decimal] instances are\nserialized as is.\n\nIn [JSON mode](../concepts/serialization.md#json-mode), they are serialized as strings.\nA [serializer](../concepts/serialization.md#field-plain-serializer) can be used to override this behavior:\n\n```python\nfrom decimal import Decimal\nfrom typing import Annotated\n\nfrom pydantic import BaseModel, PlainSerializer\n\n\nclass Model(BaseModel):\n    f: Annotated[Decimal, PlainSerializer(float, when_used='json')]\n\n\nmy_model = Model(f=Decimal('2.1'))\n\nprint(my_model.model_dump())  # (1)!\n#> {'f': Decimal('2.1')}\nprint(my_model.model_dump_json())  # (2)!\n#> {\"f\":2.1}\n```\n\n1. In Python mode, `f`remains a [`Decimal`][decimal.Decimal] instance.\n2. In JSON mode, `f` is serialized as a float.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#complex}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/api/standard_library_types.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#17",
+    "b": "pydantic:docs/api/standard_library_types.md#15",
+    "relation": "unrelated",
+    "related": 0.0047,
+    "probabilities": {
+     "same": 0.0015,
+     "overlapping": 0.0017,
+     "conflicting": 0.0015,
+     "unrelated": 0.9953
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31
+  },
+  "timing": {
+   "read_ms": 31,
+   "total_ms": 32
+  }
+ }
+}

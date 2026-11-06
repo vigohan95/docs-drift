@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3b/3bfde3920ef6cbc13675",
+ "request_hash": "3bfde3920ef6cbc1367596d96d24b5a87eea3fa1f02be5c7576488c6f33438c1",
+ "recorded_at": "2026-11-06T14:40:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1347,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "217.665119",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=402"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/client/request.md#76",
+    "text": "## SetMaxRedirects\n\n**SetMaxRedirects** sets the maximum number of redirects to follow for the request. The default is `0`, which follows none: the redirect response is returned as-is. The client has no redirect limit of its own, so set one on each request or with `Config.MaxRedirects`.\n\n```go title=\"Signature\"\nfunc (r *Request) SetMaxRedirects(count int) *Request\n```\n\n:::info\nRedirects are followed only for `GET`, `HEAD` and `QUERY` requests. Other methods receive the redirect response as-is, whatever the limit.\n:::\n\nWhile redirects are followed:\n\n- After a `301`, `302` or `303` the request is repeated as a `GET` without its body; a `HEAD` stays a `HEAD`. A `307` or `308` keeps the method and the body. The trailer section goes with the body, instead of reaching the target as header lines; a request whose section announces more than 16 names fails the redirect with `ErrRedirectTrailers`.\n- When the target is on another host, the `Authorization`, `Proxy-Authorization`, `Proxy-Authenticate`, `WWW-Authenticate`, `Cookie` and `Cookie2` headers are dropped. They are removed whatever case they are stored under. The names set with [SetRedirectSensitiveHeaders](#setredirectsensitiveheaders) on the request or the client are dropped with them. The same host on any port, and its subdomains, keep them.\n- A redirect from `https` to `http` fails with `ErrRedirectDowngrade`. Leave the limit at `0` to take such a hop yourself.\n- A redirect without a `Location` fails with `fasthttp.ErrMissingLocation`. A `Location` that cannot be parsed or names a `scheme://` other than `http` or `https` fails with `fasthttp.ErrorInvalidURI` without being requested, as does a request URL that cannot be parsed. A chain longer than the limit fails with `fasthttp.ErrTooManyRedirects`.\n- With a [retry configuration](./rest.md#setretryconfig), a chain that fails, on one of the errors above or on a hop that cannot be sent, is retried from the request as it was sent: the original URL, method, body and headers. A request with a streamed body cannot be copied, so its retry starts from the hop the failed attempt reached. A chain that succeeds is not repeated."
+   },
+   {
+    "id": "fiber:docs/client/rest.md#17",
+    "text": "## Request Configuration\n\nThe `Config` type holds per-request parameters. JSON is used to serialize the body by default. If multiple body sources are set, precedence is:\n\n1. Body\n2. FormData\n3. File\n\n```go\ntype Config struct {\n    Ctx context.Context\n\n    UserAgent string\n    Referer   string\n    Header    map[string]string\n    Param     map[string]string\n    Cookie    map[string]string\n    PathParam map[string]string\n\n    Timeout                  time.Duration\n    MaxRedirects             int\n    RedirectSensitiveHeaders []string\n    DisablePathNormalizing   bool\n\n    Body     any\n    FormData map[string]string\n    File     []*File\n}\n```\n\nThe REST helpers accept an optional `Config` and use only the first one passed. A `string` or `[]byte` `Body` is sent as is; any other value is encoded as JSON.\n\n`MaxRedirects` is honored for `GET`, `HEAD` and `QUERY` requests only; other methods receive the redirect response as-is. The default is `0`, which follows no redirects. See [SetMaxRedirects](./request.md#setmaxredirects) for how redirects are followed.\n\n`RedirectSensitiveHeaders` sets [SetRedirectSensitiveHeaders](./request.md#setredirectsensitiveheaders) for the request; an empty list leaves the request's own names as they are.\n\n`DisablePathNormalizing: true` turns path normalizing off for the request, like [SetDisablePathNormalizing](./request.md#setdisablepathnormalizing) on the request, which also says when the path is really sent as written; `false` leaves the client's setting in place."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/client/request.md#76",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/client/rest.md#17"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/client/rest.md#17",
+    "duplicates": [],
+    "overlaps": [
+     "fiber:docs/client/request.md#76"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/client/request.md#76",
+    "b": "fiber:docs/client/rest.md#17",
+    "relation": "overlapping",
+    "related": 0.997,
+    "probabilities": {
+     "same": 0.0113,
+     "overlapping": 0.981,
+     "conflicting": 0.0047,
+     "unrelated": 0.003
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0197,
+       "restated": 0.878,
+       "elaborated": 0.0745,
+       "different": 0.0279
+      },
+      "confidence": 0.9721,
+      "a": {
+       "document": "fiber:docs/client/request.md#76",
+       "quote": "Redirects are followed only for `GET`, `HEAD` and `QUERY` requests.",
+       "start": 380,
+       "end": 447,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/client/rest.md#17",
+       "quote": "A `string` or `[]byte` `Body` is sent as is; any other value is encoded as JSON.\n\n`MaxRedirects` is honored for `GET`, `HEAD` and `QUERY` requests only; other methods receive the redirect response as-is.",
+       "start": 728,
+       "end": 931,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0485,
+       "restated": 0.9122,
+       "elaborated": 0.028,
+       "different": 0.0114
+      },
+      "confidence": 0.9886,
+      "a": {
+       "document": "fiber:docs/client/request.md#76",
+       "quote": "The default is `0`, which follows none: the redirect response is returned as-is.",
+       "start": 104,
+       "end": 184,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fiber:docs/client/rest.md#17",
+       "quote": "The default is `0`, which follows no redirects.",
+       "start": 932,
+       "end": 979,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 119,
+   "passages": 2,
+   "counterparts_ms": 74
+  },
+  "timing": {
+   "read_ms": 227,
+   "total_ms": 231
+  }
+ }
+}

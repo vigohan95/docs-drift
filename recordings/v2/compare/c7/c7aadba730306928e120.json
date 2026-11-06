@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c7/c7aadba730306928e120",
+ "request_hash": "c7aadba730306928e1201f04d42317339af37af8bef37d63a3f9e5d6f63cefff",
+ "recorded_at": "2026-11-06T14:37:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 6110,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "135.254818",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=321,cfOrigin;dur=0,cfWorker;dur=269"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#24",
+    "text": "```js\nimport { foo } from '../bar.js';\n```\n\nthe source will be `\"../bar.js\"`.\n\nThe `importer` is the fully resolved id of the importing module. When resolving entry points, importer will usually be `undefined`. An exception here are entry points generated via [`this.emitFile`](#this-emitfile) as here, you can provide an `importer` argument.\n\nThe `importerAttributes` are the import attributes of the importing module. When resolving entry points, `importerAttributes` will usually be `undefined`.\n\nFor those cases, the `isEntry` option will tell you if we are resolving a user defined entry point, an emitted chunk, or if the `isEntry` parameter was provided for the [`this.resolve`](#this-resolve) context function.\n\nYou can use this for instance as a mechanism to define custom proxy modules for entry points. The following plugin will proxy all entry points to inject a polyfill import.\n\n```js twoslash\n// We prefix the polyfill id with \\0 to tell other plugins not to try to load or\n// transform it\nconst POLYFILL_ID = '\\0polyfill';\nconst PROXY_SUFFIX = '?inject-polyfill-proxy';\n\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nfunction injectPolyfillPlugin() {\n\treturn {\n\t\tname: 'inject-polyfill',\n\t\tasync resolveId(source, importer, options) {\n\t\t\tif (source === POLYFILL_ID) {\n\t\t\t\t// It is important that side effects are always respected\n\t\t\t\t// for polyfills, otherwise using\n\t\t\t\t// \"treeshake.moduleSideEffects: false\" may prevent the\n\t\t\t\t// polyfill from being included.\n\t\t\t\treturn { id: POLYFILL_ID, moduleSideEffects: true };\n\t\t\t}\n\t\t\tif (options.isEntry) {\n\t\t\t\t// Determine what the actual entry would have been.\n\t\t\t\tconst resolution = await this.resolve(source, importer, options);\n\t\t\t\t// If it cannot be resolved or is external, just return it\n\t\t\t\t// so that Rollup can display an error\n\t\t\t\tif (!resolution || resolution.external) return resolution;\n\t\t\t\t// In the load hook of the proxy, we need to know if the\n\t\t\t\t// entry has a default export. There, however, we no longer\n\t\t\t\t// have the full \"resolution\" object that may contain\n\t\t\t\t// meta-data from other plugins that is only added on first\n\t\t\t\t// load. Therefore we trigger loading here.\n\t\t\t\tconst moduleInfo = await this.load(resolution);\n\t\t\t\t// We need to make sure side effects in the original entry\n\t\t\t\t// point are respected even for\n\t\t\t\t// treeshake.moduleSideEffects: false. \"moduleSideEffects\"\n\t\t\t\t// is a writable property on ModuleInfo.\n\t\t\t\tmoduleInfo.moduleSideEffects = true;\n\t\t\t\t// It is important that the new entry does not start with\n\t\t\t\t// \\0 and has the same directory as the original one to not\n\t\t\t\t// mess up relative external import generation. Also\n\t\t\t\t// keeping the name and just adding a \"?query\" to the end\n\t\t\t\t// ensures that preserveModules will generate the original\n\t\t\t\t// entry name for this entry.\n\t\t\t\treturn `${resolution.id}${PROXY_SUFFIX}`;\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tload(id) {\n\t\t\tif (id === POLYFILL_ID) {\n\t\t\t\t// Replace with actual polyfill\n\t\t\t\treturn \"console.log('polyfill');\";\n\t\t\t}\n\t\t\tif (id.endsWith(PROXY_SUFFIX)) {\n\t\t\t\tconst entryId = id.slice(0, -PROXY_SUFFIX.length);\n\t\t\t\t// We know ModuleInfo.hasDefaultExport is reliable because\n\t\t\t\t// we awaited this.load in resolveId\n\t\t\t\tconst { hasDefaultExport } = this.getModuleInfo(entryId);\n\t\t\t\tlet code =\n\t\t\t\t\t`import ${JSON.stringify(POLYFILL_ID)};` +\n\t\t\t\t\t`export * from ${JSON.stringify(entryId)};`;\n\t\t\t\t// Namespace reexports do not reexport default, so we need\n\t\t\t\t// special handling here\n\t\t\t\tif (hasDefaultExport) {\n\t\t\t\t\tcode += `export { default } from ${JSON.stringify(entryId)};`;"
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#81",
+    "text": "Note that with regard to the `attributes`, `meta`, `moduleSideEffects` and `syntheticNamedExports` options, the same restrictions apply as for the `resolveId` hook: Their values only have an effect if the module has not been loaded yet. Thus, it is very important to use `this.resolve` first to find out if any plugins want to set special values for these options in their `resolveId` hook, and pass these options on to `this.load` if appropriate. The example below showcases how this can be handled to add a proxy module for modules containing a special code comment. Note the special handling for re-exporting the default export:\n\n```js twoslash\n// ---cut-start---\n/** @returns {import('rollup').Plugin} */\n// ---cut-end---\nexport default function addProxyPlugin() {\n\treturn {\n\t\tasync resolveId(source, importer, options) {\n\t\t\tif (importer?.endsWith('?proxy')) {\n\t\t\t\t// Do not proxy ids used in proxies\n\t\t\t\treturn null;\n\t\t\t}\n\t\t\t// We make sure to pass on any resolveId options to\n\t\t\t// this.resolve to get the module id\n\t\t\tconst resolution = await this.resolve(source, importer, options);\n\t\t\t// We can only pre-load existing and non-external ids\n\t\t\tif (resolution && !resolution.external) {\n\t\t\t\t// we pass on the entire resolution information\n\t\t\t\tconst moduleInfo = await this.load(resolution);\n\t\t\t\tif (moduleInfo.code.includes('/* use proxy */')) {\n\t\t\t\t\treturn `${resolution.id}?proxy`;\n\t\t\t\t}\n\t\t\t}\n\t\t\t// As we already fully resolved the module, there is no reason\n\t\t\t// to resolve it again\n\t\t\treturn resolution;\n\t\t},\n\t\tload(id) {\n\t\t\tif (id.endsWith('?proxy')) {\n\t\t\t\tconst importee = id.slice(0, -'?proxy'.length);\n\t\t\t\t// Note that namespace reexports do not reexport default\n\t\t\t\t// exports\n\t\t\t\tlet code = `console.log('proxy for ${importee}'); export * from ${JSON.stringify(\n\t\t\t\t\timportee\n\t\t\t\t)};`;\n\t\t\t\t// We know that while resolving the proxy, importee was\n\t\t\t\t// already fully loaded and parsed, so we can rely on\n\t\t\t\t// hasDefaultExport\n\t\t\t\tif (this.getModuleInfo(importee).hasDefaultExport) {\n\t\t\t\t\tcode += `export { default } from ${JSON.stringify(importee)};`;\n\t\t\t\t}\n\t\t\t\treturn code;\n\t\t\t}\n\t\t\treturn null;\n\t\t}\n\t};\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/plugin-development/index.md#24",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/plugin-development/index.md#81",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/plugin-development/index.md#24",
+    "b": "rollup:docs/plugin-development/index.md#81",
+    "relation": "overlapping",
+    "related": 0.9918,
+    "probabilities": {
+     "same": 0.0282,
+     "overlapping": 0.9545,
+     "conflicting": 0.0092,
+     "unrelated": 0.0082
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 43,
+   "passage_reads": 1,
+   "passages_ms": 102,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 145,
+   "total_ms": 149
+  }
+ }
+}

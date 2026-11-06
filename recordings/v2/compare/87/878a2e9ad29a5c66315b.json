@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/87/878a2e9ad29a5c66315b",
+ "request_hash": "878a2e9ad29a5c66315b795283bf0a35a802e4b03996cc229fd93f4f22be7c0c",
+ "recorded_at": "2026-11-06T14:41:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2624,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.765247",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=163"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "text": "### Python mode\n\nWhen using the Python mode, Pydantic models (and model-like types such as [dataclasses][]) (1) will be (recursively) converted to dictionaries. This is achievable by using the [`model_dump()`][pydantic.BaseModel.model_dump] method:\n{ .annotate }\n\n1. With the exception of [root models](./models.md#rootmodel-and-custom-root-types), where the root value is dumped directly.\n\n```python {group=\"python-dump\"}\nfrom pydantic import BaseModel, Field\n\n\nclass BarModel(BaseModel):\n    whatever: tuple[int, ...]\n\n\nclass FooBarModel(BaseModel):\n    banana: float | None = 1.1\n    foo: str = Field(serialization_alias='foo_alias')\n    bar: BarModel\n\n\nm = FooBarModel(banana=3.14, foo='hello', bar={'whatever': (1, 2)})\n\n# returns a dictionary:\nprint(m.model_dump())\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': (1, 2)}}\n\nprint(m.model_dump(by_alias=True))\n#> {'banana': 3.14, 'foo_alias': 'hello', 'bar': {'whatever': (1, 2)}}\n```\n\nNotice that the value of `whatever` was dumped as tuple, which isn't a known JSON type. The `mode` argument can be set to `'json'`\nto ensure JSON-compatible types are used:\n\n```python {group=\"python-dump\"}\nprint(m.model_dump(mode='json'))\n#> {'banana': 3.14, 'foo': 'hello', 'bar': {'whatever': [1, 2]}}\n```\n\n!!! info \"See also\"\n    The [`TypeAdapter.dump_python()`][pydantic.TypeAdapter.dump_python] method, useful when *not* dealing with Pydantic models.\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#modelmodel_dump_json}"
+   },
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#1",
+    "text": "```python\nfrom pydantic import BaseModel, ValidationError\n\n\nclass MyModel(BaseModel):\n    x: int\n\n\nprint(MyModel.model_validate({'x': '123'}))  # lax mode\n#> x=123\n\ntry:\n    MyModel.model_validate({'x': '123'}, strict=True)  # strict mode\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for MyModel\n    x\n      Input should be a valid integer [type=int_type, input_value='123', input_type=str]\n    \"\"\"\n```\n\nOne caveat when enabling strict mode on models an existing application relies on: inputs that were\nbeing quietly coerced will start failing. If you can't audit every caller, it helps to watch validation\nfailures while you roll the change out. [Logfire](../integrations/logfire.md) counts successful and\nfailed validations as metrics, and can record the rejected values included in structured errors.\n\nStrict mode can be enabled in various ways:\n\n* [As a validation parameter](#as-a-validation-parameter), such as when using [`model_validate()`][pydantic.BaseModel.model_validate],\n  on Pydantic models.\n* [At the field level](#at-the-field-level).\n* [At the configuration level](#as-a-configuration-value) (with the possibility to override at the field level).\n\n<!-- old anchor added for backwards compatibility -->\n<!-- markdownlint-disable-next-line no-empty-links -->\n[](){#strict-mode-in-method-calls}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/serialization.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/strict_mode.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/serialization.md#2",
+    "b": "pydantic:docs/concepts/strict_mode.md#1",
+    "relation": "unrelated",
+    "related": 0.0066,
+    "probabilities": {
+     "same": 0.002,
+     "overlapping": 0.002,
+     "conflicting": 0.0025,
+     "unrelated": 0.9934
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

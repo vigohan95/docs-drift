@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a3/a3fc810f4d9cbcdd2443",
+ "request_hash": "a3fc810f4d9cbcdd244300b72dc04241c0b1b59681d46cb1baa02358fbbc7dbb",
+ "recorded_at": "2026-11-06T14:37:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2296,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "123.570972",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=258"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#51",
+    "text": "  Note how Rollup is reusing the created namespace object to get the `default` export. If the namespace object is not needed, Rollup will use a simpler helper:\n\n  ```js\n  // input\n  import ext_default from 'external';\n  console.log(ext_default);\n\n  // output\n  var ext_default = require('external');\n\n  function _interopDefault(e) {\n  \treturn e && e.__esModule ? e : { default: e };\n  }\n\n  var ext_default__default = /*#__PURE__*/ _interopDefault(ext_default);\n  console.log(ext_default__default.default);\n  ```\n\n- `compat` is equivalent to `\"auto\"` except that it uses a slightly different helper for the default export that checks for the presence of a `default` property instead of the `__esModule` property. Except for the rare situation where a CommonJS module exports a property `\"default\"` that should not be the default export, this often helps to make interop \"just work\" as it does not rely on idiosyncratic hacks but instead uses duck-typing:\n\n  ```js twoslash\n  var external = require('external1');\n\n  function _interopNamespaceCompat(e) {\n  \tif (e && typeof e === 'object' && 'default' in e) return e;\n  \tvar n = Object.create(null);\n  \tif (e) {\n  \t\tObject.keys(e).forEach(function (k) {\n  \t\t\tif (k !== 'default') {\n  \t\t\t\tvar d = Object.getOwnPropertyDescriptor(e, k);\n  \t\t\t\tObject.defineProperty(\n  \t\t\t\t\tn,\n  \t\t\t\t\tk,\n  \t\t\t\t\td.get\n  \t\t\t\t\t\t? d\n  \t\t\t\t\t\t: {\n  \t\t\t\t\t\t\t\tenumerable: true,\n  \t\t\t\t\t\t\t\tget: function () {\n  \t\t\t\t\t\t\t\t\treturn e[k];\n  \t\t\t\t\t\t\t\t}\n  \t\t\t\t\t\t\t}\n  \t\t\t\t);\n  \t\t\t}\n  \t\t});\n  \t}\n  \tn.default = e;\n  \treturn Object.freeze(n);\n  }\n\n  var external__namespace = /*#__PURE__*/ _interopNamespaceCompat(external);\n\n  console.log(\n  \texternal__namespace.default,\n  \texternal__namespace.bar,\n  \texternal__namespace\n  );\n  Promise.resolve()\n  \t.then(function () {\n  \t\treturn /*#__PURE__*/ _interopNamespaceCompat(require('external2'));\n  \t})\n  \t.then(console.log);\n  ```"
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#52",
+    "text": "  Similar to `\"auto\"`, Rollup will use a simpler helper if the namespace is not needed:\n\n  ```js\n  // input\n  import ext_default from 'external';\n  console.log(ext_default);\n\n  // output\n  var ext_default = require('external');\n\n  function _interopDefaultCompat(e) {\n  \treturn e && typeof e === 'object' && 'default' in e\n  \t\t? e\n  \t\t: { default: e };\n  }\n\n  var ext_default__default =\n  \t/*#__PURE__*/ _interopDefaultCompat(ext_default);\n\n  console.log(ext_default__default.default);\n  ```\n\n- `\"defaultOnly\"` is similar to `\"default\"` except for the following:\n  - Named imports are forbidden. If such an import is encountered, Rollup throws an error even in `es` and `system` formats. That way it is ensures that the `es` version of the code is able to import non-builtin CommonJS modules in Node correctly.\n  - While namespace reexports `export * from 'external';` are not prohibited, they are ignored and will cause Rollup to display a warning because they would not have an effect if there are no named exports.\n  - When a namespace object is generated, Rollup uses a much simpler helper.\n\n  Here is what Rollup will create from the example code. Note that we removed `external.bar` from the code as otherwise, Rollup would have thrown an error because, as stated before, this is equivalent to a named import.\n\n  ```js\n  var ext_default = require('external1');\n\n  function _interopNamespaceDefaultOnly(e) {\n  \treturn Object.freeze({ __proto__: null, default: e });\n  }\n\n  var ext_default__namespace =\n  \t/*#__PURE__*/ _interopNamespaceDefaultOnly(ext_default);\n  console.log(ext_default, ext_default__namespace);\n  Promise.resolve()\n  \t.then(function () {\n  \t\treturn /*#__PURE__*/ _interopNamespaceDefaultOnly(\n  \t\t\trequire('external2')\n  \t\t);\n  \t})\n  \t.then(console.log);\n  ```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "rollup:docs/configuration-options/index.md#51",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "rollup:docs/configuration-options/index.md#52",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "rollup:docs/configuration-options/index.md#51",
+    "b": "rollup:docs/configuration-options/index.md#52",
+    "relation": "overlapping",
+    "related": 0.9897,
+    "probabilities": {
+     "same": 0.0259,
+     "overlapping": 0.9549,
+     "conflicting": 0.0089,
+     "unrelated": 0.0103
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 98,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 132,
+   "total_ms": 136
+  }
+ }
+}

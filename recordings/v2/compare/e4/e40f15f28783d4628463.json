@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e4/e40f15f28783d4628463",
+ "request_hash": "e40f15f28783d4628463a421226a1c4a455c05285ecc737d3680c7bca532b606",
+ "recorded_at": "2026-11-06T14:40:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 951,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "124.064476",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=250"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#162",
+    "text": "### SendStreamWriter\n\nSets the response body stream writer.\n\n:::note\nThe argument `streamWriter` represents a function that populates\nthe response body using a buffered stream writer.\n:::\n\n```go title=\"Signature\"\nfunc (c fiber.Ctx) SendStreamWriter(streamWriter func(*bufio.Writer)) error\nfunc (r fiber.Res) SendStreamWriter(streamWriter func(*bufio.Writer)) error\n```\n\n```go title=\"Example\"\napp.Get(\"/\", func (c fiber.Ctx) error {\n  return c.SendStreamWriter(func(w *bufio.Writer) {\n    fmt.Fprintf(w, \"Hello, World!\\n\")\n  })\n  // => \"Hello, World!\"\n})\n```\n\n:::info\nTo send data before `streamWriter` returns, you can call `w.Flush()`\non the provided writer. Otherwise, the buffered stream flushes after\n`streamWriter` returns.\n:::\n\n:::caution\n`streamWriter` runs on a goroutine of its own that starts when `SendStreamWriter` is called and keeps running after the handler has returned, when `c` may already serve another request, so copy what it needs from `c` before calling `SendStreamWriter` instead of using `c` inside it.\n:::\n\n:::caution HTTP/1.0 clients\nThe response is chunked, even for a request older than HTTP/1.1, for the reasons given under [`SendStream`](#sendstream). A client that cannot read a chunked response cannot be sent a stream of unknown size.\n:::\n\n:::note\n`w.Flush()` will return an error if the client disconnects before `streamWriter` finishes writing a response.\n:::\n\n```go title=\"Example\"\napp.Get(\"/wait\", func(c fiber.Ctx) error {\n  return c.SendStreamWriter(func(w *bufio.Writer) {\n    // Begin Work\n    fmt.Fprintf(w, \"Please wait for 10 seconds\\n\")\n    if err := w.Flush(); err != nil {\n      log.Print(\"Client disconnected!\")\n      return\n    }\n\n    // Send progress over time\n    time.Sleep(time.Second)\n    for i := 0; i < 9; i++ {\n      fmt.Fprintf(w, \"Still waiting...\\n\")\n      if err := w.Flush(); err != nil {\n        // If client disconnected, cancel work and finish\n        log.Print(\"Client disconnected!\")\n        return\n      }\n      time.Sleep(time.Second)\n    }\n\n    // Finish\n    fmt.Fprintf(w, \"Done!\\n\")\n  })\n})\n```"
+   },
+   {
+    "id": "fiber:docs/middleware/cache.md#0",
+    "text": "# Cache\n\nCache middleware for [Fiber](https://github.com/gofiber/fiber) that intercepts responses and stores the body, `Content-Type`, and status code under a deterministic key derived from request dimensions. Special thanks to [@codemicro](https://github.com/codemicro/fiber-cache) for contributing this middleware to Fiber core.\n\nBy default, cached responses expire after five minutes and the middleware stores up to 1 MB of responses, counting each entry's body, key and stored headers. That size limit is the default of `cache.New()` called without a `Config`: a `Config` that leaves `MaxBytes` unset stores bodies without a limit. A streamed response (`SendStream`, `SendStreamWriter`, `SendFile`, `static`) is judged by the length it declares instead of being read to measure it: one that declares more than `MaxBytes`, or no length at all, is passed on as a stream, is not stored and reports `unreachable`. So is a stream that ends early, fails or runs past the length it declares. Middleware that encodes a stream as it is sent leaves it without a declared length, so `compress` registered between the cache and a file handler keeps those files out of the cache: register `compress.New()` before `cache.New()`, or serve the files with `static.Config{Compress: true}`, to keep caching them."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/ctx.md#162",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/middleware/cache.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/ctx.md#162",
+    "b": "fiber:docs/middleware/cache.md#0",
+    "relation": "overlapping",
+    "related": 0.9377,
+    "probabilities": {
+     "same": 0.0089,
+     "overlapping": 0.9145,
+     "conflicting": 0.0144,
+     "unrelated": 0.0623
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 51,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 133,
+   "total_ms": 136
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a5/a53ecf7d32c74be849a6",
+ "request_hash": "a53ecf7d32c74be849a65ec12f516249a7de9a3269a66209c0188eecee8260b8",
+ "recorded_at": "2026-11-06T14:42:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2565,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.752575",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=214"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#16",
+    "text": "## Discriminator\n\nThe parameter `discriminator` can be used to control the field that will be used to discriminate between different\nmodels in a union. It takes either the name of a field or a `Discriminator` instance. The `Discriminator`\napproach can be useful when the discriminator fields aren't the same for all the models in the union.\n\nThe following example shows how to use `discriminator` with a field name:\n\n```python\nfrom typing import Literal\n\nfrom pydantic import BaseModel, Field\n\n\nclass Cat(BaseModel):\n    pet_type: Literal['cat']\n    age: int\n\n\nclass Dog(BaseModel):\n    pet_type: Literal['dog']\n    age: int\n\n\nclass Model(BaseModel):\n    pet: Cat | Dog = Field(discriminator='pet_type')\n\n\nprint(Model.model_validate({'pet': {'pet_type': 'cat', 'age': 12}}))  # (1)!\n#> pet=Cat(pet_type='cat', age=12)\n```\n\n1. See more about `model_validate()` in the [Validating data](./models.md#validating-data) documentation.\n\nThe following example shows how to use the `discriminator` keyword argument with a `Discriminator` instance:\n\n```python\nfrom typing import Annotated, Literal\n\nfrom pydantic import BaseModel, Discriminator, Field, Tag\n\n\nclass Cat(BaseModel):\n    pet_type: Literal['cat']\n    age: int\n\n\nclass Dog(BaseModel):\n    pet_kind: Literal['dog']\n    age: int\n\n\ndef pet_discriminator(v):\n    if isinstance(v, dict):\n        return v.get('pet_type', v.get('pet_kind'))\n    return getattr(v, 'pet_type', getattr(v, 'pet_kind', None))\n\n\nclass Model(BaseModel):\n    pet: Annotated[Cat, Tag('cat')] | Annotated[Dog, Tag('dog')] = Field(\n        discriminator=Discriminator(pet_discriminator)\n    )\n\n\nprint(repr(Model.model_validate({'pet': {'pet_type': 'cat', 'age': 12}})))\n#> Model(pet=Cat(pet_type='cat', age=12))\n\nprint(repr(Model.model_validate({'pet': {'pet_kind': 'dog', 'age': 12}})))\n#> Model(pet=Dog(pet_kind='dog', age=12))\n```\n\nYou can also take advantage of `Annotated` to define your discriminated unions.\nSee the [Discriminated Unions](./unions.md#discriminated-unions) documentation for more details."
+   },
+   {
+    "id": "pydantic:docs/concepts/performance.md#6",
+    "text": "## Use tagged union, not union\n\nTagged union (or discriminated union) is a union with a field that indicates which type it is.\n\n```python {test=\"skip\"}\nfrom typing import Any, Literal\n\nfrom pydantic import BaseModel, Field\n\n\nclass DivModel(BaseModel):\n    el_type: Literal['div'] = 'div'\n    class_name: str | None = None\n    children: list[Any] | None = None\n\n\nclass SpanModel(BaseModel):\n    el_type: Literal['span'] = 'span'\n    class_name: str | None = None\n    contents: str | None = None\n\n\nclass ButtonModel(BaseModel):\n    el_type: Literal['button'] = 'button'\n    class_name: str | None = None\n    contents: str | None = None\n\n\nclass InputModel(BaseModel):\n    el_type: Literal['input'] = 'input'\n    class_name: str | None = None\n    value: str | None = None\n\n\nclass Html(BaseModel):\n    contents: DivModel | SpanModel | ButtonModel | InputModel = Field(\n        discriminator='el_type'\n    )\n```\n\nSee [Discriminated Unions] for more details."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "pydantic:docs/concepts/fields.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "pydantic:docs/concepts/performance.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pydantic:docs/concepts/fields.md#16",
+    "b": "pydantic:docs/concepts/performance.md#6",
+    "relation": "overlapping",
+    "related": 0.996,
+    "probabilities": {
+     "same": 0.0099,
+     "overlapping": 0.9802,
+     "conflicting": 0.006,
+     "unrelated": 0.004
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 64,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 96,
+   "total_ms": 98
+  }
+ }
+}

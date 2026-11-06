@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/92/92f29b2adc8322f20330",
+ "request_hash": "92f29b2adc8322f2033047e2e972993e72562e3cd840aaebf5552c91d52a3670",
+ "recorded_at": "2026-11-06T14:40:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1977,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.682432",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=13,cfOrigin;dur=0,cfWorker;dur=166"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/api/fiber.md#19",
+    "text": "| <Reference id=\"enableprintroutes\">EnablePrintRoutes</Reference>         | `bool`                        | If set to true, will print all routes with their method, path, name, and handlers.                                                                                                                                                                                                                                                  | `false`            |\n| <Reference id=\"gracefulcontext\">GracefulContext</Reference>             | `context.Context`             | Field to shutdown Fiber by given context gracefully. A context that is already done, or is canceled while `Listen` / `Listener` is still starting up, shuts the app down too; see [Server Shutdown](#server-shutdown). With `EnablePrefork` it stops only the process it is canceled in; see [Prefork](#prefork).                                                                                                                                                                              | `nil`              |\n| <Reference id=\"ShutdownTimeout\">ShutdownTimeout</Reference>             | `time.Duration`               | Specifies the maximum duration to wait for the server to gracefully shutdown. When the timeout is reached, the shutdown stops waiting, without closing the connections that are still active, and the `context.DeadlineExceeded` error is passed to the `OnPostShutdown` callback. A zero value applies the default; set a negative value to disable the timeout and wait indefinitely. | `10 * time.Second` |\n| <Reference id=\"listeneraddrfunc\">ListenerAddrFunc</Reference>           | `func(addr net.Addr)`         | Called with the `net.Addr` of the listener that `Listen` creates, for example to read the port the OS picked for `:0`; with prefork, once in each child process. `Listener` does not call it.                                                                                                                                                                                                                                                                             | `nil`              |\n| <Reference id=\"listenernetwork\">ListenerNetwork</Reference>             | `string`                      | Known networks are \"tcp\" (`fiber.NetworkTCP`), \"tcp4\" (`fiber.NetworkTCP4`, IPv4-only), \"tcp6\" (`fiber.NetworkTCP6`, IPv6-only), \"unix\" (`fiber.NetworkUnix`, Unix Domain Sockets). WARNING: When prefork is set to true, only \"tcp4\" and \"tcp6\" can be chosen.                                                                                                                                                  | `tcp4`             |\n| <Reference id=\"preforkrecoverinterval\">PreforkRecoverInterval</Reference> | `time.Duration`             | Delays the respawn of a crashed child process by this duration. Only applies when prefork is enabled.                                                                                                                                                                                                                        | `0` (respawn immediately) |\n| <Reference id=\"preforkrecoverthreshold\">PreforkRecoverThreshold</Reference> | `int`                      | Defines the maximum number of child process restarts after crashes before the prefork master exits with an error. Only applies when prefork is enabled.                                                                                                                                                                        | `max(1, runtime.GOMAXPROCS(0) / 2)` |"
+   },
+   {
+    "id": "fiber:docs/api/services.md#9",
+    "text": "### Shutdown\n\nFiber registers a post-shutdown hook while `fiber.New` runs, so `Shutdown`, `ShutdownWithTimeout`, `ShutdownWithContext`, and a graceful shutdown started through `ListenConfig.GracefulContext` all terminate the services. The hook runs before any `OnPostShutdown` hook you register afterwards. When `Config.SharedStorage` is set, the hook closes it once the services are done (see [SharedState](./state#sharedstate-prefork-safe)).\n\nServices are terminated in reverse start order, and a terminated service is removed from the state. Termination is best effort:\n\n- If `Terminate` returns an error, Fiber logs it (`Shutdown` does not return it) and goes on with the remaining services. The failed service stays registered, so a later shutdown retries it.\n- Once the shutdown context is done, the remaining services are not terminated, and the logged error carries the context error for each of them.\n- Each started service is terminated once, even when shutdown calls overlap."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fiber:docs/api/fiber.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fiber:docs/api/services.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fiber:docs/api/fiber.md#19",
+    "b": "fiber:docs/api/services.md#9",
+    "relation": "unrelated",
+    "related": 0.4751,
+    "probabilities": {
+     "same": 0.0181,
+     "overlapping": 0.4355,
+     "conflicting": 0.0215,
+     "unrelated": 0.5249
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 50
+  },
+  "timing": {
+   "read_ms": 49,
+   "total_ms": 53
+  }
+ }
+}
