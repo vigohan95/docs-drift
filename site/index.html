@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docs Drift: documentation that contradicts itself</title>
+<meta name="description" content="Docs Drift finds places where an open-source project's documentation contradicts itself, using the Clocked API. 16 defects in 6 real projects, each checked against the source code.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<header class="top">
+  <h1>Docs Drift finds the places where a project's documentation contradicts itself.</h1>
+  <p class="lede">It read the docs of 15 open-source projects at pinned commits and surfaced 16 contradictions in 6 of them. Each one below was checked against both passages and the project's source code, with file and line. The final word belongs to the upstream maintainers. Here are three.</p>
+</header>
+
+<section class="hero" aria-label="Three contradictions">
+
+<article class="contradiction" id="fastify-onrequest-body-null">
+  <h2>What request.body is inside the onRequest hook <span class="project">in fastify/fastify</span></h2>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L73-L75">docs/Reference/Hooks.md<span class="colon">:</span>73</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">73</span><span class="src">&gt; In the [onRequest](#onrequest) hook, `request.body` will always be</span><span class="ln">74</span><span class="src">&gt; `<mark>undefined</mark>`, because the body parsing happens before the</span><span class="ln">75</span><span class="src">&gt; [<mark>preValidation](#prevalidation</mark>) hook.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1540-L1541">docs/Reference/TypeScript.md<span class="colon">:</span>1540</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">1540</span><span class="src">Notice: in the `onRequest` hook, request.body will always be <mark>null</mark>, because the</span><span class="ln">1541</span><span class="src">body parsing happens before the `<mark>preHandler</mark>` hook.</span></div></div>
+  </div>
+  <p class="evidence">lib/request.js:40 sets `this.body = undefined`; lib/handle-request.js runs body parsing before the preValidation hooks.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, confirmed</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/fastify/01-typescript-onrequest-body-undefined.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="rtk-asyncthunk-resolved">
+  <h2>The action types createAsyncThunk dispatches <span class="project">in reduxjs/redux-toolkit</span></h2>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/docs/introduction/getting-started.md#L157-L157">docs/introduction/getting-started.md<span class="colon">:</span>157</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">157</span><span class="src">generates a thunk that dispatches `pending/<mark>fulfilled</mark>/rejected` action types based on that promise</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/packages/toolkit/README.md#L78-L78">packages/toolkit/README.md<span class="colon">:</span>78</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">78</span><span class="src">generates a thunk that dispatches `pending/<mark>resolved</mark>/rejected` action types based on that promise</span></div></div>
+  </div>
+  <p class="evidence">packages/toolkit/src/createAsyncThunk.ts:544 builds `typePrefix + &#x27;/fulfilled&#x27;`.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, confirmed</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/redux-toolkit/01-readme-createasyncthunk-fulfilled.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="prometheus-st-header-hex">
+  <h2>The value st_changed_on is capped at <span class="project">in prometheus/prometheus</span></h2>
+  <div class="pair">
+    <div class="pane wrong"><p class="where"><a href="https://github.com/prometheus/prometheus/blob/0e62286556b1cb798d0afdde11f11689b6cfcd7a/tsdb/docs/format/chunks.md#L149-L151">tsdb/docs/format/chunks.md<span class="colon">:</span>149</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">149</span><span class="src">   Due to the 7 bit limitation, once a chunk has at least 127 samples,</span><span class="ln">150</span><span class="src">   `st_changed_on` is set to 127 (<mark>0xEF</mark>) and the <mark>127th</mark> and further samples will</span><span class="ln">151</span><span class="src">   have `st_i` present.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane right"><p class="where"><a href="https://github.com/prometheus/prometheus/blob/0e62286556b1cb798d0afdde11f11689b6cfcd7a/tsdb/docs/format/chunks.md#L301-L303">tsdb/docs/format/chunks.md<span class="colon">:</span>301</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">301</span><span class="src">Once a chunk has at least 127 samples,</span><span class="ln">302</span><span class="src">`st_changed_on` is set to 127 (<mark>0x7F</mark>) and the <mark>128th</mark> and further samples will</span><span class="ln">303</span><span class="src">have `st_i` present.</span></div></div>
+  </div>
+  <p class="evidence">127 is 0x7F; tsdb/chunkenc/st.go:19 has `maxFirstSTChangeOn = 0x7F`. The two passages also disagree on 127th versus 128th sample; the patch leaves that to the maintainers.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, confirmed</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/prometheus/01-chunks-st-changed-on-hex.patch</code></span></p>
+</article>
+</section>
+
+<section id="numbers">
+  <h2>The numbers, including the bad ones</h2>
+  <div class="figures">
+    <p><b>1,878</b> pairs of passages compared across 15 projects, one Clocked <code>/compare</code> request per pair.</p>
+    <p><b>11 of 21 (52%)</b> findings the standard run reported are real contradictions.</p>
+    <p><b>11 of 13 (85%)</b> on the 11 projects the reporting rule was tuned on.</p>
+    <p><b>0 of 8 (0%)</b> on the 4 projects scanned after the rule was fixed.</p>
+  </div>
+  <p class="plain">Read the last two together. The rule that decides what to report was chosen on findings from eleven projects and then tried, unchanged, on four more. On those four it reported eight findings and none was real. So the honest summary is: about half of what it reports is a real contradiction, the rate varies a lot between projects, and 9 of 15 projects produced nothing real at all.</p>
+  <p class="plain">Of the 16 contradictions, 10 were reported by the standard run, 3 came from scanning more pairs in three projects, and 3 surfaced in other runs without being reported by the standard one. Each card says which.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Project and commit</th><th class="num">Passages</th><th class="num">Pairs compared</th><th class="num">Raw findings</th><th class="num">Reported</th><th class="num">Reported and real</th><th class="num">Contradictions in the list below</th><th class="num">Credits</th><th>Role</th></tr></thead>
+    <tbody>
+<tr><td><a href="https://github.com/fastify/fastify/tree/6c14896e67dd299ce277d667f220ceb23b20d277">fastify/fastify</a><span class="commit">6c14896e</span></td><td class="num">777</td><td class="num">149</td><td class="num">6</td><td class="num">5</td><td class="num strong">5</td><td class="num">6</td><td class="num">735</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/prometheus/prometheus/tree/0e62286556b1cb798d0afdde11f11689b6cfcd7a">prometheus/prometheus</a><span class="commit">0e622865</span></td><td class="num">766</td><td class="num">150</td><td class="num">4</td><td class="num">2</td><td class="num strong">1</td><td class="num">1</td><td class="num">706</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/vitejs/vite/tree/a579e352a66fbdce6a51d4e1f67006ccf4f91343">vitejs/vite</a><span class="commit">a579e352</span></td><td class="num">567</td><td class="num">106</td><td class="num">1</td><td class="num">0</td><td class="num strong">0</td><td class="num">0</td><td class="num">389</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/jestjs/jest/tree/72614448ecb9d16c58d6474b3091247c14a5c090">jestjs/jest</a><span class="commit">72614448</span></td><td class="num">959</td><td class="num">150</td><td class="num">8</td><td class="num">1</td><td class="num strong">0</td><td class="num">0</td><td class="num">731</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/typeorm/typeorm/tree/5bdc67882dee5a02d975d5ed140c9c3f91661116">typeorm/typeorm</a><span class="commit">5bdc6788</span></td><td class="num">641</td><td class="num">150</td><td class="num">2</td><td class="num">2</td><td class="num strong">2</td><td class="num">2</td><td class="num">746</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/Automattic/mongoose/tree/bff9821f41a8bbe2add28fc912a68ba2fff02177">Automattic/mongoose</a><span class="commit">bff9821f</span></td><td class="num">643</td><td class="num">79</td><td class="num">0</td><td class="num">0</td><td class="num strong">0</td><td class="num">0</td><td class="num">315</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/mikro-orm/mikro-orm/tree/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a">mikro-orm/mikro-orm</a><span class="commit">35fe690b</span></td><td class="num">1583</td><td class="num">150</td><td class="num">4</td><td class="num">2</td><td class="num strong">2</td><td class="num">4</td><td class="num">823</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/eslint/eslint/tree/17f17cd7a248c532cfce61b7f915760608ca7121">eslint/eslint</a><span class="commit">17f17cd7</span></td><td class="num">1105</td><td class="num">150</td><td class="num">0</td><td class="num">0</td><td class="num strong">0</td><td class="num">0</td><td class="num">556</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/reduxjs/redux-toolkit/tree/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6">reduxjs/redux-toolkit</a><span class="commit">c03783eb</span></td><td class="num">876</td><td class="num">150</td><td class="num">1</td><td class="num">1</td><td class="num strong">1</td><td class="num">2</td><td class="num">537</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/vitest-dev/vitest/tree/c0346ba216dc3c6a7ba5f9c7723da5c0d951a2ca">vitest-dev/vitest</a><span class="commit">c0346ba2</span></td><td class="num">2193</td><td class="num">150</td><td class="num">13</td><td class="num">0</td><td class="num strong">0</td><td class="num">0</td><td class="num">723</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/sindresorhus/got/tree/6b5aafc1cd538998728be6f45c65b0f80bae01b2">sindresorhus/got</a><span class="commit">6b5aafc1</span></td><td class="num">385</td><td class="num">48</td><td class="num">0</td><td class="num">0</td><td class="num strong">0</td><td class="num">0</td><td class="num">166</td><td>rule tuned here</td></tr>
+<tr><td><a href="https://github.com/rollup/rollup/tree/82bef03ce41b38810d375f2b302379b97d8e9468">rollup/rollup</a><span class="commit">82bef03c</span></td><td class="num">372</td><td class="num">86</td><td class="num">5</td><td class="num">3</td><td class="num strong">0</td><td class="num">1</td><td class="num">456</td><td>after the rule was fixed</td></tr>
+<tr><td><a href="https://github.com/gofiber/fiber/tree/16cdbd2be862b6fb178fb37318e0141b8134e9d3">gofiber/fiber</a><span class="commit">16cdbd2b</span></td><td class="num">1606</td><td class="num">150</td><td class="num">7</td><td class="num">4</td><td class="num strong">0</td><td class="num">0</td><td class="num">1045</td><td>after the rule was fixed</td></tr>
+<tr><td><a href="https://github.com/pydantic/pydantic/tree/9895381aa55eb2a1e74079f0b4fb745d1ea12d12">pydantic/pydantic</a><span class="commit">9895381a</span></td><td class="num">767</td><td class="num">150</td><td class="num">1</td><td class="num">1</td><td class="num strong">0</td><td class="num">0</td><td class="num">448</td><td>after the rule was fixed</td></tr>
+<tr><td><a href="https://github.com/sveltejs/svelte/tree/7775f73b7cbe32de3bb566f3515113208887e961">sveltejs/svelte</a><span class="commit">7775f73b</span></td><td class="num">724</td><td class="num">60</td><td class="num">0</td><td class="num">0</td><td class="num strong">0</td><td class="num">0</td><td class="num">260</td><td>after the rule was fixed</td></tr>
+    </tbody>
+    <tfoot><tr><td>All 15</td><td></td><td class="num">1,878</td><td class="num">52</td><td class="num">21</td><td class="num strong">11</td><td class="num">16</td><td class="num">8,636</td><td></td></tr></tfoot>
+  </table>
+  </div>
+  <p class="note">Nothing real was found in vitejs/vite, jestjs/jest, Automattic/mongoose, eslint/eslint, vitest-dev/vitest, sindresorhus/got, gofiber/fiber, pydantic/pydantic, sveltejs/svelte.</p>
+</section>
+
+<section id="how">
+  <h2>How it works, and what each Clocked endpoint added</h2>
+  <ol class="steps">
+    <li><h3>Find passages that restate each other</h3>
+      <p>Runs locally and costs nothing. The docs are split at headings. Sentences from different sections that are worded almost alike but not identically become candidate pairs, and so do passages that mention the same option name. Every contradiction on this page came from these candidates. Reported unjudged, the list would be 99% noise.</p></li>
+    <li><h3>Compare: is this pair a conflict?</h3>
+      <p>One <code>/compare</code> request per pair. It returns the two conflicting spans and a kind (value, version, rule, scope or name). On its own, 13 of 52 (25%) of its findings were real. Two things mattered: the answer changes with the order of the two passages, and with which other passages share the request, so every pair gets its own request and identical requests are replayed from recordings.</p></li>
+    <li><h3>Verify: a second opinion</h3>
+      <p><code>/grounding</code> checks each side's sentence against the other passage, and <code>/compare</code> is asked again with the passages swapped. A finding is reported when it is a value, version or rule conflict and one of the two checks agrees. On the findings the rule was tuned on, this took precision from 55% to 85%. On the four later projects it did not help: all eight reported findings passed a check and were wrong.</p></li>
+    <li><h3>Rerank: where else is this said?</h3>
+      <p><code>/rerank</code> picks other passages that state the disputed fact, and <code>/grounding</code> checks which side they agree with, to name the outlier. With <code>/rerank</code>, 14 of 31 picked passages stated the fact; taking the top three of a plain word-overlap list gave 11 of 48. The outlier vote came out the same either way (4 of 7 named correctly with it, 4 without), so this step is a convenience, not a requirement.</p></li>
+  </ol>
+</section>
+
+<section id="all">
+  <h2>The other 13 contradictions</h2>
+  <p class="plain">Marked words differ between the two passages. Line numbers link to the pinned commit on GitHub. 16 minimal patches are prepared for upstream, one per contradiction; none has been sent. Searched each upstream repository&#x27;s issues and pull requests on 2026-11-07 (gh search, read-only) for the file name and the key terms of each defect. No open or closed issue or PR about any of them was found. typeorm PR #12025 is the merged PR that introduced the update example.</p>
+
+<article class="contradiction" id="fastify-preparsing-body-null">
+  <h3>What request.body is inside the preParsing hook <span class="project">in fastify/fastify</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L104-L106">docs/Reference/Hooks.md<span class="colon">:</span>104</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">104</span><span class="src">&gt; In the [preParsing](#preparsing) hook, `request.body` will always be</span><span class="ln">105</span><span class="src">&gt; `<mark>undefined</mark>`, because the body parsing happens before the</span><span class="ln">106</span><span class="src">&gt; [preValidation](#prevalidation) hook.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1550-L1551">docs/Reference/TypeScript.md<span class="colon">:</span>1550</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">1550</span><span class="src">Notice: in the `preParsing` hook, request.body will always be <mark>null</mark>, because the</span><span class="ln">1551</span><span class="src">body parsing happens before the `preValidation` hook.</span></div></div>
+  </div>
+  <p class="evidence">lib/request.js:40 sets `this.body = undefined`.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, confirmed</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/fastify/02-typescript-preparsing-body-undefined.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="fastify-httpmethods-union">
+  <h3>Which HTTP methods Fastify supports <span class="project">in fastify/fastify</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Server.md#L1667-L1668">docs/Reference/Server.md<span class="colon">:</span>1667</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">1667</span><span class="src">Fastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,</span><span class="ln">1668</span><span class="src">`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1103-L1104">docs/Reference/TypeScript.md<span class="colon">:</span>1103</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">1103</span><span class="src">Union type of: `&#x27;DELETE&#x27; | &#x27;GET&#x27; | &#x27;HEAD&#x27; | &#x27;PATCH&#x27; | &#x27;POST&#x27; | &#x27;PUT&#x27; |</span><span class="ln">1104</span><span class="src">&#x27;OPTIONS&#x27;`</span></div></div>
+  </div>
+  <p class="evidence">types/utils.d.ts:17-18 defines the union with &#x27;QUERY&#x27;, &#x27;TRACE&#x27; and twelve more members. docs/Reference/Routes.md:34-35 repeats the Server.md list.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, confirmed</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/fastify/03-typescript-httpmethods-union.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="fastify-onsend-payload-types">
+  <h3>What an onSend hook may change the payload to <span class="project">in fastify/fastify</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L240-L241">docs/Reference/Hooks.md<span class="colon">:</span>240</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">240</span><span class="src">&gt; If you change the payload, you may only change it to a `string`, a</span><span class="ln">241</span><span class="src">&gt; `Buffer`, a `stream`, a `ReadableStream`, a `Response`, or `null`.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1592-L1593">docs/Reference/TypeScript.md<span class="colon">:</span>1592</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">1592</span><span class="src">&gt;  If you change the payload, you may only change it to a string,</span><span class="ln">1593</span><span class="src">&gt; a Buffer, a stream, or null.</span></div></div>
+  </div>
+  <p class="evidence">lib/reply.js:183-188 accepts web streams (`getReader`) and `Response` objects.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, likely</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/fastify/04-typescript-onsend-payload-types.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="fastify-reply-final-payload-types">
+  <h3>Which types the final payload may have <span class="project">in fastify/fastify</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L240-L241">docs/Reference/Hooks.md<span class="colon">:</span>240</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">240</span><span class="src">&gt; If you change the payload, you may only change it to a `string`, a</span><span class="ln">241</span><span class="src">&gt; `Buffer`, a `stream`, a `ReadableStream`, a `Response`, or `null`.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Reply.md#L575-L583">docs/Reference/Reply.md<span class="colon">:</span>575</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">575</span><span class="src">The type of the sent payload (after serialization and going through any</span><span class="ln">576</span><span class="src">[`onSend` hooks](./Hooks.md#onsend)) must be one of the following types,</span><span class="ln">577</span><span class="src">otherwise, an error will be thrown:</span><span class="ln">578</span><span class="src"> </span><span class="ln">579</span><span class="src">- `string`</span><span class="ln">580</span><span class="src">- `Buffer`</span><span class="ln">581</span><span class="src">- `stream`</span><span class="ln">582</span><span class="src">- `undefined`</span><span class="ln">583</span><span class="src">- `null`</span></div></div>
+  </div>
+  <p class="evidence">lib/reply.js:183-188 and the final send path accept web streams and `Response` objects without throwing.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: both-orders run (weak tier) and the day-1 batch run; not reported by the standard run</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/fastify/05-reply-final-payload-types.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="fastify-logger-methods">
+  <h3>Which methods a custom logger must have <span class="project">in fastify/fastify</span></h3>
+  <div class="pair">
+    <div class="pane undecided"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Server.md#L366-L368">docs/Reference/Server.md<span class="colon">:</span>366</a><span class="verdict">the code backs part of each</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">366</span><span class="src">A custom logger instance. The logger must be a Pino instance or conform to the</span><span class="ln">367</span><span class="src">Pino interface by having the following methods: `info`, `error`, `debug`,</span><span class="ln">368</span><span class="src">`fatal`, `warn`, `trace`, `child`. For example:</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane undecided"><p class="where"><a href="https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Logging.md#L226-L228">docs/Reference/Logging.md<span class="colon">:</span>226</a><span class="verdict">the code backs part of each</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">226</span><span class="src">- **Methods:** `info`, `error`, `debug`, `fatal`, `warn`, `trace`, `silent`,</span><span class="ln">227</span><span class="src">  `child`</span><span class="ln">228</span><span class="src">- **Properties:** `level` (string)</span></div></div>
+  </div>
+  <p class="evidence">The runtime check in lib/logger-factory.js:68 requires info, error, debug, fatal, warn, trace and child. The TypeScript type FastifyBaseLogger (types/logger.d.ts:27) also requires `level` and `silent`. Each page matches one of the two.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: day-1 batch run only; the one-pair-per-request pipeline does not return a passage for it</span><span class="meta-item">No patch: which list the docs should give is a maintainer decision. Notes for an issue are in upstream-patches/fastify/06-logger-methods-issue-notes.md.</span></p>
+</article>
+
+<article class="contradiction" id="typeorm-es-version">
+  <h3>Which JavaScript version TypeORM targets <span class="project">in typeorm/typeorm</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/README.md#L19-L19">README.md<span class="colon">:</span>19</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">19</span><span class="src">and can be used with TypeScript and JavaScript (<mark>ES2023</mark>).</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/docs/docs/getting-started.md#L5-L5">docs/docs/getting-started.md<span class="colon">:</span>5</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">5</span><span class="src">and can be used with TypeScript and JavaScript (<mark>ES2021</mark>).</span></div></div>
+  </div>
+  <p class="evidence">PR #11382 (drop Node 16 and 18) changed the README from ES2021 to ES2023 and moved tsconfig.json to @tsconfig/node20; getting-started.md was not touched.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, confirmed</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/typeorm/01-getting-started-es2023.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="typeorm-update-bulk-overload">
+  <h3>What update() does with an array <span class="project">in typeorm/typeorm</span></h3>
+  <div class="pair">
+    <div class="pane wrong"><p class="where"><a href="https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/docs/docs/working-with-entity-manager/5-entity-manager-api.md#L189-L198">docs/docs/working-with-entity-manager/5-entity-manager-api.md<span class="colon">:</span>189</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">189</span><span class="src">// Bulk updates with different conditions for each operation</span><span class="ln">190</span><span class="src">await manager.update(User, [</span><span class="ln">191</span><span class="src">    { criteria: { id: 1 }, data: { firstName: &quot;Rizzrak&quot; } },</span><span class="ln">192</span><span class="src">    { criteria: { id: 2 }, data: { firstName: &quot;Karzzir&quot; } },</span><span class="ln">193</span><span class="src">    { criteria: { age: 18 }, data: { category: &quot;ADULT&quot; } },</span><span class="ln">194</span><span class="src">])</span><span class="ln">195</span><span class="src">// executes three separate UPDATE queries:</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane right"><p class="where"><a href="https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/docs/docs/working-with-entity-manager/6-repository-api.md#L154-L160">docs/docs/working-with-entity-manager/6-repository-api.md<span class="colon">:</span>154</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">154</span><span class="src">You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR&#x27;d together):</span></div></div>
+  </div>
+  <p class="evidence">packages/typeorm/src/entity-manager/EntityManager.ts:897-927 has only update(target, criteria, partialEntity, options); no {criteria, data} form exists in src or test. The example came in with docs PR #12025; the feature PR #10910 implemented OR-ed condition arrays. The same PR added &#x27;three separate queries&#x27; comments to the delete and softDelete examples, which the code also runs as one query.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, likely</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/typeorm/02-entity-manager-update-bulk-example.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="mikroorm-flush-persist">
+  <h3>Which entities em.flush() checks for changes <span class="project">in mikro-orm/mikro-orm</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/guide/01-first-entity.md#L389-L389">docs/docs/guide/01-first-entity.md<span class="colon">:</span>389</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">389</span><span class="src">Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/unit-of-work.md#L85-L85">docs/docs/unit-of-work.md<span class="colon">:</span>85</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">85</span><span class="src">Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`.</span></div></div>
+  </div>
+  <p class="evidence">packages/core/src/unit-of-work/UnitOfWork.ts computeChangeSets walks the identity map (line 769) and then the persist stack (775). unit-of-work.md:34 itself says managed entities need no persist call.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, likely</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/mikro-orm/01-unit-of-work-flush-managed-entities.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="mikroorm-sqlite-ext-hook">
+  <h3>How to load SQLite extensions <span class="project">in mikro-orm/mikro-orm</span></h3>
+  <div class="pair">
+    <div class="pane wrong"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/usage-with-sql.md#L162-L162">docs/docs/usage-with-sql.md<span class="colon">:</span>162</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">162</span><span class="src">Load them via `pool.afterCreate`:</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane right"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/usage-with-sqlite.md#L229-L229">docs/docs/usage-with-sqlite.md<span class="colon">:</span>229</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">229</span><span class="src">Once you&#x27;ve downloaded the binaries for the extensions you wish to use, they can be added via the `onCreateConnection` hook:</span></div></div>
+  </div>
+  <p class="evidence">packages/core/src/utils/Configuration.ts:639 defines `onCreateConnection`; PoolConfig (lines 805-812) has only min, max and idleTimeoutMillis.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, likely</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/mikro-orm/02-usage-with-sql-sqlite-extensions-hook.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="mikroorm-type-tojson-default">
+  <h3>What Type.toJSON() returns by default <span class="project">in mikro-orm/mikro-orm</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/custom-types.md#L20-L20">docs/docs/custom-types.md<span class="colon">:</span>20</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">20</span><span class="src">Converts a value from its JS representation to its serialized JSON form of this type. By default, <mark>uses</mark> the <mark>runtime</mark> value.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/defining-entities.md#L1616-L1616">docs/docs/defining-entities.md<span class="colon">:</span>1616</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">1616</span><span class="src">Converts a value from its JS representation to its serialized JSON form of this type. By default, <mark>converts to</mark> the <mark>database</mark> value.</span></div></div>
+  </div>
+  <p class="evidence">packages/core/src/types/Type.ts:90-92: `toJSON(value) { return value; }`.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: extended run, likely</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/mikro-orm/03-defining-entities-tojson-default.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="mikroorm-raw-tojson">
+  <h3>Whether a raw() fragment can be serialized <span class="project">in mikro-orm/mikro-orm</span></h3>
+  <div class="pair">
+    <div class="pane wrong"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/entity-manager.md#L681-L681">docs/docs/entity-manager.md<span class="colon">:</span>681</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">681</span><span class="src">It disallows serialization (via `toJSON`) as well as working with the value</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane right"><p class="where"><a href="https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/raw-queries.md#L7-L7">docs/docs/raw-queries.md<span class="colon">:</span>7</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">7</span><span class="src">This fragment is represented by `RawQueryFragment` class instance that can be serialized to a string, so it can be used both as an object value and key.</span></div></div>
+  </div>
+  <p class="evidence">packages/core/src/utils/RawQueryFragment.ts:100-102: `toJSON()` returns the string `raw(&#x27;...&#x27;)`; only conversion to a non-string primitive throws (lines 86-94).</p>
+  <p class="meta"><span class="meta-item">How it surfaced: extended run, likely</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/mikro-orm/04-entity-manager-raw-tojson.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="rtk-setuplisteners-refetchonmount">
+  <h3>Which behaviours setupListeners() enables <span class="project">in reduxjs/redux-toolkit</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/docs/rtk-query/api/setupListeners.mdx#L14-L14">docs/rtk-query/api/setupListeners.mdx<span class="colon">:</span>14</a><span class="verdict">the code agrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">14</span><span class="src">A utility used to enable `<mark>refetchOnFocus</mark>` and `refetchOnReconnect` behaviors.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/docs/introduction/getting-started.md#L184-L184">docs/introduction/getting-started.md<span class="colon">:</span>184</a><span class="verdict">the code disagrees</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">184</span><span class="src">A utility used to enable `<mark>refetchOnMount</mark>` and `refetchOnReconnect` behaviors.</span></div></div>
+  </div>
+  <p class="evidence">packages/toolkit/src/query/core/setupListeners.ts dispatches onFocus, onFocusLost, onOnline and onOffline; nothing in it concerns mounting. The same wording is at docs/rtk-query/overview.md:85 and packages/toolkit/README.md:107.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: extended run, confirmed</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/redux-toolkit/02-setuplisteners-refetchonfocus.patch</code></span></p>
+</article>
+
+<article class="contradiction" id="rollup-esm-node-support">
+  <h3>Whether Node.js supports ES modules <span class="project">in rollup/rollup</span></h3>
+  <div class="pair">
+    <div class="pane right"><p class="where"><a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/README.md#L71-L71">README.md<span class="colon">:</span>71</a><span class="verdict">newer wording</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">71</span><span class="src">Most browsers and Node.js support ES modules.</span></div></div>
+    <div class="seam" aria-hidden="true"><span>≠</span></div>
+    <div class="pane wrong"><p class="where"><a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/introduction/index.md#L52-L52">docs/introduction/index.md<span class="colon">:</span>52</a><span class="verdict">older wording</span></p><div class="quote" role="group" aria-label="quoted lines"><span class="ln">52</span><span class="src">The specification is now fixed, but it is only implemented in modern browsers and not finalised in Node.js.</span></div></div>
+  </div>
+  <p class="evidence">No source file settles this; the README paragraph is the newer wording of the same paragraph and matches Node.js since 12.17.</p>
+  <p class="meta"><span class="meta-item">How it surfaced: standard run, raw finding only: /compare labels it a scope difference, so v2.1 does not report it</span><span class="meta-item">Fix prepared as a patch: <code>upstream-patches/rollup/01-introduction-es-modules-support.patch</code></span></p>
+</article>
+</section>
+
+<section id="wrong">
+  <h2>What it reported and got wrong</h2>
+  <p class="plain">These 10 findings were reported by the standard run and are not contradictions. Most are two documents written from one template about different things: two releases, two middlewares, two functions.</p>
+  <ul class="fps">
+<li><p class="fp-where"><span class="tier">likely</span> in prometheus/prometheus: <a href="https://github.com/prometheus/prometheus/blob/0e62286556b1cb798d0afdde11f11689b6cfcd7a/docs/configuration/configuration.md#L56-L56">docs/configuration/configuration.md:56</a> against <a href="https://github.com/prometheus/prometheus/blob/0e62286556b1cb798d0afdde11f11689b6cfcd7a/docs/getting_started.md#L31-L57">docs/getting_started.md:31</a></p><p class="fp-why">Reference says the built-in default is 1m; the tutorial example config sets 15s.</p></li>
+<li><p class="fp-where"><span class="tier">likely</span> in jestjs/jest: <a href="https://github.com/jestjs/jest/blob/72614448ecb9d16c58d6474b3091247c14a5c090/packages/diff-sequences/README.md#L34-L34">packages/diff-sequences/README.md:34</a> against <a href="https://github.com/jestjs/jest/blob/72614448ecb9d16c58d6474b3091247c14a5c090/packages/jest-diff/README.md#L24-L26">packages/jest-diff/README.md:24</a></p><p class="fp-why">Two parallel documents about different things: diff-sequences and jest-diff are different packages with different diff functions.</p></li>
+<li><p class="fp-where"><span class="tier">likely</span> in rollup/rollup: <a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/configuration-options/index.md#L782-L782">docs/configuration-options/index.md:782</a> against <a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/plugin-development/index.md#L1085-L1087">docs/plugin-development/index.md:1085</a></p><p class="fp-why">banner/footer function argument (configuration-options) and renderChunk hook argument (plugin-development) are both RenderedChunk in src/rollup/types.d.ts; the two descriptions word it differently but do not disagree.</p></li>
+<li><p class="fp-where"><span class="tier">confirmed</span> in rollup/rollup: <a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/migration/index.md#L15-L15">docs/migration/index.md:15</a> against <a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/migration/index.md#L58-L62">docs/migration/index.md:58</a></p><p class="fp-why">Two sections of docs/migration/index.md, one for migrating to Rollup 4 and one for Rollup 3.</p></li>
+<li><p class="fp-where"><span class="tier">confirmed</span> in rollup/rollup: <a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/migration/index.md#L19-L19">docs/migration/index.md:19</a> against <a href="https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/migration/index.md#L62-L62">docs/migration/index.md:62</a></p><p class="fp-why">Same two version-scoped sections as 94e16f0594.</p></li>
+<li><p class="fp-where"><span class="tier">likely</span> in gofiber/fiber: <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/api/ctx.md#L3895-L3895">docs/api/ctx.md:3895</a> against <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/middleware/static.md#L193-L193">docs/middleware/static.md:193</a></p><p class="fp-why">SendFile&#x27;s Compress option (ctx.md) vs the static middleware&#x27;s Compress option (static.md): different APIs.</p></li>
+<li><p class="fp-where"><span class="tier">confirmed</span> in gofiber/fiber: <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/middleware/proxy.md#L92-L92">docs/middleware/proxy.md:92</a> against <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/whats_new.md#L2036-L2036">docs/whats_new.md:2036</a></p><p class="fp-why">proxy.md:92 and whats_new.md:2036 say the same thing in different words: the body is dropped for the redirected hop, the request the handler holds keeps it.</p></li>
+<li><p class="fp-where"><span class="tier">confirmed</span> in gofiber/fiber: <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/middleware/redirect.md#L74-L74">docs/middleware/redirect.md:74</a> against <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/middleware/rewrite.md#L23-L27">docs/middleware/rewrite.md:23</a></p><p class="fp-why">redirect&#x27;s From is a regular expression (redirect.go:202 MustCompileRegexp), rewrite&#x27;s From is path text (rewrite.go:30 MustCompilePath). Two middlewares, each documented correctly.</p></li>
+<li><p class="fp-where"><span class="tier">likely</span> in gofiber/fiber: <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/client/request.md#L665-L665">docs/client/request.md:665</a> against <a href="https://github.com/gofiber/fiber/blob/16cdbd2be862b6fb178fb37318e0141b8134e9d3/docs/client/rest.md#L801-L805">docs/client/rest.md:801</a></p><p class="fp-why">request.md is about when the path check is switched off; rest.md is about what the DisablePathNormalizing() getter reports. Different questions.</p></li>
+<li><p class="fp-where"><span class="tier">likely</span> in pydantic/pydantic: <a href="https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/docs/migration.md#L466-L466">docs/migration.md:466</a> against <a href="https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/docs/concepts/validation_decorator.md#L400-L403">docs/concepts/validation_decorator.md:400</a></p><p class="fp-why">migration.md: a TypeError raised inside a validator is no longer wrapped; validation_decorator.md: a validation failure raises ValidationError. Different situations.</p></li>
+  </ul>
+  <p class="plain">Two real contradictions were found by <code>/compare</code> but not reported, because it labelled them scope differences: the rollup one above, and a second sighting of the MikroORM flush one.</p>
+</section>
+
+<section id="limits">
+  <h2>Limits</h2>
+  <ul class="limits">
+    <li>It only sees contradictions between passages that restate each other. A page that is simply wrong, with nothing else to compare it to, is invisible.</li>
+    <li>Recall is not measured. A spot check of about 50 unreported pairs found no clear miss.</li>
+    <li>Sibling pages confuse it: per-version migration guides, the React and the Vue page of one API, READMEs of two packages. Pairs of per-version guides are skipped by file name; the rest still slips through.</li>
+    <li>Every verdict here was reached by reading both passages and the source code, with the tool's help in finding them. Upstream maintainers decide what is actually a bug.</li>
+  </ul>
+</section>
+
+<section id="replay">
+  <h2>Replay it without a key</h2>
+  <p class="plain">Every API answer behind this page is recorded in the repository. With the target repositories cloned at the pinned commits, a scan replays offline and spends no credits.</p>
+  <pre class="cmd"><code>python scripts/fetch_targets.py fastify
+python -m docsdrift target fastify --offline
+python -m pytest -q</code></pre>
+</section>
+</main>
+<footer>
+  <p>Built for the Clocked Build Challenge on <code>/compare</code>, <code>/grounding</code> and <code>/rerank</code>. Quoted documentation belongs to its projects and is shown under their licenses.</p>
+</footer>
+</body>
+</html>
