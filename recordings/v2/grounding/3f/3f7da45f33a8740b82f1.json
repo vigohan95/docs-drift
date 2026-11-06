@@ -1,0 +1,76 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/3f/3f7da45f33a8740b82f1",
+ "request_hash": "3f7da45f33a8740b82f136444db8578060e6eebe5d57f6ef8638d2d6643ebb0a",
+ "recorded_at": "2026-11-06T16:13:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 905,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.134401",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=198"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pair:a#0",
+    "text": "```typescript\nawait manager.save(user)\nawait manager.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n\n```typescript\nawait manager.remove(user)\nawait manager.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait manager.insert(User, {\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait manager.insert(User, [\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids, given conditions, or an array of condition objects. Sets fields from supplied partial entity.\n\n```typescript\nawait manager.update(User, { age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait manager.update(User, 1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// Bulk updates with different conditions for each operation\nawait manager.update(User, [\n    { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } },\n    { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } },\n    { criteria: { age: 18 }, data: { category: \"ADULT\" } },\n])\n// executes three separate UPDATE queries:\n// UPDATE user SET firstName = Rizzrak WHERE id = 1\n// UPDATE user SET firstName = Karzzir WHERE id = 2\n// UPDATE user SET category = ADULT WHERE age = 18\n```"
+   }
+  ],
+  "answer": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause).",
+  "claims": [
+   "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause)."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0089,
+  "ungrounded": 0.9911,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "pair:a#0",
+    "share": 0,
+    "share_of_answer": 0.0089,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause).",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0089,
+    "contradicted": 0.0375,
+    "not_stated": 0.9431,
+    "not_a_claim": 0.0106,
+    "verdict": "not_stated",
+    "sources": {
+     "pair:a#0": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0089
+  },
+  "timing": {
+   "read_ms": 79,
+   "total_ms": 81
+  }
+ }
+}

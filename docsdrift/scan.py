@@ -326,7 +326,11 @@ def scan(project: str, root: Path, includes: list[str], excludes: list[str] = ()
 
 def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict | None = None, repo: str = "",
             commit: str = "", client: Clocked | None = None, swap: bool = True, gate: bool = True,
-            elsewhere: bool = True, workers: int = 3, log=print) -> dict:
+            elsewhere: bool = True, workers: int = 3, log=print, progress=None, should_stop=None) -> dict:
+    """progress(stage, done, total) is called as work advances; should_stop() is polled between
+    requests and ends the run early when it returns a reason (a string)."""
+    progress = progress or (lambda stage, done, total: None)
+    should_stop = should_stop or (lambda: None)
     client = client or Clocked()
     by_cid = {c.cid: c for c in chunks}
     cstats = cstats or {}
@@ -337,6 +341,8 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
 
     def do_compare(c):
         payload = compare_payload(c["a"], c["b"])
+        if should_stop():
+            return c, None, "stopped", 0.0
         try:
             r, cr = client.call_cost("compare", payload)
         except ClockedError as e:
@@ -347,8 +353,12 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
     stopped = None
     with ThreadPoolExecutor(max_workers=workers) as ex:
         try:
-            for c, r, err, cr in ex.map(do_compare, cands):
+            for n_done, (c, r, err, cr) in enumerate(ex.map(do_compare, cands), start=1):
                 credits["compare"] += cr
+                progress("compare", n_done, len(cands))
+                if err == "stopped":
+                    stopped = stopped or should_stop() or "stopped"
+                    continue
                 if err:
                     errors.append({"a": c["a"].cid, "b": c["b"].cid, "error": err})
                     continue
@@ -400,6 +410,8 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
                                  "conflicts": len(hits), "confirmed": len(hits) > 0}
 
     if gate and not stopped:
+        progress("verify", 0, len(findings))
+
         def do_gate(f):
             try:
                 return f, run_gate(client, f, by_cid)
@@ -414,6 +426,7 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
     if elsewhere and not stopped:
         shortlist = Shortlist(chunks)
         todo = [f for f in findings if tier_of(f) in REPORTED_TIERS]
+        progress("elsewhere", 0, len(todo))
 
         def do_else(f):
             try:

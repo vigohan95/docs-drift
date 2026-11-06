@@ -51,7 +51,11 @@ def _finish(project, path, heading, start, lines):
 
 
 def split_file(project: str, root: Path, rel: str) -> list[Chunk]:
-    raw = (root / rel).read_text(encoding="utf-8", errors="replace")
+    return split_text(project, rel, (root / rel).read_text(encoding="utf-8", errors="replace"))
+
+
+def split_text(project: str, rel: str, raw: str) -> list[Chunk]:
+    """Split Markdown given as text (used for files that are only held in memory)."""
     lines = raw.split("\n")
     lines = [ln.rstrip("\r") for ln in lines]
     chunks: list[Chunk] = []

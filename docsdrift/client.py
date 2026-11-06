@@ -81,12 +81,13 @@ def _load_key() -> str:
     raise RuntimeError("CLOCKED_API_KEY not found in environment or ../.env")
 
 
-def credits_used() -> float:
-    """Total credits spent so far according to the local ledger."""
-    if not LEDGER.exists():
+def credits_used(ledger: Path | None = None) -> float:
+    """Total credits spent so far according to a ledger file (default: this repository's)."""
+    ledger = ledger or LEDGER
+    if not ledger.exists():
         return 0.0
     total = 0.0
-    for line in LEDGER.read_text(encoding="utf-8").splitlines():
+    for line in ledger.read_text(encoding="utf-8").splitlines():
         if line.strip():
             total += float(json.loads(line).get("credits") or 0)
     return total
@@ -122,7 +123,12 @@ def load_index(recordings: Path = RECORDINGS, rebuild: bool = False) -> dict:
 class Clocked:
     def __init__(self, budget: float = DEFAULT_BUDGET, timeout: float = 130.0,
                  offline: bool = False, use_cache: bool = True, recordings: Path = RECORDINGS,
-                 reserve: float = 0.0):  # `reserve` is accepted for the day-1 scripts and ignored
+                 reserve: float = 0.0,  # accepted for the day-1 scripts and ignored
+                 keep_on_disk: bool = True):
+        """keep_on_disk=False keeps answers in memory only (the live trial service uses this so that
+        text pasted by visitors is never written to disk); the ledger of credits is still written."""
+        self.keep_on_disk = keep_on_disk
+        self._mem: dict = {}
         self.offline = offline
         self.use_cache = use_cache
         self.budget = budget
@@ -133,12 +139,14 @@ class Clocked:
         self.live_calls = 0
         self.cache_hits = 0
         self.live_credits = 0.0
-        recordings.mkdir(exist_ok=True)
-        self._index = load_index(recordings) if (use_cache or offline) else {}
+        recordings.mkdir(parents=True, exist_ok=True)
+        self._index = load_index(recordings) if (keep_on_disk and (use_cache or offline)) else {}
 
     # ------------------------------------------------------------------ cache
     def cached(self, endpoint: str, payload: dict):
         h = request_hash(endpoint, payload)
+        if h in self._mem:
+            return self._mem[h]
         rel = self._index.get(h)
         if rel and (self.recordings / rel).exists():
             return json.loads((self.recordings / rel).read_text(encoding="utf-8"))
@@ -184,7 +192,7 @@ class Clocked:
             if self._key is None:
                 self._key = _load_key()
             if self._spent is None:
-                self._spent = credits_used()
+                self._spent = credits_used(self.recordings / "ledger.jsonl")
             if self._spent >= self.budget:
                 raise BudgetExceeded(f"spent {self._spent:.0f} of {self.budget:.0f} credits")
 
@@ -249,8 +257,13 @@ class Clocked:
         }
         out = self.recordings / rel
         with _lock:
-            out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_text(json.dumps(record, ensure_ascii=False, indent=1), encoding="utf-8")
+            if self.keep_on_disk:
+                out.parent.mkdir(parents=True, exist_ok=True)
+                out.write_text(json.dumps(record, ensure_ascii=False, indent=1), encoding="utf-8")
+            elif status in (200, 422) and not force_live:
+                if len(self._mem) >= 5000:
+                    self._mem.pop(next(iter(self._mem)))
+                self._mem[h] = record
             with (self.recordings / "ledger.jsonl").open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps({
                     "tag": record["tag"], "endpoint": endpoint, "status": status,
@@ -263,15 +276,15 @@ class Clocked:
             self._spent += credits
             self.live_calls += 1
             self.live_credits += credits
-            if status in (200, 422) and not force_live:
+            if self.keep_on_disk and status in (200, 422) and not force_live:
                 self._index[h] = rel
         if status != 200:
             raise ClockedError(status, raw)
         return parsed, credits
 
     def save_index(self):
-        if self.offline or self.live_calls == 0:
-            return  # nothing new was recorded
+        if self.offline or self.live_calls == 0 or not self.keep_on_disk:
+            return  # nothing new was recorded on disk
         with _lock:
             idx_file = self.recordings / "index.json"
             merged = {}
