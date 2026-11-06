@@ -25,7 +25,7 @@ V = {
  "29817c707f": (T, "typeorm-es-version", None, "README.md:19 says JavaScript (ES2023); docs/docs/getting-started.md:5 says (ES2021) in the same sentence. packages/typeorm/tsconfig.json extends @tsconfig/node20; tsconfig.browser.json uses lib es2023."),
  "2a4c1a148e": (F, None, None, "Two sections of one page, one about null and one about undefined."),
  # ------------------------------------------------------------- prometheus
- "d5d9babda2": (T, "prometheus-st-header-hex", "b", "tsdb/docs/format/chunks.md:148-150 says st_changed_on is set to 127 (0xEF) and the 127th and further samples carry st_i; lines 302-304 of the same file say 127 (0x7F) and the 128th. 127 is 0x7F, and tsdb/chunkenc/st.go:19 has maxFirstSTChangeOn = 0x7F."),
+ "d5d9babda2": (T, "prometheus-st-header-hex", "b", "tsdb/docs/format/chunks.md:149-151 says st_changed_on is set to 127 (0xEF) and the 127th and further samples carry st_i; lines 301-303 of the same file say 127 (0x7F) and the 128th. 127 is 0x7F, and tsdb/chunkenc/st.go:19 has maxFirstSTChangeOn = 0x7F."),
  "e480859f1e": (F, None, None, SIBLING + ": chunks.md (block chunks) and head_chunks.md (head chunks)."),
  "4998603c77": (F, None, None, "Reference says the built-in default is 1m; the tutorial example config sets 15s."),
  "e5f4c606de": (F, None, None, "Histogram chunk section vs float histogram chunk section."),

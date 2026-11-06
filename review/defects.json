@@ -1,0 +1,524 @@
+{
+ "upstream_search": "Searched each upstream repository's issues and pull requests on 2026-11-07 (gh search, read-only) for the file name and the key terms of each defect. No open or closed issue or PR about any of them was found. typeorm PR #12025 is the merged PR that introduced the update example.",
+ "defects": [
+  {
+   "id": "fastify-onrequest-body-null",
+   "project": "fastify",
+   "title": "What request.body is inside the onRequest hook",
+   "a": {
+    "path": "docs/Reference/Hooks.md",
+    "lines": [
+     73,
+     75
+    ],
+    "quote": "> In the [onRequest](#onrequest) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L73-L75"
+   },
+   "b": {
+    "path": "docs/Reference/TypeScript.md",
+    "lines": [
+     1540,
+     1541
+    ],
+    "quote": "Notice: in the `onRequest` hook, request.body will always be null, because the\nbody parsing happens before the `preHandler` hook.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1540-L1541"
+   },
+   "wrong": "b",
+   "source": "lib/request.js:40 sets `this.body = undefined`; lib/handle-request.js runs body parsing before the preValidation hooks.",
+   "found_by": "standard run, confirmed",
+   "findings": [
+    "2f2b5d9048",
+    "bfdf3bfa2b"
+   ],
+   "patch": "fastify/01-typescript-onrequest-body-undefined.patch",
+   "repo": "fastify/fastify",
+   "commit": "6c14896e67dd299ce277d667f220ceb23b20d277"
+  },
+  {
+   "id": "fastify-preparsing-body-null",
+   "project": "fastify",
+   "title": "What request.body is inside the preParsing hook",
+   "a": {
+    "path": "docs/Reference/Hooks.md",
+    "lines": [
+     104,
+     106
+    ],
+    "quote": "> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L104-L106"
+   },
+   "b": {
+    "path": "docs/Reference/TypeScript.md",
+    "lines": [
+     1550,
+     1551
+    ],
+    "quote": "Notice: in the `preParsing` hook, request.body will always be null, because the\nbody parsing happens before the `preValidation` hook.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1550-L1551"
+   },
+   "wrong": "b",
+   "source": "lib/request.js:40 sets `this.body = undefined`.",
+   "found_by": "standard run, confirmed",
+   "findings": [
+    "3359c8962b",
+    "cc29289b7b"
+   ],
+   "patch": "fastify/02-typescript-preparsing-body-undefined.patch",
+   "repo": "fastify/fastify",
+   "commit": "6c14896e67dd299ce277d667f220ceb23b20d277"
+  },
+  {
+   "id": "fastify-httpmethods-union",
+   "project": "fastify",
+   "title": "Which HTTP methods Fastify supports",
+   "a": {
+    "path": "docs/Reference/Server.md",
+    "lines": [
+     1667,
+     1668
+    ],
+    "quote": "Fastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,\n`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Server.md#L1667-L1668"
+   },
+   "b": {
+    "path": "docs/Reference/TypeScript.md",
+    "lines": [
+     1103,
+     1104
+    ],
+    "quote": "Union type of: `'DELETE' | 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' |\n'OPTIONS'`",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1103-L1104"
+   },
+   "wrong": "b",
+   "source": "types/utils.d.ts:17-18 defines the union with 'QUERY', 'TRACE' and twelve more members. docs/Reference/Routes.md:34-35 repeats the Server.md list.",
+   "found_by": "standard run, confirmed",
+   "findings": [
+    "2226ed1a9c",
+    "ba8d973e45",
+    "995662794b",
+    "81db55b3f9"
+   ],
+   "patch": "fastify/03-typescript-httpmethods-union.patch",
+   "repo": "fastify/fastify",
+   "commit": "6c14896e67dd299ce277d667f220ceb23b20d277"
+  },
+  {
+   "id": "fastify-onsend-payload-types",
+   "project": "fastify",
+   "title": "What an onSend hook may change the payload to",
+   "a": {
+    "path": "docs/Reference/Hooks.md",
+    "lines": [
+     240,
+     241
+    ],
+    "quote": "> If you change the payload, you may only change it to a `string`, a\n> `Buffer`, a `stream`, a `ReadableStream`, a `Response`, or `null`.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L240-L241"
+   },
+   "b": {
+    "path": "docs/Reference/TypeScript.md",
+    "lines": [
+     1592,
+     1593
+    ],
+    "quote": ">  If you change the payload, you may only change it to a string,\n> a Buffer, a stream, or null.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/TypeScript.md#L1592-L1593"
+   },
+   "wrong": "b",
+   "source": "lib/reply.js:183-188 accepts web streams (`getReader`) and `Response` objects.",
+   "found_by": "standard run, likely",
+   "findings": [
+    "c4c048a190"
+   ],
+   "patch": "fastify/04-typescript-onsend-payload-types.patch",
+   "repo": "fastify/fastify",
+   "commit": "6c14896e67dd299ce277d667f220ceb23b20d277"
+  },
+  {
+   "id": "fastify-reply-final-payload-types",
+   "project": "fastify",
+   "title": "Which types the final payload may have",
+   "a": {
+    "path": "docs/Reference/Hooks.md",
+    "lines": [
+     240,
+     241
+    ],
+    "quote": "> If you change the payload, you may only change it to a `string`, a\n> `Buffer`, a `stream`, a `ReadableStream`, a `Response`, or `null`.",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Hooks.md#L240-L241"
+   },
+   "b": {
+    "path": "docs/Reference/Reply.md",
+    "lines": [
+     575,
+     583
+    ],
+    "quote": "The type of the sent payload (after serialization and going through any\n[`onSend` hooks](./Hooks.md#onsend)) must be one of the following types,\notherwise, an error will be thrown:\n\n- `string`\n- `Buffer`\n- `stream`\n- `undefined`\n- `null`",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Reply.md#L575-L583"
+   },
+   "wrong": "b",
+   "source": "lib/reply.js:183-188 and the final send path accept web streams and `Response` objects without throwing.",
+   "found_by": "both-orders run (weak tier) and the day-1 batch run; not reported by the standard run",
+   "findings": [
+    "7b725ab594"
+   ],
+   "patch": "fastify/05-reply-final-payload-types.patch",
+   "repo": "fastify/fastify",
+   "commit": "6c14896e67dd299ce277d667f220ceb23b20d277"
+  },
+  {
+   "id": "fastify-logger-methods",
+   "project": "fastify",
+   "title": "Which methods a custom logger must have",
+   "a": {
+    "path": "docs/Reference/Server.md",
+    "lines": [
+     366,
+     368
+    ],
+    "quote": "A custom logger instance. The logger must be a Pino instance or conform to the\nPino interface by having the following methods: `info`, `error`, `debug`,\n`fatal`, `warn`, `trace`, `child`. For example:",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Server.md#L366-L368"
+   },
+   "b": {
+    "path": "docs/Reference/Logging.md",
+    "lines": [
+     226,
+     228
+    ],
+    "quote": "- **Methods:** `info`, `error`, `debug`, `fatal`, `warn`, `trace`, `silent`,\n  `child`\n- **Properties:** `level` (string)",
+    "url": "https://github.com/fastify/fastify/blob/6c14896e67dd299ce277d667f220ceb23b20d277/docs/Reference/Logging.md#L226-L228"
+   },
+   "wrong": null,
+   "source": "The runtime check in lib/logger-factory.js:68 requires info, error, debug, fatal, warn, trace and child. The TypeScript type FastifyBaseLogger (types/logger.d.ts:27) also requires `level` and `silent`. Each page matches one of the two.",
+   "found_by": "day-1 batch run only; the one-pair-per-request pipeline does not return a passage for it",
+   "findings": [],
+   "patch": null,
+   "patch_note": "No patch: which list the docs should give is a maintainer decision. Notes for an issue are in upstream-patches/fastify/06-logger-methods-issue-notes.md.",
+   "repo": "fastify/fastify",
+   "commit": "6c14896e67dd299ce277d667f220ceb23b20d277"
+  },
+  {
+   "id": "typeorm-es-version",
+   "project": "typeorm",
+   "title": "Which JavaScript version TypeORM targets",
+   "a": {
+    "path": "README.md",
+    "lines": [
+     19,
+     19
+    ],
+    "quote": "and can be used with TypeScript and JavaScript (ES2023).",
+    "url": "https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/README.md#L19-L19"
+   },
+   "b": {
+    "path": "docs/docs/getting-started.md",
+    "lines": [
+     5,
+     5
+    ],
+    "quote": "and can be used with TypeScript and JavaScript (ES2021).",
+    "url": "https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/docs/docs/getting-started.md#L5-L5"
+   },
+   "wrong": "b",
+   "source": "PR #11382 (drop Node 16 and 18) changed the README from ES2021 to ES2023 and moved tsconfig.json to @tsconfig/node20; getting-started.md was not touched.",
+   "found_by": "standard run, confirmed",
+   "findings": [
+    "29817c707f"
+   ],
+   "patch": "typeorm/01-getting-started-es2023.patch",
+   "repo": "typeorm/typeorm",
+   "commit": "5bdc67882dee5a02d975d5ed140c9c3f91661116"
+  },
+  {
+   "id": "typeorm-update-bulk-overload",
+   "project": "typeorm",
+   "title": "What update() does with an array",
+   "a": {
+    "path": "docs/docs/working-with-entity-manager/5-entity-manager-api.md",
+    "lines": [
+     189,
+     198
+    ],
+    "quote": "// Bulk updates with different conditions for each operation\nawait manager.update(User, [\n    { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } },\n    { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } },\n    { criteria: { age: 18 }, data: { category: \"ADULT\" } },\n])\n// executes three separate UPDATE queries:",
+    "url": "https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/docs/docs/working-with-entity-manager/5-entity-manager-api.md#L189-L198"
+   },
+   "b": {
+    "path": "docs/docs/working-with-entity-manager/6-repository-api.md",
+    "lines": [
+     154,
+     160
+    ],
+    "quote": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together):",
+    "url": "https://github.com/typeorm/typeorm/blob/5bdc67882dee5a02d975d5ed140c9c3f91661116/docs/docs/working-with-entity-manager/6-repository-api.md#L154-L160"
+   },
+   "wrong": "a",
+   "source": "packages/typeorm/src/entity-manager/EntityManager.ts:897-927 has only update(target, criteria, partialEntity, options); no {criteria, data} form exists in src or test. The example came in with docs PR #12025; the feature PR #10910 implemented OR-ed condition arrays. The same PR added 'three separate queries' comments to the delete and softDelete examples, which the code also runs as one query.",
+   "found_by": "standard run, likely",
+   "findings": [
+    "e0951255dd"
+   ],
+   "patch": "typeorm/02-entity-manager-update-bulk-example.patch",
+   "extra_patch": "typeorm/03-delete-softdelete-single-query.patch",
+   "repo": "typeorm/typeorm",
+   "commit": "5bdc67882dee5a02d975d5ed140c9c3f91661116"
+  },
+  {
+   "id": "prometheus-st-header-hex",
+   "project": "prometheus",
+   "title": "The value st_changed_on is capped at",
+   "a": {
+    "path": "tsdb/docs/format/chunks.md",
+    "lines": [
+     149,
+     151
+    ],
+    "quote": "   Due to the 7 bit limitation, once a chunk has at least 127 samples,\n   `st_changed_on` is set to 127 (0xEF) and the 127th and further samples will\n   have `st_i` present.",
+    "url": "https://github.com/prometheus/prometheus/blob/0e62286556b1cb798d0afdde11f11689b6cfcd7a/tsdb/docs/format/chunks.md#L149-L151"
+   },
+   "b": {
+    "path": "tsdb/docs/format/chunks.md",
+    "lines": [
+     301,
+     303
+    ],
+    "quote": "Once a chunk has at least 127 samples,\n`st_changed_on` is set to 127 (0x7F) and the 128th and further samples will\nhave `st_i` present.",
+    "url": "https://github.com/prometheus/prometheus/blob/0e62286556b1cb798d0afdde11f11689b6cfcd7a/tsdb/docs/format/chunks.md#L301-L303"
+   },
+   "wrong": "a",
+   "source": "127 is 0x7F; tsdb/chunkenc/st.go:19 has `maxFirstSTChangeOn = 0x7F`. The two passages also disagree on 127th versus 128th sample; the patch leaves that to the maintainers.",
+   "found_by": "standard run, confirmed",
+   "findings": [
+    "d5d9babda2"
+   ],
+   "patch": "prometheus/01-chunks-st-changed-on-hex.patch",
+   "repo": "prometheus/prometheus",
+   "commit": "0e62286556b1cb798d0afdde11f11689b6cfcd7a"
+  },
+  {
+   "id": "mikroorm-flush-persist",
+   "project": "mikro-orm",
+   "title": "Which entities em.flush() checks for changes",
+   "a": {
+    "path": "docs/docs/guide/01-first-entity.md",
+    "lines": [
+     389,
+     389
+    ],
+    "quote": "Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity.",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/guide/01-first-entity.md#L389-L389"
+   },
+   "b": {
+    "path": "docs/docs/unit-of-work.md",
+    "lines": [
+     85,
+     85
+    ],
+    "quote": "Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`.",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/unit-of-work.md#L85-L85"
+   },
+   "wrong": "b",
+   "source": "packages/core/src/unit-of-work/UnitOfWork.ts computeChangeSets walks the identity map (line 769) and then the persist stack (775). unit-of-work.md:34 itself says managed entities need no persist call.",
+   "found_by": "standard run, likely",
+   "findings": [
+    "0ec974ef3b",
+    "8bbae9fd13"
+   ],
+   "patch": "mikro-orm/01-unit-of-work-flush-managed-entities.patch",
+   "repo": "mikro-orm/mikro-orm",
+   "commit": "35fe690bf45ce72c4b86acb15d6de06fdbd09e8a"
+  },
+  {
+   "id": "mikroorm-sqlite-ext-hook",
+   "project": "mikro-orm",
+   "title": "How to load SQLite extensions",
+   "a": {
+    "path": "docs/docs/usage-with-sql.md",
+    "lines": [
+     162,
+     162
+    ],
+    "quote": "Load them via `pool.afterCreate`:",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/usage-with-sql.md#L162-L162"
+   },
+   "b": {
+    "path": "docs/docs/usage-with-sqlite.md",
+    "lines": [
+     229,
+     229
+    ],
+    "quote": "Once you've downloaded the binaries for the extensions you wish to use, they can be added via the `onCreateConnection` hook:",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/usage-with-sqlite.md#L229-L229"
+   },
+   "wrong": "a",
+   "source": "packages/core/src/utils/Configuration.ts:639 defines `onCreateConnection`; PoolConfig (lines 805-812) has only min, max and idleTimeoutMillis.",
+   "found_by": "standard run, likely",
+   "findings": [
+    "1a81142d07"
+   ],
+   "patch": "mikro-orm/02-usage-with-sql-sqlite-extensions-hook.patch",
+   "repo": "mikro-orm/mikro-orm",
+   "commit": "35fe690bf45ce72c4b86acb15d6de06fdbd09e8a"
+  },
+  {
+   "id": "mikroorm-type-tojson-default",
+   "project": "mikro-orm",
+   "title": "What Type.toJSON() returns by default",
+   "a": {
+    "path": "docs/docs/custom-types.md",
+    "lines": [
+     20,
+     20
+    ],
+    "quote": "Converts a value from its JS representation to its serialized JSON form of this type. By default, uses the runtime value.",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/custom-types.md#L20-L20"
+   },
+   "b": {
+    "path": "docs/docs/defining-entities.md",
+    "lines": [
+     1616,
+     1616
+    ],
+    "quote": "Converts a value from its JS representation to its serialized JSON form of this type. By default, converts to the database value.",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/defining-entities.md#L1616-L1616"
+   },
+   "wrong": "b",
+   "source": "packages/core/src/types/Type.ts:90-92: `toJSON(value) { return value; }`.",
+   "found_by": "extended run, likely",
+   "findings": [
+    "84ca97ee15"
+   ],
+   "patch": "mikro-orm/03-defining-entities-tojson-default.patch",
+   "repo": "mikro-orm/mikro-orm",
+   "commit": "35fe690bf45ce72c4b86acb15d6de06fdbd09e8a"
+  },
+  {
+   "id": "mikroorm-raw-tojson",
+   "project": "mikro-orm",
+   "title": "Whether a raw() fragment can be serialized",
+   "a": {
+    "path": "docs/docs/entity-manager.md",
+    "lines": [
+     681,
+     681
+    ],
+    "quote": "It disallows serialization (via `toJSON`) as well as working with the value",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/entity-manager.md#L681-L681"
+   },
+   "b": {
+    "path": "docs/docs/raw-queries.md",
+    "lines": [
+     7,
+     7
+    ],
+    "quote": "This fragment is represented by `RawQueryFragment` class instance that can be serialized to a string, so it can be used both as an object value and key.",
+    "url": "https://github.com/mikro-orm/mikro-orm/blob/35fe690bf45ce72c4b86acb15d6de06fdbd09e8a/docs/docs/raw-queries.md#L7-L7"
+   },
+   "wrong": "a",
+   "source": "packages/core/src/utils/RawQueryFragment.ts:100-102: `toJSON()` returns the string `raw('...')`; only conversion to a non-string primitive throws (lines 86-94).",
+   "found_by": "extended run, likely",
+   "findings": [
+    "2576821b2a"
+   ],
+   "patch": "mikro-orm/04-entity-manager-raw-tojson.patch",
+   "repo": "mikro-orm/mikro-orm",
+   "commit": "35fe690bf45ce72c4b86acb15d6de06fdbd09e8a"
+  },
+  {
+   "id": "rtk-asyncthunk-resolved",
+   "project": "redux-toolkit",
+   "title": "The action types createAsyncThunk dispatches",
+   "a": {
+    "path": "docs/introduction/getting-started.md",
+    "lines": [
+     157,
+     157
+    ],
+    "quote": "generates a thunk that dispatches `pending/fulfilled/rejected` action types based on that promise",
+    "url": "https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/docs/introduction/getting-started.md#L157-L157"
+   },
+   "b": {
+    "path": "packages/toolkit/README.md",
+    "lines": [
+     78,
+     78
+    ],
+    "quote": "generates a thunk that dispatches `pending/resolved/rejected` action types based on that promise",
+    "url": "https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/packages/toolkit/README.md#L78-L78"
+   },
+   "wrong": "b",
+   "source": "packages/toolkit/src/createAsyncThunk.ts:544 builds `typePrefix + '/fulfilled'`.",
+   "found_by": "standard run, confirmed",
+   "findings": [
+    "86618b3172"
+   ],
+   "patch": "redux-toolkit/01-readme-createasyncthunk-fulfilled.patch",
+   "repo": "reduxjs/redux-toolkit",
+   "commit": "c03783eb0242272841e7d8d9dccb1c7bc4f5aef6"
+  },
+  {
+   "id": "rtk-setuplisteners-refetchonmount",
+   "project": "redux-toolkit",
+   "title": "Which behaviours setupListeners() enables",
+   "a": {
+    "path": "docs/rtk-query/api/setupListeners.mdx",
+    "lines": [
+     14,
+     14
+    ],
+    "quote": "A utility used to enable `refetchOnFocus` and `refetchOnReconnect` behaviors.",
+    "url": "https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/docs/rtk-query/api/setupListeners.mdx#L14-L14"
+   },
+   "b": {
+    "path": "docs/introduction/getting-started.md",
+    "lines": [
+     184,
+     184
+    ],
+    "quote": "A utility used to enable `refetchOnMount` and `refetchOnReconnect` behaviors.",
+    "url": "https://github.com/reduxjs/redux-toolkit/blob/c03783eb0242272841e7d8d9dccb1c7bc4f5aef6/docs/introduction/getting-started.md#L184-L184"
+   },
+   "wrong": "b",
+   "source": "packages/toolkit/src/query/core/setupListeners.ts dispatches onFocus, onFocusLost, onOnline and onOffline; nothing in it concerns mounting. The same wording is at docs/rtk-query/overview.md:85 and packages/toolkit/README.md:107.",
+   "found_by": "extended run, confirmed",
+   "findings": [
+    "b76f4539ff",
+    "8dbc525de8"
+   ],
+   "patch": "redux-toolkit/02-setuplisteners-refetchonfocus.patch",
+   "repo": "reduxjs/redux-toolkit",
+   "commit": "c03783eb0242272841e7d8d9dccb1c7bc4f5aef6"
+  },
+  {
+   "id": "rollup-esm-node-support",
+   "project": "rollup",
+   "title": "Whether Node.js supports ES modules",
+   "a": {
+    "path": "README.md",
+    "lines": [
+     71,
+     71
+    ],
+    "quote": "Most browsers and Node.js support ES modules.",
+    "url": "https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/README.md#L71-L71"
+   },
+   "b": {
+    "path": "docs/introduction/index.md",
+    "lines": [
+     52,
+     52
+    ],
+    "quote": "The specification is now fixed, but it is only implemented in modern browsers and not finalised in Node.js.",
+    "url": "https://github.com/rollup/rollup/blob/82bef03ce41b38810d375f2b302379b97d8e9468/docs/introduction/index.md#L52-L52"
+   },
+   "wrong": "b",
+   "source": "No source file settles this; the README paragraph is the newer wording of the same paragraph and matches Node.js since 12.17.",
+   "found_by": "standard run, raw finding only: /compare labels it a scope difference, so v2.1 does not report it",
+   "findings": [
+    "c4746c62b4"
+   ],
+   "patch": "rollup/01-introduction-es-modules-support.patch",
+   "repo": "rollup/rollup",
+   "commit": "82bef03ce41b38810d375f2b302379b97d8e9468"
+  }
+ ]
+}
