@@ -89,6 +89,23 @@ def main() -> int:
             page.goto(PAGES, wait_until="load")
             page.wait_for_function("!document.querySelector('.live-status').textContent.includes('Checking')", timeout=15000)
             status = page.locator(".live-status").inner_text()
+            if not page.locator("#live").get_attribute("data-api"):
+                # published without a service address: the block must say so and show its recordings
+                check("not running" in status, f"published page, no service configured: {status[:80]!r}")
+                check(page.locator("#live-repo").count() == 0, "published page: no repository box is offered")
+                page.locator(".live-btn").first.click()
+                page.wait_for_selector(".live-verdict", timeout=10000)
+                check("recorded answer" in page.locator(".live-note").first.inner_text(), "published page: the example shows its recording and says so")
+                check("Listed for review" in page.locator(".live-verdict").first.inner_text(), "published page: the recorded verdict is shown")
+                page.locator("#try").screenshot(path=str(out / "published-try.png"))
+                for width in (375, 360):
+                    small = browser.new_context(viewport={"width": width, "height": 800}).new_page()
+                    small.goto(PAGES, wait_until="load")
+                    overflow = small.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
+                    check(overflow == 0, f"published page at {width} px: no horizontal overflow ({overflow} px)")
+                browser.close()
+                print("RESULT:", "all checks passed" if not problems else f"{len(problems)} failed")
+                return 1 if problems else 0
             check(status.startswith("Live."), f"deployed page reaches the service: {status!r}")
             page.locator("text=Check this pair").click()
             page.wait_for_selector(".live-verdict", timeout=90000)
