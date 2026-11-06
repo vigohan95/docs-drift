@@ -52,7 +52,7 @@ KIND_WORDS = {"value": "a value", "date_or_version": "a version", "rule_or_condi
 LISTED = ("confirmed", "likely", "unchecked")
 
 
-def _short(text: str, limit: int = 150) -> str:
+def _short(text: str, limit: int = 140) -> str:
     text = " ".join(text.split())
     return text if len(text) <= limit else text[:limit - 1].rstrip() + "…"
 
