@@ -124,3 +124,17 @@ def test_offline_replay_of_each_real_target_matches_its_stored_report(name):
     assert client.live_calls == 0
     assert sorted((f["id"], f["tier"]) for f in rep["findings"]) == sorted((f["id"], f["tier"]) for f in stored["findings"])
     assert rep["stats"]["pairs_compared"] == stored["stats"]["pairs_compared"]
+
+
+def test_output_survives_a_console_that_cannot_encode_the_quoted_text(tmp_path, monkeypatch):
+    """Windows consoles often use a legacy code page; quoted docs contain characters outside it."""
+    import io
+    import sys
+    raw = io.BytesIO()
+    monkeypatch.setattr(sys, "stdout", io.TextIOWrapper(raw, encoding="ascii"))
+    rep = json.loads(json.dumps(STORED))
+    rep["findings"][0]["a"]["statement"] = "Note ℹ️: requests time out after 30 seconds …"
+    cli.main(["cost"])                      # main() makes the stream tolerant
+    cli.print_report(rep)
+    sys.stdout.flush()
+    assert b"requests time out after 30 seconds" in raw.getvalue()

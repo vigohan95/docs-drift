@@ -17,7 +17,7 @@ Docs Drift gives maintainers a short list of places where their documentation co
 
    149 pairs read, 6 flagged by `/compare`, 5 listed. Add `--no-gate`, `--no-swap` or `--no-elsewhere` to see what
    each stage changes, and `--all` to see what was kept off the list.
-3. Run the tests: `python -m pytest -q` (106 tests, no network).
+3. Run the tests: `python -m pytest -q` (107 tests, no network).
 
 With a key (`CLOCKED_API_KEY`), `python -m docsdrift scan /path/to/any/repo` runs it live. A scan cost 166 to 1,045
 credits on the projects measured.

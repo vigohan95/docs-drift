@@ -124,6 +124,13 @@ def _run(args, project, root, includes, excludes, repo, commit):
 
 
 def main(argv=None) -> int:
+    # Quoted documentation contains characters a legacy console code page cannot encode.
+    # Print a replacement character instead of crashing.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(prog="docsdrift", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
 

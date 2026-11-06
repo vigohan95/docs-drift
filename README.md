@@ -73,7 +73,7 @@ recorded in `recordings/`, and a scan of a project at its pinned commit replays 
 git clone https://github.com/vigohan95/docs-drift && cd docs-drift
 python scripts/fetch_targets.py fastify                   # clones fastify at the pinned commit into ../targets/fastify
 python -m docsdrift scan ../targets/fastify --offline     # 149 pairs read, 6 flagged, 5 listed
-python -m pytest -q                                       # 106 tests, no network
+python -m pytest -q                                       # 107 tests, no network
 ```
 
 Open `docs/index.html` in a browser for the page with all sixteen defects.
@@ -186,7 +186,7 @@ upstream-patches/    one small patch per defect, with a draft of the pull reques
 docs/                the static demo page (GitHub Pages serves this folder)
 scripts/             fetch the pinned targets, build the page, render it for a visual check
 video/               storyboard and scripts for the demo video
-tests/               106 tests
+tests/               107 tests
 day1/                the first day's probes and scripts, kept for the record
 ```
 
