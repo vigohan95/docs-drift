@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/008.rerank",
+ "recorded_at": "2026-11-06T13:37:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 918,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.068253",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=218"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: But the others, 101, 110 and 111 are returned as unsigned integers 5,6,7 but actually represent -3, -2 and -1 (see list above), The cutoff value is the value set by the `nbit`'th bit, and needs a value subtracted that is represented by the `nbit+1`th bit.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#6",
+    "title": "tsdb/docs/format/chunks.md > Chunk > XOR2 chunk data > Value delta encoding (`<varbit_xor2>`):",
+    "text": "### Value delta encoding (`<varbit_xor2>`):\n\nUsed after the dod≠0 control prefixes. The XOR of the current and previous value is encoded as:\n\n| Prefix | Meaning |\n|---|---|\n| `0` | XOR = 0 (value unchanged) |\n| `10` | Reuse previous leading/trailing window; `sigbits` value bits follow |\n| `110` + leading(5) + sigbits(6) + value(sigbits) | New leading/trailing window |\n| `111` | Stale NaN marker (3 bits) |"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram chunk data > Notes:",
+    "text": "### Notes:\n\n* `histogram_flags` is a byte of which currently only the first two bits are used:\n  * `10`: Counter reset between the previous chunk and this one.\n  * `01`: No counter reset between the previous chunk and this one.\n  * `00`: Counter reset status unknown.\n  * `11`: Chunk is part of a gauge histogram, no counter resets are happening.\n* `zero_threshold` has a specific encoding:\n  * If 0, it is a single zero byte.\n  * If a power of two between 2^-243 and 2^10, it is a single byte between 1 and 254.\n  * Otherwise, it is a byte with all bits set (255), followed by a float64, resulting in 9 bytes length.\n* `schema` is a specific value defined by the exposition format. Currently\n  valid values are either -4 <= n <= 8 (standard exponential schemas) or -53\n  (custom bucket boundaries).\n* `<varbit_int>` is a variable bitwidth encoding for signed integers, optimized for “delta of deltas” of bucket deltas. It has between 1 bit and 9 bytes.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L31-L60).\n* `<varbit_uint>` is a variable bitwidth encoding for unsigned integers with the same bit-bucketing as `<varbit_int>`.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L136-L165).\n* `<varbit_xor>` is a specific variable bitwidth encoding of the result of XORing the current and the previous value. It has between 1 bit and 77 bits.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/histogram.go#L538-L574).\n* `padding` of 0 to 7 bits so that the whole chunk data is byte-aligned.\n* Note that buckets are inherently deltas between the current bucket and the previous bucket. Only `bucket_0` is an absolute count.\n* The chunk can have as few as one sample, i.e. sample 1 and following are optional.\n* Similarly, there could be down to zero spans and down to zero buckets."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/wal.md#3",
+    "title": "tsdb/docs/format/wal.md > WAL Disk Format > Segment encoding > Records encoding",
+    "text": "### Records encoding\n\nEach record fragment is encoded as:\n\n```\n┌───────────┬──────────┬────────────┬──────────────┐\n│ type <1b> │ len <2b> │ CRC32 <4b> │ data <bytes> │\n└───────────┴──────────┴────────────┴──────────────┘\n```\n\nThe initial type byte is made up of three components: a 3-bit reserved field,\na 1-bit zstd compression flag, a 1-bit snappy compression flag, and a 3-bit type flag.\n\n```\n┌─────────────────┬──────────────────┬────────────────────┬──────────────────┐\n│ reserved <3bit> │ zstd_flag <1bit> │ snappy_flag <1bit> │ type_flag <3bit> │\n└─────────────────┴──────────────────┴────────────────────┴──────────────────┘\n```\n\nThe lowest 3 bits within the type flag represent the record type as follows:\n\n* `0`: rest of page will be empty\n* `1`: a full record encoded in a single fragment\n* `2`: first fragment of a record\n* `3`: middle fragment of a record\n* `4`: final fragment of a record\n\nAfter the type byte, 2-byte length and then 4-byte checksum of the following data are encoded.\n\nAll float values are represented using the [IEEE 754 format](https://en.wikipedia.org/wiki/IEEE_754)."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#37",
+    "title": "docs/querying/operators.md > Binary operator precedence",
+    "text": "## Binary operator precedence\n\nThe following list shows the precedence of binary operators in Prometheus, from\nhighest to lowest.\n\n1. `^`\n2. `*`, `/`, `%`, `atan2`, `bitand`, `bitor`, `bitxor`\n3. `+`, `-`\n4. `==`, `!=`, `<=`, `<`, `>=`, `>`\n5. `and`, `unless`\n6. `or`\n\nOperators on the same precedence level are left-associative. For example,\n`2 * 3 % 2` is equivalent to `(2 * 3) % 2`. However `^` is right associative,\nso `2 ^ 3 ^ 2` is equivalent to `2 ^ (3 ^ 2)`."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#3",
+    "title": "tsdb/docs/format/chunks.md > Chunk > XOR chunk data > Notes:",
+    "text": "### Notes:\n\n* `ts` is the timestamp, `v` is the value.\n* `...` means to repeat the previous two fields as needed, with `n` starting at 2 and going up to `num_samples` – 1.\n* `<uint16>` has 2 bytes in big-endian order.\n* `<varint>` and `<uvarint>` have 1 to 10 bytes each.\n* `ts_1_delta` is `ts_1` – `ts_0`.\n* `ts_n_dod` is the “delta of deltas” of timestamps, i.e. (`ts_n` – `ts_n-1`) – (`ts_n-1` – `ts_n-2`).\n* `v_n_xor` is the result of `v_n` XOR `v_n-1`.\n* `<varbit_xor>` is a specific variable bitwidth encoding of the result of XORing the current and the previous value. It has between 1 bit and 77 bits.\n  See [code for details](https://github.com/prometheus/prometheus/blob/7309c20e7e5774e7838f183ec97c65baa4362edc/tsdb/chunkenc/xor.go#L220-L253).\n* `<varbit_ts>` is a specific variable bitwidth encoding for the “delta of deltas” of timestamps (signed integers that are ideally small).\n  It has between 1 and 68 bits.\n  see [code for details](https://github.com/prometheus/prometheus/blob/7309c20e7e5774e7838f183ec97c65baa4362edc/tsdb/chunkenc/xor.go#L179-L205).\n* `padding` of 0 to 7 bits so that the whole chunk data is byte-aligned.\n* The chunk can have as few as one sample, i.e. `ts_1`, `v_1`, etc. are optional."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#19",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram ST chunk data > Start timestamp encoding",
+    "text": "### Start timestamp encoding\n\nThe ST header is one byte:\n\n  ```\n  ┌───────────────────────┬───────────────────────┐\n  │ first_st_known<1 bit> │ st_changed_on<7 bits> │\n  └───────────────────────┴───────────────────────┘\n  ```\n\nwhere the highest bit `first_st_known` indicates if `st_0` is present or not.\nIf the lower 7bits `st_changed_on` is 0, no `st_i (i>0)` is present.\nOtherwise `st_i (i>=st_changed_on)` is present, while\n`st_i (0<i<st_changed_on)` is not present.\n\nOnce a chunk has at least 127 samples,\n`st_changed_on` is set to 127 (0x7F) and the 128th and further samples will\nhave `st_i` present.\n\n* `st_0` is encoded as a `<varint>` if present.\n* `st_1` is encoded as a `<varbit_int>` delta from the timestamp of the\n  previous sample (or from 0 if not previously set).\n* `st_i` (i > 1) is encoded as a `<varbit_int>` \"delta of delta\" of the ST\n  difference from the previous sample."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#8",
+    "title": "tsdb/docs/format/chunks.md > Chunk > XOR2 chunk data > Start timestamp encoding",
+    "text": "### Start timestamp encoding\n\n* We use `st_i_dod` and `st_i` interchangeably when `i>1` in these notes.\n* `st_header` is one byte:\n   ```\n   ┌───────────────────────┬───────────────────────┐\n   │ first_st_known<1 bit> | st_changed_on<7 bits> │\n   └───────────────────────┴───────────────────────┘\n   ```\n   where the highest bit `first_st_known` indicates if `st_0` is present or not.\n   If the lower 7bits `st_changed_on` is 0, no `st_i (i>0)` is present.\n   Otherwise `st_i (i>=st_changed_on>)` is present, while\n   `st_i (0<i<st_changed_on)` is not present.\n\n   Due to the 7 bit limitation, once a chunk has at least 127 samples,\n   `st_changed_on` is set to 127 (0xEF) and the 127th and further samples will\n   have `st_i` present.\n* `st_0` is encoded as a `varint` if present.\n* `st_1` is encoded as a `varbit_ts` delta from `st_0` (or from 0 if `st_0` is\n   not present).\n* `st_i_dod` aka `st_i (i>1)` is encoded as a `varbit_ts` \"delta of delta\" from\n  `st_i-1` (or from 0 if `st_i-1` is not present)."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#7",
+    "title": "tsdb/docs/format/chunks.md > Chunk > XOR2 chunk data > Value delta encoding, known non-zero (`<varbit_xor2_nn>`):",
+    "text": "### Value delta encoding, known non-zero (`<varbit_xor2_nn>`):\n\nUsed after the `10` control prefix (dod=0, value known to have changed and be non-stale).\nThe delta=0 check is skipped, saving one bit on the reuse path:\n\n| Prefix | Meaning |\n|---|---|\n| `0` | Reuse previous leading/trailing window; `sigbits` value bits follow |\n| `1` + leading(5) + sigbits(6) + value(sigbits) | New leading/trailing window |"
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `SeriesRef` > `HeadSeriesRef`",
+    "text": "#### `HeadSeriesRef`\n\n`HeadSeriesRef` is simply a 64bit counter that increments when a new series comes in.\nDue to series churn, the set of actively used `HeadSeriesRef`s may be well above zero (e.g. 0-10M may not be used, and 10M-11M is active)\n\nUsage:\n* [`stripeSeries`](https://github.com/prometheus/prometheus/blob/fdbc40a9efcc8197a94f23f0e479b0b56e52d424/tsdb/head.go#L1292-L1298) (note: when you don't know a `HeadSeriesRef` for a series, you can also access it by a hash of the series' labels)\n* WAL\n* `HeadChunkRef`s include them for addressing head chunks, as those are owned by the `memSeries`.\n\nNotes:\n1) M-mapped Head chunks, while they use `HeadSeriesRef`s, don't contain an index and depend on the series listing in memory.\nOnce mmapped, chunks have `HeadSeriesRef`s inside them, allowing you to recreate the index from reading chunks\n(Along with WAL which has the labels for those `HeadSeriesRef`s. It also has all those samples, but by using m-mapped chunks we can save cpu/time and not replay all of WAL on startup)\n\n2) During querying, `HeadSeriesRef` are limited to 2^40 (see `HeadChunkRef`)\n\n3) The last `HeadSeriesRef` is always replayed from the WAL and is continued from there."
+   },
+   {
+    "id": "prometheus:docs/querying/examples.md#4",
+    "title": "docs/querying/examples.md > Using functions, operators, etc.",
+    "text": "...we could get the top 3 CPU users grouped by application (`app`) and process\ntype (`proc`) like this:\n\n    topk(3, sum by (app, proc) (rate(instance_cpu_time_ns[5m])))\n\nAssuming this metric contains one time series per running instance, you could\ncount the number of running instances per application like this:\n\n    count by (app) (instance_cpu_time_ns)\n\nIf we are exploring some metrics for their labels, to e.g. be able to aggregate\nover some of them, we could use the following:\n\n    limitk(10, app_foo_metric_bar)\n\nAlternatively, if we wanted the returned timeseries to be more evenly sampled,\nwe could use the following to get approximately 10% of them:\n\n    limit_ratio(0.1, app_foo_metric_bar)\n\nCalculate the total cost over past week given the per-node hourly cost\n(`integral()` requires `--enable-feature=promql-experimental-functions`):\n\n    integral(hourly_cost[7d]) / 3600\n\nDitto above, but use left-point sampling for the integral, for example if\ninstant corresponds to the start of the interval (use `1` for right-point):\n\n    integral(hourly_cost[7d], 0) / 3600\n\nCalculate the total energy consumed in kWh over last day, given the instant\npower consumption in Watts:\n\n    integral(power_rate[1d]) / 1000 / 3600\n\nFor those \"boolean\" metrics that produce `1`s or `0`s, integrating them over\ntime will give the _time in seconds_ that the value was `1`, for example, to\nget the _amount of time_ a particular metric has been absent during the past\nday (sampled every 5 minutes):"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0103,
+    "document_score": 0.3213,
+    "levels": {
+     "answers": 0.0103,
+     "elsewhere": 0.311,
+     "different_case": 0.0864,
+     "unrelated": 0.5923
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/format/chunks.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0073,
+    "document_score": 0.0669,
+    "levels": {
+     "answers": 0.0073,
+     "elsewhere": 0.0595,
+     "different_case": 0.0422,
+     "unrelated": 0.8909
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:tsdb/docs/format/chunks.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0032,
+    "document_score": 0.0145,
+    "levels": {
+     "answers": 0.0032,
+     "elsewhere": 0.0113,
+     "different_case": 0.012,
+     "unrelated": 0.9735
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:tsdb/docs/format/chunks.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0082,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0058,
+     "different_case": 0.0109,
+     "unrelated": 0.9808
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/format/chunks.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0062,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.004,
+     "different_case": 0.0172,
+     "unrelated": 0.9767
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0013,
+     "different_case": 0.0038,
+     "unrelated": 0.9933
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/format/wal.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0012,
+     "different_case": 0.0031,
+     "unrelated": 0.9945
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/format/chunks.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0026,
+     "different_case": 0.0116,
+     "unrelated": 0.9846
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/operators.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0009,
+     "different_case": 0.0018,
+     "unrelated": 0.9961
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/examples.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0011,
+     "different_case": 0.0038,
+     "unrelated": 0.9939
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4929
+  },
+  "timing": {
+   "total_ms": 95,
+   "rerank_ms": 94,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5639,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 176
+   }
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "jest-nd/034",
+ "recorded_at": "2026-11-06T13:43:10Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1145,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "203.823965",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=14,cfOrigin;dur=0,cfWorker;dur=435"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/MockFunctionAPI.md#13",
+    "text": "### `mockFn.mockImplementationOnce(fn)`\n\nAccepts a function that will be used as an implementation of the mock for one call to the mocked function. Can be chained so that multiple function calls produce different results.\n\n```js tab\nconst mockFn = jest\n  .fn()\n  .mockImplementationOnce(cb => cb(null, true))\n  .mockImplementationOnce(cb => cb(null, false));\n\nmockFn((err, val) => console.log(val)); // true\nmockFn((err, val) => console.log(val)); // false\n```\n\n```ts tab\nimport {jest} from '@jest/globals';\n\nconst mockFn = jest\n  .fn<(cb: (a: null, b: boolean) => void) => void>()\n  .mockImplementationOnce(cb => cb(null, true))\n  .mockImplementationOnce(cb => cb(null, false));\n\nmockFn((err, val) => console.log(val)); // true\nmockFn((err, val) => console.log(val)); // false\n```\n\nWhen the mocked function runs out of implementations defined with `.mockImplementationOnce()`, it will execute the default implementation set with `jest.fn(() => defaultValue)` or `.mockImplementation(() => defaultValue)` if they were called:\n\n```js\nconst mockFn = jest\n  .fn(() => 'default')\n  .mockImplementationOnce(() => 'first call')\n  .mockImplementationOnce(() => 'second call');\n\nmockFn(); // 'first call'\nmockFn(); // 'second call'\nmockFn(); // 'default'\nmockFn(); // 'default'\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctions.md#6",
+    "text": "## Mock Implementations\n\nStill, there are cases where it's useful to go beyond the ability to specify return values and full-on replace the implementation of a mock function. This can be done with `jest.fn` or the `mockImplementationOnce` method on mock functions.\n\n```javascript\nconst myMockFn = jest.fn(cb => cb(null, true));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n```\n\nThe `mockImplementation` method is useful when you need to define the default implementation of a mock function that is created from another module:\n\n```js title=\"foo.js\"\nmodule.exports = function () {\n  // some implementation;\n};\n```\n\n```js title=\"test.js\"\njest.mock('../foo'); // this happens automatically with automocking\nconst foo = require('../foo');\n\n// foo is a mock function\nfoo.mockImplementation(() => 42);\nfoo();\n// > 42\n```\n\nWhen you need to recreate a complex behavior of a mock function such that multiple function calls produce different results, use the `mockImplementationOnce` method:\n\n```javascript\nconst myMockFn = jest\n  .fn()\n  .mockImplementationOnce(cb => cb(null, true))\n  .mockImplementationOnce(cb => cb(null, false));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n\nmyMockFn((err, val) => console.log(val));\n// > false\n```\n\nWhen the mocked function runs out of implementations defined with `mockImplementationOnce`, it will execute the default implementation set with `jest.fn` (if it is defined):\n\n```javascript\nconst myMockFn = jest\n  .fn(() => 'default')\n  .mockImplementationOnce(() => 'first call')\n  .mockImplementationOnce(() => 'second call');\n\nconsole.log(myMockFn(), myMockFn(), myMockFn(), myMockFn());\n// > 'first call', 'second call', 'default', 'default'\n```\n\nFor cases where we have methods that are typically chained (and thus always need to return `this`), we have a sugary API to simplify this in the form of a `.mockReturnThis()` function that also sits on all mocks:\n\n```javascript\nconst myObj = {\n  myMethod: jest.fn().mockReturnThis(),\n};\n\n// is the same as\n\nconst otherObj = {\n  myMethod: jest.fn(function () {\n    return this;\n  }),\n};\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/MockFunctionAPI.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/MockFunctions.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/MockFunctionAPI.md#13",
+    "b": "jest:docs/MockFunctions.md#6",
+    "relation": "overlapping",
+    "related": 0.9987,
+    "probabilities": {
+     "same": 0.0057,
+     "overlapping": 0.9891,
+     "conflicting": 0.0039,
+     "unrelated": 0.0013
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 60,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 1,
+   "counterparts_ms": 96
+  },
+  "timing": {
+   "read_ms": 240,
+   "total_ms": 245
+  }
+ }
+}

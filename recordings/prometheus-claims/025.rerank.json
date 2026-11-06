@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/025.rerank",
+ "recorded_at": "2026-11-06T13:38:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 938,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.817245",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=227"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Returned values are from 1 to 365 for non-leap years, and 1 to 366 in leap years.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#7",
+    "title": "docs/querying/basics.md > Literals > Float literals and time durations",
+    "text": "### Float literals and time durations\n\nScalar float values can be written as literal integer or floating-point numbers\nin the format (whitespace only included for better readability):\n\n    [-+]?(\n          [0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\n        | 0[xX][0-9a-fA-F]+\n        | [nN][aA][nN]\n        | [iI][nN][fF]\n    )\n\nExamples:\n\n    23\n    -2.43\n    3.4e-9\n    0x8f\n    -Inf\n    NaN\n\nAdditionally, underscores (`_`) can be used in between decimal or hexadecimal\ndigits to improve readability.\n\nExamples:\n\n    1_000_000\n    .123_456_789\n    0x_53_AB_F3_82\n\nFloat literals are also used to specify durations in seconds. For convenience,\ndecimal integer numbers may be combined with the following\ntime units:\n\n* `ms` – milliseconds\n* `s` – seconds – 1s equals 1000ms\n* `m` – minutes – 1m equals 60s (ignoring leap seconds)\n* `h` – hours – 1h equals 60m\n* `d` – days – 1d equals 24h (ignoring so-called daylight saving time)\n* `w` – weeks – 1w equals 7d\n* `y` – years – 1y equals 365d (ignoring leap days)\n\nSuffixing a decimal integer number with one of the units above is a different\nrepresentation of the equivalent number of seconds as a bare float literal.\n\nExamples:\n\n    1s # Equivalent to 1.\n    2m # Equivalent to 120.\n    1ms # Equivalent to 0.001.\n    -2h # Equivalent to -7200.\n\nThe following examples do _not_ work:\n\n    0xABm # No suffixing of hexadecimal numbers.\n    1.5h # Time units cannot be combined with a floating point.\n    +Infd # No suffixing of ±Inf or NaN.\n\nMultiple units can be combined by concatenation of suffixed integers. Units\nmust be ordered from the longest to the shortest. A given unit must only appear\nonce per float literal.\n\nExamples:\n\n    1h30m # Equivalent to 5400s and thus 5400.\n    12h34m56s # Equivalent to 45296s and thus 45296.\n    54s321ms # Equivalent to 54.321."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#36",
+    "title": "docs/querying/operators.md > Aggregation operators > Detailed explanations > `quantile`",
+    "text": "#### `quantile`\n\n`quantile(φ, v)` calculates the φ-quantile, the value that ranks at number φ*N among\nthe N metric values of the dimensions aggregated over.\n\n`quantile` only works with float samples. Histogram samples in the input vector\nare ignored, flagged by an info-level annotation.\n\n`NaN` is considered the smallest possible value.\n\nFor example, `quantile(0.5, ...)` calculates the median, `quantile(0.95, ...)` the 95th percentile.\n\nSpecial cases:\n\n* For φ = `NaN`, `NaN` is returned.\n* For φ < 0, `-Inf` is returned.\n* For φ > 1, `+Inf` is returned."
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `ChunkRef` > `HeadChunkRef`",
+    "text": "#### `HeadChunkRef`\n\nA `HeadChunkRef` is an 8 byte integer that packs together:\n\n* 5 Bytes for `HeadSeriesRef`.\n* 3 Bytes for `HeadChunkID` (uint64) (see below).\n\nThere are two implications here:\n\n* While `HeadSeriesRef`s can during ingestion go higher, during querying they are limited to 2^40.  Querying too high numbers will lead to query failures (but not impact ingestion).\n* `ChunkID` keeps growing as we enter new chunks until Prometheus restarts. If Prometheus runs too long, we might hit 2^24.\n  ([957 years](https://www.wolframalpha.com/input/?i=2%5E24+*+120+*+15+seconds+in+years) at 1 sample per 15 seconds).  If `ChunkID=len(mmappedchunks)` then it's the head chunk."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#29",
+    "title": "docs/querying/api.md > Expression query result formats > Range vectors",
+    "text": "### Range vectors\n\nRange vectors are returned as result type `matrix`. The corresponding\n`result` property has the following format:\n\n```json\n[\n  {\n    \"metric\": { \"<label_name>\": \"<label_value>\", ... },\n    \"values\": [ [ <unix_time>, \"<sample_value>\" ], ... ],\n    \"histograms\": [ [ <unix_time>, <histogram> ], ... ]\n  },\n  ...\n]\n```\n\nEach series could have the `\"values\"` key, or the `\"histograms\"` key, or both.\nFor a given timestamp, there will only be one sample of either float or histogram type.\n\nSeries are returned sorted by `metric`. Functions such as [`sort`](functions.md#sort)\nand [`sort_by_label`](functions.md#sort_by_label) have no effect for range vectors."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#19",
+    "title": "docs/querying/basics.md > Time series selectors > Extended range selectors > `anchored`",
+    "text": "#### `anchored`\n\nUses the most recent sample (within the lookback delta) at the beginning of the range, or alternatively the first sample within the range if there is no sample within the lookback delta. The last sample within the range is also used at the end of the range. No extrapolation or interpolation is applied, so this is useful to get the direct difference between sample values.\n\nAnchored range selectors work with: `resets`, `changes`, `rate`, `increase`, and `delta`.\n\nExample query:\n`increase(http_requests_total[5m] anchored)`\n\n**Note**: When using the anchored modifier with the increase function on float samples, the results returned are integers."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/index.md#6",
+    "title": "tsdb/docs/format/index.md > Index Disk Format > Label Offset Table",
+    "text": "### Label Offset Table\n\nA label offset table stores a sequence of label offset entries.\nEvery label offset entry holds the label name and the offset to its values in the label index section.\nThey are used to track label index sections. This is no longer used.\n\n```\n┌─────────────────────┬──────────────────────┐\n│ len <4b>            │ #entries <4b>        │\n├─────────────────────┴──────────────────────┤\n│ ┌────────────────────────────────────────┐ │\n│ │  n = 1 <1b>                            │ │\n│ ├──────────────────────┬─────────────────┤ │\n│ │ len(name) <uvarint>  │ name <bytes>    │ │\n│ ├──────────────────────┴─────────────────┤ │\n│ │  offset <uvarint64>                    │ │\n│ └────────────────────────────────────────┘ │\n│                    . . .                   │\n├────────────────────────────────────────────┤\n│  CRC32 <4b>                                │\n└────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#2",
+    "title": "tsdb/docs/bstream.md > bstream details > Delta-of-delta encoding for timestamps",
+    "text": "When decoding the number, the most interesting part is how to recognize whether a number is negative or positive, and thus which prefix to set.\nNote that the bstream library doesn't interpret integers to a specific type, but rather returns them as uint64's (which are really just a container for 64 bits).\nWithin the ranges we choose, if looked at as unsigned integers, the higher portion of the range represent the negative numbers.\nContinuing the same example, the numbers 001, 010, 011 and 100 are returned as unsigned integers 1,2,3,4 and mean the same thing when casted to int64's.\nBut the others, 101, 110 and 111 are returned as unsigned integers 5,6,7 but actually represent -3, -2 and -1 (see list above),\nThe cutoff value is the value set by the `nbit`'th bit, and needs a value subtracted that is represented by the `nbit+1`th bit.\nIn our example, the 3rd bit sets the number 4, and the 4th sets the number 8. So if we see an unsigned integer exceeding 4 (5,6,7) we subtract 8. This gives us our desired values (-3, -2 and -1).\n\nCareful observers may note that, if we shift our boundaries down by one, the first bit would always indicate the sign (and imply the needed prefix).\nIn our example of `nbits = 3`, that would mean the range from -4 to 3.  But what we have now works just fine too."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#29",
+    "title": "docs/querying/operators.md > Aggregation operators > Detailed explanations > `limit_ratio`",
+    "text": "#### `limit_ratio`\n\n`limit_ratio(r, v)` returns a subset of the input samples, including\nthe original labels in the result vector.\n\nThe subset is selected in a deterministic pseudo-random way.\nThis happens independent of the sample type.\nTherefore, it works for both float samples and histogram samples.\n\n`r` can be between +1 and -1. The absolute value of `r` is used as the selection ratio,\nbut the selection order is inverted for a negative `r`, which can be used to select complements.\nFor example, `limit_ratio(0.1, ...)` returns a deterministic set of approximatiely 10% of\nthe input samples, while `limit_ratio(-0.9, ...)` returns precisely the\nremaining approximately 90% of the input samples not returned by `limit_ratio(0.1, ...)`."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#51",
+    "title": "docs/querying/api.md > Status > Build Information",
+    "text": "### Build Information\n\nThe following endpoint returns various build information properties about the Prometheus server:\n\n```\nGET /api/v1/status/buildinfo\n```\n\nAll values are of the result type `string`.\n\n```bash\ncurl http://localhost:9090/api/v1/status/buildinfo\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"version\": \"2.13.1\",\n    \"revision\": \"cb7cbad5f9a2823a622aaa668833ca04f50a0ea7\",\n    \"branch\": \"master\",\n    \"buildUser\": \"julius@desktop\",\n    \"buildDate\": \"20191102-16:19:59\",\n    \"goVersion\": \"go1.13.1\"\n  }\n}\n```\n\nNOTE: The exact returned build properties may change without notice between Prometheus versions.\n\n*New in v2.14*"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#25",
+    "title": "docs/querying/operators.md > Aggregation operators > Detailed explanations > `topk` and `bottomk`",
+    "text": "#### `topk` and `bottomk`\n\n`topk(k, v)` and `bottomk(k, v)` are different from other aggregators in that a subset of\n`k` values from the input samples, including the original labels, are returned in the result vector.\n\n`by` and `without` are only used to bucket the input vector.\n\nSimilar to `min` and `max`, they only operate on float samples, considering `NaN` values\nto be farthest from the top or bottom, respectively. Histogram samples in the\ninput vector are ignored, flagged by an info-level annotation.\n\nIf used in an instant query, `topk` and `bottomk` return series ordered by\nvalue in descending or ascending order, respectively. If used with `by` or\n`without`, then series within each bucket are sorted by value, and series in\nthe same bucket are returned consecutively, but there is no guarantee that\nbuckets of series will be returned in any particular order.\n\nNo sorting applies to range queries."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/basics.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.0079,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.0039,
+     "different_case": 0.0093,
+     "unrelated": 0.9828
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/querying/basics.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0013,
+     "different_case": 0.003,
+     "unrelated": 0.9938
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/operators.md#36",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.001,
+     "different_case": 0.0025,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/bstream.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0011,
+     "different_case": 0.0032,
+     "unrelated": 0.9941
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/querying/operators.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0011,
+     "different_case": 0.0023,
+     "unrelated": 0.995
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/format/index.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0009,
+     "different_case": 0.0019,
+     "unrelated": 0.9956
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/api.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0012,
+     "different_case": 0.0022,
+     "unrelated": 0.9953
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/querying/api.md#51",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0009,
+     "different_case": 0.002,
+     "unrelated": 0.9958
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.0018,
+     "unrelated": 0.9963
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/operators.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0017,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0006,
+     "different_case": 0.0016,
+     "unrelated": 0.9967
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3576
+  },
+  "timing": {
+   "total_ms": 107,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 4926,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

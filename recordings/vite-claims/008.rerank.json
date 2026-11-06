@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/008.rerank",
+ "recorded_at": "2026-11-06T13:37:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 974,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.79792",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=285"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: The CSS file is automatically loaded via a `<link>` tag when the associated async chunk is loaded, and the async chunk is guaranteed to only be evaluated after the CSS is loaded to avoid [FOUC](https://en.wikipedia.org/wiki/Flash_of_unstyled_content#:~:text=A%20flash%20of%20unstyled%20content,before%20all%20information%20is%20retrieved.).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/backend-integration.md#4",
+    "title": "docs/guide/backend-integration.md > Backend Integration",
+    "text": "   Here is an example HTML template to render the proper links. The syntax here is for\n   explanation only, substitute with your server templating language. The `importedChunks`\n   function is for illustration and isn't provided by Vite.\n\n   ```html\n   <!-- if production -->\n\n   <!-- for cssFile of manifest[name].css -->\n   <link rel=\"stylesheet\" href=\"/{{ cssFile }}\" />\n\n   <!-- for chunk of importedChunks(manifest, name) -->\n   <!-- for cssFile of chunk.css -->\n   <link rel=\"stylesheet\" href=\"/{{ cssFile }}\" />\n\n   <script type=\"module\" src=\"/{{ manifest[name].file }}\"></script>\n\n   <!-- for chunk of importedChunks(manifest, name) -->\n   <link rel=\"modulepreload\" href=\"/{{ chunk.file }}\" />\n   ```\n\n   Specifically, a backend generating HTML should include the following tags given a manifest\n   file and an entry point. Note that following this order is recommended for optimal performance:\n   1. A `<link rel=\"stylesheet\">` tag for each file in the entry point chunk's `css` list (if it exists)\n   2. Recursively follow all chunks in the entry point's `imports` list and include a\n      `<link rel=\"stylesheet\">` tag for each CSS file of each imported chunk's `css` list (if it exists).\n   3. A tag for the `file` key of the entry point chunk. This can be `<script type=\"module\">` for JavaScript, `<link rel=\"stylesheet\">` for CSS.\n   4. Optionally, `<link rel=\"modulepreload\">` tag for the `file` of each imported JavaScript\n      chunk, again recursively following the imports starting from the entry point chunk."
+   },
+   {
+    "id": "vite:docs/guide/backend-integration.md#6",
+    "title": "docs/guide/backend-integration.md > Backend Integration",
+    "text": "   :::\n\n   :::info Chunk Import Maps Support (Experimental)\n\n   If you are using the experimental [`build.chunkImportMap`](/config/build-options#build-chunkimportmap) option, you also need to inject the import map into the HTML.\n\n   The import map is output to `importmap.json` in the output directory. Make sure to inject the `<script type=\"importmap\">` tag before any `<script type=\"module\">` tags or `<link rel=\"modulepreload\">` tags.\n   :::"
+   },
+   {
+    "id": "vite:docs/guide/env-and-mode.md#3",
+    "title": "docs/guide/env-and-mode.md > Env Variables and Modes > Env Variables > `.env` Files",
+    "text": "### `.env` Files\n\nVite uses [dotenv](https://github.com/motdotla/dotenv) to load additional environment variables from the following files in your [environment directory](/config/shared-options.md#envdir):\n\n```\n.env                # loaded in all cases\n.env.local          # loaded in all cases, ignored by git\n.env.[mode]         # only loaded in specified mode\n.env.[mode].local   # only loaded in specified mode, ignored by git\n```\n\n:::tip Env Loading Priorities\n\nAn env file for a specific mode (e.g. `.env.production`) will take higher priority than a generic one (e.g. `.env`).\n\nVite will always load `.env` and `.env.local` in addition to the mode-specific `.env.[mode]` file. Variables declared in mode-specific files will take precedence over those in generic files, but variables defined only in `.env` or `.env.local` will still be available in the environment.\n\nIn addition, environment variables that already exist when Vite is executed have the highest priority and will not be overwritten by `.env` files. For example, when running `VITE_SOME_KEY=123 vite build`.\n\n`.env` files are loaded at the start of Vite. Restart the server after making changes.\n\n:::\n\n:::warning Bun users\n\nWhen using [Bun](https://bun.sh), be aware that Bun automatically loads `.env` files before your script runs. This built-in behavior loads environment variables directly into `process.env` and can interfere with Vite's feature, as it respects existing `process.env` values. See [oven-sh/bun#5515](https://github.com/oven-sh/bun/issues/5515) for workarounds."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#8",
+    "title": "docs/config/build-options.md > Build Options > build.cssCodeSplit",
+    "text": "## build.cssCodeSplit\n\n- **Type:** `boolean`\n- **Default:** `true`\n\nEnable/disable CSS code splitting. When enabled, CSS imported in async JS chunks will be preserved as chunks and fetched together when the chunk is fetched.\n\nIf disabled, all CSS in the entire project will be extracted into a single CSS file.\n\n::: tip Note\nIf you specify `build.lib`, `build.cssCodeSplit` will be `false` as default.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-instances.md#7",
+    "title": "docs/guide/api-environment-instances.md > Using `Environment` Instances > `FetchResult`",
+    "text": "`ViteFetchResult` returns information about the current module, including the `code` to execute and the module's `id`, `file`, and `url`.\n\nThe `invalidate` field instructs the module runner to invalidate the module before executing it again rather than serving it from cache. This is usually `true` when an HMR update was triggered.\n\n```ts\nexport interface ViteFetchResult {\n  /**\n   * Code that will be evaluated by the Vite runner.\n   * By default this will be wrapped in an async function.\n   */\n  code: string\n  /**\n   * File path of the module on disk.\n   * This will be resolved as import.meta.url/filename.\n   * Will be `null` for virtual modules.\n   */\n  file: string | null\n  /**\n   * Module ID in the server module graph.\n   */\n  id: string\n  /**\n   * Module URL used in the import.\n   */\n  url: string\n  /**\n   * Invalidate module on the client side.\n   */\n  invalidate: boolean\n}\n```"
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#29",
+    "title": "docs/config/shared-options.md > Shared Options > json.stringify",
+    "text": "## json.stringify\n\n- **Type:** `boolean | 'auto'`\n- **Default:** `'auto'`\n\nIf set to `true`, imported JSON will be transformed into `export default JSON.parse(\"...\")` which is significantly more performant than Object literals, especially when the JSON file is large.\n\nIf set to `'auto'`, the data will be stringified only if [the data is bigger than 10kB](https://v8.dev/blog/cost-of-javascript-2019#json:~:text=A%20good%20rule%20of%20thumb%20is%20to%20apply%20this%20technique%20for%20objects%20of%2010%20kB%20or%20larger)."
+   },
+   {
+    "id": "vite:docs/config/index.md#4",
+    "title": "docs/config/index.md > Configuring Vite > Using Environment Variables in Config",
+    "text": "## Using Environment Variables in Config\n\nEnvironment variables available while the config itself is being evaluated are only those that already exist in the current process environment (`process.env`). Vite deliberately defers loading any `.env*` files until _after_ the user config has been resolved because the set of files to load depends on config options like [`root`](/guide/#index-html-and-project-root) and [`envDir`](/config/shared-options.md#envdir), and also on the final `mode`.\n\nThis means: variables defined in `.env`, `.env.local`, `.env.[mode]`, or `.env.[mode].local` are **not** automatically injected into `process.env` while your `vite.config.*` is running. They _are_ automatically loaded later and exposed to application code via `import.meta.env` (with the default `VITE_` prefix filter) exactly as documented in [Env Variables and Modes](/guide/env-and-mode.html). So if you only need to pass values from `.env*` files to the app, you don't need to call anything in the config.\n\nIf, however, values from `.env*` files must influence the config itself (for example to set `server.port`, conditionally enable plugins, or compute `define` replacements), you can load them manually using the exported [`loadEnv`](/guide/api-javascript.html#loadenv) helper.\n\n```js twoslash\nimport { defineConfig, loadEnv } from 'vite'\n\nexport default defineConfig(({ mode }) => {\n  // Load env file based on `mode` in the current working directory.\n  // Set the third parameter to '' to load all env regardless of the\n  // `VITE_` prefix.\n  const env = loadEnv(mode, process.cwd(), '')\n  return {\n    define: {\n      // Provide an explicit app-level constant derived from an env var.\n      __APP_ENV__: JSON.stringify(env.APP_ENV),\n    },\n    // Example: use an env var to set the dev server port conditionally.\n    server: {\n      port: env.APP_PORT ? Number(env.APP_PORT) : 5173,\n    },\n  }\n})\n```"
+   },
+   {
+    "id": "vite:docs/guide/performance.md#4",
+    "title": "docs/guide/performance.md > Performance > Avoid Barrel Files",
+    "text": "## Avoid Barrel Files\n\nBarrel files are files that re-export the APIs of other files in the same directory. For example:\n\n```js [src/utils/index.js]\nexport * from './color.js'\nexport * from './dom.js'\nexport * from './slash.js'\n```\n\nWhen you only import an individual API, e.g. `import { slash } from './utils'`, all the files in that barrel file need to be fetched and transformed as they may contain the `slash` API and may also contain side-effects that run on initialization. This means you're loading more files than required on the initial page load, resulting in a slower page load.\n\nIf possible, you should avoid barrel files and import the individual APIs directly, e.g. `import { slash } from './utils/slash.js'`. You can read [issue #8237](https://github.com/vitejs/vite/issues/8237) for more information."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#15",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `transformIndexHtml`",
+    "text": "### `transformIndexHtml`\n\n- **Type:** `IndexHtmlTransformHook | { order?: 'pre' | 'post', handler: IndexHtmlTransformHook }`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Dedicated hook for transforming HTML entry point files such as `index.html`. The hook receives the current HTML string and a transform context. The context exposes the [`ViteDevServer`](./api-javascript#vitedevserver) instance during dev, and exposes the Rollup output bundle during build.\n\n  The hook can be async and can return one of the following:\n  - Transformed HTML string\n  - An array of tag descriptor objects (`{ tag, attrs, children }`) to inject to the existing HTML. Each tag can also specify where it should be injected to (default is prepending to `<head>`)\n  - An object containing both as `{ html, tags }`\n\n  By default `order` is `undefined`, with this hook applied after the HTML has been transformed. In order to inject a script that should go through the Vite plugins pipeline, `order: 'pre'` will apply the hook before processing the HTML. `order: 'post'` applies the hook after all hooks with `order` undefined are applied.\n\n  **Basic Example:**\n\n  ```js\n  const htmlPlugin = () => {\n    return {\n      name: 'html-transform',\n      transformIndexHtml(html) {\n        return html.replace(\n          /<title>(.*?)<\\/title>/,\n          `<title>Title replaced!</title>`,\n        )\n      },\n    }\n  }\n  ```"
+   },
+   {
+    "id": "vite:packages/plugin-legacy/README.md#13",
+    "title": "packages/plugin-legacy/README.md > @vitejs/plugin-legacy [![npm](https://img.shields.io/npm/v/@vitejs/plugin-legacy.svg)](https://npmjs.com/package/@vitejs/plugin-legacy) > Content Security Policy",
+    "text": "## Content Security Policy\n\nThe legacy plugin requires inline scripts for [Safari 10.1 `nomodule` fix](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc), SystemJS initialization, and dynamic import fallback. If you have a strict CSP policy requirement, you will need to [add the corresponding hashes to your `script-src` list](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src#unsafe_inline_script).\n\nThe hash values (without the `sha256-` prefix) can be retrieved via:\n\n```js\nimport { cspHashes } from '@vitejs/plugin-legacy'\n```\n\nThe current values are:\n\n- `sha256-MS6/3FCg4WjP9gwgaBGwLpRCY6fZBgwmhVCdrPrNf3E=`\n- `sha256-tQjf8gvb2ROOMapIxFvFAYBeUJ0v1HCbOcSmDNXGtDo=`\n- `sha256-w36slEqa9euNKxfvkw+LLGsDIr++3rsZXpZxtmRh8Aw=`\n- `sha256-+5XkZFazzJo8n0iOP4ti/cLCMUudTf//Mzkb7xNPXIc=`\n\n<!--\nRun `node --input-type=module -e \"import {cspHashes} from '@vitejs/plugin-legacy'; console.log(cspHashes.map(h => 'sha256-'+h))\"` to retrieve the value.\n-->\n\nNote that these values could change between minor versions. Thus, we recommend generating the CSP header from the exported `cspHashes` variable. If you copy the values manually, then you should pin the minor version using `~`.\n\nWhen using the `regenerator-runtime` polyfill, it will attempt to use the `globalThis` object to register itself. If `globalThis` is not available (it is [fairly new](https://caniuse.com/?search=globalThis) and not widely supported, including IE 11), it attempts to perform dynamic `Function(...)` call which violates the CSP. To avoid dynamic `eval` in the absence of `globalThis` consider adding `core-js/proposals/global-this` to `additionalLegacyPolyfills` to define it."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/backend-integration.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0597,
+    "document_score": 0.3535,
+    "levels": {
+     "answers": 0.0597,
+     "elsewhere": 0.2938,
+     "different_case": 0.0616,
+     "unrelated": 0.5849
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/config/build-options.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0164,
+    "document_score": 0.3157,
+    "levels": {
+     "answers": 0.0164,
+     "elsewhere": 0.2993,
+     "different_case": 0.0474,
+     "unrelated": 0.637
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:packages/plugin-legacy/README.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0014,
+     "different_case": 0.0041,
+     "unrelated": 0.9928
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/api-plugin.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0018,
+     "different_case": 0.0036,
+     "unrelated": 0.993
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/backend-integration.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0035,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0022,
+     "different_case": 0.0038,
+     "unrelated": 0.9926
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/env-and-mode.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0008,
+     "different_case": 0.0019,
+     "unrelated": 0.9959
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/config/index.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0013,
+     "different_case": 0.0034,
+     "unrelated": 0.994
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/api-environment-instances.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0022,
+     "unrelated": 0.9958
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/performance.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.0019,
+     "unrelated": 0.9962
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/shared-options.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0005,
+     "different_case": 0.0012,
+     "unrelated": 0.9973
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4807
+  },
+  "timing": {
+   "total_ms": 110,
+   "rerank_ms": 94,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5357,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 192
+   }
+  }
+ }
+}

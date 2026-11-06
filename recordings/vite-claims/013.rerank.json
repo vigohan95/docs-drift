@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/013.rerank",
+ "recorded_at": "2026-11-06T13:37:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1000,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.206306",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=283"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: In Node.js <=22, ESM files cannot be loaded by [`require`](https://nodejs.org/docs/latest-v22.x/api/esm.html#require) by default.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/build.md#1",
+    "title": "docs/guide/build.md > Building for Production > Browser Compatibility",
+    "text": "## Browser Compatibility\n\nBy default, the production bundle targets the minimum browser versions compatible with [Baseline](https://web-platform-dx.github.io/baseline/) Widely Available as of a date fixed for each major release. The default browser support range for this major is:\n\n<!-- Search for the `ESBUILD_BASELINE_WIDELY_AVAILABLE_TARGET` constant for more information -->\n\n- Chrome >=111\n- Edge >=111\n- Firefox >=114\n- Safari >=16.4\n\nYou can specify custom targets via the [`build.target` config option](/config/build-options.md#build-target), where the lowest target is `es2015`. If a lower target is set, Vite will still require these minimum browser support ranges as it relies on [native ESM dynamic import](https://caniuse.com/es6-module-dynamic-import), and [`import.meta`](https://caniuse.com/mdn-javascript_operators_import_meta):\n\n<!-- Search for the `defaultEsbuildSupported` constant for more information -->\n\n- Chrome >=64\n- Firefox >=67\n- Safari >=11.1\n- Edge >=79\n\nNote that by default, Vite only handles syntax transforms and **does not cover polyfills**. You can check out https://cdnjs.cloudflare.com/polyfill/ which automatically generates polyfill bundles based on the user's browser UserAgent string.\n\nLegacy browsers can be supported via [@vitejs/plugin-legacy](https://github.com/vitejs/vite/tree/main/packages/plugin-legacy), which will automatically generate legacy chunks and corresponding ES language feature polyfills. The legacy chunks are conditionally loaded only in browsers that do not have native ESM support."
+   },
+   {
+    "id": "vite:docs/guide/philosophy.md#1",
+    "title": "docs/guide/philosophy.md > Project Philosophy > Pushing the Modern Web",
+    "text": "## Pushing the Modern Web\n\nVite provides opinionated features that push writing modern code. For example:\n\n- The source code can only be written in ESM, where non-ESM dependencies need to be [pre-bundled as ESM](./dep-pre-bundling) in order to work.\n- Web workers are encouraged to be written with the [`new Worker` syntax](./features#web-workers) to follow modern standards.\n- Node.js modules cannot be used in the browser.\n\nWhen adding new features, these patterns are followed to create a future-proof API, which may not always be compatible with other build tools."
+   },
+   {
+    "id": "vite:docs/guide/build.md#7",
+    "title": "docs/guide/build.md > Building for Production > Rebuild on Files Changes",
+    "text": "## Rebuild on Files Changes\n\nYou can enable Rolldown watcher with `vite build --watch`. Or, you can directly adjust the underlying [`WatcherOptions`](https://rolldown.rs/reference/InputOptions.watch) via `build.watch`:\n\n```js [vite.config.js]\nexport default defineConfig({\n  build: {\n    watch: {\n      // https://rolldown.rs/reference/InputOptions.watch\n    },\n  },\n})\n```\n\nWith the `--watch` flag enabled, changes to files to be bundled will trigger a rebuild. Note that changes to the config and its dependencies require restarting the build command."
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#36",
+    "title": "docs/config/shared-options.md > Shared Options > envDir",
+    "text": "## envDir\n\n- **Type:** `string | false`\n- **Default:** `root`\n\nThe directory from which `.env` files are loaded. Can be an absolute path, or a path relative to the project root. `false` will disable the `.env` file loading.\n\nSee [here](/guide/env-and-mode#env-files) for more about environment files."
+   },
+   {
+    "id": "vite:docs/guide/assets.md#7",
+    "title": "docs/guide/assets.md > Static Asset Handling > new URL(url, import.meta.url)",
+    "text": "## new URL(url, import.meta.url)\n\n[import.meta.url](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import.meta) is a native ESM feature that exposes the current module's URL. Combining it with the native [URL constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL), we can obtain the full, resolved URL of a static asset using relative path from a JavaScript module:\n\n```js\nconst imgUrl = new URL('./img.png', import.meta.url).href\n\ndocument.getElementById('hero-img').src = imgUrl\n```\n\nThis works natively in modern browsers - in fact, Vite doesn't need to process this code at all during development!\n\nThis pattern also supports dynamic URLs via template literals:\n\n```js\nfunction getImageUrl(name) {\n  // note that this does not include files in subdirectories\n  return new URL(`./dir/${name}.png`, import.meta.url).href\n}\n```\n\nDuring the production build, Vite will perform necessary transforms so that the URLs still point to the correct location even after bundling and asset hashing. However, the URL string must be static so it can be analyzed, otherwise the code will be left as is, which can cause runtime errors if `build.target` does not support `import.meta.url`.\n\n```js\n// Vite will not transform this\nconst imgUrl = new URL(imagePath, import.meta.url).href\n```\n\n::: details How it works\n\nVite will transform the `getImageUrl` function to:\n\n```js\nimport __img0png from './dir/img0.png'\nimport __img1png from './dir/img1.png'\n\nfunction getImageUrl(name) {\n  const modules = {\n    './dir/img0.png': __img0png,\n    './dir/img1.png': __img1png,\n  }\n  return new URL(modules[`./dir/${name}.png`], import.meta.url).href\n}\n```\n\n:::\n\n::: warning Does not work with SSR\nThis pattern does not work if you are using Vite for Server-Side Rendering, because `import.meta.url` has different semantics in browsers vs. Node.js. The server bundle also cannot determine the client host URL ahead of time.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/features.md#5",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options",
+    "text": "### TypeScript Compiler Options\n\nVite respects some of the options in `tsconfig.json` and sets the corresponding Oxc Transformer options. By default, Vite uses the closest parent `tsconfig.json` that matches each file. A config referenced by that config's [`references`](https://www.typescriptlang.org/tsconfig/#references) field is used when it matches the file. Vite treats a config as matching the file when the file satisfies the config's [`files`](https://www.typescriptlang.org/tsconfig/#files), [`include`](https://www.typescriptlang.org/tsconfig/#include), and [`exclude`](https://www.typescriptlang.org/tsconfig/#exclude) fields.\n\nWhen the options are set in both the Vite config and the `tsconfig.json`, the value in the Vite config takes precedence.\n\nSome configuration fields under `compilerOptions` in `tsconfig.json` require special attention."
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#12",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `loadEnv`",
+    "text": "## `loadEnv`\n\n**Type Signature:**\n\n```ts\nfunction loadEnv(\n  mode: string,\n  envDir: string,\n  prefixes: string | string[] = 'VITE_',\n): Record<string, string>\n```\n\n**Related:** [`.env` Files](./env-and-mode.md#env-files)\n\nLoad `.env` files within the `envDir` and merge them with the matching variables already present in `process.env`. By default, only env variables prefixed with `VITE_` are loaded, unless `prefixes` is changed."
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#21",
+    "title": "docs/config/shared-options.md > Shared Options > css.postcss",
+    "text": "## css.postcss\n\n- **Type:** `string | (postcss.ProcessOptions & { plugins?: postcss.AcceptedPlugin[] })`\n\nInline PostCSS config or a custom directory to search PostCSS config from (default is project root).\n\nFor inline PostCSS config, it expects the same format as `postcss.config.js`. But for `plugins` property, only [array format](https://github.com/postcss/postcss-load-config/blob/main/README.md#array) can be used.\n\nThe search is done using [postcss-load-config](https://github.com/postcss/postcss-load-config) and only the supported config file names are loaded. Config files outside the workspace root (or the [project root](/guide/#index-html-and-project-root) if no workspace is found) are not searched by default. You can specify a custom path outside of the root to load the specific config file instead if needed.\n\nNote if an inline config is provided, Vite will not search for other PostCSS config sources."
+   },
+   {
+    "id": "vite:docs/guide/build.md#11",
+    "title": "docs/guide/build.md > Building for Production > Library Mode > CSS support",
+    "text": "### CSS support\n\nIf your library imports any CSS, it will be bundled as a single CSS file besides the built JS files, e.g. `dist/my-lib.css`. The name defaults to `build.lib.fileName`, but can also be changed with [`build.lib.cssFileName`](/config/build-options.md#build-lib).\n\nYou can export the CSS file in your `package.json` to be imported by users:\n\n```json {12}\n{\n  \"name\": \"my-lib\",\n  \"type\": \"module\",\n  \"files\": [\"dist\"],\n  \"main\": \"./dist/my-lib.umd.cjs\",\n  \"module\": \"./dist/my-lib.js\",\n  \"exports\": {\n    \".\": {\n      \"import\": \"./dist/my-lib.js\",\n      \"require\": \"./dist/my-lib.umd.cjs\"\n    },\n    \"./style.css\": \"./dist/my-lib.css\"\n  }\n}\n```\n\n::: tip File Extensions\nIf the `package.json` does not contain `\"type\": \"module\"`, Vite will generate different file extensions for Node.js compatibility. `.js` will become `.mjs` and `.cjs` will become `.js`.\n:::\n\n::: tip Environment Variables\nIn library mode, all [`import.meta.env.*`](./env-and-mode.md) usage are statically replaced when building for production. However, `process.env.*` usage are not, so that consumers of your library can dynamically change it. If this is undesirable, you can use `define: { 'process.env.NODE_ENV': '\"production\"' }` for example to statically replace them, or use [`esm-env`](https://github.com/benmccann/esm-env) for better compatibility with bundlers and runtimes.\n:::\n\n::: warning Advanced Usage\nLibrary mode includes a simple and opinionated configuration for browser-oriented and JS framework libraries. If you are building non-browser libraries, or require advanced build flows, you can use [tsdown](https://tsdown.dev/) or [Rolldown](https://rolldown.rs/) directly.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/migration.md#13",
+    "title": "docs/guide/migration.md > Migration from v7 > Rolldown > Removed Module Resolution Using Format Sniffing",
+    "text": "### Removed Module Resolution Using Format Sniffing\n\nWhen both `browser` and `module` fields are present in `package.json`, Vite used to resolve the field based on the content of the file and it used to pick the ESM file for browsers. This was introduced because some packages were using the `module` field to point to ESM files for Node.js and some other packages were using the `browser` field to point to UMD files for browsers. Given that the modern `exports` field solved this problem and is now adopted by many packages, Vite no longer uses this heuristic and always respects the order of the [`resolve.mainFields`](/config/shared-options#resolve-mainfields) option. If you were relying on this behavior, you can use the [`resolve.alias`](/config/shared-options#resolve-alias) option to map the field to the desired file or apply a patch with your package manager (e.g. `patch-package`, `pnpm patch`)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/build.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0029,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0013,
+     "different_case": 0.0036,
+     "unrelated": 0.9935
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/philosophy.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0041,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0023,
+     "different_case": 0.0062,
+     "unrelated": 0.9898
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/build.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0008,
+     "different_case": 0.0021,
+     "unrelated": 0.9956
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/assets.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0015,
+     "different_case": 0.0069,
+     "unrelated": 0.9901
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/features.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0009,
+     "different_case": 0.002,
+     "unrelated": 0.9958
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-javascript.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.001,
+     "different_case": 0.0018,
+     "unrelated": 0.9958
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/config/shared-options.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0009,
+     "different_case": 0.0022,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/migration.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0018,
+     "different_case": 0.0035,
+     "unrelated": 0.9932
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/config/shared-options.md#36",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0017,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0006,
+     "different_case": 0.0015,
+     "unrelated": 0.9967
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/build.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0011,
+     "different_case": 0.0028,
+     "unrelated": 0.9949
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3627
+  },
+  "timing": {
+   "total_ms": 95,
+   "rerank_ms": 94,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 4817,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

@@ -1,0 +1,115 @@
+{
+ "endpoint": "grounding",
+ "tag": "fastify-claims/011.grounding",
+ "recorded_at": "2026-11-06T13:37:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1002,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "129.459328",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=327"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "text": "##### Shutdown lifecycle\n\nWhen `fastify.close()` is called, the following steps happen in order:\n\n1. The server is flagged as **closing**. New incoming requests receive a\n   `Connection: close` header (HTTP/1.1) and are handled according to\n   [`return503OnClosing`](#factory-return-503-on-closing).\n2. [`preClose`](./Hooks.md#pre-close) hooks execute. The server is still\n   processing in-flight requests at this point.\n3. **Connection draining** based on the\n   [`forceCloseConnections`](#forcecloseconnections) option:\n   - `\"idle\"` — idle keep-alive connections are closed; in-flight requests\n     continue.\n   - `true` — all persistent connections are destroyed immediately.\n   - `false` — no forced closure; idle connections remain open until they time\n     out naturally (see [`keepAliveTimeout`](#keepalivetimeout)).\n4. The HTTP server **stops accepting** new TCP connections\n   (`server.close()`). Node.js waits for all in-flight requests to complete\n   before invoking the callback.\n5. [`onClose`](./Hooks.md#on-close) hooks execute. All in-flight requests have\n   completed and the server is no longer listening.\n6. The `close` callback (or the returned Promise) resolves.\n\n```\nfastify.close() called\n  │\n  ├─▶ closing = true (new requests receive 503)\n  │\n  ├─▶ preClose hooks\n  │     (in-flight requests still active)\n  │\n  ├─▶ Connection draining (forceCloseConnections)\n  │\n  ├─▶ server.close()\n  │     (waits for in-flight requests to complete)\n  │\n  ├─▶ onClose hooks\n  │     (server stopped, all requests done)\n  │\n  └─▶ close callback / Promise resolves\n```\n\n> ℹ️ Note:\n> Upgraded connections (such as WebSocket) are not tracked by the HTTP\n> server and will prevent `server.close()` from completing. Close them\n> explicitly in a [`preClose`](./Hooks.md#pre-close) hook."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#61",
+    "text": "#### close\n<a id=\"close\"></a>\n\n`fastify.close(callback)`: call this function to close the server instance and\nrun the [`'onClose'`](./Hooks.md#on-close) hook.\n\nCalling `close` will also cause the server to respond to every new incoming\nrequest with a `503` error and destroy that request. See [`return503OnClosing`\nflags](#factory-return-503-on-closing) for changing this behavior.\n\nIf it is called without any arguments, it will return a Promise:\n\n```js\nfastify.close().then(() => {\n  console.log('successfully closed!')\n}, (err) => {\n  console.log('an error happened', err)\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#27",
+    "text": "### `return503OnClosing`\n<a id=\"factory-return-503-on-closing\"></a>\n\n+ Default: `true`\n\nWhen `true`, any request arriving after [`close`](#close) has been called will\nreceive a `503 Service Unavailable` response with `Connection: close` header\n(HTTP/1.1). This lets load balancers detect that the server is shutting down and\nstop routing traffic to it.\n\nWhen `false`, requests arriving during the closing phase are routed and\nprocessed normally. They will still receive a `Connection: close` header so that\nclients do not attempt to reuse the connection."
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#13",
+    "text": "Let's focus on a few parts:\n\n```sh\n{\"time\":1650063793316,\"msg\":\"Doing magic!\"}\n{\"time\":1650063793316,\"msg\":\"Server listening at http://127.0.0.1:1234\"}\n```\n\nThese are the initial logs we'd see as soon as the server started. We reach out\nto the external provider as early as possible within a valid time window (we\ncouldn't do that before the server was ready to receive connections).\n\nWhile the server is still not ready, a few requests are attempted:\n\n<!-- markdownlint-disable -->\n```sh\n{\"time\":1650063795030,\"reqId\":\"req-1\",\"req\":{\"method\":\"GET\",\"url\":\"/v1\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51928},\"msg\":\"incoming request\"}\n{\"time\":1650063795033,\"reqId\":\"req-1\",\"res\":{\"statusCode\":503},\"responseTime\":2.5721680000424385,\"msg\":\"request completed\"}\n{\"time\":1650063796248,\"reqId\":\"req-2\",\"req\":{\"method\":\"GET\",\"url\":\"/ping\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51930},\"msg\":\"incoming request\"}\n{\"time\":1650063796248,\"reqId\":\"req-2\",\"res\":{\"statusCode\":200},\"responseTime\":0.4802369996905327,\"msg\":\"request completed\"}\n```\n<!-- markdownlint-enable -->\n\nThe first one (`req-1`) was a `GET /v1`, that failed (**FAST** - `responseTime`\nis in `ms`) with our `503` status code and the meaningful information in the\nresponse. Below is the response for that request:"
+   }
+  ],
+  "answer": "At this point the server is already rejecting new requests with `503` (when [`return503OnClosing`](./Server.md#factory-return-503-on-closing) is `true`), but the HTTP server has not yet stopped listening and in-flight requests are still being processed.",
+  "claims": [
+   "At this point the server is already rejecting new requests with `503` (when [`return503OnClosing`](./Server.md#factory-return-503-on-closing) is `true`), but the HTTP server has not yet stopped listening and in-flight requests are still being processed."
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Application Hooks > preClose' of docs/Reference/Hooks.md in the documentation of the fastify project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.9893,
+  "ungrounded": 0.0107,
+  "verdict": "grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "share": 0.9926,
+    "share_of_answer": 0.9819,
+    "claims": [
+     0
+    ]
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#61",
+    "share": 0.0031,
+    "share_of_answer": 0.0031,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#27",
+    "share": 0.0024,
+    "share_of_answer": 0.0024,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#13",
+    "share": 0.0019,
+    "share_of_answer": 0.0019,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "At this point the server is already rejecting new requests with `503` (when [`return503OnClosing`](./Server.md#factory-return-503-on-closing) is `true`), but the HTTP server has not yet stopped listening and in-flight requests are still being processed.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.9893,
+    "contradicted": 0.0055,
+    "not_stated": 0.0033,
+    "not_a_claim": 0.002,
+    "verdict": "supported",
+    "sources": {
+     "fastify:docs/Reference/Server.md#62": 0.9926,
+     "fastify:docs/Reference/Server.md#61": 0.0031,
+     "fastify:docs/Reference/Server.md#27": 0.0024,
+     "fastify:docs/Guides/Delay-Accepting-Requests.md#13": 0.0019
+    },
+    "source": "fastify:docs/Reference/Server.md#62",
+    "evidence": {
+     "document": "fastify:docs/Reference/Server.md#27",
+     "quote": "1).",
+     "start": 252,
+     "end": 255,
+     "confidence": 0.996
+    }
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.9893
+  },
+  "timing": {
+   "read_ms": 137,
+   "total_ms": 141
+  }
+ }
+}

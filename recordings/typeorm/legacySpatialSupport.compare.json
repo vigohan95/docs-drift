@@ -1,0 +1,237 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm/legacySpatialSupport.compare",
+ "recorded_at": "2026-11-06T13:42:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1233,
+ "response_headers": {
+  "x-clocked-credits": "14",
+  "x-clocked-model-ms": "349.380211",
+  "x-clocked-cost-usd": "0.002789",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=503"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+    "text": "### Driver changes\n\n- **MySQL / MariaDB: `mysql` package dropped** — only `mysql2` is supported; the `connectorPackage` option has been removed ([#11766](https://github.com/typeorm/typeorm/pull/11766) by [@pkuczynski](https://github.com/pkuczynski))\n- **MySQL: `legacySpatialSupport` now defaults to `false`** — standard `ST_GeomFromText`/`ST_AsText` functions are used by default ([#12083](https://github.com/typeorm/typeorm/pull/12083) by [@pkuczynski](https://github.com/pkuczynski))\n- **MySQL: `width` and `zerofill` column options removed** — these were deprecated in MySQL 8.0.17 and removed in MySQL 8.4 ([#12084](https://github.com/typeorm/typeorm/pull/12084) by [@pkuczynski](https://github.com/pkuczynski))\n- **MySQL: `QueryBuilder.useIndex()` accepts index name(s), not raw SQL** — `useIndex()` now takes either a single index name or an array of names and escapes them as identifiers. Previously the argument was interpolated as a raw, comma-separated SQL fragment, which allowed identifier injection ([#12344](https://github.com/typeorm/typeorm/pull/12344) by [@eddieran](https://github.com/eddieran))\n- **SQLite: `sqlite3` dropped, `better-sqlite3` is the default** — the `sqlite3` package is no longer supported; `flags` and `busyTimeout` options have been removed ([#11836](https://github.com/typeorm/typeorm/pull/11836) by [@pkuczynski](https://github.com/pkuczynski))\n- **MongoDB: driver v7+ required** — support for MongoDB Node.js driver v5/v6 has been dropped; `stats()` method removed; deprecated connection options removed; internal types are no longer exported ([#12208](https://github.com/typeorm/typeorm/pull/12208) by [@naorpeled](https://github.com/naorpeled), [#12179](https://github.com/typeorm/typeorm/pull/12179) by [@pkuczynski](https://github.com/pkuczynski), [#12120](https://github.com/typeorm/typeorm/pull/12120) by [@pkuczynski](https://github.com/pkuczynski), [#12037](https://github.com/typeorm/typeorm/pull/12037) by [@alumni](https://github.com/alumni))\n- **MS SQL Server: `domain` connection option removed** — use `authentication` with NTLM type instead ([#12135](https://github.com/typeorm/typeorm/pull/12135) by [@pkuczynski](https://github.com/pkuczynski))\n- **MS SQL Server: `options.isolation` renamed to `options.isolationLevel`** — value format changed from `READ_COMMITTED` to `READ COMMITTED` to match `IsolationLevel` type; `SNAPSHOT` isolation level added ([#12231](https://github.com/typeorm/typeorm/pull/12231) by [@Cprakhar](https://github.com/Cprakhar))\n- **SAP HANA: deprecated connection aliases removed** — `hanaClientDriver`, `pool.max`, `pool.requestTimeout`, `pool.idleTimeout`, and others have been removed in favor of their modern equivalents ([#12080](https://github.com/typeorm/typeorm/pull/12080) by [@gioboa](https://github.com/gioboa))\n- **Expo: legacy driver removed** — the legacy Expo SQLite driver has been removed; use Expo SDK v52+ with the modern async API ([#11860](https://github.com/typeorm/typeorm/pull/11860) by [@G0maa](https://github.com/G0maa))\n- **Redis: legacy client support removed** — only modern Redis client (v4+) is supported for query result caching ([#12057](https://github.com/typeorm/typeorm/pull/12057) by [@G0maa](https://github.com/G0maa))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+    "text": "#### `legacySpatialSupport` default changed to `false`\n\nThe `legacySpatialSupport` option now defaults to `false`, meaning TypeORM uses the standard-compliant `ST_GeomFromText` and `ST_AsText` spatial functions introduced in MySQL 5.7 and required by MySQL 8.0+. The legacy `GeomFromText` and `AsText` functions were removed in MySQL 8.0.\n\nIf you are running MySQL 5.6 or earlier and rely on spatial types, set `legacySpatialSupport: true` explicitly:\n\n```typescript\nnew DataSource({\n    type: \"mysql\",\n    legacySpatialSupport: true,\n    // ...\n})\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/drivers/mysql.md#4",
+    "text": "- `multipleStatements` - Allow multiple mysql statements per query. Be careful with this, it could increase the scope\n  of SQL injection attacks. (Default: `false`)\n\n- `legacySpatialSupport` - Use legacy spatial functions like `GeomFromText` and `AsText` which have been replaced by the standard-compliant `ST_GeomFromText` or `ST_AsText` in MySQL 8.0. (Default: `false`)\n\n- `flags` - List of connection flags to use other than the default ones. It is also possible to blacklist default ones.\n  For more information, check [Connection Flags](https://github.com/mysqljs/mysql#connection-flags).\n\n- `ssl` - object with SSL parameters or a string containing the name of the SSL profile.\n  See [SSL options](https://github.com/mysqljs/mysql#ssl-options).\n\n- `enableQueryTimeout` - If a value is specified for maxQueryExecutionTime, in addition to generating a warning log when a query exceeds this time limit, the specified maxQueryExecutionTime value is also used as the timeout for the query. For more information, check [mysql timeouts](https://github.com/mysqljs/mysql#timeouts).\n\nAdditional options can be added to the `extra` object and will be passed directly to the client library. See more in the [mysql2 documentation](https://sidorares.github.io/node-mysql2/docs)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/drivers/mysql.md#4",
+     "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/drivers/mysql.md#4",
+     "typeorm:docs/docs/releases/1.0/01-release-notes.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/drivers/mysql.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+     "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+    "b": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+    "relation": "overlapping",
+    "related": 0.9959,
+    "probabilities": {
+     "same": 0.0246,
+     "overlapping": 0.9653,
+     "conflicting": 0.0059,
+     "unrelated": 0.0041
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0087,
+       "restated": 0.968,
+       "elaborated": 0.0158,
+       "different": 0.0075
+      },
+      "confidence": 0.9925,
+      "a": {
+       "document": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+       "quote": "- **MySQL: `legacySpatialSupport` now defaults to `false`** — standard `ST_GeomFromText`/`ST_AsText` functions are used by default ([#12083](https://github.com/typeorm/typeorm/pull/12083) by [@pkuczynski](https://github.com/pkuczynski))",
+       "start": 250,
+       "end": 486,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+       "quote": "#### `legacySpatialSupport` default changed to `false`\n\nThe `legacySpatialSupport` option now defaults to `false`, meaning TypeORM uses the standard-compliant `ST_GeomFromText` and `ST_AsText` spatial functions introduced in MySQL 5.7 and required by MySQL 8.0+.",
+       "start": 0,
+       "end": 262,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0115,
+       "restated": 0.9031,
+       "elaborated": 0.0516,
+       "different": 0.0339
+      },
+      "confidence": 0.911,
+      "a": {
+       "document": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+       "quote": "- **MySQL: `legacySpatialSupport` now defaults to `false`** — standard `ST_GeomFromText`/`ST_AsText` functions are used by default ([#12083](https://github.com/typeorm/typeorm/pull/12083) by [@pkuczynski](https://github.com/pkuczynski))",
+       "start": 250,
+       "end": 486,
+       "confidence": 0.911
+      },
+      "b": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+       "quote": "The legacy `GeomFromText` and `AsText` functions were removed in MySQL 8.0.\n\nIf you are running MySQL 5.6 or earlier and rely on spatial types, set `legacySpatialSupport: true` explicitly:\n\n```typescript\nnew DataSource({\n    type: \"mysql\",\n    legacySpatialSupport: true,\n    // ...\n})\n```",
+       "start": 263,
+       "end": 552,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+    "b": "typeorm:docs/docs/drivers/mysql.md#4",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.0151,
+     "overlapping": 0.9737,
+     "conflicting": 0.0071,
+     "unrelated": 0.0042
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0067,
+       "restated": 0.9752,
+       "elaborated": 0.0129,
+       "different": 0.0051
+      },
+      "confidence": 0.9949,
+      "a": {
+       "document": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+       "quote": "- **MySQL: `legacySpatialSupport` now defaults to `false`** — standard `ST_GeomFromText`/`ST_AsText` functions are used by default ([#12083](https://github.com/typeorm/typeorm/pull/12083) by [@pkuczynski](https://github.com/pkuczynski))",
+       "start": 250,
+       "end": 486,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/drivers/mysql.md#4",
+       "quote": "(Default: `false`)\n\n- `legacySpatialSupport` - Use legacy spatial functions like `GeomFromText` and `AsText` which have been replaced by the standard-compliant `ST_GeomFromText` or `ST_AsText` in MySQL 8.0.",
+       "start": 146,
+       "end": 352,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+    "b": "typeorm:docs/docs/drivers/mysql.md#4",
+    "relation": "overlapping",
+    "related": 0.9954,
+    "probabilities": {
+     "same": 0.0321,
+     "overlapping": 0.9539,
+     "conflicting": 0.0095,
+     "unrelated": 0.0046
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.012,
+       "restated": 0.8804,
+       "elaborated": 0.0982,
+       "different": 0.0094
+      },
+      "confidence": 0.9906,
+      "a": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+       "quote": "The `legacySpatialSupport` option now defaults to `false`, meaning TypeORM uses the standard-compliant `ST_GeomFromText` and `ST_AsText` spatial functions introduced in MySQL 5.7 and required by MySQL 8.0+.",
+       "start": 56,
+       "end": 262,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/drivers/mysql.md#4",
+       "quote": "(Default: `false`)\n\n- `legacySpatialSupport` - Use legacy spatial functions like `GeomFromText` and `AsText` which have been replaced by the standard-compliant `ST_GeomFromText` or `ST_AsText` in MySQL 8.0.",
+       "start": 146,
+       "end": 352,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0,
+   1,
+   2
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 44,
+   "passage_reads": 1,
+   "passages_ms": 156,
+   "passages": 4,
+   "counterparts_ms": 166
+  },
+  "timing": {
+   "read_ms": 364,
+   "total_ms": 370
+  }
+ }
+}

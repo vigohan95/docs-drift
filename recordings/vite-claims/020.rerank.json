@@ -1,0 +1,240 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/020.rerank",
+ "recorded_at": "2026-11-06T13:38:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1015,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.317665",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=228"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: The `vite preview` command will boot up a local static web server that serves the files from `dist` at `http://localhost:4173`.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/config/preview-options.md#3",
+    "title": "docs/config/preview-options.md > Preview Options > preview.port",
+    "text": "## preview.port\n\n- **Type:** `number`\n- **Default:** `4173`\n\nSpecify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on.\n\n**Example:**\n\n```js\nexport default defineConfig({\n  server: {\n    port: 3030,\n  },\n  preview: {\n    port: 8080,\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/guide/cli.md#9",
+    "title": "docs/guide/cli.md > Command Line Interface > Others > `vite preview`",
+    "text": "### `vite preview`\n\nLocally preview the production build. Do not use this as a production server as it's not designed for it.\n\nThis command starts a server in the build directory (by default `dist`). Run `vite build` beforehand to ensure that the build directory is up-to-date. Depending on the project's configured [`appType`](/config/shared-options#apptype), it makes use of certain middleware."
+   },
+   {
+    "id": "vite:docs/guide/backend-integration.md#1",
+    "title": "docs/guide/backend-integration.md > Backend Integration",
+    "text": "   In order to properly serve assets, you have two options:\n   - Make sure the server is configured to proxy static assets requests to the Vite server\n   - Set [`server.origin`](/config/server-options.md#server-origin) so that generated asset URLs will be resolved using the back-end server URL instead of a relative path\n\n   This is needed for assets such as images to load properly.\n\n   Note if you are using React with `@vitejs/plugin-react`, you'll also need to add this before the above scripts, since the plugin is not able to modify the HTML you are serving (substitute `http://localhost:5173` with the local URL Vite is running at):\n\n   ```html\n   <script type=\"module\">\n     import RefreshRuntime from 'http://localhost:5173/@react-refresh'\n     RefreshRuntime.injectIntoGlobalHook(window)\n     window.$RefreshReg$ = () => {}\n     window.$RefreshSig$ = () => (type) => type\n     window.__vite_plugin_react_preamble_installed__ = true\n   </script>\n   ```\n\n3. For production, after running `vite build`, a `.vite/manifest.json` file will be generated alongside other asset files. An example manifest file looks like this:\n\n   ```json [.vite/manifest.json] style:max-height:400px\n   {\n     \"_shared-B7PI925R.js\": {\n       \"file\": \"assets/shared-B7PI925R.js\",\n       \"name\": \"shared\",\n       \"css\": [\"assets/shared-ChJ_j-JJ.css\"]\n     },\n     \"_shared-ChJ_j-JJ.css\": {\n       \"file\": \"assets/shared-ChJ_j-JJ.css\",\n       \"src\": \"_shared-ChJ_j-JJ.css\"\n     },\n     \"logo.svg\": {\n       \"file\": \"assets/logo-BuPIv-2h.svg\",\n       \"src\": \"logo.svg\"\n     },\n     \"baz.js\": {\n       \"file\": \"assets/baz-B2H3sXNv.js\",\n       \"name\": \"baz\",\n       \"src\": \"baz.js\",\n       \"isDynamicEntry\": true\n     },\n     \"views/bar.js\": {\n       \"file\": \"assets/bar-gkvgaI9m.js\",\n       \"name\": \"bar\",\n       \"src\": \"views/bar.js\",\n       \"isEntry\": true,\n       \"imports\": [\"_shared-B7PI925R.js\"],\n       \"dynamicImports\": [\"baz.js\"]\n     },\n     \"views/foo.js\": {\n       \"file\": \"assets/foo-BRBmoGS9.js\",\n       \"name\": \"foo\",\n       \"src\": \"views/foo.js\",\n       \"isEntry\": true,\n       \"imports\": [\"_shared-B7PI925R.js\"],\n       \"css\": [\"assets/foo-5UjPuW-k.css\"]\n     }\n   }\n   ```"
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#25",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Default import unexpectedly returns an object",
+    "text": "### Default import unexpectedly returns an object\n\nThe default import returns the `module.exports` object for CJS modules, while you may expect it to return the `module.exports.default` value.\n\nThis may cause errors like:\n\n> Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.\n\n> foo is not a function\n\nSee Rolldown's docs about this problem for more details: [Ambiguous `default` import from CJS modules - Bundling CJS | Rolldown](https://rolldown.rs/in-depth/bundling-cjs#ambiguous-default-import-from-cjs-modules).\n\n<script setup lang=\"ts\">\n// redirect old links with hash to old version docs\nif (typeof window !== \"undefined\") {\n  const hashForOldVersion = {\n    'vite-cjs-node-api-deprecated': 6\n  }\n\n  const version = hashForOldVersion[location.hash.slice(1)]\n  if (version) {\n    // update the scheme and the port as well so that it works in local preview (it is http and 4173 locally)\n    location.href = `https://v${version}.vite.dev` + location.pathname + location.search + location.hash\n  }\n}\n</script>"
+   },
+   {
+    "id": "vite:docs/guide/index.md#6",
+    "title": "docs/guide/index.md > Getting Started > Manual Installation",
+    "text": "## Manual Installation\n\nIn your project, you can install the `vite` CLI using:\n\n::: code-group\n\n```bash [npm]\n$ npm install -D vite\n```\n\n```bash [Yarn]\n$ yarn add -D vite\n```\n\n```bash [pnpm]\n$ pnpm add -D vite\n```\n\n```bash [Bun]\n$ bun add -D vite\n```\n\n```bash [Deno]\n$ deno add -D npm:vite\n```\n\n:::\n\nAnd create an `index.html` file like this:\n\n```html\n<p>Hello Vite!</p>\n```\n\nThen run the appropriate CLI command in your terminal:\n\n::: code-group\n\n```bash [npm]\n$ npx vite\n```\n\n```bash [Yarn]\n$ yarn vite\n```\n\n```bash [pnpm]\n$ pnpm vite\n```\n\n```bash [Bun]\n$ bunx vite\n```\n\n```bash [Deno]\n$ deno run -A npm:vite\n```\n\n:::\n\nThe `index.html` will be served on `http://localhost:5173`."
+   },
+   {
+    "id": "vite:docs/guide/backend-integration.md#0",
+    "title": "docs/guide/backend-integration.md > Backend Integration",
+    "text": "# Backend Integration\n\n:::tip Note\nIf you want to serve the HTML using a traditional backend (e.g. Rails, Laravel) but use Vite for serving assets, check for existing integrations listed in [Awesome Vite](https://github.com/vitejs/awesome-vite#integrations-with-backends).\n\nIf you need a custom integration, you can follow the steps in this guide to configure it manually.\n:::\n\n1. In your Vite config, configure the entry and enable build manifest:\n\n   ```js twoslash [vite.config.js]\n   import { defineConfig } from 'vite'\n   // ---cut---\n   export default defineConfig({\n     // overwrite default .html entry\n     input: '/path/to/main.js',\n     server: {\n       cors: {\n         // the origin you will be accessing via browser\n         origin: 'http://my-backend.example.com',\n       },\n     },\n     build: {\n       // generate .vite/manifest.json in outDir\n       manifest: true,\n     },\n   })\n   ```\n\n   If you haven't disabled the [module preload polyfill](/config/build-options.md#build-polyfillmodulepreload), you also need to import the polyfill in your entry\n\n   ```js\n   // add the beginning of your app entry\n   import 'vite/modulepreload-polyfill'\n   ```\n\n2. For development, inject the following in your server's HTML template (substitute `http://localhost:5173` with the local URL Vite is running at):\n\n   ```html\n   <!-- if development -->\n   <script type=\"module\" src=\"http://localhost:5173/@vite/client\"></script>\n   <script type=\"module\" src=\"http://localhost:5173/main.js\"></script>\n   ```"
+   },
+   {
+    "id": "vite:docs/guide/dep-pre-bundling.md#1",
+    "title": "docs/guide/dep-pre-bundling.md > Dependency Pre-Bundling > The Why",
+    "text": "## The Why\n\nThis is Vite performing what we call \"dependency pre-bundling\". This process serves two purposes:\n\n1. **CommonJS and UMD compatibility:** During development, Vite serves all code as native ESM. Therefore, Vite must convert dependencies that are shipped as CommonJS or UMD into ESM first.\n\n   When converting CommonJS dependencies, Vite performs smart import analysis so that named imports to CommonJS modules will work as expected even if the exports are dynamically assigned (e.g. React):\n\n   ```js\n   // works as expected\n   import React, { useState } from 'react'\n   ```\n\n2. **Performance:** Vite converts ESM dependencies with many internal modules into a single module to improve subsequent page load performance.\n\n   Some packages ship their ES modules builds as many separate files importing one another. For example, [`lodash-es` has over 600 internal modules](https://unpkg.com/browse/lodash-es/)! When we do `import { debounce } from 'lodash-es'`, the browser fires off 600+ HTTP requests at the same time! Even though the server has no problem handling them, the large number of requests creates network congestion on the browser side, causing the page to load noticeably slower.\n\n   By pre-bundling `lodash-es` into a single module, we now only need one HTTP request instead!\n\n::: tip NOTE\nDependency pre-bundling only applies in development mode.\n:::"
+   },
+   {
+    "id": "vite:README.md#1",
+    "title": "README.md > Vite ⚡",
+    "text": "# Vite ⚡\n\n> Next Generation Frontend Tooling\n\n- 💡 Instant Server Start\n- ⚡️ Lightning Fast HMR\n- 🛠️ Rich Features\n- 📦 Optimized Build\n- 🔩 Universal Plugin Interface\n- 🔑 Fully Typed APIs\n\nVite (French word for \"quick\", pronounced [`/viːt/`](https://cdn.jsdelivr.net/gh/vitejs/vite@main/docs/public/vite.mp3), like \"veet\") is a build tool that aims to provide a faster and leaner development experience for modern web projects. It consists of two major parts:\n\n- A dev server that provides [rich feature enhancements](https://vite.dev/guide/features) over [native ES modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), for example extremely fast [Hot Module Replacement (HMR)](https://vite.dev/guide/features#hot-module-replacement).\n\n- A build command that bundles your code with [Rolldown](https://rolldown.rs), pre-configured to output highly optimized static assets for production.\n\nIn addition, Vite is highly extensible via its [Plugin API](https://vite.dev/guide/api-plugin.html) and [JavaScript API](https://vite.dev/guide/api-javascript.html) with full typing support.\n\n[Read the Docs to Learn More](https://vite.dev)."
+   },
+   {
+    "id": "vite:packages/vite/README.md#0",
+    "title": "packages/vite/README.md > Vite ⚡",
+    "text": "# Vite ⚡\n\n> Next Generation Frontend Tooling\n\n- 💡 Instant Server Start\n- ⚡️ Lightning Fast HMR\n- 🛠️ Rich Features\n- 📦 Optimized Build\n- 🔩 Universal Plugin Interface\n- 🔑 Fully Typed APIs\n\nVite (French word for \"quick\", pronounced [`/viːt/`](https://cdn.jsdelivr.net/gh/vitejs/vite@main/docs/public/vite.mp3), like \"veet\") is a build tool that aims to provide a faster and leaner development experience for modern web projects. It consists of two major parts:\n\n- A dev server that provides [rich feature enhancements](https://vite.dev/guide/features) over [native ES modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), for example extremely fast [Hot Module Replacement (HMR)](https://vite.dev/guide/features#hot-module-replacement).\n\n- A build command that bundles your code with [Rolldown](https://rolldown.rs), pre-configured to output highly optimized static assets for production.\n\nIn addition, Vite is highly extensible via its [Plugin API](https://vite.dev/guide/api-plugin.html) and [JavaScript API](https://vite.dev/guide/api-javascript.html) with full typing support.\n\n[Read the Docs to Learn More](https://vite.dev)."
+   },
+   {
+    "id": "vite:docs/guide/build.md#8",
+    "title": "docs/guide/build.md > Building for Production > Multi-Page App",
+    "text": "## Multi-Page App\n\nSuppose you have the following source code structure:\n\n```\n├── package.json\n├── vite.config.js\n├── index.html\n├── main.js\n└── nested\n    ├── index.html\n    └── nested.js\n```\n\nDuring dev, simply navigate or link to `/nested/` - it works as expected, just like for a normal static file server.\n\nDuring build, all you need to do is to specify multiple `.html` files as entry points:\n\n```js twoslash [vite.config.js]\nimport { resolve } from 'node:path'\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  input: {\n    main: resolve(import.meta.dirname, 'index.html'),\n    nested: resolve(import.meta.dirname, 'nested/index.html'),\n  },\n})\n```\n\nIf you specify a different root, remember that `import.meta.dirname` will still be the folder of your `vite.config.js` file when resolving the input paths. Therefore, you will need to add your `root` entry to the arguments for `resolve`.\n\nNote that for HTML files, Vite ignores the name given to the entry in the `rolldownOptions.input` object and instead respects the resolved id of the file when generating the HTML asset in the dist folder. This ensures a consistent structure with the way the dev server works."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/config/preview-options.md#3",
+    "action": "use",
+    "relevance_score": 0.9677,
+    "document_score": 0.982,
+    "levels": {
+     "answers": 0.9677,
+     "elsewhere": 0.0142,
+     "different_case": 0.0116,
+     "unrelated": 0.0064
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/cli.md#9",
+    "action": "expand",
+    "relevance_score": 0.2685,
+    "document_score": 0.9611,
+    "levels": {
+     "answers": 0.2685,
+     "elsewhere": 0.6926,
+     "different_case": 0.0198,
+     "unrelated": 0.0191
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/troubleshooting.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0542,
+    "document_score": 0.1006,
+    "levels": {
+     "answers": 0.0542,
+     "elsewhere": 0.0464,
+     "different_case": 0.0789,
+     "unrelated": 0.8206
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/index.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0132,
+    "document_score": 0.1791,
+    "levels": {
+     "answers": 0.0132,
+     "elsewhere": 0.1659,
+     "different_case": 0.0736,
+     "unrelated": 0.7473
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:README.md#1",
+    "action": "expand",
+    "relevance_score": 0.0074,
+    "document_score": 0.7565,
+    "levels": {
+     "answers": 0.0074,
+     "elsewhere": 0.7491,
+     "different_case": 0.0207,
+     "unrelated": 0.2228
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:packages/vite/README.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0045,
+    "document_score": 0.1177,
+    "levels": {
+     "answers": 0.0045,
+     "elsewhere": 0.1132,
+     "different_case": 0.0153,
+     "unrelated": 0.867
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/backend-integration.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0098,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0064,
+     "different_case": 0.0145,
+     "unrelated": 0.9757
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/backend-integration.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0121,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0093,
+     "different_case": 0.0096,
+     "unrelated": 0.9783
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/build.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.009,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0067,
+     "different_case": 0.0076,
+     "unrelated": 0.9834
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/dep-pre-bundling.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0018,
+     "different_case": 0.0029,
+     "unrelated": 0.9937
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4107
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5297,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

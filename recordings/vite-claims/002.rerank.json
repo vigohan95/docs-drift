@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/002.rerank",
+ "recorded_at": "2026-11-06T13:37:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 991,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.130722",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=301"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Default:** [`'last 2 versions and not dead, > 0.3%, Firefox ESR'`](https://browsersl.ist/#q=last+2+versions+and+not+dead%2C+%3E+0.3%25%2C+Firefox+ESR)",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-hmr.md#3",
+    "title": "docs/guide/api-hmr.md > HMR API > `hot.accept(cb)`",
+    "text": "## `hot.accept(cb)`\n\nFor a module to self-accept, use `import.meta.hot.accept` with a callback which receives the updated module:\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nexport const count = 1\n\nif (import.meta.hot) {\n  import.meta.hot.accept((newModule) => {\n    if (newModule) {\n      // newModule is undefined when SyntaxError happened\n      console.log('updated: count is now ', newModule.count)\n    }\n  })\n}\n```\n\nA module that \"accepts\" hot updates is considered an **HMR boundary**.\n\n```dot\ndigraph hmr_boundary {\n  rankdir=RL\n  ranksep=0.3\n  node [shape=box style=\"rounded,filled\" fontname=\"Arial\" fontsize=11 margin=\"0.2,0.1\" fontcolor=\"${#3c3c43|#ffffff}\" color=\"${#c2c2c4|#3c3f44}\"]\n  edge [color=\"${#67676c|#98989f}\" fontname=\"Arial\" fontsize=10 fontcolor=\"${#67676c|#98989f}\"]\n  bgcolor=\"transparent\"\n\n  root [label=\"main.js\" fillcolor=\"${#f6f6f7|#2e2e32}\"]\n  parent [label=\"App.vue\" fillcolor=\"${#f6f6f7|#2e2e32}\"]\n  boundary [label=\"Component.vue\\n(HMR boundary)\\nhot.accept()\" fillcolor=\"${#def5ed|#15312d}\" color=\"${#18794e|#3dd68c}\" penwidth=2]\n  edited [label=\"utils.js\\n(edited)\" fillcolor=\"${#fcf4dc|#38301a}\" color=\"${#915930|#f9b44e}\" penwidth=2]\n\n  boundary -> edited [label=\"imports\" color=\"${#915930|#f9b44e}\" style=bold]\n  parent -> boundary [label=\"imports\" style=dashed]\n  root -> parent [label=\"imports\" style=dashed]\n}\n```\n\nVite's HMR does not actually swap the originally imported module: if an HMR boundary module re-exports imports from a dep, then it is responsible for updating those re-exports (and these exports must be using `let`). In addition, importers up the chain from the boundary module will not be notified of the change. This simplified HMR implementation is sufficient for most dev use cases, while allowing us to skip the expensive work of generating proxy modules.\n\nVite requires that the call to this function appears as `import.meta.hot.accept(` (whitespace-sensitive) in the source code in order for the module to accept update. This is a requirement of the static analysis that Vite does to enable HMR support for a module."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#1",
+    "title": "docs/guide/migration.md > Migration from v7 > Default Browser Target Change [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)",
+    "text": "## Default Browser Target Change [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)\n\nThe default browser values of `build.target` and `'baseline-widely-available'` are updated to newer browser versions:\n\n- Chrome 107 → 111\n- Edge 107 → 111\n- Firefox 104 → 114\n- Safari 16.0 → 16.4\n\nThese browser versions align with [Baseline Widely Available](https://web-platform-dx.github.io/baseline/) feature sets as of 2026-01-01. In other words, they were all released about two and a half years ago."
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#0",
+    "title": "docs/guide/static-deploy.md > (preamble)",
+    "text": "<!--\n  READ THIS IF YOU WANT TO ADD A NEW DEPLOYMENT PLATFORM.\n\n  Feel free to submit a PR that adds a new section with a link to your platform's\n  deployment guide, as long as it meets these criteria:\n\n  1. Users should be able to deploy their site for free.\n  2. Free tier offerings should host the site indefinitely and are not time-bound.\n     Offering a limited number of computation resource or site counts in exchange is fine.\n  3. The linked guides should not contain any malicious content.\n  4. The platform must be in operation for at least 1 year. Please show some evidence of\n     this in your PR description.\n\n  New sections should be added last in the file. Please reference the existing sections at\n  the bottom of this file for examples of how to format the new section.\n\n  The Vite team may change the criteria and audit the current list from time to time.\n  If a section is removed, we will ping the original PR authors before doing so.\n-->"
+   },
+   {
+    "id": "vite:docs/guide/features.md#10",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options > `paths`",
+    "text": "#### `paths`\n\n- [TypeScript documentation](https://www.typescriptlang.org/tsconfig/#paths)\n\n[`resolve.tsconfigPaths: true`](/config/shared-options.md#resolve-tsconfigpaths) can be specified to tell Vite to use the `paths` option in `tsconfig.json` to resolve imports.\n\nNote that this feature has a performance cost and is [discouraged by the TypeScript team to use this option to change the behavior of the external tools](https://www.typescriptlang.org/tsconfig/#paths:~:text=Note%20that%20this%20feature%20does%20not%20change%20how%20import%20paths%20are%20emitted%20by%20tsc%2C%20so%20paths%20should%20only%20be%20used%20to%20inform%20TypeScript%20that%20another%20tool%20has%20this%20mapping%20and%20will%20use%20it%20at%20runtime%20or%20when%20bundling.)."
+   },
+   {
+    "id": "vite:docs/guide/build.md#1",
+    "title": "docs/guide/build.md > Building for Production > Browser Compatibility",
+    "text": "## Browser Compatibility\n\nBy default, the production bundle targets the minimum browser versions compatible with [Baseline](https://web-platform-dx.github.io/baseline/) Widely Available as of a date fixed for each major release. The default browser support range for this major is:\n\n<!-- Search for the `ESBUILD_BASELINE_WIDELY_AVAILABLE_TARGET` constant for more information -->\n\n- Chrome >=111\n- Edge >=111\n- Firefox >=114\n- Safari >=16.4\n\nYou can specify custom targets via the [`build.target` config option](/config/build-options.md#build-target), where the lowest target is `es2015`. If a lower target is set, Vite will still require these minimum browser support ranges as it relies on [native ESM dynamic import](https://caniuse.com/es6-module-dynamic-import), and [`import.meta`](https://caniuse.com/mdn-javascript_operators_import_meta):\n\n<!-- Search for the `defaultEsbuildSupported` constant for more information -->\n\n- Chrome >=64\n- Firefox >=67\n- Safari >=11.1\n- Edge >=79\n\nNote that by default, Vite only handles syntax transforms and **does not cover polyfills**. You can check out https://cdnjs.cloudflare.com/polyfill/ which automatically generates polyfill bundles based on the user's browser UserAgent string.\n\nLegacy browsers can be supported via [@vitejs/plugin-legacy](https://github.com/vitejs/vite/tree/main/packages/plugin-legacy), which will automatically generate legacy chunks and corresponding ES language feature polyfills. The legacy chunks are conditionally loaded only in browsers that do not have native ESM support."
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#13",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site > Surge",
+    "text": "## Surge\n\n1. Install [surge](https://www.npmjs.com/package/surge) via `npm i -g surge`.\n2. Run `npm run build`.\n3. Deploy to surge by typing `surge dist`.\n\nYou can also deploy to a [custom domain](https://surge.sh/help/adding-a-custom-domain) by adding `surge dist yourdomain.com`."
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#12",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site > Google Firebase",
+    "text": "## Google Firebase\n\n1. Install [firebase-tools](https://www.npmjs.com/package/firebase-tools) via `npm i -g firebase-tools`.\n\n2. Create the following files at the root of your project:\n\n   ::: code-group\n\n   ```json [firebase.json]\n   {\n     \"hosting\": {\n       \"public\": \"dist\",\n       \"ignore\": [],\n       \"rewrites\": [\n         {\n           \"source\": \"**\",\n           \"destination\": \"/index.html\"\n         }\n       ]\n     }\n   }\n   ```\n\n   ```js [.firebaserc]\n   {\n     \"projects\": {\n       \"default\": \"<YOUR_FIREBASE_ID>\"\n     }\n   }\n   ```\n\n   :::\n\n3. After running `npm run build`, deploy using the command `firebase deploy`."
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#8",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site > Vercel > Vercel CLI",
+    "text": "### Vercel CLI\n\n1. Install the [Vercel CLI](https://vercel.com/cli) via `npm i -g vercel` and run `vercel` to deploy.\n2. Vercel will detect that you are using Vite and will enable the correct settings for your deployment.\n3. Your application is deployed! (e.g. [vite-vue-template.vercel.app](https://vite-vue-template.vercel.app/))"
+   },
+   {
+    "id": "vite:docs/releases.md#5",
+    "title": "docs/releases.md > Releases > Semantic Versioning Edge Cases > Node.js non-LTS versions",
+    "text": "### Node.js non-LTS versions\n\nNon-LTS Node.js versions (odd-numbered) are not tested as part of Vite's CI, but they should still work before their [EOL](https://endoflife.date/nodejs)."
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#6",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site > Netlify > Netlify CLI",
+    "text": "### Netlify CLI\n\n1. Install the [Netlify CLI](https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/) via `npm install -g netlify-cli`.\n2. Create a new site using `netlify init`.\n3. Deploy using `netlify deploy`.\n\nThe Netlify CLI will share with you a preview URL to inspect. When you are ready to go into production, use the `prod` flag: `netlify deploy --prod`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "vite:docs/guide/build.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.2645,
+    "document_score": 0.2924,
+    "levels": {
+     "answers": 0.2645,
+     "elsewhere": 0.0279,
+     "different_case": 0.1708,
+     "unrelated": 0.5368
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/migration.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0121,
+    "document_score": 0.0371,
+    "levels": {
+     "answers": 0.0121,
+     "elsewhere": 0.0249,
+     "different_case": 0.0792,
+     "unrelated": 0.8838
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/releases.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.006,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0039,
+     "different_case": 0.01,
+     "unrelated": 0.984
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/features.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0009,
+     "different_case": 0.0049,
+     "unrelated": 0.9925
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/static-deploy.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.0026,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/static-deploy.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.002,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-hmr.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0026,
+     "unrelated": 0.9954
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/static-deploy.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0007,
+     "different_case": 0.0017,
+     "unrelated": 0.9964
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/static-deploy.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.002,
+     "unrelated": 0.9961
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/static-deploy.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.0017,
+     "unrelated": 0.9964
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3647
+  },
+  "timing": {
+   "total_ms": 112,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 4517,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

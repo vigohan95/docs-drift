@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/jest-mocked.rerank",
+ "recorded_at": "2026-11-06T13:42:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 947,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.739361",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=239"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `jest.mocked`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `jest.mocked`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/JestObjectAPI.md#13",
+    "title": "docs/JestObjectAPI.md > Mock Modules > `jest.mocked(source, options?)`",
+    "text": "### `jest.mocked(source, options?)`\n\nSee [TypeScript Usage](MockFunctionAPI.md#jestmockedsource-options) chapter of Mock Functions page for documentation."
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#40",
+    "title": "docs/MockFunctionAPI.md > TypeScript Usage > `jest.mocked(source, options?)`",
+    "text": "### `jest.mocked(source, options?)`\n\nThe `mocked()` helper method wraps types of the `source` object and its deep nested members with type definitions of Jest mock function. You can pass `{shallow: true}` as the `options` argument to disable the deeply mocked behavior.\n\nReturns the `source` object.\n\n```ts title=\"song.ts\"\nexport const song = {\n  one: {\n    more: {\n      time: (t: number) => {\n        return t;\n      },\n    },\n  },\n};\n```\n\n```ts title=\"song.test.ts\"\nimport {expect, jest, test} from '@jest/globals';\nimport {song} from './song';\n\njest.mock('./song');\njest.spyOn(console, 'log');\n\nconst mockedSong = jest.mocked(song);\n// or through `jest.Mocked<Source>`\n// const mockedSong = song as jest.Mocked<typeof song>;\n\ntest('deep method is typed correctly', () => {\n  mockedSong.one.more.time.mockReturnValue(12);\n\n  expect(mockedSong.one.more.time(10)).toBe(12);\n  expect(mockedSong.one.more.time.mock.calls).toHaveLength(1);\n});\n\ntest('direct usage', () => {\n  jest.mocked(console.log).mockImplementation(() => {\n    return;\n  });\n\n  console.log('one more time');\n\n  expect(jest.mocked(console.log).mock.calls).toHaveLength(1);\n});\n```"
+   },
+   {
+    "id": "jest:docs/UpgradingToJest29.md#7",
+    "title": "docs/UpgradingToJest29.md > TypeScript > `jest.mocked()`",
+    "text": "### `jest.mocked()`\n\nThe [`jest.mocked()`](MockFunctionAPI.md#jestmockedsource-options) helper method now wraps types of deep members of passed object by default. If you have used the method with `true` as the second argument, remove it to avoid type errors:\n\n```diff\n- const mockedObject = jest.mocked(someObject, true);\n+ const mockedObject = jest.mocked(someObject);\n```\n\nTo have the old shallow mocked behavior, pass `{shallow: true}` as the second argument:\n\n```diff\n- const mockedObject = jest.mocked(someObject);\n+ const mockedObject = jest.mocked(someObject, {shallow: true});\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "jest:docs/UpgradingToJest29.md#7",
+    "action": "use",
+    "relevance_score": 0.9919,
+    "document_score": 0.9944,
+    "levels": {
+     "answers": 0.9919,
+     "elsewhere": 0.0025,
+     "different_case": 0.0029,
+     "unrelated": 0.0027
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/MockFunctionAPI.md#40",
+    "action": "use",
+    "relevance_score": 0.9788,
+    "document_score": 0.9871,
+    "levels": {
+     "answers": 0.9788,
+     "elsewhere": 0.0083,
+     "different_case": 0.0074,
+     "unrelated": 0.0054
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/JestObjectAPI.md#13",
+    "action": "expand",
+    "relevance_score": 0.0037,
+    "document_score": 0.9843,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.9806,
+     "different_case": 0.006,
+     "unrelated": 0.0097
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 859
+  },
+  "timing": {
+   "total_ms": 59,
+   "rerank_ms": 44,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1264,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

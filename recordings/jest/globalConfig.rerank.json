@@ -1,0 +1,166 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/globalConfig.rerank",
+ "recorded_at": "2026-11-06T13:43:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 923,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.933792",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=244"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `globalConfig`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `globalConfig`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/Configuration.md#30",
+    "title": "docs/Configuration.md > Reference > `globalSetup` \\[string]",
+    "text": "### `globalSetup` \\[string]\n\nDefault: `undefined`\n\nThis option allows the use of a custom global setup module, which must export a function (it can be sync or async). The function will be triggered once before all test files and it will receive two arguments: Jest's [`globalConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L358-L422) and [`projectConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L424-L481).\n\n:::info\n\nA global setup module configured in a project (using multi-project runner) will be triggered only when you run at least one test from this project.\n\nAny global variables that are defined through `globalSetup` can only be read in `globalTeardown`. You cannot retrieve globals defined here in your test suites.\n\nWhile code transformation is applied to the linked setup-file, Jest will **not** transform any code in `node_modules`. This is due to the need to load the actual transformers (e.g. `babel` or `typescript`) to perform transformation.\n\n:::\n\n```js title=\"setup.js\"\nmodule.exports = async function (globalConfig, projectConfig) {\n  console.log(globalConfig.testPathPatterns);\n  console.log(projectConfig.cache);\n\n  // Set reference to mongod in order to close the server during teardown.\n  globalThis.__MONGOD__ = mongod;\n};\n```\n\n```js title=\"teardown.js\"\nmodule.exports = async function (globalConfig, projectConfig) {\n  console.log(globalConfig.testPathPatterns);\n  console.log(projectConfig.cache);\n\n  await globalThis.__MONGOD__.stop();\n};\n```"
+   },
+   {
+    "id": "jest:docs/Configuration.md#31",
+    "title": "docs/Configuration.md > Reference > `globalTeardown` \\[string]",
+    "text": "### `globalTeardown` \\[string]\n\nDefault: `undefined`\n\nThis option allows the use of a custom global teardown module which must export a function (it can be sync or async). The function will be triggered once after all test files and it will receive two arguments: Jest's [`globalConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L358-L422) and [`projectConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L424-L481).\n\n:::info\n\nA global teardown module configured in a project (using multi-project runner) will be triggered only when you run at least one test from this project.\n\nThe same caveat concerning transformation of `node_modules` as for `globalSetup` applies to `globalTeardown`.\n\n:::"
+   },
+   {
+    "id": "jest:docs/Configuration.md#55",
+    "title": "docs/Configuration.md > Reference > `reporters` \\[array&lt;moduleName | \\[moduleName, options]&gt;] > Custom Reporters",
+    "text": "#### Custom Reporters\n\n:::tip\n\nHungry for reporters? Take a look at long list of [awesome reporters](https://github.com/jest-community/awesome-jest/blob/main/README.md#reporters) from Awesome Jest.\n\n:::\n\nCustom reporter module must export a class that takes [`globalConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L358-L422), `reporterOptions` and `reporterContext` as constructor arguments:\n\n```js title=\"custom-reporter.js\"\nclass CustomReporter {\n  constructor(globalConfig, reporterOptions, reporterContext) {\n    this._globalConfig = globalConfig;\n    this._options = reporterOptions;\n    this._context = reporterContext;\n  }\n\n  onRunComplete(testContexts, results) {\n    console.log('Custom reporter output:');\n    console.log('global config:', this._globalConfig);\n    console.log('options for this reporter from Jest config:', this._options);\n    console.log('reporter context passed from test scheduler:', this._context);\n  }\n\n  // Optionally, reporters can force Jest to exit with non zero code by returning\n  // an `Error` from `getLastError()` method.\n  getLastError() {\n    if (this._shouldFail) {\n      return new Error('Custom error reported!');\n    }\n  }\n}\n\nmodule.exports = CustomReporter;\n```\n\n:::note\n\nFor the full list of hooks and argument types see the `Reporter` interface in [packages/jest-reporters/src/types.ts](https://github.com/jestjs/jest/blob/main/packages/jest-reporters/src/types.ts).\n\n:::"
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#10",
+    "title": "docs/UpgradingToJest30.md > Test Runner Behavior Changes > Custom Test Sequencers",
+    "text": "### Custom Test Sequencers\n\nIf you have a **custom test sequencer** (a class inheriting from Jest’s `TestSequencer`), you’ll need to update it for Jest 30. Jest now passes additional context to the test sequencer. Specifically, the `TestSequencer` API was extended to expose the `globalConfig` and `contexts` to your sequencer."
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#11",
+    "title": "docs/UpgradingToJest30.md > Test Runner Behavior Changes > Required `globalConfig` in Runtime",
+    "text": "### Required `globalConfig` in Runtime\n\nFor those using Jest’s programmatic APIs: constructing a `Runtime` now requires a `globalConfig` parameter. If you use `jest.runCLI` or similar helpers, make sure you pass all required options as per the updated API. (The typical `jest` CLI or `npm test` usage is unaffected by this change.)"
+   },
+   {
+    "id": "jest:docs/WatchPlugins.md#9",
+    "title": "docs/WatchPlugins.md > Watch Menu Integration > `run(globalConfig, updateConfigAndRun)`",
+    "text": "### `run(globalConfig, updateConfigAndRun)`\n\nTo handle key press events from the key returned by `getUsageInfo`, you can implement the `run` method. This method returns a `Promise<boolean>` that can be resolved when the plugin wants to return control to Jest. The `boolean` specifies if Jest should rerun the tests after it gets the control back.\n\n- [`globalConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L358-L422): A representation of Jest's current global configuration\n- `updateConfigAndRun`: Allows you to trigger a test run while the interactive plugin is running.\n\n```javascript\nclass MyWatchPlugin {\n  run(globalConfig, updateConfigAndRun) {\n    // do something.\n  }\n}\n```\n\n:::note\n\nIf you do call `updateConfigAndRun`, your `run` method should not resolve to a truthy value, as that would trigger a double-run.\n\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "jest:docs/UpgradingToJest30.md#11",
+    "action": "use",
+    "relevance_score": 0.9933,
+    "document_score": 0.9953,
+    "levels": {
+     "answers": 0.9933,
+     "elsewhere": 0.0019,
+     "different_case": 0.0022,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 5,
+    "id": "jest:docs/WatchPlugins.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0075,
+    "document_score": 0.0289,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.0214,
+     "different_case": 0.0136,
+     "unrelated": 0.9575
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/Configuration.md#31",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.0262,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.0213,
+     "different_case": 0.0213,
+     "unrelated": 0.9525
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/Configuration.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0043,
+    "document_score": 0.0173,
+    "levels": {
+     "answers": 0.0043,
+     "elsewhere": 0.013,
+     "different_case": 0.0199,
+     "unrelated": 0.9628
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/Configuration.md#55",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0094,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.006,
+     "different_case": 0.0183,
+     "unrelated": 0.9723
+    }
+   },
+   {
+    "index": 3,
+    "id": "jest:docs/UpgradingToJest30.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0091,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0064,
+     "different_case": 0.0104,
+     "unrelated": 0.9805
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2011
+  },
+  "timing": {
+   "total_ms": 62,
+   "rerank_ms": 61,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2821,
+    "branches": 6,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

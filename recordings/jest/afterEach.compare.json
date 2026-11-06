@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "jest/afterEach.compare",
+ "recorded_at": "2026-11-06T13:42:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 906,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.053055",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=221"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#3",
+    "text": "### `afterEach(fn, timeout)`\n\nRuns a function after each one of the tests in this file completes. If the function returns a promise or is a generator, Jest waits for that promise to resolve before continuing.\n\nOptionally, you can provide a `timeout` (in milliseconds) for specifying how long to wait before aborting. The default timeout is 5 seconds.\n\nThis is often useful if you want to clean up some temporary state that is created by each test.\n\nFor example:\n\n```js\nconst globalDatabase = makeGlobalDatabase();\n\nfunction cleanUpDatabase(db) {\n  db.cleanUp();\n}\n\nafterEach(() => {\n  cleanUpDatabase(globalDatabase);\n});\n\ntest('can find things', () => {\n  return globalDatabase.find('thing', {}, results => {\n    expect(results.length).toBeGreaterThan(0);\n  });\n});\n\ntest('can insert a thing', () => {\n  return globalDatabase.insert('thing', makeThing(), response => {\n    expect(response.success).toBeTruthy();\n  });\n});\n```\n\nHere the `afterEach` ensures that `cleanUpDatabase` is called after each test runs.\n\nIf `afterEach` is inside a `describe` block, it only runs after the tests that are inside this describe block.\n\nIf you want to run some cleanup just once, after all of the tests run, use `afterAll` instead."
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#1",
+    "text": "## Repeating Setup\n\nIf you have some work you need to do repeatedly for many tests, you can use `beforeEach` and `afterEach` hooks.\n\nFor example, let's say that several tests interact with a database of cities. You have a method `initializeCityDatabase()` that must be called before each of these tests, and a method `clearCityDatabase()` that must be called after each of these tests. You can do this with:\n\n```js\nbeforeEach(() => {\n  initializeCityDatabase();\n});\n\nafterEach(() => {\n  clearCityDatabase();\n});\n\ntest('city database has Vienna', () => {\n  expect(isCity('Vienna')).toBeTruthy();\n});\n\ntest('city database has San Juan', () => {\n  expect(isCity('San Juan')).toBeTruthy();\n});\n```\n\n`beforeEach` and `afterEach` can handle asynchronous code in the same ways that [tests can handle asynchronous code](TestingAsyncCode.md) - they can either take a `done` parameter or return a promise. For example, if `initializeCityDatabase()` returned a promise that resolved when the database was initialized, we would want to return that promise:\n\n```js\nbeforeEach(() => {\n  return initializeCityDatabase();\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/GlobalAPI.md#3",
+    "b": "jest:docs/SetupAndTeardown.md#1",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0051,
+     "overlapping": 0.9908,
+     "conflicting": 0.0027,
+     "unrelated": 0.0015
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 101,
+   "total_ms": 104
+  }
+ }
+}

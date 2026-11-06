@@ -1,0 +1,126 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/ManyToMany.rerank",
+ "recorded_at": "2026-11-06T13:42:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 884,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "60.734943",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=195"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@ManyToMany`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@ManyToMany`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#17",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Relation decorators > `@ManyToMany`",
+    "text": "#### `@ManyToMany`\n\nMany-to-many is a relation where A contains multiple instances of B, and B contain multiple instances of A.\nLet's take for example `Question` and `Category` entities.\nQuestion can have multiple categories, and each category can have multiple questions.\nExample:\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\nimport { Category } from \"./Category\"\n\n@Entity()\nexport class Question {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    title: string\n\n    @Column()\n    text: string\n\n    @ManyToMany((type) => Category)\n    @JoinTable()\n    categories: Category[]\n}\n```\n\nLearn more about [many-to-many relations](../relations/4-many-to-many-relations.md)."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#0",
+    "title": "docs/docs/relations/1-relations.md > Relations > What are relations?",
+    "text": "## What are relations?\n\nRelations helps you to work with related entities easily.\nThere are several types of relations:\n\n- [one-to-one](./2-one-to-one-relations.md) using `@OneToOne`\n- [many-to-one](./3-many-to-one-one-to-many-relations.md) using `@ManyToOne`\n- [one-to-many](./3-many-to-one-one-to-many-relations.md) using `@OneToMany`\n- [many-to-many](./4-many-to-many-relations.md) using `@ManyToMany`"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#0",
+    "title": "docs/docs/relations/4-many-to-many-relations.md > Many-to-many relations > What are many-to-many relations?",
+    "text": "## What are many-to-many relations?\n\nMany-to-many is a relation where A contains multiple instances of B, and B contains multiple instances of A.\nLet's take for example `Question` and `Category` entities.\nA question can have multiple categories, and each category can have multiple questions.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class Category {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\nimport { Category } from \"./Category\"\n\n@Entity()\nexport class Question {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    title: string\n\n    @Column()\n    text: string\n\n    @ManyToMany(() => Category)\n    @JoinTable()\n    categories: Category[]\n}\n```\n\n`@JoinTable()` is required for `@ManyToMany` relations.\nYou must put `@JoinTable` on one (owning) side of relation.\nThe `deferrable` relation option applies to both foreign keys on the junction table; see [relation options](./1-relations.md#relation-options).\n\nThis example will produce following tables:\n\n```text\n+-------------+--------------+----------------------------+\n|                        category                         |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| name        | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|                        question                         |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| title       | varchar(255) |                            |\n| text        | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|              question_categories_category               |\n+-------------+--------------+----------------------------+\n| questionId  | int          | PRIMARY KEY FOREIGN KEY    |\n| categoryId  | int          | PRIMARY KEY FOREIGN KEY    |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#15",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > Bug fixes > Persistence",
+    "text": "### Persistence\n\n- **Upsert with `update: false` or `generatedType`** — upsert now correctly handles columns that should not be updated ([#12030](https://github.com/typeorm/typeorm/pull/12030) by [@gioboa](https://github.com/gioboa))\n- **Value transformers applied to `FindOperator`s** — `ApplyValueTransformers` now correctly transforms values inside `FindOperator` instances like `In`, `Between`, etc. ([#11172](https://github.com/typeorm/typeorm/pull/11172) by [@ZimGil](https://github.com/ZimGil))\n- **Soft deletion no longer updates already soft-deleted rows** — `softDelete` and `softRemove` now skip rows that are already soft-deleted ([#10705](https://github.com/typeorm/typeorm/pull/10705) by [@hassanmehdi98](https://github.com/hassanmehdi98))\n- **Entity merge respects `null` values** — merging into an entity no longer silently drops `null` property values ([#11154](https://github.com/typeorm/typeorm/pull/11154) by [@knoid](https://github.com/knoid))\n- **Map/object comparison** — fixed incorrect change detection for Map and plain object column values ([#10990](https://github.com/typeorm/typeorm/pull/10990) by [@mgohin](https://github.com/mgohin))\n- **Date transformer change detection** — fixed false-positive dirty detection with date value transformers ([#11963](https://github.com/typeorm/typeorm/pull/11963) by [@gioboa](https://github.com/gioboa))\n- **Child mpath update** — tree entity mpath is now correctly updated when re-parenting, even with soft-deleted parents ([#10844](https://github.com/typeorm/typeorm/pull/10844) by [@JoseCToscano](https://github.com/JoseCToscano))\n- **Closure junction table schema/database propagation** — schema and database settings are now correctly propagated to closure junction tables ([#12110](https://github.com/typeorm/typeorm/pull/12110) by [@pkuczynski](https://github.com/pkuczynski))\n- **Virtual property handling in schema builder** — schema builder no longer attempts to create columns for virtual properties ([#11000](https://github.com/typeorm/typeorm/pull/11000) by [@skyran1278](https://github.com/skyran1278))\n- **Nameless `TableForeignKey` drop** — dropping a foreign key without an explicit name no longer fails ([#10744](https://github.com/typeorm/typeorm/pull/10744) by [@taichunmin](https://github.com/taichunmin))\n- **`getPendingMigrations` no longer creates the migrations table** — checking for pending migrations no longer has side effects ([#11672](https://github.com/typeorm/typeorm/pull/11672) by [@pkuczynski](https://github.com/pkuczynski))\n- **Many-to-many `deferrable` foreign keys** — `@ManyToMany` now honors the `deferrable` option on the junction table's foreign keys ([#11924](https://github.com/typeorm/typeorm/pull/11924) by [@smith-xyz](https://github.com/smith-xyz))\n- **Composite foreign key column order** — schema builder sorts referenced columns in composite foreign keys to match the referenced primary key index order, preventing MySQL / MSSQL / SAP HANA from rejecting the constraint ([#12280](https://github.com/typeorm/typeorm/pull/12280) by [@pkuczynski](https://github.com/pkuczynski))\n- **User-defined shared join columns preserved in change set** — explicit `@JoinColumn` entries shared between relations are no longer dropped during persistence ([#12354](https://github.com/typeorm/typeorm/pull/12354) by [@PreAgile](https://github.com/PreAgile))"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#0",
+    "action": "use",
+    "relevance_score": 0.9933,
+    "document_score": 0.9955,
+    "levels": {
+     "answers": 0.9933,
+     "elsewhere": 0.0022,
+     "different_case": 0.0026,
+     "unrelated": 0.0019
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#15",
+    "action": "use",
+    "relevance_score": 0.9368,
+    "document_score": 0.9494,
+    "levels": {
+     "answers": 0.9368,
+     "elsewhere": 0.0126,
+     "different_case": 0.0239,
+     "unrelated": 0.0267
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/relations/1-relations.md#0",
+    "action": "expand",
+    "relevance_score": 0.0046,
+    "document_score": 0.8525,
+    "levels": {
+     "answers": 0.0046,
+     "elsewhere": 0.848,
+     "different_case": 0.0124,
+     "unrelated": 0.1351
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0041,
+    "document_score": 0.037,
+    "levels": {
+     "answers": 0.0041,
+     "elsewhere": 0.0329,
+     "different_case": 0.0105,
+     "unrelated": 0.9525
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2275
+  },
+  "timing": {
+   "total_ms": 79,
+   "rerank_ms": 64,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 2815,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

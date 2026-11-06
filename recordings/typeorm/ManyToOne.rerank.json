@@ -1,0 +1,127 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/ManyToOne.rerank",
+ "recorded_at": "2026-11-06T13:43:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 938,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "56.862751",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=266"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@ManyToOne`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@ManyToOne`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#15",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Relation decorators > `@ManyToOne`",
+    "text": "#### `@ManyToOne`\n\nMany-to-one / one-to-many is a relation where A contains multiple instances of B, but B contains only one instance of A.\nLet's take for example `User` and `Photo` entities.\nUser can have multiple photos, but each photo is owned by only one single user.\nExample:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from \"typeorm\"\nimport { User } from \"./User\"\n\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @ManyToOne((type) => User, (user) => user.photos)\n    user: User\n}\n```\n\nLearn more about [many-to-one / one-to-many relations](../relations/3-many-to-one-one-to-many-relations.md)."
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#37",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Other decorators > `@ForeignKey`",
+    "text": "#### `@ForeignKey`\n\nThis decorator allows you to create a database foreign key for a specific column or columns.\nThis decorator can be applied to columns or an entity itself.\nUse it on a column when an foreign key on a single column is needed\nand use it on the entity when a single foreign key on multiple columns is required.\n\n> Note: **Do not use this decorator with relations.** Foreign keys are created automatically for relations\n> which you define using [Relation decorators](#relation-decorators) (`@ManyToOne`, `@OneToOne`, etc).\n> The `@ForeignKey` decorator should only be used to create foreign keys in the database when you\n> don't want to define an equivalent entity relationship.\n\nExamples:\n\n```typescript\n@Entity(\"orders\")\n@ForeignKey(() => City, [\"cityId\", \"countryCode\"], [\"id\", \"countryCode\"])\nexport class Order {\n    @PrimaryColumn()\n    id: number\n\n    @Column(\"uuid\", { name: \"user_uuid\" })\n    @ForeignKey<User>(\"User\", \"uuid\", { name: \"FK_user_uuid\" })\n    userUuid: string\n\n    @Column({ length: 2 })\n    @ForeignKey(() => Country, \"code\")\n    countryCode: string\n\n    @Column()\n    @ForeignKey(\"cities\")\n    cityId: number\n\n    @Column()\n    dispatchCountryCode: string\n\n    @ManyToOne(() => Country)\n    dispatchCountry: Country\n\n    @Column()\n    dispatchCityId: number\n\n    @ManyToOne(() => City)\n    dispatchCity: City\n}\n```\n\n```typescript\n@Entity(\"cities\")\n@Unique([\"id\", \"countryCode\"])\nexport class City {\n    @PrimaryColumn()\n    id: number\n\n    @Column({ length: 2 })\n    @ForeignKey(\"countries\", { onDelete: \"CASCADE\", onUpdate: \"CASCADE\" })\n    countryCode: string\n\n    @Column()\n    name: string\n}\n```\n\n```typescript\n@Entity(\"countries\")\nexport class Country {\n    @PrimaryColumn({ length: 2 })\n    code: string\n\n    @Column()\n    name: string\n}\n```\n\n```typescript\n@Entity(\"users\")\nexport class User {\n    @PrimaryColumn({ name: \"ref\" })\n    id: number\n\n    @Column(\"uuid\", { unique: true })\n    uuid: string\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#0",
+    "title": "docs/docs/relations/1-relations.md > Relations > What are relations?",
+    "text": "## What are relations?\n\nRelations helps you to work with related entities easily.\nThere are several types of relations:\n\n- [one-to-one](./2-one-to-one-relations.md) using `@OneToOne`\n- [many-to-one](./3-many-to-one-one-to-many-relations.md) using `@ManyToOne`\n- [one-to-many](./3-many-to-one-one-to-many-relations.md) using `@OneToMany`\n- [many-to-many](./4-many-to-many-relations.md) using `@ManyToMany`"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/3-many-to-one-one-to-many-relations.md#0",
+    "title": "docs/docs/relations/3-many-to-one-one-to-many-relations.md > Many-to-one / one-to-many relations",
+    "text": "# Many-to-one / one-to-many relations\n\nMany-to-one / one-to-many is a relation where A contains multiple instances of B, but B contains only one instance of A.\nLet's take for example `User` and `Photo` entities.\nUser can have multiple photos, but each photo is owned by only one single user.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from \"typeorm\"\nimport { User } from \"./User\"\n\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @ManyToOne(() => User, (user) => user.photos)\n    user: User\n}\n```\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, OneToMany } from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToMany(() => Photo, (photo) => photo.user)\n    photos: Photo[]\n}\n```\n\nHere we added `@OneToMany` to the `photos` property and specified the target relation type to be `Photo`.\nYou can omit `@JoinColumn` in a `@ManyToOne` / `@OneToMany` relation.\n`@OneToMany` cannot exist without `@ManyToOne`.\nIf you want to use `@OneToMany`, `@ManyToOne` is required. However, the inverse is not required: If you only care about the `@ManyToOne` relationship, you can define it without having `@OneToMany` on the related entity.\nWhere you set `@ManyToOne` - its related entity will have \"relation id\" and foreign key."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/relations/3-many-to-one-one-to-many-relations.md#0",
+    "action": "use",
+    "relevance_score": 0.9143,
+    "document_score": 0.9665,
+    "levels": {
+     "answers": 0.9143,
+     "elsewhere": 0.0521,
+     "different_case": 0.0128,
+     "unrelated": 0.0207
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0075,
+    "document_score": 0.0618,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.0543,
+     "different_case": 0.0176,
+     "unrelated": 0.9206
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0053,
+    "document_score": 0.0193,
+    "levels": {
+     "answers": 0.0053,
+     "elsewhere": 0.0141,
+     "different_case": 0.0239,
+     "unrelated": 0.9567
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/relations/1-relations.md#0",
+    "action": "expand",
+    "relevance_score": 0.0037,
+    "document_score": 0.7223,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.7186,
+     "different_case": 0.0105,
+     "unrelated": 0.2672
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1659
+  },
+  "timing": {
+   "total_ms": 146,
+   "rerank_ms": 130,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2199,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/042",
+ "recorded_at": "2026-11-06T13:43:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1003,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "125.591614",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=293"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/entity/5-view-entities.md#0",
+    "text": "## What is a ViewEntity?\n\nView entity is a class that maps to a database view.\nYou can create a view entity by defining a new class and mark it with `@ViewEntity()`:\n\n`@ViewEntity()` accepts following options:\n\n- `name` - view name. If not specified, then view name is generated from entity class name.\n- `database` - database name in selected DB server.\n- `schema` - schema name.\n- `expression` - view definition. **Required parameter**.\n- `dependsOn` - List of other views on which the current views depends. If your view uses another view in its definition, you can add it here so that [migrations](../migrations/01-why.md) are generated in the correct order.\n\n`expression` can be string with properly escaped columns and tables, depend on database used (postgres in example):\n\n```typescript\n@ViewEntity({\n    expression: `\n        SELECT \"post\".\"id\" AS \"id\", \"post\".\"name\" AS \"name\", \"category\".\"name\" AS \"categoryName\"\n        FROM \"post\" \"post\"\n        LEFT JOIN \"category\" \"category\" ON \"post\".\"categoryId\" = \"category\".\"id\"\n    `\n})\n```\n\nor an instance of QueryBuilder\n\n```typescript\n@ViewEntity({\n    expression: (dataSource: DataSource) => dataSource\n        .createQueryBuilder()\n        .select(\"post.id\", \"id\")\n        .addSelect(\"post.name\", \"name\")\n        .addSelect(\"category.name\", \"categoryName\")\n        .from(Post, \"post\")\n        .leftJoin(Category, \"category\", \"category.id = post.categoryId\")\n})\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#0",
+    "text": "#### `@Entity`\n\nMarks your model as an entity. Entity is a class which is transformed into a database table.\nYou can specify the table name in the entity:\n\n```typescript\n@Entity(\"users\")\nexport class User {}\n```\n\nThis code will create a database table named \"users\".\n\nYou can also specify some additional entity options:\n\n- `name` - table name. If not specified, then table name is generated from entity class name.\n- `database` - database name in selected DB server.\n- `schema` - schema name.\n- `comment` - Database table comment. Not supported by all database types. Currently supported by MySQL, MariaDB, PostgreSQL, SAP HANA.\n- `engine` - database engine to be set during table creation (works only in some databases).\n- `synchronize` - entities marked with `false` are skipped from schema updates.\n- `orderBy` - specifies default ordering for entities when using `find` operations and `QueryBuilder`.\n\nExample:\n\n```typescript\n@Entity({\n    name: \"users\",\n    engine: \"MyISAM\",\n    database: \"example_dev\",\n    schema: \"schema_with_best_tables\",\n    comment: \"This is users table\",\n    synchronize: false,\n    orderBy: {\n        name: \"ASC\",\n        id: \"DESC\",\n    },\n})\nexport class User {}\n```\n\nLearn more about [Entities](../entity/1-entities.md)."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/entity/5-view-entities.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/entity/5-view-entities.md#0",
+    "b": "typeorm:docs/docs/help/3-decorator-reference.md#0",
+    "relation": "overlapping",
+    "related": 0.6155,
+    "probabilities": {
+     "same": 0.0204,
+     "overlapping": 0.581,
+     "conflicting": 0.0142,
+     "unrelated": 0.3845
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 55,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 138,
+   "total_ms": 143
+  }
+ }
+}

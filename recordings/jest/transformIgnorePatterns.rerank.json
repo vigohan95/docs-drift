@@ -1,0 +1,126 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/transformIgnorePatterns.rerank",
+ "recorded_at": "2026-11-06T13:42:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 948,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.770336",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=256"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `transformIgnorePatterns`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `transformIgnorePatterns`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/CodeTransformation.md#4",
+    "title": "docs/CodeTransformation.md > Writing custom transformers",
+    "text": "Asynchronous transpilation can fall back to the synchronous `process` call if `processAsync` is unimplemented, but synchronous transpilation cannot use the asynchronous `processAsync` call. If your codebase is ESM only, implementing the async variants are sufficient. Otherwise, if any code is loaded through `require` (including `createRequire` from within ESM), then you need to implement the synchronous `process` variant.\n\nBe aware that `node_modules` is not transpiled with default config, the `transformIgnorePatterns` setting must be modified in order to do so.\n\nSemi-related to this are the supports flags we pass (see `CallerTransformOptions` above), but those should be used within the transform to figure out if it should return ESM or CJS, and has no direct bearing on sync vs async\n\nThough not required, we _highly recommend_ implementing `getCacheKey` as well, so we do not waste resources transpiling when we could have read its previous result from disk. You can use [`@jest/create-cache-key-function`](https://www.npmjs.com/package/@jest/create-cache-key-function) to help implement it.\n\nInstead of having your custom transformer implement the `Transformer` interface directly, you can choose to export `createTransformer`, a factory function to dynamically create transformers. This is to allow having a transformer config in your jest config."
+   },
+   {
+    "id": "jest:docs/Configuration.md#90",
+    "title": "docs/Configuration.md > Reference > `transform` \\[object&lt;string, pathToTransformer | \\[pathToTransformer, object]&gt;]",
+    "text": "### `transform` \\[object&lt;string, pathToTransformer | \\[pathToTransformer, object]&gt;]\n\nDefault: `{\"\\\\.[jt]sx?$\": \"babel-jest\"}`\n\nA map from regular expressions to paths to transformers. Optionally, a tuple with configuration options can be passed as second argument: `{filePattern: ['path-to-transformer', {options}]}`. For example, here is how you can configure `babel-jest` for non-default behavior: `{'\\\\.js$': ['babel-jest', {rootMode: 'upward'}]}`.\n\nJest runs the code of your project as JavaScript, hence a transformer is needed if you use some syntax not supported by Node out of the box (such as JSX, TypeScript, Vue templates). By default, Jest will use [`babel-jest`](https://github.com/jestjs/jest/tree/main/packages/babel-jest#setup) transformer, which will load your project's Babel configuration and transform any file matching the `/\\.[jt]sx?$/` RegExp (in other words, any `.js`, `.jsx`, `.ts` or `.tsx` file). In addition, `babel-jest` will inject the Babel plugin necessary for mock hoisting talked about in [ES Module mocking](ManualMocks.md#using-with-es-module-imports).\n\nSee the [Code Transformation](CodeTransformation.md) section for more details and instructions on building your own transformer.\n\nWhen no transformer matches a `.ts`, `.mts` or `.cts` file, Jest erases its type annotations with [`module.stripTypeScriptTypes()`](https://nodejs.org/api/module.html#modulestriptypescripttypescode-options), the same way Node does. This needs Node.js `^22.13.0` or `>=23.2.0`, and it only erases types — see [Using TypeScript](GettingStarted.md#via-nodes-type-stripping) for the limits. `transformIgnorePatterns` applies, so files under `node_modules` are left alone."
+   },
+   {
+    "id": "jest:docs/Configuration.md#92",
+    "title": "docs/Configuration.md > Reference > `transformIgnorePatterns` \\[array&lt;string&gt;]",
+    "text": "### `transformIgnorePatterns` \\[array&lt;string&gt;]\n\nDefault: `[\"/node_modules/\", \"\\\\.pnp\\\\.[^\\\\\\/]+$\"]`\n\nAn array of regexp pattern strings that are matched against all source file paths before transformation. If the file path matches **any** of the patterns, it will not be transformed.\n\nProviding regexp patterns that overlap with each other may result in files not being transformed that you expected to be transformed. For example:\n\n```js tab title=\"jest.config.js\"\nconst {defineConfig} = require('jest');\n\nmodule.exports = defineConfig({\n  transformIgnorePatterns: ['/node_modules/(?!(foo|bar)/)', '/bar/'],\n});\n```\n\n```ts tab title=\"jest.config.ts\"\nimport {defineConfig} from 'jest';\n\nexport default defineConfig({\n  transformIgnorePatterns: ['/node_modules/(?!(foo|bar)/)', '/bar/'],\n});\n```\n\nThe first pattern will match (and therefore not transform) files inside `/node_modules` except for those in `/node_modules/foo/` and `/node_modules/bar/`. The second pattern will match (and therefore not transform) files inside any path with `/bar/` in it. With the two together, files in `/node_modules/bar/` will not be transformed because it does match the second pattern, even though it was excluded by the first.\n\nSometimes it happens (especially in React Native or TypeScript projects) that 3rd party modules are published as untranspiled code. Since all files inside `node_modules` are not transformed by default, Jest will not understand the code in these modules, resulting in syntax errors. To overcome this, you may use `transformIgnorePatterns` to allow transpiling such modules. You'll find a good example of this use case in [React Native Guide](/docs/tutorial-react-native#transformignorepatterns-customization)."
+   },
+   {
+    "id": "jest:docs/TutorialReactNative.md#7",
+    "title": "docs/TutorialReactNative.md > Preset configuration > transformIgnorePatterns customization",
+    "text": "### transformIgnorePatterns customization\n\nThe [`transformIgnorePatterns`](configuration#transformignorepatterns-arraystring) option can be used to specify which files shall be transformed by Babel. Many `react-native` npm modules unfortunately don't pre-compile their source code before publishing.\n\nBy default the `jest-react-native` preset only processes the project's own source files and `react-native`. If you have npm dependencies that have to be transformed you can customize this configuration option by including modules other than `react-native` by grouping them and separating them with the `|` operator:\n\n```json\n{\n  \"transformIgnorePatterns\": [\"node_modules/(?!((@)?react-native|my-project)/)\"]\n}\n```\n\nYou can test which paths would match (and thus be excluded from transformation) with a tool [like this](https://regex101.com/r/JsLIDM/1).\n\n`transformIgnorePatterns` will exclude a file from transformation if the path matches against **any** pattern provided. Splitting into multiple patterns could therefore have unintended results if you are not careful. In the example below, the exclusion (also known as a negative lookahead assertion) for `foo` and `bar` cancel each other out:\n\n```json\n{\n  \"transformIgnorePatterns\": [\"node_modules/(?!foo/)\", \"node_modules/(?!bar/)\"] // not what you want\n}\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "jest:docs/Configuration.md#92",
+    "action": "use",
+    "relevance_score": 0.996,
+    "document_score": 0.9972,
+    "levels": {
+     "answers": 0.996,
+     "elsewhere": 0.0012,
+     "different_case": 0.0013,
+     "unrelated": 0.0016
+    }
+   },
+   {
+    "index": 3,
+    "id": "jest:docs/TutorialReactNative.md#7",
+    "action": "use",
+    "relevance_score": 0.9908,
+    "document_score": 0.9944,
+    "levels": {
+     "answers": 0.9908,
+     "elsewhere": 0.0037,
+     "different_case": 0.0034,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/CodeTransformation.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0216,
+    "document_score": 0.1518,
+    "levels": {
+     "answers": 0.0216,
+     "elsewhere": 0.1302,
+     "different_case": 0.051,
+     "unrelated": 0.7972
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/Configuration.md#90",
+    "action": "expand",
+    "relevance_score": 0.0192,
+    "document_score": 0.5426,
+    "levels": {
+     "answers": 0.0192,
+     "elsewhere": 0.5233,
+     "different_case": 0.0714,
+     "unrelated": 0.386
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1845
+  },
+  "timing": {
+   "total_ms": 141,
+   "rerank_ms": 126,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2385,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/023.rerank",
+ "recorded_at": "2026-11-06T13:37:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 994,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.503426",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=299"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: More information about text escaping can be found in the original UTF-8 [Proposal document](https://github.com/prometheus/proposals/blob/main/proposals/2023-08-21-utf8.md#text-escaping).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#19",
+    "title": "docs/feature_flags.md > Type and Unit Labels",
+    "text": "## Type and Unit Labels\n\n`--enable-feature=type-and-unit-labels`\n\nWhen enabled, Prometheus will start injecting additional, reserved `__type__`\nand `__unit__` labels as designed in the [PROM-39 proposal](https://github.com/prometheus/proposals/pull/39).\n\nThose labels are sourced from the metadata structures of the existing scrape and ingestion formats\nlike OpenMetrics Text, Prometheus Text, Prometheus Proto, Remote Write 2 and OTLP, as well as `type` and `unit` metadata configured on recording rules. All the user provided labels with\n`__type__` and `__unit__` will be overridden.\n\nPromQL layer will handle those labels the same way `__name__` is handled, e.g. dropped\non certain operations like `-` or `+` and affected by `promql-delayed-name-removal` feature.\n\nThis feature enables important metadata information to be accessible directly with samples and PromQL layer.\n\nIt's especially useful for users who:\n\n* Want to be able to select metrics based on type or unit.\n* Want to handle cases of series with the same metric name and different type and units.\n  e.g. native histogram migrations or OpenTelemetry metrics from OTLP endpoint, without translation.\n\nIn future more [work is planned](https://github.com/prometheus/prometheus/issues/16610) that will depend on this e.g. rich PromQL UX that helps\nwhen wrong types are used on wrong functions, automatic renames, delta types and more."
+   },
+   {
+    "id": "prometheus:docs/storage.md#12",
+    "title": "docs/storage.md > Remote storage integrations > Existing integrations",
+    "text": "### Existing integrations\n\nTo learn more about existing integrations with remote storage systems, see the\n[Integrations documentation](https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage)."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#21",
+    "title": "docs/feature_flags.md > Use Uncached IO",
+    "text": "## Use Uncached IO\n\n`--enable-feature=use-uncached-io`\n\nExperimental and only available on Linux.\n\nWhen enabled, it makes chunks writing bypass the page cache. Its primary\ngoal is to reduce confusion around page‐cache behavior and to prevent over‑allocation of\nmemory in response to misleading cache growth.\n\nThis is currently implemented using direct I/O.\n\nFor more details, see the [proposal](https://github.com/prometheus/proposals/pull/45)."
+   },
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#0",
+    "title": "tsdb/docs/bstream.md > bstream details",
+    "text": "# bstream details\n\nThis doc describes details of the bstream (bitstream) and how we use it for encoding and decoding.\nThis doc is incomplete.  For more background, see the Gorilla TSDB [white paper](http://www.vldb.org/pvldb/vol8/p1816-teller.pdf)\nor the original [go-tsz](https://github.com/dgryski/go-tsz) implementation, which this code is based on."
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#14",
+    "title": "documentation/internal_architecture.md > Internal architecture > Storage > Local storage",
+    "text": "### Local storage\n\nAbout Prometheus's local on-disk time series database, please refer to [`github.com/prometheus/prometheus/tsdb.DB`](https://github.com/prometheus/prometheus/blob/main/tsdb/db.go). You can find more details about the TSDB's on-disk layout in the [local storage documentation](https://prometheus.io/docs/prometheus/latest/storage/)."
+   },
+   {
+    "id": "prometheus:docs/migration.md#9",
+    "title": "docs/migration.md > Miscellaneous > UTF-8 names",
+    "text": "### UTF-8 names\n\nPrometheus v3 supports UTF-8 in metric and label names. This means metric and\nlabel names can change after upgrading according to what is exposed by\nendpoints. Furthermore, metric and label names that would have previously been\nflagged as invalid no longer will be.\n\nUsers wishing to preserve the original validation behavior can update their\nPrometheus yaml configuration to specify the legacy validation scheme:\n\n```\nglobal:\n  metric_name_validation_scheme: legacy\n```\n\nOr on a per-scrape basis:\n\n```\nscrape_configs:\n  - job_name: job1\n    metric_name_validation_scheme: utf8\n  - job_name: job2\n    metric_name_validation_scheme: legacy\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#12",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "# Limit per scrape config on the number of targets dropped by relabeling\n# that will be kept in memory. 0 means no limit.\n[ keep_dropped_targets: <int> | default = 0 ]\n\n# Specifies the validation scheme for metric and label names. Either blank or\n# \"utf8\" for full UTF-8 support, or \"legacy\" for letters, numbers, colons, and\n# underscores.\n[ metric_name_validation_scheme: <string> | default \"utf8\" ]\n\n# Specifies the character escaping scheme that will be requested when scraping\n# for metric and label names that do not conform to the legacy Prometheus\n# character set. Available options are:\n#   * `allow-utf-8`: Full UTF-8 support, no escaping needed.\n#   * `underscores`: Escape all legacy-invalid characters to underscores.\n#   * `dots`: Escapes dots to `_dot_`, underscores to `__`, and all other\n#     legacy-invalid characters to underscores.\n#   * `values`: Prepend the name with `U__` and replace all invalid\n#     characters with their unicode value, surrounded by underscores. Single\n#     underscores are replaced with double underscores.\n#     e.g. \"U__my_2e_dotted_2e_name\".\n# If this value is left blank, Prometheus will default to `allow-utf-8` if the\n# validation scheme for the current scrape config is set to utf8, or\n# `underscores` if the validation scheme is set to `legacy`.\n[ metric_name_escaping_scheme: <string> | default \"allow-utf-8\" ]\n\n# Limit on total number of positive and negative buckets allowed in a single\n# native histogram. The resolution of a histogram with more buckets will be\n# reduced until the number of buckets is within the limit. If the limit cannot\n# be reached, the scrape will fail.\n# 0 means no limit.\n[ native_histogram_bucket_limit: <int> | default = 0 ]\n\n# Lower limit for the growth factor of one bucket to the next in each native\n# histogram. The resolution of a histogram with a lower growth factor will be\n# reduced as much as possible until it is within the limit.\n# To set an upper limit for the schema (equivalent to \"scale\" in OTel's\n# exponential histograms), use the following factor limits:\n#\n# +----------------------------+----------------------------+\n# |        growth factor       | resulting schema AKA scale |\n# +----------------------------+----------------------------+\n# |          65536             |             -4             |\n# +----------------------------+----------------------------+\n# |            256             |             -3             |\n# +----------------------------+----------------------------+\n# |             16             |             -2             |\n# +----------------------------+----------------------------+\n# |              4             |             -1             |\n# +----------------------------+----------------------------+\n# |              2             |              0             |\n# +----------------------------+----------------------------+\n# |              1.4           |              1             |\n# +----------------------------+----------------------------+\n# |              1.1           |              2             |\n# +----------------------------+----------------------------+\n# |              1.09          |              3             |\n# +----------------------------+----------------------------+\n# |              1.04          |              4             |\n# +----------------------------+----------------------------+\n# |              1.02          |              5             |\n# +----------------------------+----------------------------+\n# |              1.01          |              6             |"
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#6",
+    "title": "documentation/internal_architecture.md > Internal architecture > Scrape discovery manager",
+    "text": "## Scrape discovery manager\n\nThe scrape discovery manager is a [`discovery.Manager`](https://github.com/prometheus/prometheus/blob/v2.3.1/discovery/manager.go#L73-L89) that uses Prometheus's service discovery functionality to find and continuously update the list of targets from which Prometheus should scrape metrics. It runs independently of the scrape manager (which performs the actual target scrapes) and feeds it with a stream of [target group](https://github.com/prometheus/prometheus/blob/v2.3.1/discovery/targetgroup/targetgroup.go#L24-L33) updates over a [synchronization channel](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L431).\n\nInternally, the scrape discovery manager runs an instance of each configuration-defined service discovery mechanism in its own goroutine. For example, if a `scrape_config` in the configuration file defines two [`kubernetes_sd_config` sections](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config), the manager will run two separate [`kubernetes.Discovery`](https://github.com/prometheus/prometheus/blob/v2.3.1/discovery/kubernetes/kubernetes.go#L150-L159) instances. Each of these discovery instances implements the [`discovery.Discoverer` interface](https://github.com/prometheus/prometheus/blob/v2.3.1/discovery/manager.go#L41-L55) and sends target updates over a synchronization channel to the controlling discovery manager, which then enriches the target group update with information about the specific discovery instance and forwards it to the scrape manager.\n\nWhen a configuration change is applied, the discovery manager stops all currently running discovery mechanisms and restarts new ones as defined in the new configuration file.\n\nFor more details, see the more extensive [documentation about service discovery internals](https://github.com/prometheus/prometheus/blob/main/discovery/README.md)."
+   },
+   {
+    "id": "prometheus:docs/http_sd.md#4",
+    "title": "docs/http_sd.md > HTTP SD integrations",
+    "text": "## HTTP SD integrations\n\nA list of existing HTTP SD integrations can be found on the [Integrations page](https://prometheus.io/docs/operating/integrations/#http-service-discovery) in the Prometheus documentation."
+   },
+   {
+    "id": "prometheus:README.md#12",
+    "title": "README.md > React UI Development",
+    "text": "## React UI Development\n\nFor more information on building, running, and developing on the React-based UI, see the React app's [README.md](web/ui/README.md)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 6,
+    "id": "prometheus:docs/configuration/configuration.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0497,
+    "document_score": 0.2796,
+    "levels": {
+     "answers": 0.0497,
+     "elsewhere": 0.2299,
+     "different_case": 0.077,
+     "unrelated": 0.6434
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/migration.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0041,
+    "document_score": 0.0088,
+    "levels": {
+     "answers": 0.0041,
+     "elsewhere": 0.0047,
+     "different_case": 0.0071,
+     "unrelated": 0.9841
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:tsdb/docs/bstream.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0061,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.0031,
+     "different_case": 0.0047,
+     "unrelated": 0.9892
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:documentation/internal_architecture.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0076,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0049,
+     "different_case": 0.0066,
+     "unrelated": 0.9858
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/storage.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0015,
+     "different_case": 0.0034,
+     "unrelated": 0.9936
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:documentation/internal_architecture.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0009,
+     "different_case": 0.0022,
+     "unrelated": 0.9953
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/feature_flags.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.001,
+     "different_case": 0.0027,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/http_sd.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0012,
+     "different_case": 0.0023,
+     "unrelated": 0.9952
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:README.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0009,
+     "different_case": 0.0017,
+     "unrelated": 0.9963
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/feature_flags.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0008,
+     "different_case": 0.0017,
+     "unrelated": 0.9965
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3399
+  },
+  "timing": {
+   "total_ms": 112,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 4429,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 85,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

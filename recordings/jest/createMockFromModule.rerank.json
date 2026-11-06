@@ -1,0 +1,91 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/createMockFromModule.rerank",
+ "recorded_at": "2026-11-06T13:43:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 973,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.997696",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=226"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `createMockFromModule`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `createMockFromModule`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/JestObjectAPI.md#4",
+    "title": "docs/JestObjectAPI.md > Mock Modules > `jest.createMockFromModule(moduleName)`",
+    "text": "### `jest.createMockFromModule(moduleName)`\n\nGiven the name of a module, use the automatic mocking system to generate a mocked version of the module for you.\n\nThis is useful when you want to create a [manual mock](ManualMocks.md) that extends the automatic mock's behavior:\n\n```js tab={\"span\":2} title=\"utils.js\"\nmodule.exports = {\n  authorize: () => {\n    return 'token';\n  },\n  isAuthorized: secret => secret === 'wizard',\n};\n```\n\n```js title=\"__tests__/createMockFromModule.test.js\"\nconst utils = jest.createMockFromModule('../utils');\n\nutils.isAuthorized = jest.fn(secret => secret === 'not wizard');\n\ntest('implementation created by jest.createMockFromModule', () => {\n  expect(jest.isMockFunction(utils.authorize)).toBe(true);\n  expect(utils.isAuthorized('not wizard')).toBe(true);\n});\n```\n\n```ts tab={\"span\":2} title=\"utils.ts\"\nexport const utils = {\n  authorize: () => {\n    return 'token';\n  },\n  isAuthorized: (secret: string) => secret === 'wizard',\n};\n```\n\n```ts title=\"__tests__/createMockFromModule.test.ts\"\nconst {utils} =\n  jest.createMockFromModule<typeof import('../utils')>('../utils');\n\nutils.isAuthorized = jest.fn((secret: string) => secret === 'not wizard');\n\ntest('implementation created by jest.createMockFromModule', () => {\n  expect(jest.isMockFunction(utils.authorize)).toBe(true);\n  expect(utils.isAuthorized('not wizard')).toBe(true);\n});\n```\n\nThis is how `createMockFromModule` will mock the following data types:"
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#16",
+    "title": "docs/UpgradingToJest30.md > Jest Mock API Changes > `jest.genMockFromModule` Removed",
+    "text": "### `jest.genMockFromModule` Removed\n\nThe legacy function `jest.genMockFromModule(moduleName)` has been removed. It was previously deprecated in favor of `jest.createMockFromModule(moduleName)`. If you still use `genMockFromModule`, switch to `createMockFromModule` – the behavior is the same. For example:\n\nOld code (Jest 29):\n\n```js\nconst mockFs = jest.genMockFromModule('fs');\n```\n\nNew code (Jest 30):\n\n```js\nconst mockFs = jest.createMockFromModule('fs');\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "jest:docs/UpgradingToJest30.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.037,
+    "document_score": 0.2674,
+    "levels": {
+     "answers": 0.037,
+     "elsewhere": 0.2304,
+     "different_case": 0.0468,
+     "unrelated": 0.6858
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/JestObjectAPI.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.015,
+    "document_score": 0.2606,
+    "levels": {
+     "answers": 0.015,
+     "elsewhere": 0.2456,
+     "different_case": 0.0469,
+     "unrelated": 0.6926
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 745
+  },
+  "timing": {
+   "total_ms": 41,
+   "rerank_ms": 41,
+   "questions_ms": 0,
+   "model_ms": 34,
+   "engine": {
+    "rows": 1015,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1024,
+    "long": 0,
+    "total_ms": 34,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 30,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

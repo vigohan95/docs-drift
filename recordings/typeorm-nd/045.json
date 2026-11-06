@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/045",
+ "recorded_at": "2026-11-06T13:43:24Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1013,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "126.38954",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=337"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "text": "We just created a uni-directional relation. Let's make it bi-directional:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, OneToOne } from \"typeorm\"\nimport { User } from \"./User\"\n\n@Entity()\nexport class Profile {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    gender: string\n\n    @Column()\n    photo: string\n\n    @OneToOne(() => User, (user) => user.profile) // specify inverse side as a second parameter\n    user: User\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne(() => Profile, (profile) => profile.user) // specify inverse side as a second parameter\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nWe just made our relation bi-directional. Note, inverse relation does not have a `@JoinColumn`.\n`@JoinColumn` must only be on one side of the relation - on the table that will own the foreign key.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst profiles = await dataSource\n    .getRepository(Profile)\n    .createQueryBuilder(\"profile\")\n    .leftJoinAndSelect(\"profile.user\", \"user\")\n    .getMany()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "text": "## Bi-directional relations\n\nRelations can be uni-directional and bi-directional.\nUni-directional relations are relations with a relation decorator only on one side.\nBi-directional relations are relations with decorators on both sides of a relation.\n\nWe just created a uni-directional relation. Let's make it bi-directional:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from \"typeorm\"\nimport { Question } from \"./Question\"\n\n@Entity()\nexport class Category {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @ManyToMany(() => Question, (question) => question.categories)\n    questions: Question[]\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\nimport { Category } from \"./Category\"\n\n@Entity()\nexport class Question {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    title: string\n\n    @Column()\n    text: string\n\n    @ManyToMany(() => Category, (category) => category.questions)\n    @JoinTable()\n    categories: Category[]\n}\n```\n\nWe just made our relation bi-directional. Note that the inverse relation does not have a `@JoinTable`.\n`@JoinTable` must be only on one side of the relation.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst categoriesWithQuestions = await dataSource\n    .getRepository(Category)\n    .createQueryBuilder(\"category\")\n    .leftJoinAndSelect(\"category.questions\", \"question\")\n    .getMany()\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "b": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "relation": "overlapping",
+    "related": 0.8467,
+    "probabilities": {
+     "same": 0.0199,
+     "overlapping": 0.8065,
+     "conflicting": 0.0204,
+     "unrelated": 0.1533
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 54,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 138,
+   "total_ms": 142
+  }
+ }
+}

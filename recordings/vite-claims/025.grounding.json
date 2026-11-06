@@ -1,0 +1,75 @@
+{
+ "endpoint": "grounding",
+ "tag": "vite-claims/025.grounding",
+ "recorded_at": "2026-11-06T13:38:08Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 984,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "66.433729",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=290"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "text": "## Shared Plugins During Build\n\nBefore Vite 6, the plugins pipelines worked in a different way during dev and build:\n\n- **During dev:** plugins are shared\n- **During Build:** plugins are isolated for each environment (in different processes: `vite build` then `vite build --ssr`).\n\nThis forced frameworks to share state between the `client` build and the `ssr` build through manifest files written to the file system. In Vite 6, we are now building all environments in a single process so the way the plugins pipeline and inter-environment communication can be aligned with dev.\n\nIn a future major, we could have complete alignment:\n\n- **During both dev and build:** plugins are shared, with [per-environment filtering](#per-environment-plugins-using-the-applytoenvironment-hook)\n\nThere will also be a single `ResolvedConfig` instance shared during build, allowing for caching at entire app build process level in the same way as we have been doing with `WeakMap<ResolvedConfig, CachedData>` during dev.\n\nFor Vite 6, we need to do a smaller step to keep backward compatibility. Ecosystem plugins are currently using `config.build` instead of `environment.config.build` to access configuration, so we need to create a new `ResolvedConfig` per-environment by default. A project can opt-in into sharing the full config and plugins pipeline setting `builder.sharedConfigBuild` to `true`.\n\nThis option would only work of a small subset of projects at first, so plugin authors can opt-in for a particular plugin to be shared by setting the `sharedDuringBuild` flag to `true`. This allows for easily sharing state both for regular plugins:\n\n```js\nfunction myPlugin() {\n  // Share state among all environments in dev and build\n  const sharedState = ...\n  return {\n    name: 'shared-plugin',\n    transform(code, id) { ... },\n\n    // Opt-in into a single instance for all environments\n    sharedDuringBuild: true,\n  }\n}\n```"
+   }
+  ],
+  "answer": "::: warning Future Default Change `builder.sharedConfigBuild` was first introduced in `v6.0`.",
+  "claims": [
+   "::: warning Future Default Change `builder.sharedConfigBuild` was first introduced in `v6.0`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Shared Plugins during Build' of docs/changes/shared-plugins-during-build.md in the documentation of the vite project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0092,
+  "ungrounded": 0.9908,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "share": 0,
+    "share_of_answer": 0.0092,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "::: warning Future Default Change `builder.sharedConfigBuild` was first introduced in `v6.0`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0092,
+    "contradicted": 0.0161,
+    "not_stated": 0.9621,
+    "not_a_claim": 0.0126,
+    "verdict": "not_stated",
+    "sources": {
+     "vite:docs/guide/api-environment-plugins.md#13": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0092
+  },
+  "timing": {
+   "read_ms": 163,
+   "total_ms": 167
+  }
+ }
+}

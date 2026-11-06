@@ -1,0 +1,238 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/024.rerank",
+ "recorded_at": "2026-11-06T13:37:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1195,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "118.79747",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=171,cfOrigin;dur=0,cfWorker;dur=324"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Return the 5-minute [rate](./functions.md#rate) of the `http_requests_total` metric for the past 30 minutes, with a resolution of 1 minute.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#21",
+    "title": "docs/querying/basics.md > Time series selectors > Offset modifier",
+    "text": "### Offset modifier\n\nThe `offset` modifier allows changing the time offset for individual\ninstant and range vectors in a query.\n\nFor example, the following expression returns the value of\n`http_requests_total` 5 minutes in the past relative to the current\nquery evaluation time:\n\n    http_requests_total offset 5m\n\nNote that the `offset` modifier always needs to follow the selector\nimmediately, i.e. the following would be correct:\n\n    sum(http_requests_total{method=\"GET\"} offset 5m) // GOOD.\n\nWhile the following would be *incorrect*:\n\n    sum(http_requests_total{method=\"GET\"}) offset 5m // INVALID.\n\nThe same works for range vectors. This returns the 5-minute [rate](./functions.md#rate)\nthat `http_requests_total` had a week ago:\n\n    rate(http_requests_total[5m] offset 1w)\n\nWhen querying for samples in the past, a negative offset will enable temporal comparisons forward in time:\n\n    rate(http_requests_total[5m] offset -1w)\n\nNote that this allows a query to look ahead of its evaluation time."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#8",
+    "title": "docs/querying/basics.md > Literals > Duration expressions",
+    "text": "### Duration expressions\n\nArithmetic expressions can be used wherever a time duration is expected, that is\nin [range vector selectors](#range-vector-selectors) and in\n[offset durations](#offset-modifier).\n\nIn range vectors:\n\n    rate(http_requests_total[5m * 2])     # 10 minute range\n    rate(http_requests_total[(5+2) * 1m]) # 7 minute range\n\nIn offset durations:\n\n    http_requests_total offset (1h / 2)       # 30 minute offset\n    http_requests_total offset ((2 ^ 3) * 1m) # 8 minute offset\n\nWhen using `offset` with a duration expression, you must wrap the expression in\nparentheses. Without parentheses, only the first duration value is used in the\noffset calculation.\n\nThe following operators are supported, following the usual precedence rules:\n\n* `+` – addition\n* `-` – subtraction\n* `*` – multiplication\n* `/` – division\n* `%` – modulo\n* `^` – exponentiation\n\nThe following functions can be used inside duration expressions:\n\n* `step()` resolves to the step width of a [range query](api.md#range-queries),\n  and to `0s` for an [instant query](api.md#instant-queries).\n* `range()` resolves to the full range of a range query (end time − start time),\n  and to `0s` for an instant query. This is particularly useful in combination\n  with `@ end()` to look back over the entire query range, e.g.\n  `max_over_time(metric[range()] @ end())`.\n* `min_of(<duration>, <duration>)` returns the smaller of the two durations,\n  which is useful for capping a duration at a maximum value.\n* `max_of(<duration>, <duration>)` returns the larger of the two durations,\n  which is useful for enforcing a minimum value."
+   },
+   {
+    "id": "prometheus:docs/migration.md#4",
+    "title": "docs/migration.md > PromQL > Range selectors and lookback exclude samples coinciding with the left boundary",
+    "text": "### Range selectors and lookback exclude samples coinciding with the left boundary\n\nLookback and range selectors are now left-open and right-closed (previously\nleft-closed and right-closed), which makes their behavior more consistent. This\nchange affects queries where the left boundary of a range or the lookback delta\ncoincides with the timestamp of one or more samples.\n\nFor example, assume we are querying a timeseries with evenly spaced samples\nexactly 1 minute apart. Before Prometheus v3, a range query with `5m` would\nusually return 5 samples. But if the query evaluation aligns perfectly with a\nscrape, it would return 6 samples. In Prometheus v3 queries like this will\nalways return 5 samples given even spacing.\n\nThis change will typically affect subqueries because their evaluation timing is\nnaturally perfectly evenly spaced and aligned with timestamps that are multiples\nof the subquery resolution. Furthermore, query frontends often align subqueries\nto multiples of the step size. In combination, this easily creates a situation\nof perfect mutual alignment, often unintended and unknown by the user, so that\nthe new behavior might come as a surprise. Before Prometheus V3, a subquery of\n`foo[1m:1m]` on such a system might have always returned two points, allowing\nfor rate calculations. In Prometheus V3, however, such a subquery will only\nreturn one point, which is insufficient for a rate or increase calculation,\nresulting in No Data returned.\n\nSuch queries will need to be rewritten to extend the window to properly cover\nmore than one point. In this example, `foo[2m:1m]` would always return two\npoints no matter the query alignment. The exact form of the rewritten query may\ndepend on the intended results and there is no universal drop-in replacement for\nqueries whose behavior has changed.\n\nTests are similarly more likely to affected. To fix those either adjust the\nexpected number of samples or extend the range."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#8",
+    "title": "docs/querying/api.md > Expression queries > Range queries",
+    "text": "Optional HTTP request headers:\n\n- `X-Prometheus-Use-Start-Timestamps: <bool>`: Override the engine-level start timestamp processing setting (`--enable-feature=use-start-timestamps`) for this query. When set to `true`, functions such as `rate()` will use start timestamps from ingested data. When set to `false`, start timestamp processing is disabled for this query. Optional. If omitted, the engine-level default is used.\n\nYou can URL-encode these parameters directly in the request body by using the `POST` method and\n`Content-Type: application/x-www-form-urlencoded` header. This is useful when specifying a large\nquery that may breach server-side URL character limits.\n\nThe `data` section of the query result has the following format:\n\n```json\n{\n  \"resultType\": \"matrix\",\n  \"result\": <value>\n}\n```\n\nFor the format of the `<value>` placeholder, see the [range-vector result\nformat](#range-vectors).\n\nThe following example evaluates the expression `up` over a 30-second range with\na query resolution of 15 seconds.\n\n```bash\ncurl 'http://localhost:9090/api/v1/query_range?query=up&start=2015-07-01T20:10:30.781Z&end=2015-07-01T20:11:00.781Z&step=15s'\n```\n\n```json\n{\n   \"status\" : \"success\",\n   \"data\" : {\n      \"resultType\" : \"matrix\",\n      \"result\" : [\n         {\n            \"metric\" : {\n               \"__name__\" : \"up\",\n               \"job\" : \"prometheus\",\n               \"instance\" : \"localhost:9090\"\n            },\n            \"values\" : [\n               [ 1435781430.781, \"1\" ],\n               [ 1435781445.781, \"1\" ],\n               [ 1435781460.781, \"1\" ]\n            ]\n         },\n         {\n            \"metric\" : {\n               \"__name__\" : \"up\",\n               \"job\" : \"node\",\n               \"instance\" : \"localhost:9091\"\n            },\n            \"values\" : [\n               [ 1435781430.781, \"0\" ],\n               [ 1435781445.781, \"0\" ],\n               [ 1435781460.781, \"1\" ]\n            ]\n         }\n      ]\n   }\n}\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#22",
+    "title": "docs/querying/basics.md > Time series selectors > @ modifier",
+    "text": "### @ modifier\n\nThe `@` modifier allows changing the evaluation time for individual instant\nand range vectors in a query. The time supplied to the `@` modifier\nis a Unix timestamp and described with a float literal.\n\nFor example, the following expression returns the value of\n`http_requests_total` at `2021-01-04T07:40:00+00:00`:\n\n    http_requests_total @ 1609746000\n\nNote that the `@` modifier always needs to follow the selector\nimmediately, i.e. the following would be correct:\n\n    sum(http_requests_total{method=\"GET\"} @ 1609746000) // GOOD.\n\nWhile the following would be *incorrect*:\n\n    sum(http_requests_total{method=\"GET\"}) @ 1609746000 // INVALID.\n\nThe same works for range vectors. This returns the 5-minute rate that\n`http_requests_total` had at `2021-01-04T07:40:00+00:00`:\n\n    rate(http_requests_total[5m] @ 1609746000)\n\nThe `@` modifier supports all representations of numeric literals described above.\nIt works with the `offset` modifier where the offset is applied relative to the `@`\nmodifier time.  The results are the same irrespective of the order of the modifiers.\n\nFor example, these two queries will produce the same result:\n\n    # offset after @\n    http_requests_total @ 1609746000 offset 5m\n    # offset before @\n    http_requests_total offset 5m @ 1609746000\n\nAdditionally, `start()` and `end()` can also be used as values for the `@` modifier as special values.\n\nFor a range query, they resolve to the start and end of the range query respectively and remain the same for all steps.\n\nFor an instant query, `start()` and `end()` both resolve to the evaluation time.\n\n    http_requests_total @ start()\n    rate(http_requests_total[5m] @ end())\n\nNote that the `@` modifier allows a query to look ahead of its evaluation time."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#19",
+    "title": "docs/querying/functions.md > `histogram_avg()`",
+    "text": "## `histogram_avg()`\n\n`histogram_avg(v instant-vector)` returns the arithmetic average of observed\nvalues stored in each native histogram sample in `v`. Float samples are ignored and do\nnot show up in the returned vector.\n\nUse `histogram_avg` as demonstrated below to compute the average request duration\nover a 5-minute window from a native histogram:\n\n    histogram_avg(rate(http_request_duration_seconds[5m]))\n\nWhich is equivalent to the following query:\n\n      histogram_sum(rate(http_request_duration_seconds[5m]))\n    /\n      histogram_count(rate(http_request_duration_seconds[5m]))"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#31",
+    "title": "docs/querying/functions.md > `increase()`",
+    "text": "## `increase()`\n\n`increase(v range-vector)` calculates the increase in the time series in the\nrange vector. Breaks in monotonicity (such as counter resets due to target\nrestarts) are automatically adjusted for. The increase is extrapolated to cover\nthe full time range as specified in the range vector selector, so that it is\npossible to get a non-integer result even if a counter increases only by\ninteger increments.\n\nThe following example expression returns the number of HTTP requests as measured\nover the last 5 minutes, per time series in the range vector:\n\n```\nincrease(http_requests_total{job=\"api-server\"}[5m])\n```\n\n`increase` acts on histogram samples by calculating a new histogram where each\ncomponent (sum and count of observations, buckets) is the increase between the\nrespective component in the first and last native histogram in `v`. However,\neach element in `v` that contains a mix of float samples and histogram samples\nwithin the range, will be omitted from the result vector, flagged by a\nwarn-level annotation.\n\n`increase` should only be used with counters (for both floats and histograms).\nIt is syntactic sugar for `rate(v)` multiplied by the number of seconds under\nthe specified time range window, and should be used primarily for human\nreadability. Use `rate` in recording rules so that increases are tracked\nconsistently on a per-second basis."
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "title": "docs/configuration/unit_testing_rules.md > Example > `test.yml`",
+    "text": "### `test.yml`\n\n```yaml\n# This is the main input for unit testing.\n# Only this file is passed as command line argument.\n\nrule_files:\n    - alerts.yml\n\nevaluation_interval: 1m\n\ntests:\n    # Test 1.\n    - interval: 1m\n      # Series data.\n      input_series:\n          - series: 'up{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'\n          - series: 'up{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '1+0x6 0 0 0 0 0 0 0 0' # 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0\n          - series: 'go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '10+10x2 30+20x5' # 10 20 30 30 50 70 90 110 130\n          - series: 'go_goroutines{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '10+10x7 10+30x4' # 10 20 30 40 50 60 70 80 10 40 70 100 130\n\n      # Unit test for alerting rules.\n      alert_rule_test:\n          # Unit test 1.\n          - eval_time: 10m\n            alertname: InstanceDown\n            exp_alerts:\n                # Alert 1.\n                - exp_labels:\n                      severity: page\n                      instance: localhost:9090\n                      job: prometheus\n                  exp_annotations:\n                      summary: \"Instance localhost:9090 down\"\n                      description: \"localhost:9090 of job prometheus has been down for more than 5 minutes.\"\n      # Unit tests for promql expressions.\n      promql_expr_test:\n          # Unit test 1.\n          - expr: go_goroutines > 5\n            eval_time: 4m\n            exp_samples:\n                # Sample 1.\n                - labels: 'go_goroutines{job=\"prometheus\",instance=\"localhost:9090\"}'\n                  value: 50\n                # Sample 2.\n                - labels: 'go_goroutines{job=\"node_exporter\",instance=\"localhost:9100\"}'\n                  value: 50\n```"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#17",
+    "title": "docs/feature_flags.md > OTLP Native Delta Support > Querying",
+    "text": "### Querying\n\nWhen `st-storage` and `use-start-timestamps` are also enabled and incoming delta samples have valid start timestamps, PromQL functions such as `rate()` and `increase()` use those timestamps to account for the interval represented by each delta.\n\nWithout start-timestamp storage and processing, use `sum_over_time()` to query delta metrics:\n\n* `sum_over_time(delta_metric[<range>])`: Calculates the sum of delta values over the specified time range.\n* `sum_over_time(delta_metric[<range>]) / <range>`: Calculates the per-second rate of the delta metric.\n\nThese may not work well if the `<range>` is not a multiple of the collection interval of the metric. For example, if you do `sum_over_time(delta_metric[1m]) / 1m` range query (with a 1m step), but the collection interval of a metric is 10m, the graph will show a single point every 10 minutes with a high rate value, rather than 10 points with a lower, constant value."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#49",
+    "title": "docs/querying/functions.md > `rate()`",
+    "text": "## `rate()`\n\n`rate(v range-vector)` calculates the per-second average rate of increase of the\ntime series in the range vector. Breaks in monotonicity (such as counter\nresets due to target restarts) are automatically adjusted for. Also, the\ncalculation extrapolates to the ends of the time range, allowing for missed\nscrapes or imperfect alignment of scrape cycles with the range's time period.\n\nThe following example expression returns the per-second average rate of HTTP requests\nover the last 5 minutes, per time series in the range vector:\n\n```\nrate(http_requests_total{job=\"api-server\"}[5m])\n```\n\n`rate` acts on native histograms by calculating a new histogram where each\ncomponent (sum and count of observations, buckets) is the rate of increase\nbetween the respective component in the first and last native histogram in `v`.\nHowever, each element in `v` that contains a mix of float and native histogram\nsamples within the range, will be omitted from the result vector, flagged by a\nwarn-level annotation.\n\n`rate` should only be used with counters (for both floats and histograms). It\nis best suited for alerting, and for graphing of slow-moving counters.\n\nNote that when combining `rate()` with an aggregation operator (e.g. `sum()`)\nor a function aggregating over time (any function ending in `_over_time`),\nalways take a `rate()` first, then aggregate. Otherwise `rate()` cannot detect\ncounter resets when your target restarts."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/functions.md#49",
+    "action": "use",
+    "relevance_score": 0.9302,
+    "document_score": 0.9662,
+    "levels": {
+     "answers": 0.9302,
+     "elsewhere": 0.0359,
+     "different_case": 0.0218,
+     "unrelated": 0.012
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/querying/basics.md#22",
+    "action": "expand",
+    "relevance_score": 0.051,
+    "document_score": 0.6131,
+    "levels": {
+     "answers": 0.051,
+     "elsewhere": 0.5621,
+     "different_case": 0.0543,
+     "unrelated": 0.3326
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/querying/functions.md#31",
+    "action": "expand",
+    "relevance_score": 0.0482,
+    "document_score": 0.8302,
+    "levels": {
+     "answers": 0.0482,
+     "elsewhere": 0.782,
+     "different_case": 0.0302,
+     "unrelated": 0.1396
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/api.md#8",
+    "action": "expand",
+    "relevance_score": 0.0258,
+    "document_score": 0.7797,
+    "levels": {
+     "answers": 0.0258,
+     "elsewhere": 0.7538,
+     "different_case": 0.062,
+     "unrelated": 0.1583
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/basics.md#21",
+    "action": "expand",
+    "relevance_score": 0.0256,
+    "document_score": 0.7111,
+    "levels": {
+     "answers": 0.0256,
+     "elsewhere": 0.6855,
+     "different_case": 0.0675,
+     "unrelated": 0.2214
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/basics.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0189,
+    "document_score": 0.4112,
+    "levels": {
+     "answers": 0.0189,
+     "elsewhere": 0.3922,
+     "different_case": 0.0499,
+     "unrelated": 0.539
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/querying/functions.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0082,
+    "document_score": 0.0725,
+    "levels": {
+     "answers": 0.0082,
+     "elsewhere": 0.0643,
+     "different_case": 0.0366,
+     "unrelated": 0.8909
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/feature_flags.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0057,
+    "document_score": 0.0386,
+    "levels": {
+     "answers": 0.0057,
+     "elsewhere": 0.0329,
+     "different_case": 0.0269,
+     "unrelated": 0.9345
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/migration.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0047,
+    "document_score": 0.0362,
+    "levels": {
+     "answers": 0.0047,
+     "elsewhere": 0.0315,
+     "different_case": 0.033,
+     "unrelated": 0.9308
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0023,
+     "different_case": 0.0095,
+     "unrelated": 0.9855
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5037
+  },
+  "timing": {
+   "total_ms": 138,
+   "rerank_ms": 121,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6227,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

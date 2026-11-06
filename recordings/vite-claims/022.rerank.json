@@ -1,0 +1,238 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/022.rerank",
+ "recorded_at": "2026-11-06T13:38:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1001,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "66.809822",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=260"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Default:** `true` (enabled by default since Vite 2.7)",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/features.md#28",
+    "title": "docs/guide/features.md > Features > Glob Import > Negative Patterns > Named Imports",
+    "text": "#### Named Imports\n\nIt's possible to only import parts of the modules with the `import` options.\n\n```ts twoslash\nimport 'vite/client'\n// ---cut---\nconst modules = import.meta.glob('./dir/*.js', { import: 'setup' })\n```\n\n```ts\n// code produced by vite\nconst modules = {\n  './dir/bar.js': () => import('./dir/bar.js').then((m) => m.setup),\n  './dir/foo.js': () => import('./dir/foo.js').then((m) => m.setup),\n}\n```\n\nWhen combined with `eager` it's even possible to have tree-shaking enabled for those modules.\n\n```ts twoslash\nimport 'vite/client'\n// ---cut---\nconst modules = import.meta.glob('./dir/*.js', {\n  import: 'setup',\n  eager: true,\n})\n```\n\n```ts\n// code produced by vite:\nimport { setup as __vite_glob_0_0 } from './dir/bar.js'\nimport { setup as __vite_glob_0_1 } from './dir/foo.js'\nconst modules = {\n  './dir/bar.js': __vite_glob_0_0,\n  './dir/foo.js': __vite_glob_0_1,\n}\n```\n\nSet `import` to `default` to import the default export.\n\n```ts twoslash\nimport 'vite/client'\n// ---cut---\nconst modules = import.meta.glob('./dir/*.js', {\n  import: 'default',\n  eager: true,\n})\n```\n\n```ts\n// code produced by vite:\nimport { default as __vite_glob_0_0 } from './dir/bar.js'\nimport { default as __vite_glob_0_1 } from './dir/foo.js'\nconst modules = {\n  './dir/bar.js': __vite_glob_0_0,\n  './dir/foo.js': __vite_glob_0_1,\n}\n```"
+   },
+   {
+    "id": "vite:docs/config/build-options.md#8",
+    "title": "docs/config/build-options.md > Build Options > build.cssCodeSplit",
+    "text": "## build.cssCodeSplit\n\n- **Type:** `boolean`\n- **Default:** `true`\n\nEnable/disable CSS code splitting. When enabled, CSS imported in async JS chunks will be preserved as chunks and fetched together when the chunk is fetched.\n\nIf disabled, all CSS in the entire project will be extracted into a single CSS file.\n\n::: tip Note\nIf you specify `build.lib`, `build.cssCodeSplit` will be `false` as default.\n:::"
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#9",
+    "title": "docs/config/dep-optimization-options.md > Dep Optimization Options > optimizeDeps.disabled <NonInheritBadge />",
+    "text": "## optimizeDeps.disabled <NonInheritBadge />\n\n- **Deprecated**\n- **Experimental:** [Give Feedback](https://github.com/vitejs/vite/discussions/13839)\n- **Type:** `boolean | 'build' | 'dev'`\n- **Default:** `'build'`\n\nThis option is deprecated. As of Vite 5.1, pre-bundling of dependencies during build have been removed. Setting `optimizeDeps.disabled` to `true` or `'dev'` disables the optimizer, and configured to `false` or `'build'` leaves the optimizer during dev enabled.\n\nTo disable the optimizer completely, use `optimizeDeps.noDiscovery: true` to disallow automatic discovery of dependencies and leave `optimizeDeps.include` undefined or empty.\n\n:::warning\nOptimizing dependencies during build time was an **experimental** feature. Projects trying out this strategy also removed `@rollup/plugin-commonjs` using `build.commonjsOptions: { include: [] }`. If you did so, a warning will guide you to re-enable it to support CJS only packages while bundling.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/build.md#7",
+    "title": "docs/guide/build.md > Building for Production > Rebuild on Files Changes",
+    "text": "## Rebuild on Files Changes\n\nYou can enable Rolldown watcher with `vite build --watch`. Or, you can directly adjust the underlying [`WatcherOptions`](https://rolldown.rs/reference/InputOptions.watch) via `build.watch`:\n\n```js [vite.config.js]\nexport default defineConfig({\n  build: {\n    watch: {\n      // https://rolldown.rs/reference/InputOptions.watch\n    },\n  },\n})\n```\n\nWith the `--watch` flag enabled, changes to files to be bundled will trigger a rebuild. Note that changes to the config and its dependencies require restarting the build command."
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#8",
+    "title": "docs/config/dep-optimization-options.md > Dep Optimization Options > optimizeDeps.holdUntilCrawlEnd <NonInheritBadge />",
+    "text": "## optimizeDeps.holdUntilCrawlEnd <NonInheritBadge />\n\n- **Experimental:** [Give Feedback](https://github.com/vitejs/vite/discussions/15834)\n- **Type:** `boolean`\n- **Default:** `true`\n\nWhen enabled, it will hold the first optimized deps results until all static imports are crawled on cold start. This avoids the need for full-page reloads when new dependencies are discovered and they trigger the generation of new common chunks. If all dependencies are found by the scanner plus the explicitly defined ones in `include`, it is better to disable this option to let the browser process more requests in parallel."
+   },
+   {
+    "id": "vite:docs/guide/features.md#35",
+    "title": "docs/guide/features.md > Features > WebAssembly > ESM Integration",
+    "text": "### ESM Integration\n\nA `.wasm` file can be imported directly. Vite reads the module's imports and exports from the binary, instantiates it, and re-exposes its exports as named ES module exports:\n\n```js\nimport { add } from './add.wasm'\n\nconsole.log(add(1, 2)) // 3\n```\n\nIf the WebAssembly module declares imports of its own, Vite resolves them from JavaScript modules. Each import's module name is treated as an import specifier (resolved relative to the `.wasm` file) and the requested members are wired into the instance automatically.\n\nThis follows the [WebAssembly/ES Module Integration proposal](https://github.com/WebAssembly/esm-integration). Because a WebAssembly module is instantiated asynchronously, a directly imported `.wasm` file behaves as an async module and requires top-level `await` support.\n\n::: tip TypeScript support\n\nSince the types of `.wasm` files are unknown, TypeScript will report errors like `Module '\"*.wasm\"' has no exported member 'add'`. To fix this, enable [`allowArbitraryExtensions`](https://www.typescriptlang.org/tsconfig/#allowArbitraryExtensions) in your `tsconfig.json` and create a declaration file next to your `.wasm` file. With `allowArbitraryExtensions` enabled, TypeScript will look for a declaration file named `{filename}.d.wasm.ts` when resolving a `.wasm` import. For example, for `add.wasm`, create `add.d.wasm.ts`:\n\n```ts [add.d.wasm.ts]\nexport function add(a: number, b: number): number\n```\n\n:::"
+   },
+   {
+    "id": "vite:docs/config/index.md#1",
+    "title": "docs/config/index.md > Configuring Vite > Config Intellisense",
+    "text": "## Config Intellisense\n\nSince Vite ships with TypeScript typings, you can leverage your IDE's intellisense with JSDoc type hints:\n\n```js\n/** @type {import('vite').UserConfig} */\nexport default {\n  // ...\n}\n```\n\nAlternatively, you can use the `defineConfig` helper which should provide intellisense without the need for JSDoc annotations:\n\n```js\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  // ...\n})\n```\n\nVite also supports TypeScript config files. You can use `vite.config.ts` with the `defineConfig` helper function above, or with the `satisfies` operator:\n\n```ts\nimport type { UserConfig } from 'vite'\n\nexport default {\n  // ...\n} satisfies UserConfig\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#31",
+    "title": "docs/guide/api-plugin.md > Plugin API > Client-server Communication",
+    "text": "## Client-server Communication\n\nSince Vite 2.9, we provide some utilities for plugins to help handle the communication with clients."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#27",
+    "title": "docs/config/build-options.md > Build Options > build.copyPublicDir",
+    "text": "## build.copyPublicDir\n\n- **Type:** `boolean`\n- **Default:** `true`\n\nBy default, Vite will copy files from the `publicDir` into the `outDir` on build. Set to `false` to disable this."
+   },
+   {
+    "id": "vite:docs/config/preview-options.md#2",
+    "title": "docs/config/preview-options.md > Preview Options > preview.allowedHosts",
+    "text": "## preview.allowedHosts\n\n- **Type:** `string[] | true`\n- **Default:** [`server.allowedHosts`](./server-options#server-allowedhosts)\n\nThe hostnames that Vite is allowed to respond to.\n\nSee [`server.allowedHosts`](./server-options#server-allowedhosts) for more details."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 8,
+    "id": "vite:docs/config/build-options.md#27",
+    "action": "use",
+    "relevance_score": 0.9662,
+    "document_score": 0.9787,
+    "levels": {
+     "answers": 0.9662,
+     "elsewhere": 0.0124,
+     "different_case": 0.0126,
+     "unrelated": 0.0087
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/config/dep-optimization-options.md#8",
+    "action": "use",
+    "relevance_score": 0.9658,
+    "document_score": 0.9814,
+    "levels": {
+     "answers": 0.9658,
+     "elsewhere": 0.0156,
+     "different_case": 0.0109,
+     "unrelated": 0.0077
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/config/build-options.md#8",
+    "action": "use",
+    "relevance_score": 0.9271,
+    "document_score": 0.9724,
+    "levels": {
+     "answers": 0.9271,
+     "elsewhere": 0.0453,
+     "different_case": 0.0138,
+     "unrelated": 0.0138
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/config/dep-optimization-options.md#9",
+    "action": "use",
+    "relevance_score": 0.9233,
+    "document_score": 0.9411,
+    "levels": {
+     "answers": 0.9233,
+     "elsewhere": 0.0179,
+     "different_case": 0.0367,
+     "unrelated": 0.0222
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/config/preview-options.md#2",
+    "action": "expand",
+    "relevance_score": 0.0315,
+    "document_score": 0.9097,
+    "levels": {
+     "answers": 0.0315,
+     "elsewhere": 0.8782,
+     "different_case": 0.0278,
+     "unrelated": 0.0626
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/api-plugin.md#31",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0088,
+    "document_score": 0.1562,
+    "levels": {
+     "answers": 0.0088,
+     "elsewhere": 0.1473,
+     "different_case": 0.0409,
+     "unrelated": 0.8029
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/features.md#28",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0204,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0173,
+     "different_case": 0.0129,
+     "unrelated": 0.9668
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/build.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0168,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0137,
+     "different_case": 0.01,
+     "unrelated": 0.9732
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/features.md#35",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0096,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0068,
+     "different_case": 0.0074,
+     "unrelated": 0.9829
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/config/index.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0113,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0087,
+     "different_case": 0.0055,
+     "unrelated": 0.9832
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2663
+  },
+  "timing": {
+   "total_ms": 84,
+   "rerank_ms": 69,
+   "questions_ms": 0,
+   "model_ms": 63,
+   "engine": {
+    "rows": 4013,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 63,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 61,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

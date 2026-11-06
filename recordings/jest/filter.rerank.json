@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/filter.rerank",
+ "recorded_at": "2026-11-06T13:43:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 862,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "34.476578",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=149"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--filter`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--filter`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/CLI.md#25",
+    "title": "docs/CLI.md > Reference > `--filter=<file>`",
+    "text": "### `--filter=<file>`\n\nPath to a module exporting a filtering function. This asynchronous function receives a list of test paths which can be manipulated to exclude tests from running and must return an object with shape `{ filtered: Array<string> }` containing the tests that should be run by Jest. Especially useful when used in conjunction with a testing infrastructure to filter known broken tests.\n\n```js title=\"my-filter.js\"\n// This filter when applied will only run tests ending in .spec.js (not the best way to do it, but it's just an example):\nconst filteringFunction = testPath => testPath.endsWith('.spec.js');\n\nmodule.exports = testPaths => {\n  const allowedPaths = testPaths.filter(filteringFunction); // [\"path1.spec.js\", \"path2.spec.js\", etc]\n\n  return {\n    filtered: allowedPaths,\n  };\n};\n```"
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#8",
+    "title": "docs/UpgradingToJest30.md > Configuration Updates > Other CLI Changes",
+    "text": "### Other CLI Changes\n\n- Jest now validates CLI flags that require arguments to ensure an argument is provided. For example, if you use `--maxWorkers` or `--selectProjects`, you must include a value (e.g. `--maxWorkers=50%`). Previously, Jest might have allowed certain flags without a value (falling back to defaults); now it will throw an error if the value is missing. Ensure any scripts or npm commands passing Jest flags include the necessary arguments.\n- If you use the `--filter` option to filter test files (an advanced use-case where you provide a path to a filter implementation), the expected interface has changed. The filter function should now return an object of shape `{filtered: Array<string>}`, matching the documented format. In prior versions, a different return format may have been accepted (e.g., returning an array directly). Update any custom test filter functions to return an object with a `filtered` property as documented."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "jest:docs/UpgradingToJest30.md#8",
+    "action": "use",
+    "relevance_score": 0.9888,
+    "document_score": 0.9915,
+    "levels": {
+     "answers": 0.9888,
+     "elsewhere": 0.0027,
+     "different_case": 0.0061,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/CLI.md#25",
+    "action": "use",
+    "relevance_score": 0.9777,
+    "document_score": 0.9862,
+    "levels": {
+     "answers": 0.9777,
+     "elsewhere": 0.0086,
+     "different_case": 0.0086,
+     "unrelated": 0.0052
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 570
+  },
+  "timing": {
+   "total_ms": 38,
+   "rerank_ms": 37,
+   "questions_ms": 0,
+   "model_ms": 32,
+   "engine": {
+    "rows": 840,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1024,
+    "long": 0,
+    "total_ms": 32,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 30,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

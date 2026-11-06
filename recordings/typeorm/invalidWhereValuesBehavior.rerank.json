@@ -1,0 +1,125 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/invalidWhereValuesBehavior.rerank",
+ "recorded_at": "2026-11-06T13:42:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1347,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.249214",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=39,cfOrigin;dur=0,cfWorker;dur=586"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `invalidWhereValuesBehavior`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `invalidWhereValuesBehavior`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+    "title": "docs/docs/data-source/2-data-source-options.md > Data Source Options > Common data source options",
+    "text": "- `invalidWhereValuesBehavior` - Controls how null and undefined values are handled in where conditions for high-level operations (find operations, repository methods, EntityManager methods). Does not affect QueryBuilder's `.where()` directly.\n    - `null` behavior options:\n        - `'ignore'` - skips null properties\n        - `'sql-null'` - transforms null to SQL NULL\n        - `'throw'` (default) - throws an error\n    - `undefined` behavior options:\n        - `'ignore'` - skips undefined properties\n        - `'throw'` (default) - throws an error\n\n    Example: `invalidWhereValuesBehavior: { null: 'sql-null', undefined: 'ignore' }`.\n\n    Learn more about [Null and Undefined Handling](./5-null-and-undefined-handling.md)."
+   },
+   {
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+    "title": "docs/docs/data-source/5-null-and-undefined-handling.md > Handling null and undefined values in where conditions > Supported operations > Only plain-object criteria is normalized",
+    "text": "### Only plain-object criteria is normalized\n\n`invalidWhereValuesBehavior` normalizes **plain `FindOptionsWhere` objects** only. Any other criteria value passed to `update` / `delete` / `softDelete` / `restore` — an **entity class instance**, a `FindOperator`, an array, a `Date`, a `Buffer`, or a primitive `id` — is passed through untouched and is **not** validated. So an entity instance whose nullable column is `null` renders as `col = NULL` (matching nothing), rather than throwing/converting. If you need null handling, pass a plain object with the `IsNull()` operator (e.g. `{ text: IsNull() }`).\n\n> Deep validation of entity-instance criteria requires entity metadata and is out of scope here; use a plain `FindOptionsWhere` object when you want `invalidWhereValuesBehavior` applied."
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#6",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > Breaking changes > Behavioral changes",
+    "text": "### Behavioral changes\n\n- **Non-nullable relations now use INNER JOIN** — `ManyToOne` and owning `OneToOne` relations marked `nullable: false` now use `INNER JOIN` instead of `LEFT JOIN`, which may exclude rows with orphaned foreign keys ([#12064](https://github.com/typeorm/typeorm/pull/12064) by [@pkuczynski](https://github.com/pkuczynski))\n- **`invalidWhereValuesBehavior` defaults to `throw`** — passing `null` or `undefined` in where conditions now throws an error instead of silently ignoring the property; use `IsNull()` for null matching ([#11710](https://github.com/typeorm/typeorm/pull/11710) by [@naorpeled](https://github.com/naorpeled))\n- **`invalidWhereValuesBehavior` scoped to high-level APIs only** — QueryBuilder's `.where()`, `.andWhere()`, `.orWhere()` are no longer affected by this setting ([#11878](https://github.com/typeorm/typeorm/pull/11878) by [@naorpeled](https://github.com/naorpeled))\n- **`ConnectionOptionsReader` and `FileLogger` paths resolved from `process.cwd()`** — `ConnectionOptionsReader` no longer uses `app-root-path` to locate `ormconfig` files; it searches `process.cwd()` instead. Pass `{ root: \"/custom/path\" }` to the constructor to override. `FileLogger.logPath` is likewise resolved from `process.cwd()` — use an absolute path when the app is not started from its root folder ([#12257](https://github.com/typeorm/typeorm/pull/12257) by [@alumni](https://github.com/alumni))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "title": "docs/docs/releases/1.0/02-upgrading-from-0.3.md > Upgrading from 0.3 to 1.0 > Behavioral changes > `invalidWhereValuesBehavior` default changed to `throw`",
+    "text": "### `invalidWhereValuesBehavior` default changed to `throw`\n\n**This is a significant behavioral change that may break existing applications at runtime.**\n\nThe default behavior for null and undefined values in where conditions has changed. Previously, null and undefined values were silently ignored (the property was skipped). Now, both **throw an error by default**.\n\nThis change prevents subtle bugs where queries like `findBy({ id: undefined })` would silently return all rows instead of failing.\n\n```typescript\n// v0.3: silently returns all posts (null is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: null } })\n\n// v0.3: silently returns all posts (undefined is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: undefined } })\n```\n\nTo match null values, use the `IsNull()` operator:\n\n```typescript\nimport { IsNull } from \"typeorm\"\n\nawait repository.find({ where: { text: IsNull() } })\n```\n\nTo restore the previous behavior, set `invalidWhereValuesBehavior` in your data source options:\n\n```typescript\nnew DataSource({\n    // ...\n    invalidWhereValuesBehavior: {\n        null: \"ignore\",\n        undefined: \"ignore\",\n    },\n})\n```\n\nThis setting guards all high-level APIs — find operations, repository/manager mutation methods, and `queryBuilder.setFindOptions()` (the only QueryBuilder method that is affected). The rest of the QueryBuilder methods (`.where()`, `.andWhere()`, `.orWhere()`) are **not** affected — null and undefined values pass through as-is. See [Null and undefined handling](../../data-source/5-null-and-undefined-handling.md) for full details."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "action": "use",
+    "relevance_score": 0.9951,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9951,
+     "elsewhere": 0.0013,
+     "different_case": 0.0017,
+     "unrelated": 0.0019
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+    "action": "use",
+    "relevance_score": 0.9943,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9943,
+     "elsewhere": 0.0015,
+     "different_case": 0.0018,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#6",
+    "action": "use",
+    "relevance_score": 0.9932,
+    "document_score": 0.995,
+    "levels": {
+     "answers": 0.9932,
+     "elsewhere": 0.0018,
+     "different_case": 0.0026,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+    "action": "use",
+    "relevance_score": 0.9322,
+    "document_score": 0.9652,
+    "levels": {
+     "answers": 0.9322,
+     "elsewhere": 0.033,
+     "different_case": 0.0171,
+     "unrelated": 0.0177
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1637
+  },
+  "timing": {
+   "total_ms": 466,
+   "rerank_ms": 450,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2177,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/017.rerank",
+ "recorded_at": "2026-11-06T13:38:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1233,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.02243",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=174,cfOrigin;dur=0,cfWorker;dur=294"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: New incoming requests receive a `Connection: close` header (HTTP/1.1) and are handled according to [`return503OnClosing`](#factory-return-503-on-closing).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#20",
+    "title": "docs/Reference/Hooks.md > Application Hooks > preClose",
+    "text": "### preClose\n<a id=\"pre-close\"></a>\n\nTriggered when `fastify.close()` is invoked to stop the server. At this\npoint the server is already rejecting new requests with `503` (when\n[`return503OnClosing`](./Server.md#factory-return-503-on-closing) is `true`),\nbut the HTTP server has not yet stopped listening and in-flight requests are\nstill being processed.\n\nIt is useful when [plugins](./Plugins.md) have set up state attached to the HTTP\nserver that would prevent the server from closing, such as open WebSocket\nconnections or Server-Sent Events streams that must be explicitly terminated for\n`server.close()` to complete.\n_It is unlikely you will need to use this hook_,\nuse the [`onClose`](#onclose) for the most common case.\n\n```js\n// callback style\nfastify.addHook('preClose', (done) => {\n  // Some code\n  done()\n})\n\n// or async/await style\nfastify.addHook('preClose', async () => {\n  // Some async code\n  await removeSomeServerState()\n})\n```\n\nFor example, closing WebSocket connections during shutdown:\n\n```js\nfastify.addHook('preClose', async () => {\n  // Close all WebSocket connections so that server.close() can complete.\n  // Without this, open connections would keep the server alive.\n  for (const ws of activeWebSockets) {\n    ws.close(1001, 'Server shutting down')\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#14",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "```sh\nHTTP/1.1 503 Service Unavailable\nConnection: keep-alive\nContent-Length: 31\nContent-Type: application/json; charset=utf-8\nDate: Fri, 15 Apr 2022 23:03:15 GMT\nKeep-Alive: timeout=5\nRetry-After: 5000\n\n{\n    \"error\": true,\n    \"retryInMs\": 5000\n}\n```\n\nThen we attempted a new request (`req-2`), which was a `GET /ping`. As expected,\nsince that was not one of the requests we asked our plugin to filter, it\nsucceeded. That could also be used as a means of informing an interested party\nwhether or not we were ready to serve requests with the `ready` field. Although\n`/ping` is more commonly associated with *liveness* checks and that would be\nthe responsibility of a *readiness* check. The curious reader can get more info\non these terms in the article\n[\"Kubernetes best practices: Setting up health checks with readiness and liveness probes\"](\nhttps://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes).\n\nBelow is the response to that request:\n\n```sh\nHTTP/1.1 200 OK\nConnection: keep-alive\nContent-Length: 29\nContent-Type: application/json; charset=utf-8\nDate: Fri, 15 Apr 2022 23:03:16 GMT\nKeep-Alive: timeout=5\n\n{\n    \"error\": false,\n    \"ready\": false\n}\n```\n\nAfter that, there were more interesting log messages:\n\n<!-- markdownlint-disable -->\n```sh\n{\"time\":1650063798377,\"reqId\":\"req-3\",\"req\":{\"method\":\"POST\",\"url\":\"/webhook\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51932},\"msg\":\"incoming request\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"msg\":\"Ready for customer requests!\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"res\":{\"statusCode\":200},\"responseTime\":1.3567829988896847,\"msg\":\"request completed\"}\n```\n<!-- markdownlint-enable -->"
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#12",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > Manage Errors from a hook",
+    "text": "### Manage Errors from a hook\nIf you get an error during the execution of your hook, just pass it to `done()`\nand Fastify will automatically close the request and send the appropriate error\ncode to the user.\n\n```js\nfastify.addHook('onRequest', (request, reply, done) => {\n  done(new Error('Some error'))\n})\n```\n\nIf you want to pass a custom error code to the user, just use `reply.code()`:\n```js\nfastify.addHook('preHandler', (request, reply, done) => {\n  reply.code(400)\n  done(new Error('Some error'))\n})\n```\n*The error will be handled by [`Reply`](./Reply.md#errors).*\n\nOr if you're using `async/await` you can just throw an error:\n```js\nfastify.addHook('onRequest', async (request, reply) => {\n  throw new Error('Some error')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#23",
+    "title": "docs/Reference/Request.md > Request > Request > Properties > .socket",
+    "text": "##### .socket\n\nThe underlying connection of the incoming request."
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#1",
+    "title": "docs/Reference/Request.md > Request > Introduction",
+    "text": "### Introduction\n<a id=\"introduction\"></a>\n\nThe first parameter of the handler function is `Request`.\n\nRequest is a core Fastify object containing the following fields:\n- `query` - The parsed querystring.\n- `body` - The request payload.\n- `params` - The params matching the URL.\n- [`headers`](#headers) - The headers getter and setter.\n- `raw` - The incoming HTTP request from Node core.\n- `server` - The Fastify server instance.\n- `id` - The request ID.\n- `log` - The logger instance of the incoming request.\n- `ip` - The IP address of the incoming request.\n- `ips` - An array of IP addresses from `X-Forwarded-For`.\n- `host` - The host of the incoming request.\n- `hostname` - The hostname parsed from `request.host`.\n- `port` - The port parsed from `request.host`.\n- `protocol` - The protocol of the incoming request (`https` or `http`).\n- `method` - The method of the incoming request.\n- `url` - The URL of the incoming request.\n- `originalUrl` - The original URL of the incoming request.\n- `mediaType` - The media type extracted from `Content-Type` header.\n- `is404` - `true` if request is being handled by 404 handler, `false` otherwise.\n- `socket` - The underlying connection of the incoming request.\n- `signal` - An `AbortSignal` that aborts on handler timeout or client\n  disconnect.\n- `routeOptions` - The route [`option`](./Routes.md#routes-options) object.\n- `validationError` - The validation error, when `attachValidation` is set.\n- `getDecorator(name)` - Returns the value of a request decorator.\n- `setDecorator(name, value)` - Sets the value of a request decorator.\n- [.getValidationFunction(schema | httpPart)](#getvalidationfunction) -\n  Returns a validation function for the specified schema or HTTP part, if\n  set or cached.\n- [.compileValidationSchema(schema, [httpPart])](#compilevalidationschema) -\n  Compiles the specified schema and returns a validation function using the\n  default (or customized) `ValidationCompiler`. The optional `httpPart` is\n  forwarded to the `ValidationCompiler` if provided, defaults to `null`.\n- [.validateInput(data, schema | httpPart, [httpPart])](#validate) -\n  Validates the input using the specified schema or HTTP part and returns\n  `true` if the input is valid, `false` otherwise. If `httpPart` is provided,\n  the function uses the validator for that HTTP part. Defaults to `null`."
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#15",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "This time it was our simulated external provider hitting us to let us know\nauthentication had gone well and telling us what our `magicKey` was. We saved\nthat into our `magicKey` decorator and celebrated with a log message saying we\nwere now ready for customers to hit us!\n\n<!-- markdownlint-disable -->\n```sh\n{\"time\":1650063799858,\"reqId\":\"req-4\",\"req\":{\"method\":\"GET\",\"url\":\"/v1\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51934},\"msg\":\"incoming request\"}\n{\"time\":1650063800561,\"reqId\":\"req-4\",\"res\":{\"statusCode\":200},\"responseTime\":702.4662979990244,\"msg\":\"request completed\"}\n```\n<!-- markdownlint-enable -->\n\nFinally, a final `GET /v1` request was made and, this time, it succeeded. Its\nresponse was the following:\n\n```sh\nHTTP/1.1 200 OK\nConnection: keep-alive\nContent-Length: 31\nContent-Type: application/json; charset=utf-8\nDate: Fri, 15 Apr 2022 23:03:20 GMT\nKeep-Alive: timeout=5\n\n{\n    \"customer\": true,\n    \"error\": false\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "##### delay\n\n`delay` is not a plugin itself. It's actually a plugin *factory*. It expects a\nFastify plugin with `routes` and exports the actual plugin that'll handle\nenveloping those routes with an `onRequest` hook that will make sure no requests\nare handled until we're ready for them.\n\n```js\nconst delay = (routes) =>\n  function (fastify, opts, done) {\n    // Make sure customer requests won't be accepted if the magicKey is not\n    // available\n    fastify.addHook('onRequest', function (request, reply, next) {\n      if (!request.server.magicKey) {\n        reply.statusCode = 503\n        reply.header('Retry-After', USUAL_WAIT_TIME_MS)\n        reply.send({ error: true, retryInMs: USUAL_WAIT_TIME_MS })\n      }\n\n      next()\n    })\n\n    // Register to-be-delayed routes\n    fastify.register(routes, opts)\n\n    done()\n  }\n```\n\nInstead of updating every single controller that might use the `magicKey`, we\nsimply make sure that no route that's related to customer requests will be\nserved until we have everything ready. And there's more: we fail **FAST** and\nhave the possibility of giving the customer meaningful information, like how\nlong they should wait before retrying the request. Going even further, by\nissuing a [`503` status\ncode](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/503) we're\nsignaling to our infrastructure components (namely load balancers) that we're\nstill not ready to take incoming requests and they should redirect traffic to\nother instances, if available. Additionally, we are providing a `Retry-After`\nheader with the time in milliseconds the client should wait before retrying."
+   },
+   {
+    "id": "fastify:docs/Guides/Database.md#4",
+    "title": "docs/Guides/Database.md > Database > [Mongo](https://github.com/fastify/fastify-mongodb)",
+    "text": "### [Mongo](https://github.com/fastify/fastify-mongodb)\nInstall the plugin by running `npm i @fastify/mongodb`\n\n*Usage:*\n```javascript\nconst fastify = require('fastify')()\n\nfastify.register(require('@fastify/mongodb'), {\n  // force to close the mongodb connection when app stopped\n  // the default value is false\n  forceClose: true,\n\n  url: 'mongodb://mongo/mydb'\n})\n\nfastify.get('/user/:id', async function (req, reply) {\n  // Or this.mongo.client.db('mydb').collection('users')\n  const users = this.mongo.db.collection('users')\n\n  // if the id is an ObjectId format, you need to create a new ObjectId\n  const id = this.mongo.ObjectId(req.params.id)\n  try {\n    const user = await users.findOne({ id })\n    return user\n  } catch (err) {\n    return err\n  }\n})\n\nfastify.listen({ port: 3000 }, err => {\n  if (err) throw err\n})\n```"
+   },
+   {
+    "id": "fastify:SECURITY.md#11",
+    "title": "SECURITY.md > Security Policy > Handling vulnerability reports > Secondary Contact",
+    "text": "### Secondary Contact\n\nIf you do not receive an acknowledgment of your report within 6 business days,\nor if you cannot find a private security contact for the project, you may\ncontact the OpenJS Foundation CNA at <https://cna.openjsf.org/> (or\n`security@lists.openjsf.org`) for assistance.\n\nThe CNA can help ensure your report is properly acknowledged, assist with\ncoordinating disclosure timelines, and assign CVEs when necessary. This is a\nsupport mechanism to ensure security reports are handled appropriately across\nall OpenJS Foundation projects."
+   },
+   {
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#2",
+    "title": "docs/Guides/Detecting-When-Clients-Abort.md > Detecting When Clients Abort > Solution > Hands-on",
+    "text": "### Hands-on\n\nSay we have the following base server set up:\n\n```js\nimport Fastify from 'fastify';\n\nconst sleep = async (time) => {\n  return await new Promise(resolve => setTimeout(resolve, time || 1000));\n}\n\nconst app = Fastify({\n  logger: {\n    transport: {\n      target: 'pino-pretty',\n      options: {\n        translateTime: 'HH:MM:ss Z',\n        ignore: 'pid,hostname',\n      },\n    },\n  },\n})\n\napp.addHook('onRequest', async (request, reply) => {\n  request.raw.on('close', () => {\n    if (request.raw.aborted) {\n      app.log.info('request closed')\n    }\n  })\n})\n\napp.get('/', async (request, reply) => {\n  await sleep(3000)\n  reply.code(200).send({ ok: true })\n})\n\nconst start = async () => {\n  try {\n    await app.listen({ port: 3000 })\n  } catch (err) {\n    app.log.error(err)\n    process.exit(1)\n  }\n}\n\nstart()\n```\n\nOur code is setting up a Fastify server which includes the following\nfunctionality:\n\n- Accepting requests at `http://localhost:3000`, with a 3 second delayed response\nof `{ ok: true }`.\n- An onRequest hook that triggers when every request is received.\n- Logic that triggers in the hook when the request is closed.\n- Logging that occurs when the closed request property `aborted` is true.\n\nWhilst the `aborted` property has been deprecated, `destroyed` is not a\nsuitable replacement as the\n[Node.js documentation suggests](https://nodejs.org/api/http.html#requestaborted).\nA request can be `destroyed` for various reasons, such as when the server closes\nthe connection. The `aborted` property is still the most reliable way to detect\nwhen a client intentionally aborts a request."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Hooks.md#20",
+    "action": "expand",
+    "relevance_score": 0.3833,
+    "document_score": 0.9067,
+    "levels": {
+     "answers": 0.3833,
+     "elsewhere": 0.5234,
+     "different_case": 0.0588,
+     "unrelated": 0.0346
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0072,
+    "document_score": 0.0337,
+    "levels": {
+     "answers": 0.0072,
+     "elsewhere": 0.0266,
+     "different_case": 0.0425,
+     "unrelated": 0.9238
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0064,
+    "document_score": 0.0208,
+    "levels": {
+     "answers": 0.0064,
+     "elsewhere": 0.0144,
+     "different_case": 0.0362,
+     "unrelated": 0.943
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Request.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0051,
+    "document_score": 0.065,
+    "levels": {
+     "answers": 0.0051,
+     "elsewhere": 0.0599,
+     "different_case": 0.0132,
+     "unrelated": 0.9219
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0045,
+    "document_score": 0.0209,
+    "levels": {
+     "answers": 0.0045,
+     "elsewhere": 0.0164,
+     "different_case": 0.0413,
+     "unrelated": 0.9378
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Request.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0043,
+    "document_score": 0.0351,
+    "levels": {
+     "answers": 0.0043,
+     "elsewhere": 0.0308,
+     "different_case": 0.0112,
+     "unrelated": 0.9538
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0096,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0076,
+     "different_case": 0.0094,
+     "unrelated": 0.981
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Hooks.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0037,
+     "different_case": 0.0056,
+     "unrelated": 0.9892
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Database.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0029,
+     "unrelated": 0.9951
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:SECURITY.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.0018,
+     "unrelated": 0.9964
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4563
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5753,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

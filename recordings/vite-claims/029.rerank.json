@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/029.rerank",
+ "recorded_at": "2026-11-06T13:38:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 986,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.095581",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=299"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: :::tip Note Before Vite 2.7, this was informed to plugin hooks with a positional `ssr` param instead of using the `options` object.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "title": "docs/changes/this-environment-in-hooks.md > `this.environment` in Hooks",
+    "text": "# `this.environment` in Hooks\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nBefore Vite 6, only two environments were available: `client` and `ssr`. A single `options.ssr` plugin hook argument in `resolveId`, `load` and `transform` allowed plugin authors to differentiate between these two environments when processing modules in plugin hooks. In Vite 6, a Vite application can define any number of named environments as needed. We're introducing `this.environment` in the plugin context to interact with the environment of the current module in hooks.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`this.environment` was introduced in `v6.0`. The deprecation of `options.ssr` is planned for a future major. At that point we'll start recommending migrating your plugins to use the new API. To identify your usage, set `future.removePluginHookSsrArgument` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#2",
+    "title": "docs/changes/this-environment-in-hooks.md > `this.environment` in Hooks > Migration Guide",
+    "text": "## Migration Guide\n\nFor the existing plugin to do a quick migration, replace the `options.ssr` argument with `this.environment.config.consumer === 'server'` in the `resolveId`, `load` and `transform` hooks:\n\n```ts\nimport { Plugin } from 'vite'\n\nexport function myPlugin(): Plugin {\n  return {\n    name: 'my-plugin',\n    resolveId(id, importer, options) {\n      const isSSR = options.ssr // [!code --]\n      const isSSR = this.environment.config.consumer === 'server' // [!code ++]\n\n      if (isSSR) {\n        // SSR specific logic\n      } else {\n        // Client specific logic\n      }\n    },\n  }\n}\n```\n\nFor a more robust long term implementation, the plugin hook should handle for [multiple environments](/guide/api-environment-plugins.html#accessing-the-current-environment-in-hooks) using fine-grained environment options instead of relying on the environment name."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#4",
+    "title": "docs/guide/api-plugin.md > Plugin API > Simple Examples",
+    "text": "## Simple Examples\n\n:::tip\nIt is common convention to author a Vite/Rolldown/Rollup plugin as a factory function that returns the actual plugin object. The function can accept options which allows users to customize the behavior of the plugin.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "title": "docs/changes/ssr-using-modulerunner.md > SSR Using `ModuleRunner` API",
+    "text": "# SSR Using `ModuleRunner` API\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\n`server.ssrLoadModule` has been replaced by importing from a [Module Runner](/guide/api-environment-runtimes#modulerunner).\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`ModuleRunner` was first introduced in `v6.0`. The deprecation of `server.ssrLoadModule` is planned for a future major. To identify your usage, set `future.removeSsrLoadModule` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#2",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Accessing the Current Environment in Hooks",
+    "text": "## Accessing the Current Environment in Hooks\n\nGiven that there were only two Environments until Vite 6 (`client` and `ssr`), a `ssr` boolean was enough to identify the current environment in Vite APIs. Plugin Hooks received a `ssr` boolean in the last options parameter, and several APIs expected an optional last `ssr` parameter to properly associate modules to the correct environment (for example `server.moduleGraph.getModuleByUrl(url, { ssr })`).\n\nWith the advent of configurable environments, we now have a uniform way to access their options and instance in plugins. Plugin hooks now expose `this.environment` in their context, and APIs that previously expected a `ssr` boolean are now scoped to the proper environment (for example `environment.moduleGraph.getModuleByUrl(url)`).\n\nThe Vite server has a shared plugin pipeline, but when a module is processed it is always done in the context of a given environment. The `environment` instance is available in the plugin context.\n\nA plugin could use the `environment` instance to change how a module is processed depending on the configuration for the environment (which can be accessed using `environment.config`).\n\n```ts\n  transform(code, id) {\n    console.log(this.environment.config.resolve.conditions)\n  }\n```"
+   },
+   {
+    "id": "vite:docs/plugins/index.md#0",
+    "title": "docs/plugins/index.md > Plugins",
+    "text": "# Plugins\n\n:::tip NOTE\nVite aims to provide out-of-the-box support for common web development patterns. Before searching for a Vite or Compatible Rollup plugin, check out the [Features Guide](../guide/features.md). A lot of the cases where a plugin would be needed in a Rollup project are already covered in Vite.\n:::\n\nCheck out [Using Plugins](../guide/using-plugins) for information on how to use plugins."
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#10",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `mergeConfig`",
+    "text": "## `mergeConfig`\n\n**Type Signature:**\n\n```ts\nfunction mergeConfig(\n  defaults: Record<string, any>,\n  overrides: Record<string, any>,\n  isRoot = true,\n): Record<string, any>\n```\n\nDeeply merge two Vite configs. `isRoot` represents the level within the Vite config which is being merged. For example, set `false` if you're merging two `build` options.\n\nNote that `null` and `undefined` values in `overrides` are skipped and not merged. If you need to explicitly clear a value from `defaults`, modify the result of `mergeConfig` directly.\n\n::: tip NOTE\n`mergeConfig` accepts only config in object form. If you have a config in callback form, you should call it before passing into `mergeConfig`.\n\nYou can use the `defineConfig` helper to merge a config in callback form with another config:\n\n```ts twoslash\nimport {\n  defineConfig,\n  mergeConfig,\n  type UserConfigFnObject,\n  type UserConfig,\n} from 'vite'\ndeclare const configAsCallback: UserConfigFnObject\ndeclare const configAsObject: UserConfig\n\n// ---cut---\nexport default defineConfig((configEnv) =>\n  mergeConfig(configAsCallback(configEnv), configAsObject),\n)\n```\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#4",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `ViteDevServer`",
+    "text": "## `ViteDevServer`\n\n```ts\ninterface ViteDevServer {\n  /**\n   * The resolved Vite config object.\n   */\n  config: ResolvedConfig\n  /**\n   * A connect app instance\n   * - Can be used to attach custom middlewares to the dev server.\n   * - Can also be used as the handler function of a custom http server\n   *   or as a middleware in any connect-style Node.js frameworks.\n   *\n   * https://github.com/senchalabs/connect#use-middleware\n   */\n  middlewares: Connect.Server\n  /**\n   * Native Node http server instance.\n   * Will be null in middleware mode.\n   */\n  httpServer: http.Server | null\n  /**\n   * Chokidar watcher instance. If `config.server.watch` is set to `null`,\n   * it will not watch any files and calling `add` or `unwatch` will have no effect.\n   * https://github.com/paulmillr/chokidar/tree/3.6.0#api\n   */\n  watcher: FSWatcher\n  /**\n   * WebSocket server with `send(payload)` method.\n   */\n  ws: WebSocketServer\n  /**\n   * Rollup plugin container that can run plugin hooks on a given file.\n   */\n  pluginContainer: PluginContainer\n  /**\n   * Module graph that tracks the import relationships, url to file mapping\n   * and hmr state.\n   */\n  moduleGraph: ModuleGraph\n  /**\n   * The resolved urls Vite prints on the CLI (URL-encoded). Returns `null`\n   * in middleware mode or if the server is not listening on any port.\n   */\n  resolvedUrls: ResolvedServerUrls | null\n  /**\n   * Programmatically resolve, load and transform a URL and get the result\n   * without going through the http request pipeline.\n   */\n  transformRequest(\n    url: string,\n    options?: TransformOptions,\n  ): Promise<TransformResult | null>\n  /**\n   * Apply Vite built-in HTML transforms and any plugin HTML transforms.\n   */\n  transformIndexHtml(\n    url: string,\n    html: string,\n    originalUrl?: string,\n  ): Promise<string>\n  /**\n   * Load a given URL as an instantiated module for SSR.\n   */\n  ssrLoadModule(\n    url: string,\n    options?: { fixStacktrace?: boolean },\n  ): Promise<Record<string, any>>\n  /**\n   * Fix ssr error stacktrace.\n   */\n  ssrFixStacktrace(e: Error): void\n  /**\n   * Triggers HMR for a module in the module graph. You can use the `server.moduleGraph`\n   * API to retrieve the module to be reloaded. If `hmr` is false, this is a no-op.\n   */\n  reloadModule(module: ModuleNode): Promise<void>\n  /**\n   * Start the server.\n   */\n  listen(port?: number, isRestart?: boolean): Promise<ViteDevServer>\n  /**\n   * Restart the server.\n   *\n   * @param forceOptimize - force the optimizer to re-bundle, same as --force cli flag\n   */\n  restart(forceOptimize?: boolean): Promise<void>\n  /**\n   * Stop the server.\n   */\n  close(): Promise<void>\n  /**\n   * Bind CLI shortcuts\n   */\n  bindCLIShortcuts(options?: BindCLIShortcutsOptions<ViteDevServer>): void\n  /**\n   * Calling `await server.waitForRequestsIdle(id)` will wait until all static imports\n   * are processed. If called from a load or transform plugin hook, the id needs to be\n   * passed as a parameter to avoid deadlocks. Calling this function after the first\n   * static imports section of the module graph has been processed will resolve immediately.\n   * @experimental\n   */\n  waitForRequestsIdle: (ignoredId?: string) => Promise<void>\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/build.md#12",
+    "title": "docs/guide/build.md > Building for Production > Advanced Base Options",
+    "text": "## Advanced Base Options\n\n::: warning\nThis feature is experimental. [Give Feedback](https://github.com/vitejs/vite/discussions/13834).\n:::\n\nFor advanced use cases, the deployed assets and public files may be in different paths, for example to use different cache strategies.\nA user may choose to deploy in three different paths:\n\n- The generated entry HTML files (which may be processed during SSR)\n- The generated hashed assets (JS, CSS, and other file types like images)\n- The copied [public files](assets.md#the-public-directory)\n\nA single static [base](#public-base-path) isn't enough in these scenarios. Vite provides experimental support for advanced base options during build, using `experimental.renderBuiltUrl`.\n\n```ts twoslash\nimport type { UserConfig } from 'vite'\n// prettier-ignore\nconst config: UserConfig = {\n// ---cut-before---\nexperimental: {\n  renderBuiltUrl(filename, { hostType }) {\n    if (hostType === 'js') {\n      return { runtime: `window.__toCdnUrl(${JSON.stringify(filename)})` }\n    } else {\n      return { relative: true }\n    }\n  },\n},\n// ---cut-after---\n}\n```\n\nIf the hashed assets and public files aren't deployed together, options for each group can be defined independently using asset `type` included in the second `context` param given to the function.\n\n```ts twoslash\nimport path from 'node:path'\nimport type { UserConfig } from 'vite'\n// prettier-ignore\nconst config: UserConfig = {\n// ---cut-before---\nexperimental: {\n  renderBuiltUrl(filename, { hostId, hostType, type }) {\n    if (type === 'public') {\n      return 'https://www.domain.com/' + filename\n    } else if (path.extname(hostId) === '.js') {\n      return {\n        runtime: `window.__assetsPath(${JSON.stringify(filename)})`\n      }\n    } else {\n      return 'https://cdn.domain.com/assets/' + filename\n    }\n  },\n},\n// ---cut-after---\n}\n```\n\nNote that the `filename` passed is a decoded URL, and if the function returns a URL string, it should also be decoded. Vite will handle the encoding automatically when rendering the URLs. If an object with `runtime` is returned, encoding should be handled yourself where needed as the runtime code will be rendered as is."
+   },
+   {
+    "id": "vite:docs/guide/using-plugins.md#2",
+    "title": "docs/guide/using-plugins.md > Using Plugins > Finding Plugins",
+    "text": "## Finding Plugins\n\n:::tip NOTE\nVite aims to provide out-of-the-box support for common web development patterns. Before searching for a Vite or compatible Rollup plugin, check out the [Features Guide](../guide/features.md). A lot of the cases where a plugin would be needed in a Rollup project are already covered in Vite.\n:::\n\nCheck out the [Plugins section](../plugins/) for information about official plugins. Community plugins that are published to npm are listed in [Vite Plugin Registry](https://registry.vite.dev/plugins)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "action": "use",
+    "relevance_score": 0.9538,
+    "document_score": 0.9652,
+    "levels": {
+     "answers": 0.9538,
+     "elsewhere": 0.0115,
+     "different_case": 0.0225,
+     "unrelated": 0.0122
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/changes/this-environment-in-hooks.md#2",
+    "action": "use",
+    "relevance_score": 0.6903,
+    "document_score": 0.7918,
+    "levels": {
+     "answers": 0.6903,
+     "elsewhere": 0.1015,
+     "different_case": 0.051,
+     "unrelated": 0.1572
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/api-environment-plugins.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0991,
+    "document_score": 0.2305,
+    "levels": {
+     "answers": 0.0991,
+     "elsewhere": 0.1313,
+     "different_case": 0.0468,
+     "unrelated": 0.7227
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/plugins/index.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0171,
+    "document_score": 0.1925,
+    "levels": {
+     "answers": 0.0171,
+     "elsewhere": 0.1754,
+     "different_case": 0.0249,
+     "unrelated": 0.7826
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/using-plugins.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0089,
+    "document_score": 0.1277,
+    "levels": {
+     "answers": 0.0089,
+     "elsewhere": 0.1189,
+     "different_case": 0.0203,
+     "unrelated": 0.8519
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/api-plugin.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0071,
+    "document_score": 0.0496,
+    "levels": {
+     "answers": 0.0071,
+     "elsewhere": 0.0426,
+     "different_case": 0.0143,
+     "unrelated": 0.9361
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/api-javascript.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0068,
+    "document_score": 0.0607,
+    "levels": {
+     "answers": 0.0068,
+     "elsewhere": 0.0538,
+     "different_case": 0.0284,
+     "unrelated": 0.9109
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/build.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0062,
+    "document_score": 0.0335,
+    "levels": {
+     "answers": 0.0062,
+     "elsewhere": 0.0273,
+     "different_case": 0.02,
+     "unrelated": 0.9465
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-javascript.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.006,
+    "document_score": 0.0351,
+    "levels": {
+     "answers": 0.006,
+     "elsewhere": 0.0291,
+     "different_case": 0.0252,
+     "unrelated": 0.9397
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0058,
+    "document_score": 0.0316,
+    "levels": {
+     "answers": 0.0058,
+     "elsewhere": 0.0258,
+     "different_case": 0.0159,
+     "unrelated": 0.9524
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3957
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5147,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

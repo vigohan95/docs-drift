@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/000.rerank",
+ "recorded_at": "2026-11-06T13:37:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1210,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.91584",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=485"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Due to peculiarities of Go Modules, v3.y.z will be displayed as v0.3y.z (the y in v0.3y.z is always padded to two digits, with a leading zero if needed), while v2.y.z will be displayed as v0.y.z.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:RELEASE.md#12",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 3. Tag the library release",
+    "text": "### 3. Tag the library release\n\nGo modules versioning requires strict use of semver. Because we do not commit to\navoid code-level breaking changes for the libraries between minor releases of\nthe Prometheus server, we use major version zero releases for the libraries.\n\nTagging the new library release works similar to the normal release tagging,\nbut without the subsequent build and publish steps. Use the following commands:\n\n```bash\ntag=\"v$(./scripts/get_module_version.sh)\"\ngit tag -s \"${tag}\" -m \"${tag}\"\ngit push origin \"${tag}\"\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "title": "tsdb/docs/bstream.md > bstream details > Delta-of-delta encoding for timestamps",
+    "text": "## Delta-of-delta encoding for timestamps\n\nWe need to be able to encode and decode dod's for timestamps, which can be positive, zero, or negative.\nNote that int64's are implemented as [2's complement](https://en.wikipedia.org/wiki/Two%27s_complement)\n\nand look like:\n\n```\n0111...111 = maxint64\n    ...\n0000...111 = 7\n0000...110 = 6\n0000...101 = 5\n0000...100 = 4\n0000...011 = 3\n0000...010 = 2\n0000...001 = 1\n0000...000 = 0\n1111...111 = -1\n1111...110 = -2\n1111...101 = -3\n1111...100 = -4\n1111...011 = -5\n1111...010 = -6\n1111...001 = -7\n1111...000 = -8\n    ...\n1000...001 = minint64+1\n1000...000 = minint64\n```\n\nAll numbers have a prefix (of zeroes for positive numbers, of ones for negative numbers), followed by a number of significant digits at the end.\nIn all cases, the smaller the absolute value of the number, the fewer the amount of significant digits.\n\nTo encode these numbers, we use:\n* A prefix which declares the amount of bits that follow (we use a predefined list of options in order of increasing number of significant bits).\n* A number of bits which is one more than the number of significant bits.  The extra bit is needed because we deal with unsigned integers, although\n  it isn't exactly a sign bit. (See below for details).\n\nThe `bitRange` function determines whether a given integer can be represented by a number of bits.\nFor a given number of bits `nbits` we can distinguish (and thus encode) any set of `2^nbits` numbers.\nE.g. for `nbits = 3`, we can encode 8 distinct numbers, and we have a choice of choosing our boundaries.  For example -4 to 3,\n-3 to 4, 0 to 7 or even -2 to 5 (always inclusive).  (Observe in the list above that this is always true.)\nBecause we need to support positive and negative numbers equally, we choose boundaries that grow symmetrically.  Following the same example,\nwe choose -3 to 4."
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `SeriesRef` > `HeadSeriesRef`",
+    "text": "#### `HeadSeriesRef`\n\n`HeadSeriesRef` is simply a 64bit counter that increments when a new series comes in.\nDue to series churn, the set of actively used `HeadSeriesRef`s may be well above zero (e.g. 0-10M may not be used, and 10M-11M is active)\n\nUsage:\n* [`stripeSeries`](https://github.com/prometheus/prometheus/blob/fdbc40a9efcc8197a94f23f0e479b0b56e52d424/tsdb/head.go#L1292-L1298) (note: when you don't know a `HeadSeriesRef` for a series, you can also access it by a hash of the series' labels)\n* WAL\n* `HeadChunkRef`s include them for addressing head chunks, as those are owned by the `memSeries`.\n\nNotes:\n1) M-mapped Head chunks, while they use `HeadSeriesRef`s, don't contain an index and depend on the series listing in memory.\nOnce mmapped, chunks have `HeadSeriesRef`s inside them, allowing you to recreate the index from reading chunks\n(Along with WAL which has the labels for those `HeadSeriesRef`s. It also has all those samples, but by using m-mapped chunks we can save cpu/time and not replay all of WAL on startup)\n\n2) During querying, `HeadSeriesRef` are limited to 2^40 (see `HeadChunkRef`)\n\n3) The last `HeadSeriesRef` is always replayed from the WAL and is continued from there."
+   },
+   {
+    "id": "prometheus:RELEASE.md#7",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 0. Updating dependencies and promoting/demoting experimental features > Manually updating Go dependencies",
+    "text": "#### Manually updating Go dependencies\n\nThis is usually only needed for `+incompatible` and `v0.0.0` non-semver updates.\n\n```bash\nmake update-all-go-deps\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#25",
+    "title": "docs/querying/functions.md > `histogram_quantile()`",
+    "text": "If `b` has 0 observations, `NaN` is returned. For φ < 0, `-Inf` is\nreturned. For φ > 1, `+Inf` is returned. For φ = `NaN`, `NaN` is returned.\n\nSpecial cases for classic histograms:\n\n* If `b` contains fewer than two buckets, `NaN` is returned.\n* The highest bucket must have an upper bound of `+Inf`. (Otherwise, `NaN` is\n  returned.)\n* If a quantile is located in the highest bucket, the upper bound of the second\n  highest bucket is returned.\n* The lower limit of the lowest bucket is assumed to be 0 if the upper bound of\n  that bucket is greater than 0. In that case, the usual linear interpolation\n  is applied within that bucket. Otherwise, the upper bound of the lowest\n  bucket is returned for quantiles located in the lowest bucket.\n\nSpecial cases for native histograms:\n\n* If a native histogram with standard exponential buckets has `NaN`\n  observations and the quantile falls into one of the existing exponential\n  buckets, the result is skewed towards higher values due to `NaN`\n  observations treated as `+Inf`. This is flagged with an info level\n  annotation.\n* If a native histogram with standard exponential buckets has `NaN`\n  observations and the quantile falls above all of the existing exponential\n  buckets, `NaN` is returned. This is flagged with an info level annotation.\n* A zero bucket with finite width is assumed to contain no negative\n  observations if the histogram has observations in positive buckets, but none\n  in negative buckets.\n* A zero bucket with finite width is assumed to contain no positive\n  observations if the histogram has observations in negative buckets, but none\n  in positive buckets."
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `ChunkRef` > `HeadChunkRef`",
+    "text": "#### `HeadChunkRef`\n\nA `HeadChunkRef` is an 8 byte integer that packs together:\n\n* 5 Bytes for `HeadSeriesRef`.\n* 3 Bytes for `HeadChunkID` (uint64) (see below).\n\nThere are two implications here:\n\n* While `HeadSeriesRef`s can during ingestion go higher, during querying they are limited to 2^40.  Querying too high numbers will lead to query failures (but not impact ingestion).\n* `ChunkID` keeps growing as we enter new chunks until Prometheus restarts. If Prometheus runs too long, we might hit 2^24.\n  ([957 years](https://www.wolframalpha.com/input/?i=2%5E24+*+120+*+15+seconds+in+years) at 1 sample per 15 seconds).  If `ChunkID=len(mmappedchunks)` then it's the head chunk."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#2",
+    "title": "docs/feature_flags.md > Memory snapshot on shutdown",
+    "text": "## Memory snapshot on shutdown\n\n`--enable-feature=memory-snapshot-on-shutdown`\n\nThis takes a snapshot of the chunks that are in memory along with the series information when shutting down and stores it on disk. This will reduce the startup time since the memory state can now be restored with this snapshot\nand m-mapped chunks, while a WAL replay from disk is only needed for the parts of the WAL that are not part of the snapshot."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#26",
+    "title": "docs/querying/functions.md > `histogram_quantile()`",
+    "text": "You can use `histogram_quantile(0, v instant-vector)` to get the estimated\nminimum value stored in a histogram.\n\nYou can use `histogram_quantile(1, v instant-vector)` to get the estimated\nmaximum value stored in a histogram.\n\nBuckets of classic histograms are cumulative. Therefore, the following should\nalways be the case:\n\n* The counts in the buckets are monotonically increasing (strictly\n  non-decreasing).\n* A lack of observations between the upper limits of two consecutive buckets\n  results in equal counts in those two buckets.\n\nHowever, floating point precision issues (e.g. small discrepancies introduced\nby computing of buckets with `sum(rate(...))`) or invalid data might violate\nthese assumptions. In that case, `histogram_quantile` would be unable to return\nmeaningful results. To mitigate the issue, `histogram_quantile` assumes that\ntiny relative differences between consecutive buckets are happening because of\nfloating point precision errors and ignores them. (The threshold to ignore a\ndifference between two buckets is a trillionth (1e-12) of the sum of both\nbuckets.) Furthermore, if there are non-monotonic bucket counts even after this\nadjustment, they are increased to the value of the previous buckets to enforce\nmonotonicity. The latter is evidence for an actual issue with the input data\nand is therefore flagged by an info-level annotation reading `input to\nhistogram_quantile needed to be fixed for monotonicity`. If you encounter this\nannotation, you should find and remove the source of the invalid data."
+   },
+   {
+    "id": "prometheus:discovery/README.md#4",
+    "title": "discovery/README.md > Service Discovery > Design of a Prometheus SD > Other implementation considerations",
+    "text": "### Other implementation considerations\n\nSDs are intended to dump all possible targets. For example the optional use of\nEC2 service discovery would be to take the entire region's worth of EC2\ninstances it provides and do everything needed in one `scrape_config`. For\nlarge deployments where you are only interested in a small proportion of the\nreturned targets, this may cause performance issues. If this occurs it is\nacceptable to also offer filtering via whatever mechanisms the SD exposes. For\nEC2 that would be the `Filter` option on `DescribeInstances`. Keep in mind that\nthis is a performance optimisation, it should be possible to do the same\nfiltering using relabelling alone. As with SD generally, we do not invent new\nways to filter targets (that is what relabelling is for), merely offer up\nwhatever functionality the SD itself offers.\n\nIt is a general rule with Prometheus that all configuration comes from the\nconfiguration file. While the libraries you use to talk to the SD may also\noffer other mechanisms for providing configuration/authentication under the\ncovers (EC2's use of environment variables being a prime example), using your SD\nmechanism should not require this. Put another way, your SD implementation\nshould not read environment variables or files to obtain configuration.\n\nSome SD mechanisms have rate limits that make them challenging to use. As an\nexample we have unfortunately had to reject Amazon ECS service discovery due to\nthe rate limits being so low that it would not be usable for anything beyond\nsmall setups."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#37",
+    "title": "docs/querying/functions.md > `irate()`",
+    "text": "## `irate()`\n\n`irate(v range-vector)` calculates the per-second instant rate of increase of\nthe time series in the range vector. This is based on the last two data points.\nBreaks in monotonicity (such as counter resets due to target restarts) are\nautomatically adjusted for. Both samples must be either float samples or\nhistogram samples. Elements in `v` where one of the last two samples is a float\nsample and the other is a histogram sample will be omitted from the result\nvector, flagged by a warn-level annotation.\n\n`irate` should only be used with counters (for both floats and histograms).\n\nThe following example expression returns the per-second rate of HTTP requests\nlooking up to 5 minutes back for the two most recent data points, per time\nseries in the range vector:\n\n```\nirate(http_requests_total{job=\"api-server\"}[5m])\n```\n\n`irate` should only be used when graphing volatile, fast-moving counters.\nUse `rate` for alerts and slow-moving counters, as brief changes\nin the rate can reset the `FOR` clause and graphs consisting entirely of rare\nspikes are hard to read.\n\nNote that when combining `irate()` with an\n[aggregation operator](operators.md#aggregation-operators) (e.g. `sum()`)\nor a function aggregating over time (any function ending in `_over_time`),\nalways take an `irate()` first, then aggregate. Otherwise `irate()` cannot detect\ncounter resets when your target restarts."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:RELEASE.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0155,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0122,
+     "different_case": 0.0128,
+     "unrelated": 0.9717
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:RELEASE.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0021,
+     "different_case": 0.0043,
+     "unrelated": 0.9916
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0009,
+     "different_case": 0.0021,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:discovery/README.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0005,
+     "different_case": 0.0018,
+     "unrelated": 0.9964
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/querying/functions.md#26",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0006,
+     "different_case": 0.0019,
+     "unrelated": 0.9963
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/functions.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0016,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0005,
+     "different_case": 0.0014,
+     "unrelated": 0.997
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0006,
+     "different_case": 0.0015,
+     "unrelated": 0.997
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0009,
+    "document_score": 0.0014,
+    "levels": {
+     "answers": 0.0009,
+     "elsewhere": 0.0005,
+     "different_case": 0.0015,
+     "unrelated": 0.9971
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/querying/functions.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0009,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.0009,
+     "elsewhere": 0.0005,
+     "different_case": 0.0016,
+     "unrelated": 0.9969
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/feature_flags.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0008,
+    "document_score": 0.0013,
+    "levels": {
+     "answers": 0.0008,
+     "elsewhere": 0.0005,
+     "different_case": 0.0012,
+     "unrelated": 0.9975
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4246
+  },
+  "timing": {
+   "total_ms": 240,
+   "rerank_ms": 239,
+   "questions_ms": 0,
+   "model_ms": 88,
+   "engine": {
+    "rows": 5116,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 88,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 85,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

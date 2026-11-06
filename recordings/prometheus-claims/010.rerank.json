@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/010.rerank",
+ "recorded_at": "2026-11-06T13:37:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1166,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "115.197151",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=170,cfOrigin;dur=0,cfWorker;dur=327"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Continuing the same example, the numbers 001, 010, 011 and 100 are returned as unsigned integers 1,2,3,4 and mean the same thing when casted to int64's.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#1",
+    "title": "tsdb/docs/format/memory_snapshot.md > Memory Snapshot Format > Series records",
+    "text": "### Series records\n\nThis record is a snapshot of a single series. Only one series exists per record.\nIt includes the metadata of the series and the in-memory chunk data if it exists.\nThe sampleBuf is the last 4 samples in the in-memory chunk.\n\n```\n┌──────────────────────────┬────────────────────────────┐\n│     Record Type <byte>   │   Series Ref <uint64>      │\n├──────────────────────────┴────────────────────────────┤\n│               Number of Labels <uvarint>              │\n├──────────────────────────────┬────────────────────────┤\n│     len(name_1) <uvarint>    │    name_1 <bytes>      │\n├──────────────────────────────┼────────────────────────┤\n│     len(val_1) <uvarint>     │    val_1 <bytes>       │\n├──────────────────────────────┴────────────────────────┤\n│                         . . .                         │\n├──────────────────────────────┬────────────────────────┤\n│     len(name_N) <uvarint>    │    name_N <bytes>      │\n├──────────────────────────────┼────────────────────────┤\n│     len(val_N) <uvarint>     │    val_N <bytes>       │\n├──────────────────────────────┴────────────────────────┤\n│                  Chunk Range <int64>                  │\n├───────────────────────────────────────────────────────┤\n│                 Chunk Exists <uvarint>                │\n│ # 1 if head chunk exists, 0 otherwise to detect a nil |\n| # chunk. Below fields exists only when it's 1 here.   |\n├───────────────────────────┬───────────────────────────┤\n│     Chunk Mint <int64>    │    Chunk Maxt <int64>     │\n├───────────────────────────┴───────────────────────────┤\n│                 Chunk Encoding <byte>                 │\n├──────────────────────────────┬────────────────────────┤\n│      len(Chunk) <uvarint>    │    Chunk <bytes>       │\n├──────────────────────────┬───┴────────────────────────┤\n|  sampleBuf[0].t <int64>  |  sampleBuf[0].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[1].t <int64>  |  sampleBuf[1].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[2].t <int64>  |  sampleBuf[2].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[3].t <int64>  |  sampleBuf[3].v <float64>  | \n└──────────────────────────┴────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#37",
+    "title": "docs/querying/operators.md > Binary operator precedence",
+    "text": "## Binary operator precedence\n\nThe following list shows the precedence of binary operators in Prometheus, from\nhighest to lowest.\n\n1. `^`\n2. `*`, `/`, `%`, `atan2`, `bitand`, `bitor`, `bitxor`\n3. `+`, `-`\n4. `==`, `!=`, `<=`, `<`, `>=`, `>`\n5. `and`, `unless`\n6. `or`\n\nOperators on the same precedence level are left-associative. For example,\n`2 * 3 % 2` is equivalent to `(2 * 3) % 2`. However `^` is right associative,\nso `2 ^ 3 ^ 2` is equivalent to `2 ^ (3 ^ 2)`."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram chunk data > Notes:",
+    "text": "### Notes:\n\n* `histogram_flags` is a byte of which currently only the first two bits are used:\n  * `10`: Counter reset between the previous chunk and this one.\n  * `01`: No counter reset between the previous chunk and this one.\n  * `00`: Counter reset status unknown.\n  * `11`: Chunk is part of a gauge histogram, no counter resets are happening.\n* `zero_threshold` has a specific encoding:\n  * If 0, it is a single zero byte.\n  * If a power of two between 2^-243 and 2^10, it is a single byte between 1 and 254.\n  * Otherwise, it is a byte with all bits set (255), followed by a float64, resulting in 9 bytes length.\n* `schema` is a specific value defined by the exposition format. Currently\n  valid values are either -4 <= n <= 8 (standard exponential schemas) or -53\n  (custom bucket boundaries).\n* `<varbit_int>` is a variable bitwidth encoding for signed integers, optimized for “delta of deltas” of bucket deltas. It has between 1 bit and 9 bytes.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L31-L60).\n* `<varbit_uint>` is a variable bitwidth encoding for unsigned integers with the same bit-bucketing as `<varbit_int>`.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L136-L165).\n* `<varbit_xor>` is a specific variable bitwidth encoding of the result of XORing the current and the previous value. It has between 1 bit and 77 bits.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/histogram.go#L538-L574).\n* `padding` of 0 to 7 bits so that the whole chunk data is byte-aligned.\n* Note that buckets are inherently deltas between the current bucket and the previous bucket. Only `bucket_0` is an absolute count.\n* The chunk can have as few as one sample, i.e. sample 1 and following are optional.\n* Similarly, there could be down to zero spans and down to zero buckets."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#9",
+    "title": "docs/querying/basics.md > Literals > Duration expressions",
+    "text": "For example, `max_of(step(), 5s)` ensures the duration is never shorter than\n`5s`, while `min_of(range(), 1h)` caps the duration at `1h`.\n\nLike the scalar functions, `min_of` and `max_of` ignore a `NaN` argument if the\nother argument is not `NaN`. If both arguments are `NaN`, the result is `NaN`.\nA duration expression whose final result is `NaN` or infinite is rejected.\n\n**Note**: Duration expressions are not supported in the [`@` modifier](#modifier).\n\nExamples of equivalent durations:\n\n* `5m * 2` is equivalent to `10m` or `600s`.\n* `10m - 1m` is equivalent to `9m` or `540s`.\n* `(5+2) * 1m` is equivalent to `7m` or `420s`.\n* `1h / 2` is equivalent to `30m` or `1800s`.\n* `4h % 3h` is equivalent to `1h` or `3600s`.\n* `(2 ^ 3) * 1m` is equivalent to `8m` or `480s`.\n* `step() + 1` is equivalent to the query step width increased by `1s`.\n* `max_of(step(), 5s)` is equivalent to the larger of the query step width and `5s`.\n* `min_of(2 * step() + 5s, 5m)` is equivalent to the smaller of twice the query step increased by `5s` and `5m`."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#17",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram chunk data > Notes:",
+    "text": "The `<custom>` encoding within the custom values data depends on the schema.\nFor schema -53 (custom bucket boundaries, currently the only use case for\ncustom values), the values to encode are bucket boundaries in the form of\nfloats. The encoding of a given float value _x_ works as follows:\n\n1. Create an intermediate value _y_ = _x_ * 1000.\n2. If 0 ≤ _y_ ≤ 33554430 _and_ if the decimal value of _y_ is integer, store\n   _y_ + 1 as `<varbit_uint>`.\n3. Otherwise, store a 0 bit, followed by the 64 bit of the original _x_\n   encoded as plain `<float64>`.\n\nNote that values stored as per (2) will always start with a 1 bit, which allow\ndecoders to recognize this case in contrast to values stores as per (3), which\nalways start with a 0 bit.\n\nThe rational behind this encoding is that most custom bucket boundaries are set\nby humans as decimal numbers with not very many decimal places. In most cases,\nthe encoding will therefore result in a short varbit representation. The upper\nbound of 33554430 is picked so that the varbit encoded value will take at most\n4 bytes."
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `ChunkRef` > `HeadChunkRef`",
+    "text": "#### `HeadChunkRef`\n\nA `HeadChunkRef` is an 8 byte integer that packs together:\n\n* 5 Bytes for `HeadSeriesRef`.\n* 3 Bytes for `HeadChunkID` (uint64) (see below).\n\nThere are two implications here:\n\n* While `HeadSeriesRef`s can during ingestion go higher, during querying they are limited to 2^40.  Querying too high numbers will lead to query failures (but not impact ingestion).\n* `ChunkID` keeps growing as we enter new chunks until Prometheus restarts. If Prometheus runs too long, we might hit 2^24.\n  ([957 years](https://www.wolframalpha.com/input/?i=2%5E24+*+120+*+15+seconds+in+years) at 1 sample per 15 seconds).  If `ChunkID=len(mmappedchunks)` then it's the head chunk."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#18",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram ST chunk data",
+    "text": "## Histogram ST chunk data\n\nThe histogram ST chunk extends the histogram chunk format with optional Start\nTimestamp (ST) data, using the same ST encoding scheme as XOR2. The base\nhistogram sample encoding is identical to the\n[histogram chunk](#histogram-chunk-data). The total header is 3 bytes — the\nsame size as the histogram chunk header — but the counter-reset bits are\nrelocated into the high 2 bits of the sample count byte so that byte 2 can\nhold the ST header. An optional ST field is appended after each sample's data.\n\n```\n┌────────────────────────┬───────────────────────┬────────────────────┬───────────────────────────────┬─────────────────────┬──────────────────┬──────────────────┬──────────────────────┬────────────────┬──────────────────┐\n│ counter_reset <2 bits> │ num_samples <14 bits> │ st_header <1 byte> │ zero_threshold <1 or 9 bytes> │ schema <varbit_int> │ pos_spans <data> │ neg_spans <data> │ custom_values <data> │ samples <data> │ padding <x bits> │\n└────────────────────────┴───────────────────────┴────────────────────┴───────────────────────────────┴─────────────────────┴──────────────────┴──────────────────┴──────────────────────┴────────────────┴──────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "title": "docs/configuration/unit_testing_rules.md > Test file format > `<series>`",
+    "text": "### `<series>`\n\n```yaml\n# This follows the usual series notation '<metric name>{<label name>=<label value>, ...}'\n# Examples:\n#      series_name{label1=\"value1\", label2=\"value2\"}\n#      go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}\nseries: <string>\n\n# This uses expanding notation.\n# Expanding notation:\n#     'a+bxn' becomes 'a a+b a+(2*b) a+(3*b) … a+(n*b)'\n#     Read this as series starts at a, then n further samples incrementing by b.\n#     'a-bxn' becomes 'a a-b a-(2*b) a-(3*b) … a-(n*b)'\n#     Read this as series starts at a, then n further samples decrementing by b (or incrementing by negative b).\n#     'axn' becomes 'a a a … a' (a n+1 times) - it's a shorthand for 'a+0xn'\n# There are special values to indicate missing and stale samples:\n#     '_' represents a missing sample from scrape\n#     'stale' indicates a stale sample\n# Examples:\n#     1. '-2+4x3' becomes '-2 2 6 10' - series starts at -2, then 3 further samples incrementing by 4.\n#     2. ' 1-2x4' becomes '1 -1 -3 -5 -7' - series starts at 1, then 4 further samples decrementing by 2.\n#     3. ' 1x4' becomes '1 1 1 1 1' - shorthand for '1+0x4', series starts at 1, then 4 further samples incrementing by 0.\n#     4. ' 1 _x3 stale' becomes '1 _ _ _ stale' - the missing sample cannot increment, so 3 missing samples are produced by the '_x3' expression.\n#\n# Native histogram notation:\n#     Native histograms can be used instead of floating point numbers using the following notation:\n#     {{schema:1 sum:-0.3 count:3.1 z_bucket:7.1 z_bucket_w:0.05 buckets:[5.1 10 7] offset:-3 n_buckets:[4.1 5] n_offset:-5 counter_reset_hint:gauge}}\n#     Native histograms support the same expanding notation as floating point numbers, i.e. 'axn', 'a+bxn' and 'a-bxn'.\n#     All properties are optional and default to 0. The order is not important. The following properties are supported:\n#     - schema (int):\n#         Currently valid schema numbers are -53 and -4 <= n <= 8.\n#         Schema -53 is the custom buckets schema, upper bucket boundaries are defined in custom_values\n#         like for classic histograms, and you shouldn't use z_bucket, z_bucket_w, n_buckets, n_offset.\n#         The rest are base-2 standard schemas, where 1.0 is a bucket boundary in each case, and\n#         then each power of two is divided into 2^n logarithmic buckets.  Or\n#         in other words, each bucket boundary is the previous boundary times\n#         2^(2^-n).\n#     - sum (float):\n#         The sum of all observations, including the zero bucket.\n#     - count (non-negative float):\n#         The number of observations, including those that are NaN and including the zero bucket.\n#     - z_bucket (non-negative float):\n#         The sum of all observations in the zero bucket.\n#     - z_bucket_w (non-negative float):\n#         The width of the zero bucket.\n#         If z_bucket_w > 0, the zero bucket contains all observations -z_bucket_w <= x <= z_bucket_w.\n#         Otherwise, the zero bucket only contains observations that are exactly 0.\n#     - buckets (list of non-negative floats):\n#         Observation counts in positive buckets. Each represents an absolute count.\n#     - offset (int):\n#         The starting index of the first entry in the positive buckets.\n#     - n_buckets (list of non-negative floats):\n#         Observation counts in negative buckets. Each represents an absolute count.\n#     - n_offset (int):\n#         The starting index of the first entry in the negative buckets.\n#     - counter_reset_hint (one of 'unknown', 'reset', 'not_reset' or 'gauge')"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#12",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "# Limit per scrape config on the number of targets dropped by relabeling\n# that will be kept in memory. 0 means no limit.\n[ keep_dropped_targets: <int> | default = 0 ]\n\n# Specifies the validation scheme for metric and label names. Either blank or\n# \"utf8\" for full UTF-8 support, or \"legacy\" for letters, numbers, colons, and\n# underscores.\n[ metric_name_validation_scheme: <string> | default \"utf8\" ]\n\n# Specifies the character escaping scheme that will be requested when scraping\n# for metric and label names that do not conform to the legacy Prometheus\n# character set. Available options are:\n#   * `allow-utf-8`: Full UTF-8 support, no escaping needed.\n#   * `underscores`: Escape all legacy-invalid characters to underscores.\n#   * `dots`: Escapes dots to `_dot_`, underscores to `__`, and all other\n#     legacy-invalid characters to underscores.\n#   * `values`: Prepend the name with `U__` and replace all invalid\n#     characters with their unicode value, surrounded by underscores. Single\n#     underscores are replaced with double underscores.\n#     e.g. \"U__my_2e_dotted_2e_name\".\n# If this value is left blank, Prometheus will default to `allow-utf-8` if the\n# validation scheme for the current scrape config is set to utf8, or\n# `underscores` if the validation scheme is set to `legacy`.\n[ metric_name_escaping_scheme: <string> | default \"allow-utf-8\" ]\n\n# Limit on total number of positive and negative buckets allowed in a single\n# native histogram. The resolution of a histogram with more buckets will be\n# reduced until the number of buckets is within the limit. If the limit cannot\n# be reached, the scrape will fail.\n# 0 means no limit.\n[ native_histogram_bucket_limit: <int> | default = 0 ]\n\n# Lower limit for the growth factor of one bucket to the next in each native\n# histogram. The resolution of a histogram with a lower growth factor will be\n# reduced as much as possible until it is within the limit.\n# To set an upper limit for the schema (equivalent to \"scale\" in OTel's\n# exponential histograms), use the following factor limits:\n#\n# +----------------------------+----------------------------+\n# |        growth factor       | resulting schema AKA scale |\n# +----------------------------+----------------------------+\n# |          65536             |             -4             |\n# +----------------------------+----------------------------+\n# |            256             |             -3             |\n# +----------------------------+----------------------------+\n# |             16             |             -2             |\n# +----------------------------+----------------------------+\n# |              4             |             -1             |\n# +----------------------------+----------------------------+\n# |              2             |              0             |\n# +----------------------------+----------------------------+\n# |              1.4           |              1             |\n# +----------------------------+----------------------------+\n# |              1.1           |              2             |\n# +----------------------------+----------------------------+\n# |              1.09          |              3             |\n# +----------------------------+----------------------------+\n# |              1.04          |              4             |\n# +----------------------------+----------------------------+\n# |              1.02          |              5             |\n# +----------------------------+----------------------------+\n# |              1.01          |              6             |"
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#8",
+    "title": "documentation/internal_architecture.md > Internal architecture > Scrape manager > Target updates and overall architecture",
+    "text": "### Target updates and overall architecture\n\nIn the same way that the scrape discovery manager runs one discovery mechanism for each `scrape_config`, the scrape manager runs a corresponding scrape pool for each such section. Both identify these sections (e.g. across reloads and across the two components) via the section's `job_name` field, which has to be unique in a given configuration file. The discovery manager sends target updates for each `scrape_config` over a synchronization channel to the scrape manager, [which then applies those updates to the corresponding scrape pools](https://github.com/prometheus/prometheus/blob/v2.3.1/scrape/manager.go#L150-L173). Each scrape pool in turn runs one scrape loop for each target. The overall hierarchy looks like this:\n\n* Scrape manager\n  * Scrape pool for `scrape_config` 1\n    * Scrape loop for target 1\n    * Scrape loop for target 2\n    * Scrape loop for target 3\n    * [...]\n    * Scrape loop for target n\n  * Scrape pool for `scrape_config` 2\n    * [...]\n  * Scrape pool for `scrape_config` 3\n    * [...]\n  * [...]\n  * Scrape pool for `scrape_config` n\n    * [...]"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0064,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.004,
+     "different_case": 0.008,
+     "unrelated": 0.9857
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:tsdb/docs/format/chunks.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0015,
+     "different_case": 0.0041,
+     "unrelated": 0.9926
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0016,
+     "different_case": 0.0067,
+     "unrelated": 0.99
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0028,
+     "different_case": 0.0063,
+     "unrelated": 0.9892
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/format/chunks.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0014,
+     "different_case": 0.0037,
+     "unrelated": 0.9935
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.0031,
+     "unrelated": 0.9945
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/operators.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0012,
+     "different_case": 0.0028,
+     "unrelated": 0.9947
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/configuration/configuration.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0006,
+     "different_case": 0.0021,
+     "unrelated": 0.9961
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:documentation/internal_architecture.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0026,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/basics.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0005,
+     "different_case": 0.0013,
+     "unrelated": 0.9972
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6001
+  },
+  "timing": {
+   "total_ms": 134,
+   "rerank_ms": 118,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 7031,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

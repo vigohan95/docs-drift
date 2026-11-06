@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/005.rerank",
+ "recorded_at": "2026-11-06T13:37:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1057,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.154526",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=62,cfOrigin;dur=0,cfWorker;dur=309"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: The `make docker` target is intended only for use in our CI system and will not produce a fully working image when run locally.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:RELEASE.md#10",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 1. Prepare your release",
+    "text": "Run it for the target release version (RC, final, or patch; for example `v3.11.0-rc.0`, `v3.11.0`, or `v3.11.1`):\n\n```bash\nGITHUB_TOKEN=<token> scripts/generate_release_notes.sh 3.Y_SET_ME.Z_SET_ME\n```\n\nReview the output carefully before adding it to `CHANGELOG.md`:\n\n- Remove entries already present in a previous release's Changelog. Duplicates can appear for fixes merged to the previous release branch.\n- `CHANGELOG.md` should only document changes relevant to users of Prometheus, including external API changes, performance improvements, and new features. Do not document changes of internal interfaces, code refactorings and clean-ups, changes to the build process, etc. People interested in these are asked to refer to the git history.\n\nThen bump the UI module version:\n\n```bash\nmake ui-bump-version\n```\n\nAll of the above goes to make a PR, which you should create targeting the `release-x.y` branch, then wait for CI to complete and get an approval.\nOnce the PR is ready, merge it into the release branch and pull it down to your work area. Then you are ready for the next step:"
+   },
+   {
+    "id": "prometheus:docs/installation.md#4",
+    "title": "docs/installation.md > Using Docker > Setting command line parameters",
+    "text": "### Setting command line parameters\n\nThe Docker image is started with a number of default command line parameters, which\ncan be found in the [Dockerfile](https://github.com/prometheus/prometheus/blob/main/Dockerfile) (adjust the link to correspond with the version in use).\n\nIf you want to add extra command line parameters to the `docker run` command,\nyou will need to re-add these yourself as they will be overwritten."
+   },
+   {
+    "id": "prometheus:RELEASE.md#8",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 0. Updating dependencies and promoting/demoting experimental features > Manually updating React dependencies",
+    "text": "#### Manually updating React dependencies\n\nThe React application recently moved to a monorepo system with multiple internal npm packages. Dependency upgrades are\nquite sensitive for the time being.\n\nIn case you want to update the UI dependencies, you can run the following command:\n\n```bash\nmake update-npm-deps\n```\n\nOnce this step completes, please verify that no additional `node_modules` directory was created in any of the module subdirectories\n(which could indicate conflicting dependency versions across modules). Then run `make ui-build` to verify that the build is still working.\n\nNote: Once in a while, the npm dependencies should also be updated to their latest release versions (major or minor) with `make upgrade-npm-deps`,\nthough this may be done at convenient times (e.g. by the UI maintainers) that are out-of-sync with Prometheus releases."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#50",
+    "title": "docs/configuration/configuration.md > Configuration file > `<dockerswarm_sd_config>` > `tasks`",
+    "text": "#### `tasks`\n\nThe `tasks` role discovers all [Swarm tasks](https://docs.docker.com/engine/swarm/key-concepts/#services-and-tasks)\nand exposes their ports as targets. For each published port of a task, a single\ntarget is generated. If a task has no published ports, a target per task is\ncreated using the `port` parameter defined in the SD configuration.\n\nAvailable meta labels:\n\n* `__meta_dockerswarm_container_label_<labelname>`: each label configured in the task's `ContainerSpec`, with any unsupported characters converted to an underscore. Labels defined in the image are not available through the Docker Swarm task API. To expose image metadata, copy the required values to a container or service label when deploying the service.\n* `__meta_dockerswarm_task_id`: the id of the task\n* `__meta_dockerswarm_task_container_id`: the container id of the task\n* `__meta_dockerswarm_task_desired_state`: the desired state of the task\n* `__meta_dockerswarm_task_slot`: the slot of the task\n* `__meta_dockerswarm_task_state`: the state of the task\n* `__meta_dockerswarm_task_port_publish_mode`: the publish mode of the task port\n* `__meta_dockerswarm_service_id`: the id of the service\n* `__meta_dockerswarm_service_name`: the name of the service\n* `__meta_dockerswarm_service_mode`: the mode of the service\n* `__meta_dockerswarm_service_label_<labelname>`: each label of the service, with any unsupported characters converted to an underscore\n* `__meta_dockerswarm_network_id`: the ID of the network\n* `__meta_dockerswarm_network_name`: the name of the network\n* `__meta_dockerswarm_network_ingress`: whether the network is ingress\n* `__meta_dockerswarm_network_internal`: whether the network is internal\n* `__meta_dockerswarm_network_label_<labelname>`: each label of the network, with any unsupported characters converted to an underscore\n* `__meta_dockerswarm_network_label`: each label of the network, with any unsupported characters converted to an underscore\n* `__meta_dockerswarm_network_scope`: the scope of the network\n* `__meta_dockerswarm_node_id`: the ID of the node\n* `__meta_dockerswarm_node_hostname`: the hostname of the node\n* `__meta_dockerswarm_node_address`: the address of the node\n* `__meta_dockerswarm_node_availability`: the availability of the node\n* `__meta_dockerswarm_node_label_<labelname>`: each label of the node, with any unsupported characters converted to an underscore\n* `__meta_dockerswarm_node_platform_architecture`: the architecture of the node\n* `__meta_dockerswarm_node_platform_os`: the operating system of the node\n* `__meta_dockerswarm_node_role`: the role of the node\n* `__meta_dockerswarm_node_status`: the status of the node"
+   },
+   {
+    "id": "prometheus:docs/installation.md#3",
+    "title": "docs/installation.md > Using Docker",
+    "text": "## Using Docker\n\nAll Prometheus services are available as Docker images on\n[Quay.io](https://quay.io/repository/prometheus/prometheus) or\n[Docker Hub](https://hub.docker.com/r/prom/prometheus/).\n\nRunning Prometheus on Docker is as simple as `docker run -p 9090:9090\nprom/prometheus`. This starts Prometheus with a sample\nconfiguration and exposes it on port 9090.\n\nThe Prometheus image uses a volume to store the actual metrics. For\nproduction deployments it is highly recommended to use a\n[named volume](https://docs.docker.com/storage/volumes/)\nto ease managing the data on Prometheus upgrades."
+   },
+   {
+    "id": "prometheus:RELEASE.md#11",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 2. Draft the new release",
+    "text": "### 2. Draft the new release\n\nTag the new release via the following commands:\n\n```bash\ntag=\"v$(< VERSION)\"\ngit tag -s \"${tag}\" -m \"${tag}\"\ngit push origin \"${tag}\"\n```\n\nAlternatively, you can use this handy `.gitconfig` alias.\n\n```ini\n[alias]\n  tag-release = \"!f() { tag=v${1:-$(cat VERSION)} ; git tag -s ${tag} -m ${tag} && git push origin ${tag}; }; f\"\n```\n\nThen release with `git tag-release`.\n\nSigning a tag with a GPG key is appreciated, but in case you can't add a GPG key to your Github account using the following [procedure](https://help.github.com/articles/generating-a-gpg-key/), you can replace the `-s` flag by `-a` flag of the `git tag` command to only annotate the tag without signing.\n\nOnce a tag is created, the release process through Github Actions will be triggered for this tag and Github Actions will draft the GitHub release using the `prombot` account.\n\nFinally, wait for the build step for the tag to finish. The point here is to wait for tarballs to be uploaded to the Github release and the container images to be pushed to the Docker Hub and Quay.io. Once that has happened, click _Publish release_, which will make the release publicly visible and create a GitHub notification.\n**Note:** for a release candidate version ensure the _This is a pre-release_ box is checked when drafting the release in the Github UI. The CI job should take care of this but it's a good idea to double check before clicking _Publish release_.`"
+   },
+   {
+    "id": "prometheus:docs/configuration/template_reference.md#3",
+    "title": "docs/configuration/template_reference.md > Functions > Queries",
+    "text": "### Queries\n\n| Name          | Arguments     | Returns  | Notes    |\n| ------------- | ------------- | -------- | -------- |\n| query         | query string  | []sample | Queries the database, does not support returning range vectors.  |\n| first         | []sample      | sample   | Equivalent to `index a 0`  |\n| label         | label, sample | string   | Equivalent to `index sample.Labels label`  |\n| value         | sample        | interface{}  | Equivalent to `sample.Value`  |\n| sortByLabel   | label, []samples | []sample | Sorts the samples by the given label. Is stable.  |\n\n`first`, `label` and `value` are intended to make query results easily usable in pipelines."
+   },
+   {
+    "id": "prometheus:documentation/prometheus-mixin/README.md#0",
+    "title": "documentation/prometheus-mixin/README.md > Prometheus Mixin",
+    "text": "# Prometheus Mixin\n\n_This is work in progress. We aim for it to become a good role model for alerts\nand dashboards eventually, but it is not quite there yet._\n\nThe Prometheus Mixin is a set of configurable, reusable, and extensible alerts\nand dashboards for Prometheus.\n\nTo use them, you need to have `jsonnet` (v0.13+) and `jb` installed. If you\nhave a working Go development environment, it's easiest to run the following:\n```bash\n$ go install github.com/google/go-jsonnet/cmd/jsonnet@latest\n$ go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest\n$ go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest\n```\n\n_Note: The make targets `lint` and `fmt` need the `jsonnetfmt` binary, which is\navailable from [v.0.16.0](https://github.com/google/jsonnet/releases/tag/v0.16.0) in the Go implementation of `jsonnet`. If your jsonnet version is older than 0.16.0 you have to either upgrade or install the [C++ version of\njsonnetfmt](https://github.com/google/jsonnet) if you want to use `make lint`\nor `make fmt`._\n\nNext, install the dependencies by running the following command in this\ndirectory:\n```bash\n$ jb install\n```\n\nYou can then build a `prometheus_alerts.yaml` with the alerts and a directory\n`dashboards_out` with the Grafana dashboard JSON files:\n```bash\n$ make prometheus_alerts.yaml\n$ make dashboards_out\n```\n\nFor more advanced uses of mixins, see https://github.com/monitoring-mixins/docs."
+   },
+   {
+    "id": "prometheus:docs/installation.md#7",
+    "title": "docs/installation.md > Using Docker > Custom image",
+    "text": "### Custom image\n\nTo avoid managing a file on the host and bind-mount it, the\nconfiguration can be baked into the image. This works well if the\nconfiguration itself is rather static and the same across all\nenvironments.\n\nFor this, create a new directory with a Prometheus configuration and a\n`Dockerfile` like this:\n\n```Dockerfile\nFROM prom/prometheus\nADD prometheus.yml /etc/prometheus/\n```\n\nNow build and run it:\n\n```bash\ndocker build -t my-prometheus .\ndocker run -p 9090:9090 my-prometheus\n```\n\nA more advanced option is to render the configuration dynamically on start\nwith some tooling or even have a daemon update it periodically."
+   },
+   {
+    "id": "prometheus:docs/configuration/template_reference.md#4",
+    "title": "docs/configuration/template_reference.md > Functions > Numbers",
+    "text": "### Numbers\n\n| Name                | Arguments        | Returns |  Notes    |\n|---------------------| -----------------| --------| --------- |\n| humanize            | number or string | string  | Converts a number to a more readable format, using [metric prefixes](https://en.wikipedia.org/wiki/Metric_prefix).\n| humanize1024        | number or string | string  | Like `humanize`, but uses 1024 as the base rather than 1000. |\n| humanizeDuration    | number or string | string  | Converts a duration in seconds to a more readable format. |\n| humanizePercentage  | number or string | string  | Converts a ratio value to a fraction of 100. |\n| humanizeTimestamp   | number or string | string         | Converts a Unix timestamp in seconds to a more readable format. |\n| toTime              | number or string | *time.Time     | Converts a Unix timestamp in seconds to a time.Time.            |\n| toDuration          | number or string | *time.Duration | Converts a duration in seconds to a time.Duration. |\n| now                 | none             | float64        | Returns the Unix timestamp in seconds at the time of the template evaluation. |\n\nHumanizing functions are intended to produce reasonable output for consumption\nby humans, and are not guaranteed to return the same results between Prometheus\nversions."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 7,
+    "id": "prometheus:documentation/prometheus-mixin/README.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0047,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0022,
+     "different_case": 0.0069,
+     "unrelated": 0.9884
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:RELEASE.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.006,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0038,
+     "different_case": 0.0086,
+     "unrelated": 0.9854
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/installation.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0031,
+     "different_case": 0.0041,
+     "unrelated": 0.9908
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/installation.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0022,
+     "different_case": 0.0035,
+     "unrelated": 0.9927
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:RELEASE.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0018,
+     "different_case": 0.0043,
+     "unrelated": 0.9923
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/configuration/template_reference.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.001,
+     "different_case": 0.0025,
+     "unrelated": 0.995
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:RELEASE.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0015,
+     "different_case": 0.0039,
+     "unrelated": 0.9931
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/installation.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0019,
+     "different_case": 0.0034,
+     "unrelated": 0.9933
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/configuration/template_reference.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0008,
+     "different_case": 0.0019,
+     "unrelated": 0.996
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/configuration/configuration.md#50",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0017,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0006,
+     "different_case": 0.002,
+     "unrelated": 0.9963
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3810
+  },
+  "timing": {
+   "total_ms": 96,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5160,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

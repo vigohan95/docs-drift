@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/018.rerank",
+ "recorded_at": "2026-11-06T13:37:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1153,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "94.785248",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=164,cfOrigin;dur=0,cfWorker;dur=317"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Due to the 7 bit limitation, once a chunk has at least 127 samples, `st_changed_on` is set to 127 (0xEF) and the 127th and further samples will have `st_i` present.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `SeriesRef` > `HeadSeriesRef`",
+    "text": "#### `HeadSeriesRef`\n\n`HeadSeriesRef` is simply a 64bit counter that increments when a new series comes in.\nDue to series churn, the set of actively used `HeadSeriesRef`s may be well above zero (e.g. 0-10M may not be used, and 10M-11M is active)\n\nUsage:\n* [`stripeSeries`](https://github.com/prometheus/prometheus/blob/fdbc40a9efcc8197a94f23f0e479b0b56e52d424/tsdb/head.go#L1292-L1298) (note: when you don't know a `HeadSeriesRef` for a series, you can also access it by a hash of the series' labels)\n* WAL\n* `HeadChunkRef`s include them for addressing head chunks, as those are owned by the `memSeries`.\n\nNotes:\n1) M-mapped Head chunks, while they use `HeadSeriesRef`s, don't contain an index and depend on the series listing in memory.\nOnce mmapped, chunks have `HeadSeriesRef`s inside them, allowing you to recreate the index from reading chunks\n(Along with WAL which has the labels for those `HeadSeriesRef`s. It also has all those samples, but by using m-mapped chunks we can save cpu/time and not replay all of WAL on startup)\n\n2) During querying, `HeadSeriesRef` are limited to 2^40 (see `HeadChunkRef`)\n\n3) The last `HeadSeriesRef` is always replayed from the WAL and is continued from there."
+   },
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#2",
+    "title": "tsdb/docs/bstream.md > bstream details > Delta-of-delta encoding for timestamps",
+    "text": "When decoding the number, the most interesting part is how to recognize whether a number is negative or positive, and thus which prefix to set.\nNote that the bstream library doesn't interpret integers to a specific type, but rather returns them as uint64's (which are really just a container for 64 bits).\nWithin the ranges we choose, if looked at as unsigned integers, the higher portion of the range represent the negative numbers.\nContinuing the same example, the numbers 001, 010, 011 and 100 are returned as unsigned integers 1,2,3,4 and mean the same thing when casted to int64's.\nBut the others, 101, 110 and 111 are returned as unsigned integers 5,6,7 but actually represent -3, -2 and -1 (see list above),\nThe cutoff value is the value set by the `nbit`'th bit, and needs a value subtracted that is represented by the `nbit+1`th bit.\nIn our example, the 3rd bit sets the number 4, and the 4th sets the number 8. So if we see an unsigned integer exceeding 4 (5,6,7) we subtract 8. This gives us our desired values (-3, -2 and -1).\n\nCareful observers may note that, if we shift our boundaries down by one, the first bit would always indicate the sign (and imply the needed prefix).\nIn our example of `nbits = 3`, that would mean the range from -4 to 3.  But what we have now works just fine too."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/head_chunks.md#2",
+    "title": "tsdb/docs/format/head_chunks.md > Chunk > OOO encoding",
+    "text": "## OOO encoding\n\nHead chunks use the highest bit of the `encoding` field to indicate whether it is out-of-order (1) or not (0). This bit is not set for chunks in the on-disk blocks."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#48",
+    "title": "docs/querying/api.md > Status > Config",
+    "text": "### Config\n\nThe following endpoint returns currently loaded configuration file:\n\n```\nGET /api/v1/status/config\n```\n\nThe config is returned as dumped YAML file. Due to limitation of the YAML\nlibrary, YAML comments are not included.\n\n```bash\ncurl http://localhost:9090/api/v1/status/config\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"yaml\": \"<content of the loaded config file in YAML>\",\n  }\n}\n```"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#7",
+    "title": "docs/feature_flags.md > Start timestamp (ST) native storage",
+    "text": "## Start timestamp (ST) native storage\n\n`--enable-feature=st-storage`\n\nEnables the storage of start timestamps (ST) per sample, through WAL, TSDB/Agent and Remote-Write 2.0. This option\nallows preserving the exact ST value as it was presented from scrape and receive protocols. In the future this feature\nis meant to be a replacement of `created-timestamp-zero-ingestion` which injects synthetic 0 samples.\n\nCurrently, Prometheus supports start timestamps on:\n\n* `PrometheusProto`\n* `OpenMetrics1.0.0`\n\n`PrometheusProto` is recommended, due to efficiency of ST passing.\n\nBesides enabling this feature in Prometheus, start timestamps need to be exposed by the application being scraped.\n\n> NOTE: This is an experimental feature with known limitations until fully implemented.\n> * It introduces new WAL record type (SamplesV2) that can only be replayed with Prometheus 3.11 or later versions.\n> * For persistent storage support (TSDB blocks), this feature automatically enables the XOR2 chunk format for floats and the histogram ST chunk formats for native histograms. These are the same formats enabled independently through [`chunk_encoding.floats: xor2`](configuration/configuration.md#tsdb) and the [`histograms-st-encoding`](#histogram-st-chunk-encoding) flag.\n>   Explicitly setting `chunk_encoding.floats: xor` in the config file while `st-storage` is active is rejected at config reload because XOR chunks do not store start timestamps.\n>   These constraints might change later once we finish the experimentation phase.\n> * Other areas of ST support for native histograms and NHCBs are still in progress (see [#18315](https://github.com/prometheus/prometheus/issues/18315)).\n> * PromQL use of ST is out of scope of this feature."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "  # File to which PromQL queries are logged.\n  # Reloading the configuration will reopen the file.\n  [ query_log_file: <string> ]\n\n  # Maximum number of series a query may load before it is rejected. The limit\n  # is enforced during execution against the query's actual running cost, never\n  # against the cost estimate returned by the query cost API: the query is\n  # rejected as soon as it loads more series than this. 0 means no limit.\n  # These three query cost limits are reloadable and only enforced when the\n  # query-cost feature flag is enabled (--enable-feature=query-cost).\n  # They apply to every query the engine evaluates, including recording and\n  # alerting rule evaluation.\n  # A client may lower any of them for a single request with the max_series,\n  # max_samples_read and max_query_duration query parameters. A request that\n  # asks for a value above the ceiling set here is an error, it is not silently\n  # clamped down.\n  [ query_max_series: <int> | default = 0 ]\n\n  # Maximum number of samples a query may read before it is rejected. Like\n  # query_max_series, it is enforced during execution against the samples the\n  # query actually reads, never against the estimate: the query is\n  # rejected as soon as it reads more samples than this. 0 means no limit.\n  [ query_max_samples_read: <int> | default = 0 ]\n\n  # Maximum wall-clock duration a query may take. It surfaces as a query\n  # timeout: the query is aborted once it has run for this long. 0s falls back\n  # to --query.timeout. A nonzero value overrides that flag only when the\n  # query-cost feature is enabled. The per-query timeout parameter\n  # of the query endpoints is capped at this ceiling.\n  [ query_max_duration: <duration> | default = 0s ]\n\n  # File to which scrape failures are logged.\n  # Reloading the configuration will reopen the file.\n  [ scrape_failure_log_file: <string> ]\n\n  # An uncompressed response body larger than this many bytes will cause the\n  # scrape to fail. 0 means no limit. Example: 100MB.\n  # This is an experimental feature, this behaviour could\n  # change or be removed in the future.\n  [ body_size_limit: <size> | default = 0 ]\n\n  # Per-scrape limit on the number of scraped samples that will be accepted.\n  # If more than this number of samples are present after metric relabeling\n  # the entire scrape will be treated as failed. 0 means no limit.\n  [ sample_limit: <int> | default = 0 ]"
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#3",
+    "title": "documentation/internal_architecture.md > Internal architecture > Configuration > Configuration reading and parsing",
+    "text": "### Configuration reading and parsing\n\nWhen the initial configuration is loaded or a subsequent reload happens, Prometheus calls the [`config.LoadFile()`](https://github.com/prometheus/prometheus/blob/v2.3.1/config/config.go#L52-L64) function to read its configuration from a file and parse it into the [`config.Config` structure](https://github.com/prometheus/prometheus/blob/v2.3.1/config/config.go#L133-L145). This structure represents the overall configuration of the server and all of its components. It contains sub-structures that mirror the hierarchy of the configuration file. Each struct has a [default configuration](https://github.com/prometheus/prometheus/blob/v2.3.1/config/config.go#L66-L131) as well as an `UnmarshalYAML()` method which parses the struct from YAML and may apply further validity checks or initializations. Once the configuration has been fully parsed and validated, the resulting configuration structure is returned."
+   },
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "title": "tsdb/docs/bstream.md > bstream details > Delta-of-delta encoding for timestamps",
+    "text": "## Delta-of-delta encoding for timestamps\n\nWe need to be able to encode and decode dod's for timestamps, which can be positive, zero, or negative.\nNote that int64's are implemented as [2's complement](https://en.wikipedia.org/wiki/Two%27s_complement)\n\nand look like:\n\n```\n0111...111 = maxint64\n    ...\n0000...111 = 7\n0000...110 = 6\n0000...101 = 5\n0000...100 = 4\n0000...011 = 3\n0000...010 = 2\n0000...001 = 1\n0000...000 = 0\n1111...111 = -1\n1111...110 = -2\n1111...101 = -3\n1111...100 = -4\n1111...011 = -5\n1111...010 = -6\n1111...001 = -7\n1111...000 = -8\n    ...\n1000...001 = minint64+1\n1000...000 = minint64\n```\n\nAll numbers have a prefix (of zeroes for positive numbers, of ones for negative numbers), followed by a number of significant digits at the end.\nIn all cases, the smaller the absolute value of the number, the fewer the amount of significant digits.\n\nTo encode these numbers, we use:\n* A prefix which declares the amount of bits that follow (we use a predefined list of options in order of increasing number of significant bits).\n* A number of bits which is one more than the number of significant bits.  The extra bit is needed because we deal with unsigned integers, although\n  it isn't exactly a sign bit. (See below for details).\n\nThe `bitRange` function determines whether a given integer can be represented by a number of bits.\nFor a given number of bits `nbits` we can distinguish (and thus encode) any set of `2^nbits` numbers.\nE.g. for `nbits = 3`, we can encode 8 distinct numbers, and we have a choice of choosing our boundaries.  For example -4 to 3,\n-3 to 4, 0 to 7 or even -2 to 5 (always inclusive).  (Observe in the list above that this is always true.)\nBecause we need to support positive and negative numbers equally, we choose boundaries that grow symmetrically.  Following the same example,\nwe choose -3 to 4."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#126",
+    "title": "docs/configuration/configuration.md > Configuration file > `<remote_write>`",
+    "text": "  # Azure Certificate-based authentication.\n  [ certificate:\n      client_id: <string>\n      tenant_id: <string>\n      certificate_path: <file_name>\n      # Optional path to private key file if separate from certificate\n      [ certificate_key_path: <file_name> ]\n      # Optional password for password-protected certificate files (PFX/PKCS12)\n      [ certificate_password: <secret> ]\n      # Whether to send the certificate chain in the x5c header\n      [ send_certificate_chain: <boolean> | default = false ] ]\n\n  # Azure SDK auth.\n  # See https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication\n  [ sdk:\n      [ tenant_id: <string> ] ]\n\n  # Optional custom OAuth 2.0 scope to request when acquiring tokens.\n  # If not specified, defaults to the appropriate monitoring scope for the cloud:\n  # - AzurePublic: https://monitor.azure.com//.default\n  # - AzureGovernment: https://monitor.azure.us//.default  \n  # - AzureChina: https://monitor.azure.cn//.default\n  # Use this to authenticate against custom Azure applications or non-standard endpoints.\n  [ scope: <string> ]\n\n# WARNING: Remote write is NOT SUPPORTED by Google Cloud. This configuration is reserved for future use.\n# Optional Google Cloud Monitoring configuration.\n# Cannot be used at the same time as basic_auth, authorization, oauth2, sigv4 or azuread.\n# To use the default credentials from the Google Cloud SDK, use `google_iam: {}`.\ngoogle_iam:\n  # Service account key with monitoring write permissions.\n  credentials_file: <file_name>\n\n# Configures the queue used to write to remote storage.\nqueue_config:\n  # Number of samples to buffer per shard before we block reading of more\n  # samples from the WAL. It is recommended to have enough capacity in each\n  # shard to buffer several requests to keep throughput up while processing\n  # occasional slow remote requests.\n  [ capacity: <int> | default = 10000 ]\n  # Maximum number of shards, i.e. amount of concurrency.\n  [ max_shards: <int> | default = 50 ]\n  # Minimum number of shards, i.e. amount of concurrency.\n  [ min_shards: <int> | default = 1 ]\n  # Maximum number of samples per send.\n  [ max_samples_per_send: <int> | default = 2000]\n  # Maximum time a sample will wait for a send. The sample might wait less\n  # if the buffer is full. Further time might pass due to potential retries.\n  [ batch_send_deadline: <duration> | default = 5s ]\n  # Initial retry delay. Gets doubled for every retry.\n  [ min_backoff: <duration> | default = 30ms ]\n  # Maximum retry delay.\n  [ max_backoff: <duration> | default = 5s ]\n  # Retry upon receiving a 429 status code from the remote-write storage.\n  # This is experimental and might change in the future.\n  [ retry_on_http_429: <boolean> | default = false ]\n  # If set, any sample that is older than sample_age_limit\n  # will not be sent to the remote storage. The default value is 0s,\n  # which means that all samples are sent.\n  [ sample_age_limit: <duration> | default = 0s ]"
+   },
+   {
+    "id": "prometheus:docs/querying/examples.md#5",
+    "title": "docs/querying/examples.md > Using functions, operators, etc.",
+    "text": "    integral((absent(metric_name) or vector(0))[1d:5m])\n\nThe `or vector(0)` supplies zero when the metric is present, so the integral\ndoes not connect separate periods of absence across healthy periods.\n\nAs another case for measuring _amount of time_, for example a boolean metric\nrepresenting a service level agreement (SLA) being met divided by the total\ntime, will give the SLA ratio:\n\n    integral(service_sla_ok[7d]) / (3600 * 24 * 7)"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/bstream.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.005,
+    "document_score": 0.0135,
+    "levels": {
+     "answers": 0.005,
+     "elsewhere": 0.0085,
+     "different_case": 0.0376,
+     "unrelated": 0.9489
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/feature_flags.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0089,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0066,
+     "different_case": 0.0072,
+     "unrelated": 0.9839
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0074,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0051,
+     "different_case": 0.011,
+     "unrelated": 0.9815
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:documentation/internal_architecture.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0025,
+     "different_case": 0.0039,
+     "unrelated": 0.9919
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/api.md#48",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0046,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.003,
+     "different_case": 0.004,
+     "unrelated": 0.9913
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.002,
+     "different_case": 0.0037,
+     "unrelated": 0.993
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0013,
+     "different_case": 0.0033,
+     "unrelated": 0.9939
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/examples.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0013,
+     "different_case": 0.0027,
+     "unrelated": 0.9946
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/format/head_chunks.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0049,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0036,
+     "different_case": 0.0038,
+     "unrelated": 0.9913
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/configuration/configuration.md#126",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0009,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.0009,
+     "elsewhere": 0.0006,
+     "different_case": 0.0015,
+     "unrelated": 0.997
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5034
+  },
+  "timing": {
+   "total_ms": 99,
+   "rerank_ms": 98,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 6064,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

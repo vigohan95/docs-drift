@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/024.rerank",
+ "recorded_at": "2026-11-06T13:38:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 954,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.013214",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=258"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Default:** `['module', 'node', 'development|production']` (`defaultServerConditions`) (`['module', 'browser', 'development|production']` (`defaultClientConditions`) for `ssr.target === 'webworker'`)",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/ssr.md#13",
+    "title": "docs/guide/ssr.md > Server-Side Rendering (SSR) > SSR Target",
+    "text": "## SSR Target\n\nThe default target for the SSR build is a node environment, but you can also run the server in a Web Worker. Packages entry resolution is different for each platform. You can configure the target to be Web Worker using the `ssr.target` set to `'webworker'`."
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#13",
+    "title": "docs/config/shared-options.md > Shared Options > resolve.conditions <NonInheritBadge />",
+    "text": "## resolve.conditions <NonInheritBadge />\n\n- **Type:** `string[]`\n- **Default:** `['module', 'browser', 'development|production']` (`defaultClientConditions`)\n\nAdditional allowed conditions when resolving [Conditional Exports](https://nodejs.org/api/packages.html#packages_conditional_exports) from a package.\n\nA package with conditional exports may have the following `exports` field in its `package.json`:\n\n```json\n{\n  \"exports\": {\n    \".\": {\n      \"import\": \"./index.mjs\",\n      \"require\": \"./index.js\"\n    }\n  }\n}\n```\n\nHere, `import` and `require` are \"conditions\". Conditions can be nested and should be specified from most specific to least specific.\n\n`development|production` is a special value that is replaced with `production` or `development` depending on the value of `process.env.NODE_ENV`. It is replaced with `production` when `process.env.NODE_ENV === 'production'` and `development` otherwise.\n\nNote that `import`, `require`, `default` conditions are always applied if the requirements are met.\n\nIn addition, the `style` condition is applied when resolving style imports, e.g. `@import 'my-library'`. For some CSS pre-processors, their corresponding conditions are also applied, i.e. `sass` for Sass and `less` for Less."
+   },
+   {
+    "id": "vite:docs/guide/features.md#39",
+    "title": "docs/guide/features.md > Features > Web Workers > Import with Query Suffixes",
+    "text": "### Import with Query Suffixes\n\nA web worker script can be directly imported by appending `?worker` or `?sharedworker` to the import request. The default export will be a custom worker constructor:\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport MyWorker from './worker?worker'\n\nconst worker = new MyWorker()\n```\n\nThe worker script can also use ESM `import` statements instead of `importScripts()`. **Note**: During development this relies on [browser native support](https://caniuse.com/?search=module%20worker), but for the production build it is compiled away.\n\nBy default, the worker script will be emitted as a separate chunk in the production build. If you wish to inline the worker as base64 strings, add the `inline` query:\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport MyWorker from './worker?worker&inline'\n```\n\nIf you wish to retrieve the worker as a URL, add the `url` query:\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport MyWorker from './worker?worker&url'\n```\n\nSee [Worker Options](/config/worker-options.md) for details on configuring the bundling of all workers."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#3",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Registering New Environments Using Hooks",
+    "text": "## Registering New Environments Using Hooks\n\nPlugins can add new environments in the `config` hook. For example, [RSC support](/plugins/#vitejs-plugin-rsc) uses an additional environment to have a separate module graph with the `react-server` condition:\n\n```ts\n  config(config: UserConfig) {\n    return {\n      environments: {\n        rsc: {\n          resolve: {\n            conditions: ['react-server', ...defaultServerConditions],\n          },\n        },\n      },\n    }\n  }\n```\n\nAn empty object is enough to register the environment, using default values from the root level environment config."
+   },
+   {
+    "id": "vite:docs/plugins/index.md#4",
+    "title": "docs/plugins/index.md > Plugins > Official Plugins > [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react-swc)",
+    "text": "### [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react-swc)\n\nReplaces Oxc with [SWC](https://swc.rs/) during development for SWC plugin usage. During production builds, SWC+Oxc Transformer are used when using plugins. For big projects that require custom plugins, cold start and Hot Module Replacement (HMR) can be significantly faster, if the plugin is also available for SWC."
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#3",
+    "title": "docs/config/shared-options.md > Shared Options > mode",
+    "text": "## mode\n\n- **Type:** `string`\n- **Default:** `'development'` for serve, `'production'` for build\n\nSpecifying this in config will override the default mode for **both serve and build**. This value can also be overridden via the command line `--mode` option.\n\nSee [Env Variables and Modes](/guide/env-and-mode) for more details."
+   },
+   {
+    "id": "vite:docs/guide/index.md#2",
+    "title": "docs/guide/index.md > Getting Started > Browser Support",
+    "text": "## Browser Support\n\nDuring development, Vite assumes that a modern browser is used. This means the browser supports most of the latest JavaScript and CSS features. For that reason, Vite sets [`esnext` as the transform target](https://oxc.rs/docs/guide/usage/transformer/lowering.html#target). This prevents syntax lowering, letting Vite serve modules as close as possible to the original source code. Vite injects some runtime code to make the development server work. This code uses features included in [Baseline](https://web-platform-dx.github.io/baseline/) Newly Available at the time of each major release (2026-01-01 for this major).\n\nFor production builds, Vite by default targets [Baseline](https://web-platform-dx.github.io/baseline/) Widely Available browser versions as of a date fixed for each major release. For this major, that corresponds to [browser versions released around mid-2023](https://web-platform-dx.github.io/supported-browsers/?widelyAvailableOnDate=2026-01-01). The target can be lowered via configuration. Additionally, legacy browsers can be supported via the official [@vitejs/plugin-legacy](https://github.com/vitejs/vite/tree/main/packages/plugin-legacy). See the [Building for Production](./build) section for more details."
+   },
+   {
+    "id": "vite:docs/guide/features.md#36",
+    "title": "docs/guide/features.md > Features > WebAssembly > Manual Initialization",
+    "text": "### Manual Initialization\n\nWhen you need control over when and how the module is instantiated, import it with `?init`. The default export will be an initialization function that returns a Promise of the [`WebAssembly.Instance`](https://developer.mozilla.org/en-US/docs/WebAssembly/JavaScript_interface/Instance):\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport init from './example.wasm?init'\n\ninit().then((instance) => {\n  instance.exports.test()\n})\n```\n\nThe init function can also take an importObject which is passed along to [`WebAssembly.instantiate`](https://developer.mozilla.org/en-US/docs/WebAssembly/JavaScript_interface/instantiate) as its second argument:\n\n```js twoslash\nimport 'vite/client'\nimport init from './example.wasm?init'\n// ---cut---\ninit({\n  imports: {\n    someFunc: () => {\n      /* ... */\n    },\n  },\n}).then(() => {\n  /* ... */\n})\n```\n\nIn the production build, `.wasm` files smaller than `assetsInlineLimit` will be inlined as base64 strings. Otherwise, they will be treated as a [static asset](./assets) and fetched on-demand.\n\n::: warning For SSR build, Node.js compatible runtimes are only supported\n\nDue to the lack of a universal way to load a file, the internal implementation for both direct `.wasm` imports and `.wasm?init` relies on the `node:fs` module. This means that these features will only work in Node.js compatible runtimes for SSR builds.\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/env-and-mode.md#5",
+    "title": "docs/guide/env-and-mode.md > Env Variables and Modes > IntelliSense for TypeScript",
+    "text": "## IntelliSense for TypeScript\n\nBy default, Vite provides type definitions for `import.meta.env` in [`vite/client.d.ts`](https://github.com/vitejs/vite/blob/main/packages/vite/client.d.ts). While you can define more custom env variables in `.env.[mode]` files, you may want to get TypeScript IntelliSense for user-defined env variables that are prefixed with `VITE_`.\n\nTo achieve this, you can create a `vite-env.d.ts` in the `src` directory, then augment `ImportMetaEnv` like this:\n\n```typescript [vite-env.d.ts]\ninterface ViteTypeOptions {\n  // By adding this line, you can make the type of ImportMetaEnv strict\n  // to disallow unknown keys.\n  // strictImportMetaEnv: unknown\n}\n\ninterface ImportMetaEnv {\n  readonly VITE_APP_TITLE: string\n  // more env variables...\n}\n\ninterface ImportMeta {\n  readonly env: ImportMetaEnv\n}\n```\n\nIf your code relies on types from browser environments such as [DOM](https://github.com/microsoft/TypeScript/blob/main/tsc/internal/bundled/libs/lib.dom.d.ts) and [WebWorker](https://github.com/microsoft/TypeScript/blob/main/tsc/internal/bundled/libs/lib.webworker.d.ts), you can update the [lib](https://www.typescriptlang.org/tsconfig#lib) field in `tsconfig.json`.\n\n```json [tsconfig.json]\n{\n  \"lib\": [\"WebWorker\"]\n}\n```\n\n:::warning Imports will break type augmentation\n\nIf the `ImportMetaEnv` augmentation does not work, make sure you do not have any `import` statements in `vite-env.d.ts`. See the [TypeScript documentation](https://www.typescriptlang.org/docs/handbook/2/modules.html#how-javascript-modules-are-defined) for more information.\n\n:::"
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#2",
+    "title": "docs/config/shared-options.md > Shared Options > base",
+    "text": "## base\n\n- **Type:** `string`\n- **Default:** `/`\n- **Related:** [`server.origin`](/config/server-options.md#server-origin)\n\nBase public path when served in development or production. Valid values include:\n\n- Absolute URL pathname, e.g. `/foo/`\n- Full URL, e.g. `https://bar.com/foo/` (The origin part won't be used in development so the value is the same as `/foo/`)\n- Empty string or `./` (for embedded deployment)\n\nSee [Public Base Path](/guide/build#public-base-path) for more details."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/config/shared-options.md#13",
+    "action": "expand",
+    "relevance_score": 0.1028,
+    "document_score": 0.7952,
+    "levels": {
+     "answers": 0.1028,
+     "elsewhere": 0.6924,
+     "different_case": 0.1319,
+     "unrelated": 0.0729
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/ssr.md#13",
+    "action": "expand",
+    "relevance_score": 0.007,
+    "document_score": 0.866,
+    "levels": {
+     "answers": 0.007,
+     "elsewhere": 0.8591,
+     "different_case": 0.0364,
+     "unrelated": 0.0975
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/api-environment-plugins.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0657,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0623,
+     "different_case": 0.0344,
+     "unrelated": 0.8999
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/shared-options.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0081,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0053,
+     "different_case": 0.0086,
+     "unrelated": 0.9833
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/features.md#39",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0062,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0041,
+     "different_case": 0.0079,
+     "unrelated": 0.9859
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/features.md#36",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0044,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0026,
+     "different_case": 0.0066,
+     "unrelated": 0.9889
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/env-and-mode.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0021,
+     "different_case": 0.005,
+     "unrelated": 0.9912
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/config/shared-options.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0022,
+     "different_case": 0.0039,
+     "unrelated": 0.9921
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/index.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0053,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0038,
+     "different_case": 0.0049,
+     "unrelated": 0.9898
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/plugins/index.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0017,
+     "different_case": 0.0036,
+     "unrelated": 0.9933
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3469
+  },
+  "timing": {
+   "total_ms": 109,
+   "rerank_ms": 94,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4499,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

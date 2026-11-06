@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "prometheus-claims/029.grounding",
+ "recorded_at": "2026-11-06T13:38:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 932,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "84.060095",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=227"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "text": "### Notes:\n\n* `histogram_flags` is a byte of which currently only the first two bits are used:\n  * `10`: Counter reset between the previous chunk and this one.\n  * `01`: No counter reset between the previous chunk and this one.\n  * `00`: Counter reset status unknown.\n  * `11`: Chunk is part of a gauge histogram, no counter resets are happening.\n* `zero_threshold` has a specific encoding:\n  * If 0, it is a single zero byte.\n  * If a power of two between 2^-243 and 2^10, it is a single byte between 1 and 254.\n  * Otherwise, it is a byte with all bits set (255), followed by a float64, resulting in 9 bytes length.\n* `schema` is a specific value defined by the exposition format. Currently\n  valid values are either -4 <= n <= 8 (standard exponential schemas) or -53\n  (custom bucket boundaries).\n* `<varbit_int>` is a variable bitwidth encoding for signed integers, optimized for “delta of deltas” of bucket deltas. It has between 1 bit and 9 bytes.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L31-L60).\n* `<varbit_uint>` is a variable bitwidth encoding for unsigned integers with the same bit-bucketing as `<varbit_int>`.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L136-L165).\n* `<varbit_xor>` is a specific variable bitwidth encoding of the result of XORing the current and the previous value. It has between 1 bit and 77 bits.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/histogram.go#L538-L574).\n* `padding` of 0 to 7 bits so that the whole chunk data is byte-aligned.\n* Note that buckets are inherently deltas between the current bucket and the previous bucket. Only `bucket_0` is an absolute count.\n* The chunk can have as few as one sample, i.e. sample 1 and following are optional.\n* Similarly, there could be down to zero spans and down to zero buckets."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#11",
+    "text": "### Custom values data:\n\nThe `custom_values` data is currently only used for schema -53 (custom bucket boundaries). For other schemas, it is empty (length of zero).\n\n```\n┌──────────────────────────┬──────────────────┬──────────────────┬─────┬──────────────────┐\n│ num_values <varbit_uint> │ value_0 <custom> │ value_1 <custom> │ ... │ value_n <custom> │\n└──────────────────────────┴─────────────────────────────────────┴─────┴──────────────────┘\n```"
+   }
+  ],
+  "answer": "Currently valid schema numbers are -53 and -4 <= n <= 8.",
+  "claims": [
+   "Currently valid schema numbers are -53 and -4 <= n <= 8."
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Test file format > `<series>`' of docs/configuration/unit_testing_rules.md in the documentation of the prometheus project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.9962,
+  "ungrounded": 0.0038,
+  "verdict": "grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "share": 0.9978,
+    "share_of_answer": 0.994,
+    "claims": [
+     0
+    ]
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#11",
+    "share": 0.0022,
+    "share_of_answer": 0.0022,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Currently valid schema numbers are -53 and -4 <= n <= 8.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.9962,
+    "contradicted": 0.0014,
+    "not_stated": 0.0011,
+    "not_a_claim": 0.0013,
+    "verdict": "supported",
+    "sources": {
+     "prometheus:tsdb/docs/format/chunks.md#16": 0.9978,
+     "prometheus:tsdb/docs/format/chunks.md#11": 0.0022
+    },
+    "source": "prometheus:tsdb/docs/format/chunks.md#16",
+    "evidence": {
+     "document": "prometheus:tsdb/docs/format/chunks.md#16",
+     "quote": "Currently",
+     "start": 683,
+     "end": 692,
+     "confidence": 0.997
+    }
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.9962
+  },
+  "timing": {
+   "read_ms": 92,
+   "total_ms": 95
+  }
+ }
+}

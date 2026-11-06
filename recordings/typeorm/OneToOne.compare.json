@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm/OneToOne.compare",
+ "recorded_at": "2026-11-06T13:42:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1167,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "202.446877",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=449"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "text": "### Creating a one-to-one relation\n\nLet's create a one-to-one relationship with another class.\nLet's create a new class in `PhotoMetadata.ts`. This PhotoMetadata class is supposed to contain our photo's additional meta-information:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column(\"int\")\n    height: number\n\n    @Column(\"int\")\n    width: number\n\n    @Column()\n    orientation: string\n\n    @Column()\n    compressed: boolean\n\n    @Column()\n    comment: string\n\n    @OneToOne(() => Photo)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\nHere, we are using a new decorator called `@OneToOne`. It allows us to create a one-to-one relationship between two entities. We also add a `@JoinColumn` decorator, which indicates that this side of the relationship will own the relationship.\nRelations can be unidirectional or bidirectional.\nOnly one side of the relation can be the owner.\nUsing `@JoinColumn` decorator is required on the owner side of the relationship.\n\nIf you run the app, you'll see a newly generated table, and it will contain a column with a foreign key for the photo relation:\n\n```text\n+-------------+--------------+----------------------------+\n|                     photo_metadata                      |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| height      | int          |                            |\n| width       | int          |                            |\n| comment     | varchar(255) |                            |\n| compressed  | boolean      |                            |\n| orientation | varchar(255) |                            |\n| photoId     | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "text": "# One-to-one relations\n\nOne-to-one is a relation where A contains only one instance of B, and B contains only one instance of A.\nLet's take for example `User` and `Profile` entities.\nUser can have only a single profile, and a single profile is owned by only a single user.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class Profile {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    gender: string\n\n    @Column()\n    photo: string\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne(() => Profile)\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nHere we added `@OneToOne` to the `user` and specified the target relation type to be `Profile`.\nWe also added `@JoinColumn` which is required and must be set only on one side of the relation.\nThe side you set `@JoinColumn` on, that side's table will contain a \"relation id\" and foreign keys to the target entity table.\n\nThis example will produce the following tables:\n\n```text\n+-------------+--------------+----------------------------+\n|                        profile                          |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| gender      | varchar(255) |                            |\n| photo       | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|                          user                           |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| name        | varchar(255) |                            |\n| profileId   | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/getting-started.md#23",
+    "b": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "relation": "overlapping",
+    "related": 0.9979,
+    "probabilities": {
+     "same": 0.0086,
+     "overlapping": 0.9858,
+     "conflicting": 0.0035,
+     "unrelated": 0.0021
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 59,
+   "passage_reads": 1,
+   "passages_ms": 87,
+   "passages": 1,
+   "counterparts_ms": 107
+  },
+  "timing": {
+   "read_ms": 252,
+   "total_ms": 257
+  }
+ }
+}

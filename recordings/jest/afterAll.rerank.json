@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/afterAll.rerank",
+ "recorded_at": "2026-11-06T13:42:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1494,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.846657",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=802"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `afterAll`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `afterAll`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#2",
+    "title": "docs/GlobalAPI.md > Reference > `afterAll(fn, timeout)`",
+    "text": "### `afterAll(fn, timeout)`\n\nRuns a function after all the tests in this file have completed. If the function returns a promise or is a generator, Jest waits for that promise to resolve before continuing.\n\nOptionally, you can provide a `timeout` (in milliseconds) for specifying how long to wait before aborting. The default timeout is 5 seconds.\n\nThis is often useful if you want to clean up some global setup state that is shared across tests.\n\nFor example:\n\n```js\nconst globalDatabase = makeGlobalDatabase();\n\nfunction cleanUpDatabase(db) {\n  db.cleanUp();\n}\n\nafterAll(() => {\n  cleanUpDatabase(globalDatabase);\n});\n\ntest('can find things', () => {\n  return globalDatabase.find('thing', {}, results => {\n    expect(results.length).toBeGreaterThan(0);\n  });\n});\n\ntest('can insert a thing', () => {\n  return globalDatabase.insert('thing', makeThing(), response => {\n    expect(response.success).toBeTruthy();\n  });\n});\n```\n\nHere the `afterAll` ensures that `cleanUpDatabase` is called after all tests run.\n\nIf `afterAll` is inside a `describe` block, it runs at the end of the describe block.\n\nIf you want to run some cleanup after every test instead of after all tests, use `afterEach` instead."
+   },
+   {
+    "id": "jest:docs/JestObjectAPI.md#61",
+    "title": "docs/JestObjectAPI.md > Misc > `jest.retryTimes(numRetries, options?)`",
+    "text": "Each attempt runs the block's `beforeAll` hooks, child tests and nested describes, and `afterAll` hooks. When a retryable test or hook failure is recorded, passing tests run again with the rest of the block. If `entireDescribe` is omitted or `false`, `jest.retryTimes()` keeps its existing per-test behavior.\n\nNested describe retry settings compose from the innermost block outwards. Each time an ancestor starts a new attempt, its descendant retry budgets start again. The maximum number of times a test can run from nested describe retries is therefore the product of `(numRetries + 1)` for each configured block. A block configured with zero describe retries still defines a retry boundary and disables per-test retries in its subtree.\n\n`afterAll` hooks still run after every attempt, but failures from `afterAll` and process-level errors do not trigger a describe retry. If either occurs during an attempt, no further attempts run, even if another failure would otherwise be retried, and all errors remain reported.\n\nUnhandled rejections owned by a test, `beforeAll`, `beforeEach`, or `afterEach` participate in describe retries. Ownerless rejections remain reported, while `afterAll` failures remain non-retryable.\n\nWhen test randomization is enabled, each describe block keeps the order selected for its first attempt across all of its retries."
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#2",
+    "title": "docs/SetupAndTeardown.md > One-Time Setup",
+    "text": "## One-Time Setup\n\nIn some cases, you only need to do setup once, at the beginning of a file. This can be especially bothersome when the setup is asynchronous, so you can't do it inline. Jest provides `beforeAll` and `afterAll` hooks to handle this situation.\n\nFor example, if both `initializeCityDatabase()` and `clearCityDatabase()` returned promises, and the city database could be reused between tests, we could change our test code to:\n\n```js\nbeforeAll(() => {\n  return initializeCityDatabase();\n});\n\nafterAll(() => {\n  return clearCityDatabase();\n});\n\ntest('city database has Vienna', () => {\n  expect(isCity('Vienna')).toBeTruthy();\n});\n\ntest('city database has San Juan', () => {\n  expect(isCity('San Juan')).toBeTruthy();\n});\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "jest:docs/GlobalAPI.md#2",
+    "action": "use",
+    "relevance_score": 0.9942,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9942,
+     "elsewhere": 0.0016,
+     "different_case": 0.0017,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/JestObjectAPI.md#61",
+    "action": "use",
+    "relevance_score": 0.9692,
+    "document_score": 0.9867,
+    "levels": {
+     "answers": 0.9692,
+     "elsewhere": 0.0175,
+     "different_case": 0.0095,
+     "unrelated": 0.0038
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/SetupAndTeardown.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0061,
+    "document_score": 0.0199,
+    "levels": {
+     "answers": 0.0061,
+     "elsewhere": 0.0137,
+     "different_case": 0.0151,
+     "unrelated": 0.9651
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1058
+  },
+  "timing": {
+   "total_ms": 657,
+   "rerank_ms": 656,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1463,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

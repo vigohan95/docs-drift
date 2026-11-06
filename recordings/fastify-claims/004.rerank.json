@@ -1,0 +1,236 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/004.rerank",
+ "recorded_at": "2026-11-06T13:37:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1125,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "115.135551",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=156,cfOrigin;dur=0,cfWorker;dur=314"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Require the framework and instantiate it",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#2",
+    "title": "docs/Guides/Getting-Started.md > Getting Started > Your first server",
+    "text": "### Your first server\n<a id=\"first-server\"></a>\n\nLet's write our first server:\n```js\n// Require the framework and instantiate it\n\n// ESM\nimport Fastify from 'fastify'\n\nconst fastify = Fastify({\n  logger: true\n})\n// CommonJs\nconst fastify = require('fastify')({\n  logger: true\n})\n\n// Declare a route\nfastify.get('/', function (request, reply) {\n  reply.send({ hello: 'world' })\n})\n\n// Run the server!\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n> If you are using ECMAScript Modules (ESM) in your project, be sure to\n> include \"type\": \"module\" in your package.json.\n>```js\n>{\n>  \"type\": \"module\"\n>}\n>```\n\nDo you prefer to use `async/await`? Fastify supports it out-of-the-box.\n\n```js\n// ESM\nimport Fastify from 'fastify'\n\nconst fastify = Fastify({\n  logger: true\n})\n// CommonJs\nconst fastify = require('fastify')({\n  logger: true\n})\n\nfastify.get('/', async (request, reply) => {\n  return { hello: 'world' }\n})\n\n/**\n * Run the server!\n */\nconst start = async () => {\n  try {\n    await fastify.listen({ port: 3000 })\n  } catch (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n}\nstart()\n```\n\nAwesome, that was easy.\n\nUnfortunately, writing a complex application requires significantly more code\nthan this example. A classic problem when you are building a new application is\nhow to handle multiple files, asynchronous bootstrapping, and the architecture\nof your code."
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "title": "docs/Reference/Errors.md > Errors > Errors In Fastify Lifecycle Hooks And A Custom Error Handler",
+    "text": "- Throwing a new error in a custom error handler will call the parent\n  `errorHandler`.\n  - The `onError` hook will be triggered once for the first error thrown\n  - An error will not be triggered twice from a lifecycle hook. Fastify\n    internally monitors error invocation to avoid infinite loops for errors\n    thrown in the reply phases of the lifecycle (those after the route handler)\n\nWhen using Fastify's custom error handling through\n[`setErrorHandler`](./Server.md#seterrorhandler), be aware of how errors are\npropagated between custom and default error handlers.\n\nIf a plugin's error handler re-throws an error that is not an instance of\n[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error),\nit will not propagate to the parent context error handler. Instead, it will be\ncaught by the default error handler. This can be seen in the `/bad` route of the\nexample below.\n\nTo ensure consistent error handling, throw instances of `Error`. For example,\nreplace `throw 'foo'` with `throw new Error('foo')` in the `/bad` route to\nensure errors propagate through the custom error handling chain as intended.\nThis practice helps avoid potential pitfalls when working with custom error\nhandling in Fastify.\n\nFor example:\n```js\nconst Fastify = require('fastify')\n\n// Instantiate the framework\nconst fastify = Fastify({\n  logger: true\n})\n\n// Register parent error handler\nfastify.setErrorHandler((error, request, reply) => {\n  reply.status(500).send({ ok: false })\n})\n\nfastify.register((app, options, next) => {\n  // Register child error handler\n  app.setErrorHandler((error, request, reply) => {\n    throw error\n  })\n\n  app.get('/bad', async () => {\n    // Throws a non-Error type, 'foo'\n    throw 'foo'\n  })\n\n  app.get('/good', async () => {\n    // Throws an Error instance, 'bar'\n    throw new Error('bar')\n  })\n\n  next()\n})\n\n// Run the server\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is listening at ${address}\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#13",
+    "title": "docs/Reference/Errors.md > Errors > Fastify Error Codes",
+    "text": "### Fastify Error Codes\n<a id=\"fastify-error-codes\"></a>\n\nYou can access `errorCodes` for mapping:\n```js\n// ESM\nimport { errorCodes } from 'fastify'\n\n// CommonJS\nconst errorCodes = require('fastify').errorCodes\n```\n\nFor example:\n```js\nconst Fastify = require('fastify')\n\n// Instantiate the framework\nconst fastify = Fastify({\n  logger: true\n})\n\n// Declare a route\nfastify.get('/', function (request, reply) {\n  reply.code('bad status code').send({ hello: 'world' })\n})\n\nfastify.setErrorHandler(function (error, request, reply) {\n  if (error instanceof Fastify.errorCodes.FST_ERR_BAD_STATUS_CODE) {\n    // Log error\n    this.log.error(error)\n    // Send error response\n    reply.status(500).send({ ok: false })\n  } else {\n    // Fastify will use parent error handler to handle this\n    reply.send(error)\n  }\n})\n\n// Run the server!\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\nBelow is a table with all the error codes used by Fastify.\n\n| Code | Description | How to solve | Discussion |\n|------|-------------|--------------|------------|\n| <a id=\"fst_err_not_found\">FST_ERR_NOT_FOUND</a> | 404 Not Found | - | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_options_not_obj\">FST_ERR_OPTIONS_NOT_OBJ</a> | Fastify options wrongly specified. | Fastify options should be an object. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_qsp_not_fn\">FST_ERR_QSP_NOT_FN</a> | QueryStringParser wrongly specified. | QueryStringParser option should be a function. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_schema_controller_bucket_opt_not_fn\">FST_ERR_SCHEMA_CONTROLLER_BUCKET_OPT_NOT_FN</a> | SchemaController.bucket wrongly specified. | SchemaController.bucket option should be a function. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_schema_error_formatter_not_fn\">FST_ERR_SCHEMA_ERROR_FORMATTER_NOT_FN</a> | SchemaErrorFormatter option wrongly specified. | SchemaErrorFormatter option should be a non async function. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_ajv_custom_options_opt_not_obj\">FST_ERR_AJV_CUSTOM_OPTIONS_OPT_NOT_OBJ</a> | ajv.customOptions wrongly specified. | ajv.customOptions option should be an object. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_ajv_custom_options_opt_not_arr\">FST_ERR_AJV_CUSTOM_OPTIONS_OPT_NOT_ARR</a> | ajv.plugins option wrongly specified. | ajv.plugins option should be an array. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_ctp_already_present\">FST_ERR_CTP_ALREADY_PRESENT</a> | The parser for this content type was already registered. | Use a different content type or delete the already registered parser. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_ctp_invalid_type\">FST_ERR_CTP_INVALID_TYPE</a> | `Content-Type` wrongly specified | The `Content-Type` should be a string. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_ctp_empty_type\">FST_ERR_CTP_EMPTY_TYPE</a> | `Content-Type` is an empty string. | `Content-Type` cannot be an empty string. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_ctp_invalid_handler\">FST_ERR_CTP_INVALID_HANDLER</a> | Invalid handler for the content type. | Use a different handler. | [#1168](https://github.com/fastify/fastify/pull/1168) |"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#1",
+    "title": "docs/Guides/Migration-Guide-V3.md > V3 Migration Guide > Breaking changes > Changed middleware support ([#2014](https://github.com/fastify/fastify/pull/2014))",
+    "text": "### Changed middleware support ([#2014](https://github.com/fastify/fastify/pull/2014))\n\nFrom Fastify v3, middleware support does not come out-of-the-box with the\nframework itself.\n\nIf you use Express middleware in your application, please install and register\nthe [`@fastify/express`](https://github.com/fastify/fastify-express) or\n[`@fastify/middie`](https://github.com/fastify/middie) plugin before doing so.\n\n**v2:**\n\n```js\n// Using the Express `cors` middleware in Fastify v2.\nfastify.use(require('cors')());\n```\n\n**v3:**\n\n```js\n// Using the Express `cors` middleware in Fastify v3.\nawait fastify.register(require('@fastify/express'));\nfastify.use(require('cors')());\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#32",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Fastify > fastify< [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [Logger][LoggerGeneric]>(opts?: [FastifyServerOptions][FastifyServerOptions]): [FastifyInstance][FastifyInstance] > Example 2: HTTPS server",
+    "text": "###### Example 2: HTTPS server\n\n1. Create the following imports from `@types/node` and `fastify`\n   ```typescript\n   import fs from 'node:fs'\n   import path from 'node:path'\n   import fastify from 'fastify'\n   ```\n2. Perform the following steps before setting up a Fastify HTTPS server\nto create the `key.pem` and `cert.pem` files:\n```sh\nopenssl genrsa -out key.pem\nopenssl req -new -key key.pem -out csr.pem\nopenssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem\nrm csr.pem\n```\n3. Instantiate a Fastify https server and add a route:\n   ```typescript\n   const server = fastify({\n     https: {\n       key: fs.readFileSync(path.join(__dirname, 'key.pem')),\n       cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))\n     }\n   })\n\n   server.get('/', async function (request, reply) {\n     return { hello: 'world' }\n   })\n\n   server.listen({ port: 8080 }, (err, address) => {\n     if (err) {\n       console.error(err)\n       process.exit(0)\n     }\n     console.log(`Server listening at ${address}`)\n   })\n   ```\n4. Build and run! Test your server out by querying with: `curl -k\n   https://localhost:8080`"
+   },
+   {
+    "id": "fastify:docs/Reference/Principles.md#4",
+    "title": "docs/Reference/Principles.md > Technical Principles > Easy to migrate to microservices (or even serverless) and back",
+    "text": "## Easy to migrate to microservices (or even serverless) and back\n\nRoute deployment should not matter. The framework should \"just work\"."
+   },
+   {
+    "id": "fastify:docs/Reference/Principles.md#5",
+    "title": "docs/Reference/Principles.md > Technical Principles > Security and Data Validation",
+    "text": "## Security and Data Validation\n\nA web framework is the first point of contact with untrusted data and must act\nas the first line of defense for the system."
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#20",
+    "title": "docs/Guides/Serverless.md > Google Firebase Functions",
+    "text": "## Google Firebase Functions\n\nFollow this guide if you want to use Fastify as the HTTP framework for\nFirebase Functions instead of the vanilla JavaScript router provided with\n`onRequest(async (req, res) => {}`."
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#5",
+    "title": "docs/Guides/Getting-Started.md > Getting Started > Your first plugin",
+    "text": "At the beginning of this guide, we noted that Fastify provides a foundation that\nassists with asynchronous bootstrapping of your application. Why is this\nimportant?\n\nConsider the scenario where a database connection is needed to handle data\nstorage. The database connection needs to be available before the server is\naccepting connections. How do we address this problem?\n\nA typical solution is to use a complex callback, or promises - a system that\nwill mix the framework API with other libraries and the application code.\n\nFastify handles this internally, with minimum effort!\n\nLet's rewrite the above example with a database connection.\n\n\nFirst, install `fastify-plugin` and `@fastify/mongodb`:\n\n```sh\nnpm i fastify-plugin @fastify/mongodb\n```\n\n**server.js**\n```js\n// ESM\nimport Fastify from 'fastify'\nimport dbConnector from './our-db-connector.js'\nimport routes from './our-first-routes.js'\n\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = Fastify({\n  logger: true\n})\nfastify.register(dbConnector)\nfastify.register(routes)\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n```js\n// CommonJs\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = require('fastify')({\n  logger: true\n})\n\nfastify.register(require('./our-db-connector'))\nfastify.register(require('./our-first-routes'))\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#4",
+    "title": "docs/Guides/Getting-Started.md > Getting Started > Your first plugin",
+    "text": "### Your first plugin\n<a id=\"first-plugin\"></a>\n\nAs with JavaScript, where everything is an object, with Fastify everything is a\nplugin.\n\nBefore digging into it, let's see how it works!\n\nLet's declare our basic server, but instead of declaring the route inside the\nentry point, we'll declare it in an external file (check out the [route\ndeclaration](../Reference/Routes.md) docs).\n```js\n// ESM\nimport Fastify from 'fastify'\nimport routes from './our-first-routes.js'\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = Fastify({\n  logger: true\n})\n\nfastify.register(routes)\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n```js\n// CommonJs\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = require('fastify')({\n  logger: true\n})\n\nfastify.register(require('./our-first-routes'))\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n\n```js\n// our-first-routes.js\n\n/**\n * Encapsulates the routes\n * @param {FastifyInstance} fastify  Encapsulated Fastify Instance\n * @param {Object} options plugin options, refer to https://fastify.dev/docs/latest/Reference/Plugins/#plugin-options\n */\nasync function routes (fastify, options) {\n  fastify.get('/', async (request, reply) => {\n    return { hello: 'world' }\n  })\n}\n\n//ESM\nexport default routes;\n\n// CommonJs\nmodule.exports = routes\n```\nIn this example, we used the `register` API, which is the core of the Fastify\nframework. It is the only way to add routes, plugins, et cetera."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "action": "use",
+    "relevance_score": 0.9847,
+    "document_score": 0.989,
+    "levels": {
+     "answers": 0.9847,
+     "elsewhere": 0.0043,
+     "different_case": 0.0056,
+     "unrelated": 0.0054
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Getting-Started.md#2",
+    "action": "use",
+    "relevance_score": 0.9837,
+    "document_score": 0.9871,
+    "levels": {
+     "answers": 0.9837,
+     "elsewhere": 0.0034,
+     "different_case": 0.0037,
+     "unrelated": 0.0092
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Guides/Getting-Started.md#4",
+    "action": "use",
+    "relevance_score": 0.9828,
+    "document_score": 0.9883,
+    "levels": {
+     "answers": 0.9828,
+     "elsewhere": 0.0055,
+     "different_case": 0.0065,
+     "unrelated": 0.0052
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Guides/Getting-Started.md#5",
+    "action": "use",
+    "relevance_score": 0.9812,
+    "document_score": 0.9877,
+    "levels": {
+     "answers": 0.9812,
+     "elsewhere": 0.0065,
+     "different_case": 0.0079,
+     "unrelated": 0.0044
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Errors.md#13",
+    "action": "use",
+    "relevance_score": 0.9643,
+    "document_score": 0.9736,
+    "levels": {
+     "answers": 0.9643,
+     "elsewhere": 0.0093,
+     "different_case": 0.0155,
+     "unrelated": 0.0108
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/TypeScript.md#32",
+    "action": "use",
+    "relevance_score": 0.9567,
+    "document_score": 0.9805,
+    "levels": {
+     "answers": 0.9567,
+     "elsewhere": 0.0238,
+     "different_case": 0.0095,
+     "unrelated": 0.0101
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#1",
+    "action": "use",
+    "relevance_score": 0.6367,
+    "document_score": 0.6819,
+    "levels": {
+     "answers": 0.6367,
+     "elsewhere": 0.0452,
+     "different_case": 0.0658,
+     "unrelated": 0.2523
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Serverless.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.019,
+    "document_score": 0.0864,
+    "levels": {
+     "answers": 0.019,
+     "elsewhere": 0.0674,
+     "different_case": 0.0308,
+     "unrelated": 0.8828
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Principles.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0098,
+    "document_score": 0.0456,
+    "levels": {
+     "answers": 0.0098,
+     "elsewhere": 0.0358,
+     "different_case": 0.0149,
+     "unrelated": 0.9394
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Principles.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0097,
+    "document_score": 0.0293,
+    "levels": {
+     "answers": 0.0097,
+     "elsewhere": 0.0196,
+     "different_case": 0.0216,
+     "unrelated": 0.9491
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4768
+  },
+  "timing": {
+   "total_ms": 133,
+   "rerank_ms": 118,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6278,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 96
+   }
+  }
+ }
+}

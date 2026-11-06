@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/009.rerank",
+ "recorded_at": "2026-11-06T13:37:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1045,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.21283",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=304"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: For users migrating from `rolldown-vite` to Vite 8, you can undo the dependency changes in `package.json` and update to Vite 8:",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/acknowledgements.md#6",
+    "title": "docs/acknowledgements.md > Acknowledgements > Dependencies > Bundled Dependency Authors",
+    "text": "### Bundled Dependency Authors\n\n<table class=\"authors-table\">\n  <thead>\n    <tr>\n      <th>Author</th>\n      <th>Packages</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr v-for=\"author in data.authors\" :key=\"author.name\">\n      <td>\n        <a v-if=\"author.url\" :href=\"author.url\" target=\"_blank\" rel=\"noopener\">{{ author.name }}</a>\n        <template v-else>{{ author.name }}</template>\n        <a v-if=\"author.funding\" :href=\"author.funding\" target=\"_blank\" rel=\"noopener\" class=\"sponsor-link\">Sponsor</a>\n      </td>\n      <td>\n        <template v-for=\"(pkg, index) in author.packages\" :key=\"pkg.name\">\n          <span class=\"pkg-item\"><a :href=\"npmUrl(pkg.name)\" target=\"_blank\" rel=\"noopener\"><code>{{ pkg.name }}</code></a><a v-if=\"pkg.funding\" :href=\"pkg.funding\" target=\"_blank\" rel=\"noopener\" class=\"sponsor-link\">Sponsor</a></span><template v-if=\"index < author.packages.length - 1\">, </template>\n        </template>\n      </td>\n    </tr>\n  </tbody>\n</table>\n\n::: tip For package authors\nThis section is automatically generated from the `author` and `funding` fields in each package's `package.json`. If you'd like to update how your package appears here, you can update these fields in your package.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/index.md#1",
+    "title": "docs/changes/index.md > Breaking Changes > Planned",
+    "text": "## Planned\n\nThese changes are planned for the next major version of Vite. The deprecation or usage warnings will guide you where possible, and we're reaching out to framework, plugin authors, and users to apply these changes.\n\n- [`this.environment` in Hooks](/changes/this-environment-in-hooks)\n- [HMR `hotUpdate` Plugin Hook](/changes/hotupdate-hook)\n- [SSR Using `ModuleRunner` API](/changes/ssr-using-modulerunner)"
+   },
+   {
+    "id": "vite:docs/guide/philosophy.md#4",
+    "title": "docs/guide/philosophy.md > Project Philosophy > An Active Ecosystem",
+    "text": "## An Active Ecosystem\n\nVite evolution is a cooperation between framework and plugin maintainers, users, and the Vite team. We encourage active participation in Vite's Core development once a project adopts Vite. We work closely with the main projects in the ecosystem to minimize regressions on each release, aided by tools like [vite-ecosystem-ci](https://github.com/vitejs/vite-ecosystem-ci). It allows us to run the CI of major projects using Vite on selected PRs and gives us a clear status of how the Ecosystem would react to a release. We strive to fix regressions before they hit users and allow projects to update to the next versions as soon as they are released. If you are working with Vite, we invite you to join [Vite's Discord](https://chat.vite.dev) and get involved in the project too."
+   },
+   {
+    "id": "vite:docs/guide/build.md#10",
+    "title": "docs/guide/build.md > Building for Production > Library Mode",
+    "text": ":::\n\nThe entry file would contain exports that can be imported by users of your package:\n\n```js [lib/main.js]\nimport Bar from './Bar.vue'\nimport Foo from './Foo.vue'\nexport { Foo, Bar }\n```\n\nRunning `vite build` with this config uses a Rollup preset that is oriented towards shipping libraries and produces two bundle formats:\n\n- `es` and `umd` (for single entry)\n- `es` and `cjs` (for multiple entries)\n\nThe formats can be configured with the [`build.lib.formats`](/config/build-options.md#build-lib) option.\n\n```\n$ vite build\nbuilding for production...\ndist/my-lib.js      0.08 kB / gzip: 0.07 kB\ndist/my-lib.umd.cjs 0.30 kB / gzip: 0.16 kB\n```\n\nRecommended `package.json` for your lib:\n\n::: code-group\n\n```json [package.json (single entry)]\n{\n  \"name\": \"my-lib\",\n  \"type\": \"module\",\n  \"files\": [\"dist\"],\n  \"main\": \"./dist/my-lib.umd.cjs\",\n  \"module\": \"./dist/my-lib.js\",\n  \"exports\": {\n    \".\": {\n      \"import\": \"./dist/my-lib.js\",\n      \"require\": \"./dist/my-lib.umd.cjs\"\n    }\n  }\n}\n```\n\n```json [package.json (multiple entries)]\n{\n  \"name\": \"my-lib\",\n  \"type\": \"module\",\n  \"files\": [\"dist\"],\n  \"main\": \"./dist/my-lib.cjs\",\n  \"module\": \"./dist/my-lib.js\",\n  \"exports\": {\n    \".\": {\n      \"import\": \"./dist/my-lib.js\",\n      \"require\": \"./dist/my-lib.cjs\"\n    },\n    \"./secondary\": {\n      \"import\": \"./dist/secondary.js\",\n      \"require\": \"./dist/secondary.cjs\"\n    }\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/dep-pre-bundling.md#3",
+    "title": "docs/guide/dep-pre-bundling.md > Dependency Pre-Bundling > Monorepos and Linked Dependencies",
+    "text": "## Monorepos and Linked Dependencies\n\nIn a monorepo setup, a dependency may be a linked package from the same repo. Vite automatically detects dependencies that are not resolved from `node_modules` and treats the linked dep as source code. It will not attempt to bundle the linked dep, and will analyze the linked dep's dependency list instead.\n\nHowever, this requires the linked dep to be exported as ESM. If not, you can add the dependency to [`optimizeDeps.include`](/config/dep-optimization-options.md#optimizedeps-include) in your config.\n\n```js twoslash [vite.config.js]\nimport { defineConfig } from 'vite'\n// ---cut---\nexport default defineConfig({\n  optimizeDeps: {\n    include: ['linked-dep'],\n  },\n})\n```\n\nWhen making changes to the linked dep, restart the dev server with the `--force` command line option for the changes to take effect."
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#7",
+    "title": "docs/guide/ssr.md > Server-Side Rendering (SSR) > Setting Up the Dev Server",
+    "text": "The `dev` script in `package.json` should also be changed to use the server script instead:\n\n```diff [package.json]\n  \"scripts\": {\n-   \"dev\": \"vite\"\n+   \"dev\": \"node server\"\n  }\n```"
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#4",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site > GitHub Pages",
+    "text": "## GitHub Pages\n\n1. **Update Vite Config**\n\n   Set the correct `base` in `vite.config.js`.\n\n   If you are deploying to `https://<USERNAME>.github.io/`, or to a custom domain through GitHub Pages (eg. `www.example.com`), set `base` to `'/'`. Alternatively, you can remove `base` from the configuration, as it defaults to `'/'`.\n\n   If you are deploying to `https://<USERNAME>.github.io/<REPO>/` (eg. your repository is at `https://github.com/<USERNAME>/<REPO>`), then set `base` to `'/<REPO>/'`.\n\n2. **Enable GitHub Pages**\n\n   In your repository, go to **Settings → Pages**. Under **Build and deployment**, open the **Source** dropdown, and select **GitHub Actions**.\n\n   GitHub will now deploy your site using a GitHub Actions [workflow](https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows), which is necessary since Vite requires a build step for deployment.\n\n3. **Create a Workflow**\n\n   Create a new file in your repository at `.github/workflows/deploy.yml`. You can also click on **“create your own”** from the previous step, which will generate a starter workflow file for you.\n\n   Here’s a sample workflow that installs dependencies with npm, builds the site, and deploys it whenever you push changes to the `main` branch:\n\n   <<< ./static-deploy-github-pages.yaml#content [.github/workflows/deploy.yml]"
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#1",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site",
+    "text": "# Deploying a Static Site\n\nThe following guides are based on some shared assumptions:\n\n- You are using the default build output location (`dist`). This location [can be changed using `build.outDir`](/config/build-options.md#build-outdir), and you can extrapolate instructions from these guides in that case.\n- You are using npm. You can use equivalent commands to run the scripts if you are using Yarn or other package managers.\n- Vite is installed as a local dev dependency in your project, and you have setup the following npm scripts:\n\n```json [package.json]\n{\n  \"scripts\": {\n    \"build\": \"vite build\",\n    \"preview\": \"vite preview\"\n  }\n}\n```\n\nIt is important to note that `vite preview` is intended for previewing the build locally and not meant as a production server.\n\n::: tip NOTE\nThese guides provide instructions for performing a static deployment of your Vite site. Vite also supports Server-Side Rendering. SSR refers to front-end frameworks that support running the same application in Node.js, pre-rendering it to HTML, and finally hydrating it on the client. Check out the [SSR Guide](./ssr) to learn about this feature. On the other hand, if you are looking for integration with traditional server-side frameworks, check out the [Backend Integration guide](./backend-integration) instead.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/build.md#11",
+    "title": "docs/guide/build.md > Building for Production > Library Mode > CSS support",
+    "text": "### CSS support\n\nIf your library imports any CSS, it will be bundled as a single CSS file besides the built JS files, e.g. `dist/my-lib.css`. The name defaults to `build.lib.fileName`, but can also be changed with [`build.lib.cssFileName`](/config/build-options.md#build-lib).\n\nYou can export the CSS file in your `package.json` to be imported by users:\n\n```json {12}\n{\n  \"name\": \"my-lib\",\n  \"type\": \"module\",\n  \"files\": [\"dist\"],\n  \"main\": \"./dist/my-lib.umd.cjs\",\n  \"module\": \"./dist/my-lib.js\",\n  \"exports\": {\n    \".\": {\n      \"import\": \"./dist/my-lib.js\",\n      \"require\": \"./dist/my-lib.umd.cjs\"\n    },\n    \"./style.css\": \"./dist/my-lib.css\"\n  }\n}\n```\n\n::: tip File Extensions\nIf the `package.json` does not contain `\"type\": \"module\"`, Vite will generate different file extensions for Node.js compatibility. `.js` will become `.mjs` and `.cjs` will become `.js`.\n:::\n\n::: tip Environment Variables\nIn library mode, all [`import.meta.env.*`](./env-and-mode.md) usage are statically replaced when building for production. However, `process.env.*` usage are not, so that consumers of your library can dynamically change it. If this is undesirable, you can use `define: { 'process.env.NODE_ENV': '\"production\"' }` for example to statically replace them, or use [`esm-env`](https://github.com/benmccann/esm-env) for better compatibility with bundlers and runtimes.\n:::\n\n::: warning Advanced Usage\nLibrary mode includes a simple and opinionated configuration for browser-oriented and JS framework libraries. If you are building non-browser libraries, or require advanced build flows, you can use [tsdown](https://tsdown.dev/) or [Rolldown](https://rolldown.rs/) directly.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#5",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `ViteDevServer`",
+    "text": ":::info\n`waitForRequestsIdle` is meant to be used as an escape hatch to improve DX for features that can't be implemented following the on-demand nature of the Vite dev server. It can be used during startup by tools like Tailwind to delay generating the app CSS classes until the app code has been seen, avoiding flashes of style changes. When this function is used in a load or transform hook, and the default HTTP1 server is used, one of the six http channels will be blocked until the server processes all static imports. Vite's dependency optimizer currently uses this function to avoid full-page reloads on missing dependencies by delaying loading of pre-bundled dependencies until all imported dependencies have been collected from static imported sources. Vite may switch to a different strategy in a future major release, setting `optimizeDeps.holdUntilCrawlEnd: false` by default to avoid the performance hit in large applications during cold start.\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 8,
+    "id": "vite:docs/guide/build.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0027,
+     "different_case": 0.0134,
+     "unrelated": 0.9814
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/changes/index.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0067,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0046,
+     "different_case": 0.0078,
+     "unrelated": 0.9855
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/acknowledgements.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0016,
+     "different_case": 0.0056,
+     "unrelated": 0.991
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/ssr.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0022,
+     "different_case": 0.0063,
+     "unrelated": 0.9897
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/build.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0019,
+     "different_case": 0.0068,
+     "unrelated": 0.9898
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/philosophy.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0012,
+     "different_case": 0.0027,
+     "unrelated": 0.9946
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/dep-pre-bundling.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0011,
+     "different_case": 0.0033,
+     "unrelated": 0.9941
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/static-deploy.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0008,
+     "different_case": 0.0022,
+     "unrelated": 0.9957
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/api-javascript.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.001,
+     "different_case": 0.0021,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/static-deploy.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0022,
+     "unrelated": 0.9958
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3775
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 4965,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

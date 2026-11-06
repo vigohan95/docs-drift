@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/jest-requireActual.rerank",
+ "recorded_at": "2026-11-06T13:42:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 969,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "45.60656",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=280"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `jest.requireActual`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `jest.requireActual`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/ECMAScriptModules.md#2",
+    "title": "docs/ECMAScriptModules.md > `require()` of ESM",
+    "text": "## `require()` of ESM\n\nOn Node v24.9 and later, Jest supports `require()`-ing an ES module from CJS code, mirroring [Node's own `require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require).\n\n```js title=\"main.test.cjs\"\nconst {value, default: defaultExport} = require('./esm-module.mjs');\n```\n\nCalling `require()` on an ESM file with top-level `await` (or whose graph contains TLA) throws `ERR_REQUIRE_ASYNC_MODULE`. Use `await import(...)` for those files. The same error is thrown when a configured [transformer](Configuration.md#transform-objectstring-pathtotransformer--pathtotransformer-object) or [resolver](Configuration.md#resolver-string) only supports async operation - `require()` cannot wait for it.\n\nPackages resolve through the [`require` and `module-sync` conditions](https://nodejs.org/api/packages.html#community-conditions-definitions), as they do in Node. A package that exposes its ESM entry point under `module-sync` can therefore be `require()`d, and one that exposes it only under `import` cannot - Node refuses that too, with `ERR_PACKAGE_PATH_NOT_EXPORTED`. A `module-sync` entry point whose graph contains top-level `await` throws `ERR_REQUIRE_ASYNC_MODULE`.\n\n`jest.mock` does _not_ apply when the resolved file is ESM - `jest.mock` is for CJS targets. To mock an ESM file you `require()`, register the mock via `jest.unstable_mockModule` - it applies both to the file you `require()` and to the ESM dependencies it imports. `jest.requireActual` bypasses it, as it does for CJS mocks.\n\nOn Node versions older than v24.9, `require()` of an ESM file still throws `ERR_REQUIRE_ESM`."
+   },
+   {
+    "id": "jest:docs/JestObjectAPI.md#20",
+    "title": "docs/JestObjectAPI.md > Mock Modules > `jest.requireActual(moduleName)`",
+    "text": "### `jest.requireActual(moduleName)`\n\nReturns the actual module instead of a mock, bypassing all checks on whether the module should receive a mock implementation or not.\n\n```js tab\njest.mock('../myModule', () => {\n  // Require the original module to not be mocked...\n  const originalModule = jest.requireActual('../myModule');\n\n  return {\n    __esModule: true, // Use it when dealing with esModules\n    ...originalModule,\n    getRandom: jest.fn(() => 10),\n  };\n});\n\nconst getRandom = require('../myModule').getRandom;\n\ngetRandom(); // Always returns 10\n```\n\n```ts tab\njest.mock('../myModule', () => {\n  // Require the original module to not be mocked...\n  const originalModule =\n    jest.requireActual<typeof import('../myModule')>('../myModule');\n\n  return {\n    __esModule: true, // Use it when dealing with esModules\n    ...originalModule,\n    getRandom: jest.fn(() => 10),\n  };\n});\n\nconst getRandom = require('../myModule').getRandom;\n\ngetRandom(); // Always returns 10\n```"
+   },
+   {
+    "id": "jest:docs/ManualMocks.md#5",
+    "title": "docs/ManualMocks.md > Examples",
+    "text": "The example mock shown here uses [`jest.createMockFromModule`](JestObjectAPI.md#jestcreatemockfrommodulemodulename) to generate an automatic mock, and overrides its default behavior. This is the recommended approach, but is completely optional. If you do not want to use the automatic mock at all, you can export your own functions from the mock file. One downside to fully manual mocks is that they're manual – meaning you have to manually update them any time the module they are mocking changes. Because of this, it's best to use or extend the automatic mock when it works for your needs.\n\nTo ensure that a manual mock and its real implementation stay in sync, it might be useful to require the real module using [`jest.requireActual(moduleName)`](JestObjectAPI.md#jestrequireactualmodulename) in your manual mock and amending it with mock functions before exporting it.\n\nThe code for this example is available at [examples/manual-mocks](https://github.com/jestjs/jest/tree/main/examples/manual-mocks)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "jest:docs/JestObjectAPI.md#20",
+    "action": "use",
+    "relevance_score": 0.9831,
+    "document_score": 0.9899,
+    "levels": {
+     "answers": 0.9831,
+     "elsewhere": 0.0068,
+     "different_case": 0.0059,
+     "unrelated": 0.0042
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/ECMAScriptModules.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.011,
+    "document_score": 0.0936,
+    "levels": {
+     "answers": 0.011,
+     "elsewhere": 0.0826,
+     "different_case": 0.08,
+     "unrelated": 0.8264
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/ManualMocks.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0075,
+    "document_score": 0.1332,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.1257,
+     "different_case": 0.0272,
+     "unrelated": 0.8397
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1205
+  },
+  "timing": {
+   "total_ms": 153,
+   "rerank_ms": 152,
+   "questions_ms": 0,
+   "model_ms": 43,
+   "engine": {
+    "rows": 1610,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 43,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/025.rerank",
+ "recorded_at": "2026-11-06T13:38:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1092,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.650078",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=162,cfOrigin;dur=0,cfWorker;dur=237"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Fastify v4 is still supported until June 30, 2025.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/LTS.md#3",
+    "title": "docs/Reference/LTS.md > Long Term Support > Schedule",
+    "text": "### Schedule\n<a id=\"lts-schedule\"></a>\n\n| Version | Release Date | End Of LTS Date | Node.js            | Nsolid(Node)   |\n| :------ | :----------- | :-------------- | :----------------- | :------------- |\n| 1.0.0   | 2018-03-06   | 2019-09-01      | 6, 8, 9, 10, 11    |                |\n| 2.0.0   | 2019-02-25   | 2021-01-31      | 6, 8, 10, 12, 14   |                |\n| 3.0.0   | 2020-07-07   | 2023-06-30      | 10, 12, 14, 16, 18 | v5(18)         |\n| 4.0.0   | 2022-06-08   | 2025-06-30      | 14, 16, 18, 20, 22 | v5(18), v5(20) |\n| 5.0.0   | 2024-09-17   | TBD             | 20, 22, 24, 26     | v5(20)         |\n| 6.0.0   | TDB          | TBD             | 24, 26             | v6(24)         |"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#3",
+    "title": "docs/Guides/Migration-Guide-V4.md > V4 Migration Guide > Breaking Changes > Removed `app.use()` ([#3506](https://github.com/fastify/fastify/pull/3506))",
+    "text": "### Removed `app.use()` ([#3506](https://github.com/fastify/fastify/pull/3506))\n\nWith v4 of Fastify, `app.use()` has been removed and the use of middleware is\nno longer supported.\n\nIf you need to use middleware, use\n[`@fastify/middie`](https://github.com/fastify/middie) or\n[`@fastify/express`](https://github.com/fastify/fastify-express), which will\ncontinue to be maintained.\nHowever, it is strongly recommended that you migrate to Fastify's [hooks](../Reference/Hooks.md).\n\n> ℹ️ Note:\n> Codemod remove `app.use()` with:\n> ```bash\n> npx codemod@latest fastify/4/remove-app-use\n> ```"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#7",
+    "title": "docs/Guides/Migration-Guide-V3.md > V3 Migration Guide > Breaking changes > Changed Content Type Parser syntax ([#2286](https://github.com/fastify/fastify/pull/2286))",
+    "text": "### Changed Content Type Parser syntax ([#2286](https://github.com/fastify/fastify/pull/2286))\n\nIn Fastify v3 the content type parsers now have a single signature for parsers.\n\nThe new signatures are `fn(request, payload, done)` or `async fn(request,\npayload)`. Note that `request` is now a Fastify request, not an\n`IncomingMessage`. The payload is, by default, a stream. If the `parseAs` option\nis used in `addContentTypeParser`, then `payload` reflects the option value\n(string or buffer).\n\nThe old signatures `fn(req, [done])` or `fn(req, payload, [done])` (where `req`\nis `IncomingMessage`) are still supported but are deprecated."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#6",
+    "title": "docs/Reference/Routes.md > Routes > Url building",
+    "text": "### Url building\n<a id=\"url-building\"></a>\n\nFastify supports both static and dynamic URLs.\n\nTo register a **parametric** path, use a *colon* before the parameter name. For\n**wildcard**, use a *star*. Static routes are always checked before parametric\nand wildcard routes.\n\n```js\n// parametric\nfastify.get('/example/:userId', function (request, reply) {\n  // curl ${app-url}/example/12345\n  // userId === '12345'\n  const { userId } = request.params;\n  // your code here\n})\nfastify.get('/example/:userId/:secretToken', function (request, reply) {\n  // curl ${app-url}/example/12345/abc.zHi\n  // userId === '12345'\n  // secretToken === 'abc.zHi'\n  const { userId, secretToken } = request.params;\n  // your code here\n})\n\n// wildcard\nfastify.get('/example/*', function (request, reply) {})\n```\n\nRegular expression routes are supported, but slashes must be escaped.\nTake note that RegExp is also very expensive in terms of performance!\n```js\n// parametric with regexp\nfastify.get('/example/:file(^\\\\d+).png', function (request, reply) {\n  // curl ${app-url}/example/12345.png\n  // file === '12345'\n  const { file } = request.params;\n  // your code here\n})\n```\n\nIt is possible to define more than one parameter within the same couple of slash\n(\"/\"). Such as:\n```js\nfastify.get('/example/near/:lat-:lng/radius/:r', function (request, reply) {\n  // curl ${app-url}/example/near/15°N-30°E/radius/20\n  // lat === \"15°N\"\n  // lng === \"30°E\"\n  // r ===\"20\"\n  const { lat, lng, r } = request.params;\n  // your code here\n})\n```\n*Remember in this case to use the dash (\"-\") as parameters separator.*"
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "##### delay\n\n`delay` is not a plugin itself. It's actually a plugin *factory*. It expects a\nFastify plugin with `routes` and exports the actual plugin that'll handle\nenveloping those routes with an `onRequest` hook that will make sure no requests\nare handled until we're ready for them.\n\n```js\nconst delay = (routes) =>\n  function (fastify, opts, done) {\n    // Make sure customer requests won't be accepted if the magicKey is not\n    // available\n    fastify.addHook('onRequest', function (request, reply, next) {\n      if (!request.server.magicKey) {\n        reply.statusCode = 503\n        reply.header('Retry-After', USUAL_WAIT_TIME_MS)\n        reply.send({ error: true, retryInMs: USUAL_WAIT_TIME_MS })\n      }\n\n      next()\n    })\n\n    // Register to-be-delayed routes\n    fastify.register(routes, opts)\n\n    done()\n  }\n```\n\nInstead of updating every single controller that might use the `magicKey`, we\nsimply make sure that no route that's related to customer requests will be\nserved until we have everything ready. And there's more: we fail **FAST** and\nhave the possibility of giving the customer meaningful information, like how\nlong they should wait before retrying the request. Going even further, by\nissuing a [`503` status\ncode](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/503) we're\nsignaling to our infrastructure components (namely load balancers) that we're\nstill not ready to take incoming requests and they should redirect traffic to\nother instances, if available. Additionally, we are providing a `Retry-After`\nheader with the time in milliseconds the client should wait before retrying."
+   },
+   {
+    "id": "fastify:docs/Guides/Recommendations.md#8",
+    "title": "docs/Guides/Recommendations.md > Kubernetes",
+    "text": "## Kubernetes\n<a id=\"kubernetes\"></a>\n\nThe `readinessProbe` uses ([by\ndefault](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes))\nthe pod IP as the hostname. Fastify listens on `127.0.0.1` by default. The probe\nwill not be able to reach the application in this case. To make it work,\nthe application must listen on `0.0.0.0` or specify a custom hostname in\nthe `readinessProbe.httpGet` spec, as per the following example:\n\n```yaml\nreadinessProbe:\n    httpGet:\n        path: /health\n        port: 4000\n    initialDelaySeconds: 30\n    periodSeconds: 30\n    timeoutSeconds: 3\n    successThreshold: 1\n    failureThreshold: 5\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/LTS.md#0",
+    "title": "docs/Reference/LTS.md > Long Term Support",
+    "text": "## Long Term Support\n<a id=\"lts\"></a>\n\nFastify's Long Term Support (LTS) is provided according to the schedule laid out\nin this document:\n\n1. Major releases, \"X\" release of [semantic versioning][semver] X.Y.Z release\n   versions, are supported for a minimum period of six months from their release\n   date. The release date of any specific version can be found at\n   [https://github.com/fastify/fastify/releases](https://github.com/fastify/fastify/releases).\n2. Major releases will receive security updates for an additional six months\n   from the release of the next major release. After this period, Fastify maintainers\n   will still review and release security fixes as long as they are provided\n   by the community and they do not violate other constraints,\n   e.g., minimum supported Node.js version.\n3. Major releases will be tested and verified against all Node.js release lines\n   that are supported by the [Node.js LTS\n   policy](https://github.com/nodejs/Release) within the LTS period of that\n   given Fastify release line. This implies that only the latest Node.js release\n   of a given line is supported.\n4. In addition to Node.js runtime, major releases of Fastify will also be tested\n   and verified against alternative runtimes that are compatible with Node.js.\n   The maintenance teams of these alternative runtimes are responsible for ensuring\n   and guaranteeing these tests work properly.\n   1. [N|Solid](https://docs.nodesource.com/docs/product_suite/) tests and\n      verifies each Fastify major release against current N|Solid LTS versions.\n      NodeSource ensures Fastify compatibility with N|Solid, aligning with the\n      support scope of N|Solid LTS versions at the time of the Fastify release.\n      This guarantees N|Solid users can confidently use Fastify."
+   },
+   {
+    "id": "fastify:docs/Guides/Index.md#0",
+    "title": "docs/Guides/Index.md > Guides Table Of Contents",
+    "text": "## Guides Table Of Contents\n<a id=\"guides-toc\"></a>\n\nThis table of contents is in alphabetical order.\n\n+ [Benchmarking](./Benchmarking.md): This guide introduces how to benchmark\n  applications based on Fastify.\n+ [Contributing](./Contributing.md): Details how to participate in the\n  development of Fastify, and shows how to setup an environment compatible with\n  the project's code style.\n+ [Delay Accepting Requests](./Delay-Accepting-Requests.md): A practical guide\n  on how to delay serving requests to specific routes until some condition is\n  met in your application. This guide focuses on solving the problem using\n  [`Hooks`](../Reference/Hooks.md), [`Decorators`](../Reference/Decorators.md),\n  and [`Plugins`](../Reference/Plugins.md).\n+ [Detecting When Clients Abort](./Detecting-When-Clients-Abort.md): A\n  practical guide on detecting if and when a client aborts a request.\n+ [Ecosystem](./Ecosystem.md): Lists all core plugins and many known community\n  plugins.\n+ [Fluent Schema](./Fluent-Schema.md): Shows how JSON Schema can be\n  written with a fluent API and used in Fastify.\n+ [Getting Started](./Getting-Started.md): Introduction tutorial for Fastify.\n  This is where beginners should start.\n+ [Migration Guide (v4)](./Migration-Guide-V4.md): Details how to migrate to\n  Fastify v4 from earlier versions.\n+ [Migration Guide (v3)](./Migration-Guide-V3.md): Details how to migrate to\n  Fastify v3 from earlier versions.\n+ [Plugins Guide](./Plugins-Guide.md): An informal introduction to writing\n  Fastify plugins.\n+ [Prototype Poisoning](./Prototype-Poisoning.md): A description of how the\n  prototype poisoning attack works and is mitigated.\n+ [Recommendations](./Recommendations.md): Recommendations for how to deploy\n  Fastify into production environments.\n+ [Serverless](./Serverless.md): Details on how to deploy Fastify applications\n  in various Function as a Service (FaaS) environments.\n+ [Style Guide](./Style-Guide.md): Explains the writing style we use for the\n  Fastify documentation for those who want to contribute documentation.\n+ [Testing](./Testing.md): Explains how to write unit tests for Fastify\n  applications.\n+ [Write Plugin](./Write-Plugin.md): A set of guidelines for what the Fastify\n  team considers good practices for writing a Fastify plugin."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > close > Shutdown lifecycle",
+    "text": "##### Shutdown lifecycle\n\nWhen `fastify.close()` is called, the following steps happen in order:\n\n1. The server is flagged as **closing**. New incoming requests receive a\n   `Connection: close` header (HTTP/1.1) and are handled according to\n   [`return503OnClosing`](#factory-return-503-on-closing).\n2. [`preClose`](./Hooks.md#pre-close) hooks execute. The server is still\n   processing in-flight requests at this point.\n3. **Connection draining** based on the\n   [`forceCloseConnections`](#forcecloseconnections) option:\n   - `\"idle\"` — idle keep-alive connections are closed; in-flight requests\n     continue.\n   - `true` — all persistent connections are destroyed immediately.\n   - `false` — no forced closure; idle connections remain open until they time\n     out naturally (see [`keepAliveTimeout`](#keepalivetimeout)).\n4. The HTTP server **stops accepting** new TCP connections\n   (`server.close()`). Node.js waits for all in-flight requests to complete\n   before invoking the callback.\n5. [`onClose`](./Hooks.md#on-close) hooks execute. All in-flight requests have\n   completed and the server is no longer listening.\n6. The `close` callback (or the returned Promise) resolves.\n\n```\nfastify.close() called\n  │\n  ├─▶ closing = true (new requests receive 503)\n  │\n  ├─▶ preClose hooks\n  │     (in-flight requests still active)\n  │\n  ├─▶ Connection draining (forceCloseConnections)\n  │\n  ├─▶ server.close()\n  │     (waits for in-flight requests to complete)\n  │\n  ├─▶ onClose hooks\n  │     (server stopped, all requests done)\n  │\n  └─▶ close callback / Promise resolves\n```\n\n> ℹ️ Note:\n> Upgraded connections (such as WebSocket) are not tracked by the HTTP\n> server and will prevent `server.close()` from completing. Close them\n> explicitly in a [`preClose`](./Hooks.md#pre-close) hook."
+   },
+   {
+    "id": "fastify:docs/Reference/LTS.md#1",
+    "title": "docs/Reference/LTS.md > Long Term Support",
+    "text": "A \"month\" is defined as 30 consecutive days.\n\n> ## Security Releases and Semver\n>\n> As a consequence of providing long-term support for major releases, there are\n> occasions when breaking changes must be released as a _minor_ version\n> release. Such changes will _always_ be documented in the [release\n> notes](https://github.com/fastify/fastify/releases).\n>\n> To avoid automatically receiving breaking security updates, it is possible to\n> use the tilde (`~`) range qualifier. For example, to get patches for the 3.15\n> release, and avoid automatically updating to the 3.16 release, specify the\n> dependency as `\"fastify\": \"~3.15.x\"`. This will leave your application\n> vulnerable. Use this approach with caution."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/LTS.md#3",
+    "action": "use",
+    "relevance_score": 0.9917,
+    "document_score": 0.9937,
+    "levels": {
+     "answers": 0.9917,
+     "elsewhere": 0.002,
+     "different_case": 0.0024,
+     "unrelated": 0.0039
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/LTS.md#0",
+    "action": "expand",
+    "relevance_score": 0.0135,
+    "document_score": 0.6789,
+    "levels": {
+     "answers": 0.0135,
+     "elsewhere": 0.6654,
+     "different_case": 0.0372,
+     "unrelated": 0.2839
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/LTS.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.006,
+    "document_score": 0.4058,
+    "levels": {
+     "answers": 0.006,
+     "elsewhere": 0.3997,
+     "different_case": 0.0244,
+     "unrelated": 0.5699
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Index.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0037,
+    "document_score": 0.0778,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.0741,
+     "different_case": 0.0176,
+     "unrelated": 0.9046
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0061,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0042,
+     "different_case": 0.0056,
+     "unrelated": 0.9883
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0008,
+     "different_case": 0.0026,
+     "unrelated": 0.9951
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Guides/Recommendations.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0012,
+     "different_case": 0.0024,
+     "unrelated": 0.9951
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0014,
+     "different_case": 0.0028,
+     "unrelated": 0.9945
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Routes.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.001,
+     "different_case": 0.0021,
+     "unrelated": 0.9958
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/Server.md#62",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0009,
+     "different_case": 0.0019,
+     "unrelated": 0.9961
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4501
+  },
+  "timing": {
+   "total_ms": 97,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5851,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

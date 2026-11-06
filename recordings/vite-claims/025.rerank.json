@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/025.rerank",
+ "recorded_at": "2026-11-06T13:38:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 989,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.804802",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=312"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: ::: warning Future Default Change `builder.sharedConfigBuild` was first introduced in `v6.0`.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "title": "docs/changes/ssr-using-modulerunner.md > SSR Using `ModuleRunner` API",
+    "text": "# SSR Using `ModuleRunner` API\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\n`server.ssrLoadModule` has been replaced by importing from a [Module Runner](/guide/api-environment-runtimes#modulerunner).\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`ModuleRunner` was first introduced in `v6.0`. The deprecation of `server.ssrLoadModule` is planned for a future major. To identify your usage, set `future.removeSsrLoadModule` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#0",
+    "title": "docs/changes/hotupdate-hook.md > HMR `hotUpdate` Plugin Hook",
+    "text": "# HMR `hotUpdate` Plugin Hook\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nWe're planning to deprecate the `handleHotUpdate` plugin hook in favor of [`hotUpdate` hook](/guide/api-environment-plugins#the-hotupdate-hook) to be [Environment API](/guide/api-environment.md) aware, and handle additional watch events with `create` and `delete`.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`hotUpdate` was first introduced in `v6.0`. The deprecation of `handleHotUpdate` is planned for a future major. We don't recommend moving away from `handleHotUpdate` yet. If you want to experiment and give us feedback, you can use the `future.removePluginHookHandleHotUpdate` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/per-environment-apis.md#0",
+    "title": "docs/changes/per-environment-apis.md > Move to Per-environment APIs",
+    "text": "# Move to Per-environment APIs\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nMultiple APIs from `ViteDevServer` related to module graph and modules transforms have been moved to the `DevEnvironment` instances.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\nThe `Environment` instance was first introduced at `v6.0`. The deprecation of `server.moduleGraph` and other methods that are now in environments is planned for a future major. We don't recommend moving away from server methods yet. To identify your usage, set these in your vite config.\n\n```ts\nfuture: {\n  removeServerModuleGraph: 'warn',\n  removeServerReloadModule: 'warn',\n  removeServerPluginContainer: 'warn',\n  removeServerHot: 'warn',\n  removeServerTransformRequest: 'warn',\n  removeServerWarmupRequest: 'warn',\n}\n```\n\n:::"
+   },
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "title": "docs/changes/this-environment-in-hooks.md > `this.environment` in Hooks",
+    "text": "# `this.environment` in Hooks\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nBefore Vite 6, only two environments were available: `client` and `ssr`. A single `options.ssr` plugin hook argument in `resolveId`, `load` and `transform` allowed plugin authors to differentiate between these two environments when processing modules in plugin hooks. In Vite 6, a Vite application can define any number of named environments as needed. We're introducing `this.environment` in the plugin context to interact with the environment of the current module in hooks.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`this.environment` was introduced in `v6.0`. The deprecation of `options.ssr` is planned for a future major. At that point we'll start recommending migrating your plugins to use the new API. To identify your usage, set `future.removePluginHookSsrArgument` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/why.md#4",
+    "title": "docs/guide/why.md > Why Vite > A Unified Toolchain",
+    "text": "## A Unified Toolchain\n\nVite originally relied on two separate tools under the hood: [esbuild](https://esbuild.github.io/) for fast compilation during development, and [Rollup](https://rollupjs.org/) for thorough optimization in production builds. This worked, but maintaining two pipelines introduced inconsistencies: different transformation behaviors, separate plugin systems, and growing glue code to keep them aligned.\n\n[Rolldown](https://rolldown.rs/) was built to unify both into a single bundler: written in Rust for native speed, and compatible with the same plugin API the ecosystem already relied on. It uses [Oxc](https://oxc.rs/) for parsing, transforming, and minifying. This gives Vite an end-to-end toolchain where the build tool, bundler, and compiler are maintained together and evolve as a unit.\n\nThe result is one consistent pipeline from development to [production](./build.md). The migration was done carefully: a [technical preview](https://voidzero.dev/posts/announcing-rolldown-vite) shipped first so early adopters could validate the change, ecosystem CI caught compatibility issues early, and a compatibility layer preserved existing configurations."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Shared Plugins During Build",
+    "text": "## Shared Plugins During Build\n\nBefore Vite 6, the plugins pipelines worked in a different way during dev and build:\n\n- **During dev:** plugins are shared\n- **During Build:** plugins are isolated for each environment (in different processes: `vite build` then `vite build --ssr`).\n\nThis forced frameworks to share state between the `client` build and the `ssr` build through manifest files written to the file system. In Vite 6, we are now building all environments in a single process so the way the plugins pipeline and inter-environment communication can be aligned with dev.\n\nIn a future major, we could have complete alignment:\n\n- **During both dev and build:** plugins are shared, with [per-environment filtering](#per-environment-plugins-using-the-applytoenvironment-hook)\n\nThere will also be a single `ResolvedConfig` instance shared during build, allowing for caching at entire app build process level in the same way as we have been doing with `WeakMap<ResolvedConfig, CachedData>` during dev.\n\nFor Vite 6, we need to do a smaller step to keep backward compatibility. Ecosystem plugins are currently using `config.build` instead of `environment.config.build` to access configuration, so we need to create a new `ResolvedConfig` per-environment by default. A project can opt-in into sharing the full config and plugins pipeline setting `builder.sharedConfigBuild` to `true`.\n\nThis option would only work of a small subset of projects at first, so plugin authors can opt-in for a particular plugin to be shared by setting the `sharedDuringBuild` flag to `true`. This allows for easily sharing state both for regular plugins:\n\n```js\nfunction myPlugin() {\n  // Share state among all environments in dev and build\n  const sharedState = ...\n  return {\n    name: 'shared-plugin',\n    transform(code, id) { ... },\n\n    // Opt-in into a single instance for all environments\n    sharedDuringBuild: true,\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-hmr.md#8",
+    "title": "docs/guide/api-hmr.md > HMR API > `hot.decline()`",
+    "text": "## `hot.decline()`\n\nThis is currently a noop and is there for backward compatibility. This could change in the future if there is a new usage for it. To indicate that the module is not hot-updatable, use `hot.invalidate()`."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#1",
+    "title": "docs/guide/migration.md > Migration from v7 > Default Browser Target Change [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)",
+    "text": "## Default Browser Target Change [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)\n\nThe default browser values of `build.target` and `'baseline-widely-available'` are updated to newer browser versions:\n\n- Chrome 107 → 111\n- Edge 107 → 111\n- Firefox 104 → 114\n- Safari 16.0 → 16.4\n\nThese browser versions align with [Baseline Widely Available](https://web-platform-dx.github.io/baseline/) feature sets as of 2026-01-01. In other words, they were all released about two and a half years ago."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#2",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Config > This package is ESM only",
+    "text": "### This package is ESM only\n\nWhen importing an ESM only package by `require`, the following error happens.\n\n> Failed to resolve \"foo\". This package is ESM only but it was tried to load by `require`.\n\n> Error [ERR_REQUIRE_ESM]: require() of ES Module /path/to/dependency.js from /path/to/vite.config.js not supported.\n> Instead change the require of index.js in /path/to/vite.config.js to a dynamic import() which is available in all CommonJS modules.\n\nIn Node.js <=22, ESM files cannot be loaded by [`require`](https://nodejs.org/docs/latest-v22.x/api/esm.html#require) by default.\n\nWhile it may work using [`--experimental-require-module`](https://nodejs.org/docs/latest-v22.x/api/modules.html#loading-ecmascript-modules-using-require), or Node.js >22, or in other runtimes, we still recommend converting your config to ESM by either:\n\n- adding `\"type\": \"module\"` to the nearest `package.json`\n- renaming `vite.config.js`/`vite.config.ts` to `vite.config.mjs`/`vite.config.mts`"
+   },
+   {
+    "id": "vite:docs/guide/migration.md#13",
+    "title": "docs/guide/migration.md > Migration from v7 > Rolldown > Removed Module Resolution Using Format Sniffing",
+    "text": "### Removed Module Resolution Using Format Sniffing\n\nWhen both `browser` and `module` fields are present in `package.json`, Vite used to resolve the field based on the content of the file and it used to pick the ESM file for browsers. This was introduced because some packages were using the `module` field to point to ESM files for Node.js and some other packages were using the `browser` field to point to UMD files for browsers. Given that the modern `exports` field solved this problem and is now adopted by many packages, Vite no longer uses this heuristic and always respects the order of the [`resolve.mainFields`](/config/shared-options#resolve-mainfields) option. If you were relying on this behavior, you can use the [`resolve.alias`](/config/shared-options#resolve-alias) option to map the field to the desired file or apply a patch with your package manager (e.g. `patch-package`, `pnpm patch`)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 5,
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "action": "use",
+    "relevance_score": 0.9843,
+    "document_score": 0.99,
+    "levels": {
+     "answers": 0.9843,
+     "elsewhere": 0.0057,
+     "different_case": 0.0055,
+     "unrelated": 0.0045
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0512,
+    "document_score": 0.104,
+    "levels": {
+     "answers": 0.0512,
+     "elsewhere": 0.0528,
+     "different_case": 0.0871,
+     "unrelated": 0.809
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/changes/per-environment-apis.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0274,
+    "document_score": 0.1543,
+    "levels": {
+     "answers": 0.0274,
+     "elsewhere": 0.1268,
+     "different_case": 0.0599,
+     "unrelated": 0.7858
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0145,
+    "document_score": 0.036,
+    "levels": {
+     "answers": 0.0145,
+     "elsewhere": 0.0215,
+     "different_case": 0.0523,
+     "unrelated": 0.9118
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/changes/hotupdate-hook.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0057,
+    "document_score": 0.0157,
+    "levels": {
+     "answers": 0.0057,
+     "elsewhere": 0.01,
+     "different_case": 0.0694,
+     "unrelated": 0.9149
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/migration.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0019,
+     "different_case": 0.0048,
+     "unrelated": 0.9912
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/troubleshooting.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0011,
+     "different_case": 0.0025,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/why.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0016,
+     "different_case": 0.0028,
+     "unrelated": 0.994
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-hmr.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0016,
+     "different_case": 0.0023,
+     "unrelated": 0.995
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/migration.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0015,
+     "unrelated": 0.9966
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3188
+  },
+  "timing": {
+   "total_ms": 128,
+   "rerank_ms": 112,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4538,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/jest-createMockFromModule.rerank",
+ "recorded_at": "2026-11-06T13:42:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 870,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.353153",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=14,cfOrigin;dur=0,cfWorker;dur=189"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `jest.createMockFromModule`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `jest.createMockFromModule`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/JestObjectAPI.md#4",
+    "title": "docs/JestObjectAPI.md > Mock Modules > `jest.createMockFromModule(moduleName)`",
+    "text": "### `jest.createMockFromModule(moduleName)`\n\nGiven the name of a module, use the automatic mocking system to generate a mocked version of the module for you.\n\nThis is useful when you want to create a [manual mock](ManualMocks.md) that extends the automatic mock's behavior:\n\n```js tab={\"span\":2} title=\"utils.js\"\nmodule.exports = {\n  authorize: () => {\n    return 'token';\n  },\n  isAuthorized: secret => secret === 'wizard',\n};\n```\n\n```js title=\"__tests__/createMockFromModule.test.js\"\nconst utils = jest.createMockFromModule('../utils');\n\nutils.isAuthorized = jest.fn(secret => secret === 'not wizard');\n\ntest('implementation created by jest.createMockFromModule', () => {\n  expect(jest.isMockFunction(utils.authorize)).toBe(true);\n  expect(utils.isAuthorized('not wizard')).toBe(true);\n});\n```\n\n```ts tab={\"span\":2} title=\"utils.ts\"\nexport const utils = {\n  authorize: () => {\n    return 'token';\n  },\n  isAuthorized: (secret: string) => secret === 'wizard',\n};\n```\n\n```ts title=\"__tests__/createMockFromModule.test.ts\"\nconst {utils} =\n  jest.createMockFromModule<typeof import('../utils')>('../utils');\n\nutils.isAuthorized = jest.fn((secret: string) => secret === 'not wizard');\n\ntest('implementation created by jest.createMockFromModule', () => {\n  expect(jest.isMockFunction(utils.authorize)).toBe(true);\n  expect(utils.isAuthorized('not wizard')).toBe(true);\n});\n```\n\nThis is how `createMockFromModule` will mock the following data types:"
+   },
+   {
+    "id": "jest:docs/ManualMocks.md#5",
+    "title": "docs/ManualMocks.md > Examples",
+    "text": "The example mock shown here uses [`jest.createMockFromModule`](JestObjectAPI.md#jestcreatemockfrommodulemodulename) to generate an automatic mock, and overrides its default behavior. This is the recommended approach, but is completely optional. If you do not want to use the automatic mock at all, you can export your own functions from the mock file. One downside to fully manual mocks is that they're manual – meaning you have to manually update them any time the module they are mocking changes. Because of this, it's best to use or extend the automatic mock when it works for your needs.\n\nTo ensure that a manual mock and its real implementation stay in sync, it might be useful to require the real module using [`jest.requireActual(moduleName)`](JestObjectAPI.md#jestrequireactualmodulename) in your manual mock and amending it with mock functions before exporting it.\n\nThe code for this example is available at [examples/manual-mocks](https://github.com/jestjs/jest/tree/main/examples/manual-mocks)."
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#16",
+    "title": "docs/UpgradingToJest30.md > Jest Mock API Changes > `jest.genMockFromModule` Removed",
+    "text": "### `jest.genMockFromModule` Removed\n\nThe legacy function `jest.genMockFromModule(moduleName)` has been removed. It was previously deprecated in favor of `jest.createMockFromModule(moduleName)`. If you still use `genMockFromModule`, switch to `createMockFromModule` – the behavior is the same. For example:\n\nOld code (Jest 29):\n\n```js\nconst mockFs = jest.genMockFromModule('fs');\n```\n\nNew code (Jest 30):\n\n```js\nconst mockFs = jest.createMockFromModule('fs');\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "jest:docs/UpgradingToJest30.md#16",
+    "action": "expand",
+    "relevance_score": 0.0776,
+    "document_score": 0.8407,
+    "levels": {
+     "answers": 0.0776,
+     "elsewhere": 0.7631,
+     "different_case": 0.0428,
+     "unrelated": 0.1164
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/JestObjectAPI.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0108,
+    "document_score": 0.2083,
+    "levels": {
+     "answers": 0.0108,
+     "elsewhere": 0.1975,
+     "different_case": 0.0427,
+     "unrelated": 0.749
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/ManualMocks.md#5",
+    "action": "expand",
+    "relevance_score": 0.0099,
+    "document_score": 0.7221,
+    "levels": {
+     "answers": 0.0099,
+     "elsewhere": 0.7122,
+     "different_case": 0.0276,
+     "unrelated": 0.2503
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1072
+  },
+  "timing": {
+   "total_ms": 44,
+   "rerank_ms": 43,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1477,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

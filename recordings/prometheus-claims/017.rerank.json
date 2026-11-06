@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/017.rerank",
+ "recorded_at": "2026-11-06T13:37:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 965,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "69.66787",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=267"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Following the configuration above, `localhost:8080` and `localhost:8081` are labeled `group=\"production\"` and `localhost:8082` is labeled `group=\"canary\"`.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#1",
+    "title": "documentation/examples/remote_storage/remote_storage_adapter/README.md > Remote storage adapter > Running",
+    "text": "## Running\n\nGraphite example:\n\n```\n./remote_storage_adapter --graphite-address=localhost:8080\n```\n\nOpenTSDB example:\n\n```\n./remote_storage_adapter --opentsdb-url=http://localhost:8081/\n```\n\nInfluxDB example:\n\n```\nINFLUXDB_AUTH_TOKEN=<token> ./remote_storage_adapter --influxdb-url=http://localhost:8086/ --influxdb.organization=<organization_name> --influxdb.bucket=<bucket_name>\n```\n\nTo show all flags:\n\n```\n./remote_storage_adapter -h\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#56",
+    "title": "docs/querying/api.md > Status > Self Metrics",
+    "text": "```bash\ncurl 'http://localhost:9090/api/v1/status/self_metrics?metric_name_pattern=prometheus_build_info'\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"name\": \"prometheus_build_info\",\n      \"help\": \"A metric with a constant '1' value labeled by version, revision, branch, goversion from which prometheus was built, and the goos and goarch for the build.\",\n      \"type\": \"GAUGE\",\n      \"metric\": [\n        {\n          \"label\": [\n            { \"name\": \"branch\", \"value\": \"main\" },\n            { \"name\": \"goarch\", \"value\": \"amd64\" },\n            { \"name\": \"goos\", \"value\": \"linux\" },\n            { \"name\": \"goversion\", \"value\": \"go1.26.1-X:nodwarf5\" },\n            { \"name\": \"revision\", \"value\": \"7b5a4090e38d9e1ad7697c7641234f4ed135a6c7\" },\n            { \"name\": \"tags\", \"value\": \"netgo,builtinassets\" },\n            { \"name\": \"version\", \"value\": \"3.11.0-rc.0\" }\n          ],\n          \"gauge\": {\n            \"value\": 1\n          }\n        }\n      ]\n    }\n  ]\n}\n```"
+   },
+   {
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#2",
+    "title": "documentation/examples/remote_storage/remote_storage_adapter/README.md > Remote storage adapter > Configuring Prometheus",
+    "text": "## Configuring Prometheus\n\nTo configure Prometheus to send samples to this binary, add the following to your `prometheus.yml`:\n\n```yaml\n# Remote write configuration (for Graphite, OpenTSDB, or InfluxDB).\nremote_write:\n  - url: \"http://localhost:9201/write\"\n\n# Remote read configuration (for InfluxDB only at the moment).\nremote_read:\n  - url: \"http://localhost:9201/read\"\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#48",
+    "title": "docs/querying/api.md > Status > Config",
+    "text": "### Config\n\nThe following endpoint returns currently loaded configuration file:\n\n```\nGET /api/v1/status/config\n```\n\nThe config is returned as dumped YAML file. Due to limitation of the YAML\nlibrary, YAML comments are not included.\n\n```bash\ncurl http://localhost:9090/api/v1/status/config\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"yaml\": \"<content of the loaded config file in YAML>\",\n  }\n}\n```"
+   },
+   {
+    "id": "prometheus:docs/installation.md#3",
+    "title": "docs/installation.md > Using Docker",
+    "text": "## Using Docker\n\nAll Prometheus services are available as Docker images on\n[Quay.io](https://quay.io/repository/prometheus/prometheus) or\n[Docker Hub](https://hub.docker.com/r/prom/prometheus/).\n\nRunning Prometheus on Docker is as simple as `docker run -p 9090:9090\nprom/prometheus`. This starts Prometheus with a sample\nconfiguration and exposes it on port 9090.\n\nThe Prometheus image uses a volume to store the actual metrics. For\nproduction deployments it is highly recommended to use a\n[named volume](https://docs.docker.com/storage/volumes/)\nto ease managing the data on Prometheus upgrades."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#117",
+    "title": "docs/configuration/configuration.md > Configuration file > `<relabel_config>`",
+    "text": "Care must be taken with `labeldrop` and `labelkeep` to ensure that metrics are\nstill uniquely labeled once the labels are removed."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#11",
+    "title": "docs/querying/basics.md > Time series selectors > Instant vector selectors",
+    "text": "### Instant vector selectors\n\nInstant vector selectors allow the selection of a set of time series and a\nsingle sample value for each at a given timestamp (point in time).  In the simplest\nform, only a metric name is specified, which results in an instant vector\ncontaining elements for all time series that have this metric name.\n\nThe value returned will be that of the most recent sample at or before the\nquery's evaluation timestamp (in the case of an\n[instant query](api.md#instant-queries))\nor the current step within the query (in the case of a\n[range query](api.md#range-queries)).\nThe [`@` modifier](#modifier) allows overriding the timestamp relative to which\nthe selection takes place. Time series are only returned if their most recent sample is less than the [lookback period](#staleness) ago.\n\nThis example selects all time series that have the `http_requests_total` metric\nname, returning the most recent sample for each:\n\n    http_requests_total\n\nIt is possible to filter these time series further by appending a comma-separated list of label\nmatchers in curly braces (`{}`).\n\nThis example selects only those time series with the `http_requests_total`\nmetric name that also have the `job` label set to `prometheus` and their\n`group` label set to `canary`:\n\n    http_requests_total{job=\"prometheus\",group=\"canary\"}"
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#15",
+    "title": "docs/command-line/promtool.md > Commands > `promtool check` > Flags > `promtool check healthy` > Flags",
+    "text": "###### Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">--http.config.file</code> | HTTP client configuration file, see details at https://prometheus.io/docs/prometheus/latest/configuration/promtool |  |\n| <code class=\"text-nowrap\">--url</code> | The URL for the Prometheus server. | `http://localhost:9090` |"
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#17",
+    "title": "docs/command-line/promtool.md > Commands > `promtool check` > Flags > `promtool check ready` > Flags",
+    "text": "###### Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">--http.config.file</code> | HTTP client configuration file, see details at https://prometheus.io/docs/prometheus/latest/configuration/promtool |  |\n| <code class=\"text-nowrap\">--url</code> | The URL for the Prometheus server. | `http://localhost:9090` |"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#47",
+    "title": "docs/querying/api.md > Status",
+    "text": "## Status\n\nFollowing status endpoints expose current Prometheus configuration."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/api.md#48",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0071,
+    "document_score": 0.1013,
+    "levels": {
+     "answers": 0.0071,
+     "elsewhere": 0.0941,
+     "different_case": 0.0213,
+     "unrelated": 0.8774
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/api.md#47",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.005,
+    "document_score": 0.0238,
+    "levels": {
+     "answers": 0.005,
+     "elsewhere": 0.0188,
+     "different_case": 0.0106,
+     "unrelated": 0.9656
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.014,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.009,
+     "different_case": 0.0104,
+     "unrelated": 0.9757
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/configuration/configuration.md#117",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0047,
+    "document_score": 0.0277,
+    "levels": {
+     "answers": 0.0047,
+     "elsewhere": 0.0231,
+     "different_case": 0.0099,
+     "unrelated": 0.9624
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/querying/basics.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0046,
+    "document_score": 0.0236,
+    "levels": {
+     "answers": 0.0046,
+     "elsewhere": 0.0189,
+     "different_case": 0.0211,
+     "unrelated": 0.9553
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0055,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0031,
+     "different_case": 0.0053,
+     "unrelated": 0.9892
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/installation.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0021,
+     "different_case": 0.0037,
+     "unrelated": 0.9924
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/command-line/promtool.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0032,
+     "different_case": 0.0053,
+     "unrelated": 0.9896
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/command-line/promtool.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0022,
+     "different_case": 0.0052,
+     "unrelated": 0.9908
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/api.md#56",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0011,
+     "different_case": 0.0027,
+     "unrelated": 0.9947
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2610
+  },
+  "timing": {
+   "total_ms": 88,
+   "rerank_ms": 72,
+   "questions_ms": 0,
+   "model_ms": 64,
+   "engine": {
+    "rows": 3800,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 64,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 61,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

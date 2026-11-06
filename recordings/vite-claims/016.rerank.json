@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/016.rerank",
+ "recorded_at": "2026-11-06T13:37:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1167,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "115.106819",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=176,cfOrigin;dur=0,cfWorker;dur=314"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: ::: warning Note This hook won't be called if you are using a framework that has custom handling of entry files (for example [SvelteKit](https://github.com/sveltejs/kit/discussions/8269#discussioncomment-4509145)). :::",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/build.md#2",
+    "title": "docs/guide/build.md > Building for Production > Public Base Path",
+    "text": "## Public Base Path\n\n- Related: [Asset Handling](./assets)\n\nIf you are deploying your project under a nested public path, simply specify the [`base` config option](/config/shared-options.md#base) and all asset paths will be rewritten accordingly. This option can also be specified as a command line flag, e.g. `vite build --base=/my/public/path/`.\n\nJS-imported asset URLs, CSS `url()` references, and asset references in your `.html` files are all automatically adjusted to respect this option during build.\n\nThe exception is when you need to dynamically concatenate URLs on the fly. In this case, you can use the globally injected `import.meta.env.BASE_URL` variable which will be the public base path. Note this variable is statically replaced during build so it must appear exactly as-is (i.e. `import.meta.env['BASE_URL']` won't work).\n\nFor advanced base path control, check out [Advanced Base Options](#advanced-base-options)."
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#23",
+    "title": "docs/config/shared-options.md > Shared Options > css.preprocessorOptions > css.preprocessorOptions[extension].additionalData",
+    "text": "### css.preprocessorOptions[extension].additionalData\n\n- **Type:** `string | ((source: string, filename: string) => (string | { content: string; map?: SourceMap }))`\n\nThis option can be used to inject extra code for each style content. Note that if you include actual styles and not just variables, those styles will be duplicated in the final bundle.\n\n**Example:**\n\n```js\nexport default defineConfig({\n  css: {\n    preprocessorOptions: {\n      scss: {\n        additionalData: `$injectedColor: orange;`,\n      },\n    },\n  },\n})\n```\n\n::: tip Importing files\nSince the same code is prepended to files in different directories, relative paths won't resolve correctly. Use absolute paths or [aliases](#resolve-alias) instead.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > `RunnableDevEnvironment`",
+    "text": "```ts\nexport class RunnableDevEnvironment extends DevEnvironment {\n  public readonly runner: ModuleRunner\n}\n\nclass ModuleRunner {\n  /**\n   * URL to execute.\n   * Accepts file path, server path, or id relative to the root.\n   * Returns an instantiated module (same as in ssrLoadModule)\n   */\n  public async import(url: string): Promise<Record<string, any>>\n  /**\n   * Other ModuleRunner methods...\n   */\n}\n\nif (isRunnableDevEnvironment(server.environments.ssr)) {\n  await server.environments.ssr.runner.import('/entry-point.js')\n}\n```\n\n:::warning\nThe `runner` is evaluated lazily only when it's accessed for the first time. Beware that Vite enables source map support when the `runner` is created by calling `process.setSourceMapsEnabled` or by overriding `Error.prepareStackTrace` if it's not available.\n:::\n\nGiven a Vite server configured in middleware mode as described by the [SSR setup guide](/guide/ssr#setting-up-the-dev-server), let's implement the SSR middleware using the environment API. Remember that it doesn't have to be called `ssr`, so we'll name it `server` in this example. Error handling is omitted.\n\n```js\nimport fs from 'node:fs'\nimport path from 'node:path'\nimport { createServer } from 'vite'\n\nconst viteServer = await createServer({\n  server: { middlewareMode: true },\n  appType: 'custom',\n  environments: {\n    server: {\n      // by default, modules are run in the same process as the vite server\n    },\n  },\n})\n\n// You might need to cast this to RunnableDevEnvironment in TypeScript or\n// use isRunnableDevEnvironment to guard the access to the runner\nconst serverEnvironment = viteServer.environments.server\n\napp.use('*', async (req, res, next) => {\n  const url = req.originalUrl\n\n  // 1. Read index.html\n  const indexHtmlPath = path.resolve(import.meta.dirname, 'index.html')\n  let template = fs.readFileSync(indexHtmlPath, 'utf-8')\n\n  // 2. Apply Vite HTML transforms. This injects the Vite HMR client,\n  //    and also applies HTML transforms from Vite plugins, e.g. global\n  //    preambles from @vitejs/plugin-react\n  template = await viteServer.transformIndexHtml(url, template)\n\n  // 3. Load the server entry. import(url) automatically transforms\n  //    ESM source code to be usable in Node.js! There is no bundling\n  //    required, and provides full HMR support.\n  const { render } = await serverEnvironment.runner.import(\n    '/src/entry-server.js',\n  )"
+   },
+   {
+    "id": "vite:docs/guide/build.md#12",
+    "title": "docs/guide/build.md > Building for Production > Advanced Base Options",
+    "text": "## Advanced Base Options\n\n::: warning\nThis feature is experimental. [Give Feedback](https://github.com/vitejs/vite/discussions/13834).\n:::\n\nFor advanced use cases, the deployed assets and public files may be in different paths, for example to use different cache strategies.\nA user may choose to deploy in three different paths:\n\n- The generated entry HTML files (which may be processed during SSR)\n- The generated hashed assets (JS, CSS, and other file types like images)\n- The copied [public files](assets.md#the-public-directory)\n\nA single static [base](#public-base-path) isn't enough in these scenarios. Vite provides experimental support for advanced base options during build, using `experimental.renderBuiltUrl`.\n\n```ts twoslash\nimport type { UserConfig } from 'vite'\n// prettier-ignore\nconst config: UserConfig = {\n// ---cut-before---\nexperimental: {\n  renderBuiltUrl(filename, { hostType }) {\n    if (hostType === 'js') {\n      return { runtime: `window.__toCdnUrl(${JSON.stringify(filename)})` }\n    } else {\n      return { relative: true }\n    }\n  },\n},\n// ---cut-after---\n}\n```\n\nIf the hashed assets and public files aren't deployed together, options for each group can be defined independently using asset `type` included in the second `context` param given to the function.\n\n```ts twoslash\nimport path from 'node:path'\nimport type { UserConfig } from 'vite'\n// prettier-ignore\nconst config: UserConfig = {\n// ---cut-before---\nexperimental: {\n  renderBuiltUrl(filename, { hostId, hostType, type }) {\n    if (type === 'public') {\n      return 'https://www.domain.com/' + filename\n    } else if (path.extname(hostId) === '.js') {\n      return {\n        runtime: `window.__assetsPath(${JSON.stringify(filename)})`\n      }\n    } else {\n      return 'https://cdn.domain.com/assets/' + filename\n    }\n  },\n},\n// ---cut-after---\n}\n```\n\nNote that the `filename` passed is a decoded URL, and if the function returns a URL string, it should also be decoded. Vite will handle the encoding automatically when rendering the URLs. If an object with `runtime` is returned, encoding should be handled yourself where needed as the runtime code will be rendered as is."
+   },
+   {
+    "id": "vite:docs/config/server-options.md#7",
+    "title": "docs/config/server-options.md > Server Options > server.proxy",
+    "text": "## server.proxy\n\n- **Type:** `Record<string, string | ProxyOptions>`\n\nConfigure custom proxy rules for the dev server. Expects an object of `{ key: options }` pairs. Any requests whose request path starts with that key will be proxied to the specified target. If the key starts with `^`, it will be interpreted as a `RegExp`. The `configure` option can be used to access the proxy instance. If a request matches any of the configured proxy rules, the request won't be transformed by Vite.\n\nNote that if you are using non-relative [`base`](/config/shared-options.md#base), you must prefix each key with that `base`.\n\nExtends [`http-proxy-3`](https://github.com/sagemathinc/http-proxy-3#options). Additional options are [here](https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/middlewares/proxy.ts#L13).\n\nIn some cases, you might also want to configure the underlying dev server (e.g. to add custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app). In order to do that, you need to write your own [plugin](/guide/using-plugins.html) and use [configureServer](/guide/api-plugin.html#configureserver) function.\n\n**Example:**\n\n```js\nexport default defineConfig({\n  server: {\n    proxy: {\n      // string shorthand:\n      // http://localhost:5173/foo\n      //   -> http://localhost:4567/foo\n      '/foo': 'http://localhost:4567',\n      // with options:\n      // http://localhost:5173/api/bar\n      //   -> http://jsonplaceholder.typicode.com/bar\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/api/, ''),\n      },\n      // with RegExp:\n      // http://localhost:5173/fallback/\n      //   -> http://jsonplaceholder.typicode.com/\n      '^/fallback/.*': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/fallback/, ''),\n      },\n      // Using the proxy instance\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        configure: (proxy, options) => {\n          // proxy will be an instance of 'http-proxy-3'\n        },\n      },\n      // Proxying websockets or socket.io:\n      // ws://localhost:5173/socket.io\n      //   -> ws://localhost:5174/socket.io\n      // Exercise caution using `rewriteWsOrigin` as it can leave the\n      // proxying open to CSRF attacks.\n      '/socket.io': {\n        target: 'ws://localhost:5174',\n        ws: true,\n        rewriteWsOrigin: true,\n      },\n    },\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#16",
+    "title": "docs/config/server-options.md > Server Options > server.middlewareMode",
+    "text": "## server.middlewareMode\n\n- **Type:** `boolean | { server: http.Server }`\n- **Default:** `false`\n\nCreate Vite server in middleware mode.\n\nIf [proxy](./server-options#server-proxy) is setup for WebSocket, the `server` should be provided to bind the proxy correctly.\n\n- **Related:** [appType](./shared-options#apptype), [SSR - Setting Up the Dev Server](/guide/ssr#setting-up-the-dev-server)\n\n- **Example:**\n\n```js twoslash\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    // don't include Vite's default HTML handling middlewares\n    appType: 'custom',\n  })\n  // Use vite's connect instance as middleware\n  app.use(vite.middlewares)\n\n  app.use('*', async (req, res) => {\n    // Since `appType` is `'custom'`, should serve response here.\n    // Note: if `appType` is `'spa'` or `'mpa'`, Vite includes middlewares\n    // to handle HTML requests and 404s so user middlewares should be added\n    // before Vite's middlewares to take effect instead\n  })\n}\n\ncreateServer()\n```"
+   },
+   {
+    "id": "vite:docs/guide/env-and-mode.md#6",
+    "title": "docs/guide/env-and-mode.md > Env Variables and Modes > HTML Constant Replacement",
+    "text": "## HTML Constant Replacement\n\nVite also supports replacing constants in HTML files. Any properties in `import.meta.env` can be used in HTML files with a special `%CONST_NAME%` syntax:\n\n```html\n<h1>Vite is running in %MODE%</h1>\n<p>Using data from %VITE_API_URL%</p>\n```\n\nIf the env doesn't exist in `import.meta.env`, e.g. `%NON_EXISTENT%`, it will be ignored and not replaced, unlike `import.meta.env.NON_EXISTENT` in JS where it's replaced as `undefined`.\n\nGiven that Vite is used by many frameworks, it is intentionally unopinionated about complex replacements like conditionals. Vite can be extended using [an existing userland plugin](https://github.com/vitejs/awesome-vite#transformers) or a custom plugin that implements the [`transformIndexHtml` hook](./api-plugin#transformindexhtml)."
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "title": "docs/changes/hotupdate-hook.md > HMR `hotUpdate` Plugin Hook > Motivation",
+    "text": "## Motivation\n\nThe [`handleHotUpdate` hook](/guide/api-plugin.md#handlehotupdate) allows to perform custom HMR update handling. A list of modules to be updated is passed in the `HmrContext`.\n\n```ts\ninterface HmrContext {\n  file: string\n  timestamp: number\n  modules: Array<ModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThis hook is called once for all environments, and the passed modules have mixed information from the Client and SSR environments only. Once frameworks move to custom environments, a new hook that is called for each of them is needed.\n\nThe new `hotUpdate` hook works in the same way as `handleHotUpdate` but it is called for each environment and receives a new `HotUpdateOptions` instance:\n\n```ts\ninterface HotUpdateOptions {\n  type: 'create' | 'update' | 'delete'\n  file: string\n  timestamp: number\n  modules: Array<EnvironmentModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThe current dev environment can be accessed like in other Plugin hooks with `this.environment`. The `modules` list will now be module nodes from the current environment only. Each environment update can define different update strategies.\n\nThis hook is also now called for additional watch events and not only for `'update'`. Use `type` to differentiate between them."
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#38",
+    "title": "docs/config/shared-options.md > Shared Options > appType",
+    "text": "## appType\n\n- **Type:** `'spa' | 'mpa' | 'custom'`\n- **Default:** `'spa'`\n\nWhether your application is a Single Page Application (SPA), a [Multi Page Application (MPA)](../guide/build#multi-page-app), or Custom Application (SSR and frameworks with custom HTML handling):\n\n- `'spa'`: include HTML middlewares and use SPA fallback. Configure [sirv](https://github.com/lukeed/sirv) with `single: true` in preview\n- `'mpa'`: include HTML middlewares\n- `'custom'`: don't include HTML middlewares\n\nLearn more in Vite's [SSR guide](/guide/ssr#vite-cli). Related: [`server.middlewareMode`](./server-options#server-middlewaremode)."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#8",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Per-environment Plugins Using the `applyToEnvironment` Hook",
+    "text": "## Per-environment Plugins Using the `applyToEnvironment` Hook\n\n- **Type:** `(environment: PartialEnvironment) => boolean | PluginOption | Promise<boolean>`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](#per-environment-hooks-and-global-hooks)\n\nA plugin can define what are the environments it should apply to with the `applyToEnvironment` function.\n\n```js\nconst UnoCssPlugin = () => {\n  // shared global state\n  return {\n    buildStart() {\n      // init per-environment state with WeakMap<Environment,Data>\n      // using this.environment\n    },\n    configureServer() {\n      // use global hooks normally\n    },\n    applyToEnvironment(environment) {\n      // return true if this plugin should be active in this environment,\n      // or return a new plugin to replace it.\n      // if the hook is not used, the plugin is active in all environments\n    },\n    resolveId(id, importer) {\n      // only called for environments this plugin apply to\n    },\n  }\n}\n```\n\nIf a plugin isn't environment aware and has state that isn't keyed on the current environment, the `applyToEnvironment` hook allows to easily make it per-environment.\n\n```js\nimport { nonShareablePlugin } from 'non-shareable-plugin'\n\nexport default defineConfig({\n  plugins: [\n    {\n      name: 'per-environment-plugin',\n      applyToEnvironment(environment) {\n        return nonShareablePlugin({ outputName: environment.name })\n      },\n    },\n  ],\n})\n```\n\nVite exports a `perEnvironmentPlugin` helper to simplify these cases where no other hooks are required:\n\n```js\nimport { nonShareablePlugin } from 'non-shareable-plugin'\n\nexport default defineConfig({\n  plugins: [\n    perEnvironmentPlugin('per-environment-plugin', (environment) =>\n      nonShareablePlugin({ outputName: environment.name }),\n    ),\n  ],\n})\n```\n\nNote that the plugin returned from `applyToEnvironment` or `perEnvironmentPlugin` should not use Vite-specific hooks.\n\nThe `applyToEnvironment` hook is called at config time, currently after `configResolved` due to projects in the ecosystem modifying the plugins in it. Environment plugins resolution may be moved before `configResolved` in the future."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 7,
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0316,
+    "document_score": 0.2138,
+    "levels": {
+     "answers": 0.0316,
+     "elsewhere": 0.1821,
+     "different_case": 0.0433,
+     "unrelated": 0.743
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/api-environment-plugins.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0282,
+    "document_score": 0.1237,
+    "levels": {
+     "answers": 0.0282,
+     "elsewhere": 0.0955,
+     "different_case": 0.0424,
+     "unrelated": 0.8339
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/build.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0248,
+    "document_score": 0.1074,
+    "levels": {
+     "answers": 0.0248,
+     "elsewhere": 0.0826,
+     "different_case": 0.0486,
+     "unrelated": 0.8441
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/env-and-mode.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0103,
+    "document_score": 0.061,
+    "levels": {
+     "answers": 0.0103,
+     "elsewhere": 0.0507,
+     "different_case": 0.0285,
+     "unrelated": 0.9105
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0081,
+    "document_score": 0.0674,
+    "levels": {
+     "answers": 0.0081,
+     "elsewhere": 0.0592,
+     "different_case": 0.0327,
+     "unrelated": 0.8999
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/config/server-options.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.008,
+    "document_score": 0.0841,
+    "levels": {
+     "answers": 0.008,
+     "elsewhere": 0.076,
+     "different_case": 0.0228,
+     "unrelated": 0.8931
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/server-options.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0052,
+    "document_score": 0.0355,
+    "levels": {
+     "answers": 0.0052,
+     "elsewhere": 0.0303,
+     "different_case": 0.0218,
+     "unrelated": 0.9427
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/config/shared-options.md#38",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.0103,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.0066,
+     "different_case": 0.0178,
+     "unrelated": 0.9719
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/config/shared-options.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0091,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0057,
+     "different_case": 0.022,
+     "unrelated": 0.9688
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/build.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.003,
+     "different_case": 0.0101,
+     "unrelated": 0.9848
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5237
+  },
+  "timing": {
+   "total_ms": 134,
+   "rerank_ms": 118,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6267,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

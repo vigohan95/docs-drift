@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/017.rerank",
+ "recorded_at": "2026-11-06T13:37:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1146,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.598465",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=160,cfOrigin;dur=0,cfWorker;dur=297"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: The parsed value of `VITE_SOME_KEY` – `\"123\"` – will be exposed on the client, but the value of `DB_PASSWORD` will not.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#9",
+    "title": "docs/guide/api-environment-runtimes.md > Environment API for Runtimes > `ModuleRunnerTransport`",
+    "text": "```js [server.js]\nimport { BroadcastChannel } from 'node:worker_threads'\nimport { createServer, DevEnvironment } from 'vite'\n\nfunction createWorkerEnvironment(name, config, context) {\n  const worker = new Worker('./worker.js')\n  const handlerToWorkerListener = new WeakMap()\n  const client = {\n    send(payload: HotPayload) {\n      worker.postMessage(payload)\n    },\n  }\n\n  const workerHotChannel = {\n    // Worker threads post messages are not exposed over the network, skip server.fs checks\n    skipFsCheck: true,\n    send: (data) => worker.postMessage(data),\n    on: (event, handler) => {\n      // client is already connected\n      if (event === 'vite:client:connect') return\n      if (event === 'vite:client:disconnect') {\n        const listener = () => {\n          handler(undefined, client)\n        }\n        handlerToWorkerListener.set(handler, listener)\n        worker.on('exit', listener)\n        return\n      }\n\n      const listener = (value) => {\n        if (value.type === 'custom' && value.event === event) {\n          handler(value.data, client)\n        }\n      }\n      handlerToWorkerListener.set(handler, listener)\n      worker.on('message', listener)\n    },\n    off: (event, handler) => {\n      if (event === 'vite:client:connect') return\n      if (event === 'vite:client:disconnect') {\n        const listener = handlerToWorkerListener.get(handler)\n        if (listener) {\n          worker.off('exit', listener)\n          handlerToWorkerListener.delete(handler)\n        }\n        return\n      }\n\n      const listener = handlerToWorkerListener.get(handler)\n      if (listener) {\n        worker.off('message', listener)\n        handlerToWorkerListener.delete(handler)\n      }\n    },\n  }\n\n  return new DevEnvironment(name, config, {\n    transport: workerHotChannel,\n  })\n}\n\nawait createServer({\n  environments: {\n    worker: {\n      dev: {\n        createEnvironment: createWorkerEnvironment,\n      },\n    },\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#37",
+    "title": "docs/config/shared-options.md > Shared Options > envPrefix",
+    "text": "## envPrefix\n\n- **Type:** `string | string[]`\n- **Default:** `VITE_`\n\nEnv variables starting with `envPrefix` will be exposed to your client source code via `import.meta.env`.\n\n:::warning SECURITY NOTES\n`envPrefix` should not be set as `''`, which will expose all your env variables and cause unexpected leaking of sensitive information. Vite will throw an error when detecting `''`.\n\nIf you would like to expose an unprefixed variable, you can use [define](#define) to expose it:\n\n```js\ndefine: {\n  'import.meta.env.ENV_VARIABLE': JSON.stringify(process.env.ENV_VARIABLE)\n}\n```\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#7",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > raw `DevEnvironment`",
+    "text": "### raw `DevEnvironment`\n\nIf the environment does not implement the `RunnableDevEnvironment` or `FetchableDevEnvironment` interfaces, you need to set up the communication manually.\n\nIf your code can run in the same runtime as the user modules (i.e., it does not rely on Node.js-specific APIs), you can use a virtual module. This approach eliminates the need to access the value from the code using Vite's APIs.\n\n```ts\n// code using the Vite's APIs\nimport { createServer } from 'vite'\n\nconst server = await createServer({\n  plugins: [\n    // a plugin that handles `virtual:entrypoint`\n    {\n      name: 'virtual-module',\n      /* plugin implementation */\n    },\n  ],\n})\nconst ssrEnvironment = server.environments.ssr\nconst input = {}\n\n// use exposed functions by each environment factories that runs the code\n// check for each environment factories what they provide\nif (ssrEnvironment instanceof CustomDevEnvironment) {\n  ssrEnvironment.runEntrypoint('virtual:entrypoint')\n} else {\n  throw new Error(`Unsupported runtime for ${ssrEnvironment.name}`)\n}\n\n// -------------------------------------\n// virtual:entrypoint\nconst { createHandler } = await import('./entrypoint.js')\nconst handler = createHandler(input)\nconst response = handler(new Request('http://example.com/'))\n\n// -------------------------------------\n// ./entrypoint.js\nexport function createHandler(input) {\n  return function handler(req) {\n    return new Response('hello')\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#17",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `preprocessCSS`",
+    "text": "## `preprocessCSS`\n\n- **Experimental:** [Give Feedback](https://github.com/vitejs/vite/discussions/13815)\n\n**Type Signature:**\n\n```ts\nasync function preprocessCSS(\n  code: string,\n  filename: string,\n  config: ResolvedConfig,\n): Promise<PreprocessCSSResult>\n\ninterface PreprocessCSSResult {\n  code: string\n  map?: SourceMapInput\n  modules?: Record<string, string>\n  deps?: Set<string>\n}\n```\n\nPre-processes `.css`, `.scss`, `.sass`, `.less`, `.styl` and `.stylus` files to plain CSS so it can be used in browsers or parsed by other tools. Similar to the [built-in CSS pre-processing support](/guide/features#css-pre-processors), the corresponding pre-processor must be installed if used.\n\nThe pre-processor used is inferred from the `filename` extension. If the `filename` ends with `.module.{ext}`, it is inferred as a [CSS module](https://github.com/css-modules/css-modules) and the returned result will include a `modules` object mapping the original class names to the transformed ones.\n\nNote that pre-processing will not resolve URLs in `url()` or `image-set()`."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#16",
+    "title": "docs/config/build-options.md > Build Options > build.lib",
+    "text": "## build.lib\n\n- **Type:** `{ entry?: string | string[] | { [entryAlias: string]: string }, name?: string, formats?: ('es' | 'cjs' | 'umd' | 'iife')[], fileName?: string | ((format: ModuleFormat, entryName: string) => string), cssFileName?: string }`\n- **Related:** [Library Mode](/guide/build#library-mode)\n\nBuild as a library. `entry` defaults to the top-level [`input`](/config/shared-options#input) option, and one of them is required since the library cannot use HTML as entry. `name` is the exposed global variable and is required when `formats` includes `'umd'` or `'iife'`. Default `formats` are `['es', 'umd']`, or `['es', 'cjs']`, if multiple entries are used.\n\n`fileName` is the name of the package file output, which defaults to the `\"name\"` in `package.json`. It can also be defined as a function taking the `format` and `entryName` as arguments, and returning the file name.\n\nIf your package imports CSS, `cssFileName` can be used to specify the name of the CSS file output. It defaults to the same value as `fileName` if it's set a string, otherwise it also falls back to the `\"name\"` in `package.json`.\n\n```js twoslash [vite.config.js]\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  build: {\n    lib: {\n      entry: ['src/main.js'],\n      fileName: (format, entryName) => `my-lib-${entryName}.${format}.js`,\n      cssFileName: 'my-lib-style',\n    },\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#2",
+    "title": "docs/guide/api-environment.md > Environment API > Closing the Gap Between Build and Dev",
+    "text": "## Closing the Gap Between Build and Dev\n\nFor a simple SPA/MPA, no new APIs around environments are exposed to the config. Internally, Vite will apply the options to a `client` environment, but it's not necessary to know of this concept when configuring Vite. The config and behavior from Vite 5 should work seamlessly here.\n\nWhen we move to a typical server-side rendered (SSR) app, we'll have two environments:\n\n- `client`: runs the app in the browser.\n- `ssr`: runs the app in node (or other server runtimes) which renders pages before sending them to the browser.\n\nIn dev, Vite executes the server code in the same Node process as the Vite dev server, giving a close approximation to the production environment. However, it is also possible for servers to run in other JS runtimes, like [Cloudflare's workerd](https://github.com/cloudflare/workerd) which have different constraints. Modern apps may also run in more than two environments, e.g. a browser, a node server, and an edge server. Vite 5 didn't allow these environments to be properly represented.\n\nVite 6 allows users to configure their app during build and dev to map all of its environments. During dev, a single Vite dev server can now be used to run code in multiple different environments concurrently. The app source code is still transformed by Vite dev server. On top of the shared HTTP server, middlewares, resolved config, and plugins pipeline, the Vite dev server now has a set of independent dev environments. Each of them is configured to match the production environment as closely as possible, and is connected to a dev runtime where the code is executed (for workerd, the server code can now run in miniflare locally). In the client, the browser imports and executes the code. In other environments, a module runner fetches and evaluates the transformed code.\n\n![Vite Environments](../images/vite-environments.svg)"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#12",
+    "title": "docs/config/server-options.md > Server Options > server.ws",
+    "text": "## server.ws\n\n- **Type:** `false | { protocol?: string, host?: string, port?: number, path?: string, timeout?: number, clientPort?: number, server?: Server }`\n\nConfigure WebSocket connection options. Set to `false` to disable the WebSocket connection entirely.\n\n- `protocol` - WebSocket protocol (`ws` or `wss`)\n- `host` - WebSocket server host\n- `port` - WebSocket server port\n- `path` - WebSocket path\n- `clientPort` - Override the port on the client side, allowing you to serve the websocket on a different port than the client code looks for it on\n- `timeout` - Connection timeout in milliseconds (default: 30000)\n- `server` - Use a custom HTTP server for WebSocket connections\n\nWhen `server.ws.server` is defined, Vite will process the WebSocket connection requests through the provided server. If not in middleware mode, Vite will attempt to process WebSocket connection requests through the existing server. This can be helpful when using self-signed certificates or when you want to expose Vite over a network on a single port.\n\n```js\nexport default defineConfig({\n  server: {\n    ws: {\n      protocol: 'wss',\n      host: 'localhost',\n      port: 3001,\n    },\n  },\n})\n```\n\nCheck out [`vite-setup-catalogue`](https://github.com/sapphi-red/vite-setup-catalogue) for some examples.\n\n::: tip NOTE\n\nWith the default configuration, reverse proxies in front of Vite are expected to support proxying WebSocket. If the Vite HMR client fails to connect WebSocket, the client will fall back to connecting the WebSocket directly to the Vite HMR server bypassing the reverse proxies:\n\n```\nDirect websocket connection fallback. Check out https://vite.dev/config/server-options.html#server-ws to remove the previous connection error.\n```\n\nThe error that appears in the Browser when the fallback happens can be ignored. To avoid the error by directly bypassing reverse proxies, you could either:\n\n- configure the reverse proxy to proxy WebSocket too\n- set [`server.strictPort = true`](#server-strictport) and set `server.ws.clientPort` to the same value with `server.port`\n- set `server.ws.port` to a different value from [`server.port`](#server-port)\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#14",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > Environment Agnostic Code",
+    "text": "## Environment Agnostic Code\n\nMost of the time, the current `environment` instance will be available as part of the context of the code being run so the need to access them through `server.environments` should be rare. For example, inside plugin hooks the environment is exposed as part of the `PluginContext`, so it can be accessed using `this.environment`. See [Environment API for Plugins](./api-environment-plugins.md) to learn about how to build environment aware plugins."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#4",
+    "title": "docs/guide/api-environment-runtimes.md > Environment API for Runtimes > Creating a New Environment Factory",
+    "text": "One of the goals of this feature is to provide a customizable API to process and run code. Users can create new environment factories using the exposed primitives.\n\n```ts\nimport { DevEnvironment, HotChannel } from 'vite'\n\nfunction createWorkerdDevEnvironment(\n  name: string,\n  config: ResolvedConfig,\n  context: DevEnvironmentContext\n) {\n  const connection = /* ... */\n  const transport: HotChannel = {\n    on: (listener) => { connection.on('message', listener) },\n    send: (data) => connection.send(data),\n  }\n\n  const workerdDevEnvironment = new DevEnvironment(name, config, {\n    options: {\n      resolve: { conditions: ['custom'] },\n      ...context.options,\n    },\n    hot: true,\n    transport,\n  })\n  return workerdDevEnvironment\n}\n```\n\nBy default, `HotChannel` transports have `server.fs` restrictions applied, meaning only files within the allowed directories can be served. If your transport is not exposed over the network (e.g., it communicates via worker threads or in-process calls), you can set `skipFsCheck: true` on the `HotChannel` to bypass these restrictions.\n\nThere are [multiple communication levels for the `DevEnvironment`](/guide/api-environment-frameworks#devenvironment-communication-levels). To make it easier for frameworks to write runtime agnostic code, we recommend to implement the most flexible communication level possible."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Module externalized for browser compatibility",
+    "text": "### Module externalized for browser compatibility\n\nWhen you use a Node.js module in the browser, Vite will output the following warning.\n\n> Module \"fs\" has been externalized for browser compatibility. Cannot access \"fs.readFile\" in client code.\n\nThis is because Vite does not automatically polyfill Node.js modules.\n\nWe recommend avoiding Node.js modules for browser code to reduce the bundle size, although you can add polyfills manually. If the module is imported from a third-party library (that's meant to be used in the browser), it's advised to report the issue to the respective library."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/config/shared-options.md#37",
+    "action": "use",
+    "relevance_score": 0.9725,
+    "document_score": 0.9828,
+    "levels": {
+     "answers": 0.9725,
+     "elsewhere": 0.0102,
+     "different_case": 0.0102,
+     "unrelated": 0.007
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/api-environment.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0084,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0064,
+     "different_case": 0.0075,
+     "unrelated": 0.9841
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/api-environment-frameworks.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0048,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.003,
+     "different_case": 0.0083,
+     "unrelated": 0.9869
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/config/server-options.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0013,
+     "different_case": 0.0041,
+     "unrelated": 0.9931
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-runtimes.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0012,
+     "different_case": 0.0035,
+     "unrelated": 0.9939
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/api-environment-frameworks.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.002,
+     "different_case": 0.0029,
+     "unrelated": 0.9938
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0014,
+     "different_case": 0.0022,
+     "unrelated": 0.9951
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/api-javascript.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.0016,
+     "unrelated": 0.9965
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/config/build-options.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0012,
+     "different_case": 0.0026,
+     "unrelated": 0.995
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/api-environment-runtimes.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.001,
+     "different_case": 0.0019,
+     "unrelated": 0.996
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4304
+  },
+  "timing": {
+   "total_ms": 112,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5494,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 82,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

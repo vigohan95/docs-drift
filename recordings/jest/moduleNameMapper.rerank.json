@@ -1,0 +1,127 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/moduleNameMapper.rerank",
+ "recorded_at": "2026-11-06T13:42:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1035,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "58.878494",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=325"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `moduleNameMapper`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `moduleNameMapper`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/Configuration.md#38",
+    "title": "docs/Configuration.md > Reference > `moduleNameMapper` \\[object&lt;string, string | array&lt;string>&gt;]",
+    "text": "### `moduleNameMapper` \\[object&lt;string, string | array&lt;string>&gt;]\n\nDefault: `null`\n\nA map from regular expressions to module names or to arrays of module names that allow to stub out resources, like images or styles with a single module.\n\nModules that are mapped to an alias are unmocked by default, regardless of whether automocking is enabled or not.\n\nUse `<rootDir>` string token to refer to [`rootDir`](#rootdir-string) value if you want to use file paths.\n\nAdditionally, you can substitute captured regex groups using numbered backreferences.\n\n```js tab title=\"jest.config.js\"\nconst {defineConfig} = require('jest');\n\nmodule.exports = defineConfig({\n  moduleNameMapper: {\n    '^image![a-zA-Z0-9$_-]+$': 'GlobalImageStub',\n    '^[./a-zA-Z0-9$_-]+\\\\.png$': '<rootDir>/RelativeImageStub.js',\n    'module_name_(.*)': '<rootDir>/substituted_module_$1.js',\n    'assets/(.*)': [\n      '<rootDir>/images/$1',\n      '<rootDir>/photos/$1',\n      '<rootDir>/recipes/$1',\n    ],\n  },\n});\n```\n\n```ts tab title=\"jest.config.ts\"\nimport {defineConfig} from 'jest';\n\nexport default defineConfig({\n  moduleNameMapper: {\n    '^image![a-zA-Z0-9$_-]+$': 'GlobalImageStub',\n    '^[./a-zA-Z0-9$_-]+\\\\.png$': '<rootDir>/RelativeImageStub.js',\n    'module_name_(.*)': '<rootDir>/substituted_module_$1.js',\n    'assets/(.*)': [\n      '<rootDir>/images/$1',\n      '<rootDir>/photos/$1',\n      '<rootDir>/recipes/$1',\n    ],\n  },\n});\n```\n\nThe order in which the mappings are defined matters. Patterns are checked one by one until one fits. The most specific rule should be listed first. This is true for arrays of module names as well.\n\n:::info\n\nIf you provide module names without boundaries `^$` it may cause hard to spot errors. E.g. `relay` will replace all modules which contain `relay` as a substring in its name: `relay`, `react-relay` and `graphql-relay` will all be pointed to your stub.\n\n:::"
+   },
+   {
+    "id": "jest:docs/TutorialReactNative.md#9",
+    "title": "docs/TutorialReactNative.md > Preset configuration > moduleNameMapper",
+    "text": "### moduleNameMapper\n\nThe [`moduleNameMapper`](configuration#modulenamemapper-objectstring-string--arraystring) can be used to map a module path to a different module. By default the preset maps all images to an image stub module but if a module cannot be found this configuration option can help:\n\n```json\n{\n  \"moduleNameMapper\": {\n    \"my-module.js\": \"<rootDir>/path/to/my-module.js\"\n  }\n}\n```"
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#20",
+    "title": "docs/UpgradingToJest30.md > Module & Runtime Changes > Glob Pattern Matching Changes",
+    "text": "### Glob Pattern Matching Changes\n\nJest’s dependency for file pattern matching (`glob`) has been upgraded to v10. Glob v10 may have slight differences in pattern syntax and behavior.\n\nOne notable change is that `glob@10` treats brace expansions and extglobs a bit differently and is stricter about some patterns. If you have custom `testMatch` patterns, `moduleNameMapper` patterns, or other glob-based config, they should continue to work in most cases. Just be aware that if a pattern isn’t matching files as it used to, you might need to adjust it for the new glob engine."
+   },
+   {
+    "id": "jest:docs/Webpack.md#3",
+    "title": "docs/Webpack.md > A webpack example > Mocking CSS Modules",
+    "text": "### Mocking CSS Modules\n\nYou can use an [ES6 Proxy](https://github.com/keyanzhang/identity-obj-proxy) to mock [CSS Modules](https://github.com/css-modules/css-modules):\n\n```bash npm2yarn\nnpm install --save-dev identity-obj-proxy\n```\n\nThen all your className lookups on the styles object will be returned as-is (e.g., `styles.foobar === 'foobar'`). This is pretty handy for React [Snapshot Testing](SnapshotTesting.md).\n\n```js title=\"jest.config.js (for CSS Modules)\"\nmodule.exports = {\n  moduleNameMapper: {\n    '\\\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':\n      '<rootDir>/__mocks__/fileMock.js',\n    '\\\\.(css|less)$': 'identity-obj-proxy',\n  },\n};\n```\n\nIf `moduleNameMapper` cannot fulfill your requirements, you can use Jest's [`transform`](Configuration.md#transform-objectstring-pathtotransformer--pathtotransformer-object) config option to specify how assets are transformed. For example, a transformer that returns the basename of a file (such that `require('logo.jpg');` returns `'logo'`) can be written as:\n\n```js title=\"fileTransformer.js\"\nconst path = require('path');\n\nmodule.exports = {\n  process(sourceText, sourcePath, options) {\n    return {\n      code: `module.exports = ${JSON.stringify(path.basename(sourcePath))};`,\n    };\n  },\n};\n```\n\n```js title=\"jest.config.js (for custom transformers and CSS Modules)\"\nmodule.exports = {\n  moduleNameMapper: {\n    '\\\\.(css|less)$': 'identity-obj-proxy',\n  },\n  transform: {\n    '\\\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':\n      '<rootDir>/fileTransformer.js',\n  },\n};\n```\n\nWe've told Jest to ignore files matching a stylesheet or image extension, and instead, require our mock files. You can adjust the regular expression to match the file types your webpack config handles.\n\n:::tip\n\nRemember to include the default `babel-jest` transformer explicitly, if you wish to use it alongside with additional code preprocessors:\n\n```json\n\"transform\": {\n  \"\\\\.[jt]sx?$\": \"babel-jest\",\n  \"\\\\.css$\": \"some-css-transformer\",\n}\n```\n\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "jest:docs/Configuration.md#38",
+    "action": "use",
+    "relevance_score": 0.994,
+    "document_score": 0.9954,
+    "levels": {
+     "answers": 0.994,
+     "elsewhere": 0.0015,
+     "different_case": 0.002,
+     "unrelated": 0.0026
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/TutorialReactNative.md#9",
+    "action": "use",
+    "relevance_score": 0.9737,
+    "document_score": 0.9815,
+    "levels": {
+     "answers": 0.9737,
+     "elsewhere": 0.0078,
+     "different_case": 0.0105,
+     "unrelated": 0.0079
+    }
+   },
+   {
+    "index": 3,
+    "id": "jest:docs/Webpack.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.0163,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.0114,
+     "different_case": 0.0193,
+     "unrelated": 0.9644
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/UpgradingToJest30.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0216,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0182,
+     "different_case": 0.0194,
+     "unrelated": 0.959
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1788
+  },
+  "timing": {
+   "total_ms": 80,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2328,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

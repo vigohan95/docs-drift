@@ -1,0 +1,75 @@
+{
+ "endpoint": "grounding",
+ "tag": "fastify-claims/022.grounding",
+ "recorded_at": "2026-11-06T13:38:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 945,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "66.939871",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=218"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   }
+  ],
+  "answer": "> If you are passing an error to `send` and the statusCode is less than > 400, Fastify will automatically set it at 500.",
+  "claims": [
+   "> If you are passing an error to `send` and the statusCode is less than > 400, Fastify will automatically set it at 500."
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Reply > Reply > Methods > .send(data) > Errors' of docs/Reference/Reply.md in the documentation of the fastify project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0566,
+  "ungrounded": 0.9434,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "share": 1,
+    "share_of_answer": 0.0566,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "> If you are passing an error to `send` and the statusCode is less than > 400, Fastify will automatically set it at 500.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0566,
+    "contradicted": 0.0878,
+    "not_stated": 0.8317,
+    "not_a_claim": 0.0239,
+    "verdict": "not_stated",
+    "sources": {
+     "fastify:docs/Reference/Server.md#88": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0566
+  },
+  "timing": {
+   "read_ms": 75,
+   "total_ms": 78
+  }
+ }
+}

@@ -1,0 +1,104 @@
+{
+ "endpoint": "grounding",
+ "tag": "fastify-claims/023.grounding",
+ "recorded_at": "2026-11-06T13:38:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 967,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.411297",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=54,cfOrigin;dur=0,cfWorker;dur=225"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#74",
+    "text": "#### addSchema\n<a id=\"add-schema\"></a>\n\n`fastify.addSchema(schemaObj)`, adds a JSON schema to the Fastify instance. This\nallows you to reuse it everywhere in your application just by using the standard\n`$ref` keyword.\n\nTo learn more, read the [Validation and\nSerialization](./Validation-and-Serialization.md) documentation."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#3",
+    "text": "### Changed schema substitution ([#2023](https://github.com/fastify/fastify/pull/2023))\n\nThe non-standard `replace-way` shared schema support has been removed. This\nfeature has been replaced with JSON Schema specification compliant `$ref` based\nsubstitution. To help understand this change read [Validation and Serialization\nin Fastify\nv3](https://dev.to/eomm/validation-and-serialization-in-fastify-v3-2e8l).\n\n**v2:**\n\n```js\nconst schema = {\n  body: 'schemaId#'\n};\nfastify.route({ method, url, schema, handler });\n```\n\n**v3:**\n\n```js\nconst schema = {\n  body: {\n    $ref: 'schemaId#'\n  }\n};\nfastify.route({ method, url, schema, handler });\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Fluent-Schema.md#2",
+    "text": "### Reuse\n\nWith `fluent-json-schema`, you can manipulate your schemas more easily and\nprogrammatically and then reuse them thanks to the `addSchema()` method. You can\nrefer to the schema in two different manners that are detailed in the\n[Validation and\nSerialization](../Reference/Validation-and-Serialization.md#adding-a-shared-schema)\ndocumentation.\n\nHere are some usage examples:\n\n**`$ref-way`**: refer to an external schema.\n\n```js\nconst addressSchema = S.object()\n  .id('#address')\n  .prop('line1').required()\n  .prop('line2')\n  .prop('country').required()\n  .prop('city').required()\n  .prop('zipcode').required()\n\nconst commonSchemas = S.object()\n  .id('https://fastify/demo')\n  .definition('addressSchema', addressSchema)\n  .definition('otherSchema', otherSchema) // You can add any schemas you need\n\nfastify.addSchema(commonSchemas)\n\nconst bodyJsonSchema = S.object()\n  .prop('residence', S.ref('https://fastify/demo#address')).required()\n  .prop('office', S.ref('https://fastify/demo#/definitions/addressSchema')).required()\n\nconst schema = { body: bodyJsonSchema }\n\nfastify.post('/the/url', { schema }, handler)\n```\n\n\n**`replace-way`**: refer to a shared schema to replace before the validation\nprocess.\n\n```js\nconst sharedAddressSchema = {\n  $id: 'sharedAddress',\n  type: 'object',\n  required: ['line1', 'country', 'city', 'zipcode'],\n  properties: {\n    line1: { type: 'string' },\n    line2: { type: 'string' },\n    country: { type: 'string' },\n    city: { type: 'string' },\n    zipcode: { type: 'string' }\n  }\n}\nfastify.addSchema(sharedAddressSchema)\n\nconst bodyJsonSchema = {\n  type: 'object',\n  properties: {\n    vacation: 'sharedAddress#'\n  }\n}\n\nconst schema = { body: bodyJsonSchema }\n\nfastify.post('/the/url', { schema }, handler)\n```\n\n> ℹ️ Note:\n> You can mix up the `$ref-way` and the `replace-way`\n> when using `fastify.addSchema`."
+   }
+  ],
+  "answer": "Shared schemas can be reused with the JSON Schema [**`$ref`**](https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-01#section-8) keyword.",
+  "claims": [
+   "Shared schemas can be reused with the JSON Schema [**`$ref`**](https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-01#section-8) keyword."
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Validation and Serialization > Core concepts > Adding a shared schema' of docs/Reference/Validation-and-Serialization.md in the documentation of the fastify project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.988,
+  "ungrounded": 0.012,
+  "verdict": "grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#74",
+    "share": 0.9864,
+    "share_of_answer": 0.9746,
+    "claims": [
+     0
+    ]
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#3",
+    "share": 0.0093,
+    "share_of_answer": 0.0092,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Guides/Fluent-Schema.md#2",
+    "share": 0.0043,
+    "share_of_answer": 0.0042,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Shared schemas can be reused with the JSON Schema [**`$ref`**](https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-01#section-8) keyword.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.988,
+    "contradicted": 0.0046,
+    "not_stated": 0.0035,
+    "not_a_claim": 0.0039,
+    "verdict": "supported",
+    "sources": {
+     "fastify:docs/Reference/Server.md#74": 0.9864,
+     "fastify:docs/Guides/Migration-Guide-V3.md#3": 0.0093,
+     "fastify:docs/Guides/Fluent-Schema.md#2": 0.0043
+    },
+    "source": "fastify:docs/Reference/Server.md#74",
+    "evidence": {
+     "document": "fastify:docs/Reference/Server.md#74",
+     "quote": "This",
+     "start": 116,
+     "end": 120,
+     "confidence": 0.993
+    }
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.988
+  },
+  "timing": {
+   "read_ms": 99,
+   "total_ms": 102
+  }
+ }
+}

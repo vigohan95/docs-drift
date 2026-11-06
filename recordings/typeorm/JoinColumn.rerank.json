@@ -1,0 +1,236 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/JoinColumn.rerank",
+ "recorded_at": "2026-11-06T13:42:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1200,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "115.701309",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=168,cfOrigin;dur=0,cfWorker;dur=317"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@JoinColumn`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@JoinColumn`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "title": "docs/docs/getting-started.md > Getting Started > Step-by-Step Guide > Creating a one-to-one relation",
+    "text": "### Creating a one-to-one relation\n\nLet's create a one-to-one relationship with another class.\nLet's create a new class in `PhotoMetadata.ts`. This PhotoMetadata class is supposed to contain our photo's additional meta-information:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column(\"int\")\n    height: number\n\n    @Column(\"int\")\n    width: number\n\n    @Column()\n    orientation: string\n\n    @Column()\n    compressed: boolean\n\n    @Column()\n    comment: string\n\n    @OneToOne(() => Photo)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\nHere, we are using a new decorator called `@OneToOne`. It allows us to create a one-to-one relationship between two entities. We also add a `@JoinColumn` decorator, which indicates that this side of the relationship will own the relationship.\nRelations can be unidirectional or bidirectional.\nOnly one side of the relation can be the owner.\nUsing `@JoinColumn` decorator is required on the owner side of the relationship.\n\nIf you run the app, you'll see a newly generated table, and it will contain a column with a foreign key for the photo relation:\n\n```text\n+-------------+--------------+----------------------------+\n|                     photo_metadata                      |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| height      | int          |                            |\n| width       | int          |                            |\n| comment     | varchar(255) |                            |\n| compressed  | boolean      |                            |\n| orientation | varchar(255) |                            |\n| photoId     | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/getting-started.md#25",
+    "title": "docs/docs/getting-started.md > Getting Started > Step-by-Step Guide > Inverse side of the relationship",
+    "text": "### Inverse side of the relationship\n\nRelations can be unidirectional or bidirectional.\nCurrently, our relation between PhotoMetadata and Photo is unidirectional.\nThe owner of the relation is PhotoMetadata, and Photo doesn't know anything about PhotoMetadata.\nThis makes it complicated to access PhotoMetadata from the Photo side.\nTo fix this issue, we should add an inverse relation, and make relations between PhotoMetadata and Photo bidirectional.\nLet's modify our entities:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    /* ... other columns */\n\n    @OneToOne(() => Photo, (photo) => photo.metadata)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\n```typescript\nimport { Entity, Column, PrimaryGeneratedColumn, OneToOne } from \"typeorm\"\nimport { PhotoMetadata } from \"./PhotoMetadata\"\n\n@Entity()\nexport class Photo {\n    /* ... other columns */\n\n    @OneToOne(() => PhotoMetadata, (photoMetadata) => photoMetadata.photo)\n    metadata: PhotoMetadata\n}\n```\n\n`photo => photo.metadata` is a function that returns the name of the inverse side of the relation.\nHere we show that the metadata property of the Photo class is where we store PhotoMetadata in the Photo class.\nInstead of passing a function that returns a property of the photo, you could alternatively pass a string to `@OneToOne` decorator, like `\"metadata\"`.\nBut we used this function-typed approach to make our refactoring easier.\n\nNote that we should use the `@JoinColumn` decorator only on one side of a relation.\nWhichever side you put this decorator on will be the owning side of the relationship.\nThe owning side of a relationship contains a column with a foreign key in the database."
+   },
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "title": "docs/docs/help/1-faq.md > FAQ > What does \"owner side\" in a relations mean or why we need to use `@JoinColumn` and `@JoinTable`?",
+    "text": "## What does \"owner side\" in a relations mean or why we need to use `@JoinColumn` and `@JoinTable`?\n\nLet's start with `one-to-one` relation.\nLet's say we have two entities: `User` and `Photo`:\n\n```typescript\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne()\n    photo: Photo\n}\n```\n\n```typescript\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @OneToOne()\n    user: User\n}\n```\n\nThis example does not have a `@JoinColumn` which is incorrect.\nWhy? Because to make a real relation, we need to create a column in the database.\nWe need to create a column `userId` in `photo` or `photoId` in `user`.\nBut which column should be created - `userId` or `photoId`?\nTypeORM cannot decide for you.\nTo make a decision, you must use `@JoinColumn` on one of the sides.\nIf you put `@JoinColumn` in `Photo` then a column called `userId` will be created in the `photo` table.\nIf you put `@JoinColumn` in `User` then a column called `photoId` will be created in the `user` table.\nThe side with `@JoinColumn` will be called the \"owner side of the relationship\".\nThe other side of the relation, without `@JoinColumn`, is called the \"inverse (non-owner) side of relationship\".\n\nIt is the same in a `@ManyToMany` relation. You use `@JoinTable` to show the owner side of the relation.\n\nIn `@ManyToOne` or `@OneToMany` relations, `@JoinColumn` is not necessary because\nboth decorators are different, and the table where you put the `@ManyToOne` decorator will have the relational column.\n\n`@JoinColumn` and `@JoinTable` decorators can also be used to specify additional\njoin column / junction table settings, like join column name or junction table name."
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#18",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Relation decorators > `@JoinColumn`",
+    "text": "#### `@JoinColumn`\n\nDefines which side of the relation contains the join column with a foreign key and\nallows you to customize the join column name, referenced column name and foreign key name.\nExample:\n\n```typescript\n@Entity()\nexport class Post {\n    @ManyToOne((type) => Category)\n    @JoinColumn({\n        name: \"cat_id\",\n        referencedColumnName: \"name\",\n        foreignKeyConstraintName: \"fk_cat_id\",\n    })\n    category: Category\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "title": "docs/docs/relations/1-relations.md > Relations > `@JoinColumn` options",
+    "text": "## `@JoinColumn` options\n\n`@JoinColumn` not only defines which side of the relation contains the join column with a foreign key,\nbut also allows you to customize join column name and referenced column name.\n\nWhen we set `@JoinColumn`, it automatically creates a column in the database named `propertyName + referencedColumnName`.\nFor example:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn() // this decorator is optional for @ManyToOne, but required for @OneToOne\ncategory: Category;\n```\n\nThis code will create a `categoryId` column in the database.\nIf you want to change this name in the database you can specify a custom join column name:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ name: \"cat_id\" })\ncategory: Category;\n```\n\nJoin columns are always a reference to some other columns (using a foreign key).\nBy default your relation always refers to the primary column of the related entity.\nIf you want to create relation with other columns of the related entity -\nyou can specify them in `@JoinColumn` as well:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ referencedColumnName: \"name\" })\ncategory: Category;\n```\n\nThe relation now refers to `name` of the `Category` entity, instead of `id`.\nColumn name for that relation will become `categoryName`.\n\nYou can also join multiple columns. Note that they do not reference the primary column of the related entity by default: you must provide the referenced column name.\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn([\n    { name: \"category_id\", referencedColumnName: \"id\" },\n    { name: \"locale_id\", referencedColumnName: \"locale_id\" }\n])\ncategory: Category;\n```\n\n> **Note:** When using composite `@JoinColumn` or `@JoinTable`, TypeORM automatically sorts the foreign key columns to match the referenced entity's primary key order. This ensures compatibility with databases like MySQL, MSSQL, and SAP HANA that require FK columns to reference PK columns in index order."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "title": "docs/docs/relations/2-one-to-one-relations.md > One-to-one relations",
+    "text": "# One-to-one relations\n\nOne-to-one is a relation where A contains only one instance of B, and B contains only one instance of A.\nLet's take for example `User` and `Profile` entities.\nUser can have only a single profile, and a single profile is owned by only a single user.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class Profile {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    gender: string\n\n    @Column()\n    photo: string\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne(() => Profile)\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nHere we added `@OneToOne` to the `user` and specified the target relation type to be `Profile`.\nWe also added `@JoinColumn` which is required and must be set only on one side of the relation.\nThe side you set `@JoinColumn` on, that side's table will contain a \"relation id\" and foreign keys to the target entity table.\n\nThis example will produce the following tables:\n\n```text\n+-------------+--------------+----------------------------+\n|                        profile                          |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| gender      | varchar(255) |                            |\n| photo       | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|                          user                           |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| name        | varchar(255) |                            |\n| profileId   | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "title": "docs/docs/relations/2-one-to-one-relations.md > One-to-one relations",
+    "text": "Again, `@JoinColumn` must be set only on one side of the relation - the side that must have the foreign key in the database table.\n\nExample how to save such a relation:\n\n```typescript\nconst profile = new Profile()\nprofile.gender = \"male\"\nprofile.photo = \"me.jpg\"\nawait dataSource.manager.save(profile)\n\nconst user = new User()\nuser.name = \"Joe Smith\"\nuser.profile = profile\nawait dataSource.manager.save(user)\n```\n\nWith [cascades](./1-relations.md#cascades) enabled you can save this relation with only one `save` call.\n\nTo load user with profile inside you must specify relation in `FindOptions`:\n\n```typescript\nconst users = await dataSource.getRepository(User).find({\n    relations: {\n        profile: true,\n    },\n})\n```\n\nOr using `QueryBuilder` you can join them:\n\n```typescript\nconst users = await dataSource\n    .getRepository(User)\n    .createQueryBuilder(\"user\")\n    .leftJoinAndSelect(\"user.profile\", \"profile\")\n    .getMany()\n```\n\nWith eager loading enabled on a relation, you don't have to specify relations in the find command as it will ALWAYS be loaded automatically. If you use QueryBuilder eager relations are disabled, you have to use `leftJoinAndSelect` to load the relation.\n\nRelations can be uni-directional and bi-directional.\nUni-directional are relations with a relation decorator only on one side.\nBi-directional are relations with decorators on both sides of a relation."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "title": "docs/docs/relations/2-one-to-one-relations.md > One-to-one relations",
+    "text": "We just created a uni-directional relation. Let's make it bi-directional:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, OneToOne } from \"typeorm\"\nimport { User } from \"./User\"\n\n@Entity()\nexport class Profile {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    gender: string\n\n    @Column()\n    photo: string\n\n    @OneToOne(() => User, (user) => user.profile) // specify inverse side as a second parameter\n    user: User\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne(() => Profile, (profile) => profile.user) // specify inverse side as a second parameter\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nWe just made our relation bi-directional. Note, inverse relation does not have a `@JoinColumn`.\n`@JoinColumn` must only be on one side of the relation - on the table that will own the foreign key.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst profiles = await dataSource\n    .getRepository(Profile)\n    .createQueryBuilder(\"profile\")\n    .leftJoinAndSelect(\"profile.user\", \"user\")\n    .getMany()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/3-many-to-one-one-to-many-relations.md#0",
+    "title": "docs/docs/relations/3-many-to-one-one-to-many-relations.md > Many-to-one / one-to-many relations",
+    "text": "# Many-to-one / one-to-many relations\n\nMany-to-one / one-to-many is a relation where A contains multiple instances of B, but B contains only one instance of A.\nLet's take for example `User` and `Photo` entities.\nUser can have multiple photos, but each photo is owned by only one single user.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from \"typeorm\"\nimport { User } from \"./User\"\n\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @ManyToOne(() => User, (user) => user.photos)\n    user: User\n}\n```\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, OneToMany } from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToMany(() => Photo, (photo) => photo.user)\n    photos: Photo[]\n}\n```\n\nHere we added `@OneToMany` to the `photos` property and specified the target relation type to be `Photo`.\nYou can omit `@JoinColumn` in a `@ManyToOne` / `@OneToMany` relation.\n`@OneToMany` cannot exist without `@ManyToOne`.\nIf you want to use `@OneToMany`, `@ManyToOne` is required. However, the inverse is not required: If you only care about the `@ManyToOne` relationship, you can define it without having `@OneToMany` on the related entity.\nWhere you set `@ManyToOne` - its related entity will have \"relation id\" and foreign key."
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#15",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > Bug fixes > Persistence",
+    "text": "### Persistence\n\n- **Upsert with `update: false` or `generatedType`** — upsert now correctly handles columns that should not be updated ([#12030](https://github.com/typeorm/typeorm/pull/12030) by [@gioboa](https://github.com/gioboa))\n- **Value transformers applied to `FindOperator`s** — `ApplyValueTransformers` now correctly transforms values inside `FindOperator` instances like `In`, `Between`, etc. ([#11172](https://github.com/typeorm/typeorm/pull/11172) by [@ZimGil](https://github.com/ZimGil))\n- **Soft deletion no longer updates already soft-deleted rows** — `softDelete` and `softRemove` now skip rows that are already soft-deleted ([#10705](https://github.com/typeorm/typeorm/pull/10705) by [@hassanmehdi98](https://github.com/hassanmehdi98))\n- **Entity merge respects `null` values** — merging into an entity no longer silently drops `null` property values ([#11154](https://github.com/typeorm/typeorm/pull/11154) by [@knoid](https://github.com/knoid))\n- **Map/object comparison** — fixed incorrect change detection for Map and plain object column values ([#10990](https://github.com/typeorm/typeorm/pull/10990) by [@mgohin](https://github.com/mgohin))\n- **Date transformer change detection** — fixed false-positive dirty detection with date value transformers ([#11963](https://github.com/typeorm/typeorm/pull/11963) by [@gioboa](https://github.com/gioboa))\n- **Child mpath update** — tree entity mpath is now correctly updated when re-parenting, even with soft-deleted parents ([#10844](https://github.com/typeorm/typeorm/pull/10844) by [@JoseCToscano](https://github.com/JoseCToscano))\n- **Closure junction table schema/database propagation** — schema and database settings are now correctly propagated to closure junction tables ([#12110](https://github.com/typeorm/typeorm/pull/12110) by [@pkuczynski](https://github.com/pkuczynski))\n- **Virtual property handling in schema builder** — schema builder no longer attempts to create columns for virtual properties ([#11000](https://github.com/typeorm/typeorm/pull/11000) by [@skyran1278](https://github.com/skyran1278))\n- **Nameless `TableForeignKey` drop** — dropping a foreign key without an explicit name no longer fails ([#10744](https://github.com/typeorm/typeorm/pull/10744) by [@taichunmin](https://github.com/taichunmin))\n- **`getPendingMigrations` no longer creates the migrations table** — checking for pending migrations no longer has side effects ([#11672](https://github.com/typeorm/typeorm/pull/11672) by [@pkuczynski](https://github.com/pkuczynski))\n- **Many-to-many `deferrable` foreign keys** — `@ManyToMany` now honors the `deferrable` option on the junction table's foreign keys ([#11924](https://github.com/typeorm/typeorm/pull/11924) by [@smith-xyz](https://github.com/smith-xyz))\n- **Composite foreign key column order** — schema builder sorts referenced columns in composite foreign keys to match the referenced primary key index order, preventing MySQL / MSSQL / SAP HANA from rejecting the constraint ([#12280](https://github.com/typeorm/typeorm/pull/12280) by [@pkuczynski](https://github.com/pkuczynski))\n- **User-defined shared join columns preserved in change set** — explicit `@JoinColumn` entries shared between relations are no longer dropped during persistence ([#12354](https://github.com/typeorm/typeorm/pull/12354) by [@PreAgile](https://github.com/PreAgile))"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "action": "use",
+    "relevance_score": 0.9957,
+    "document_score": 0.997,
+    "levels": {
+     "answers": 0.9957,
+     "elsewhere": 0.0013,
+     "different_case": 0.0016,
+     "unrelated": 0.0014
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "action": "use",
+    "relevance_score": 0.995,
+    "document_score": 0.9967,
+    "levels": {
+     "answers": 0.995,
+     "elsewhere": 0.0017,
+     "different_case": 0.0016,
+     "unrelated": 0.0017
+    }
+   },
+   {
+    "index": 5,
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "action": "use",
+    "relevance_score": 0.9943,
+    "document_score": 0.996,
+    "levels": {
+     "answers": 0.9943,
+     "elsewhere": 0.0016,
+     "different_case": 0.0022,
+     "unrelated": 0.0018
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/getting-started.md#25",
+    "action": "use",
+    "relevance_score": 0.9912,
+    "document_score": 0.9948,
+    "levels": {
+     "answers": 0.9912,
+     "elsewhere": 0.0035,
+     "different_case": 0.0029,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 7,
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "action": "use",
+    "relevance_score": 0.9896,
+    "document_score": 0.9935,
+    "levels": {
+     "answers": 0.9896,
+     "elsewhere": 0.0039,
+     "different_case": 0.0037,
+     "unrelated": 0.0028
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "action": "use",
+    "relevance_score": 0.9559,
+    "document_score": 0.9876,
+    "levels": {
+     "answers": 0.9559,
+     "elsewhere": 0.0317,
+     "different_case": 0.0087,
+     "unrelated": 0.0037
+    }
+   },
+   {
+    "index": 6,
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "action": "use",
+    "relevance_score": 0.8617,
+    "document_score": 0.9148,
+    "levels": {
+     "answers": 0.8617,
+     "elsewhere": 0.0531,
+     "different_case": 0.0353,
+     "unrelated": 0.0499
+    }
+   },
+   {
+    "index": 9,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0191,
+    "document_score": 0.131,
+    "levels": {
+     "answers": 0.0191,
+     "elsewhere": 0.1119,
+     "different_case": 0.0722,
+     "unrelated": 0.7967
+    }
+   },
+   {
+    "index": 8,
+    "id": "typeorm:docs/docs/relations/3-many-to-one-one-to-many-relations.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.019,
+    "document_score": 0.3353,
+    "levels": {
+     "answers": 0.019,
+     "elsewhere": 0.3163,
+     "different_case": 0.0349,
+     "unrelated": 0.6298
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0037,
+    "document_score": 0.0225,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.0188,
+     "different_case": 0.0104,
+     "unrelated": 0.9672
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5534
+  },
+  "timing": {
+   "total_ms": 120,
+   "rerank_ms": 119,
+   "questions_ms": 0,
+   "model_ms": 108,
+   "engine": {
+    "rows": 6884,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 108,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

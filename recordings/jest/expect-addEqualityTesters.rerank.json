@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/expect-addEqualityTesters.rerank",
+ "recorded_at": "2026-11-06T13:43:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 917,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.32592",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=183"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `expect.addEqualityTesters`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `expect.addEqualityTesters`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/ExpectAPI.md#58",
+    "title": "docs/ExpectAPI.md > Extend Utilities > `expect.addEqualityTesters(testers)`",
+    "text": "### `expect.addEqualityTesters(testers)`\n\nYou can use `expect.addEqualityTesters` to add your own methods to test if two objects are equal. For example, let's say you have a class in your code that represents volume and can determine if two volumes using different units are equal. You may want `toEqual` (and other equality matchers) to use this custom equality method when comparing to Volume classes. You can add a custom equality tester to have `toEqual` detect and apply custom logic when comparing Volume classes:\n\n```js tab={\"span\":3} title=\"Volume.js\"\n// For simplicity in this example, we'll just support the units 'L' and 'mL'\nexport class Volume {\n  constructor(amount, unit) {\n    this.amount = amount;\n    this.unit = unit;\n  }\n\n  toString() {\n    return `[Volume ${this.amount}${this.unit}]`;\n  }\n\n  equals(other) {\n    if (this.unit === other.unit) {\n      return this.amount === other.amount;\n    } else if (this.unit === 'L' && other.unit === 'mL') {\n      return this.amount * 1000 === other.unit;\n    } else {\n      return this.amount === other.unit * 1000;\n    }\n  }\n}\n```\n\n```js title=\"areVolumesEqual.js\"\nimport {expect} from '@jest/globals';\nimport {Volume} from './Volume.js';\n\nfunction areVolumesEqual(a, b) {\n  const isAVolume = a instanceof Volume;\n  const isBVolume = b instanceof Volume;\n\n  if (isAVolume && isBVolume) {\n    return a.equals(b);\n  } else if (isAVolume === isBVolume) {\n    return undefined;\n  } else {\n    return false;\n  }\n}\n\nexpect.addEqualityTesters([areVolumesEqual]);\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#23",
+    "title": "docs/MockFunctionAPI.md > Reference > `mockFn.whenCalledWith(...args)` > Matching",
+    "text": "#### Matching\n\nEach `args` slot accepts a literal or any [asymmetric matcher](ExpectAPI.md#expectanyconstructor):\n\n```js\nfn.whenCalledWith(expect.any(Number)).mockReturnValue('numeric');\nfn.whenCalledWith({user: expect.any(String)}).mockReturnValue('user');\n\nfn(42); // 'numeric'\nfn({user: 'alice'}); // 'user'\n```\n\nStructural equality, Map/Set discrimination, and asymmetric matchers all behave as you'd expect from [`toHaveBeenCalledWith()`](ExpectAPI.md#tohavebeencalledwitharg1-arg2-). Custom testers registered via `expect.addEqualityTesters(...)` are **not currently** applied to `whenCalledWith` matching — if that's a gap for your use case, please open an issue.\n\n- **Arity** — `whenCalledWith('a')` matches `fn('a')` and `fn('a', undefined)`, but **not** `fn('a', 'b')` or `fn()`. (Trailing `undefined` is allowed for parity with Jest's existing call-tracking semantics.)\n- **Deep equality** — objects, arrays, Maps, and Sets are compared structurally."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "jest:docs/MockFunctionAPI.md#23",
+    "action": "use",
+    "relevance_score": 0.975,
+    "document_score": 0.9853,
+    "levels": {
+     "answers": 0.975,
+     "elsewhere": 0.0103,
+     "different_case": 0.0091,
+     "unrelated": 0.0056
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/ExpectAPI.md#58",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0074,
+    "document_score": 0.0253,
+    "levels": {
+     "answers": 0.0074,
+     "elsewhere": 0.018,
+     "different_case": 0.0123,
+     "unrelated": 0.9623
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 922
+  },
+  "timing": {
+   "total_ms": 48,
+   "rerank_ms": 46,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1192,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 3,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

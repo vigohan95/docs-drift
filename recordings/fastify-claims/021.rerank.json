@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/021.rerank",
+ "recorded_at": "2026-11-06T13:38:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1021,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.596832",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=295"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: You can use the label [\"plugin suggestion\"](https://github.com/fastify/fastify/issues?q=is%3Aissue+is%3Aopen+label%3A%22plugin+suggestion%22) in our issue tracker!*",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Contributing.md#2",
+    "title": "docs/Guides/Contributing.md > Contributing To Fastify > Types Of Contributions We're Looking For",
+    "text": "## Types Of Contributions We're Looking For\n<a id=\"contribution-types\"></a>\n\nIn short, we welcome any type of contribution you are willing to provide. No\ncontribution is too small. We gladly accept contributions such as:\n\n* Documentation improvements: from small typo corrections to major document\n  reworks\n* Helping others by answering questions in pull requests and\n  [discussions](https://github.com/fastify/fastify/discussions)\n* Fixing [known\n  bugs](https://github.com/fastify/fastify/issues?q=is%3Aissue+is%3Aopen+label%3Abug)\n* Reporting previously unknown bugs by opening an issue with a minimal\n  reproduction"
+   },
+   {
+    "id": "fastify:docs/Guides/Contributing.md#4",
+    "title": "docs/Guides/Contributing.md > Contributing To Fastify > How To Contribute",
+    "text": "## How To Contribute\n<a id=\"contributing-how-to\"></a>\n\nIf you'd like to contribute, start by searching through the\n[issues](https://github.com/fastify/fastify/issues) and [pull\nrequests](https://github.com/fastify/fastify/pulls) to see whether someone else\nhas raised a similar idea or question.\n\nIf you don't see your idea listed, and you think it fits into the goals of this\nguide, do one of the following:\n* **If your contribution is minor,** such as a typo fix, open a pull request.\n* **If your contribution is major,** such as a new feature, start by opening an\n  issue first. That way, other people can weigh in on the discussion before you\n  do any work."
+   },
+   {
+    "id": "fastify:docs/Reference/Encapsulation.md#2",
+    "title": "docs/Reference/Encapsulation.md > Encapsulation",
+    "text": "The server example above demonstrates the encapsulation concepts from the\noriginal diagram:\n\n1. Each _child context_ (`authenticatedContext`, `publicContext`, and\n   `grandchildContext`) has access to the `answer` request decorator defined in\n   the _root context_.\n2. Only the `authenticatedContext` has access to the `@fastify/bearer-auth`\n   plugin.\n3. Both the `publicContext` and `grandchildContext` have access to the `foo`\n   request decorator.\n4. Only the `grandchildContext` has access to the `bar` request decorator.\n\nTo see this, start the server and issue requests:\n\n```sh\ncurl -H 'authorization: Bearer abc123' http://127.0.0.1:8000/one\n# {\"answer\":42}\ncurl http://127.0.0.1:8000/two\n# {\"answer\":42,\"foo\":\"foo\"}\ncurl http://127.0.0.1:8000/three\n# {\"answer\":42,\"foo\":\"foo\",\"bar\":\"bar\"}\n```\n\n[bearer]: https://github.com/fastify/fastify-bearer-auth"
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#10",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Validation > Ajv Plugins",
+    "text": "#### Ajv Plugins\n<a id=\"ajv-plugins\"></a>\n\nA list of plugins can be provided for use with the default `ajv` instance.\nEnsure the plugin is **compatible with the Ajv version shipped within Fastify**.\n\n> Refer to [`ajv options`](./Server.md#ajv) to check plugins format.\n\n```js\nconst fastify = require('fastify')({\n  ajv: {\n    plugins: [\n      require('ajv-merge-patch')\n    ]\n  }\n})\n\nfastify.post('/', {\n  handler (req, reply) { reply.send({ ok: 1 }) },\n  schema: {\n    body: {\n      $patch: {\n        source: {\n          type: 'object',\n          properties: {\n            q: {\n              type: 'string'\n            }\n          }\n        },\n        with: [\n          {\n            op: 'add',\n            path: '/properties/q',\n            value: { type: 'number' }\n          }\n        ]\n      }\n    }\n  }\n})\n\nfastify.post('/foo', {\n  handler (req, reply) { reply.send({ ok: 1 }) },\n  schema: {\n    body: {\n      $merge: {\n        source: {\n          type: 'object',\n          properties: {\n            q: {\n              type: 'string'\n            }\n          }\n        },\n        with: {\n          required: ['q']\n        }\n      }\n    }\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:SECURITY.md#17",
+    "title": "SECURITY.md > Security Policy > OpenSSF CII Best Practices > Gold",
+    "text": "### Gold\nWe meet 70% of the “gold” criteria. The gaps are as follows:\n  - we do not yet have the “silver” badge; see all the gaps above.\n  - We do not include a copyright or license statement in each source file.\n    Efforts are underway to change this archaic practice into a\n    suggestion instead of a hard requirement.\n  - There are a few unanswered questions around cryptography that are\n    waiting for clarification."
+   },
+   {
+    "id": "fastify:docs/Reference/LTS.md#4",
+    "title": "docs/Reference/LTS.md > Long Term Support > CI Tested Operating Systems",
+    "text": "### CI Tested Operating Systems\n<a id=\"supported-os\"></a>\n\nFastify uses GitHub Actions for CI testing, please refer to [GitHub&#39;s\ndocumentation regarding workflow\nrunners](https://docs.github.com/en/actions/reference/runners/github-hosted-runners#supported-runners-and-hardware-resources)\nfor further details on what the latest virtual environment is in relation to the\nYAML workflow labels below:\n\n| OS      | YAML Workflow Label | Package Manager | Node.js     | Nsolid(Node)  |\n| ------- | ------------------- | --------------- | ----------- | ------------- |\n| Linux   | `ubuntu-latest`     | npm             | 24          | v6(24)        |\n| Linux   | `ubuntu-latest`     | yarn,pnpm       | 24          | v6(24)        |\n| Windows | `windows-latest`    | npm             | 24          | v6(24)        |\n| MacOS   | `macos-latest`      | npm             | 24          | v6(24)        |\n\nWhen using [yarn](https://yarnpkg.com/), the `--ignore-engines` flag may be required.\n\n[semver]: https://semver.org/\n\n[hd-link]: https://www.herodevs.com/support/fastify-nes?utm_source=fastify&utm_medium=link&utm_campaign=eol_support_fastify"
+   },
+   {
+    "id": "fastify:docs/Reference/LTS.md#3",
+    "title": "docs/Reference/LTS.md > Long Term Support > Schedule",
+    "text": "### Schedule\n<a id=\"lts-schedule\"></a>\n\n| Version | Release Date | End Of LTS Date | Node.js            | Nsolid(Node)   |\n| :------ | :----------- | :-------------- | :----------------- | :------------- |\n| 1.0.0   | 2018-03-06   | 2019-09-01      | 6, 8, 9, 10, 11    |                |\n| 2.0.0   | 2019-02-25   | 2021-01-31      | 6, 8, 10, 12, 14   |                |\n| 3.0.0   | 2020-07-07   | 2023-06-30      | 10, 12, 14, 16, 18 | v5(18)         |\n| 4.0.0   | 2022-06-08   | 2025-06-30      | 14, 16, 18, 20, 22 | v5(18), v5(20) |\n| 5.0.0   | 2024-09-17   | TBD             | 20, 22, 24, 26     | v5(20)         |\n| 6.0.0   | TDB          | TBD             | 24, 26             | v6(24)         |"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#2",
+    "title": "docs/Reference/TypeScript.md > Learn By Example > Getting Started",
+    "text": "### Getting Started\n\nThis example will get you up and running with Fastify and TypeScript. It results\nin a blank http Fastify server.\n\n1. Create a new npm project, install Fastify, and install typescript & Node.js\n   types as peer dependencies:\n  ```bash\n  npm init -y\n  npm i fastify\n  npm i -D typescript @types/node\n  ```\n2. Add the following lines to the `\"scripts\"` section of the `package.json`:\n  ```json\n  {\n    \"scripts\": {\n      \"build\": \"tsc -p tsconfig.json\",\n      \"start\": \"node index.js\"\n    }\n  }\n  ```\n\n3. Initialize a TypeScript configuration file:\n  ```bash\n  npx tsc --init\n  ```\n  or use one of the [recommended\n  ones](https://github.com/tsconfig/bases#node-14-tsconfigjson).\n\n> ℹ️ Note:\n> Set `target` property in `tsconfig.json` to `es2017` or greater to avoid\n> [FastifyDeprecation](https://github.com/fastify/fastify/issues/3284) warning.\n\n4. Create an `index.ts` file - this will contain the server code\n5. Add the following code block to your file:\n   ```typescript\n   import fastify from 'fastify'\n\n   const server = fastify()\n\n   server.get('/ping', async (request, reply) => {\n     return 'pong\\n'\n   })\n\n   server.listen({ port: 8080 }, (err, address) => {\n     if (err) {\n       console.error(err)\n       process.exit(1)\n     }\n     console.log(`Server listening at ${address}`)\n   })\n   ```\n6. Run `npm run build` - this will compile `index.ts` into `index.js` which can\n   be executed using Node.js. If you run into any errors please open an issue in\n   [fastify/help](https://github.com/fastify/help/)\n7. Run `npm run start` to run the Fastify server\n8. You should see `Server listening at http://127.0.0.1:8080` in your console\n9. Try out your server using `curl localhost:8080/ping`, it should return `pong`\n   🏓"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#67",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > pluginName",
+    "text": "#### pluginName\n<a id=\"pluginName\"></a>\n\nName of the current plugin. The root plugin is called `'fastify'`. There are\ndifferent ways to define a name (in order).\n\n1. If you use [fastify-plugin](https://github.com/fastify/fastify-plugin) the\n   metadata `name` is used.\n2. If the exported plugin has the `Symbol.for('fastify.display-name')` property,\n   then the value of that property is used.\n   Example: `pluginFn[Symbol.for('fastify.display-name')] = \"Custom Name\"`\n3. If you `module.exports` a plugin the filename is used.\n4. If you use a regular [function\n   declaration](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#defining_functions)\n   the function name is used.\n\n*Fallback*: The first two lines of your plugin will represent the plugin name.\nNewlines are replaced by ` -- `. This will help to identify the root cause when\nyou deal with many plugins.\n\n> ⚠ Warning:\n> If you have to deal with nested plugins, the name differs with the usage of\n> the [fastify-plugin](https://github.com/fastify/fastify-plugin) because\n> no new scope is created and therefore we have no place to attach contextual\n> data. In that case, the plugin name will represent the boot order of all\n> involved plugins in the format of `fastify -> plugin-A -> plugin-B`."
+   },
+   {
+    "id": "fastify:docs/Guides/Ecosystem.md#4",
+    "title": "docs/Guides/Ecosystem.md > Ecosystem > [Community](#community)",
+    "text": "#### [Community](#community)\n\n> ℹ️ Note:\n> Fastify community plugins are part of the broader community efforts,\n> and we are thankful for these contributions. However, they are not\n> maintained by the Fastify team.\n> Use them at your own discretion.\n> If you find malicious code, please\n> [open an issue](https://github.com/fastify/fastify/issues/new/choose) or\n> submit a PR to remove the plugin from the list.\n\n- [`@aaroncadillac/crudify-mongo`](https://github.com/aaroncadillac/crudify-mongo)\n  A simple way to add a crud in your fastify project.\n- [`@applicazza/fastify-nextjs`](https://github.com/applicazza/fastify-nextjs)\n  Alternate Fastify and Next.js integration.\n- [`@attaryz/fastify-devtools`](https://github.com/attaryz/fastify-devtools)\n  Development tools plugin for Fastify with live request dashboard, replay\n  capabilities, and metrics tracking.\n- [`@blastorg/fastify-aws-dynamodb-cache`](https://github.com/blastorg/fastify-aws-dynamodb-cache)\n  A plugin to help with caching API responses using AWS DynamoDB.\n- [`@clerk/fastify`](https://github.com/clerk/javascript/tree/main/packages/fastify)\n  Add authentication and user management to your Fastify application with Clerk.\n- [`@dnlup/fastify-doc`](https://github.com/dnlup/fastify-doc) A plugin for\n  sampling process metrics.\n- [`@dnlup/fastify-traps`](https://github.com/dnlup/fastify-traps) A plugin to\n  close the server gracefully on `SIGINT` and `SIGTERM` signals.\n- [`@eropple/fastify-openapi3`](https://github.com/eropple/fastify-openapi3) Provides\n  easy, developer-friendly OpenAPI 3.1 specs + doc explorer based on your routes."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Contributing.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0096,
+    "document_score": 0.1821,
+    "levels": {
+     "answers": 0.0096,
+     "elsewhere": 0.1725,
+     "different_case": 0.0248,
+     "unrelated": 0.7931
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Contributing.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0079,
+    "document_score": 0.1386,
+    "levels": {
+     "answers": 0.0079,
+     "elsewhere": 0.1308,
+     "different_case": 0.0217,
+     "unrelated": 0.8397
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Guides/Ecosystem.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0043,
+    "document_score": 0.0253,
+    "levels": {
+     "answers": 0.0043,
+     "elsewhere": 0.0211,
+     "different_case": 0.0103,
+     "unrelated": 0.9644
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/TypeScript.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0048,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0022,
+     "different_case": 0.0077,
+     "unrelated": 0.9875
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0046,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0022,
+     "different_case": 0.0061,
+     "unrelated": 0.9892
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/Server.md#67",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0049,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0025,
+     "different_case": 0.0062,
+     "unrelated": 0.9889
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/LTS.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0057,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0038,
+     "different_case": 0.0065,
+     "unrelated": 0.9878
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/LTS.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.001,
+     "different_case": 0.0034,
+     "unrelated": 0.994
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Encapsulation.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0015,
+     "different_case": 0.004,
+     "unrelated": 0.9929
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:SECURITY.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0014,
+     "different_case": 0.0035,
+     "unrelated": 0.9937
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4437
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5467,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

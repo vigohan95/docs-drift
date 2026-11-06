@@ -1,0 +1,237 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/010.rerank",
+ "recorded_at": "2026-11-06T13:37:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1175,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.436607",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=174,cfOrigin;dur=0,cfWorker;dur=298"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Given that there were only two Environments until Vite 6 (`client` and `ssr`), a `ssr` boolean was enough to identify the current environment in Vite APIs.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment.md#1",
+    "title": "docs/guide/api-environment.md > Environment API > Formalizing Environments",
+    "text": "## Formalizing Environments\n\nVite 6 formalizes the concept of Environments. Until Vite 5, there were two implicit Environments (`client`, and optionally `ssr`). The new Environment API allows users and framework authors to create as many environments as needed to map the way their apps work in production. This new capability required a big internal refactoring, but a lot of effort has been placed on backward compatibility. The initial goal of Vite 6 is to move the ecosystem to the new major as smoothly as possible, delaying the adoption of the APIs until enough users have migrated and frameworks and plugin authors have validated the new design."
+   },
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "title": "docs/changes/this-environment-in-hooks.md > `this.environment` in Hooks",
+    "text": "# `this.environment` in Hooks\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nBefore Vite 6, only two environments were available: `client` and `ssr`. A single `options.ssr` plugin hook argument in `resolveId`, `load` and `transform` allowed plugin authors to differentiate between these two environments when processing modules in plugin hooks. In Vite 6, a Vite application can define any number of named environments as needed. We're introducing `this.environment` in the plugin context to interact with the environment of the current module in hooks.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`this.environment` was introduced in `v6.0`. The deprecation of `options.ssr` is planned for a future major. At that point we'll start recommending migrating your plugins to use the new API. To identify your usage, set `future.removePluginHookSsrArgument` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/per-environment-apis.md#1",
+    "title": "docs/changes/per-environment-apis.md > Move to Per-environment APIs > Motivation",
+    "text": "## Motivation\n\nIn Vite v5 and before, a single Vite dev server always had two environments (`client` and `ssr`). The `server.moduleGraph` had mixed modules from both of these environments. Nodes were connected through `clientImportedModules` and `ssrImportedModules` lists (but a single `importers` list was maintained for each). A transformed module was represented by an `id` and a `ssr` boolean. This boolean needed to be passed to APIs, for example `server.moduleGraph.getModuleByUrl(url, ssr)` and `server.transformRequest(url, { ssr })`.\n\nIn Vite v6, it is now possible to create any number of custom environments (`client`, `ssr`, `edge`, etc). A single `ssr` boolean isn't enough anymore. Instead of changing the APIs to be of the form `server.transformRequest(url, { environment })`, we moved these methods to the environment instance allowing them to be called without a Vite dev server."
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#7",
+    "title": "docs/guide/api-environment.md > Environment API > Backward Compatibility",
+    "text": "## Backward Compatibility\n\nThe current Vite server API is not yet deprecated and is backward compatible with Vite 5.\n\nThe `server.moduleGraph` returns a mixed view of the client and ssr module graphs. Backward compatible mixed module nodes will be returned from all its methods. The same scheme is used for the module nodes passed to `handleHotUpdate`.\n\nWe don't recommend switching to Environment API yet. We are aiming for a good portion of the user base to adopt Vite 6 before so plugins don't need to maintain two versions. Checkout the future breaking changes section for information on future deprecations and upgrade path:\n\n- [`this.environment` in Hooks](/changes/this-environment-in-hooks)\n- [HMR `hotUpdate` Plugin Hook](/changes/hotupdate-hook)\n- [Move to Per-environment APIs](/changes/per-environment-apis)\n- [SSR Using `ModuleRunner` API](/changes/ssr-using-modulerunner)\n- [Shared Plugins During Build](/changes/shared-plugins-during-build)"
+   },
+   {
+    "id": "vite:docs/guide/why.md#5",
+    "title": "docs/guide/why.md > Why Vite > Where Vite is Heading",
+    "text": "## Where Vite is Heading\n\nVite's architecture continues to evolve. Several efforts are shaping its future:\n\n- **Full bundle mode**: Unbundled ESM was the right tradeoff when Vite was created because no tool was both fast enough and had the HMR and plugin capabilities needed to bundle during dev. Rolldown changes that. Since exceptionally large codebases can experience slow page loads due to the high number of unbundled network requests, the team is exploring a mode where the dev server bundles code similarly to production, reducing network overhead.\n\n- **Environment API**: Instead of treating \"client\" and \"SSR\" as the only two build targets, the [Environment API](./api-environment-instances.md) lets frameworks define custom environments (edge runtimes, service workers, and other deployment targets), each with their own module resolution and execution rules. As where and how code runs continues to diversify, Vite's model expands with it.\n\n- **Evolving with JavaScript**: With Oxc and Rolldown closely collaborating with Vite, new language features and standards can be adopted quickly across the entire toolchain, without waiting on upstream dependencies.\n\nVite's goal is not to be the final tool, but to be one that keeps evolving with the web platform, and with the developers building on it."
+   },
+   {
+    "id": "vite:docs/changes/per-environment-apis.md#0",
+    "title": "docs/changes/per-environment-apis.md > Move to Per-environment APIs",
+    "text": "# Move to Per-environment APIs\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nMultiple APIs from `ViteDevServer` related to module graph and modules transforms have been moved to the `DevEnvironment` instances.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\nThe `Environment` instance was first introduced at `v6.0`. The deprecation of `server.moduleGraph` and other methods that are now in environments is planned for a future major. We don't recommend moving away from server methods yet. To identify your usage, set these in your vite config.\n\n```ts\nfuture: {\n  removeServerModuleGraph: 'warn',\n  removeServerReloadModule: 'warn',\n  removeServerPluginContainer: 'warn',\n  removeServerHot: 'warn',\n  removeServerTransformRequest: 'warn',\n  removeServerWarmupRequest: 'warn',\n}\n```\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#2",
+    "title": "docs/guide/api-environment.md > Environment API > Closing the Gap Between Build and Dev",
+    "text": "## Closing the Gap Between Build and Dev\n\nFor a simple SPA/MPA, no new APIs around environments are exposed to the config. Internally, Vite will apply the options to a `client` environment, but it's not necessary to know of this concept when configuring Vite. The config and behavior from Vite 5 should work seamlessly here.\n\nWhen we move to a typical server-side rendered (SSR) app, we'll have two environments:\n\n- `client`: runs the app in the browser.\n- `ssr`: runs the app in node (or other server runtimes) which renders pages before sending them to the browser.\n\nIn dev, Vite executes the server code in the same Node process as the Vite dev server, giving a close approximation to the production environment. However, it is also possible for servers to run in other JS runtimes, like [Cloudflare's workerd](https://github.com/cloudflare/workerd) which have different constraints. Modern apps may also run in more than two environments, e.g. a browser, a node server, and an edge server. Vite 5 didn't allow these environments to be properly represented.\n\nVite 6 allows users to configure their app during build and dev to map all of its environments. During dev, a single Vite dev server can now be used to run code in multiple different environments concurrently. The app source code is still transformed by Vite dev server. On top of the shared HTTP server, middlewares, resolved config, and plugins pipeline, the Vite dev server now has a set of independent dev environments. Each of them is configured to match the production environment as closely as possible, and is connected to a dev runtime where the code is executed (for workerd, the server code can now run in miniflare locally). In the client, the browser imports and executes the code. In other environments, a module runner fetches and evaluates the transformed code.\n\n![Vite Environments](../images/vite-environments.svg)"
+   },
+   {
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "title": "docs/changes/ssr-using-modulerunner.md > SSR Using `ModuleRunner` API",
+    "text": "# SSR Using `ModuleRunner` API\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\n`server.ssrLoadModule` has been replaced by importing from a [Module Runner](/guide/api-environment-runtimes#modulerunner).\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`ModuleRunner` was first introduced in `v6.0`. The deprecation of `server.ssrLoadModule` is planned for a future major. To identify your usage, set `future.removeSsrLoadModule` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#4",
+    "title": "docs/guide/api-environment.md > Environment API > Environments Configuration",
+    "text": "The `EnvironmentOptions` interface exposes all the per-environment options. There are environment options that apply to both `build` and `dev`, like `resolve`. And there are `DevEnvironmentOptions` and `BuildEnvironmentOptions` for dev and build specific options (like `dev.warmup` or `build.outDir`). Some options like `optimizeDeps` only applies to dev, but is kept as top level instead of nested in `dev` for backward compatibility.\n\n```ts\ninterface EnvironmentOptions {\n  define?: Record<string, any>\n  resolve?: EnvironmentResolveOptions\n  optimizeDeps: DepOptimizationOptions\n  consumer?: 'client' | 'server'\n  dev: DevOptions\n  build: BuildOptions\n}\n```\n\nThe `UserConfig` interface extends from the `EnvironmentOptions` interface, allowing to configure the client and defaults for other environments, configured through the `environments` option. The `client` and a server environment named `ssr` are always present during dev. This allows backward compatibility with `server.ssrLoadModule(url)` and `server.moduleGraph`. During build, the `client` environment is always present, and the `ssr` environment is only present if it is explicitly configured (using `environments.ssr` or for backward compatibility `build.ssr`). An app doesn't need to use the `ssr` name for its SSR environment, it could name it `server` for example."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > `RunnableDevEnvironment`",
+    "text": "```ts\nexport class RunnableDevEnvironment extends DevEnvironment {\n  public readonly runner: ModuleRunner\n}\n\nclass ModuleRunner {\n  /**\n   * URL to execute.\n   * Accepts file path, server path, or id relative to the root.\n   * Returns an instantiated module (same as in ssrLoadModule)\n   */\n  public async import(url: string): Promise<Record<string, any>>\n  /**\n   * Other ModuleRunner methods...\n   */\n}\n\nif (isRunnableDevEnvironment(server.environments.ssr)) {\n  await server.environments.ssr.runner.import('/entry-point.js')\n}\n```\n\n:::warning\nThe `runner` is evaluated lazily only when it's accessed for the first time. Beware that Vite enables source map support when the `runner` is created by calling `process.setSourceMapsEnabled` or by overriding `Error.prepareStackTrace` if it's not available.\n:::\n\nGiven a Vite server configured in middleware mode as described by the [SSR setup guide](/guide/ssr#setting-up-the-dev-server), let's implement the SSR middleware using the environment API. Remember that it doesn't have to be called `ssr`, so we'll name it `server` in this example. Error handling is omitted.\n\n```js\nimport fs from 'node:fs'\nimport path from 'node:path'\nimport { createServer } from 'vite'\n\nconst viteServer = await createServer({\n  server: { middlewareMode: true },\n  appType: 'custom',\n  environments: {\n    server: {\n      // by default, modules are run in the same process as the vite server\n    },\n  },\n})\n\n// You might need to cast this to RunnableDevEnvironment in TypeScript or\n// use isRunnableDevEnvironment to guard the access to the runner\nconst serverEnvironment = viteServer.environments.server\n\napp.use('*', async (req, res, next) => {\n  const url = req.originalUrl\n\n  // 1. Read index.html\n  const indexHtmlPath = path.resolve(import.meta.dirname, 'index.html')\n  let template = fs.readFileSync(indexHtmlPath, 'utf-8')\n\n  // 2. Apply Vite HTML transforms. This injects the Vite HMR client,\n  //    and also applies HTML transforms from Vite plugins, e.g. global\n  //    preambles from @vitejs/plugin-react\n  template = await viteServer.transformIndexHtml(url, template)\n\n  // 3. Load the server entry. import(url) automatically transforms\n  //    ESM source code to be usable in Node.js! There is no bundling\n  //    required, and provides full HMR support.\n  const { render } = await serverEnvironment.runner.import(\n    '/src/entry-server.js',\n  )"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "action": "use",
+    "relevance_score": 0.9945,
+    "document_score": 0.9959,
+    "levels": {
+     "answers": 0.9945,
+     "elsewhere": 0.0014,
+     "different_case": 0.0017,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/changes/per-environment-apis.md#1",
+    "action": "use",
+    "relevance_score": 0.9942,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9942,
+     "elsewhere": 0.0016,
+     "different_case": 0.0018,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-environment.md#2",
+    "action": "use",
+    "relevance_score": 0.9394,
+    "document_score": 0.9735,
+    "levels": {
+     "answers": 0.9394,
+     "elsewhere": 0.0341,
+     "different_case": 0.0195,
+     "unrelated": 0.007
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment.md#1",
+    "action": "use",
+    "relevance_score": 0.8512,
+    "document_score": 0.941,
+    "levels": {
+     "answers": 0.8512,
+     "elsewhere": 0.0898,
+     "different_case": 0.027,
+     "unrelated": 0.032
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/api-environment.md#4",
+    "action": "use",
+    "relevance_score": 0.8126,
+    "document_score": 0.9397,
+    "levels": {
+     "answers": 0.8126,
+     "elsewhere": 0.1271,
+     "different_case": 0.0353,
+     "unrelated": 0.025
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/why.md#5",
+    "action": "use",
+    "relevance_score": 0.7172,
+    "document_score": 0.8991,
+    "levels": {
+     "answers": 0.7172,
+     "elsewhere": 0.1818,
+     "different_case": 0.0735,
+     "unrelated": 0.0275
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/changes/per-environment-apis.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0101,
+    "document_score": 0.2886,
+    "levels": {
+     "answers": 0.0101,
+     "elsewhere": 0.2784,
+     "different_case": 0.0602,
+     "unrelated": 0.6512
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/api-environment.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0036,
+    "document_score": 0.3109,
+    "levels": {
+     "answers": 0.0036,
+     "elsewhere": 0.3073,
+     "different_case": 0.0237,
+     "unrelated": 0.6654
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0161,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0133,
+     "different_case": 0.0133,
+     "unrelated": 0.9706
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0089,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0063,
+     "different_case": 0.0134,
+     "unrelated": 0.9778
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3860
+  },
+  "timing": {
+   "total_ms": 95,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5050,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

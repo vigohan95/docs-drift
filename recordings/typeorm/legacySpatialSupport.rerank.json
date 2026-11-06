@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/legacySpatialSupport.rerank",
+ "recorded_at": "2026-11-06T13:42:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 921,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.070686",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=198"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `legacySpatialSupport`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `legacySpatialSupport`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/drivers/mysql.md#4",
+    "title": "docs/docs/drivers/mysql.md > MySQL / MariaDB > Data Source Options",
+    "text": "- `multipleStatements` - Allow multiple mysql statements per query. Be careful with this, it could increase the scope\n  of SQL injection attacks. (Default: `false`)\n\n- `legacySpatialSupport` - Use legacy spatial functions like `GeomFromText` and `AsText` which have been replaced by the standard-compliant `ST_GeomFromText` or `ST_AsText` in MySQL 8.0. (Default: `false`)\n\n- `flags` - List of connection flags to use other than the default ones. It is also possible to blacklist default ones.\n  For more information, check [Connection Flags](https://github.com/mysqljs/mysql#connection-flags).\n\n- `ssl` - object with SSL parameters or a string containing the name of the SSL profile.\n  See [SSL options](https://github.com/mysqljs/mysql#ssl-options).\n\n- `enableQueryTimeout` - If a value is specified for maxQueryExecutionTime, in addition to generating a warning log when a query exceeds this time limit, the specified maxQueryExecutionTime value is also used as the timeout for the query. For more information, check [mysql timeouts](https://github.com/mysqljs/mysql#timeouts).\n\nAdditional options can be added to the `extra` object and will be passed directly to the client library. See more in the [mysql2 documentation](https://sidorares.github.io/node-mysql2/docs)."
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > Breaking changes > Driver changes",
+    "text": "### Driver changes\n\n- **MySQL / MariaDB: `mysql` package dropped** — only `mysql2` is supported; the `connectorPackage` option has been removed ([#11766](https://github.com/typeorm/typeorm/pull/11766) by [@pkuczynski](https://github.com/pkuczynski))\n- **MySQL: `legacySpatialSupport` now defaults to `false`** — standard `ST_GeomFromText`/`ST_AsText` functions are used by default ([#12083](https://github.com/typeorm/typeorm/pull/12083) by [@pkuczynski](https://github.com/pkuczynski))\n- **MySQL: `width` and `zerofill` column options removed** — these were deprecated in MySQL 8.0.17 and removed in MySQL 8.4 ([#12084](https://github.com/typeorm/typeorm/pull/12084) by [@pkuczynski](https://github.com/pkuczynski))\n- **MySQL: `QueryBuilder.useIndex()` accepts index name(s), not raw SQL** — `useIndex()` now takes either a single index name or an array of names and escapes them as identifiers. Previously the argument was interpolated as a raw, comma-separated SQL fragment, which allowed identifier injection ([#12344](https://github.com/typeorm/typeorm/pull/12344) by [@eddieran](https://github.com/eddieran))\n- **SQLite: `sqlite3` dropped, `better-sqlite3` is the default** — the `sqlite3` package is no longer supported; `flags` and `busyTimeout` options have been removed ([#11836](https://github.com/typeorm/typeorm/pull/11836) by [@pkuczynski](https://github.com/pkuczynski))\n- **MongoDB: driver v7+ required** — support for MongoDB Node.js driver v5/v6 has been dropped; `stats()` method removed; deprecated connection options removed; internal types are no longer exported ([#12208](https://github.com/typeorm/typeorm/pull/12208) by [@naorpeled](https://github.com/naorpeled), [#12179](https://github.com/typeorm/typeorm/pull/12179) by [@pkuczynski](https://github.com/pkuczynski), [#12120](https://github.com/typeorm/typeorm/pull/12120) by [@pkuczynski](https://github.com/pkuczynski), [#12037](https://github.com/typeorm/typeorm/pull/12037) by [@alumni](https://github.com/alumni))\n- **MS SQL Server: `domain` connection option removed** — use `authentication` with NTLM type instead ([#12135](https://github.com/typeorm/typeorm/pull/12135) by [@pkuczynski](https://github.com/pkuczynski))\n- **MS SQL Server: `options.isolation` renamed to `options.isolationLevel`** — value format changed from `READ_COMMITTED` to `READ COMMITTED` to match `IsolationLevel` type; `SNAPSHOT` isolation level added ([#12231](https://github.com/typeorm/typeorm/pull/12231) by [@Cprakhar](https://github.com/Cprakhar))\n- **SAP HANA: deprecated connection aliases removed** — `hanaClientDriver`, `pool.max`, `pool.requestTimeout`, `pool.idleTimeout`, and others have been removed in favor of their modern equivalents ([#12080](https://github.com/typeorm/typeorm/pull/12080) by [@gioboa](https://github.com/gioboa))\n- **Expo: legacy driver removed** — the legacy Expo SQLite driver has been removed; use Expo SDK v52+ with the modern async API ([#11860](https://github.com/typeorm/typeorm/pull/11860) by [@G0maa](https://github.com/G0maa))\n- **Redis: legacy client support removed** — only modern Redis client (v4+) is supported for query result caching ([#12057](https://github.com/typeorm/typeorm/pull/12057) by [@G0maa](https://github.com/G0maa))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+    "title": "docs/docs/releases/1.0/02-upgrading-from-0.3.md > Upgrading from 0.3 to 1.0 > Driver changes > MySQL / MariaDB > `legacySpatialSupport` default changed to `false`",
+    "text": "#### `legacySpatialSupport` default changed to `false`\n\nThe `legacySpatialSupport` option now defaults to `false`, meaning TypeORM uses the standard-compliant `ST_GeomFromText` and `ST_AsText` spatial functions introduced in MySQL 5.7 and required by MySQL 8.0+. The legacy `GeomFromText` and `AsText` functions were removed in MySQL 8.0.\n\nIf you are running MySQL 5.6 or earlier and rely on spatial types, set `legacySpatialSupport: true` explicitly:\n\n```typescript\nnew DataSource({\n    type: \"mysql\",\n    legacySpatialSupport: true,\n    // ...\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#3",
+    "action": "use",
+    "relevance_score": 0.9956,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9956,
+     "elsewhere": 0.0008,
+     "different_case": 0.0012,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#6",
+    "action": "use",
+    "relevance_score": 0.9951,
+    "document_score": 0.9962,
+    "levels": {
+     "answers": 0.9951,
+     "elsewhere": 0.0011,
+     "different_case": 0.0015,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/drivers/mysql.md#4",
+    "action": "use",
+    "relevance_score": 0.995,
+    "document_score": 0.9961,
+    "levels": {
+     "answers": 0.995,
+     "elsewhere": 0.0011,
+     "different_case": 0.0017,
+     "unrelated": 0.0022
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1867
+  },
+  "timing": {
+   "total_ms": 66,
+   "rerank_ms": 65,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2272,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

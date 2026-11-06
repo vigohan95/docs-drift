@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/020.rerank",
+ "recorded_at": "2026-11-06T13:37:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 945,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.148705",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=241"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: 2) During querying, `HeadSeriesRef` are limited to 2^40 (see `HeadChunkRef`)",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/template_examples.md#6",
+    "title": "docs/configuration/template_examples.md > Defining reusable templates",
+    "text": "## Defining reusable templates\n\nPrometheus supports defining templates that can be reused. This is particularly\npowerful when combined with\n[console library](template_reference.md#console-templates) support, allowing\nsharing of templates across consoles.\n\n```\n{{/* Define the template */}}\n{{define \"myTemplate\"}}\n  do something\n{{end}}\n\n{{/* Use the template */}}\n{{template \"myTemplate\"}}\n```\n\nTemplates are limited to one argument. The `args` function can be used to wrap multiple arguments.\n\n```\n{{define \"myMultiArgTemplate\"}}\n  First argument: {{.arg0}}\n  Second argument: {{.arg1}}\n{{end}}\n{{template \"myMultiArgTemplate\" (args 1 2)}}\n```"
+   },
+   {
+    "id": "prometheus:docs/prometheus_agent.md#2",
+    "title": "docs/prometheus_agent.md > Prometheus Agent Mode > Benefits of agent mode",
+    "text": "### Benefits of agent mode\n\n- Improved efficiency. The customized Agent TSDB WAL removes the data immediately after successful writes. If it cannot reach the remote endpoint, it persists the data temporarily on the disk until the remote endpoint is back online. This is currently limited to a two-hour buffer only, similar to non-agent Prometheus. This means that there is no need to build chunks of data in memory or maintain a full index for querying purposes. Essentially the Agent mode uses a fraction of the resources that a normal Prometheus server would use in a similar situation.\n- Agent mode enables easier [horizontal scalability for ingestion](https://prometheus.io/blog/2021/11/16/agent/#the-dream-auto-scalable-metric-ingestion)."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#111",
+    "title": "docs/configuration/configuration.md > Configuration file > `<outscale_sd_config>`",
+    "text": "### `<outscale_sd_config>`\n\nOutscale SD configurations allow retrieving scrape targets from [Outscale Cloud](https://outscale.com/) VMs via the Outscale API (OAPI).\n\nThe following meta labels are available on targets during [relabeling](#relabel_config):\n\n* `__meta_outscale_vm_instance_id`: the ID of the VM\n* `__meta_outscale_vm_region`: the region of the VM\n* `__meta_outscale_vm_subregion`: the subregion of the VM\n* `__meta_outscale_vm_state`: the state of the VM\n* `__meta_outscale_vm_private_ip`: the private IP address of the VM\n* `__meta_outscale_vm_public_ip`: the public IP address of the VM\n* `__meta_outscale_vm_tag_<key>`: each tag value; the tag key is sanitized and appended (e.g. tag key `Name` → `__meta_outscale_vm_tag_Name`)\n\nTargets use the first address found: private IP, then public IP. This can be changed with relabeling, as demonstrated in [the Prometheus outscale-sd configuration file](/documentation/examples/prometheus-outscale.yml).\n\nSee below for the configuration options for Outscale discovery:\n\n```yaml\n# Region to use.\n[ region: <string> | default = \"eu-west-2\" ]\n\n# Access key (20 alphanumeric characters). See https://docs.outscale.com/en/userguide/Creating-an-Access-Key.html\naccess_key: <string>\n\n# Secret key (40 characters). Use one of `secret_key` or `secret_key_file`.\n[ secret_key: <secret> ]\n\n# Secret key file.\n[ secret_key_file: <filename> ]\n\n# API endpoint URL. Defaults to https://api.<region>.outscale.com/api/v1 if empty.\n[ endpoint: <string> ]\n\n# The port to scrape metrics from.\n[ port: <int> | default = 80 ]\n\n# Refresh interval to re-read the targets list.\n[ refresh_interval: <duration> | default = 60s ]\n\n# HTTP client settings.\n[ <http_config> ]\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#54",
+    "title": "docs/querying/api.md > Status > WAL Replay Stats",
+    "text": "### WAL Replay Stats\n\nThe following endpoint returns information about the WAL replay:\n\n```\nGET /api/v1/status/walreplay\n```\n\n- **read**: The number of segments replayed so far.\n- **total**: The total number segments needed to be replayed.\n- **progress**: The progress of the replay (0 - 100%).\n- **state**: The state of the replay. Possible states:\n  - **waiting**: Waiting for the replay to start.\n  - **in progress**: The replay is in progress.\n  - **done**: The replay has finished.\n\n```bash\ncurl http://localhost:9090/api/v1/status/walreplay\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"min\": 2,\n    \"max\": 5,\n    \"current\": 40,\n    \"state\": \"in progress\"\n  }\n}\n```\n\nNOTE: This endpoint is available before the server has been marked ready and is updated in real time to facilitate monitoring the progress of the WAL replay.\n\n*New in v2.28*"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#10",
+    "title": "docs/querying/api.md > Expression queries > Query statistics",
+    "text": "Floats count as one sample; native histograms are weighted by their in-memory size. Fixed `@` subqueries read their window once, charging reads to the first parent step, while each parent step counts its logical underlying consumption.\n\nThe server also exposes two Prometheus metrics: `prometheus_engine_query_samples_total` (logical underlying sample consumption) and `prometheus_engine_query_samples_read_total` (samples read). See [Per-step stats](../feature_flags.md#per-step-stats) for the `promql-per-step-stats` feature flag.\n\nWhen the [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled, the\ninstant and range query endpoints accept a `cost=<bool>` parameter. It is a plain\non/off switch, not a set of levels: `cost=true` enables the comparison, and any\nvalue that does not parse as a boolean is rejected with HTTP 400 (`bad_data`).\nWhen `cost` is `true`, the response `data` includes an additional `cost` object\ncomparing estimated storage input with the actual cost measured\nduring execution:\n\n```json\n\"cost\": {\n  \"estimated\": {\n    \"seriesTouched\": 42,\n    \"samplesRead\": 5040\n  },\n  \"actual\": {\n    \"seriesTouched\": 40,\n    \"samplesRead\": 4980,\n    \"peakSamples\": 320\n  }\n}\n```\n\nThe estimated `seriesTouched` and `samplesRead` values are approximations that\ncan be higher or lower than actual cost: see\n[Query cost](#query-cost) for how they are computed and their accuracy\nlimitations. `peakSamples` is reported only for the actual cost; there is no\nestimated `peakSamples`. The comparison is informational: the estimate is never\nused to reject a query."
+   },
+   {
+    "id": "prometheus:tsdb/docs/usage.md#4",
+    "title": "tsdb/docs/usage.md > Usage > Querying data",
+    "text": "## Querying data\n\nUse [`db.Querier()`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#DB.Querier) to obtain a \"querier\".\nThe [golang docs](https://pkg.go.dev/github.com/prometheus/prometheus/storage#Querier) speak mostly for themselves.\n\nRemember:\n\n* A querier can only see data that was committed when it was created. This limits the lifetime of a querier.\n* A querier should be closed when you're done with it.\n* Use mint/maxt to avoid loading unneeded data."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/wal.md#0",
+    "title": "tsdb/docs/format/wal.md > WAL Disk Format",
+    "text": "# WAL Disk Format\n\nThis document describes the official Prometheus WAL format.\n\nThe write ahead log operates in segments that are numbered and sequential,\nand are limited to 128MB by default."
+   },
+   {
+    "id": "prometheus:docs/storage.md#9",
+    "title": "docs/storage.md > Remote storage integrations",
+    "text": "## Remote storage integrations\n\nPrometheus's local storage is limited to a single node's scalability and durability.\nInstead of trying to solve clustered storage in Prometheus itself, Prometheus offers\na set of interfaces that allow integrating with remote storage systems."
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "title": "docs/configuration/unit_testing_rules.md > Example > `test.yml`",
+    "text": "### `test.yml`\n\n```yaml\n# This is the main input for unit testing.\n# Only this file is passed as command line argument.\n\nrule_files:\n    - alerts.yml\n\nevaluation_interval: 1m\n\ntests:\n    # Test 1.\n    - interval: 1m\n      # Series data.\n      input_series:\n          - series: 'up{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'\n          - series: 'up{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '1+0x6 0 0 0 0 0 0 0 0' # 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0\n          - series: 'go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '10+10x2 30+20x5' # 10 20 30 30 50 70 90 110 130\n          - series: 'go_goroutines{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '10+10x7 10+30x4' # 10 20 30 40 50 60 70 80 10 40 70 100 130\n\n      # Unit test for alerting rules.\n      alert_rule_test:\n          # Unit test 1.\n          - eval_time: 10m\n            alertname: InstanceDown\n            exp_alerts:\n                # Alert 1.\n                - exp_labels:\n                      severity: page\n                      instance: localhost:9090\n                      job: prometheus\n                  exp_annotations:\n                      summary: \"Instance localhost:9090 down\"\n                      description: \"localhost:9090 of job prometheus has been down for more than 5 minutes.\"\n      # Unit tests for promql expressions.\n      promql_expr_test:\n          # Unit test 1.\n          - expr: go_goroutines > 5\n            eval_time: 4m\n            exp_samples:\n                # Sample 1.\n                - labels: 'go_goroutines{job=\"prometheus\",instance=\"localhost:9090\"}'\n                  value: 50\n                # Sample 2.\n                - labels: 'go_goroutines{job=\"node_exporter\",instance=\"localhost:9100\"}'\n                  value: 50\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/usage.md#0",
+    "title": "tsdb/docs/usage.md > Usage",
+    "text": "# Usage\n\nTSDB can be - and is - used by other applications such as [Cortex](https://cortexmetrics.io/), [Thanos](https://thanos.io/), and [Grafana Mimir](https://grafana.com/oss/mimir/).\nThis directory contains documentation for any developers who wish to work on or with TSDB.\n\nFor a full example of instantiating a database, adding and querying data, see the [tsdb example in the docs](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb).\n`tsdb/db_test.go` also demonstrates various specific usages of the TSDB library."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/usage.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0231,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0202,
+     "different_case": 0.0072,
+     "unrelated": 0.9697
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:tsdb/docs/usage.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0227,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0199,
+     "different_case": 0.0072,
+     "unrelated": 0.9701
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/format/wal.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0025,
+     "different_case": 0.0043,
+     "unrelated": 0.9916
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/querying/api.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0035,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.002,
+     "different_case": 0.0047,
+     "unrelated": 0.9917
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0008,
+     "different_case": 0.0024,
+     "unrelated": 0.9953
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/api.md#54",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.0028,
+     "unrelated": 0.9947
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/prometheus_agent.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0029,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0017,
+     "different_case": 0.002,
+     "unrelated": 0.9951
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/storage.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.002,
+     "different_case": 0.0024,
+     "unrelated": 0.9944
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/template_examples.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0009,
+     "different_case": 0.0012,
+     "unrelated": 0.9968
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/configuration/configuration.md#111",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0007,
+     "different_case": 0.0021,
+     "unrelated": 0.9961
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3464
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4814,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

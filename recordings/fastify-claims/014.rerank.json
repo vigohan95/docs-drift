@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/014.rerank",
+ "recorded_at": "2026-11-06T13:37:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 942,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.026787",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=229"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: All v2 deprecations have been removed and they will no longer work after upgrading. ([#1750](https://github.com/fastify/fastify/pull/1750))",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#0",
+    "title": "docs/Guides/Migration-Guide-V4.md > V4 Migration Guide",
+    "text": "# V4 Migration Guide\n\nThis guide is intended to help with migration from Fastify v3 to v4.\n\nBefore migrating to v4, please ensure that you have fixed all deprecation\nwarnings from v3. All v3 deprecations have been removed and they will no longer\nwork after upgrading."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#0",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide",
+    "text": "# V5 Migration Guide\n\nThis guide is intended to help with migration from Fastify v4 to v5.\n\nBefore migrating to v5, please ensure that you have fixed all deprecation\nwarnings from v4. All v4 deprecations have been removed and will no longer\nwork after upgrading."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#8",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > Changes to the .listen() method",
+    "text": "### Changes to the .listen() method\n\nThe variadic argument signature of the `.listen()` method has been removed.\nThis means that you can no longer call `.listen()` with a variable number of arguments.\n\n```js\n// v4\nfastify.listen(8000)\n```\n\nWill become:\n\n```js\n// v5\nfastify.listen({ port: 8000 })\n```\n\nThis was already deprecated in v4 as `FSTDEP011`, so you should have already updated\nyour code to use the new signature."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#9",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > Direct return of trailers has been removed",
+    "text": "### Direct return of trailers has been removed\n\nIn v4, you could directly return trailers from a handler.\nThis is no longer possible in v5.\n\n```js\n// v4\nfastify.get('/route', (req, reply) => {\n  reply.trailer('ETag', function (reply, payload) {\n    return 'custom-etag'\n  })\n  reply.send('')\n});\n```\n\n```js\n// v5\nfastify.get('/route', (req, reply) => {\n  reply.trailer('ETag', async function (reply, payload) {\n    return 'custom-etag'\n  })\n  reply.send('')\n});\n```\n\nA callback could also be used.\nThis was already deprecated in v4 as `FSTDEP013`,\nso you should have already updated your code to use the new signature."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#3",
+    "title": "docs/Guides/Migration-Guide-V4.md > V4 Migration Guide > Breaking Changes > Removed `app.use()` ([#3506](https://github.com/fastify/fastify/pull/3506))",
+    "text": "### Removed `app.use()` ([#3506](https://github.com/fastify/fastify/pull/3506))\n\nWith v4 of Fastify, `app.use()` has been removed and the use of middleware is\nno longer supported.\n\nIf you need to use middleware, use\n[`@fastify/middie`](https://github.com/fastify/middie) or\n[`@fastify/express`](https://github.com/fastify/fastify-express), which will\ncontinue to be maintained.\nHowever, it is strongly recommended that you migrate to Fastify's [hooks](../Reference/Hooks.md).\n\n> ℹ️ Note:\n> Codemod remove `app.use()` with:\n> ```bash\n> npx codemod@latest fastify/4/remove-app-use\n> ```"
+   },
+   {
+    "id": "fastify:docs/Reference/Warnings.md#4",
+    "title": "docs/Reference/Warnings.md > Warnings > Fastify Deprecation Codes",
+    "text": "### Fastify Deprecation Codes\n\nDeprecation codes are supported by the Node.js CLI options:\n\n- [--no-deprecation](https://nodejs.org/api/cli.html#no-deprecation)\n- [--throw-deprecation](https://nodejs.org/api/cli.html#throw-deprecation)\n- [--trace-deprecation](https://nodejs.org/api/cli.html#trace-deprecation)\n\nThere are currently no active deprecation codes because the APIs deprecated in\nFastify v5 have been removed in Fastify v6.\n\n| Code | Description | How to solve | Discussion |\n| ---- | ----------- | ------------ | ---------- |"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#23",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > Removes `getDefaultRoute` and `setDefaultRoute` methods",
+    "text": "### Removes `getDefaultRoute` and `setDefaultRoute` methods\n\nThe `getDefaultRoute` and `setDefaultRoute` methods have been removed in v5.\n\nSee [#4485](https://github.com/fastify/fastify/pull/4485)\nand [#4480](https://github.com/fastify/fastify/pull/4480)\nfor more information.\nThis was already deprecated in v4 as `FSTDEP014`,\nso you should have already updated your code."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#13",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > Constraints for route versioning signature changes",
+    "text": "### Constraints for route versioning signature changes\n\nWe changed the signature for route versioning constraints.\nThe `version` and `versioning` options have been removed and you should\nuse the `constraints` option instead.\n\n| Code | Description | How to solve | Discussion |\n| ---- | ----------- | ------------ | ---------- |\n| FSTDEP008 | You are using route constraints via the route `{version: \"...\"}` option.  |  Use `{constraints: {version: \"...\"}}` option.  | [#2682](https://github.com/fastify/fastify/pull/2682) |\n| FSTDEP009 | You are using a custom route versioning strategy via the server `{versioning: \"...\"}` option. |  Use `{constraints: {version: \"...\"}}` option.  | [#2682](https://github.com/fastify/fastify/pull/2682) |"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#10",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > Streamlined access to route definition",
+    "text": "### Streamlined access to route definition\n\nAll deprecated properties relating to accessing the route definition have been removed\nand are now accessed via `request.routeOptions`.\n\n| Code | Description | How to solve | Discussion |\n| ---- | ----------- | ------------ | ---------- |\n| FSTDEP012 | You are trying to access the deprecated `request.context` property. | Use `request.routeOptions.config` or `request.routeOptions.schema`. | [#4216](https://github.com/fastify/fastify/pull/4216) [#5084](https://github.com/fastify/fastify/pull/5084) |\n| FSTDEP015 | You are accessing the deprecated `request.routeSchema` property. | Use `request.routeOptions.schema`. | [#4470](https://github.com/fastify/fastify/pull/4470) |\n| FSTDEP016 | You are accessing the deprecated `request.routeConfig` property. | Use `request.routeOptions.config`. | [#4470](https://github.com/fastify/fastify/pull/4470) |\n| FSTDEP017 | You are accessing the deprecated `request.routerPath` property. | Use `request.routeOptions.url`. | [#4470](https://github.com/fastify/fastify/pull/4470) |\n| FSTDEP018 | You are accessing the deprecated `request.routerMethod` property. | Use `request.routeOptions.method`. | [#4470](https://github.com/fastify/fastify/pull/4470) |\n| FSTDEP019 | You are accessing the deprecated `reply.context` property. | Use `reply.routeOptions.config` or `reply.routeOptions.schema`. | [#5032](https://github.com/fastify/fastify/pull/5032) [#5084](https://github.com/fastify/fastify/pull/5084) |\n\nSee [#5616](https://github.com/fastify/fastify/pull/5616) for more information."
+   },
+   {
+    "id": "fastify:CONTRIBUTING.md#3",
+    "title": "CONTRIBUTING.md > Fastify is an OPEN Open Source Project > Rules",
+    "text": "## Rules\n\nThere are a few basic ground rules for contributors:\n\n1. **No `--force` pushes** on `main` or modifying the Git history in any way\n   after a PR has been merged.\n1. **Non-main branches** ought to be used for ongoing work.\n1. **External API changes and significant modifications** ought to be subject to\n   an **internal pull request** to solicit feedback from other contributors.\n1. Internal pull requests to solicit feedback are *encouraged* for any other\n   non-trivial contribution but are left to the discretion of the contributor.\n1. Contributors should attempt to adhere to the prevailing code style.\n1. At least two contributors, or one core member, must approve pull requests\n   before merging.\n1. All integrated CI services must be green before a pull request can be merged.\n1. A lead maintainer must merge SemVer-major changes in this repository.\n1. If it is not possible to reach a consensus in a pull request, the decision\n   is left to the lead maintainer's team.\n1. Pure-AI contributions with no human in the loop are not welcome. Pull\nrequests ***MUST*** be opened by a human. Pull requests opened by bots not\nmanaged by the Fastify organization will result in the bot being banned\nfrom the organization."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 8,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#10",
+    "action": "use",
+    "relevance_score": 0.6344,
+    "document_score": 0.7582,
+    "levels": {
+     "answers": 0.6344,
+     "elsewhere": 0.1238,
+     "different_case": 0.0878,
+     "unrelated": 0.154
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Warnings.md#4",
+    "action": "use",
+    "relevance_score": 0.5142,
+    "document_score": 0.6297,
+    "levels": {
+     "answers": 0.5142,
+     "elsewhere": 0.1155,
+     "different_case": 0.0658,
+     "unrelated": 0.3044
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#23",
+    "action": "skip",
+    "reason": "different_case",
+    "relevance_score": 0.0792,
+    "document_score": 0.1408,
+    "levels": {
+     "answers": 0.0792,
+     "elsewhere": 0.0616,
+     "different_case": 0.5154,
+     "unrelated": 0.3438
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0438,
+    "document_score": 0.1184,
+    "levels": {
+     "answers": 0.0438,
+     "elsewhere": 0.0746,
+     "different_case": 0.1085,
+     "unrelated": 0.773
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0331,
+    "document_score": 0.2234,
+    "levels": {
+     "answers": 0.0331,
+     "elsewhere": 0.1903,
+     "different_case": 0.1844,
+     "unrelated": 0.5922
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#0",
+    "action": "skip",
+    "reason": "different_case",
+    "relevance_score": 0.0276,
+    "document_score": 0.0415,
+    "levels": {
+     "answers": 0.0276,
+     "elsewhere": 0.0139,
+     "different_case": 0.9417,
+     "unrelated": 0.0168
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0244,
+    "document_score": 0.1071,
+    "levels": {
+     "answers": 0.0244,
+     "elsewhere": 0.0826,
+     "different_case": 0.271,
+     "unrelated": 0.6219
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.007,
+    "document_score": 0.0184,
+    "levels": {
+     "answers": 0.007,
+     "elsewhere": 0.0114,
+     "different_case": 0.1834,
+     "unrelated": 0.7982
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#0",
+    "action": "skip",
+    "reason": "different_case",
+    "relevance_score": 0.0059,
+    "document_score": 0.0089,
+    "levels": {
+     "answers": 0.0059,
+     "elsewhere": 0.003,
+     "different_case": 0.9855,
+     "unrelated": 0.0055
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:CONTRIBUTING.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0011,
+     "different_case": 0.0037,
+     "unrelated": 0.9941
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3104
+  },
+  "timing": {
+   "total_ms": 93,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4294,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

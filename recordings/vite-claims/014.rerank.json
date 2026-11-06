@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/014.rerank",
+ "recorded_at": "2026-11-06T13:37:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 951,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.519875",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=252"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Compatibility Note:** > Vite requires [Node.js](https://nodejs.org/en/) version 20.19+, 22.12+.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/index.md#4",
+    "title": "docs/guide/index.md > Getting Started > Scaffolding Your First Vite Project",
+    "text": "## Scaffolding Your First Vite Project\n\n::: code-group\n\n```bash [npm]\n$ npm create vite@latest\n```\n\n```bash [Yarn]\n$ yarn create vite\n```\n\n```bash [pnpm]\n$ pnpm create vite\n```\n\n```bash [Bun]\n$ bun create vite\n```\n\n```bash [Deno]\n$ deno init --npm vite\n```\n\n:::\n\nThen follow the prompts!\n\n<ScrimbaLink href=\"https://scrimba.com/intro-to-vite-c03p6pbbdq/~0yhj?via=vite\" title=\"Scaffolding Your First Vite Project\">Watch an interactive lesson on Scrimba</ScrimbaLink>\n\n::: tip Compatibility Note\nVite requires [Node.js](https://nodejs.org/en/) version 20.19+, 22.12+. However, some templates require a higher Node.js version to work, please upgrade if your package manager warns about it.\n:::\n\n:::: details Using create vite with command line options\n\nYou can also directly specify the project name and the template you want to use via additional command line options. For example, to scaffold a Vite + Vue project, run:\n\n::: code-group\n\n```bash [npm]\n# npm 7+, extra double-dash is needed:\n$ npm create vite@latest my-vue-app -- --template vue\n```\n\n```bash [Yarn]\n$ yarn create vite my-vue-app --template vue\n```\n\n```bash [pnpm]\n$ pnpm create vite my-vue-app --template vue\n```\n\n```bash [Bun]\n$ bun create vite my-vue-app --template vue\n```\n\n```bash [Deno]\n$ deno init --npm vite my-vue-app --template vue\n```\n\n:::\n\nSee [create-vite](https://github.com/vitejs/vite/tree/main/packages/create-vite) for more details on each supported template: `vanilla`, `vanilla-ts`, `vue`, `vue-ts`, `react`, `react-compiler`, `react-ts`, `react-compiler-ts`, `preact`, `preact-ts`, `lit`, `lit-ts`, `svelte`, `svelte-ts`, `solid`, `solid-ts`, `qwik`, `qwik-ts`.\n\nYou can use `.` for the project name to scaffold in the current directory.\n\nTo create a project without interactive prompts, you can use the `--no-interactive` flag.\n\n::::"
+   },
+   {
+    "id": "vite:docs/config/index.md#5",
+    "title": "docs/config/index.md > Configuring Vite > Debugging the Config File in VS Code",
+    "text": "## Debugging the Config File in VS Code\n\nFor the most reliable debugging experience, use the native config loader when starting Vite:\n\n```bash\nvite --configLoader native\n```\n\nThe native loader executes the original config file directly, so breakpoints in the config file and in plugin hooks such as `transform` map to the original source. It requires a runtime that supports the syntax used by your config file, such as Node.js 22.18+ for TypeScript files.\n\nWhen using `--configLoader bundle` (the current default, though `native` is planned to become the default in a future major version), Vite generates an inline source map and writes the bundled config to `node_modules/.vite-temp` before loading it. If you need to use the bundle loader, add the temporary directory for the JavaScript Debug Terminal in `.vscode/settings.json`:\n\n```json\n{\n  \"debug.javascript.terminalOptions\": {\n    \"resolveSourceMapLocations\": [\n      \"${workspaceFolder}/**\",\n      \"!**/node_modules/**\",\n      \"**/node_modules/.vite-temp/**\"\n    ]\n  }\n}\n```\n\nThis setting only applies to the JavaScript Debug Terminal, it does not affect launch configurations started from the Run and Debug view. To support this for the Run and Debug view, add the temporary directory in `.vscode/launch.json`:\n\n```json\n{\n  \"version\": \"0.2.0\",\n  \"configurations\": [\n    {\n      \"type\": \"node\",\n      \"request\": \"launch\",\n      \"name\": \"Vite\",\n      \"runtimeExecutable\": \"npm\",\n      \"runtimeArgs\": [\"exec\", \"vite\", \"--configLoader\", \"bundle\"],\n      \"console\": \"integratedTerminal\",\n      \"sourceMaps\": true,\n      \"resolveSourceMapLocations\": [\n        \"${workspaceFolder}/**\",\n        \"!**/node_modules/**\",\n        \"**/node_modules/.vite-temp/**\"\n      ]\n    }\n  ]\n}\n```"
+   },
+   {
+    "id": "vite:docs/config/build-options.md#1",
+    "title": "docs/config/build-options.md > Build Options > build.target",
+    "text": "## build.target\n\n- **Type:** `string | string[]`\n- **Default:** `'baseline-widely-available'`\n- **Related:** [Browser Compatibility](/guide/build#browser-compatibility)\n\nBrowser compatibility target for the final bundle. The default value is a Vite special value, `'baseline-widely-available'`, which targets the minimum browser versions compatible with [Baseline](https://web-platform-dx.github.io/baseline/) Widely Available as of a date fixed for each major release ([2026-01-01 for this major](https://web-platform-dx.github.io/supported-browsers/?widelyAvailableOnDate=2026-01-01)). Specifically, it is `['chrome111', 'edge111', 'firefox114', 'safari16.4', 'ios16.4']`.\n\nAnother special value is `'esnext'` - which assumes native dynamic imports support and will only perform minimal transpiling.\n\nThe transform is performed with Oxc Transformer and the value should be a valid [Oxc Transformer target option](https://oxc.rs/docs/guide/usage/transformer/lowering#target). Custom targets can either be an ES version (e.g. `es2015`), a browser with version (e.g. `chrome58`), or an array of multiple target strings.\n\nNote the build will output a warning if the code contains features that cannot be safely transpiled by Oxc. See [Oxc docs](https://oxc.rs/docs/guide/usage/transformer/lowering#warnings) for more details."
+   },
+   {
+    "id": "vite:docs/config/index.md#0",
+    "title": "docs/config/index.md > Configuring Vite",
+    "text": "# Configuring Vite\n\nWhen running `vite` from the command line, Vite will automatically try to resolve a config file named `vite.config.js` inside [project root](/guide/#index-html-and-project-root) (other JS and TS extensions are also supported).\n\nThe most basic config file looks like this:\n\n```js [vite.config.js]\nexport default {\n  // config options\n}\n```\n\nNote that to use ES modules syntax in the config file, it should be in a file detected as ESM by Node.js, e.g. `.mjs` or `.js` with `\"type\": \"module\"` in closest `package.json`.\n\nYou can also explicitly specify a config file to use with the `--config` CLI option (resolved relative to `cwd`):\n\n```bash\nvite --config my-config.js\n```\n\n<ScrimbaLink href=\"https://scrimba.com/intro-to-vite-c03p6pbbdq/~05jg?via=vite\" title=\"Configuring Vite\">Watch an interactive lesson on Scrimba</ScrimbaLink>\n\n::: tip CONFIG LOADING\nBy default, Vite uses [Rolldown](https://rolldown.rs/) to bundle the config into a temporary file and load it. If you're using an environment that supports TypeScript (e.g. Node 22.18+), or if you're only writing plain JavaScript, you can specify `--configLoader native` to use the environment's native runtime to load the config file. `configLoader: 'native'` is planned to become the default in a future major version.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#19",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `rolldownVersion`",
+    "text": "## `rolldownVersion`\n\n**Type:** `string`\n\nThe version of Rolldown used by Vite as a string (e.g. `\"1.0.0\"`). A re-export of [`VERSION`](https://rolldown.rs/reference/Variable.VERSION) from `rolldown`."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#12",
+    "title": "docs/config/build-options.md > Build Options > build.chunkImportMap",
+    "text": "## build.chunkImportMap\n\n- **Type:** `boolean`\n- **Default:** `false`\n- **Experimental**\n- **Related:** [Chunk Import Map Optimization](/guide/features#chunk-import-map-optimization)\n\nWhether to use import maps feature to optimize chunk caching efficiency.\n\nNote that this option requires [`import.meta.resolve` support](https://caniuse.com/mdn-javascript_operators_import_meta_resolve). If you need to support older browsers, check out [`@vitejs/plugin-legacy`](https://github.com/vitejs/vite/tree/main/packages/plugin-legacy)."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Module externalized for browser compatibility",
+    "text": "### Module externalized for browser compatibility\n\nWhen you use a Node.js module in the browser, Vite will output the following warning.\n\n> Module \"fs\" has been externalized for browser compatibility. Cannot access \"fs.readFile\" in client code.\n\nThis is because Vite does not automatically polyfill Node.js modules.\n\nWe recommend avoiding Node.js modules for browser code to reduce the bundle size, although you can add polyfills manually. If the module is imported from a third-party library (that's meant to be used in the browser), it's advised to report the issue to the respective library."
+   },
+   {
+    "id": "vite:packages/plugin-legacy/README.md#13",
+    "title": "packages/plugin-legacy/README.md > @vitejs/plugin-legacy [![npm](https://img.shields.io/npm/v/@vitejs/plugin-legacy.svg)](https://npmjs.com/package/@vitejs/plugin-legacy) > Content Security Policy",
+    "text": "## Content Security Policy\n\nThe legacy plugin requires inline scripts for [Safari 10.1 `nomodule` fix](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc), SystemJS initialization, and dynamic import fallback. If you have a strict CSP policy requirement, you will need to [add the corresponding hashes to your `script-src` list](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src#unsafe_inline_script).\n\nThe hash values (without the `sha256-` prefix) can be retrieved via:\n\n```js\nimport { cspHashes } from '@vitejs/plugin-legacy'\n```\n\nThe current values are:\n\n- `sha256-MS6/3FCg4WjP9gwgaBGwLpRCY6fZBgwmhVCdrPrNf3E=`\n- `sha256-tQjf8gvb2ROOMapIxFvFAYBeUJ0v1HCbOcSmDNXGtDo=`\n- `sha256-w36slEqa9euNKxfvkw+LLGsDIr++3rsZXpZxtmRh8Aw=`\n- `sha256-+5XkZFazzJo8n0iOP4ti/cLCMUudTf//Mzkb7xNPXIc=`\n\n<!--\nRun `node --input-type=module -e \"import {cspHashes} from '@vitejs/plugin-legacy'; console.log(cspHashes.map(h => 'sha256-'+h))\"` to retrieve the value.\n-->\n\nNote that these values could change between minor versions. Thus, we recommend generating the CSP header from the exported `cspHashes` variable. If you copy the values manually, then you should pin the minor version using `~`.\n\nWhen using the `regenerator-runtime` polyfill, it will attempt to use the `globalThis` object to register itself. If `globalThis` is not available (it is [fairly new](https://caniuse.com/?search=globalThis) and not widely supported, including IE 11), it attempts to perform dynamic `Function(...)` call which violates the CSP. To avoid dynamic `eval` in the absence of `globalThis` consider adding `core-js/proposals/global-this` to `additionalLegacyPolyfills` to define it."
+   },
+   {
+    "id": "vite:docs/releases.md#5",
+    "title": "docs/releases.md > Releases > Semantic Versioning Edge Cases > Node.js non-LTS versions",
+    "text": "### Node.js non-LTS versions\n\nNon-LTS Node.js versions (odd-numbered) are not tested as part of Vite's CI, but they should still work before their [EOL](https://endoflife.date/nodejs)."
+   },
+   {
+    "id": "vite:docs/releases.md#1",
+    "title": "docs/releases.md > Releases",
+    "text": "# Releases\n\nVite releases follow [Semantic Versioning](https://semver.org/). You can see the latest stable version of Vite in the [Vite npm package page](https://www.npmjs.com/package/vite).\n\nA full changelog of past releases is [available on GitHub](https://github.com/vitejs/vite/blob/main/packages/vite/CHANGELOG.md)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/index.md#4",
+    "action": "use",
+    "relevance_score": 0.991,
+    "document_score": 0.9931,
+    "levels": {
+     "answers": 0.991,
+     "elsewhere": 0.0021,
+     "different_case": 0.0027,
+     "unrelated": 0.0043
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/config/index.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0119,
+    "document_score": 0.152,
+    "levels": {
+     "answers": 0.0119,
+     "elsewhere": 0.1402,
+     "different_case": 0.0402,
+     "unrelated": 0.8078
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/releases.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0092,
+    "document_score": 0.3046,
+    "levels": {
+     "answers": 0.0092,
+     "elsewhere": 0.2954,
+     "different_case": 0.037,
+     "unrelated": 0.6584
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/releases.md#1",
+    "action": "expand",
+    "relevance_score": 0.0088,
+    "document_score": 0.5939,
+    "levels": {
+     "answers": 0.0088,
+     "elsewhere": 0.5851,
+     "different_case": 0.0248,
+     "unrelated": 0.3813
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/config/index.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.0661,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.062,
+     "different_case": 0.0192,
+     "unrelated": 0.9147
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/api-javascript.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0072,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.0041,
+     "different_case": 0.0085,
+     "unrelated": 0.9843
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/config/build-options.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0048,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0028,
+     "different_case": 0.0068,
+     "unrelated": 0.9884
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0049,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0031,
+     "different_case": 0.0054,
+     "unrelated": 0.9897
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:packages/plugin-legacy/README.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0012,
+     "different_case": 0.0034,
+     "unrelated": 0.9936
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/build-options.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0014,
+     "different_case": 0.0024,
+     "unrelated": 0.9948
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3821
+  },
+  "timing": {
+   "total_ms": 107,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5011,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

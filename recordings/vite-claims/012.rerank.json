@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/012.rerank",
+ "recorded_at": "2026-11-06T13:37:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 965,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.60154",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=271"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Currently, the Oxc transformer does not support lowering native decorators as we are waiting for the specification to progress, see ([oxc-project/oxc#9170](https://github.com/oxc-project/oxc/issues/9170)).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/features.md#9",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options > `emitDecoratorMetadata`",
+    "text": "#### `emitDecoratorMetadata`\n\n- [TypeScript documentation](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)\n\nThis option is only partially supported. Full support requires type inference by the TypeScript compiler, which is not supported. See [Oxc Transformer's documentation](https://oxc.rs/docs/guide/usage/transformer/typescript.html#decorators) for details."
+   },
+   {
+    "id": "vite:docs/plugins/index.md#3",
+    "title": "docs/plugins/index.md > Plugins > Official Plugins > [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react)",
+    "text": "### [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react)\n\nProvides React Fast Refresh support via [Oxc Transformer](https://oxc.rs/docs/guide/usage/transformer)."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#1",
+    "title": "docs/config/build-options.md > Build Options > build.target",
+    "text": "## build.target\n\n- **Type:** `string | string[]`\n- **Default:** `'baseline-widely-available'`\n- **Related:** [Browser Compatibility](/guide/build#browser-compatibility)\n\nBrowser compatibility target for the final bundle. The default value is a Vite special value, `'baseline-widely-available'`, which targets the minimum browser versions compatible with [Baseline](https://web-platform-dx.github.io/baseline/) Widely Available as of a date fixed for each major release ([2026-01-01 for this major](https://web-platform-dx.github.io/supported-browsers/?widelyAvailableOnDate=2026-01-01)). Specifically, it is `['chrome111', 'edge111', 'firefox114', 'safari16.4', 'ios16.4']`.\n\nAnother special value is `'esnext'` - which assumes native dynamic imports support and will only perform minimal transpiling.\n\nThe transform is performed with Oxc Transformer and the value should be a valid [Oxc Transformer target option](https://oxc.rs/docs/guide/usage/transformer/lowering#target). Custom targets can either be an ES version (e.g. `es2015`), a browser with version (e.g. `chrome58`), or an array of multiple target strings.\n\nNote the build will output a warning if the code contains features that cannot be safely transpiled by Oxc. See [Oxc docs](https://oxc.rs/docs/guide/usage/transformer/lowering#warnings) for more details."
+   },
+   {
+    "id": "vite:docs/guide/features.md#6",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options > `isolatedModules`",
+    "text": "#### `isolatedModules`\n\n- [TypeScript documentation](https://www.typescriptlang.org/tsconfig#isolatedModules)\n\nShould be set to `true`.\n\nIt is because Oxc transformer only performs transpilation without type information, it doesn't support certain features like const enum and implicit type-only imports.\n\nYou must set `\"isolatedModules\": true` in your `tsconfig.json` under `compilerOptions`, so that TS will warn you against the features that do not work with isolated transpilation.\n\nIf a dependency doesn't work well with `\"isolatedModules\": true`, you can use `\"skipLibCheck\": true` to temporarily suppress the errors until it is fixed upstream."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#8",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Dev Server > Dev Containers / VS Code Port Forwarding",
+    "text": "### Dev Containers / VS Code Port Forwarding\n\nIf you are using a Dev Container or port forwarding feature in VS Code, you may need to set the [`server.host`](/config/server-options.md#server-host) option to `127.0.0.1` in the config to make it work.\n\nThis is because [the port forwarding feature in VS Code does not support IPv6](https://github.com/microsoft/vscode-remote-release/issues/7029).\n\nSee [#16522](https://github.com/vitejs/vite/issues/16522) for more details."
+   },
+   {
+    "id": "vite:docs/config/server-options.md#15",
+    "title": "docs/config/server-options.md > Server Options > server.watch",
+    "text": "## server.watch\n\n- **Type:** `object | null`\n\nFile system watcher options to pass on to [chokidar](https://github.com/paulmillr/chokidar/tree/3.6.0#api).\n\nWhen bundled-dev mode is enabled, [Rolldown watch options](https://rolldown.rs/reference/InputOptions.watch) (for example, `usePolling`, `pollInterval`, `useDebounce`, `debounceDuration`, `include`, `exclude`) are also accepted. The chokidar-only options are still used by the chokidar watcher, which keeps watching files outside the module graph, such as config file dependencies and env files.\n\nThe Vite server watcher watches the `root` and skips the `.git/`, `node_modules/`, `test-results/`, and Vite's `cacheDir` and `build.outDir` directories by default. When updating a watched file, Vite will apply HMR and update the page only if needed.\n\nIf set to `null`, no files will be watched. [`server.watcher`](/guide/api-javascript.html#vitedevserver) will provide a compatible event emitter, but calling `add` or `unwatch` will have no effect.\n\n::: warning Watching files in `node_modules`\n\nIt's currently not possible to watch files and packages in `node_modules`. For further progress and workarounds, you can follow [issue #8619](https://github.com/vitejs/vite/issues/8619).\n\n:::\n\n::: warning Using Vite on Windows Subsystem for Linux (WSL) 2\n\nWhen running Vite on WSL2, file system watching does not work when a file is edited by Windows applications (non-WSL2 process). This is due to [a WSL2 limitation](https://github.com/microsoft/WSL/issues/4739). This also applies to running on Docker with a WSL2 backend.\n\nTo fix it, you could either:\n\n- **Recommended**: Use WSL2 applications to edit your files.\n  - It is also recommended to move the project folder outside of a Windows filesystem. Accessing Windows filesystem from WSL2 is slow. Removing that overhead will improve performance.\n- Set `{ usePolling: true }`.\n  - Note that [`usePolling` leads to high CPU utilization](https://github.com/paulmillr/chokidar/tree/3.6.0#performance).\n\n:::"
+   },
+   {
+    "id": "vite:docs/plugins/index.md#4",
+    "title": "docs/plugins/index.md > Plugins > Official Plugins > [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react-swc)",
+    "text": "### [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react-swc)\n\nReplaces Oxc with [SWC](https://swc.rs/) during development for SWC plugin usage. During production builds, SWC+Oxc Transformer are used when using plugins. For big projects that require custom plugins, cold start and Hot Module Replacement (HMR) can be significantly faster, if the plugin is also available for SWC."
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#14",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `transformWithOxc`",
+    "text": "## `transformWithOxc`\n\n**Type Signature:**\n\n```ts\nasync function transformWithOxc(\n  code: string,\n  filename: string,\n  options?: OxcTransformOptions,\n  inMap?: object,\n): Promise<Omit<OxcTransformResult, 'errors'> & { warnings: string[] }>\n```\n\nTransform JavaScript or TypeScript with [Oxc Transformer](https://oxc.rs/docs/guide/usage/transformer). Useful for plugins that prefer matching Vite's internal Oxc Transformer transform."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#22",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Syntax Error / Type Error happens",
+    "text": "### Syntax Error / Type Error happens\n\nVite cannot handle and does not support code that only runs on non-strict mode (sloppy mode). This is because Vite uses ESM and it is always [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) inside ESM.\n\nFor example, you might see these errors.\n\n> [ERROR] With statements cannot be used with the \"esm\" output format due to strict mode\n\n> TypeError: Cannot create property 'foo' on boolean 'false'\n\nIf these codes are used inside dependencies, you could use [`patch-package`](https://github.com/ds300/patch-package) (or [`yarn patch`](https://yarnpkg.com/cli/patch) or [`pnpm patch`](https://pnpm.io/cli/patch)) for an escape hatch."
+   },
+   {
+    "id": "vite:packages/plugin-legacy/README.md#11",
+    "title": "packages/plugin-legacy/README.md > @vitejs/plugin-legacy [![npm](https://img.shields.io/npm/v/@vitejs/plugin-legacy.svg)](https://npmjs.com/package/@vitejs/plugin-legacy) > Browsers that supports ESM but does not support widely-available features",
+    "text": "## Browsers that supports ESM but does not support widely-available features\n\nThe legacy plugin offers a way to use widely-available features natively in the modern build, while falling back to the legacy build in browsers with native ESM but without those features supported (e.g. Legacy Edge). This feature works by injecting a runtime check and loading the legacy bundle with SystemJS runtime if needed. There are the following drawbacks:\n\n- Modern bundle is downloaded in all ESM browsers\n- Modern bundle throws an error in browsers without those features support\n\nThe following features are considered as widely-available:\n\n- dynamic import\n- async generator\n- `import.meta.resolve`"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/features.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0122,
+    "document_score": 0.1282,
+    "levels": {
+     "answers": 0.0122,
+     "elsewhere": 0.116,
+     "different_case": 0.0682,
+     "unrelated": 0.8037
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/plugins/index.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0079,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0052,
+     "different_case": 0.0123,
+     "unrelated": 0.9798
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/plugins/index.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0067,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0043,
+     "different_case": 0.0147,
+     "unrelated": 0.9787
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/features.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0047,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0025,
+     "different_case": 0.0088,
+     "unrelated": 0.9865
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/api-javascript.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0093,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0071,
+     "different_case": 0.0094,
+     "unrelated": 0.9813
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/config/build-options.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0044,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0024,
+     "different_case": 0.0085,
+     "unrelated": 0.9871
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:packages/plugin-legacy/README.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0006,
+     "different_case": 0.0023,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/troubleshooting.md#22",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0008,
+     "different_case": 0.0024,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/troubleshooting.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0005,
+     "different_case": 0.0015,
+     "unrelated": 0.997
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/server-options.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0006,
+     "different_case": 0.0019,
+     "unrelated": 0.9966
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3283
+  },
+  "timing": {
+   "total_ms": 129,
+   "rerank_ms": 114,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4313,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

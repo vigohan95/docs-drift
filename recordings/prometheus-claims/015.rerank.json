@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/015.rerank",
+ "recorded_at": "2026-11-06T13:37:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 953,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "69.811424",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=257"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: For release candidate versions (`v3.6.0-rc.0`), run the benchmark for 3 days using the `/prombench vX.Y.Z` command, `vX.Y.Z` being the latest stable patch release's tag of the previous minor release series, such as `v3.5.2`.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/getting_started.md#1",
+    "title": "docs/getting_started.md > Downloading and running Prometheus",
+    "text": "## Downloading and running Prometheus\n\n[Download the latest release](https://prometheus.io/download) of Prometheus for\nyour platform, then extract and run it:\n\n```bash\ntar xvfz prometheus-*.tar.gz\ncd prometheus-*/\n```\n\nBefore starting Prometheus, let's configure it."
+   },
+   {
+    "id": "prometheus:README.md#4",
+    "title": "README.md > Install > Precompiled binaries",
+    "text": "### Precompiled binaries\n\nPrecompiled binaries for released versions are available in the\n[*download* section](https://prometheus.io/download/)\non [prometheus.io](https://prometheus.io). Using the latest production release binary\nis the recommended way to install Prometheus.\nSee the [Installing](https://prometheus.io/docs/introduction/install/)\nchapter in the documentation for all the details."
+   },
+   {
+    "id": "prometheus:docs/storage.md#18",
+    "title": "docs/storage.md > Backfilling for Recording Rules > Limitations",
+    "text": "### Limitations\n\n- If you run the rule backfiller multiple times with the overlapping start/end times,\n  blocks containing the same data will be created each time the rule backfiller is run.\n- All rules in the recording rule files will be evaluated.\n- If the `interval` is set in the recording rule file that will take priority over\n  the `eval-interval` flag in the rule backfill command.\n- Alerts are currently ignored if they are in the recording rule file.\n- Rules in the same group cannot see the results of previous rules. Meaning that rules\n  that refer to other rules being backfilled is not supported. A workaround is to\n  backfill multiple times and create the dependent data first (and move dependent\n  data to the Prometheus server data dir so that it is accessible from the Prometheus API)."
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#56",
+    "title": "docs/command-line/promtool.md > Commands > `promtool tsdb` > `promtool tsdb bench write`",
+    "text": "##### `promtool tsdb bench write`\n\nRun a write performance benchmark."
+   },
+   {
+    "id": "prometheus:documentation/prometheus-mixin/README.md#0",
+    "title": "documentation/prometheus-mixin/README.md > Prometheus Mixin",
+    "text": "# Prometheus Mixin\n\n_This is work in progress. We aim for it to become a good role model for alerts\nand dashboards eventually, but it is not quite there yet._\n\nThe Prometheus Mixin is a set of configurable, reusable, and extensible alerts\nand dashboards for Prometheus.\n\nTo use them, you need to have `jsonnet` (v0.13+) and `jb` installed. If you\nhave a working Go development environment, it's easiest to run the following:\n```bash\n$ go install github.com/google/go-jsonnet/cmd/jsonnet@latest\n$ go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest\n$ go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest\n```\n\n_Note: The make targets `lint` and `fmt` need the `jsonnetfmt` binary, which is\navailable from [v.0.16.0](https://github.com/google/jsonnet/releases/tag/v0.16.0) in the Go implementation of `jsonnet`. If your jsonnet version is older than 0.16.0 you have to either upgrade or install the [C++ version of\njsonnetfmt](https://github.com/google/jsonnet) if you want to use `make lint`\nor `make fmt`._\n\nNext, install the dependencies by running the following command in this\ndirectory:\n```bash\n$ jb install\n```\n\nYou can then build a `prometheus_alerts.yaml` with the alerts and a directory\n`dashboards_out` with the Grafana dashboard JSON files:\n```bash\n$ make prometheus_alerts.yaml\n$ make dashboards_out\n```\n\nFor more advanced uses of mixins, see https://github.com/monitoring-mixins/docs."
+   },
+   {
+    "id": "prometheus:README.md#11",
+    "title": "README.md > Using Prometheus as a Go Library > Prometheus code base",
+    "text": "### Prometheus code base\n\nIn order to comply with [go mod](https://go.dev/ref/mod#versions) rules,\nPrometheus release number do not exactly match Go module releases.\n\nFor the\nPrometheus v3.y.z releases, we are publishing equivalent v0.3y.z tags. The y in v0.3y.z is always padded to two digits, with a leading zero if needed.\n\nTherefore, a user that would want to use Prometheus v3.0.0 as a library could do:\n\n```shell\ngo get github.com/prometheus/prometheus@v0.300.0\n```\n\nFor the\nPrometheus v2.y.z releases, we published the equivalent v0.y.z tags.\n\nTherefore, a user that would want to use Prometheus v2.35.0 as a library could do:\n\n```shell\ngo get github.com/prometheus/prometheus@v0.35.0\n```\n\nThis solution makes it clear that we might break our internal Go APIs between\nminor user-facing releases, as [breaking changes are allowed in major version\nzero](https://semver.org/#spec-item-4)."
+   },
+   {
+    "id": "prometheus:tsdb/docs/usage.md#3",
+    "title": "tsdb/docs/usage.md > Usage > Adding data",
+    "text": "  Breaching this condition results in \"out of bounds\" errors.  \n  The first condition assures the block that will be generated doesn't overlap with the previous one (which simplifies querying)  \n  The second condition assures the sample won't go into the so called \"compaction window\", that is the section of the data that might be in process of being saved into a persistent block on disk.  (because that logic runs concurrently with ingestion without a lock)\n2) The labels don't validate. (if the set is empty or contains duplicate label names)\n3) If the sample, for the respective series (based on all the labels) is out of order or has a different value for the last (highest) timestamp seen. (results in `storage.ErrOutOfOrderSample` and `storage.ErrDuplicateSampleForTimestamp` respectively)\n\n`Commit()` may also refuse data that is out of order with respect to samples that were added via a different appender."
+   },
+   {
+    "id": "prometheus:docs/migration.md#12",
+    "title": "docs/migration.md > Miscellaneous > Disallow configuring Alertmanager with the v1 API",
+    "text": "### Disallow configuring Alertmanager with the v1 API\nPrometheus 3 no longer supports Alertmanager's v1 API. Effectively Prometheus 3\nrequires [Alertmanager 0.16.0](https://github.com/prometheus/alertmanager/releases/tag/v0.16.0) or later. Users with older Alertmanager\nversions or configurations that use `alerting: alertmanagers: [api_version: v1]`\nneed to upgrade Alertmanager and change their configuration to use `api_version: v2`."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#28",
+    "title": "docs/querying/basics.md > Gotchas > Staleness",
+    "text": "### Staleness\n\nThe timestamps at which to sample data, during a query, are selected\nindependently of the actual present time series data. This is mainly to support\ncases like aggregation (`sum`, `avg`, and so on), where multiple aggregated\ntime series do not precisely align in time. Because of their independence,\nPrometheus needs to assign a value at those timestamps for each relevant time\nseries. It does so by taking the newest sample that is less than the lookback period ago.\nThe lookback period is 5 minutes by default, but can be\n[set with the `--query.lookback-delta` flag](../command-line/prometheus.md)\nor overridden on an individual query via the `lookback_delta` parameter.\n\nIf a target scrape or rule evaluation no longer returns a sample for a time\nseries that was previously present, this time series will be marked as stale.\nIf a target is removed, the previously retrieved time series will be marked as\nstale soon after removal.\n\nIf a query is evaluated at a sampling timestamp after a time series is marked\nas stale, then no value is returned for that time series. If new samples are\nsubsequently ingested for that time series, they will be returned as expected.\n\nA time series will go stale when it is no longer exported, or the target no\nlonger exists. Such time series will disappear from graphs\nat the times of their latest collected sample, and they will not be returned\nin queries after they are marked stale.\n\nSome exporters, which put their own timestamps on samples, get a different behaviour:\nseries that stop being exported take the last value for (by default) 5 minutes before\ndisappearing. The `track_timestamps_staleness` setting can change this."
+   },
+   {
+    "id": "prometheus:docs/migration.md#0",
+    "title": "docs/migration.md > (preamble)",
+    "text": "---\ntitle: Prometheus 3.0 migration guide\nnav_title: Migration\nsort_rank: 10\n---\n\nIn line with our [stability promise](https://prometheus.io/docs/prometheus/latest/stability/),\nthe Prometheus 3.0 release contains a number of backwards incompatible changes.\nThis document offers guidance on migrating from Prometheus 2.x to Prometheus 3.0 and newer versions."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "prometheus:docs/command-line/promtool.md#56",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0061,
+    "document_score": 0.0335,
+    "levels": {
+     "answers": 0.0061,
+     "elsewhere": 0.0274,
+     "different_case": 0.022,
+     "unrelated": 0.9445
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/getting_started.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0051,
+    "document_score": 0.0277,
+    "levels": {
+     "answers": 0.0051,
+     "elsewhere": 0.0226,
+     "different_case": 0.01,
+     "unrelated": 0.9623
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:README.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0062,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0039,
+     "different_case": 0.0095,
+     "unrelated": 0.9842
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:README.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0032,
+     "different_case": 0.0075,
+     "unrelated": 0.9871
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:documentation/prometheus-mixin/README.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0019,
+     "different_case": 0.004,
+     "unrelated": 0.992
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/migration.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0049,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.003,
+     "different_case": 0.0059,
+     "unrelated": 0.9892
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/querying/basics.md#28",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.001,
+     "different_case": 0.0033,
+     "unrelated": 0.9943
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/storage.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0011,
+     "different_case": 0.0029,
+     "unrelated": 0.9947
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/usage.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0009,
+     "different_case": 0.0025,
+     "unrelated": 0.9952
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/migration.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0009,
+     "different_case": 0.002,
+     "unrelated": 0.9959
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3174
+  },
+  "timing": {
+   "total_ms": 73,
+   "rerank_ms": 72,
+   "questions_ms": 0,
+   "model_ms": 65,
+   "engine": {
+    "rows": 4044,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 65,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 62,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

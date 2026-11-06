@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/013.rerank",
+ "recorded_at": "2026-11-06T13:37:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1065,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.855492",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=38,cfOrigin;dur=0,cfWorker;dur=289"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: For those \"boolean\" metrics that produce `1`s or `0`s, integrating them over time will give the _time in seconds_ that the value was `1`, for example, to get the _amount of time_ a particular metric has been absent during the past day (sampled every 5 minutes):",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#17",
+    "title": "docs/feature_flags.md > OTLP Native Delta Support > Querying",
+    "text": "### Querying\n\nWhen `st-storage` and `use-start-timestamps` are also enabled and incoming delta samples have valid start timestamps, PromQL functions such as `rate()` and `increase()` use those timestamps to account for the interval represented by each delta.\n\nWithout start-timestamp storage and processing, use `sum_over_time()` to query delta metrics:\n\n* `sum_over_time(delta_metric[<range>])`: Calculates the sum of delta values over the specified time range.\n* `sum_over_time(delta_metric[<range>]) / <range>`: Calculates the per-second rate of the delta metric.\n\nThese may not work well if the `<range>` is not a multiple of the collection interval of the metric. For example, if you do `sum_over_time(delta_metric[1m]) / 1m` range query (with a 1m step), but the collection interval of a metric is 10m, the graph will show a single point every 10 minutes with a high rate value, rather than 10 points with a lower, constant value."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/template_examples.md#1",
+    "title": "docs/configuration/template_examples.md > Simple alert field templates",
+    "text": "## Simple alert field templates\n\n```yaml\nalert: InstanceDown\nexpr: up == 0\nfor: 5m\nlabels:\n  severity: page\nannotations:\n  summary: \"Instance {{$labels.instance}} down\"\n  description: \"{{$labels.instance}} of job {{$labels.job}} has been down for more than 5 minutes.\"\n```\n\nAlert field templates will be executed during every rule iteration for each\nalert that fires, so keep any queries and templates lightweight. If you have a\nneed for more complicated templates for alerts, it is recommended to link to a\nconsole instead."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#21",
+    "title": "docs/querying/basics.md > Time series selectors > Offset modifier",
+    "text": "### Offset modifier\n\nThe `offset` modifier allows changing the time offset for individual\ninstant and range vectors in a query.\n\nFor example, the following expression returns the value of\n`http_requests_total` 5 minutes in the past relative to the current\nquery evaluation time:\n\n    http_requests_total offset 5m\n\nNote that the `offset` modifier always needs to follow the selector\nimmediately, i.e. the following would be correct:\n\n    sum(http_requests_total{method=\"GET\"} offset 5m) // GOOD.\n\nWhile the following would be *incorrect*:\n\n    sum(http_requests_total{method=\"GET\"}) offset 5m // INVALID.\n\nThe same works for range vectors. This returns the 5-minute [rate](./functions.md#rate)\nthat `http_requests_total` had a week ago:\n\n    rate(http_requests_total[5m] offset 1w)\n\nWhen querying for samples in the past, a negative offset will enable temporal comparisons forward in time:\n\n    rate(http_requests_total[5m] offset -1w)\n\nNote that this allows a query to look ahead of its evaluation time."
+   },
+   {
+    "id": "prometheus:docs/configuration/alerting_rules.md#2",
+    "title": "docs/configuration/alerting_rules.md > Defining alerting rules > Templating",
+    "text": "### Templating\n\nLabel and annotation values can be templated using [console\ntemplates](https://prometheus.io/docs/visualization/consoles).  The `$labels`\nvariable holds the label key/value pairs of an alert instance. The configured\nexternal labels can be accessed via the `$externalLabels` variable. The\n`$value` variable holds the evaluated value of an alert instance.\n\n    # To insert a firing element's label values:\n    {{ $labels.<labelname> }}\n    # To insert the numeric expression value of the firing element:\n    {{ $value }}\n\nExamples:\n\n```yaml\ngroups:\n- name: example\n  rules:\n\n  # Alert for any instance that is unreachable for >5 minutes.\n  - alert: InstanceDown\n    expr: up == 0\n    for: 5m\n    labels:\n      severity: page\n    annotations:\n      summary: \"Instance {{ $labels.instance }} down\"\n      description: \"{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.\"\n\n  # Alert for any instance that has a median request latency >1s.\n  - alert: APIHighRequestLatency\n    expr: api_http_request_latencies_second{quantile=\"0.5\"} > 1\n    for: 10m\n    annotations:\n      summary: \"High request latency on {{ $labels.instance }}\"\n      description: \"{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)\"\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#11",
+    "title": "docs/configuration/unit_testing_rules.md > Example > `alerts.yml`",
+    "text": "### `alerts.yml`\n\n```yaml\n# This is the rules file.\n\ngroups:\n- name: example\n  rules:\n\n  - alert: InstanceDown\n    expr: up == 0\n    for: 5m\n    labels:\n        severity: page\n    annotations:\n        summary: \"Instance {{ $labels.instance }} down\"\n        description: \"{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.\"\n\n  - alert: AnotherInstanceDown\n    expr: up == 0\n    for: 10m\n    labels:\n        severity: page\n    annotations:\n        summary: \"Instance {{ $labels.instance }} down\"\n        description: \"{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.\"\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "title": "docs/querying/operators.md > Vector matching > Filling in missing matches",
+    "text": "* If a fill modifier is used on the \"many\" side of a match, it will only fill in a single series\n  for the \"many\" side of each match group, using the group's matching labels as the series identity.\n* If a fill modifier is used on the \"one\" side of a match and the grouping modifier specifies\n  label names to include from the \"one\" side (e.g. `left_vector * on(instance, job) group_left(info_label) fill_right(1) right_vector`), those labels will not be filled in for missing\n  series, as there is no source for their values.\n\nFill modifiers are not supported for set operators (`and`, `or`, `unless`), as the purpose of those\noperators is to filter series based on presence or absence in the other vector.\n\nExample query, filling in missing series on the either side with `0`:\n\n    method_code:http_errors:rate5m{status=\"500\"} / ignoring(code) fill(0) method:http_requests:rate5m\n\nThis returns a result vector containing the fraction of HTTP requests with status code\nof 500 for each method, as measured over the last 5 minutes. The entries with methods `put` and `del`\nare now included in the result with a filled-in default sample value of `0`, as they had no matching\nseries on the respective other side:\n\n    {method=\"get\"}  0.04            #  24 / 600\n    {method=\"put\"}  +Inf            #   3 /   0 (missing right side filled in)\n    {method=\"del\"}  0               #   0 /  34 (missing left side filled in)\n    {method=\"post\"} 0.05            #   6 / 120"
+   },
+   {
+    "id": "prometheus:docs/configuration/recording_rules.md#4",
+    "title": "docs/configuration/recording_rules.md > Recording rules > `<rule_group>`",
+    "text": "### `<rule_group>`\n\n```yaml\n# The name of the group. Must be unique within a file.\nname: <string>\n\n# How often rules in the group are evaluated.\n[ interval: <duration> | default = global.evaluation_interval ]\n\n# Limit the number of alerts an alerting rule and series a recording\n# rule can produce. 0 is no limit.\n[ limit: <int> | default = 0 ]\n\n# Offset the rule evaluation timestamp of this particular group by the specified duration into the past.\n[ query_offset: <duration> | default = global.rule_query_offset ]\n\n# Labels to add or overwrite before storing the result for its rules.\n# Labels defined in <rule> will override the key if it has a collision.\nlabels:\n  [ <labelname>: <labelvalue> ]\n\nrules:\n  [ - <rule> ... ]\n```"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#8",
+    "title": "docs/getting_started.md > Configure Prometheus to monitor the sample targets",
+    "text": "To confirm the metrics are available, first open a target's `/metrics` endpoint\ndirectly, for example [localhost:8080/metrics](http://localhost:8080/metrics), to\nsee the raw metric names it exposes. Then enter one of them, such as \n`node_cpu_seconds_total`, into the expression browser and click \"Execute\". This\nshould return one time series per CPU and mode for each instance, for example:\n\n​```\nnode_cpu_seconds_total{cpu=\"0\",group=\"production\",instance=\"localhost:8080\",job=\"node\",mode=\"idle\"}\n​```\n\nTo browse every metric name that is currently available, open the query options\nmenu (the three-dots button to the right of the expression input) and select\n**Explore metrics**. "
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#29",
+    "title": "docs/querying/functions.md > `hour()`",
+    "text": "## `hour()`\n\n`hour(v=vector(time()) instant-vector)` interprets float samples in `v` as\ntimestamps (number of seconds since January 1, 1970 UTC) and returns the hour\nof the day (in UTC) for each of those timestamps. Returned values are from 0\nto 23. Histogram samples in the input vector are ignored silently."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/feature_flags.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.3151,
+    "document_score": 0.3591,
+    "levels": {
+     "answers": 0.3151,
+     "elsewhere": 0.044,
+     "different_case": 0.0483,
+     "unrelated": 0.5926
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/configuration/template_examples.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0062,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0039,
+     "different_case": 0.0094,
+     "unrelated": 0.9844
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/configuration/alerting_rules.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0058,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0034,
+     "different_case": 0.0107,
+     "unrelated": 0.9835
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0058,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0035,
+     "different_case": 0.0086,
+     "unrelated": 0.9856
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/querying/operators.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0062,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.004,
+     "different_case": 0.0108,
+     "unrelated": 0.983
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/getting_started.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0053,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0032,
+     "different_case": 0.006,
+     "unrelated": 0.9887
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/functions.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0024,
+     "different_case": 0.0054,
+     "unrelated": 0.9906
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0015,
+     "different_case": 0.0037,
+     "unrelated": 0.9933
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/basics.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0018,
+     "different_case": 0.0047,
+     "unrelated": 0.9921
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/configuration/recording_rules.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0016,
+     "different_case": 0.0032,
+     "unrelated": 0.9941
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3939
+  },
+  "timing": {
+   "total_ms": 109,
+   "rerank_ms": 94,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4809,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

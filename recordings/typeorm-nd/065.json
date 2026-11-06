@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/065",
+ "recorded_at": "2026-11-06T13:43:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 868,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.327456",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=167"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "text": "```typescript\nawait manager.save(user)\nawait manager.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n\n```typescript\nawait manager.remove(user)\nawait manager.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait manager.insert(User, {\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait manager.insert(User, [\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids, given conditions, or an array of condition objects. Sets fields from supplied partial entity.\n\n```typescript\nawait manager.update(User, { age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait manager.update(User, 1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// Bulk updates with different conditions for each operation\nawait manager.update(User, [\n    { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } },\n    { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } },\n    { criteria: { age: 18 }, data: { category: \"ADULT\" } },\n])\n// executes three separate UPDATE queries:\n// UPDATE user SET firstName = Rizzrak WHERE id = 1\n// UPDATE user SET firstName = Karzzir WHERE id = 2\n// UPDATE user SET category = ADULT WHERE age = 18\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#6",
+    "text": "- `softDelete` and `restore` - Soft deleting and restoring a row by id, ids, given conditions, or an array of condition objects:\n\n```typescript\nconst repository = dataSource.getRepository(Entity)\n// Soft delete an entity\nawait repository.softDelete(1)\n// And you can restore it using restore;\nawait repository.restore(1)\n// Soft delete multiple entities\nawait repository.softDelete([1, 2, 3])\n// Or soft delete by other attribute\nawait repository.softDelete({ firstName: \"Jake\" })\n\n// Bulk soft deletes with different conditions for each operation\nawait repository.softDelete([{ firstName: \"Jake\" }, { age: 25 }, { id: 42 }])\n// executes three separate UPDATE queries (setting deletedAt timestamp):\n// UPDATE entity SET deletedAt = NOW() WHERE firstName = Jake\n// UPDATE entity SET deletedAt = NOW() WHERE age = 25\n// UPDATE entity SET deletedAt = NOW() WHERE id = 42\n```\n\n- `softRemove` and `recover` - This is alternative to `softDelete` and `restore`.\n\n```typescript\n// You can soft-delete them using softRemove\nconst entities = await repository.find()\nconst entitiesAfterSoftRemove = await repository.softRemove(entities)\n\n// And You can recover them using recover;\nawait repository.recover(entitiesAfterSoftRemove)\n```\n\n- `increment` - Increments some column by provided value of entities that match given options."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#6",
+    "relation": "unrelated",
+    "related": 0.0145,
+    "probabilities": {
+     "same": 0.0045,
+     "overlapping": 0.0051,
+     "conflicting": 0.0049,
+     "unrelated": 0.9855
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

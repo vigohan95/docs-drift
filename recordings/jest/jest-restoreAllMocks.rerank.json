@@ -1,0 +1,126 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/jest-restoreAllMocks.rerank",
+ "recorded_at": "2026-11-06T13:42:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 876,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.048832",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=193"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `jest.restoreAllMocks`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `jest.restoreAllMocks`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/CLI.md#48",
+    "title": "docs/CLI.md > Reference > `--restoreMocks`",
+    "text": "### `--restoreMocks`\n\nAutomatically restore mock state and implementation before every test. Equivalent to calling [`jest.restoreAllMocks()`](JestObjectAPI.md#jestrestoreallmocks) before each test. This will lead to any mocks having their fake implementations removed and restores their initial implementation."
+   },
+   {
+    "id": "jest:docs/Configuration.md#61",
+    "title": "docs/Configuration.md > Reference > `restoreMocks` \\[boolean]",
+    "text": "### `restoreMocks` \\[boolean]\n\nDefault: `false`\n\nAutomatically restore mock state and implementation before every test. Equivalent to calling [`jest.restoreAllMocks()`](JestObjectAPI.md#jestrestoreallmocks) before each test. This will lead to any mocks having their fake implementations removed and restores their initial implementation."
+   },
+   {
+    "id": "jest:docs/JestObjectAPI.md#29",
+    "title": "docs/JestObjectAPI.md > Mock Functions > `jest.spyOn(object, methodName)`",
+    "text": "### `jest.spyOn(object, methodName)`\n\nCreates a mock function similar to `jest.fn` but also tracks calls to `object[methodName]`. Returns a Jest [mock function](MockFunctionAPI.md).\n\n:::note\n\nBy default, `jest.spyOn` also calls the **spied** method. This is different behavior from most other test libraries. If you want to overwrite the original function, you can use `jest.spyOn(object, methodName).mockImplementation(() => customImplementation)` or `object[methodName] = jest.fn(() => customImplementation)`.\n\n:::\n\n:::tip\n\nSince `jest.spyOn` is a mock, you could restore the initial state by calling [`jest.restoreAllMocks`](#jestrestoreallmocks) in the body of the callback passed to the [afterEach](GlobalAPI.md#aftereachfn-timeout) hook.\n\n:::\n\nExample:\n\n```js\nconst video = {\n  play() {\n    return true;\n  },\n};\n\nmodule.exports = video;\n```\n\nExample test:\n\n```js\nconst video = require('./video');\n\nafterEach(() => {\n  // restore the spy created with spyOn\n  jest.restoreAllMocks();\n});\n\ntest('plays video', () => {\n  const spy = jest.spyOn(video, 'play');\n  const isPlaying = video.play();\n\n  expect(spy).toHaveBeenCalled();\n  expect(isPlaying).toBe(true);\n});\n```"
+   },
+   {
+    "id": "jest:docs/JestObjectAPI.md#36",
+    "title": "docs/JestObjectAPI.md > Mock Functions > `jest.restoreAllMocks()`",
+    "text": "### `jest.restoreAllMocks()`\n\nRestores all mocks and replaced properties back to their original value. Equivalent to calling [`.mockRestore()`](MockFunctionAPI.md#mockfnmockrestore) on every mocked function and [`.restore()`](MockFunctionAPI.md#replacedpropertyrestore) on every replaced property. Beware that `jest.restoreAllMocks()` only works for mocks created with [`jest.spyOn()`](#jestspyonobject-methodname) and properties replaced with [`jest.replaceProperty()`](#jestreplacepropertyobject-propertykey-value); other mocks will require you to manually restore them."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "jest:docs/JestObjectAPI.md#36",
+    "action": "use",
+    "relevance_score": 0.9935,
+    "document_score": 0.9959,
+    "levels": {
+     "answers": 0.9935,
+     "elsewhere": 0.0024,
+     "different_case": 0.002,
+     "unrelated": 0.0021
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/CLI.md#48",
+    "action": "use",
+    "relevance_score": 0.9378,
+    "document_score": 0.9758,
+    "levels": {
+     "answers": 0.9378,
+     "elsewhere": 0.038,
+     "different_case": 0.0112,
+     "unrelated": 0.0129
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/Configuration.md#61",
+    "action": "use",
+    "relevance_score": 0.9331,
+    "document_score": 0.9742,
+    "levels": {
+     "answers": 0.9331,
+     "elsewhere": 0.041,
+     "different_case": 0.0125,
+     "unrelated": 0.0133
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/JestObjectAPI.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.0273,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.0235,
+     "different_case": 0.0152,
+     "unrelated": 0.9576
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 990
+  },
+  "timing": {
+   "total_ms": 63,
+   "rerank_ms": 48,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1530,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

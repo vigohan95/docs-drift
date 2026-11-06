@@ -31,6 +31,12 @@ FAMILY_TOPIC = {
 }
 
 
+def _own_spent(project: str, label: str) -> float:
+    """Credits spent under this run's tag prefix (safe with parallel runs)."""
+    from .pairrun import spent_under
+    return spent_under(f"{project}{label}/")
+
+
 def slug(s: str) -> str:
     return re.sub(r"[^A-Za-z0-9]+", "-", s).strip("-")[:60] or "key"
 
@@ -51,14 +57,14 @@ def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_
     by_cid = {c.cid: c for c in chunks}
     ranked = rank_keys(chunks)
     client = Clocked(budget=5000, reserve=150)
-    start_credits = credits_used()
+    start_credits = _own_spent(project, label)
     out_dir = RUNS / project
     out_dir.mkdir(parents=True, exist_ok=True)
     seen_pairs: set[tuple[str, str]] = set()
     findings, pair_rows, key_rows = [], [], []
 
     for score, key, bearing in ranked[offset:offset + max_keys]:
-        spent = credits_used() - start_credits
+        spent = _own_spent(project, label) - start_credits
         if spent >= credit_cap:
             print(f"[{project}] credit cap reached ({spent:.0f}/{credit_cap})")
             break
@@ -122,7 +128,7 @@ def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_
                 })
         key_rows.append(row)
         print(f"[{project}] {key}: local {len(bearing)} -> kept {len(kept)} -> {cmp.get('verdict')} "
-              f"(spent {credits_used() - start_credits:.0f})")
+              f"(spent {_own_spent(project, label) - start_credits:.0f})")
 
     # dedupe findings by (chunk pair, quotes)
     uniq, seen = [], set()
@@ -136,7 +142,7 @@ def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_
     (out_dir / f"pairs{suffix}.json").write_text(json.dumps(pair_rows, ensure_ascii=False, indent=1), encoding="utf-8")
     (out_dir / f"keys{suffix}.json").write_text(json.dumps(key_rows, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"[{project}] keys processed {len(key_rows)}, pairs compared {len(seen_pairs)}, "
-          f"conflict findings {len(uniq)}, credits {credits_used() - start_credits:.0f}")
+          f"conflict findings {len(uniq)}, credits {_own_spent(project, label) - start_credits:.0f}")
 
 
 if __name__ == "__main__":

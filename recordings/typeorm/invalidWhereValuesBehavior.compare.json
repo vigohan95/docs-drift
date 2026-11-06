@@ -1,0 +1,264 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm/invalidWhereValuesBehavior.compare",
+ "recorded_at": "2026-11-06T13:42:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1312,
+ "response_headers": {
+  "x-clocked-credits": "15",
+  "x-clocked-model-ms": "352.378113",
+  "x-clocked-cost-usd": "0.002988",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=575"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "text": "### `invalidWhereValuesBehavior` default changed to `throw`\n\n**This is a significant behavioral change that may break existing applications at runtime.**\n\nThe default behavior for null and undefined values in where conditions has changed. Previously, null and undefined values were silently ignored (the property was skipped). Now, both **throw an error by default**.\n\nThis change prevents subtle bugs where queries like `findBy({ id: undefined })` would silently return all rows instead of failing.\n\n```typescript\n// v0.3: silently returns all posts (null is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: null } })\n\n// v0.3: silently returns all posts (undefined is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: undefined } })\n```\n\nTo match null values, use the `IsNull()` operator:\n\n```typescript\nimport { IsNull } from \"typeorm\"\n\nawait repository.find({ where: { text: IsNull() } })\n```\n\nTo restore the previous behavior, set `invalidWhereValuesBehavior` in your data source options:\n\n```typescript\nnew DataSource({\n    // ...\n    invalidWhereValuesBehavior: {\n        null: \"ignore\",\n        undefined: \"ignore\",\n    },\n})\n```\n\nThis setting guards all high-level APIs — find operations, repository/manager mutation methods, and `queryBuilder.setFindOptions()` (the only QueryBuilder method that is affected). The rest of the QueryBuilder methods (`.where()`, `.andWhere()`, `.orWhere()`) are **not** affected — null and undefined values pass through as-is. See [Null and undefined handling](../../data-source/5-null-and-undefined-handling.md) for full details."
+   },
+   {
+    "id": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+    "text": "- `invalidWhereValuesBehavior` - Controls how null and undefined values are handled in where conditions for high-level operations (find operations, repository methods, EntityManager methods). Does not affect QueryBuilder's `.where()` directly.\n    - `null` behavior options:\n        - `'ignore'` - skips null properties\n        - `'sql-null'` - transforms null to SQL NULL\n        - `'throw'` (default) - throws an error\n    - `undefined` behavior options:\n        - `'ignore'` - skips undefined properties\n        - `'throw'` (default) - throws an error\n\n    Example: `invalidWhereValuesBehavior: { null: 'sql-null', undefined: 'ignore' }`.\n\n    Learn more about [Null and Undefined Handling](./5-null-and-undefined-handling.md)."
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#6",
+    "text": "### Behavioral changes\n\n- **Non-nullable relations now use INNER JOIN** — `ManyToOne` and owning `OneToOne` relations marked `nullable: false` now use `INNER JOIN` instead of `LEFT JOIN`, which may exclude rows with orphaned foreign keys ([#12064](https://github.com/typeorm/typeorm/pull/12064) by [@pkuczynski](https://github.com/pkuczynski))\n- **`invalidWhereValuesBehavior` defaults to `throw`** — passing `null` or `undefined` in where conditions now throws an error instead of silently ignoring the property; use `IsNull()` for null matching ([#11710](https://github.com/typeorm/typeorm/pull/11710) by [@naorpeled](https://github.com/naorpeled))\n- **`invalidWhereValuesBehavior` scoped to high-level APIs only** — QueryBuilder's `.where()`, `.andWhere()`, `.orWhere()` are no longer affected by this setting ([#11878](https://github.com/typeorm/typeorm/pull/11878) by [@naorpeled](https://github.com/naorpeled))\n- **`ConnectionOptionsReader` and `FileLogger` paths resolved from `process.cwd()`** — `ConnectionOptionsReader` no longer uses `app-root-path` to locate `ormconfig` files; it searches `process.cwd()` instead. Pass `{ root: \"/custom/path\" }` to the constructor to override. `FileLogger.logPath` is likewise resolved from `process.cwd()` — use an absolute path when the app is not started from its root folder ([#12257](https://github.com/typeorm/typeorm/pull/12257) by [@alumni](https://github.com/alumni))"
+   },
+   {
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+    "text": "### Only plain-object criteria is normalized\n\n`invalidWhereValuesBehavior` normalizes **plain `FindOptionsWhere` objects** only. Any other criteria value passed to `update` / `delete` / `softDelete` / `restore` — an **entity class instance**, a `FindOperator`, an array, a `Date`, a `Buffer`, or a primitive `id` — is passed through untouched and is **not** validated. So an entity instance whose nullable column is `null` renders as `col = NULL` (matching nothing), rather than throwing/converting. If you need null handling, pass a plain object with the `IsNull()` operator (e.g. `{ text: IsNull() }`).\n\n> Deep validation of entity-instance criteria requires entity metadata and is out of scope here; use a plain `FindOptionsWhere` object when you want `invalidWhereValuesBehavior` applied."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+     "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "b": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0082,
+     "overlapping": 0.9849,
+     "conflicting": 0.0046,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.0171,
+       "restated": 0.2621,
+       "elaborated": 0.7037,
+       "different": 0.0171
+      },
+      "confidence": 0.9829,
+      "a": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+       "quote": "This setting guards all high-level APIs — find operations, repository/manager mutation methods, and `queryBuilder.setFindOptions()` (the only QueryBuilder method that is affected).",
+       "start": 1194,
+       "end": 1374,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+       "quote": "- `invalidWhereValuesBehavior` - Controls how null and undefined values are handled in where conditions for high-level operations (find operations, repository methods, EntityManager methods).",
+       "start": 0,
+       "end": 191,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.0101,
+       "restated": 0.4731,
+       "elaborated": 0.5034,
+       "different": 0.0134
+      },
+      "confidence": 0.9866,
+      "a": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+       "quote": "The rest of the QueryBuilder methods (`.where()`, `.andWhere()`, `.orWhere()`) are **not** affected — null and undefined values pass through as-is.",
+       "start": 1375,
+       "end": 1522,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+       "quote": "Does not affect QueryBuilder's `.where()` directly.\n    - `null` behavior options:\n        - `'ignore'` - skips null properties\n        - `'sql-null'` - transforms null to SQL NULL\n        - `'throw'` (default) - throws an error\n    - `undefined` behavior options:\n        - `'ignore'` - skips undefined properties\n        - `'throw'` (default) - throws an error\n\n    Example: `invalidWhereValuesBehavior: { null: 'sql-null', undefined: 'ignore' }`.\n\n    Learn more about [Null and Undefined Handling](./5-null-and-undefined-handling.md).",
+       "start": 192,
+       "end": 730,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#6",
+    "relation": "overlapping",
+    "related": 0.9966,
+    "probabilities": {
+     "same": 0.0126,
+     "overlapping": 0.9781,
+     "conflicting": 0.0058,
+     "unrelated": 0.0034
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "b": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+    "relation": "overlapping",
+    "related": 0.9927,
+    "probabilities": {
+     "same": 0.0087,
+     "overlapping": 0.9734,
+     "conflicting": 0.0105,
+     "unrelated": 0.0073
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0252,
+       "restated": 0.8299,
+       "elaborated": 0.0701,
+       "different": 0.0748
+      },
+      "confidence": 0.757,
+      "a": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+       "quote": "To match null values, use the `IsNull()` operator:",
+       "start": 795,
+       "end": 845,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+       "quote": "If you need null handling, pass a plain object with the `IsNull()` operator (e.g. `{ text: IsNull() }`).\n\n> Deep validation of entity-instance criteria requires entity metadata and is out of scope here; use a plain `FindOptionsWhere` object when you want `invalidWhereValuesBehavior` applied.",
+       "start": 500,
+       "end": 792,
+       "confidence": 0.757
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#6",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0087,
+     "overlapping": 0.9837,
+     "conflicting": 0.0048,
+     "unrelated": 0.0027
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/data-source/2-data-source-options.md#4",
+    "b": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+    "relation": "overlapping",
+    "related": 0.9809,
+    "probabilities": {
+     "same": 0.0161,
+     "overlapping": 0.938,
+     "conflicting": 0.0269,
+     "unrelated": 0.0191
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/releases/1.0/01-release-notes.md#6",
+    "b": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#14",
+    "relation": "overlapping",
+    "related": 0.9881,
+    "probabilities": {
+     "same": 0.0128,
+     "overlapping": 0.9615,
+     "conflicting": 0.0139,
+     "unrelated": 0.0119
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0,
+   2
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 40,
+   "passage_reads": 1,
+   "passages_ms": 211,
+   "passages": 3,
+   "counterparts_ms": 118
+  },
+  "timing": {
+   "read_ms": 368,
+   "total_ms": 374
+  }
+ }
+}

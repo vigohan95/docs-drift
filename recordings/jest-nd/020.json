@@ -1,0 +1,188 @@
+{
+ "endpoint": "compare",
+ "tag": "jest-nd/020",
+ "recorded_at": "2026-11-06T13:42:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1038,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "197.135805",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=346"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/JestObjectAPI.md#45",
+    "text": "### `jest.advanceTimersByTime(msToRun)`\n\nExecutes only the macro task queue (i.e. all tasks queued by `setTimeout()` or `setInterval()` and `setImmediate()`).\n\nWhen this API is called, all timers are advanced by `msToRun` milliseconds. All pending \"macro-tasks\" that have been queued via `setTimeout()` or `setInterval()`, and would be executed within this time frame will be executed. Additionally, if those macro-tasks schedule new macro-tasks that would be executed within the same time frame, those will be executed until there are no more macro-tasks remaining in the queue, that should be run within `msToRun` milliseconds.\n\n`msToRun` also accepts a `Temporal.Duration`. Calendar units (`years`, `months`, `weeks`) are not supported and will throw — use time-based units (`days`, `hours`, `minutes`, `seconds`, `milliseconds`) instead."
+   },
+   {
+    "id": "jest:docs/TimerMocks.md#4",
+    "text": "## Advance Timers by Time\n\nAnother possibility is use `jest.advanceTimersByTime(msToRun)`. When this API is called, all timers are advanced by `msToRun` milliseconds. All pending \"macro-tasks\" that have been queued via setTimeout() or setInterval(), and would be executed during this time frame, will be executed. Additionally, if those macro-tasks schedule new macro-tasks that would be executed within the same time frame, those will be executed until there are no more macro-tasks remaining in the queue that should be run within msToRun milliseconds.\n\n```javascript title=\"timerGame.js\"\nfunction timerGame(callback) {\n  console.log('Ready....go!');\n  setTimeout(() => {\n    console.log(\"Time's up -- stop!\");\n    callback && callback();\n  }, 1000);\n}\n\nmodule.exports = timerGame;\n```\n\n```javascript title=\"__tests__/timerGame-test.js\"\njest.useFakeTimers();\nit('calls the callback after 1 second via advanceTimersByTime', () => {\n  const timerGame = require('../timerGame');\n  const callback = jest.fn();\n\n  timerGame(callback);\n\n  // At this point in time, the callback should not have been called yet\n  expect(callback).not.toHaveBeenCalled();\n\n  // Fast-forward until all timers have been executed\n  jest.advanceTimersByTime(1000);\n\n  // Now our callback should have been called!\n  expect(callback).toHaveBeenCalled();\n  expect(callback).toHaveBeenCalledTimes(1);\n});\n```\n\nLastly, it may occasionally be useful in some tests to be able to clear all of the pending timers. For this, we have `jest.clearAllTimers()`."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/JestObjectAPI.md#45",
+    "duplicates": [],
+    "overlaps": [
+     "jest:docs/TimerMocks.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/TimerMocks.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "jest:docs/JestObjectAPI.md#45"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/JestObjectAPI.md#45",
+    "b": "jest:docs/TimerMocks.md#4",
+    "relation": "overlapping",
+    "related": 0.9986,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9897,
+     "conflicting": 0.0025,
+     "unrelated": 0.0014
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0198,
+       "restated": 0.5053,
+       "elaborated": 0.0308,
+       "different": 0.4441
+      },
+      "confidence": 0.5559,
+      "a": {
+       "document": "jest:docs/JestObjectAPI.md#45",
+       "quote": "### `jest.advanceTimersByTime(msToRun)`",
+       "start": 0,
+       "end": 39,
+       "confidence": 1
+      },
+      "b": {
+       "document": "jest:docs/TimerMocks.md#4",
+       "quote": "## Advance Timers by Time\n\nAnother possibility is use `jest.advanceTimersByTime(msToRun)`.",
+       "start": 0,
+       "end": 90,
+       "confidence": 0.998
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9791,
+       "restated": 0.0085,
+       "elaborated": 0.0066,
+       "different": 0.0058
+      },
+      "confidence": 0.9942,
+      "a": {
+       "document": "jest:docs/JestObjectAPI.md#45",
+       "quote": "When this API is called, all timers are advanced by `msToRun` milliseconds.",
+       "start": 160,
+       "end": 235,
+       "confidence": 1
+      },
+      "b": {
+       "document": "jest:docs/TimerMocks.md#4",
+       "quote": "When this API is called, all timers are advanced by `msToRun` milliseconds.",
+       "start": 91,
+       "end": 166,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0244,
+       "restated": 0.9501,
+       "elaborated": 0.0157,
+       "different": 0.0098
+      },
+      "confidence": 0.9902,
+      "a": {
+       "document": "jest:docs/JestObjectAPI.md#45",
+       "quote": "All pending \"macro-tasks\" that have been queued via `setTimeout()` or `setInterval()`, and would be executed within this time frame will be executed.",
+       "start": 236,
+       "end": 385,
+       "confidence": 1
+      },
+      "b": {
+       "document": "jest:docs/TimerMocks.md#4",
+       "quote": "All pending \"macro-tasks\" that have been queued via setTimeout() or setInterval(), and would be executed during this time frame, will be executed.",
+       "start": 167,
+       "end": 313,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0603,
+       "restated": 0.8836,
+       "elaborated": 0.0407,
+       "different": 0.0154
+      },
+      "confidence": 0.9846,
+      "a": {
+       "document": "jest:docs/JestObjectAPI.md#45",
+       "quote": "Additionally, if those macro-tasks schedule new macro-tasks that would be executed within the same time frame, those will be executed until there are no more macro-tasks remaining in the queue, that should be run within `msToRun` milliseconds.",
+       "start": 386,
+       "end": 629,
+       "confidence": 1
+      },
+      "b": {
+       "document": "jest:docs/TimerMocks.md#4",
+       "quote": "Additionally, if those macro-tasks schedule new macro-tasks that would be executed within the same time frame, those will be executed until there are no more macro-tasks remaining in the queue that should be run within msToRun milliseconds.\n\n```javascript title=\"timerGame.js\"\nfunction timerGame(callback) {\n  console.log('Ready....go!')",
+       "start": 314,
+       "end": 651,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 4,
+   "counterparts_ms": 93
+  },
+  "timing": {
+   "read_ms": 209,
+   "total_ms": 213
+  }
+ }
+}

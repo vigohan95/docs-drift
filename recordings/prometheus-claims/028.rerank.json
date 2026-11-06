@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/028.rerank",
+ "recorded_at": "2026-11-06T13:38:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 979,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.664482",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Then, set `target_label` to `replacement`, with match group references (`${1}`, `${2}`, ...) in `replacement` substituted by their value.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/functions.md#39",
+    "title": "docs/querying/functions.md > `label_replace()`",
+    "text": "## `label_replace()`\n\nFor each timeseries in `v`, `label_replace(v instant-vector, dst_label string, replacement string, src_label string, regex string)`\nmatches the [regular expression](./basics.md#regular-expressions) `regex` against the value of the label `src_label`. If it\nmatches, the value of the label `dst_label` in the returned timeseries will be the expansion\nof `replacement`, together with the original labels in the input. Capturing groups in the\nregular expression can be referenced with `$1`, `$2`, etc. Named capturing groups in the regular expression can be referenced with `$name` (where `name` is the  capturing group name). If the regular expression doesn't match then the timeseries is returned unchanged.\n\n`label_replace` acts on float and histogram samples in the same way.\n\nThis example will return timeseries with the values `a:c` at label `service` and `a` at label `foo`:\n\n```\nlabel_replace(up{job=\"api-server\",service=\"a:c\"}, \"foo\", \"$1\", \"service\", \"(.*):.*\")\n```\n\nThis second example has the same effect than the first example, and illustrates use of named capturing groups:\n```\nlabel_replace(up{job=\"api-server\",service=\"a:c\"}, \"foo\", \"$name\", \"service\", \"(?P<name>.*):(?P<version>.*)\")\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#38",
+    "title": "docs/querying/api.md > Relabel steps",
+    "text": "## Relabel steps\n\nThis endpoint is **experimental** and might change in the future. It is currently only meant to be used by Prometheus' own web UI, and the endpoint name and exact format returned may change from one Prometheus version to another. It may also be removed again in case it is no longer needed by the UI.\n\nThe following endpoint returns a step-by-step list of relabeling rules and their effects on a given target's label set.\n\n```\nGET /api/v1/targets/relabel_steps\n```\n\nURL query parameters:\n- `scrapePool=<string>`: The scrape pool name of the target, used to determine the relabeling rules to apply. Required.\n- `labels=<string>`: A JSON object containing the label set of the target before any relabeling is applied. Required.\n\nThe following example returns the relabeling steps for a discovered target in the `prometheus` scrape pool with the label set `{\"__address__\": \"localhost:9090\", \"job\": \"prometheus\"}`:\n\n```bash\ncurl -g 'http://localhost:9090/api/v1/targets/relabel_steps?scrapePool=prometheus&labels={\"__address__\":\"localhost:9090\",\"job\":\"prometheus\"}'\n```\n\n```json\n{\n   \"data\" : {\n      \"steps\" : [\n         {\n            \"keep\" : true,\n            \"output\" : {\n               \"__address__\" : \"localhost:9090\",\n               \"env\" : \"development\",\n               \"job\" : \"prometheus\"\n            },\n            \"rule\" : {\n               \"action\" : \"replace\",\n               \"regex\" : \"(.*)\",\n               \"replacement\" : \"development\",\n               \"separator\" : \";\",\n               \"target_label\" : \"env\"\n            }\n         },\n         {\n            \"keep\" : false,\n            \"output\" : {},\n            \"rule\" : {\n               \"action\" : \"drop\",\n               \"regex\" : \"localhost:.*\",\n               \"replacement\" : \"$1\",\n               \"separator\" : \";\",\n               \"source_labels\" : [\n                  \"__address__\"\n               ]\n            }\n         }\n      ]\n   },\n   \"status\" : \"success\"\n}\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#8",
+    "title": "docs/querying/operators.md > Binary operators > Bitwise binary operators",
+    "text": "### Bitwise binary operators\n\nThe following bitwise binary operators exist in Prometheus:\n\n* `bitand` (bitwise AND)\n* `bitor` (bitwise OR)\n* `bitxor` (bitwise exclusive OR)\n\nThese act like arithmetic operators, supporting scalar/scalar, vector/scalar,\nand vector/vector operands with the usual vector matching and group\nmodifiers. Operands must be nonnegative integers up to `2^53 - 1`; any other\nvalue (fractional, negative, out-of-range, infinite, or `NaN`) produces\n`NaN`. Operations involving histogram samples remove the corresponding\nvector elements and emit an info-level annotation. The metric name is\ndropped from the result.\n\nFor example, check whether the flag with value 64 is set:\n\n```promql\n(node_timex_status bitand 64) != 0\n```"
+   },
+   {
+    "id": "prometheus:docs/migration.md#11",
+    "title": "docs/migration.md > Miscellaneous > `le` and `quantile` label values",
+    "text": "### `le` and `quantile` label values\nIn Prometheus v3, the values of the `le` label of classic histograms and the\n`quantile` label of summaries are normalized upon ingestion. In Prometheus v2\nthe value of these labels depended on the scrape protocol (protobuf vs text\nformat) in some situations. This led to label values changing based on the\nscrape protocol. E.g. a metric exposed as `my_classic_hist{le=\"1\"}` would be\ningested as `my_classic_hist{le=\"1\"}` via the text format, but as\n`my_classic_hist{le=\"1.0\"}` via protobuf. This changed the identity of the\nmetric and caused problems when querying the metric.\nIn Prometheus v3 these label values will always be normalized to a float like\nrepresentation. I.e. the above example will always result in\n`my_classic_hist{le=\"1.0\"}` being ingested into prometheus, no matter via which\nprotocol. The effect of this change is that alerts, recording rules and\ndashboards that directly reference label values as whole numbers such as\n`le=\"1\"` will stop working.\n\nWays to deal with this change either globally or on a per metric basis:\n\n- Fix references to integer `le`, `quantile` label values, but otherwise do\nnothing and accept that some queries that span the transition time will produce\ninaccurate or unexpected results.\n_This is the recommended solution._\n- Use `metric_relabel_config` to retain the old labels when scraping targets.\nThis should **only** be applied to metrics that currently produce such labels.\n\n```yaml\n    metric_relabel_configs:\n      - source_labels:\n          - quantile\n        target_label: quantile\n        regex: (\\d+)\\.0+\n      - source_labels:\n          - le\n          - __name__\n        target_label: le\n        regex: (\\d+)\\.0+;.*_bucket\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#30",
+    "title": "docs/querying/operators.md > Aggregation operators > Detailed explanations > `group`",
+    "text": "#### `group`\n\n`group(v)` returns 1 for each group that contains any value at that timestamp.\n\nThe value may be a float or histogram sample."
+   },
+   {
+    "id": "prometheus:docs/federation.md#4",
+    "title": "docs/federation.md > Configuring federation",
+    "text": "## Configuring federation\n\nOn any given Prometheus server, the `/federate` endpoint allows retrieving the\ncurrent value for a selected set of time series in that server. At least one\n`match[]` URL parameter must be specified to select the series to expose. Each\n`match[]` argument needs to specify an\n[instant vector selector](querying/basics.md#instant-vector-selectors) like\n`up` or `{job=\"api-server\"}`. If multiple `match[]` parameters are provided,\nthe union of all matched series is selected.\n\nTo federate metrics from one server to another, configure your destination\nPrometheus server to scrape from the `/federate` endpoint of a source server,\nwhile also enabling the `honor_labels` scrape option (to not overwrite any\nlabels exposed by the source server) and passing in the desired `match[]`\nparameters. For example, the following `scrape_configs` federates any series\nwith the label `job=\"prometheus\"` or a metric name starting with `job:` from\nthe Prometheus servers at `source-prometheus-{1,2,3}:9090` into the scraping\nPrometheus:\n\n```yaml\nscrape_configs:\n  - job_name: 'federate'\n    scrape_interval: 15s\n\n    honor_labels: true\n    metrics_path: '/federate'\n\n    params:\n      'match[]':\n        - '{job=\"prometheus\"}'\n        - '{__name__=~\"job:.*\"}'\n\n    static_configs:\n      - targets:\n        - 'source-prometheus-1:9090'\n        - 'source-prometheus-2:9090'\n        - 'source-prometheus-3:9090'\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "title": "docs/querying/operators.md > Vector matching > Filling in missing matches",
+    "text": "* If a fill modifier is used on the \"many\" side of a match, it will only fill in a single series\n  for the \"many\" side of each match group, using the group's matching labels as the series identity.\n* If a fill modifier is used on the \"one\" side of a match and the grouping modifier specifies\n  label names to include from the \"one\" side (e.g. `left_vector * on(instance, job) group_left(info_label) fill_right(1) right_vector`), those labels will not be filled in for missing\n  series, as there is no source for their values.\n\nFill modifiers are not supported for set operators (`and`, `or`, `unless`), as the purpose of those\noperators is to filter series based on presence or absence in the other vector.\n\nExample query, filling in missing series on the either side with `0`:\n\n    method_code:http_errors:rate5m{status=\"500\"} / ignoring(code) fill(0) method:http_requests:rate5m\n\nThis returns a result vector containing the fraction of HTTP requests with status code\nof 500 for each method, as measured over the last 5 minutes. The entries with methods `put` and `del`\nare now included in the result with a filled-in default sample value of `0`, as they had no matching\nseries on the respective other side:\n\n    {method=\"get\"}  0.04            #  24 / 600\n    {method=\"put\"}  +Inf            #   3 /   0 (missing right side filled in)\n    {method=\"del\"}  0               #   0 /  34 (missing left side filled in)\n    {method=\"post\"} 0.05            #   6 / 120"
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#60",
+    "title": "docs/command-line/promtool.md > Commands > `promtool tsdb` > `promtool tsdb analyze` > Flags",
+    "text": "###### Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">--limit</code> | How many items to show in each list. | `20` |\n| <code class=\"text-nowrap\">--extended</code> | Run extended analysis. |  |\n| <code class=\"text-nowrap\">--match</code> | Series selector to analyze. Only 1 set of matchers is supported now. |  |"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "title": "docs/configuration/unit_testing_rules.md > Example > Time within tests",
+    "text": "### Time within tests\n\nIt should be noted that in all tests, either in `alert_test_case` or\n`promql_test_case`, the output from all functions related to the current time,\nfor example the `time()` and `day_of_*()` functions, will output a consistent value\nfor tests.\n\nBy default, at the start of the test evaluation, `time()` returns 0 (Unix epoch:\nJanuary 1, 1970 00:00:00 UTC). The `eval_time` field specifies a duration relative\nto `start_timestamp`, so by default `time()` will return a value of `0 + eval_time`.\n\nYou can configure a custom start timestamp for your tests by setting the `start_timestamp`\nfield in your test group. This field accepts either:\n- A Unix timestamp (e.g., `1609459200` for January 1, 2021 00:00:00 UTC)\n- An RFC3339 formatted timestamp (e.g., `\"2021-01-01T00:00:00Z\"`)\n\nWhen you set `start_timestamp`:\n- All `input_series` samples will be timestamped starting from `start_timestamp`\n- The `eval_time` field in test cases is interpreted as a duration relative to `start_timestamp`\n- The `time()` function will return `start_timestamp + eval_time`"
+   },
+   {
+    "id": "prometheus:docs/configuration/template_reference.md#5",
+    "title": "docs/configuration/template_reference.md > Functions > Strings",
+    "text": "### Strings\n\n| Name          | Arguments     | Returns |    Notes    |\n| ------------- | ------------- | ------- | ----------- |\n| title         | string        | string  | [cases.Title](https://pkg.go.dev/golang.org/x/text/cases#Title), capitalises first character of each word.|\n| toUpper       | string        | string  | [strings.ToUpper](https://golang.org/pkg/strings/#ToUpper), converts all characters to upper case.|\n| toLower       | string        | string  | [strings.ToLower](https://golang.org/pkg/strings/#ToLower), converts all characters to lower case.|\n| stripPort     | string        | string  | [net.SplitHostPort](https://pkg.go.dev/net#SplitHostPort), splits string into host and port, then returns only host.|\n| match         | pattern, text | boolean | [regexp.MatchString](https://golang.org/pkg/regexp/#MatchString) Tests for a unanchored regexp match. |\n| reReplaceAll  | pattern, replacement, text | string | [Regexp.ReplaceAllString](https://golang.org/pkg/regexp/#Regexp.ReplaceAllString) Regexp substitution, unanchored. |\n| graphLink  | expr | string | Returns path to graph view in the [expression browser](https://prometheus.io/docs/visualization/browser/) for the expression. |\n| tableLink  | expr | string | Returns path to tabular (\"Table\") view in the [expression browser](https://prometheus.io/docs/visualization/browser/) for the expression. |\n| parseDuration | string | float | Parses a duration string such as \"1h\" into the number of seconds it represents. |\n| stripDomain | string | string | Removes the domain part of a FQDN. Leaves port untouched. |\n| urlQueryEscape | string | string | [url.QueryEscape](https://pkg.go.dev/net/url#QueryEscape) Escapes the string so it can be safely placed inside a URL query. |"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/functions.md#39",
+    "action": "use",
+    "relevance_score": 0.9897,
+    "document_score": 0.9929,
+    "levels": {
+     "answers": 0.9897,
+     "elsewhere": 0.0032,
+     "different_case": 0.0033,
+     "unrelated": 0.0038
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/migration.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.1863,
+    "document_score": 0.2548,
+    "levels": {
+     "answers": 0.1863,
+     "elsewhere": 0.0685,
+     "different_case": 0.0908,
+     "unrelated": 0.6544
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/configuration/template_reference.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.044,
+    "document_score": 0.218,
+    "levels": {
+     "answers": 0.044,
+     "elsewhere": 0.174,
+     "different_case": 0.0332,
+     "unrelated": 0.7488
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/api.md#38",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0403,
+    "document_score": 0.0572,
+    "levels": {
+     "answers": 0.0403,
+     "elsewhere": 0.0168,
+     "different_case": 0.0233,
+     "unrelated": 0.9195
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/querying/operators.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0069,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0035,
+     "different_case": 0.009,
+     "unrelated": 0.9842
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/federation.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0065,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0038,
+     "different_case": 0.0127,
+     "unrelated": 0.9808
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/operators.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0055,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.003,
+     "different_case": 0.0072,
+     "unrelated": 0.9872
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/command-line/promtool.md#60",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0057,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0034,
+     "different_case": 0.0056,
+     "unrelated": 0.9887
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/querying/operators.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0024,
+     "different_case": 0.0033,
+     "unrelated": 0.9922
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0016,
+     "different_case": 0.0048,
+     "unrelated": 0.9919
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4200
+  },
+  "timing": {
+   "total_ms": 107,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 84,
+   "engine": {
+    "rows": 5390,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 84,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 82,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

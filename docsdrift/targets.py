@@ -29,6 +29,23 @@ TARGETS = {
         "excludes": [r"^docs/blog/", r"CHANGELOG", r"LICENSE"],
         "readme": "packages/vite/README.md",
     },
+    # Added later on day 1 (see report): two of the first three targets
+    # produced no confirmed contradictions, so two more were added to test
+    # whether the method generalises.
+    "jest": {
+        "repo": "jestjs/jest",
+        "commit": "72614448ecb9d16c58d6474b3091247c14a5c090",
+        "includes": ["README.md", "docs/*.md", "packages/*/README.md"],
+        "excludes": [r"CHANGELOG"],
+        "readme": "README.md",
+    },
+    "typeorm": {
+        "repo": "typeorm/typeorm",
+        "commit": "5bdc67882dee5a02d975d5ed140c9c3f91661116",
+        "includes": ["README.md", "docs/docs/**/*.md"],
+        "excludes": [r"CHANGELOG"],
+        "readme": "README.md",
+    },
 }
 
 

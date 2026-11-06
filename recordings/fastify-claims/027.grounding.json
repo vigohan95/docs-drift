@@ -1,0 +1,75 @@
+{
+ "endpoint": "grounding",
+ "tag": "fastify-claims/027.grounding",
+ "recorded_at": "2026-11-06T13:38:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 936,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "74.217793",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=265"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#31",
+    "text": "### Adjust Fastify server\n\nFor Fastify to properly listen for requests within the container, be\nsure to set the correct port and address:\n\n```js\nfunction build() {\n  const fastify = Fastify({ trustProxy: true })\n  return fastify\n}\n\nasync function start() {\n  // Google Cloud Run will set this environment variable for you, so\n  // you can also use it to detect if you are running in Cloud Run\n  const IS_GOOGLE_CLOUD_RUN = process.env.K_SERVICE !== undefined\n\n  // You must listen on the port Cloud Run provides\n  const port = process.env.PORT || 3000\n\n  // You must listen on all IPV4 addresses in Cloud Run\n  const host = IS_GOOGLE_CLOUD_RUN ? \"0.0.0.0\" : undefined\n\n  try {\n    const server = build()\n    const address = await server.listen({ port, host })\n    console.log(`Listening on ${address}`)\n  } catch (err) {\n    console.error(err)\n    process.exit(1)\n  }\n}\n\nmodule.exports = build\n\nif (require.main === module) {\n  start()\n}\n```"
+   }
+  ],
+  "answer": "To make it work, the application must listen on `0.0.0.0` or specify a custom hostname in the `readinessProbe.httpGet` spec, as per the following example:",
+  "claims": [
+   "To make it work, the application must listen on `0.0.0.0` or specify a custom hostname in the `readinessProbe.httpGet` spec, as per the following example:"
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Kubernetes' of docs/Guides/Recommendations.md in the documentation of the fastify project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0149,
+  "ungrounded": 0.9851,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#31",
+    "share": 1,
+    "share_of_answer": 0.0149,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "To make it work, the application must listen on `0.0.0.0` or specify a custom hostname in the `readinessProbe.httpGet` spec, as per the following example:",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0149,
+    "contradicted": 0.0147,
+    "not_stated": 0.9563,
+    "not_a_claim": 0.0141,
+    "verdict": "not_stated",
+    "sources": {
+     "fastify:docs/Guides/Serverless.md#31": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0149
+  },
+  "timing": {
+   "read_ms": 81,
+   "total_ms": 84
+  }
+ }
+}

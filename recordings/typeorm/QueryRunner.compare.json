@@ -1,0 +1,278 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm/QueryRunner.compare",
+ "recorded_at": "2026-11-06T13:42:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1341,
+ "response_headers": {
+  "x-clocked-credits": "18",
+  "x-clocked-model-ms": "442.795191",
+  "x-clocked-cost-usd": "0.003586",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=654"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "text": "### Explicitly selecting query destinations\n\nBy default, TypeORM will send all read queries to a random read slave, and all writes to the master. This means when you first add the `replication` settings to your configuration, any existing read query runners that don't explicitly specify a replication mode will start going to a slave. This is good for scalability, but if some of those queries _must_ return up to date data, then you need to explicitly pass a replication mode when you create a query runner.\n\nIf you want to explicitly use the `master` for read queries, pass an explicit `ReplicationMode` when creating your `QueryRunner`;\n\n```typescript\nconst masterQueryRunner = dataSource.createQueryRunner(\"master\")\ntry {\n    const postsFromMaster = await dataSource\n        .createQueryBuilder(Post, \"post\", masterQueryRunner) // you can either pass QueryRunner as an optional argument with query builder\n        .setQueryRunner(masterQueryRunner) // or use setQueryRunner which sets or overrides query builder's QueryRunner\n        .getMany()\n} finally {\n    await masterQueryRunner.release()\n}\n```\n\nIf you want to use a slave in raw queries, pass `slave` as the replication mode when creating a query runner:\n\n```typescript\nconst slaveQueryRunner = dataSource.createQueryRunner(\"slave\")\ntry {\n    const userFromSlave = await slaveQueryRunner.query(\n        \"SELECT * FROM users WHERE id = $1\",\n        [userId],\n        slaveQueryRunner,\n    )\n} finally {\n    return slaveQueryRunner.release()\n}\n```\n\n**Note**: Manually created `QueryRunner` instances must be explicitly released on their own. If you don't release your query runners, they will keep a connection checked out of the pool, and prevent other queries from using it."
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#3",
+    "text": "## Explicit Resource Management\n\n`QueryRunner` also supports explicit resource management:\n\n```typescript\nasync function updateSalaries() {\n    await using queryRunner = dataSource.createQueryRunner()\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"junior\" },\n        { bonus: 0.2 },\n    )\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"senior\" },\n        { bonus: 0.1 },\n    )\n    // no need anymore to manually release the QueryRunner\n}\n\ntry {\n    await updateSalaries()\n} catch (error) {\n    console.error(error)\n}\n```\n\nWhen declaring a query runner like this, it will be automatically released after the last statement in the containing scope was executed."
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#2",
+    "text": "## Using `QueryRunner`\n\nAfter creating a new instance of `QueryRunner`, a connection will be acquired from the pool when you issue the first query:\n\n```typescript\nconst queryRunner = dataSource.createQueryRunner()\nawait queryRunner.query(\"SELECT 1\")\nawait queryRunner.release()\n```\n\nYou can also use `connect` method to directly get a connection from the connection pool:\n\n```typescript\nconst queryRunner = dataSource.createQueryRunner()\nconst clientConnection = await queryRunner.connect()\nawait queryRunner.release()\n```\n\n**Important**: make sure to release the `QueryRunner` when it is no longer necessary to return the connection back to the connection pool:\n\n```typescript\nawait queryRunner.release()\n```\n\nAfter the `QueryRunner` is released, it is no longer possible to use the query runner methods.\n\n`QueryRunner` also has its own `EntityManager` instance, which you can use through the `manager` property to run `EntityManager` queries on a particular database connection used by the `QueryRunner` instance:\n\n```typescript\nlet queryRunner: QueryRunner\ntry {\n    queryRunner = dataSource.createQueryRunner()\n    // use a single database connection to execute multiple queries\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"junior\" },\n        { bonus: 0.2 },\n    )\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"senior\" },\n        { bonus: 0.1 },\n    )\n} catch (error) {\n    console.error(error)\n} finally {\n    // remember to release connection after you are done using it\n    await queryRunner.release()\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "text": "### Removed APIs\n\n- **`Connection` and `ConnectionOptions` removed** — use `DataSource` and `DataSourceOptions` instead ([#12022](https://github.com/typeorm/typeorm/pull/12022) by [@alumni](https://github.com/alumni))\n- **`.connection` property renamed to `.dataSource`** — the `connection` property on `Driver`, `QueryRunner`, `EntityManager`, `QueryBuilder`, `EntityMetadata`, and all `*Event` subscriber interfaces has been renamed to `dataSource`; a deprecated getter is provided as a bridge ([#12244](https://github.com/typeorm/typeorm/pull/12244), [#12245](https://github.com/typeorm/typeorm/pull/12245), [#12246](https://github.com/typeorm/typeorm/pull/12246), [#12249](https://github.com/typeorm/typeorm/pull/12249) by [@pkuczynski](https://github.com/pkuczynski))\n- **`ConnectionManager` and global convenience functions removed** — `createConnection`, `getConnection`, `getManager`, `getRepository`, `createQueryBuilder`, and other globals have been removed ([#12098](https://github.com/typeorm/typeorm/pull/12098) by [@michaelbromley](https://github.com/michaelbromley))\n- **`getMongoRepository` and `getMongoManager` globals removed** — use `dataSource.getMongoRepository()` and `dataSource.mongoManager` instead ([#12099](https://github.com/typeorm/typeorm/pull/12099) by [@pkuczynski](https://github.com/pkuczynski))\n- **`DataSource.name` removed** — named connections were deprecated in v0.3; `ConnectionOptionsReader.all()` renamed to `get()` ([#12136](https://github.com/typeorm/typeorm/pull/12136) by [@pkuczynski](https://github.com/pkuczynski))\n- **`TYPEORM_*` environment variable support removed** — `ConnectionOptionsEnvReader`, `ormconfig.env`, and `dotenv` auto-loading have been removed ([#12134](https://github.com/typeorm/typeorm/pull/12134) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findByIds` removed** — use `findBy` with `In` operator instead ([#12114](https://github.com/typeorm/typeorm/pull/12114) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findOneById` removed** — use `findOneBy` instead ([#12198](https://github.com/typeorm/typeorm/pull/12198) by [@pkuczynski](https://github.com/pkuczynski))\n- **`Repository.exist()` removed** — use `Repository.exists()` instead ([#12131](https://github.com/typeorm/typeorm/pull/12131) by [@pkuczynski](https://github.com/pkuczynski))\n- **`AbstractRepository`, `@EntityRepository`, and `getCustomRepository` removed** — use `Repository.extend()` instead ([#12096](https://github.com/typeorm/typeorm/pull/12096) by [@pkuczynski](https://github.com/pkuczynski))\n- **`@RelationCount` decorator removed** — use `@VirtualColumn` with a sub-query instead ([#12181](https://github.com/typeorm/typeorm/pull/12181) by [@pkuczynski](https://github.com/pkuczynski))\n- **IoC container system removed** — `useContainer()`, `getFromContainer()`, and related types have been removed ([#12180](https://github.com/typeorm/typeorm/pull/12180) by [@pkuczynski](https://github.com/pkuczynski))\n- **`readonly` column option removed** — use `update: false` instead ([#12132](https://github.com/typeorm/typeorm/pull/12132) by [@pkuczynski](https://github.com/pkuczynski))\n- **`unsigned` on `ColumnNumericOptions` removed** — only affected decimal/float types; integer `unsigned` is unchanged ([#12133](https://github.com/typeorm/typeorm/pull/12133) by [@pkuczynski](https://github.com/pkuczynski))\n- **QueryBuilder: `onConflict()`, deprecated `orUpdate()` overload, and `setNativeParameters()` removed** — use `orIgnore()`/`orUpdate()` array signature and `setParameters()` instead ([#12090](https://github.com/typeorm/typeorm/pull/12090) by [@pkuczynski](https://github.com/pkuczynski))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "text": "### Query Builder\n\n- **`INSERT INTO ... SELECT FROM ...`** — new `valuesFromSelect()` method on `InsertQueryBuilder` for data migration and transformation queries ([#11896](https://github.com/typeorm/typeorm/pull/11896) by [@Cprakhar](https://github.com/Cprakhar))\n- **`returning` option for update/upsert** — repository and entity manager `update()` and `upsert()` methods now support a `returning` option on databases that support `RETURNING` clauses ([#11782](https://github.com/typeorm/typeorm/pull/11782) by [@naorpeled](https://github.com/naorpeled))\n- **`ifExists` parameter on all drop methods** — `dropColumn`, `dropIndex`, `dropPrimaryKey`, `dropForeignKey`, `dropUniqueConstraint`, `dropCheckConstraint`, `dropExclusionConstraint`, and their plural variants now accept an `ifExists` flag ([#12121](https://github.com/typeorm/typeorm/pull/12121) by [@pkuczynski](https://github.com/pkuczynski))\n- **Explicit resource management for `QueryRunner`** — supports `await using` syntax (TypeScript 5.2+) for automatic cleanup ([#11701](https://github.com/typeorm/typeorm/pull/11701) by [@alumni](https://github.com/alumni))"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/releases/1.0/01-release-notes.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/query-runner.md#3"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "b": "typeorm:docs/docs/query-runner.md#3",
+    "relation": "overlapping",
+    "related": 0.9814,
+    "probabilities": {
+     "same": 0.0118,
+     "overlapping": 0.9539,
+     "conflicting": 0.0157,
+     "unrelated": 0.0186
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "b": "typeorm:docs/docs/query-runner.md#2",
+    "relation": "overlapping",
+    "related": 0.9942,
+    "probabilities": {
+     "same": 0.0179,
+     "overlapping": 0.9667,
+     "conflicting": 0.0096,
+     "unrelated": 0.0058
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "relation": "unrelated",
+    "related": 0.0913,
+    "probabilities": {
+     "same": 0.0196,
+     "overlapping": 0.0528,
+     "conflicting": 0.019,
+     "unrelated": 0.9087
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "relation": "overlapping",
+    "related": 0.9903,
+    "probabilities": {
+     "same": 0.0131,
+     "overlapping": 0.9646,
+     "conflicting": 0.0127,
+     "unrelated": 0.0097
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/query-runner.md#3",
+    "b": "typeorm:docs/docs/query-runner.md#2",
+    "relation": "overlapping",
+    "related": 0.9926,
+    "probabilities": {
+     "same": 0.0178,
+     "overlapping": 0.9663,
+     "conflicting": 0.0085,
+     "unrelated": 0.0074
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/query-runner.md#3",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "relation": "unrelated",
+    "related": 0.4419,
+    "probabilities": {
+     "same": 0.037,
+     "overlapping": 0.3808,
+     "conflicting": 0.0241,
+     "unrelated": 0.5581
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/query-runner.md#3",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "relation": "overlapping",
+    "related": 0.9907,
+    "probabilities": {
+     "same": 0.0989,
+     "overlapping": 0.8775,
+     "conflicting": 0.0143,
+     "unrelated": 0.0093
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0105,
+       "restated": 0.9324,
+       "elaborated": 0.0263,
+       "different": 0.0309
+      },
+      "confidence": 0.883,
+      "a": {
+       "document": "typeorm:docs/docs/query-runner.md#3",
+       "quote": "## Explicit Resource Management",
+       "start": 0,
+       "end": 31,
+       "confidence": 0.995
+      },
+      "b": {
+       "document": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+       "quote": "SELECT FROM ...`** — new `valuesFromSelect()` method on `InsertQueryBuilder` for data migration and transformation queries ([#11896](https://github.com/typeorm/typeorm/pull/11896) by [@Cprakhar](https://github.com/Cprakhar))\n- **`returning` option for update/upsert** — repository and entity manager `update()` and `upsert()` methods now support a `returning` option on databases that support `RETURNING` clauses ([#11782](https://github.com/typeorm/typeorm/pull/11782) by [@naorpeled](https://github.com/naorpeled))\n- **`ifExists` parameter on all drop methods** — `dropColumn`, `dropIndex`, `dropPrimaryKey`, `dropForeignKey`, `dropUniqueConstraint`, `dropCheckConstraint`, `dropExclusionConstraint`, and their plural variants now accept an `ifExists` flag ([#12121](https://github.com/typeorm/typeorm/pull/12121) by [@pkuczynski](https://github.com/pkuczynski))\n- **Explicit resource management for `QueryRunner`** — supports `await using` syntax (TypeScript 5.2+) for automatic cleanup ([#11701](https://github.com/typeorm/typeorm/pull/11701) by [@alumni](https://github.com/alumni))",
+       "start": 40,
+       "end": 1127,
+       "confidence": 0.883
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/query-runner.md#2",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "relation": "unrelated",
+    "related": 0.0294,
+    "probabilities": {
+     "same": 0.0088,
+     "overlapping": 0.0139,
+     "conflicting": 0.0067,
+     "unrelated": 0.9706
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/query-runner.md#2",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "relation": "overlapping",
+    "related": 0.9909,
+    "probabilities": {
+     "same": 0.0122,
+     "overlapping": 0.9711,
+     "conflicting": 0.0076,
+     "unrelated": 0.0091
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "b": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "relation": "overlapping",
+    "related": 0.7268,
+    "probabilities": {
+     "same": 0.0391,
+     "overlapping": 0.6623,
+     "conflicting": 0.0254,
+     "unrelated": 0.2732
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   6
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   3,
+   4,
+   6,
+   8,
+   9
+  ],
+  "stages": {
+   "pairs_reread": 3,
+   "pairs_ms": 104,
+   "passage_reads": 1,
+   "passages_ms": 282,
+   "passages": 1,
+   "counterparts_ms": 125
+  },
+  "timing": {
+   "read_ms": 510,
+   "total_ms": 516
+  }
+ }
+}

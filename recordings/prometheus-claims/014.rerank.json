@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/014.rerank",
+ "recorded_at": "2026-11-06T13:37:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1106,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "116.044189",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=162,cfOrigin;dur=0,cfWorker;dur=279"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Operands must be nonnegative integers up to `2^53 - 1`; any other value (fractional, negative, out-of-range, infinite, or `NaN`) produces `NaN`.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#9",
+    "title": "docs/querying/basics.md > Literals > Duration expressions",
+    "text": "For example, `max_of(step(), 5s)` ensures the duration is never shorter than\n`5s`, while `min_of(range(), 1h)` caps the duration at `1h`.\n\nLike the scalar functions, `min_of` and `max_of` ignore a `NaN` argument if the\nother argument is not `NaN`. If both arguments are `NaN`, the result is `NaN`.\nA duration expression whose final result is `NaN` or infinite is rejected.\n\n**Note**: Duration expressions are not supported in the [`@` modifier](#modifier).\n\nExamples of equivalent durations:\n\n* `5m * 2` is equivalent to `10m` or `600s`.\n* `10m - 1m` is equivalent to `9m` or `540s`.\n* `(5+2) * 1m` is equivalent to `7m` or `420s`.\n* `1h / 2` is equivalent to `30m` or `1800s`.\n* `4h % 3h` is equivalent to `1h` or `3600s`.\n* `(2 ^ 3) * 1m` is equivalent to `8m` or `480s`.\n* `step() + 1` is equivalent to the query step width increased by `1s`.\n* `max_of(step(), 5s)` is equivalent to the larger of the query step width and `5s`.\n* `min_of(2 * step() + 5s, 5m)` is equivalent to the smaller of twice the query step increased by `5s` and `5m`."
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "title": "docs/configuration/unit_testing_rules.md > Test file format > `<series>`",
+    "text": "### `<series>`\n\n```yaml\n# This follows the usual series notation '<metric name>{<label name>=<label value>, ...}'\n# Examples:\n#      series_name{label1=\"value1\", label2=\"value2\"}\n#      go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}\nseries: <string>\n\n# This uses expanding notation.\n# Expanding notation:\n#     'a+bxn' becomes 'a a+b a+(2*b) a+(3*b) … a+(n*b)'\n#     Read this as series starts at a, then n further samples incrementing by b.\n#     'a-bxn' becomes 'a a-b a-(2*b) a-(3*b) … a-(n*b)'\n#     Read this as series starts at a, then n further samples decrementing by b (or incrementing by negative b).\n#     'axn' becomes 'a a a … a' (a n+1 times) - it's a shorthand for 'a+0xn'\n# There are special values to indicate missing and stale samples:\n#     '_' represents a missing sample from scrape\n#     'stale' indicates a stale sample\n# Examples:\n#     1. '-2+4x3' becomes '-2 2 6 10' - series starts at -2, then 3 further samples incrementing by 4.\n#     2. ' 1-2x4' becomes '1 -1 -3 -5 -7' - series starts at 1, then 4 further samples decrementing by 2.\n#     3. ' 1x4' becomes '1 1 1 1 1' - shorthand for '1+0x4', series starts at 1, then 4 further samples incrementing by 0.\n#     4. ' 1 _x3 stale' becomes '1 _ _ _ stale' - the missing sample cannot increment, so 3 missing samples are produced by the '_x3' expression.\n#\n# Native histogram notation:\n#     Native histograms can be used instead of floating point numbers using the following notation:\n#     {{schema:1 sum:-0.3 count:3.1 z_bucket:7.1 z_bucket_w:0.05 buckets:[5.1 10 7] offset:-3 n_buckets:[4.1 5] n_offset:-5 counter_reset_hint:gauge}}\n#     Native histograms support the same expanding notation as floating point numbers, i.e. 'axn', 'a+bxn' and 'a-bxn'.\n#     All properties are optional and default to 0. The order is not important. The following properties are supported:\n#     - schema (int):\n#         Currently valid schema numbers are -53 and -4 <= n <= 8.\n#         Schema -53 is the custom buckets schema, upper bucket boundaries are defined in custom_values\n#         like for classic histograms, and you shouldn't use z_bucket, z_bucket_w, n_buckets, n_offset.\n#         The rest are base-2 standard schemas, where 1.0 is a bucket boundary in each case, and\n#         then each power of two is divided into 2^n logarithmic buckets.  Or\n#         in other words, each bucket boundary is the previous boundary times\n#         2^(2^-n).\n#     - sum (float):\n#         The sum of all observations, including the zero bucket.\n#     - count (non-negative float):\n#         The number of observations, including those that are NaN and including the zero bucket.\n#     - z_bucket (non-negative float):\n#         The sum of all observations in the zero bucket.\n#     - z_bucket_w (non-negative float):\n#         The width of the zero bucket.\n#         If z_bucket_w > 0, the zero bucket contains all observations -z_bucket_w <= x <= z_bucket_w.\n#         Otherwise, the zero bucket only contains observations that are exactly 0.\n#     - buckets (list of non-negative floats):\n#         Observation counts in positive buckets. Each represents an absolute count.\n#     - offset (int):\n#         The starting index of the first entry in the positive buckets.\n#     - n_buckets (list of non-negative floats):\n#         Observation counts in negative buckets. Each represents an absolute count.\n#     - n_offset (int):\n#         The starting index of the first entry in the negative buckets.\n#     - counter_reset_hint (one of 'unknown', 'reset', 'not_reset' or 'gauge')"
+   },
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "title": "tsdb/docs/bstream.md > bstream details > Delta-of-delta encoding for timestamps",
+    "text": "## Delta-of-delta encoding for timestamps\n\nWe need to be able to encode and decode dod's for timestamps, which can be positive, zero, or negative.\nNote that int64's are implemented as [2's complement](https://en.wikipedia.org/wiki/Two%27s_complement)\n\nand look like:\n\n```\n0111...111 = maxint64\n    ...\n0000...111 = 7\n0000...110 = 6\n0000...101 = 5\n0000...100 = 4\n0000...011 = 3\n0000...010 = 2\n0000...001 = 1\n0000...000 = 0\n1111...111 = -1\n1111...110 = -2\n1111...101 = -3\n1111...100 = -4\n1111...011 = -5\n1111...010 = -6\n1111...001 = -7\n1111...000 = -8\n    ...\n1000...001 = minint64+1\n1000...000 = minint64\n```\n\nAll numbers have a prefix (of zeroes for positive numbers, of ones for negative numbers), followed by a number of significant digits at the end.\nIn all cases, the smaller the absolute value of the number, the fewer the amount of significant digits.\n\nTo encode these numbers, we use:\n* A prefix which declares the amount of bits that follow (we use a predefined list of options in order of increasing number of significant bits).\n* A number of bits which is one more than the number of significant bits.  The extra bit is needed because we deal with unsigned integers, although\n  it isn't exactly a sign bit. (See below for details).\n\nThe `bitRange` function determines whether a given integer can be represented by a number of bits.\nFor a given number of bits `nbits` we can distinguish (and thus encode) any set of `2^nbits` numbers.\nE.g. for `nbits = 3`, we can encode 8 distinct numbers, and we have a choice of choosing our boundaries.  For example -4 to 3,\n-3 to 4, 0 to 7 or even -2 to 5 (always inclusive).  (Observe in the list above that this is always true.)\nBecause we need to support positive and negative numbers equally, we choose boundaries that grow symmetrically.  Following the same example,\nwe choose -3 to 4."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#3",
+    "title": "tsdb/docs/format/chunks.md > Chunk > XOR chunk data > Notes:",
+    "text": "### Notes:\n\n* `ts` is the timestamp, `v` is the value.\n* `...` means to repeat the previous two fields as needed, with `n` starting at 2 and going up to `num_samples` – 1.\n* `<uint16>` has 2 bytes in big-endian order.\n* `<varint>` and `<uvarint>` have 1 to 10 bytes each.\n* `ts_1_delta` is `ts_1` – `ts_0`.\n* `ts_n_dod` is the “delta of deltas” of timestamps, i.e. (`ts_n` – `ts_n-1`) – (`ts_n-1` – `ts_n-2`).\n* `v_n_xor` is the result of `v_n` XOR `v_n-1`.\n* `<varbit_xor>` is a specific variable bitwidth encoding of the result of XORing the current and the previous value. It has between 1 bit and 77 bits.\n  See [code for details](https://github.com/prometheus/prometheus/blob/7309c20e7e5774e7838f183ec97c65baa4362edc/tsdb/chunkenc/xor.go#L220-L253).\n* `<varbit_ts>` is a specific variable bitwidth encoding for the “delta of deltas” of timestamps (signed integers that are ideally small).\n  It has between 1 and 68 bits.\n  see [code for details](https://github.com/prometheus/prometheus/blob/7309c20e7e5774e7838f183ec97c65baa4362edc/tsdb/chunkenc/xor.go#L179-L205).\n* `padding` of 0 to 7 bits so that the whole chunk data is byte-aligned.\n* The chunk can have as few as one sample, i.e. `ts_1`, `v_1`, etc. are optional."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram chunk data > Notes:",
+    "text": "### Notes:\n\n* `histogram_flags` is a byte of which currently only the first two bits are used:\n  * `10`: Counter reset between the previous chunk and this one.\n  * `01`: No counter reset between the previous chunk and this one.\n  * `00`: Counter reset status unknown.\n  * `11`: Chunk is part of a gauge histogram, no counter resets are happening.\n* `zero_threshold` has a specific encoding:\n  * If 0, it is a single zero byte.\n  * If a power of two between 2^-243 and 2^10, it is a single byte between 1 and 254.\n  * Otherwise, it is a byte with all bits set (255), followed by a float64, resulting in 9 bytes length.\n* `schema` is a specific value defined by the exposition format. Currently\n  valid values are either -4 <= n <= 8 (standard exponential schemas) or -53\n  (custom bucket boundaries).\n* `<varbit_int>` is a variable bitwidth encoding for signed integers, optimized for “delta of deltas” of bucket deltas. It has between 1 bit and 9 bytes.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L31-L60).\n* `<varbit_uint>` is a variable bitwidth encoding for unsigned integers with the same bit-bucketing as `<varbit_int>`.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L136-L165).\n* `<varbit_xor>` is a specific variable bitwidth encoding of the result of XORing the current and the previous value. It has between 1 bit and 77 bits.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/histogram.go#L538-L574).\n* `padding` of 0 to 7 bits so that the whole chunk data is byte-aligned.\n* Note that buckets are inherently deltas between the current bucket and the previous bucket. Only `bucket_0` is an absolute count.\n* The chunk can have as few as one sample, i.e. sample 1 and following are optional.\n* Similarly, there could be down to zero spans and down to zero buckets."
+   },
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#2",
+    "title": "tsdb/docs/bstream.md > bstream details > Delta-of-delta encoding for timestamps",
+    "text": "When decoding the number, the most interesting part is how to recognize whether a number is negative or positive, and thus which prefix to set.\nNote that the bstream library doesn't interpret integers to a specific type, but rather returns them as uint64's (which are really just a container for 64 bits).\nWithin the ranges we choose, if looked at as unsigned integers, the higher portion of the range represent the negative numbers.\nContinuing the same example, the numbers 001, 010, 011 and 100 are returned as unsigned integers 1,2,3,4 and mean the same thing when casted to int64's.\nBut the others, 101, 110 and 111 are returned as unsigned integers 5,6,7 but actually represent -3, -2 and -1 (see list above),\nThe cutoff value is the value set by the `nbit`'th bit, and needs a value subtracted that is represented by the `nbit+1`th bit.\nIn our example, the 3rd bit sets the number 4, and the 4th sets the number 8. So if we see an unsigned integer exceeding 4 (5,6,7) we subtract 8. This gives us our desired values (-3, -2 and -1).\n\nCareful observers may note that, if we shift our boundaries down by one, the first bit would always indicate the sign (and imply the needed prefix).\nIn our example of `nbits = 3`, that would mean the range from -4 to 3.  But what we have now works just fine too."
+   },
+   {
+    "id": "prometheus:docs/federation.md#4",
+    "title": "docs/federation.md > Configuring federation",
+    "text": "## Configuring federation\n\nOn any given Prometheus server, the `/federate` endpoint allows retrieving the\ncurrent value for a selected set of time series in that server. At least one\n`match[]` URL parameter must be specified to select the series to expose. Each\n`match[]` argument needs to specify an\n[instant vector selector](querying/basics.md#instant-vector-selectors) like\n`up` or `{job=\"api-server\"}`. If multiple `match[]` parameters are provided,\nthe union of all matched series is selected.\n\nTo federate metrics from one server to another, configure your destination\nPrometheus server to scrape from the `/federate` endpoint of a source server,\nwhile also enabling the `honor_labels` scrape option (to not overwrite any\nlabels exposed by the source server) and passing in the desired `match[]`\nparameters. For example, the following `scrape_configs` federates any series\nwith the label `job=\"prometheus\"` or a metric name starting with `job:` from\nthe Prometheus servers at `source-prometheus-{1,2,3}:9090` into the scraping\nPrometheus:\n\n```yaml\nscrape_configs:\n  - job_name: 'federate'\n    scrape_interval: 15s\n\n    honor_labels: true\n    metrics_path: '/federate'\n\n    params:\n      'match[]':\n        - '{job=\"prometheus\"}'\n        - '{__name__=~\"job:.*\"}'\n\n    static_configs:\n      - targets:\n        - 'source-prometheus-1:9090'\n        - 'source-prometheus-2:9090'\n        - 'source-prometheus-3:9090'\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#7",
+    "title": "docs/querying/basics.md > Literals > Float literals and time durations",
+    "text": "### Float literals and time durations\n\nScalar float values can be written as literal integer or floating-point numbers\nin the format (whitespace only included for better readability):\n\n    [-+]?(\n          [0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\n        | 0[xX][0-9a-fA-F]+\n        | [nN][aA][nN]\n        | [iI][nN][fF]\n    )\n\nExamples:\n\n    23\n    -2.43\n    3.4e-9\n    0x8f\n    -Inf\n    NaN\n\nAdditionally, underscores (`_`) can be used in between decimal or hexadecimal\ndigits to improve readability.\n\nExamples:\n\n    1_000_000\n    .123_456_789\n    0x_53_AB_F3_82\n\nFloat literals are also used to specify durations in seconds. For convenience,\ndecimal integer numbers may be combined with the following\ntime units:\n\n* `ms` – milliseconds\n* `s` – seconds – 1s equals 1000ms\n* `m` – minutes – 1m equals 60s (ignoring leap seconds)\n* `h` – hours – 1h equals 60m\n* `d` – days – 1d equals 24h (ignoring so-called daylight saving time)\n* `w` – weeks – 1w equals 7d\n* `y` – years – 1y equals 365d (ignoring leap days)\n\nSuffixing a decimal integer number with one of the units above is a different\nrepresentation of the equivalent number of seconds as a bare float literal.\n\nExamples:\n\n    1s # Equivalent to 1.\n    2m # Equivalent to 120.\n    1ms # Equivalent to 0.001.\n    -2h # Equivalent to -7200.\n\nThe following examples do _not_ work:\n\n    0xABm # No suffixing of hexadecimal numbers.\n    1.5h # Time units cannot be combined with a floating point.\n    +Infd # No suffixing of ±Inf or NaN.\n\nMultiple units can be combined by concatenation of suffixed integers. Units\nmust be ordered from the longest to the shortest. A given unit must only appear\nonce per float literal.\n\nExamples:\n\n    1h30m # Equivalent to 5400s and thus 5400.\n    12h34m56s # Equivalent to 45296s and thus 45296.\n    54s321ms # Equivalent to 54.321."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#25",
+    "title": "docs/querying/functions.md > `histogram_quantile()`",
+    "text": "If `b` has 0 observations, `NaN` is returned. For φ < 0, `-Inf` is\nreturned. For φ > 1, `+Inf` is returned. For φ = `NaN`, `NaN` is returned.\n\nSpecial cases for classic histograms:\n\n* If `b` contains fewer than two buckets, `NaN` is returned.\n* The highest bucket must have an upper bound of `+Inf`. (Otherwise, `NaN` is\n  returned.)\n* If a quantile is located in the highest bucket, the upper bound of the second\n  highest bucket is returned.\n* The lower limit of the lowest bucket is assumed to be 0 if the upper bound of\n  that bucket is greater than 0. In that case, the usual linear interpolation\n  is applied within that bucket. Otherwise, the upper bound of the lowest\n  bucket is returned for quantiles located in the lowest bucket.\n\nSpecial cases for native histograms:\n\n* If a native histogram with standard exponential buckets has `NaN`\n  observations and the quantile falls into one of the existing exponential\n  buckets, the result is skewed towards higher values due to `NaN`\n  observations treated as `+Inf`. This is flagged with an info level\n  annotation.\n* If a native histogram with standard exponential buckets has `NaN`\n  observations and the quantile falls above all of the existing exponential\n  buckets, `NaN` is returned. This is flagged with an info level annotation.\n* A zero bucket with finite width is assumed to contain no negative\n  observations if the histogram has observations in positive buckets, but none\n  in negative buckets.\n* A zero bucket with finite width is assumed to contain no positive\n  observations if the histogram has observations in negative buckets, but none\n  in positive buckets."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#16",
+    "title": "docs/querying/functions.md > `double_exponential_smoothing()`",
+    "text": "## `double_exponential_smoothing()`\n\n**This function has to be enabled via the [feature\nflag](../feature_flags.md#experimental-promql-functions)\n`--enable-feature=promql-experimental-functions`.**\n\n`double_exponential_smoothing(v range-vector, sf scalar, tf scalar)` produces a\nsmoothed value for each float time series in the range in `v`. The lower the\nsmoothing factor `sf`, the more importance is given to old data. The higher the\ntrend factor `tf`, the more trends in the data is considered. Both `sf` and\n`tf` must be between 0 and 1. For additional details, refer to [NIST\nEngineering Statistics\nHandbook](https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc433.htm). In\nPrometheus V2 this function was called `holt_winters`. This caused confusion\nsince the Holt-Winters method usually refers to triple exponential smoothing.\nDouble exponential smoothing as implemented here is also referred to as \"Holt\nLinear\".\n\n`double_exponential_smoothing` should only be used with gauges and only works\nfor float samples. Elements in the range vector that contain only histogram\nsamples are ignored entirely. For elements that contain a mix of float and\nhistogram samples, only the float samples are used as input, which is flagged\nby an info-level annotation."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 8,
+    "id": "prometheus:docs/querying/functions.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.011,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.0072,
+     "different_case": 0.0275,
+     "unrelated": 0.9615
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/querying/basics.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0037,
+    "document_score": 0.0121,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.0084,
+     "different_case": 0.0168,
+     "unrelated": 0.9711
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/basics.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0036,
+    "document_score": 0.009,
+    "levels": {
+     "answers": 0.0036,
+     "elsewhere": 0.0053,
+     "different_case": 0.0175,
+     "unrelated": 0.9736
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/bstream.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.007,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.004,
+     "different_case": 0.016,
+     "unrelated": 0.977
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/functions.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0064,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0034,
+     "different_case": 0.0111,
+     "unrelated": 0.9825
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0053,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0024,
+     "different_case": 0.0102,
+     "unrelated": 0.9845
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0075,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0048,
+     "different_case": 0.0256,
+     "unrelated": 0.9669
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:tsdb/docs/format/chunks.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0021,
+     "different_case": 0.0052,
+     "unrelated": 0.991
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0012,
+     "different_case": 0.0038,
+     "unrelated": 0.9935
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/federation.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0008,
+     "different_case": 0.0022,
+     "unrelated": 0.9957
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6382
+  },
+  "timing": {
+   "total_ms": 120,
+   "rerank_ms": 119,
+   "questions_ms": 0,
+   "model_ms": 108,
+   "engine": {
+    "rows": 7572,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 108,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

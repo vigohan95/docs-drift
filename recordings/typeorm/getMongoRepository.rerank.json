@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/getMongoRepository.rerank",
+ "recorded_at": "2026-11-06T13:43:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1127,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.514431",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `getMongoRepository`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `getMongoRepository`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "title": "docs/docs/data-source/4-data-source-api.md > DataSource API",
+    "text": "```typescript\nconst userMetadata = dataSource.getMetadata(User)\n// now you can get any information about User entity\n```\n\n- `getRepository` - Gets `Repository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getRepository(User)\n// now you can call repository methods, for example find:\nconst users = await repository.find()\n```\n\n- `getTreeRepository` - Gets `TreeRepository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getTreeRepository(Category)\n// now you can call tree repository methods, for example findTrees:\nconst categories = await repository.findTrees()\n```\n\n- `getMongoRepository` - Gets `MongoRepository` of the given entity.\n  This repository is used for entities in MongoDB dataSource.\n  Learn more about [MongoDB support](../drivers/mongodb.md).\n\n```typescript\nconst repository = dataSource.getMongoRepository(User)\n// now you can call mongodb-specific repository methods, for example createEntityCursor:\nconst categoryCursor = repository.createEntityCursor()\nconst category1 = await categoryCursor.next()\nconst category2 = await categoryCursor.next()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > Breaking changes > Removed APIs",
+    "text": "### Removed APIs\n\n- **`Connection` and `ConnectionOptions` removed** — use `DataSource` and `DataSourceOptions` instead ([#12022](https://github.com/typeorm/typeorm/pull/12022) by [@alumni](https://github.com/alumni))\n- **`.connection` property renamed to `.dataSource`** — the `connection` property on `Driver`, `QueryRunner`, `EntityManager`, `QueryBuilder`, `EntityMetadata`, and all `*Event` subscriber interfaces has been renamed to `dataSource`; a deprecated getter is provided as a bridge ([#12244](https://github.com/typeorm/typeorm/pull/12244), [#12245](https://github.com/typeorm/typeorm/pull/12245), [#12246](https://github.com/typeorm/typeorm/pull/12246), [#12249](https://github.com/typeorm/typeorm/pull/12249) by [@pkuczynski](https://github.com/pkuczynski))\n- **`ConnectionManager` and global convenience functions removed** — `createConnection`, `getConnection`, `getManager`, `getRepository`, `createQueryBuilder`, and other globals have been removed ([#12098](https://github.com/typeorm/typeorm/pull/12098) by [@michaelbromley](https://github.com/michaelbromley))\n- **`getMongoRepository` and `getMongoManager` globals removed** — use `dataSource.getMongoRepository()` and `dataSource.mongoManager` instead ([#12099](https://github.com/typeorm/typeorm/pull/12099) by [@pkuczynski](https://github.com/pkuczynski))\n- **`DataSource.name` removed** — named connections were deprecated in v0.3; `ConnectionOptionsReader.all()` renamed to `get()` ([#12136](https://github.com/typeorm/typeorm/pull/12136) by [@pkuczynski](https://github.com/pkuczynski))\n- **`TYPEORM_*` environment variable support removed** — `ConnectionOptionsEnvReader`, `ormconfig.env`, and `dotenv` auto-loading have been removed ([#12134](https://github.com/typeorm/typeorm/pull/12134) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findByIds` removed** — use `findBy` with `In` operator instead ([#12114](https://github.com/typeorm/typeorm/pull/12114) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findOneById` removed** — use `findOneBy` instead ([#12198](https://github.com/typeorm/typeorm/pull/12198) by [@pkuczynski](https://github.com/pkuczynski))\n- **`Repository.exist()` removed** — use `Repository.exists()` instead ([#12131](https://github.com/typeorm/typeorm/pull/12131) by [@pkuczynski](https://github.com/pkuczynski))\n- **`AbstractRepository`, `@EntityRepository`, and `getCustomRepository` removed** — use `Repository.extend()` instead ([#12096](https://github.com/typeorm/typeorm/pull/12096) by [@pkuczynski](https://github.com/pkuczynski))\n- **`@RelationCount` decorator removed** — use `@VirtualColumn` with a sub-query instead ([#12181](https://github.com/typeorm/typeorm/pull/12181) by [@pkuczynski](https://github.com/pkuczynski))\n- **IoC container system removed** — `useContainer()`, `getFromContainer()`, and related types have been removed ([#12180](https://github.com/typeorm/typeorm/pull/12180) by [@pkuczynski](https://github.com/pkuczynski))\n- **`readonly` column option removed** — use `update: false` instead ([#12132](https://github.com/typeorm/typeorm/pull/12132) by [@pkuczynski](https://github.com/pkuczynski))\n- **`unsigned` on `ColumnNumericOptions` removed** — only affected decimal/float types; integer `unsigned` is unchanged ([#12133](https://github.com/typeorm/typeorm/pull/12133) by [@pkuczynski](https://github.com/pkuczynski))\n- **QueryBuilder: `onConflict()`, deprecated `orUpdate()` overload, and `setNativeParameters()` removed** — use `orIgnore()`/`orUpdate()` array signature and `setParameters()` instead ([#12090](https://github.com/typeorm/typeorm/pull/12090) by [@pkuczynski](https://github.com/pkuczynski))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#15",
+    "title": "docs/docs/releases/1.0/02-upgrading-from-0.3.md > Upgrading from 0.3 to 1.0 > Driver changes > MongoDB > `getMongoRepository` and `getMongoManager` globals removed",
+    "text": "#### `getMongoRepository` and `getMongoManager` globals removed\n\nThe deprecated global functions `getMongoRepository()` and `getMongoManager()` have been removed. Use the corresponding instance methods on `DataSource` or `EntityManager` instead:\n\n```typescript\n// Before\nimport { getMongoManager, getMongoRepository } from \"typeorm\"\n\nconst manager = getMongoManager()\nconst repository = getMongoRepository(User)\n\n// After\nconst manager = dataSource.mongoManager\nconst repository = dataSource.getMongoRepository(User)\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "action": "use",
+    "relevance_score": 0.9893,
+    "document_score": 0.9927,
+    "levels": {
+     "answers": 0.9893,
+     "elsewhere": 0.0034,
+     "different_case": 0.0031,
+     "unrelated": 0.0042
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0402,
+    "document_score": 0.2543,
+    "levels": {
+     "answers": 0.0402,
+     "elsewhere": 0.214,
+     "different_case": 0.0272,
+     "unrelated": 0.7185
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.019,
+    "document_score": 0.0667,
+    "levels": {
+     "answers": 0.019,
+     "elsewhere": 0.0477,
+     "different_case": 0.0255,
+     "unrelated": 0.9078
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2014
+  },
+  "timing": {
+   "total_ms": 173,
+   "rerank_ms": 157,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2419,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

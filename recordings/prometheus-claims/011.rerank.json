@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/011.rerank",
+ "recorded_at": "2026-11-06T13:37:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1165,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "116.388382",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=160,cfOrigin;dur=0,cfWorker;dur=323"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: If Prometheus runs too long, we might hit 2^24. ([957 years](https://www.wolframalpha.com/input/?i=2%5E24+*+120+*+15+seconds+in+years) at 1 sample per 15 seconds).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#7",
+    "title": "docs/querying/basics.md > Literals > Float literals and time durations",
+    "text": "### Float literals and time durations\n\nScalar float values can be written as literal integer or floating-point numbers\nin the format (whitespace only included for better readability):\n\n    [-+]?(\n          [0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\n        | 0[xX][0-9a-fA-F]+\n        | [nN][aA][nN]\n        | [iI][nN][fF]\n    )\n\nExamples:\n\n    23\n    -2.43\n    3.4e-9\n    0x8f\n    -Inf\n    NaN\n\nAdditionally, underscores (`_`) can be used in between decimal or hexadecimal\ndigits to improve readability.\n\nExamples:\n\n    1_000_000\n    .123_456_789\n    0x_53_AB_F3_82\n\nFloat literals are also used to specify durations in seconds. For convenience,\ndecimal integer numbers may be combined with the following\ntime units:\n\n* `ms` – milliseconds\n* `s` – seconds – 1s equals 1000ms\n* `m` – minutes – 1m equals 60s (ignoring leap seconds)\n* `h` – hours – 1h equals 60m\n* `d` – days – 1d equals 24h (ignoring so-called daylight saving time)\n* `w` – weeks – 1w equals 7d\n* `y` – years – 1y equals 365d (ignoring leap days)\n\nSuffixing a decimal integer number with one of the units above is a different\nrepresentation of the equivalent number of seconds as a bare float literal.\n\nExamples:\n\n    1s # Equivalent to 1.\n    2m # Equivalent to 120.\n    1ms # Equivalent to 0.001.\n    -2h # Equivalent to -7200.\n\nThe following examples do _not_ work:\n\n    0xABm # No suffixing of hexadecimal numbers.\n    1.5h # Time units cannot be combined with a floating point.\n    +Infd # No suffixing of ±Inf or NaN.\n\nMultiple units can be combined by concatenation of suffixed integers. Units\nmust be ordered from the longest to the shortest. A given unit must only appear\nonce per float literal.\n\nExamples:\n\n    1h30m # Equivalent to 5400s and thus 5400.\n    12h34m56s # Equivalent to 45296s and thus 45296.\n    54s321ms # Equivalent to 54.321."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "title": "docs/querying/operators.md > Vector matching > Filling in missing matches",
+    "text": "* If a fill modifier is used on the \"many\" side of a match, it will only fill in a single series\n  for the \"many\" side of each match group, using the group's matching labels as the series identity.\n* If a fill modifier is used on the \"one\" side of a match and the grouping modifier specifies\n  label names to include from the \"one\" side (e.g. `left_vector * on(instance, job) group_left(info_label) fill_right(1) right_vector`), those labels will not be filled in for missing\n  series, as there is no source for their values.\n\nFill modifiers are not supported for set operators (`and`, `or`, `unless`), as the purpose of those\noperators is to filter series based on presence or absence in the other vector.\n\nExample query, filling in missing series on the either side with `0`:\n\n    method_code:http_errors:rate5m{status=\"500\"} / ignoring(code) fill(0) method:http_requests:rate5m\n\nThis returns a result vector containing the fraction of HTTP requests with status code\nof 500 for each method, as measured over the last 5 minutes. The entries with methods `put` and `del`\nare now included in the result with a filled-in default sample value of `0`, as they had no matching\nseries on the respective other side:\n\n    {method=\"get\"}  0.04            #  24 / 600\n    {method=\"put\"}  +Inf            #   3 /   0 (missing right side filled in)\n    {method=\"del\"}  0               #   0 /  34 (missing left side filled in)\n    {method=\"post\"} 0.05            #   6 / 120"
+   },
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--storage.agent.checkpoint-batch-size</code> | Size of a single WAL log entry chunk to be flushed. Has no effect without --storage.agent.checkpoint-from-in-memory-series flag. Use with agent mode only. | `1000` |\n| <code class=\"text-nowrap\">--storage.agent.no-lockfile</code> | Do not create lockfile in data directory. Use with agent mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.remote.flush-deadline</code> | How long to wait flushing sample on shutdown or config reload. | `1m` |\n| <code class=\"text-nowrap\">--storage.remote.read-sample-limit</code> | Maximum overall number of samples to return via the remote read interface, in a single query. 0 means no limit. This limit is ignored for streamed response types. Use with server mode only. | `5e7` |\n| <code class=\"text-nowrap\">--storage.remote.read-concurrent-limit</code> | Maximum number of concurrent remote read calls. 0 means no limit. Use with server mode only. | `10` |\n| <code class=\"text-nowrap\">--storage.remote.read-max-bytes-in-frame</code> | Maximum number of bytes in a single frame for streaming remote read response types before marshalling. Note that client might have limit on frame size as well. 1MB as recommended by protobuf by default. Use with server mode only. | `1048576` |\n| <code class=\"text-nowrap\">--web.search.max-limit</code> | Hard upper bound on the \"limit\" query parameter accepted by the experimental search API (--enable-feature=search-api). Requests with a higher limit are rejected with HTTP 400. 0 disables the cap. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--rules.alert.for-outage-tolerance</code> | Max time to tolerate prometheus outage for restoring \"for\" state of alert. Use with server mode only. | `1h` |\n| <code class=\"text-nowrap\">--rules.alert.for-grace-period</code> | Minimum duration between alert and restored \"for\" state. This is maintained only for alerts with configured \"for\" time greater than grace period. Use with server mode only. | `10m` |\n| <code class=\"text-nowrap\">--rules.alert.resend-delay</code> | Minimum amount of time to wait before resending an alert to Alertmanager. Use with server mode only. | `1m` |\n| <code class=\"text-nowrap\">--rules.max-concurrent-evals</code> | Global concurrency limit for independent rules that can run concurrently. When set, \"query.max-concurrency\" may need to be adjusted accordingly. Use with server mode only. | `4` |\n| <code class=\"text-nowrap\">--alertmanager.notification-queue-capacity</code> | The capacity of the queue for pending Alertmanager notifications. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--alertmanager.notification-batch-size</code> | The maximum number of notifications per batch to send to the Alertmanager. Use with server mode only. | `256` |\n| <code class=\"text-nowrap\">--alertmanager.drain-notification-queue-on-shutdown</code> | Send any outstanding Alertmanager notifications when shutting down. If false, any outstanding Alertmanager notifications will be dropped when shutting down. Use with server mode only. | `true` |\n| <code class=\"text-nowrap\">--query.lookback-delta</code> | The maximum lookback duration for retrieving metrics during expression evaluations and federation. Use with server mode only. | `5m` |\n| <code class=\"text-nowrap\">--query.timeout</code> | Maximum time a query may take before being aborted. Use with server mode only. | `2m` |\n| <code class=\"text-nowrap\">--query.max-concurrency</code> | Maximum number of queries executed concurrently. Use with server mode only. | `20` |"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#11",
+    "title": "docs/querying/functions.md > `day_of_year()`",
+    "text": "## `day_of_year()`\n\n`day_of_year(v=vector(time()) instant-vector)` interprets float samples in `v`\nas timestamps (number of seconds since January 1, 1970 UTC) and returns the day\nof the year (in UTC) for each of those timestamps. Returned values are from 1\nto 365 for non-leap years, and 1 to 366 in leap years. Histogram samples in the\ninput vector are ignored silently."
+   },
+   {
+    "id": "prometheus:docs/storage.md#15",
+    "title": "docs/storage.md > Backfilling from OpenMetrics format > Usage > Longer Block Durations",
+    "text": "#### Longer Block Durations\n\nBy default, the promtool will use the default block duration (2h) for the blocks;\nthis behavior is the most generally applicable and correct. However, when backfilling\ndata over a long range of times, it may be advantageous to use a larger value for\nthe block duration to backfill faster and prevent additional compactions by TSDB later.\n\nThe `--max-block-duration` flag allows the user to configure a maximum duration of blocks.\nThe backfilling tool will pick a suitable block duration no larger than this.\n\nTo use `--max-block-duration` as is, rather than rounding it down to a duration Prometheus typically\ncompacts to, also set `--allow-incompatible-block-duration`. For example,\n`--max-block-duration=24h --allow-incompatible-block-duration` creates the daily blocks\nthat other TSDB systems, such as Cortex, Mimir and Thanos, expect.\n\nWhile larger blocks may improve the performance of backfilling large datasets,\ndrawbacks exist as well. Time-based retention policies must keep the entire block\naround if even one sample of the (potentially large) block is still within the\nretention policy. Conversely, size-based retention policies will remove the entire\nblock even if the TSDB only goes over the size limit in a minor way.\n\nTherefore, backfilling with few blocks, thereby choosing a larger block duration,\nmust be done with care and is not recommended for any production instances."
+   },
+   {
+    "id": "prometheus:tsdb/docs/usage.md#3",
+    "title": "tsdb/docs/usage.md > Usage > Adding data",
+    "text": "  Breaching this condition results in \"out of bounds\" errors.  \n  The first condition assures the block that will be generated doesn't overlap with the previous one (which simplifies querying)  \n  The second condition assures the sample won't go into the so called \"compaction window\", that is the section of the data that might be in process of being saved into a persistent block on disk.  (because that logic runs concurrently with ingestion without a lock)\n2) The labels don't validate. (if the set is empty or contains duplicate label names)\n3) If the sample, for the respective series (based on all the labels) is out of order or has a different value for the last (highest) timestamp seen. (results in `storage.ErrOutOfOrderSample` and `storage.ErrDuplicateSampleForTimestamp` respectively)\n\n`Commit()` may also refuse data that is out of order with respect to samples that were added via a different appender."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#17",
+    "title": "docs/querying/operators.md > Vector matching > Many-to-one and one-to-many vector matches",
+    "text": "### Many-to-one and one-to-many vector matches\n\n**Many-to-one** and **one-to-many** matchings refer to the case where each vector element on\nthe \"one\"-side can match with multiple elements on the \"many\"-side. This has to\nbe explicitly requested using the `group_left` or `group_right` [modifiers](#group-modifiers), where\nleft/right determines which vector has the higher cardinality.\n\n    <vector expr> <bin-op> ignoring(<label list>) group_left(<label list>) <vector expr>\n    <vector expr> <bin-op> ignoring(<label list>) group_right(<label list>) <vector expr>\n    <vector expr> <bin-op> on(<label list>) group_left(<label list>) <vector expr>\n    <vector expr> <bin-op> on(<label list>) group_right(<label list>) <vector expr>\n\nThe label list provided with the [group modifier](#group-modifiers) contains additional labels from\nthe \"one\"-side to be included in the result metrics. For `on` a label can only\nappear in one of the lists. Every time series of the result vector must be\nuniquely identifiable.\n\nExample query:\n\n    method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:rate5m\n\nIn this case the left vector contains more than one entry per `method` label\nvalue. Thus, we indicate this using `group_left`. The elements from the right\nside are now matched with multiple elements with the same `method` label on the\nleft:\n\n    {method=\"get\", code=\"500\"}  0.04            //  24 / 600\n    {method=\"get\", code=\"404\"}  0.05            //  30 / 600\n    {method=\"post\", code=\"500\"} 0.05            //   6 / 120\n    {method=\"post\", code=\"404\"} 0.175           //  21 / 120"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#37",
+    "title": "docs/querying/operators.md > Binary operator precedence",
+    "text": "## Binary operator precedence\n\nThe following list shows the precedence of binary operators in Prometheus, from\nhighest to lowest.\n\n1. `^`\n2. `*`, `/`, `%`, `atan2`, `bitand`, `bitor`, `bitxor`\n3. `+`, `-`\n4. `==`, `!=`, `<=`, `<`, `>=`, `>`\n5. `and`, `unless`\n6. `or`\n\nOperators on the same precedence level are left-associative. For example,\n`2 * 3 % 2` is equivalent to `(2 * 3) % 2`. However `^` is right associative,\nso `2 ^ 3 ^ 2` is equivalent to `2 ^ (3 ^ 2)`."
+   },
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "title": "docs/storage.md > Local storage > Operational aspects",
+    "text": "### Operational aspects\n\nPrometheus has several flags that configure local storage. The most important are:\n\n- `--storage.tsdb.path`: Where Prometheus writes its database. Defaults to `data/`.\n- `--storage.tsdb.retention.time`: How long to retain samples in storage. If neither\n  this flag nor `storage.tsdb.retention.size` is set, the retention time defaults to\n  `15d`. Supported units: y, w, d, h, m, s, ms.\n- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.\n  The oldest data will be removed first. Defaults to `0` or disabled. Units supported:\n  B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. Only\n  the persistent blocks are deleted to honor this retention although WAL and m-mapped\n  chunks are counted in the total size. So the minimum requirement for the disk is the\n  peak space taken by the `wal` (the WAL and Checkpoint) and `chunks_head`\n  (m-mapped Head chunks) directory combined (peaks every 2 hours).\n- `--storage.tsdb.wal-compression`: Enables compression of the write-ahead log (WAL).\n  Depending on your data, you can expect the WAL size to be halved with little extra\n  CPU load. This flag was introduced in 2.11.0 and enabled by default in 2.20.0.\n  Note that once enabled, downgrading Prometheus to a version below 2.11.0 will\n  require deleting the WAL."
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#9",
+    "title": "docs/getting_started.md > Configure rules for aggregating scraped data into new time series",
+    "text": "## Configure rules for aggregating scraped data into new time series\n\nThough not a problem in our example, queries that aggregate over thousands of\ntime series can get slow when computed ad-hoc. To make this more efficient,\nPrometheus can prerecord expressions into new persisted\ntime series via configured _recording rules_. Let's say we are interested in\nrecording the per-second rate of cpu time (`node_cpu_seconds_total`) averaged\nover all cpus per instance (but preserving the `job`, `instance` and `mode`\ndimensions) as measured over a window of 5 minutes. We could write this as:\n\n```\navg by (job, instance, mode) (rate(node_cpu_seconds_total[5m]))\n```\n\nTry graphing this expression.\n\nTo record the time series resulting from this expression into a new metric\ncalled `job_instance_mode:node_cpu_seconds:avg_rate5m`, create a file\nwith the following recording rule and save it as `prometheus.rules.yml`:\n\n```yaml\ngroups:\n- name: cpu-node\n  rules:\n  - record: job_instance_mode:node_cpu_seconds:avg_rate5m\n    expr: avg by (job, instance, mode) (rate(node_cpu_seconds_total[5m]))\n```\n\nTo make Prometheus pick up this new rule, add a `rule_files` statement in your `prometheus.yml`. The config should now\nlook like this:\n\n```yaml\nglobal:\n  scrape_interval:     15s # By default, scrape targets every 15 seconds.\n  evaluation_interval: 15s # Evaluate rules every 15 seconds.\n\n  # Attach these extra labels to all timeseries collected by this Prometheus instance.\n  external_labels:\n    monitor: 'codelab-monitor'\n\nrule_files:\n  - 'prometheus.rules.yml'\n\nscrape_configs:\n  - job_name: 'prometheus'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:9090']\n\n  - job_name:       'node'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:8080', 'localhost:8081']\n        labels:\n          group: 'production'\n\n      - targets: ['localhost:8082']\n        labels:\n          group: 'canary'\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/basics.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0492,
+    "document_score": 0.2265,
+    "levels": {
+     "answers": 0.0492,
+     "elsewhere": 0.1773,
+     "different_case": 0.0837,
+     "unrelated": 0.6897
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/getting_started.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0109,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.008,
+     "different_case": 0.0492,
+     "unrelated": 0.9399
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.002,
+     "different_case": 0.0068,
+     "unrelated": 0.9888
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/storage.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0081,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0056,
+     "different_case": 0.0124,
+     "unrelated": 0.9795
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/functions.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0056,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0036,
+     "different_case": 0.0041,
+     "unrelated": 0.9903
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/querying/operators.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0046,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0027,
+     "different_case": 0.0049,
+     "unrelated": 0.9905
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/operators.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0009,
+     "different_case": 0.0022,
+     "unrelated": 0.9953
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/storage.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0039,
+     "different_case": 0.0121,
+     "unrelated": 0.9825
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/usage.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0063,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0048,
+     "different_case": 0.0088,
+     "unrelated": 0.985
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/querying/operators.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0007,
+     "different_case": 0.0022,
+     "unrelated": 0.996
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5604
+  },
+  "timing": {
+   "total_ms": 120,
+   "rerank_ms": 119,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6474,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

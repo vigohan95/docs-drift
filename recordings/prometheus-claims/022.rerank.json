@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/022.rerank",
+ "recorded_at": "2026-11-06T13:37:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 934,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.661507",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=224"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Effectively Prometheus 3 requires [Alertmanager 0.16.0](https://github.com/prometheus/alertmanager/releases/tag/v0.16.0) or later.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/storage.md#13",
+    "title": "docs/storage.md > Backfilling from OpenMetrics format > Overview",
+    "text": "### Overview\n\nIf a user wants to create blocks into the TSDB from data that is in\n[OpenMetrics](https://openmetrics.io/) format, they can do so using backfilling.\nHowever, they should be careful and note that it is not safe to backfill data\nfrom the last 3 hours (the current head block) as this time range may overlap\nwith the current head block Prometheus is still mutating. Backfilling will\ncreate new TSDB blocks, each containing two hours of metrics data. This limits\nthe memory requirements of block creation. Compacting the two hour blocks into\nlarger blocks is later done by the Prometheus server itself.\n\nA typical use case is to migrate metrics data from a different monitoring system\nor time-series database to Prometheus. To do so, the user must first convert the\nsource data into [OpenMetrics](https://openmetrics.io/) format, which is the\ninput format for the backfilling as described below.\n\nNote that native histograms and staleness markers are not supported by this\nprocedure, as they cannot be represented in the OpenMetrics format."
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#19",
+    "title": "documentation/internal_architecture.md > Internal architecture > Notifier discovery",
+    "text": "## Notifier discovery\n\nThe notifier discovery manager is a [`discovery.Manager`](https://github.com/prometheus/prometheus/blob/v2.3.1/discovery/manager.go#L73-L89) that uses Prometheus's service discovery functionality to find and continuously update the list of Alertmanager instances that the notifier should send alerts to. It runs independently of the notifier manager and feeds it with a stream of target group updates over a [synchronization channel](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L587).\n\nInternally it works like the scrape discovery manager."
+   },
+   {
+    "id": "prometheus:RELEASE.md#12",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 3. Tag the library release",
+    "text": "### 3. Tag the library release\n\nGo modules versioning requires strict use of semver. Because we do not commit to\navoid code-level breaking changes for the libraries between minor releases of\nthe Prometheus server, we use major version zero releases for the libraries.\n\nTagging the new library release works similar to the normal release tagging,\nbut without the subsequent build and publish steps. Use the following commands:\n\n```bash\ntag=\"v$(./scripts/get_module_version.sh)\"\ngit tag -s \"${tag}\" -m \"${tag}\"\ngit push origin \"${tag}\"\n```"
+   },
+   {
+    "id": "prometheus:documentation/prometheus-mixin/README.md#0",
+    "title": "documentation/prometheus-mixin/README.md > Prometheus Mixin",
+    "text": "# Prometheus Mixin\n\n_This is work in progress. We aim for it to become a good role model for alerts\nand dashboards eventually, but it is not quite there yet._\n\nThe Prometheus Mixin is a set of configurable, reusable, and extensible alerts\nand dashboards for Prometheus.\n\nTo use them, you need to have `jsonnet` (v0.13+) and `jb` installed. If you\nhave a working Go development environment, it's easiest to run the following:\n```bash\n$ go install github.com/google/go-jsonnet/cmd/jsonnet@latest\n$ go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest\n$ go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest\n```\n\n_Note: The make targets `lint` and `fmt` need the `jsonnetfmt` binary, which is\navailable from [v.0.16.0](https://github.com/google/jsonnet/releases/tag/v0.16.0) in the Go implementation of `jsonnet`. If your jsonnet version is older than 0.16.0 you have to either upgrade or install the [C++ version of\njsonnetfmt](https://github.com/google/jsonnet) if you want to use `make lint`\nor `make fmt`._\n\nNext, install the dependencies by running the following command in this\ndirectory:\n```bash\n$ jb install\n```\n\nYou can then build a `prometheus_alerts.yaml` with the alerts and a directory\n`dashboards_out` with the Grafana dashboard JSON files:\n```bash\n$ make prometheus_alerts.yaml\n$ make dashboards_out\n```\n\nFor more advanced uses of mixins, see https://github.com/monitoring-mixins/docs."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#9",
+    "title": "docs/feature_flags.md > Start timestamp (ST) synthesis",
+    "text": "## Start timestamp (ST) synthesis\n\n`--enable-feature=st-synthesis`\n\nEnables the synthesis of start timestamps (ST) for cumulative metrics (Counters, Classic Histograms, Native Histograms) when they are not provided by the source. Similar to [the official OpenTelemetry metricstarttimeprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/metricstarttimeprocessor#strategy-subtract-initial-point), it tracks previous values to detect resets and subtracts the initial reference point to synthesize a zero-based timeline from the first sample.\n\n> NOTE: This is an experimental feature.\n> * The first sample is dropped when this feature is turned on to establish the start timestamp reference point. As a result, if a series has only a single point reported, turning this feature on may result in no points being ingested for that series.\n> * Synthesis yields accurate Start Timestamp while maintaining accurate counter rates. However, the raw counter values will be different that what's scraped. This is because the first point is dropped and its timestamp is used as the start timestamp for all subsequent points. All subsequent points are normalized against that dropped point (i.e. subtracted by it). Effectively, synthesis create new counter streams with the known start timestamp from the original data.\n> * Synthesis works only with scraped data (RW and Otel receiver are not implemented).\n> * Synthesis requires ordered samples. As a result, cumulative samples without ST that are out of order will be rejected despite the `tsdb. out_of_order_time_window` setting.\n> * If an append fails for a series (e.g., due to out-of-order samples being rejected), the synthesis state for that series is cleared. As a result, the next sample received after the failure will be treated as the first sample again and will be dropped to establish a new reference point."
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#18",
+    "title": "documentation/internal_architecture.md > Internal architecture > Notifier",
+    "text": "## Notifier\n\nThe notifier is a [`notifier.Manager`](https://github.com/prometheus/prometheus/blob/v2.3.1/notifier/notifier.go#L104-L119) that takes alerts generated by the rule manager via its `Send()` method, enqueues them, and forwards them to all configured Alertmanager instances. The notifier serves to decouple generation of alerts from dispatching them to Alertmanager (which may fail or take time)."
+   },
+   {
+    "id": "prometheus:docs/configuration/alerting_rules.md#4",
+    "title": "docs/configuration/alerting_rules.md > Sending alert notifications",
+    "text": "## Sending alert notifications\n\nPrometheus's alerting rules are good at figuring what is broken *right now*, but\nthey are not a fully-fledged notification solution. Another layer is needed to\nadd summarization, notification rate limiting, silencing and alert dependencies\non top of the simple alert definitions. In Prometheus's ecosystem, the\n[Alertmanager](https://prometheus.io/docs/alerting/alertmanager/) takes on this\nrole. Thus, Prometheus may be configured to periodically send information about\nalert states to an Alertmanager instance, which then takes care of dispatching\nthe right notifications.\nPrometheus can be [configured](configuration.md) to automatically discover available\nAlertmanager instances through its service discovery integrations."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#119",
+    "title": "docs/configuration/configuration.md > Configuration file > `<alert_relabel_configs>`",
+    "text": "### `<alert_relabel_configs>`\n\nAlert relabeling is applied to alerts before they are sent to the Alertmanager.\nIt has the same configuration format and actions as target relabeling. Alert\nrelabeling is applied after external labels.\n\nOne use for this is ensuring a HA pair of Prometheus servers with different\nexternal labels send identical alerts."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#27",
+    "title": "docs/feature_flags.md > OpenMetrics 2.0",
+    "text": "## OpenMetrics 2.0\n\n`--enable-feature=openmetrics2`\n\nEnables scraping targets that expose the [OpenMetrics 2.0](https://prometheus.io/docs/specs/om/open_metrics_spec_2_0/)\ntext format, advertised with the `application/openmetrics-text; version=2.0.0` or\n`application/openmetrics-text; version=2.0.0-rc` content type. To negotiate OpenMetrics 2.0\nwith scrape targets, add `OpenMetricsText2.0.0` and `OpenMetricsText2.0.0-rc` to\n`scrape_protocols` in the configuration.\n\nOpenMetrics 2.0 support is **experimental**. The parser is not stable\nyet, so expositions that Prometheus accepts today may be rejected by a later release.\nDo not depend on the current behavior in production.\n\nWhen this flag is disabled, an OpenMetrics 2.0 content type is treated as an\nunsupported content type: the target's `fallback_scrape_protocol` is used if\none is configured, and the scrape fails otherwise.\n\nIf you are implementing an OpenMetrics 2.0 exporter or client library, note that\na successful scrape by Prometheus is **not** a certification that your output is\nspec-compliant. Refer to [OpenMetrics 2.0 migration guide](https://prometheus.io/docs/guides/open_metrics_2_0_migration/)\ninstead. "
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#46",
+    "title": "docs/querying/api.md > Alertmanagers",
+    "text": "## Alertmanagers\n\nThe following endpoint returns an overview of the current state of the\nPrometheus alertmanager discovery:\n\n```\nGET /api/v1/alertmanagers\n```\n\nBoth the active and dropped Alertmanagers are part of the response.\n\n```bash\ncurl http://localhost:9090/api/v1/alertmanagers\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"activeAlertmanagers\": [\n      {\n        \"url\": \"http://127.0.0.1:9090/api/v1/alerts\"\n      }\n    ],\n    \"droppedAlertmanagers\": [\n      {\n        \"url\": \"http://127.0.0.1:9093/api/v1/alerts\"\n      }\n    ]\n  }\n}\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 6,
+    "id": "prometheus:docs/configuration/alerting_rules.md#4",
+    "action": "expand",
+    "relevance_score": 0.0075,
+    "document_score": 0.5465,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.539,
+     "different_case": 0.0228,
+     "unrelated": 0.4307
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:documentation/internal_architecture.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0054,
+    "document_score": 0.0216,
+    "levels": {
+     "answers": 0.0054,
+     "elsewhere": 0.0163,
+     "different_case": 0.0102,
+     "unrelated": 0.9682
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/configuration/configuration.md#119",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0151,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0117,
+     "different_case": 0.0055,
+     "unrelated": 0.9794
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/api.md#46",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0155,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0125,
+     "different_case": 0.008,
+     "unrelated": 0.9765
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:documentation/prometheus-mixin/README.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.005,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0026,
+     "different_case": 0.0087,
+     "unrelated": 0.9863
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:documentation/internal_architecture.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0059,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0039,
+     "different_case": 0.0048,
+     "unrelated": 0.9893
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:RELEASE.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0017,
+     "different_case": 0.0036,
+     "unrelated": 0.993
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/feature_flags.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0011,
+     "different_case": 0.003,
+     "unrelated": 0.9944
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/storage.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0009,
+     "different_case": 0.0023,
+     "unrelated": 0.9955
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/feature_flags.md#27",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0017,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0007,
+     "different_case": 0.0013,
+     "unrelated": 0.997
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3248
+  },
+  "timing": {
+   "total_ms": 107,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 4438,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

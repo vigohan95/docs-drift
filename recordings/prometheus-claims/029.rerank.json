@@ -1,0 +1,240 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/029.rerank",
+ "recorded_at": "2026-11-06T13:38:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1130,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.112381",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=163,cfOrigin;dur=0,cfWorker;dur=301"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Currently valid schema numbers are -53 and -4 <= n <= 8.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram chunk data > Notes:",
+    "text": "### Notes:\n\n* `histogram_flags` is a byte of which currently only the first two bits are used:\n  * `10`: Counter reset between the previous chunk and this one.\n  * `01`: No counter reset between the previous chunk and this one.\n  * `00`: Counter reset status unknown.\n  * `11`: Chunk is part of a gauge histogram, no counter resets are happening.\n* `zero_threshold` has a specific encoding:\n  * If 0, it is a single zero byte.\n  * If a power of two between 2^-243 and 2^10, it is a single byte between 1 and 254.\n  * Otherwise, it is a byte with all bits set (255), followed by a float64, resulting in 9 bytes length.\n* `schema` is a specific value defined by the exposition format. Currently\n  valid values are either -4 <= n <= 8 (standard exponential schemas) or -53\n  (custom bucket boundaries).\n* `<varbit_int>` is a variable bitwidth encoding for signed integers, optimized for “delta of deltas” of bucket deltas. It has between 1 bit and 9 bytes.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L31-L60).\n* `<varbit_uint>` is a variable bitwidth encoding for unsigned integers with the same bit-bucketing as `<varbit_int>`.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/varbit.go#L136-L165).\n* `<varbit_xor>` is a specific variable bitwidth encoding of the result of XORing the current and the previous value. It has between 1 bit and 77 bits.\n  See [code for details](https://github.com/prometheus/prometheus/blob/8c1507ebaa4ca552958ffb60c2d1b21afb7150e4/tsdb/chunkenc/histogram.go#L538-L574).\n* `padding` of 0 to 7 bits so that the whole chunk data is byte-aligned.\n* Note that buckets are inherently deltas between the current bucket and the previous bucket. Only `bucket_0` is an absolute count.\n* The chunk can have as few as one sample, i.e. sample 1 and following are optional.\n* Similarly, there could be down to zero spans and down to zero buckets."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#17",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram chunk data > Notes:",
+    "text": "The `<custom>` encoding within the custom values data depends on the schema.\nFor schema -53 (custom bucket boundaries, currently the only use case for\ncustom values), the values to encode are bucket boundaries in the form of\nfloats. The encoding of a given float value _x_ works as follows:\n\n1. Create an intermediate value _y_ = _x_ * 1000.\n2. If 0 ≤ _y_ ≤ 33554430 _and_ if the decimal value of _y_ is integer, store\n   _y_ + 1 as `<varbit_uint>`.\n3. Otherwise, store a 0 bit, followed by the 64 bit of the original _x_\n   encoded as plain `<float64>`.\n\nNote that values stored as per (2) will always start with a 1 bit, which allow\ndecoders to recognize this case in contrast to values stores as per (3), which\nalways start with a 0 bit.\n\nThe rational behind this encoding is that most custom bucket boundaries are set\nby humans as decimal numbers with not very many decimal places. In most cases,\nthe encoding will therefore result in a short varbit representation. The upper\nbound of 33554430 is picked so that the varbit encoded value will take at most\n4 bytes."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#11",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram chunk data > Custom values data:",
+    "text": "### Custom values data:\n\nThe `custom_values` data is currently only used for schema -53 (custom bucket boundaries). For other schemas, it is empty (length of zero).\n\n```\n┌──────────────────────────┬──────────────────┬──────────────────┬─────┬──────────────────┐\n│ num_values <varbit_uint> │ value_0 <custom> │ value_1 <custom> │ ... │ value_n <custom> │\n└──────────────────────────┴─────────────────────────────────────┴─────┴──────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/tombstones.md#0",
+    "title": "tsdb/docs/format/tombstones.md > Tombstones Disk Format",
+    "text": "# Tombstones Disk Format\n\nThe following describes the format of a tombstones file, which is placed\nat the top level directory of a block.\n\nThe last 8 bytes specifies the offset to the start of Stones section.\nThe stones section is 0 padded to a multiple of 4 for fast scans.\n\n```\n┌────────────────────────────┬─────────────────────┐\n│ magic(0x0130BA30) <4b>     │ version(1) <1 byte> │\n├────────────────────────────┴─────────────────────┤\n│ ┌──────────────────────────────────────────────┐ │\n│ │                Tombstone 1                   │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      ...                     │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                Tombstone N                   │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                  CRC<4b>                     │ │\n│ └──────────────────────────────────────────────┘ │\n└──────────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/wal.md#8",
+    "title": "tsdb/docs/format/wal.md > WAL Disk Format > Segment encoding > Record types > Exemplar records",
+    "text": "#### Exemplar records\n\nExemplar records encode exemplars as a list of triples `(series_id, timestamp, value)`\nplus the length of the labels list, and all the labels.\nThe first row stores the starting id and the starting timestamp.\nSeries reference and timestamp are encoded as deltas w.r.t the first exemplar.\nThe first exemplar record begins at the second row.\n\nSee: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#exemplars\n\n```\n┌──────────────────────────────────────────────────────────────────┐\n│ type = 4 <1b>                                                    │\n├──────────────────────────────────────────────────────────────────┤\n│ ┌────────────────────┬───────────────────────────┐               │\n│ │ id <8b>            │ timestamp <8b>            │               │\n│ └────────────────────┴───────────────────────────┘               │\n│ ┌────────────────────┬───────────────────────────┬─────────────┐ │\n│ │ id_delta <uvarint> │ timestamp_delta <uvarint> │ value <8b>  │ │\n│ ├────────────────────┴───────────────────────────┴─────────────┤ │\n│ │  n = len(labels) <uvarint>                                   │ │\n│ ├──────────────────────┬───────────────────────────────────────┤ │\n│ │ len(str_1) <uvarint> │ str_1 <bytes>                         │ │\n│ ├──────────────────────┴───────────────────────────────────────┤ │\n│ │  ...                                                         │ │\n│ ├───────────────────────┬──────────────────────────────────────┤ │\n│ │ len(str_2n) <uvarint> │ str_2n <bytes> │                     │ │\n│ └───────────────────────┴────────────────┴─────────────────────┘ │\n│                              . . .                               │\n└──────────────────────────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/wal.md#5",
+    "title": "tsdb/docs/format/wal.md > WAL Disk Format > Segment encoding > Record types > Series records",
+    "text": "#### Series records\n\nSeries records encode the labels that identifies a series and its unique ID.\n\n```\n┌────────────────────────────────────────────┐\n│ type = 1 <1b>                              │\n├────────────────────────────────────────────┤\n│ ┌─────────┬──────────────────────────────┐ │\n│ │ id <8b> │ n = len(labels) <uvarint>    │ │\n│ ├─────────┴────────────┬─────────────────┤ │\n│ │ len(str_1) <uvarint> │ str_1 <bytes>   │ │\n│ ├──────────────────────┴─────────────────┤ │\n│ │  ...                                   │ │\n│ ├───────────────────────┬────────────────┤ │\n│ │ len(str_2n) <uvarint> │ str_2n <bytes> │ │\n│ └───────────────────────┴────────────────┘ │\n│                  . . .                     │\n└────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#3",
+    "title": "tsdb/docs/format/memory_snapshot.md > Memory Snapshot Format > Exemplar record",
+    "text": "### Exemplar record\n\nA single exemplar record contains one or more exemplars, encoded in the same way as we do in WAL but with changed record type.\n\n```\n┌───────────────────────────────────────────────────────────────────┐\n│                      Record Type <byte>                           │\n├───────────────────────────────────────────────────────────────────┤\n│ ┌────────────────────┬───────────────────────────┐                │\n│ │ series ref <8b>    │ timestamp <8b>            │                │\n│ └────────────────────┴───────────────────────────┘                │\n│ ┌─────────────────────┬───────────────────────────┬─────────────┐ │\n│ │ ref_delta <uvarint> │ timestamp_delta <uvarint> │ value <8b>  │ │\n│ ├─────────────────────┴───────────────────────────┴─────────────┤ │\n│ │  n = len(labels) <uvarint>                                    │ │\n│ ├───────────────────────────────┬───────────────────────────────┤ │\n│ │     len(str_1) <uvarint>      │       str_1 <bytes>           │ │\n│ ├───────────────────────────────┴───────────────────────────────┤ │\n│ │                              ...                              │ │\n│ ├───────────────────────────────┬───────────────────────────────┤ │\n│ │     len(str_2n) <uvarint>     │       str_2n <bytes>          │ │\n│ ├───────────────────────────────┴───────────────────────────────┤ │\n│                               . . .                               │\n└───────────────────────────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/index.md#6",
+    "title": "tsdb/docs/format/index.md > Index Disk Format > Label Offset Table",
+    "text": "### Label Offset Table\n\nA label offset table stores a sequence of label offset entries.\nEvery label offset entry holds the label name and the offset to its values in the label index section.\nThey are used to track label index sections. This is no longer used.\n\n```\n┌─────────────────────┬──────────────────────┐\n│ len <4b>            │ #entries <4b>        │\n├─────────────────────┴──────────────────────┤\n│ ┌────────────────────────────────────────┐ │\n│ │  n = 1 <1b>                            │ │\n│ ├──────────────────────┬─────────────────┤ │\n│ │ len(name) <uvarint>  │ name <bytes>    │ │\n│ ├──────────────────────┴─────────────────┤ │\n│ │  offset <uvarint64>                    │ │\n│ └────────────────────────────────────────┘ │\n│                    . . .                   │\n├────────────────────────────────────────────┤\n│  CRC32 <4b>                                │\n└────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/wal.md#11",
+    "title": "tsdb/docs/format/wal.md > WAL Disk Format > Segment encoding > Record types > Histogram records",
+    "text": "A record with the float native histograms with the exponential bucketing:\n\n```\n┌───────────────────────────────────────────────────────────────────────┐\n│ type = 8 <1b>                                                         │\n├───────────────────────────────────────────────────────────────────────┤\n│ ┌────────────────────┬───────────────────────────┐                    │\n│ │ id <8b>            │ timestamp <8b>            │                    │\n│ └────────────────────┴───────────────────────────┘                    │\n│ ┌────────────────────┬──────────────────────────────────────────────┐ │\n│ │ id_delta <uvarint> │ timestamp_delta <uvarint>                    │ │\n│ ├────────────────────┴────┬─────────────────────────────────────────┤ │\n│ │ counter_reset_hint <1b> │ schema <varint>                         │ │\n│ ├─────────────────────────┴────┬────────────────────────────────────┤ │\n│ │ zero_threshold (float) <8b>  │   zero_count (float) <8b>          │ │\n│ ├────────────────────┬─────────┴────────────────────────────────────┤ │\n│ │ count (float) <8b> │ sum (float) <8b>                             │ │\n│ ├────────────────────┴──────────────────────────────────────────────┤ │\n│ │ positive_spans_num <uvarint>                                      │ │\n│ ├─────────────────────────────────┬─────────────────────────────────┤ │\n│ │ positive_span_offset_1 <varint> │ positive_span_len_1 <uvarint32> │ │\n│ ├─────────────────────────────────┴─────────────────────────────────┤ │\n│ │ . . .                                                             │ │\n│ ├───────────────────────────────────────────────────────────────────┤ │\n│ │ negative_spans_num <uvarint>                                      │ │\n│ ├───────────────────────────────┬───────────────────────────────────┤ │\n│ │ negative_span_offset <varint> │ negative_span_len <uvarint32>     │ │\n│ ├───────────────────────────────┴───────────────────────────────────┤ │\n│ │ . . .                                                             │ │\n│ ├───────────────────────────────────────────────────────────────────┤ │\n│ │ positive_bkts_num <uvarint>                                       │ │\n│ ├─────────────────────────────┬───────┬─────────────────────────────┤ │\n│ │ positive_bkt_1 (float) <8b> │ . . . │ positive_bkt_n (float) <8b> │ │\n│ ├─────────────────────────────┴───────┴─────────────────────────────┤ │\n│ │ negative_bkts_num <uvarint>                                       │ │\n│ ├─────────────────────────────┬───────┬─────────────────────────────┤ │\n│ │ negative_bkt_1 (float) <8b> │ . . . │ negative_bkt_n (float) <8b> │ │\n│ └─────────────────────────────┴───────┴─────────────────────────────┘ │\n│                              . . .                                    │\n└───────────────────────────────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#13",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "# +----------------------------+----------------------------+\n# |              1.005         |              7             |\n# +----------------------------+----------------------------+\n# |              1.002         |              8             |\n# +----------------------------+----------------------------+\n#\n# 0 results in the smallest supported factor (which is currently ~1.0027 or\n# schema 8, but might change in the future).\n[ native_histogram_min_bucket_factor: <float> | default = 0 ]\n\n# If true, native histograms exposed by a target are recognized during\n# scraping and ingested as such. If false, any native parts of histograms\n# are ignored and only the classic parts are recognized (possibly as\n# a classic histogram with only the +Inf buckets if no explicit classic\n# buckets are part of the histogram).\n[ scrape_native_histograms: <bool> | default = <global.scrape_native_histograms> ]\n\n# Specifies whether to convert classic histograms into native histograms with\n# custom buckets.\n[ convert_classic_histograms_to_nhcb: <bool> | default = <global.convert_classic_histograms_to_nhcb>]\n\n# Specifies whether to additionally scrape the classic parts of a histogram,\n# even if it is also exposed with native parts or it is converted into a\n# native histogram with custom buckets.\n[ always_scrape_classic_histograms: <boolean> | default = <global.always_scrape_classic_histograms> ]\n\n# See global configuration above for further explanations of how the last three\n# options combine their effects.\n\n# When enabled, Prometheus stores additional time series for this scrape job:\n# scrape_timeout_seconds, scrape_sample_limit, and scrape_body_size_bytes.\n# These metrics help monitor how close targets are to their configured limits.\n# If not set, inherits the value from the global configuration.\n[ extra_scrape_metrics: <boolean> | default = <global.extra_scrape_metrics> ]\n\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/format/chunks.md#16",
+    "action": "use",
+    "relevance_score": 0.9939,
+    "document_score": 0.9953,
+    "levels": {
+     "answers": 0.9939,
+     "elsewhere": 0.0014,
+     "different_case": 0.0016,
+     "unrelated": 0.0031
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/format/chunks.md#11",
+    "action": "use",
+    "relevance_score": 0.788,
+    "document_score": 0.8936,
+    "levels": {
+     "answers": 0.788,
+     "elsewhere": 0.1056,
+     "different_case": 0.0565,
+     "unrelated": 0.0499
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/format/chunks.md#17",
+    "action": "expand",
+    "relevance_score": 0.0973,
+    "document_score": 0.8507,
+    "levels": {
+     "answers": 0.0973,
+     "elsewhere": 0.7534,
+     "different_case": 0.0712,
+     "unrelated": 0.0782
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/configuration/configuration.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0881,
+    "document_score": 0.2746,
+    "levels": {
+     "answers": 0.0881,
+     "elsewhere": 0.1865,
+     "different_case": 0.0708,
+     "unrelated": 0.6546
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:tsdb/docs/format/wal.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.005,
+    "document_score": 0.0102,
+    "levels": {
+     "answers": 0.005,
+     "elsewhere": 0.0052,
+     "different_case": 0.0131,
+     "unrelated": 0.9768
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/format/wal.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0048,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0027,
+     "different_case": 0.0037,
+     "unrelated": 0.9915
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:tsdb/docs/format/tombstones.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0015,
+     "different_case": 0.0034,
+     "unrelated": 0.9936
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0011,
+     "different_case": 0.0028,
+     "unrelated": 0.9944
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:tsdb/docs/format/wal.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0019,
+     "different_case": 0.0035,
+     "unrelated": 0.9931
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:tsdb/docs/format/index.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0029,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0015,
+     "different_case": 0.0035,
+     "unrelated": 0.9936
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4434
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5784,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 82,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

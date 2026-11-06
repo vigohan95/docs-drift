@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/027",
+ "recorded_at": "2026-11-06T13:43:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1251,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "197.422909",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=391"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "text": "- `merge` - Merges multiple entities into a single entity.\n\n```typescript\nconst user = new User()\nmanager.merge(User, user, { firstName: \"Timber\" }, { lastName: \"Saw\" }) // same as user.firstName = \"Timber\"; user.lastName = \"Saw\";\n```\n\n- `preload` - Creates a new entity from the given plain javascript object. If the entity already exist in the database, then\n  it loads it (and everything related to it), replaces all values with the new ones from the given object,\n  and returns the new entity. The new entity is actually loaded from the database entity with all properties\n  replaced from the new object.\n\n```typescript\nconst partialUser = {\n    id: 1,\n    firstName: \"Rizzrak\",\n    profile: {\n        id: 1,\n    },\n}\nconst user = await manager.preload(User, partialUser)\n// user will contain all missing data from partialUser with partialUser property values:\n// { id: 1, firstName: \"Rizzrak\", lastName: \"Saw\", profile: { id: 1, ... } }\n```\n\n- `save` - Saves a given entity or array of entities.\n  If the entity already exists in the database, then it's updated.\n  If the entity does not exist in the database yet, it's inserted.\n  It saves all given entities in a single transaction (in the case of entity manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped. In order to make a value `NULL`, you must manually set the property to equal `null`."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#1",
+    "text": "- `create` - Creates a new instance of `User`. Optionally accepts an object literal with user properties\n  which will be written into newly created user object\n\n```typescript\nconst user = repository.create() // same as const user = new User();\nconst user = repository.create({\n    id: 1,\n    firstName: \"Timber\",\n    lastName: \"Saw\",\n}) // same as const user = new User(); user.firstName = \"Timber\"; user.lastName = \"Saw\";\n```\n\n- `merge` - Merges multiple entities into a single entity.\n\n```typescript\nconst user = new User()\nrepository.merge(user, { firstName: \"Timber\" }, { lastName: \"Saw\" }) // same as user.firstName = \"Timber\"; user.lastName = \"Saw\";\n```\n\n- `preload` - Creates a new entity from the given plain javascript object. If the entity already exists in the database, then\n  it loads it (and everything related to it), replaces all values with the new ones from the given object,\n  and returns the new entity. The new entity is actually an entity loaded from the database with all properties\n  replaced from the new object.\n\n    > Note that given entity-like object must have an entity id / primary key to find entity by. Returns undefined if entity with given id was not found.\n\n```typescript\nconst partialUser = {\n    id: 1,\n    firstName: \"Rizzrak\",\n    profile: {\n        id: 1,\n    },\n}\nconst user = await repository.preload(partialUser)\n// user will contain all missing data from partialUser with partialUser property values:\n// { id: 1, firstName: \"Rizzrak\", lastName: \"Saw\", profile: { id: 1, ... } }\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#1"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#1",
+    "relation": "overlapping",
+    "related": 0.996,
+    "probabilities": {
+     "same": 0.0136,
+     "overlapping": 0.9724,
+     "conflicting": 0.01,
+     "unrelated": 0.004
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0458,
+       "restated": 0.9197,
+       "elaborated": 0.023,
+       "different": 0.0116
+      },
+      "confidence": 0.9884,
+      "a": {
+       "document": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+       "quote": "If the entity already exist in the database, then",
+       "start": 311,
+       "end": 360,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#1",
+       "quote": "If the entity already exists in the database, then\n  it loads it (and everything related to it), replaces all values with the new ones from the given object,\n  and returns the new entity.",
+       "start": 736,
+       "end": 923,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 98,
+   "passages": 2,
+   "counterparts_ms": 135
+  },
+  "timing": {
+   "read_ms": 268,
+   "total_ms": 272
+  }
+ }
+}

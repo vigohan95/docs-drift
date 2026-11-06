@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/006.rerank",
+ "recorded_at": "2026-11-06T13:37:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1155,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.567261",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=163,cfOrigin;dur=0,cfWorker;dur=289"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Multiple modes of **graphing and dashboarding support**",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#3",
+    "title": "docs/querying/basics.md > Expression language data types",
+    "text": "## Expression language data types\n\nIn Prometheus's expression language, an expression or sub-expression can\nevaluate to one of four types:\n\n* **Instant vector** - a set of time series containing a single sample for each time series, all sharing the same timestamp\n* **Range vector** - a set of time series containing a range of data points over time for each time series\n* **Scalar** - a simple numeric floating point value\n* **String** - a simple string value; currently unused\n\nDepending on the use case (e.g. when graphing vs. displaying the output of an\nexpression), only some of these types are legal as the result of a\nuser-specified expression.\nFor [instant queries](api.md#instant-queries), any of the above data types are allowed as the root of the expression.\n[Range queries](api.md#range-queries) only support scalar-typed and instant-vector-typed expressions.\n\nBoth vectors and time series may contain a mix of float samples and histogram\nsamples."
+   },
+   {
+    "id": "prometheus:docs/configuration/template_examples.md#6",
+    "title": "docs/configuration/template_examples.md > Defining reusable templates",
+    "text": "## Defining reusable templates\n\nPrometheus supports defining templates that can be reused. This is particularly\npowerful when combined with\n[console library](template_reference.md#console-templates) support, allowing\nsharing of templates across consoles.\n\n```\n{{/* Define the template */}}\n{{define \"myTemplate\"}}\n  do something\n{{end}}\n\n{{/* Use the template */}}\n{{template \"myTemplate\"}}\n```\n\nTemplates are limited to one argument. The `args` function can be used to wrap multiple arguments.\n\n```\n{{define \"myMultiArgTemplate\"}}\n  First argument: {{.arg0}}\n  Second argument: {{.arg1}}\n{{end}}\n{{template \"myMultiArgTemplate\" (args 1 2)}}\n```"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#10",
+    "title": "docs/getting_started.md > Configure rules for aggregating scraped data into new time series",
+    "text": "Restart Prometheus with the new configuration and verify that a new time series\nwith the metric name `job_instance_mode:node_cpu_seconds:avg_rate5m`\nis now available by querying it through the expression browser or graphing it."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#12",
+    "title": "docs/feature_flags.md > Metadata WAL Records",
+    "text": "## Metadata WAL Records\n\n`--enable-feature=metadata-wal-records`\n\nWhen enabled, Prometheus (both in server and agent modes) will store metadata in-memory and keep track of\nmetadata changes as WAL records on a per-series basis, including any `help`, `type`, and `unit` metadata configured on recording rules.\n\nThis must be used if you would like to send metadata using the new remote write 2.0."
+   },
+   {
+    "id": "prometheus:docs/prometheus_agent.md#1",
+    "title": "docs/prometheus_agent.md > Prometheus Agent Mode",
+    "text": "## Prometheus Agent Mode\n\nThe Prometheus Agent is an operational mode built into the Prometheus binary with the same scraping APIs, semantics, configuration, and discovery mechanism; this agent mode disables some of Prometheus' usual features(TSDB, alerting, and rule evaluations) and optimizes the binary for scraping and remote writing to remote locations. \n\nThe Prometheus Remote Write protocol forwards(streams) all or a subset of metrics collected by Prometheus to a remote location; you can configure Prometheus to forward some metrics (if you want, with all metadata and exemplars!) to one or more locations that support the Remote Write API. \n\nWith Remote Write, Prometheus still uses a pull model to gather metrics from applications, which gives us an understanding of those different failure modes. After that, we batch samples and series and export, replicate (push) data to the Remote Write endpoints, limiting the number of monitoring unknowns that the central point has.\nStreaming data from such a scraper enables Global View use cases by allowing you to store metrics data in a centralized location. This enables the separation of concerns, which is useful when different teams manage applications than the observability or monitoring pipelines. \n\nThe Agent mode optimizes Prometheus for the remote write use case. It disables querying, alerting, and local storage and replaces it with a customized TSDB WAL. Everything else stays the same: scraping logic, service discovery, and related configuration. It can be used as a drop-in replacement for Prometheus if you want to just forward your data to a remote Prometheus server or any other Remote-Write-compliant project. \n\nIn essence, it looks like this:\n![Prometheus Agent Remote Write](./images/prometheus_agent.png)"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#123",
+    "title": "docs/configuration/configuration.md > Configuration file > `<remote_write>`",
+    "text": "### `<remote_write>`\n\n`write_relabel_configs` is relabeling applied to samples before sending them\nto the remote endpoint. Write relabeling is applied after external labels. This\ncould be used to limit which samples are sent.\n\nThere is a [small demo](/documentation/examples/remote_storage) of how to use\nthis functionality.\n\n```yaml\n# The URL of the endpoint to send samples to.\nurl: <string>\n\n# protobuf message to use when writing to the remote write endpoint.\n#\n# * The `prometheus.WriteRequest` represents the message introduced in Remote Write 1.0, which\n# will be deprecated eventually.\n# * The `io.prometheus.write.v2.Request` was introduced in Remote Write 2.0 and replaces the former,\n# by improving efficiency and sending metadata, start timestamp and native histograms by default.\n#\n# Before changing this value, consult with your remote storage provider (or test) what message it supports.\n# Read more on https://prometheus.io/docs/specs/remote_write_spec_2_0/#io-prometheus-write-v2-request\n[ protobuf_message: <prometheus.WriteRequest | io.prometheus.write.v2.Request> | default = prometheus.WriteRequest ]\n\n# EXPERIMENTAL: Remote-Write 2.0 mode to use when `protobuf_message` is `io.prometheus.write.v2.Request`.\n#\n# * `none`: default Remote-Write 2.0 behavior with no additional restrictions.\n# * `stateless`: appends `;mode=stateless` to the Content-Type header, defaults `send_native_histograms` to `true`,\n#   requires `--enable-feature=metadata-wal-records` or `--enable-feature=type-and-unit-labels`, and drops classic\n#   histogram float series, series with unspecified metadata type, and all exemplars (until sample-exemplar coalescing\n#   is implemented, as `stateless` mode forbids detached exemplars).\n# * `stateless-st`: appends `;mode=stateless-st` to the Content-Type header, includes all `stateless` rules,\n#   additionally requires `--enable-feature=st-storage`, and drops cumulative metrics missing a start timestamp.\n#\n# Support for metadata relabeling (https://github.com/prometheus/proposals/pull/104) is coming to allow relabeling\n# untyped series (such as recording rule outputs) to `counter` or `gauge` (relabeling `__type__` already works when\n# `--enable-feature=type-and-unit-labels` is enabled).\n#\n# Read more on https://prometheus.io/docs/specs/prw/remote_write_spec_2_0/#modes\n[ mode: <none | stateless | stateless-st> | default = none ]"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#5",
+    "title": "docs/getting_started.md > Using the graphing interface",
+    "text": "## Using the graphing interface\n\nTo graph expressions, navigate to http://localhost:9090/query and use the \"Graph\"\ntab.\n\nFor example, enter the following expression to graph the per-second rate of chunks\nbeing created in the self-scraped Prometheus:\n\n```\nrate(prometheus_tsdb_head_chunks_created_total[1m])\n```\n\nExperiment with the graph range parameters and other settings."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#28",
+    "title": "docs/querying/basics.md > Gotchas > Staleness",
+    "text": "### Staleness\n\nThe timestamps at which to sample data, during a query, are selected\nindependently of the actual present time series data. This is mainly to support\ncases like aggregation (`sum`, `avg`, and so on), where multiple aggregated\ntime series do not precisely align in time. Because of their independence,\nPrometheus needs to assign a value at those timestamps for each relevant time\nseries. It does so by taking the newest sample that is less than the lookback period ago.\nThe lookback period is 5 minutes by default, but can be\n[set with the `--query.lookback-delta` flag](../command-line/prometheus.md)\nor overridden on an individual query via the `lookback_delta` parameter.\n\nIf a target scrape or rule evaluation no longer returns a sample for a time\nseries that was previously present, this time series will be marked as stale.\nIf a target is removed, the previously retrieved time series will be marked as\nstale soon after removal.\n\nIf a query is evaluated at a sampling timestamp after a time series is marked\nas stale, then no value is returned for that time series. If new samples are\nsubsequently ingested for that time series, they will be returned as expected.\n\nA time series will go stale when it is no longer exported, or the target no\nlonger exists. Such time series will disappear from graphs\nat the times of their latest collected sample, and they will not be returned\nin queries after they are marked stale.\n\nSome exporters, which put their own timestamps on samples, get a different behaviour:\nseries that stop being exported take the last value for (by default) 5 minutes before\ndisappearing. The `track_timestamps_staleness` setting can change this."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#46",
+    "title": "docs/configuration/configuration.md > Configuration file > `<docker_sd_config>`",
+    "text": "See below for the configuration options for Docker discovery:\n\n```yaml\n# Address of the Docker daemon.\nhost: <string>\n\n# The port to scrape metrics from, when `role` is nodes, and for discovered\n# tasks and services that don't have published ports.\n[ port: <int> | default = 80 ]\n\n# The host to use if the container is in host networking mode.\n[ host_networking_host: <string> | default = \"localhost\" ]\n\n# Sort all non-nil networks in ascending order based on network name and\n# get the first network if the container has multiple networks defined,\n# thus avoiding collecting duplicate targets.\n[ match_first_network: <boolean> | default = true ]\n\n# Optional filters to limit the discovery process to a subset of available\n# resources.\n# The available filters are listed in the upstream documentation:\n# https://docs.docker.com/engine/api/v1.40/#operation/ContainerList\n[ filters:\n  [ - name: <string>\n      values: <string>, [...] ]\n\n# The time after which the containers are refreshed.\n[ refresh_interval: <duration> | default = 60s ]\n\n# HTTP client settings, including authentication methods (such as basic auth and\n# authorization), proxy configurations, TLS options, custom HTTP headers, etc.\n[ <http_config> ]\n```\n\nThe [relabeling phase](#relabel_config) is the preferred and more powerful\nway to filter containers. For users with thousands of containers it\ncan be more efficient to use the Docker API directly which has basic support for\nfiltering containers (using `filters`)."
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#1",
+    "title": "documentation/internal_architecture.md > Internal architecture > Main function",
+    "text": "## Main function\n\nThe [`main()` function](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L77-L600) initializes and runs all other Prometheus server components. It also connects interdependent components to each other.\n\nAs a first step, `main()` defines and parses the server's command-line flags into a [local configuration structure](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L83-L100), while performing extra sanitization and initialization for some values. Note that this flag-based configuration structure is independent of the configuration that is later read from a configuration file (as provided by the `--config.file` flag). Prometheus distinguishes between flag-based configuration and file-based configuration: flags are used for simple settings that do not support being updated without a server restart, while any settings provided in the configuration file have to support being reloaded without restarting the entire server.\n\nNext, `main()` instantiates all the major run-time components of Prometheus and connects them together using channels, references, or passing in contexts for later coordination and cancellation. These components include service discovery, target scraping, storage, and more (as laid out in the rest of this document).\n\nFinally, the server [runs all components](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L366-L598) in an [actor-like model](https://www.brianstorti.com/the-actor-model/), using [`github.com/oklog/oklog/pkg/group`](https://pkg.go.dev/github.com/oklog/run) to coordinate the startup and shutdown of all interconnected actors. Multiple channels are used to enforce ordering constraints, such as not enabling the web interface before the storage is ready and the initial configuration file load has happened."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 6,
+    "id": "prometheus:docs/getting_started.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0517,
+    "document_score": 0.1292,
+    "levels": {
+     "answers": 0.0517,
+     "elsewhere": 0.0776,
+     "different_case": 0.039,
+     "unrelated": 0.8318
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/getting_started.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0179,
+    "document_score": 0.0284,
+    "levels": {
+     "answers": 0.0179,
+     "elsewhere": 0.0105,
+     "different_case": 0.0457,
+     "unrelated": 0.9259
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/prometheus_agent.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0057,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0035,
+     "different_case": 0.0063,
+     "unrelated": 0.988
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/basics.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0058,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0038,
+     "different_case": 0.0056,
+     "unrelated": 0.9886
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/configuration/configuration.md#46",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0029,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0012,
+     "different_case": 0.0031,
+     "unrelated": 0.994
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/template_examples.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0018,
+     "different_case": 0.0031,
+     "unrelated": 0.9936
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/feature_flags.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0012,
+     "different_case": 0.003,
+     "unrelated": 0.9945
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/configuration/configuration.md#123",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0013,
+     "different_case": 0.0026,
+     "unrelated": 0.9948
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/querying/basics.md#28",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0009,
+     "different_case": 0.002,
+     "unrelated": 0.9959
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:documentation/internal_architecture.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0011,
+     "different_case": 0.003,
+     "unrelated": 0.9946
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3538
+  },
+  "timing": {
+   "total_ms": 107,
+   "rerank_ms": 92,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5048,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 96
+   }
+  }
+ }
+}

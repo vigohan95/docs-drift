@@ -1,0 +1,240 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/023.rerank",
+ "recorded_at": "2026-11-06T13:38:10Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 967,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.255234",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=241"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Shared schemas can be reused with the JSON Schema [**`$ref`**](https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-01#section-8) keyword.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#74",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > addSchema",
+    "text": "#### addSchema\n<a id=\"add-schema\"></a>\n\n`fastify.addSchema(schemaObj)`, adds a JSON schema to the Fastify instance. This\nallows you to reuse it everywhere in your application just by using the standard\n`$ref` keyword.\n\nTo learn more, read the [Validation and\nSerialization](./Validation-and-Serialization.md) documentation."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#3",
+    "title": "docs/Guides/Migration-Guide-V3.md > V3 Migration Guide > Breaking changes > Changed schema substitution ([#2023](https://github.com/fastify/fastify/pull/2023))",
+    "text": "### Changed schema substitution ([#2023](https://github.com/fastify/fastify/pull/2023))\n\nThe non-standard `replace-way` shared schema support has been removed. This\nfeature has been replaced with JSON Schema specification compliant `$ref` based\nsubstitution. To help understand this change read [Validation and Serialization\nin Fastify\nv3](https://dev.to/eomm/validation-and-serialization-in-fastify-v3-2e8l).\n\n**v2:**\n\n```js\nconst schema = {\n  body: 'schemaId#'\n};\nfastify.route({ method, url, schema, handler });\n```\n\n**v3:**\n\n```js\nconst schema = {\n  body: {\n    $ref: 'schemaId#'\n  }\n};\nfastify.route({ method, url, schema, handler });\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#10",
+    "title": "docs/Guides/Migration-Guide-V4.md > V4 Migration Guide > Non-Breaking Changes > Change of schema for multiple types",
+    "text": "### Change of schema for multiple types\n\nAjv has been upgraded to v8 in Fastify v4, meaning \"type\" keywords with multiple\ntypes other than \"null\"\n[are now prohibited](https://ajv.js.org/strict-mode.html#strict-types).\n\nYou may encounter a console warning such as:\n```sh\nstrict mode: use allowUnionTypes to allow union type keyword at \"#/properties/image\" (strictTypes)\n```\n\nAs such, schemas like below will need to be changed from:\n```js\n{\n  type: 'object',\n  properties: {\n    api_key: { type: 'string' },\n    image: { type: ['object', 'array'] }\n  }\n}\n```\n\nInto:\n```js\n{\n  type: 'object',\n  properties: {\n    api_key: { type: 'string' },\n    image: {\n      anyOf: [\n        { type: 'array' },\n        { type: 'object' }\n      ]\n    }\n  }\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#81",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > validatorCompiler",
+    "text": "#### validatorCompiler\n<a id=\"validator-compiler\"></a>\n\nThis property can be used to get the schema validator. If not set, it will be\n`null` until the server starts, then it will be a function with the signature\n`function ({ schema, method, url, httpPart })` that returns the input `schema`\ncompiled to a function for validating data. The input `schema` can access all\nthe shared schemas added with [`.addSchema`](#add-schema) function."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#82",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > serializerCompiler",
+    "text": "#### serializerCompiler\n<a id=\"serializer-compiler\"></a>\n\nThis property can be used to get the schema serializer. If not set, it will be\n`null` until the server starts, then it will be a function with the signature\n`function ({ schema, method, url, httpPart })` that returns the input `schema`\ncompiled to a function for validating data. The input `schema` can access all\nthe shared schemas added with [`.addSchema`](#add-schema) function."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#75",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > getSchemas",
+    "text": "#### getSchemas\n<a id=\"get-schemas\"></a>\n\n`fastify.getSchemas()`, returns a hash of all schemas added via `.addSchema`.\nThe keys of the hash are the `$id`s of the JSON Schema provided."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#84",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > schemaController",
+    "text": "#### schemaController\n<a id=\"schema-controller\"></a>\n\nThis property can be used to fully manage:\n- `bucket`: where the schemas of your application will be stored\n- `compilersFactory`: what module must compile the JSON schemas\n\nIt can be useful when your schemas are stored in another data structure that is\nunknown to Fastify.\n\nAnother use case is to tweak all the schemas processing. Doing so it is possible\nto use Ajv v8 JTD or Standalone feature. To use such as JTD or the Standalone\nmode, refers to the [`@fastify/ajv-compiler`\ndocumentation](https://github.com/fastify/ajv-compiler#usage).\n\n```js\nconst fastify = Fastify({\n  schemaController: {\n    /**\n     * This factory is called whenever `fastify.register()` is called.\n     * It may receive as input the schemas of the parent context if some schemas have been added.\n     * @param {object} parentSchemas these schemas will be returned by the\n     * `getSchemas()` method function of the returned `bucket`.\n     */\n    bucket: function factory (parentSchemas) {\n      return {\n        add (inputSchema) {\n          // This function must store the schema added by the user.\n          // This function is invoked when `fastify.addSchema()` is called.\n        },\n        getSchema (schema$id) {\n          // This function must return the raw schema requested by the `schema$id`.\n          // This function is invoked when `fastify.getSchema(id)` is called.\n          return aSchema\n        },\n        getSchemas () {\n          // This function must return all the schemas referenced by the routes schemas' $ref\n          // It must return a JSON where the property is the schema `$id` and the value is the raw JSON Schema.\n          const allTheSchemaStored = {\n            'schema$id1': schema1,\n            'schema$id2': schema2\n          }\n          return allTheSchemaStored\n        }\n      }\n    },\n\n    /**\n     * The compilers factory lets you fully control the validator and serializer\n     * in the Fastify's lifecycle, providing the encapsulation to your compilers.\n     */\n    compilersFactory: {\n      /**\n       * This factory is called whenever a new validator instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`. Needed to resolve the external references $ref.\n       * @param {object} ajvServerOption the server `ajv` options to build your compilers accordingly\n       */\n      buildValidator: function factory (externalSchemas, ajvServerOption) {\n        // This factory function must return a schema validator compiler.\n        // See [#schema-validator](./Validation-and-Serialization.md#schema-validator) for details.\n        const yourAjvInstance = new Ajv(ajvServerOption.customOptions)\n        return function validatorCompiler ({ schema, method, url, httpPart }) {\n          return yourAjvInstance.compile(schema)\n        }\n      },"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#85",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > schemaController",
+    "text": "      /**\n       * This factory is called whenever a new serializer instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`. Needed to resolve the external references $ref.\n       * @param {object} serializerOptsServerOption the server `serializerOpts`\n       * options to build your compilers accordingly\n       */\n      buildSerializer: function factory (externalSchemas, serializerOptsServerOption) {\n        // This factory function must return a schema serializer compiler.\n        // See [#schema-serializer](./Validation-and-Serialization.md#schema-serializer) for details.\n        return function serializerCompiler ({ schema, method, url, httpStatus, contentType }) {\n          return data => JSON.stringify(data)\n        }\n      }\n    }\n  }\n});\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Fluent-Schema.md#2",
+    "title": "docs/Guides/Fluent-Schema.md > Fluent Schema > Reuse",
+    "text": "### Reuse\n\nWith `fluent-json-schema`, you can manipulate your schemas more easily and\nprogrammatically and then reuse them thanks to the `addSchema()` method. You can\nrefer to the schema in two different manners that are detailed in the\n[Validation and\nSerialization](../Reference/Validation-and-Serialization.md#adding-a-shared-schema)\ndocumentation.\n\nHere are some usage examples:\n\n**`$ref-way`**: refer to an external schema.\n\n```js\nconst addressSchema = S.object()\n  .id('#address')\n  .prop('line1').required()\n  .prop('line2')\n  .prop('country').required()\n  .prop('city').required()\n  .prop('zipcode').required()\n\nconst commonSchemas = S.object()\n  .id('https://fastify/demo')\n  .definition('addressSchema', addressSchema)\n  .definition('otherSchema', otherSchema) // You can add any schemas you need\n\nfastify.addSchema(commonSchemas)\n\nconst bodyJsonSchema = S.object()\n  .prop('residence', S.ref('https://fastify/demo#address')).required()\n  .prop('office', S.ref('https://fastify/demo#/definitions/addressSchema')).required()\n\nconst schema = { body: bodyJsonSchema }\n\nfastify.post('/the/url', { schema }, handler)\n```\n\n\n**`replace-way`**: refer to a shared schema to replace before the validation\nprocess.\n\n```js\nconst sharedAddressSchema = {\n  $id: 'sharedAddress',\n  type: 'object',\n  required: ['line1', 'country', 'city', 'zipcode'],\n  properties: {\n    line1: { type: 'string' },\n    line2: { type: 'string' },\n    country: { type: 'string' },\n    city: { type: 'string' },\n    zipcode: { type: 'string' }\n  }\n}\nfastify.addSchema(sharedAddressSchema)\n\nconst bodyJsonSchema = {\n  type: 'object',\n  properties: {\n    vacation: 'sharedAddress#'\n  }\n}\n\nconst schema = { body: bodyJsonSchema }\n\nfastify.post('/the/url', { schema }, handler)\n```\n\n> ℹ️ Note:\n> You can mix up the `$ref-way` and the `replace-way`\n> when using `fastify.addSchema`."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#11",
+    "title": "docs/Reference/TypeScript.md > Learn By Example > JSON Schema > json-schema-to-typescript",
+    "text": "Great work! Now you can make use of both JSON Schemas and TypeScript\ndefinitions."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Server.md#74",
+    "action": "use",
+    "relevance_score": 0.9918,
+    "document_score": 0.9941,
+    "levels": {
+     "answers": 0.9918,
+     "elsewhere": 0.0023,
+     "different_case": 0.0022,
+     "unrelated": 0.0037
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#3",
+    "action": "use",
+    "relevance_score": 0.98,
+    "document_score": 0.9855,
+    "levels": {
+     "answers": 0.98,
+     "elsewhere": 0.0056,
+     "different_case": 0.0063,
+     "unrelated": 0.0082
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Guides/Fluent-Schema.md#2",
+    "action": "use",
+    "relevance_score": 0.8351,
+    "document_score": 0.8596,
+    "levels": {
+     "answers": 0.8351,
+     "elsewhere": 0.0246,
+     "different_case": 0.0336,
+     "unrelated": 0.1068
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Server.md#85",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0268,
+    "document_score": 0.0483,
+    "levels": {
+     "answers": 0.0268,
+     "elsewhere": 0.0215,
+     "different_case": 0.0323,
+     "unrelated": 0.9194
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Server.md#84",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0055,
+    "document_score": 0.0303,
+    "levels": {
+     "answers": 0.0055,
+     "elsewhere": 0.0248,
+     "different_case": 0.045,
+     "unrelated": 0.9248
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/TypeScript.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.009,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.005,
+     "different_case": 0.0052,
+     "unrelated": 0.9858
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Server.md#75",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0128,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0098,
+     "different_case": 0.012,
+     "unrelated": 0.9752
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#81",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0079,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0058,
+     "different_case": 0.0118,
+     "unrelated": 0.9803
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0037,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0017,
+     "different_case": 0.0043,
+     "unrelated": 0.992
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Server.md#82",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0055,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0038,
+     "different_case": 0.0087,
+     "unrelated": 0.9858
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3572
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 4602,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

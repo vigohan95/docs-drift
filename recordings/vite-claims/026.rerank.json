@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/026.rerank",
+ "recorded_at": "2026-11-06T13:38:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1056,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.363167",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=156,cfOrigin;dur=0,cfWorker;dur=238"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: :::warning Vite validates the input and output of the `dispatchFetch` method: the request must be an instance of the global `Request` class and the response must be the instance of the global `Response` class.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-instances.md#2",
+    "title": "docs/guide/api-environment-instances.md > Using `Environment` Instances > `DevEnvironment` class",
+    "text": "## `DevEnvironment` class\n\nDuring dev, each environment is an instance of the `DevEnvironment` class:\n\n```ts\nclass DevEnvironment {\n  /**\n   * Unique identifier for the environment in a Vite server.\n   * By default Vite exposes 'client' and 'ssr' environments.\n   */\n  name: string\n  /**\n   * Communication channel to send and receive messages from the\n   * associated module runner in the target runtime.\n   */\n  hot: NormalizedHotChannel\n  /**\n   * Graph of module nodes, with the imported relationship between\n   * processed modules and the cached result of the processed code.\n   */\n  moduleGraph: EnvironmentModuleGraph\n  /**\n   * Resolved plugins for this environment, including the ones\n   * created using the per-environment `create` hook\n   */\n  plugins: Plugin[]\n  /**\n   * Allows to resolve, load, and transform code through the\n   * environment plugins pipeline\n   */\n  pluginContainer: EnvironmentPluginContainer\n  /**\n   * Resolved config options for this environment. Options at the server\n   * global scope are taken as defaults for all environments, and can\n   * be overridden (resolve conditions, external, optimizedDeps)\n   */\n  config: ResolvedConfig & ResolvedDevEnvironmentOptions\n\n  constructor(\n    name: string,\n    config: ResolvedConfig,\n    context: DevEnvironmentContext,\n  )\n\n  /**\n   * Resolve the URL to an id, load it, and process the code using the\n   * plugins pipeline. The module graph is also updated.\n   */\n  async transformRequest(url: string): Promise<TransformResult | null>\n\n  /**\n   * Register a request to be processed with low priority. This is useful\n   * to avoid waterfalls. The Vite server has information about the\n   * imported modules by other requests, so it can warmup the module graph\n   * so the modules are already processed when they are requested.\n   */\n  async warmupRequest(url: string): Promise<void>\n\n  /**\n   * Called by the module runner to retrieve information about the specified\n   * module. Internally calls `transformRequest` and wraps the result in the\n   * format that the module runner understands.\n   * This method is not meant to be called manually.\n   */\n  async fetchModule(\n    id: string,\n    importer?: string,\n    options?: FetchFunctionOptions,\n  ): Promise<FetchResult>\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#10",
+    "title": "docs/guide/api-environment-runtimes.md > Environment API for Runtimes > `ModuleRunnerTransport`",
+    "text": ":::\n\nMake sure to implement the `vite:client:connect` / `vite:client:disconnect` events in the `on` / `off` methods when those methods exist. `vite:client:connect` event should be emitted when the connection is established, and `vite:client:disconnect` event should be emitted when the connection is closed. The `HotChannelClient` object passed to the event handler must have the same reference for the same connection.\n\nA different example using an HTTP request to communicate between the runner and the server:\n\n```ts\nimport { ESModulesEvaluator, ModuleRunner } from 'vite/module-runner'\n\nexport const runner = new ModuleRunner(\n  {\n    transport: {\n      async invoke(data) {\n        const response = await fetch(`http://my-vite-server/invoke`, {\n          method: 'POST',\n          body: JSON.stringify(data),\n        })\n        return response.json()\n      },\n    },\n    hmr: false, // disable HMR as HMR requires transport.connect\n  },\n  new ESModulesEvaluator(),\n)\n\nawait runner.import('/entry.js')\n```\n\nIn this case, the `handleInvoke` method in the `NormalizedHotChannel` can be used:\n\n```ts\nconst customEnvironment = new DevEnvironment(name, config, context)\n\nserver.onRequest((request: Request) => {\n  const url = new URL(request.url)\n  if (url.pathname === '/invoke') {\n    const payload = (await request.json()) as HotPayload\n    const result = customEnvironment.hot.handleInvoke(payload)\n    return new Response(JSON.stringify(result))\n  }\n  return Response.error()\n})\n```"
+   },
+   {
+    "id": "vite:docs/config/build-options.md#16",
+    "title": "docs/config/build-options.md > Build Options > build.lib",
+    "text": "## build.lib\n\n- **Type:** `{ entry?: string | string[] | { [entryAlias: string]: string }, name?: string, formats?: ('es' | 'cjs' | 'umd' | 'iife')[], fileName?: string | ((format: ModuleFormat, entryName: string) => string), cssFileName?: string }`\n- **Related:** [Library Mode](/guide/build#library-mode)\n\nBuild as a library. `entry` defaults to the top-level [`input`](/config/shared-options#input) option, and one of them is required since the library cannot use HTML as entry. `name` is the exposed global variable and is required when `formats` includes `'umd'` or `'iife'`. Default `formats` are `['es', 'umd']`, or `['es', 'cjs']`, if multiple entries are used.\n\n`fileName` is the name of the package file output, which defaults to the `\"name\"` in `package.json`. It can also be defined as a function taking the `format` and `entryName` as arguments, and returning the file name.\n\nIf your package imports CSS, `cssFileName` can be used to specify the name of the CSS file output. It defaults to the same value as `fileName` if it's set a string, otherwise it also falls back to the `\"name\"` in `package.json`.\n\n```js twoslash [vite.config.js]\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  build: {\n    lib: {\n      entry: ['src/main.js'],\n      fileName: (format, entryName) => `my-lib-${entryName}.${format}.js`,\n      cssFileName: 'my-lib-style',\n    },\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#4",
+    "title": "docs/config/dep-optimization-options.md > Dep Optimization Options > optimizeDeps.rolldownOptions <NonInheritBadge />",
+    "text": "## optimizeDeps.rolldownOptions <NonInheritBadge />\n\n- **Type:** <code>Omit<<a href=\"https://rolldown.rs/reference/Interface.RolldownOptions\">RolldownOptions</a>, 'input' | 'logLevel' | 'output'> & { output?: Omit<<a href=\"https://rolldown.rs/reference/#:~:text=Output%20Options\">RolldownOutputOptions</a>, 'format' | 'sourcemap' | 'dir' | 'banner'> }</code>\n\nOptions to pass to Rolldown during the dep scanning and optimization.\n\nCertain options are omitted since changing them would not be compatible with Vite's dep optimization.\n\n- `plugins` are merged with Vite's dep plugin"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#10",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Application-Plugin Communication > Managing the Application Instances",
+    "text": "### Managing the Application Instances\n\nBe aware that there might be multiple application instances running in the same environment. For example, if you have multiple tabs open in the browser, each tab is a separate application instance and has a separate connection to the server.\n\nWhen a new connection is established, a `vite:client:connect` event is emitted on the environment's `hot` instance. When the connection is closed, a `vite:client:disconnect` event is emitted.\n\nEach event handler receives the `NormalizedHotChannelClient` as the second argument. The client is an object with a `send` method that can be used to send messages to that specific application instance. The client reference is always the same for the same connection, so you can keep it to track the connection."
+   },
+   {
+    "id": "vite:docs/config/server-options.md#7",
+    "title": "docs/config/server-options.md > Server Options > server.proxy",
+    "text": "## server.proxy\n\n- **Type:** `Record<string, string | ProxyOptions>`\n\nConfigure custom proxy rules for the dev server. Expects an object of `{ key: options }` pairs. Any requests whose request path starts with that key will be proxied to the specified target. If the key starts with `^`, it will be interpreted as a `RegExp`. The `configure` option can be used to access the proxy instance. If a request matches any of the configured proxy rules, the request won't be transformed by Vite.\n\nNote that if you are using non-relative [`base`](/config/shared-options.md#base), you must prefix each key with that `base`.\n\nExtends [`http-proxy-3`](https://github.com/sagemathinc/http-proxy-3#options). Additional options are [here](https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/middlewares/proxy.ts#L13).\n\nIn some cases, you might also want to configure the underlying dev server (e.g. to add custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app). In order to do that, you need to write your own [plugin](/guide/using-plugins.html) and use [configureServer](/guide/api-plugin.html#configureserver) function.\n\n**Example:**\n\n```js\nexport default defineConfig({\n  server: {\n    proxy: {\n      // string shorthand:\n      // http://localhost:5173/foo\n      //   -> http://localhost:4567/foo\n      '/foo': 'http://localhost:4567',\n      // with options:\n      // http://localhost:5173/api/bar\n      //   -> http://jsonplaceholder.typicode.com/bar\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/api/, ''),\n      },\n      // with RegExp:\n      // http://localhost:5173/fallback/\n      //   -> http://jsonplaceholder.typicode.com/\n      '^/fallback/.*': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/fallback/, ''),\n      },\n      // Using the proxy instance\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        configure: (proxy, options) => {\n          // proxy will be an instance of 'http-proxy-3'\n        },\n      },\n      // Proxying websockets or socket.io:\n      // ws://localhost:5173/socket.io\n      //   -> ws://localhost:5174/socket.io\n      // Exercise caution using `rewriteWsOrigin` as it can leave the\n      // proxying open to CSRF attacks.\n      '/socket.io': {\n        target: 'ws://localhost:5174',\n        ws: true,\n        rewriteWsOrigin: true,\n      },\n    },\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#11",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Application-Plugin Communication > Example Usage",
+    "text": "### Example Usage\n\nThe plugin side:\n\n```js\nconfigureServer(server) {\n  server.environments.ssr.hot.on('my:greetings', (data, client) => {\n    // do something with the data,\n    // and optionally send a response to that application instance\n    client.send('my:foo:reply', `Hello from server! You said: ${data}`)\n  })\n\n  // broadcast a message to all application instances\n  server.environments.ssr.hot.send('my:foo', 'Hello from server!')\n}\n```\n\nThe application side is same with the Client-server Communication feature. You can use the `import.meta.hot` object to send messages to the plugin."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `configureServer`",
+    "text": "### `configureServer`\n\n- **Type:** `(server: ViteDevServer) => (() => void) | void | Promise<(() => void) | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [ViteDevServer](./api-javascript#vitedevserver)\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Hook for configuring the dev server. The most common use case is adding custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      server.middlewares.use((req, res, next) => {\n        // custom handle request...\n      })\n    },\n  })\n  ```\n\n  **Injecting Post Middleware**\n\n  The `configureServer` hook is called before internal middlewares are installed, so the custom middlewares will run before internal middlewares by default. If you want to inject a middleware **after** internal middlewares, you can return a function from `configureServer`, which will be called after internal middlewares are installed:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      // return a post hook that is called after internal middlewares are\n      // installed\n      return () => {\n        server.middlewares.use((req, res, next) => {\n          // custom handle request...\n        })\n      }\n    },\n  })\n  ```\n\n  **Storing Server Access**\n\n  In some cases, other plugin hooks may need access to the dev server instance (e.g. accessing the WebSocket server, the file system watcher, or the module graph). This hook can also be used to store the server instance for access in other hooks:\n\n  ```js\n  const myPlugin = () => {\n    let server\n    return {\n      name: 'configure-server',\n      configureServer(_server) {\n        server = _server\n      },\n      transform(code, id) {\n        if (server) {\n          // use server...\n        }\n      },\n    }\n  }\n  ```\n\n  Note `configureServer` is not called when running the production build so your other hooks need to guard against its absence."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#6",
+    "title": "docs/guide/api-environment-runtimes.md > Environment API for Runtimes > `ModuleRunnerOptions`",
+    "text": "## `ModuleRunnerOptions`\n\n```ts twoslash\nimport type { Debug } from '@type-challenges/utils'\nimport type {\n  InterceptorOptions as InterceptorOptionsRaw,\n  ModuleRunnerHmr as ModuleRunnerHmrRaw,\n  EvaluatedModules,\n} from 'vite/module-runner'\n\ntype InterceptorOptions = Debug<InterceptorOptionsRaw>\ntype ModuleRunnerHmr = Debug<ModuleRunnerHmrRaw>\n/** see below */\ntype ModuleRunnerTransport = unknown\n\n// ---cut---\ninterface ModuleRunnerOptions {\n  /**\n   * A set of methods to communicate with the server.\n   */\n  transport: ModuleRunnerTransport\n  /**\n   * Configure how source maps are resolved.\n   * Prefers `node` if `process.setSourceMapsEnabled` is available.\n   * Otherwise it will use `prepareStackTrace` by default which overrides\n   * `Error.prepareStackTrace` method.\n   * You can provide an object to configure how file contents and\n   * source maps are resolved for files that were not processed by Vite.\n   */\n  sourcemapInterceptor?:\n    | false\n    | 'node'\n    | 'prepareStackTrace'\n    | InterceptorOptions\n  /**\n   * Disable HMR or configure HMR options.\n   *\n   * @default true\n   */\n  hmr?: boolean | ModuleRunnerHmr\n  /**\n   * Custom module cache. If not provided, it creates a separate module\n   * cache for each module runner instance.\n   */\n  evaluatedModules?: EvaluatedModules\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Module externalized for browser compatibility",
+    "text": "### Module externalized for browser compatibility\n\nWhen you use a Node.js module in the browser, Vite will output the following warning.\n\n> Module \"fs\" has been externalized for browser compatibility. Cannot access \"fs.readFile\" in client code.\n\nThis is because Vite does not automatically polyfill Node.js modules.\n\nWe recommend avoiding Node.js modules for browser code to reduce the bundle size, although you can add polyfills manually. If the module is imported from a third-party library (that's meant to be used in the browser), it's advised to report the issue to the respective library."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-environment-runtimes.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0104,
+    "document_score": 0.0435,
+    "levels": {
+     "answers": 0.0104,
+     "elsewhere": 0.0331,
+     "different_case": 0.0242,
+     "unrelated": 0.9323
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0041,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0018,
+     "different_case": 0.0056,
+     "unrelated": 0.9904
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-instances.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0033,
+     "different_case": 0.0065,
+     "unrelated": 0.9881
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/config/dep-optimization-options.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0018,
+     "different_case": 0.0048,
+     "unrelated": 0.9912
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/api-environment-runtimes.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0021,
+     "different_case": 0.0046,
+     "unrelated": 0.9912
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-environment-plugins.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0022,
+     "different_case": 0.0044,
+     "unrelated": 0.9916
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/server-options.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0029,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0012,
+     "different_case": 0.005,
+     "unrelated": 0.9921
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/api-environment-plugins.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0017,
+     "different_case": 0.0032,
+     "unrelated": 0.9935
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/config/build-options.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.0027,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0011,
+     "different_case": 0.0022,
+     "unrelated": 0.9955
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4726
+  },
+  "timing": {
+   "total_ms": 112,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5916,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 82,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

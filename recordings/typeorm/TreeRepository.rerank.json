@@ -1,0 +1,128 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/TreeRepository.rerank",
+ "recorded_at": "2026-11-06T13:42:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1024,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "46.384094",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=31,cfOrigin;dur=0,cfWorker;dur=253"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `TreeRepository`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `TreeRepository`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "title": "docs/docs/data-source/4-data-source-api.md > DataSource API",
+    "text": "```typescript\nconst userMetadata = dataSource.getMetadata(User)\n// now you can get any information about User entity\n```\n\n- `getRepository` - Gets `Repository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getRepository(User)\n// now you can call repository methods, for example find:\nconst users = await repository.find()\n```\n\n- `getTreeRepository` - Gets `TreeRepository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getTreeRepository(Category)\n// now you can call tree repository methods, for example findTrees:\nconst categories = await repository.findTrees()\n```\n\n- `getMongoRepository` - Gets `MongoRepository` of the given entity.\n  This repository is used for entities in MongoDB dataSource.\n  Learn more about [MongoDB support](../drivers/mongodb.md).\n\n```typescript\nconst repository = dataSource.getMongoRepository(User)\n// now you can call mongodb-specific repository methods, for example createEntityCursor:\nconst categoryCursor = repository.createEntityCursor()\nconst category1 = await categoryCursor.next()\nconst category2 = await categoryCursor.next()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/entity/4-tree-entities.md#6",
+    "title": "docs/docs/entity/4-tree-entities.md > Tree Entities > Working with tree entities",
+    "text": "There are other special methods to work with tree entities through `TreeRepository`:\n\n- `findTrees` - Returns all trees in the database with all their children, children of children, etc.\n\n```typescript\nconst treeCategories = await dataSource.manager\n    .getTreeRepository(Category)\n    .findTrees()\n// returns root categories with sub categories inside\n\nconst treeCategoriesWithLimitedDepth = await dataSource.manager\n    .getTreeRepository(Category)\n    .findTrees({ depth: 2 })\n// returns root categories with sub categories inside, up to depth 2\n```\n\n- `findRoots` - Roots are entities that have no ancestors. Finds them all.\n  Does not load children's leaves.\n\n```typescript\nconst rootCategories = await dataSource.manager\n    .getTreeRepository(Category)\n    .findRoots()\n// returns root categories without sub categories inside\n```\n\n- `findDescendants` - Gets all children (descendants) of the given entity. Returns them all in a flat array.\n\n```typescript\nconst children = await dataSource.manager\n    .getTreeRepository(Category)\n    .findDescendants(parentCategory)\n// returns all direct subcategories (without its nested categories) of a parentCategory\n```\n\n- `findDescendantsTree` - Gets all children (descendants) of the given entity. Returns them in a tree - nested into each other.\n\n```typescript\nconst childrenTree = await repository.findDescendantsTree(parentCategory)\n// returns all direct subcategories (with its nested categories) of a parentCategory\nconst childrenTreeWithLimitedDepth = await repository.findDescendantsTree(\n    parentCategory,\n    { depth: 2 },\n)\n// returns all direct subcategories (with its nested categories) of a parentCategory, up to depth 2\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#9",
+    "title": "docs/docs/working-with-entity-manager/5-entity-manager-api.md > `EntityManager` API",
+    "text": "```typescript\nconst userRepository = manager.getRepository(User)\n```\n\n- `getTreeRepository` - Gets `TreeRepository` to perform operations on a specific entity.\n  Learn more about [Repositories](./2-working-with-repository.md).\n\n```typescript\nconst categoryRepository = manager.getTreeRepository(Category)\n```\n\n- `getMongoRepository` - Gets `MongoRepository` to perform operations on a specific entity.\n  Learn more about [MongoDB](../drivers/mongodb.md).\n\n```typescript\nconst userRepository = manager.getMongoRepository(User)\n```\n\n- `withRepository` - Gets custom repository instance used in a transaction.\n  Learn more about [Custom repositories](./4-custom-repository.md).\n\n```typescript\nconst myUserRepository = manager.withRepository(UserRepository)\n```\n\n- `release` - Releases query runner of an entity manager.\n  Used only when query runner was created and managed manually.\n\n```typescript\nawait manager.release()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#13",
+    "title": "docs/docs/working-with-entity-manager/6-repository-api.md > Repository APIs > `TreeRepository` API",
+    "text": "## `TreeRepository` API\n\nFor `TreeRepository` API refer to [the Tree Entities documentation](../entity/4-tree-entities.md#working-with-tree-entities)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/entity/4-tree-entities.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0938,
+    "document_score": 0.411,
+    "levels": {
+     "answers": 0.0938,
+     "elsewhere": 0.3172,
+     "different_case": 0.0273,
+     "unrelated": 0.5617
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0071,
+    "document_score": 0.0565,
+    "levels": {
+     "answers": 0.0071,
+     "elsewhere": 0.0494,
+     "different_case": 0.0223,
+     "unrelated": 0.9212
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0062,
+    "document_score": 0.0711,
+    "levels": {
+     "answers": 0.0062,
+     "elsewhere": 0.0649,
+     "different_case": 0.0192,
+     "unrelated": 0.9097
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#13",
+    "action": "expand",
+    "relevance_score": 0.0055,
+    "document_score": 0.9634,
+    "levels": {
+     "answers": 0.0055,
+     "elsewhere": 0.9578,
+     "different_case": 0.0078,
+     "unrelated": 0.0288
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1385
+  },
+  "timing": {
+   "total_ms": 70,
+   "rerank_ms": 55,
+   "questions_ms": 0,
+   "model_ms": 43,
+   "engine": {
+    "rows": 1925,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 43,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

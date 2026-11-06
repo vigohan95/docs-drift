@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/021.rerank",
+ "recorded_at": "2026-11-06T13:37:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1124,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.345375",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=162,cfOrigin;dur=0,cfWorker;dur=278"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: 4. ' 1 _x3 stale' becomes '1 _ _ _ stale' - the missing sample cannot increment, so 3 missing samples are produced by the '_x3' expression.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/recording_rules.md#6",
+    "title": "docs/configuration/recording_rules.md > Limiting alerts and series",
+    "text": "## Limiting alerts and series\n\nA limit for alerts produced by alerting rules and series produced recording rules\ncan be configured per-group. When the limit is exceeded, _all_ series produced\nby the rule are discarded, and if it's an alerting rule, _all_ alerts for\nthe rule, active, pending, or inactive, are cleared as well. The event will be\nrecorded as an error in the evaluation, and as such no stale markers are\nwritten."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#18",
+    "title": "docs/querying/operators.md > Vector matching > Filling in missing matches",
+    "text": "### Filling in missing matches\n\nFill modifiers are **experimental** and must be enabled with `--enable-feature=promql-binop-fill-modifiers`.\n\nBy default, vector elements that do not find a match on the other side of a binary operation\nare not included in the result vector. Fill modifiers allow overriding this behavior by filling\nin missing series on either side of a binary operation with a provided default sample value:\n\n* `fill(<value>)`: Fill in missing matches on either side with `value`.\n* `fill_left(<value>)`: Fill in missing matches on the left side with `value`.\n* `fill_right(<value>)`: Fill in missing matches on the right side with `value`.\n\n`value` has to be a numeric literal representing a float sample. Histogram samples are not supported.\n\nNote that these modifiers can only fill in series that are missing on one side of the operation.\nIf a series is missing on both sides, it cannot be created by these modifiers.\n\nThe fill modifiers can be used in the following combinations:\n\n* `fill(<default>)`\n* `fill_left(<default>)`\n* `fill_right(<default>)`\n* `fill_left(<default>) fill_right(<default>)`\n* `fill_right(<default>) fill_left(<default>)`\n\nIf other binary operator modifiers like `bool`, `on`, `ignoring`, `group_left`, or `group_right`\nare used, the fill modifiers must be provided last.\n\nWhen using fill modifiers in combination with `group_left` or `group_right`, they behave as follows:"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#9",
+    "title": "docs/querying/basics.md > Literals > Duration expressions",
+    "text": "For example, `max_of(step(), 5s)` ensures the duration is never shorter than\n`5s`, while `min_of(range(), 1h)` caps the duration at `1h`.\n\nLike the scalar functions, `min_of` and `max_of` ignore a `NaN` argument if the\nother argument is not `NaN`. If both arguments are `NaN`, the result is `NaN`.\nA duration expression whose final result is `NaN` or infinite is rejected.\n\n**Note**: Duration expressions are not supported in the [`@` modifier](#modifier).\n\nExamples of equivalent durations:\n\n* `5m * 2` is equivalent to `10m` or `600s`.\n* `10m - 1m` is equivalent to `9m` or `540s`.\n* `(5+2) * 1m` is equivalent to `7m` or `420s`.\n* `1h / 2` is equivalent to `30m` or `1800s`.\n* `4h % 3h` is equivalent to `1h` or `3600s`.\n* `(2 ^ 3) * 1m` is equivalent to `8m` or `480s`.\n* `step() + 1` is equivalent to the query step width increased by `1s`.\n* `max_of(step(), 5s)` is equivalent to the larger of the query step width and `5s`.\n* `min_of(2 * step() + 5s, 5m)` is equivalent to the smaller of twice the query step increased by `5s` and `5m`."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#26",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Float histogram ST chunk data",
+    "text": "## Float histogram ST chunk data\n\nThe float histogram ST chunk extends the float histogram chunk format with\noptional Start Timestamp (ST) data, with the same ST encoding scheme as\n[Histogram ST](#histogram-st-chunk-data). The float histogram sample encoding\nis unchanged. The 3-byte chunk header layout is identical to the\n[Histogram ST header layout](#histogram-st-chunk-data)).\n\n```\n┌────────────────────────┬───────────────────────┬────────────────────┬───────────────────────────────┬─────────────────────┬──────────────────┬──────────────────┬──────────────────────┬────────────────┬──────────────────┐\n│ counter_reset <2 bits> │ num_samples <14 bits> │ st_header <1 byte> │ zero_threshold <1 or 9 bytes> │ schema <varbit_int> │ pos_spans <data> │ neg_spans <data> │ custom_values <data> │ samples <data> │ padding <x bits> │\n└────────────────────────┴───────────────────────┴────────────────────┴───────────────────────────────┴─────────────────────┴──────────────────┴──────────────────┴──────────────────────┴────────────────┴──────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#1",
+    "title": "tsdb/docs/format/memory_snapshot.md > Memory Snapshot Format > Series records",
+    "text": "### Series records\n\nThis record is a snapshot of a single series. Only one series exists per record.\nIt includes the metadata of the series and the in-memory chunk data if it exists.\nThe sampleBuf is the last 4 samples in the in-memory chunk.\n\n```\n┌──────────────────────────┬────────────────────────────┐\n│     Record Type <byte>   │   Series Ref <uint64>      │\n├──────────────────────────┴────────────────────────────┤\n│               Number of Labels <uvarint>              │\n├──────────────────────────────┬────────────────────────┤\n│     len(name_1) <uvarint>    │    name_1 <bytes>      │\n├──────────────────────────────┼────────────────────────┤\n│     len(val_1) <uvarint>     │    val_1 <bytes>       │\n├──────────────────────────────┴────────────────────────┤\n│                         . . .                         │\n├──────────────────────────────┬────────────────────────┤\n│     len(name_N) <uvarint>    │    name_N <bytes>      │\n├──────────────────────────────┼────────────────────────┤\n│     len(val_N) <uvarint>     │    val_N <bytes>       │\n├──────────────────────────────┴────────────────────────┤\n│                  Chunk Range <int64>                  │\n├───────────────────────────────────────────────────────┤\n│                 Chunk Exists <uvarint>                │\n│ # 1 if head chunk exists, 0 otherwise to detect a nil |\n| # chunk. Below fields exists only when it's 1 here.   |\n├───────────────────────────┬───────────────────────────┤\n│     Chunk Mint <int64>    │    Chunk Maxt <int64>     │\n├───────────────────────────┴───────────────────────────┤\n│                 Chunk Encoding <byte>                 │\n├──────────────────────────────┬────────────────────────┤\n│      len(Chunk) <uvarint>    │    Chunk <bytes>       │\n├──────────────────────────┬───┴────────────────────────┤\n|  sampleBuf[0].t <int64>  |  sampleBuf[0].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[1].t <int64>  |  sampleBuf[1].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[2].t <int64>  |  sampleBuf[2].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[3].t <int64>  |  sampleBuf[3].v <float64>  | \n└──────────────────────────┴────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#37",
+    "title": "docs/querying/operators.md > Binary operator precedence",
+    "text": "## Binary operator precedence\n\nThe following list shows the precedence of binary operators in Prometheus, from\nhighest to lowest.\n\n1. `^`\n2. `*`, `/`, `%`, `atan2`, `bitand`, `bitor`, `bitxor`\n3. `+`, `-`\n4. `==`, `!=`, `<=`, `<`, `>=`, `>`\n5. `and`, `unless`\n6. `or`\n\nOperators on the same precedence level are left-associative. For example,\n`2 * 3 % 2` is equivalent to `(2 * 3) % 2`. However `^` is right associative,\nso `2 ^ 3 ^ 2` is equivalent to `2 ^ (3 ^ 2)`."
+   },
+   {
+    "id": "prometheus:docs/configuration/alerting_rules.md#3",
+    "title": "docs/configuration/alerting_rules.md > Inspecting alerts during runtime",
+    "text": "## Inspecting alerts during runtime\n\nTo manually inspect which alerts are active (pending or firing), navigate to\nthe \"Alerts\" tab of your Prometheus instance. This will show you the exact\nlabel sets for which each defined alert is currently active.\n\nFor pending and firing alerts, Prometheus also stores synthetic time series of\nthe form `ALERTS{alertname=\"<alert name>\", alertstate=\"<pending or firing>\", <additional alert labels>}`.\nThe sample value is set to `1` as long as the alert is in the indicated active\n(pending or firing) state, and the series is marked stale when this is no\nlonger the case."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#18",
+    "title": "tsdb/docs/format/chunks.md > Chunk > Histogram ST chunk data",
+    "text": "## Histogram ST chunk data\n\nThe histogram ST chunk extends the histogram chunk format with optional Start\nTimestamp (ST) data, using the same ST encoding scheme as XOR2. The base\nhistogram sample encoding is identical to the\n[histogram chunk](#histogram-chunk-data). The total header is 3 bytes — the\nsame size as the histogram chunk header — but the counter-reset bits are\nrelocated into the high 2 bits of the sample count byte so that byte 2 can\nhold the ST header. An optional ST field is appended after each sample's data.\n\n```\n┌────────────────────────┬───────────────────────┬────────────────────┬───────────────────────────────┬─────────────────────┬──────────────────┬──────────────────┬──────────────────────┬────────────────┬──────────────────┐\n│ counter_reset <2 bits> │ num_samples <14 bits> │ st_header <1 byte> │ zero_threshold <1 or 9 bytes> │ schema <varbit_int> │ pos_spans <data> │ neg_spans <data> │ custom_values <data> │ samples <data> │ padding <x bits> │\n└────────────────────────┴───────────────────────┴────────────────────┴───────────────────────────────┴─────────────────────┴──────────────────┴──────────────────┴──────────────────────┴────────────────┴──────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "title": "docs/querying/operators.md > Vector matching > Filling in missing matches",
+    "text": "* If a fill modifier is used on the \"many\" side of a match, it will only fill in a single series\n  for the \"many\" side of each match group, using the group's matching labels as the series identity.\n* If a fill modifier is used on the \"one\" side of a match and the grouping modifier specifies\n  label names to include from the \"one\" side (e.g. `left_vector * on(instance, job) group_left(info_label) fill_right(1) right_vector`), those labels will not be filled in for missing\n  series, as there is no source for their values.\n\nFill modifiers are not supported for set operators (`and`, `or`, `unless`), as the purpose of those\noperators is to filter series based on presence or absence in the other vector.\n\nExample query, filling in missing series on the either side with `0`:\n\n    method_code:http_errors:rate5m{status=\"500\"} / ignoring(code) fill(0) method:http_requests:rate5m\n\nThis returns a result vector containing the fraction of HTTP requests with status code\nof 500 for each method, as measured over the last 5 minutes. The entries with methods `put` and `del`\nare now included in the result with a filled-in default sample value of `0`, as they had no matching\nseries on the respective other side:\n\n    {method=\"get\"}  0.04            #  24 / 600\n    {method=\"put\"}  +Inf            #   3 /   0 (missing right side filled in)\n    {method=\"del\"}  0               #   0 /  34 (missing left side filled in)\n    {method=\"post\"} 0.05            #   6 / 120"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/head_chunks.md#0",
+    "title": "tsdb/docs/format/head_chunks.md > Head Chunks on Disk Format",
+    "text": "# Head Chunks on Disk Format\n\nThe following describes the format of a chunks file, which is created in the\n`chunks_head/` directory inside the data directory.\n\nChunks in the files are referenced from the index by uint64 composed of\nin-file offset (lower 4 bytes) and segment sequence number (upper 4 bytes).\n\n```\n┌──────────────────────────────┐\n│  magic(0x0130BC91) <4 byte>  │\n├──────────────────────────────┤\n│    version(1) <1 byte>       │\n├──────────────────────────────┤\n│    padding(0) <3 byte>       │\n├──────────────────────────────┤\n│ ┌──────────────────────────┐ │\n│ │         Chunk 1          │ │\n│ ├──────────────────────────┤ │\n│ │          ...             │ │\n│ ├──────────────────────────┤ │\n│ │         Chunk N          │ │\n│ └──────────────────────────┘ │\n└──────────────────────────────┘\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/operators.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0102,
+    "document_score": 0.047,
+    "levels": {
+     "answers": 0.0102,
+     "elsewhere": 0.0368,
+     "different_case": 0.02,
+     "unrelated": 0.933
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/querying/operators.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0211,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0176,
+     "different_case": 0.015,
+     "unrelated": 0.9638
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/basics.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0033,
+     "different_case": 0.0106,
+     "unrelated": 0.9841
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:tsdb/docs/format/chunks.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0056,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0036,
+     "different_case": 0.0069,
+     "unrelated": 0.9875
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/configuration/alerting_rules.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.008,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0062,
+     "different_case": 0.0088,
+     "unrelated": 0.9832
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/querying/operators.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0026,
+     "different_case": 0.0052,
+     "unrelated": 0.9906
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:tsdb/docs/format/chunks.md#26",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0029,
+     "different_case": 0.0055,
+     "unrelated": 0.9901
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:tsdb/docs/format/head_chunks.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0029,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0015,
+     "different_case": 0.0039,
+     "unrelated": 0.9932
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/recording_rules.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0036,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0023,
+     "different_case": 0.0032,
+     "unrelated": 0.9932
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0012,
+     "different_case": 0.0048,
+     "unrelated": 0.9929
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3961
+  },
+  "timing": {
+   "total_ms": 96,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5151,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

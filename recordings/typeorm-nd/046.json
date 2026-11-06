@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/046",
+ "recorded_at": "2026-11-06T13:43:25Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 926,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "45.389504",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=210"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "text": "## What does \"owner side\" in a relations mean or why we need to use `@JoinColumn` and `@JoinTable`?\n\nLet's start with `one-to-one` relation.\nLet's say we have two entities: `User` and `Photo`:\n\n```typescript\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne()\n    photo: Photo\n}\n```\n\n```typescript\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @OneToOne()\n    user: User\n}\n```\n\nThis example does not have a `@JoinColumn` which is incorrect.\nWhy? Because to make a real relation, we need to create a column in the database.\nWe need to create a column `userId` in `photo` or `photoId` in `user`.\nBut which column should be created - `userId` or `photoId`?\nTypeORM cannot decide for you.\nTo make a decision, you must use `@JoinColumn` on one of the sides.\nIf you put `@JoinColumn` in `Photo` then a column called `userId` will be created in the `photo` table.\nIf you put `@JoinColumn` in `User` then a column called `photoId` will be created in the `user` table.\nThe side with `@JoinColumn` will be called the \"owner side of the relationship\".\nThe other side of the relation, without `@JoinColumn`, is called the \"inverse (non-owner) side of relationship\".\n\nIt is the same in a `@ManyToMany` relation. You use `@JoinTable` to show the owner side of the relation.\n\nIn `@ManyToOne` or `@OneToMany` relations, `@JoinColumn` is not necessary because\nboth decorators are different, and the table where you put the `@ManyToOne` decorator will have the relational column.\n\n`@JoinColumn` and `@JoinTable` decorators can also be used to specify additional\njoin column / junction table settings, like join column name or junction table name."
+   },
+   {
+    "id": "typeorm:docs/docs/query-builder/1-select-query-builder.md#16",
+    "text": "## Joining relations\n\nLet's say you have the following entities:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, OneToMany } from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToMany((type) => Photo, (photo) => photo.user)\n    photos: Photo[]\n}\n```\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from \"typeorm\"\nimport { User } from \"./User\"\n\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @ManyToOne((type) => User, (user) => user.photos)\n    user: User\n}\n```\n\nNow let's say you want to load user \"Timber\" with all of his photos:\n\n```typescript\nconst user = await dataSource\n    .createQueryBuilder(\"user\")\n    .leftJoinAndSelect(\"user.photos\", \"photo\")\n    .where(\"user.name = :name\", { name: \"Timber\" })\n    .getOne()\n```\n\nYou'll get the following result:\n\n```typescript\n{\n    id: 1,\n    name: \"Timber\",\n    photos: [{\n        id: 1,\n        url: \"me-with-chakram.jpg\"\n    }, {\n        id: 2,\n        url: \"me-with-trees.jpg\"\n    }]\n}\n```\n\nAs you can see `leftJoinAndSelect` automatically loaded all of Timber's photos.\nThe first argument is the relation you want to load and the second argument is an alias you assign to this relation's table.\nYou can use this alias anywhere in query builder.\nFor example, let's take all Timber's photos which aren't removed."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/query-builder/1-select-query-builder.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/help/1-faq.md#4",
+    "b": "typeorm:docs/docs/query-builder/1-select-query-builder.md#16",
+    "relation": "unrelated",
+    "related": 0.4805,
+    "probabilities": {
+     "same": 0.015,
+     "overlapping": 0.456,
+     "conflicting": 0.0096,
+     "unrelated": 0.5195
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 57
+  },
+  "timing": {
+   "read_ms": 56,
+   "total_ms": 60
+  }
+ }
+}

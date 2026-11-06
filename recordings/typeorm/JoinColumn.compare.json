@@ -1,0 +1,338 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm/JoinColumn.compare",
+ "recorded_at": "2026-11-06T13:42:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1612,
+ "response_headers": {
+  "x-clocked-credits": "26",
+  "x-clocked-model-ms": "645.5079",
+  "x-clocked-cost-usd": "0.005179",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=841"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "text": "## `@JoinColumn` options\n\n`@JoinColumn` not only defines which side of the relation contains the join column with a foreign key,\nbut also allows you to customize join column name and referenced column name.\n\nWhen we set `@JoinColumn`, it automatically creates a column in the database named `propertyName + referencedColumnName`.\nFor example:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn() // this decorator is optional for @ManyToOne, but required for @OneToOne\ncategory: Category;\n```\n\nThis code will create a `categoryId` column in the database.\nIf you want to change this name in the database you can specify a custom join column name:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ name: \"cat_id\" })\ncategory: Category;\n```\n\nJoin columns are always a reference to some other columns (using a foreign key).\nBy default your relation always refers to the primary column of the related entity.\nIf you want to create relation with other columns of the related entity -\nyou can specify them in `@JoinColumn` as well:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ referencedColumnName: \"name\" })\ncategory: Category;\n```\n\nThe relation now refers to `name` of the `Category` entity, instead of `id`.\nColumn name for that relation will become `categoryName`.\n\nYou can also join multiple columns. Note that they do not reference the primary column of the related entity by default: you must provide the referenced column name.\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn([\n    { name: \"category_id\", referencedColumnName: \"id\" },\n    { name: \"locale_id\", referencedColumnName: \"locale_id\" }\n])\ncategory: Category;\n```\n\n> **Note:** When using composite `@JoinColumn` or `@JoinTable`, TypeORM automatically sorts the foreign key columns to match the referenced entity's primary key order. This ensures compatibility with databases like MySQL, MSSQL, and SAP HANA that require FK columns to reference PK columns in index order."
+   },
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "text": "### Creating a one-to-one relation\n\nLet's create a one-to-one relationship with another class.\nLet's create a new class in `PhotoMetadata.ts`. This PhotoMetadata class is supposed to contain our photo's additional meta-information:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column(\"int\")\n    height: number\n\n    @Column(\"int\")\n    width: number\n\n    @Column()\n    orientation: string\n\n    @Column()\n    compressed: boolean\n\n    @Column()\n    comment: string\n\n    @OneToOne(() => Photo)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\nHere, we are using a new decorator called `@OneToOne`. It allows us to create a one-to-one relationship between two entities. We also add a `@JoinColumn` decorator, which indicates that this side of the relationship will own the relationship.\nRelations can be unidirectional or bidirectional.\nOnly one side of the relation can be the owner.\nUsing `@JoinColumn` decorator is required on the owner side of the relationship.\n\nIf you run the app, you'll see a newly generated table, and it will contain a column with a foreign key for the photo relation:\n\n```text\n+-------------+--------------+----------------------------+\n|                     photo_metadata                      |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| height      | int          |                            |\n| width       | int          |                            |\n| comment     | varchar(255) |                            |\n| compressed  | boolean      |                            |\n| orientation | varchar(255) |                            |\n| photoId     | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "text": "# One-to-one relations\n\nOne-to-one is a relation where A contains only one instance of B, and B contains only one instance of A.\nLet's take for example `User` and `Profile` entities.\nUser can have only a single profile, and a single profile is owned by only a single user.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class Profile {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    gender: string\n\n    @Column()\n    photo: string\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne(() => Profile)\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nHere we added `@OneToOne` to the `user` and specified the target relation type to be `Profile`.\nWe also added `@JoinColumn` which is required and must be set only on one side of the relation.\nThe side you set `@JoinColumn` on, that side's table will contain a \"relation id\" and foreign keys to the target entity table.\n\nThis example will produce the following tables:\n\n```text\n+-------------+--------------+----------------------------+\n|                        profile                          |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| gender      | varchar(255) |                            |\n| photo       | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|                          user                           |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| name        | varchar(255) |                            |\n| profileId   | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/getting-started.md#25",
+    "text": "### Inverse side of the relationship\n\nRelations can be unidirectional or bidirectional.\nCurrently, our relation between PhotoMetadata and Photo is unidirectional.\nThe owner of the relation is PhotoMetadata, and Photo doesn't know anything about PhotoMetadata.\nThis makes it complicated to access PhotoMetadata from the Photo side.\nTo fix this issue, we should add an inverse relation, and make relations between PhotoMetadata and Photo bidirectional.\nLet's modify our entities:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    /* ... other columns */\n\n    @OneToOne(() => Photo, (photo) => photo.metadata)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\n```typescript\nimport { Entity, Column, PrimaryGeneratedColumn, OneToOne } from \"typeorm\"\nimport { PhotoMetadata } from \"./PhotoMetadata\"\n\n@Entity()\nexport class Photo {\n    /* ... other columns */\n\n    @OneToOne(() => PhotoMetadata, (photoMetadata) => photoMetadata.photo)\n    metadata: PhotoMetadata\n}\n```\n\n`photo => photo.metadata` is a function that returns the name of the inverse side of the relation.\nHere we show that the metadata property of the Photo class is where we store PhotoMetadata in the Photo class.\nInstead of passing a function that returns a property of the photo, you could alternatively pass a string to `@OneToOne` decorator, like `\"metadata\"`.\nBut we used this function-typed approach to make our refactoring easier.\n\nNote that we should use the `@JoinColumn` decorator only on one side of a relation.\nWhichever side you put this decorator on will be the owning side of the relationship.\nThe owning side of a relationship contains a column with a foreign key in the database."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "text": "We just created a uni-directional relation. Let's make it bi-directional:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, OneToOne } from \"typeorm\"\nimport { User } from \"./User\"\n\n@Entity()\nexport class Profile {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    gender: string\n\n    @Column()\n    photo: string\n\n    @OneToOne(() => User, (user) => user.profile) // specify inverse side as a second parameter\n    user: User\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne(() => Profile, (profile) => profile.user) // specify inverse side as a second parameter\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nWe just made our relation bi-directional. Note, inverse relation does not have a `@JoinColumn`.\n`@JoinColumn` must only be on one side of the relation - on the table that will own the foreign key.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst profiles = await dataSource\n    .getRepository(Profile)\n    .createQueryBuilder(\"profile\")\n    .leftJoinAndSelect(\"profile.user\", \"user\")\n    .getMany()\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/getting-started.md#25"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/relations/2-one-to-one-relations.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/getting-started.md#25",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/getting-started.md#23",
+     "typeorm:docs/docs/relations/2-one-to-one-relations.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/getting-started.md#25",
+     "typeorm:docs/docs/relations/2-one-to-one-relations.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/relations/1-relations.md#5",
+    "b": "typeorm:docs/docs/getting-started.md#23",
+    "relation": "overlapping",
+    "related": 0.988,
+    "probabilities": {
+     "same": 0.0098,
+     "overlapping": 0.9722,
+     "conflicting": 0.0059,
+     "unrelated": 0.012
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/relations/1-relations.md#5",
+    "b": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "relation": "overlapping",
+    "related": 0.9135,
+    "probabilities": {
+     "same": 0.0179,
+     "overlapping": 0.8763,
+     "conflicting": 0.0193,
+     "unrelated": 0.0865
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/relations/1-relations.md#5",
+    "b": "typeorm:docs/docs/getting-started.md#25",
+    "relation": "overlapping",
+    "related": 0.9799,
+    "probabilities": {
+     "same": 0.0145,
+     "overlapping": 0.9557,
+     "conflicting": 0.0097,
+     "unrelated": 0.0201
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/relations/1-relations.md#5",
+    "b": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "relation": "unrelated",
+    "related": 0.3905,
+    "probabilities": {
+     "same": 0.0159,
+     "overlapping": 0.3572,
+     "conflicting": 0.0175,
+     "unrelated": 0.6095
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/getting-started.md#23",
+    "b": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "relation": "overlapping",
+    "related": 0.9957,
+    "probabilities": {
+     "same": 0.009,
+     "overlapping": 0.98,
+     "conflicting": 0.0067,
+     "unrelated": 0.0043
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/getting-started.md#23",
+    "b": "typeorm:docs/docs/getting-started.md#25",
+    "relation": "overlapping",
+    "related": 0.9956,
+    "probabilities": {
+     "same": 0.0124,
+     "overlapping": 0.9782,
+     "conflicting": 0.005,
+     "unrelated": 0.0044
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0086,
+       "restated": 0.9706,
+       "elaborated": 0.0101,
+       "different": 0.0107
+      },
+      "confidence": 0.522,
+      "a": {
+       "document": "typeorm:docs/docs/getting-started.md#23",
+       "quote": "Using `@JoinColumn` decorator is required on the owner side of the relationship.",
+       "start": 1073,
+       "end": 1153,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "typeorm:docs/docs/getting-started.md#25",
+       "quote": "other columns */\n\n    @OneToOne(() => PhotoMetadata, (photoMetadata) => photoMetadata.photo)\n    metadata: PhotoMetadata\n}\n```\n\n`photo => photo.metadata` is a function that returns the name of the inverse side of the relation.\nHere we show that the metadata property of the Photo class is where we store PhotoMetadata in the Photo class.\nInstead of passing a function that returns a property of the photo, you could alternatively pass a string to `@OneToOne` decorator, like `\"metadata\"`.\nBut we used this function-typed approach to make our refactoring easier.\n\nNote that we should use the `@JoinColumn` decorator only on one side of a relation.\nWhichever side you put this decorator on will be the owning side of the relationship.\nThe owning side of a relationship contains a column with a foreign key in the database.",
+       "start": 978,
+       "end": 1798,
+       "confidence": 0.522
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/getting-started.md#23",
+    "b": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "relation": "overlapping",
+    "related": 0.9921,
+    "probabilities": {
+     "same": 0.0233,
+     "overlapping": 0.9594,
+     "conflicting": 0.0094,
+     "unrelated": 0.0079
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "b": "typeorm:docs/docs/getting-started.md#25",
+    "relation": "overlapping",
+    "related": 0.9961,
+    "probabilities": {
+     "same": 0.0106,
+     "overlapping": 0.9793,
+     "conflicting": 0.0062,
+     "unrelated": 0.0039
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "b": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "relation": "overlapping",
+    "related": 0.9953,
+    "probabilities": {
+     "same": 0.0154,
+     "overlapping": 0.9729,
+     "conflicting": 0.007,
+     "unrelated": 0.0047
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0259,
+       "restated": 0.7262,
+       "elaborated": 0.0412,
+       "different": 0.2066
+      },
+      "confidence": 0.7934,
+      "a": {
+       "document": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+       "quote": "We also added `@JoinColumn` which is required and must be set only on one side of the relation.",
+       "start": 944,
+       "end": 1039,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+       "quote": "Note, inverse relation does not have a `@JoinColumn`.\n`@JoinColumn` must only be on one side of the relation - on the table that will own the foreign key.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst profiles = await dataSource\n    .getRepository(Profile)\n    .createQueryBuilder(\"profile\")\n    .leftJoinAndSelect(\"profile.user\", \"user\")\n    .getMany()\n```",
+       "start": 916,
+       "end": 1340,
+       "confidence": 0.94
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "typeorm:docs/docs/getting-started.md#25",
+    "b": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+    "relation": "overlapping",
+    "related": 0.9955,
+    "probabilities": {
+     "same": 0.0135,
+     "overlapping": 0.9751,
+     "conflicting": 0.0069,
+     "unrelated": 0.0045
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0118,
+       "restated": 0.9649,
+       "elaborated": 0.0095,
+       "different": 0.0137
+      },
+      "confidence": 0.9863,
+      "a": {
+       "document": "typeorm:docs/docs/getting-started.md#25",
+       "quote": "Note that we should use the `@JoinColumn` decorator only on one side of a relation.",
+       "start": 1541,
+       "end": 1624,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/relations/2-one-to-one-relations.md#2",
+       "quote": "Note, inverse relation does not have a `@JoinColumn`.\n`@JoinColumn` must only be on one side of the relation - on the table that will own the foreign key.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst profiles = await dataSource\n    .getRepository(Profile)\n    .createQueryBuilder(\"profile\")\n    .leftJoinAndSelect(\"profile.user\", \"user\")\n    .getMany()\n```",
+       "start": 916,
+       "end": 1340,
+       "confidence": 0.992
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   5,
+   8,
+   9
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 90,
+   "passage_reads": 1,
+   "passages_ms": 390,
+   "passages": 6,
+   "counterparts_ms": 227
+  },
+  "timing": {
+   "read_ms": 703,
+   "total_ms": 713
+  }
+ }
+}

@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/VirtualColumn.rerank",
+ "recorded_at": "2026-11-06T13:42:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 911,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "61.975967",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=66,cfOrigin;dur=0,cfWorker;dur=190"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@VirtualColumn`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@VirtualColumn`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#13",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Column decorators > `@VirtualColumn`",
+    "text": "#### `@VirtualColumn`\n\nSpecial column that is never saved to the database and thus acts as a readonly property.\nEach time you call `find` or `findOne` from the entity manager, the value is recalculated based on the query function that was provided in the VirtualColumn Decorator. The alias argument passed to the query references the exact entity alias of the generated query behind the scenes.\n\n```typescript\n@Entity({ name: \"companies\", alias: \"COMP\" })\nexport class Company extends BaseEntity {\n    @PrimaryColumn(\"varchar\", { length: 50 })\n    name: string\n\n    @VirtualColumn({\n        query: (alias) =>\n            `SELECT COUNT(\"name\") FROM \"employees\" WHERE \"companyName\" = ${alias}.name`,\n    })\n    totalEmployeesCount: number\n\n    @OneToMany((type) => Employee, (employee) => employee.company)\n    employees: Employee[]\n}\n\n@Entity({ name: \"employees\" })\nexport class Employee extends BaseEntity {\n    @PrimaryColumn(\"varchar\", { length: 50 })\n    name: string\n\n    @ManyToOne((type) => Company, (company) => company.employees)\n    company: Company\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > Breaking changes > Removed APIs",
+    "text": "### Removed APIs\n\n- **`Connection` and `ConnectionOptions` removed** — use `DataSource` and `DataSourceOptions` instead ([#12022](https://github.com/typeorm/typeorm/pull/12022) by [@alumni](https://github.com/alumni))\n- **`.connection` property renamed to `.dataSource`** — the `connection` property on `Driver`, `QueryRunner`, `EntityManager`, `QueryBuilder`, `EntityMetadata`, and all `*Event` subscriber interfaces has been renamed to `dataSource`; a deprecated getter is provided as a bridge ([#12244](https://github.com/typeorm/typeorm/pull/12244), [#12245](https://github.com/typeorm/typeorm/pull/12245), [#12246](https://github.com/typeorm/typeorm/pull/12246), [#12249](https://github.com/typeorm/typeorm/pull/12249) by [@pkuczynski](https://github.com/pkuczynski))\n- **`ConnectionManager` and global convenience functions removed** — `createConnection`, `getConnection`, `getManager`, `getRepository`, `createQueryBuilder`, and other globals have been removed ([#12098](https://github.com/typeorm/typeorm/pull/12098) by [@michaelbromley](https://github.com/michaelbromley))\n- **`getMongoRepository` and `getMongoManager` globals removed** — use `dataSource.getMongoRepository()` and `dataSource.mongoManager` instead ([#12099](https://github.com/typeorm/typeorm/pull/12099) by [@pkuczynski](https://github.com/pkuczynski))\n- **`DataSource.name` removed** — named connections were deprecated in v0.3; `ConnectionOptionsReader.all()` renamed to `get()` ([#12136](https://github.com/typeorm/typeorm/pull/12136) by [@pkuczynski](https://github.com/pkuczynski))\n- **`TYPEORM_*` environment variable support removed** — `ConnectionOptionsEnvReader`, `ormconfig.env`, and `dotenv` auto-loading have been removed ([#12134](https://github.com/typeorm/typeorm/pull/12134) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findByIds` removed** — use `findBy` with `In` operator instead ([#12114](https://github.com/typeorm/typeorm/pull/12114) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findOneById` removed** — use `findOneBy` instead ([#12198](https://github.com/typeorm/typeorm/pull/12198) by [@pkuczynski](https://github.com/pkuczynski))\n- **`Repository.exist()` removed** — use `Repository.exists()` instead ([#12131](https://github.com/typeorm/typeorm/pull/12131) by [@pkuczynski](https://github.com/pkuczynski))\n- **`AbstractRepository`, `@EntityRepository`, and `getCustomRepository` removed** — use `Repository.extend()` instead ([#12096](https://github.com/typeorm/typeorm/pull/12096) by [@pkuczynski](https://github.com/pkuczynski))\n- **`@RelationCount` decorator removed** — use `@VirtualColumn` with a sub-query instead ([#12181](https://github.com/typeorm/typeorm/pull/12181) by [@pkuczynski](https://github.com/pkuczynski))\n- **IoC container system removed** — `useContainer()`, `getFromContainer()`, and related types have been removed ([#12180](https://github.com/typeorm/typeorm/pull/12180) by [@pkuczynski](https://github.com/pkuczynski))\n- **`readonly` column option removed** — use `update: false` instead ([#12132](https://github.com/typeorm/typeorm/pull/12132) by [@pkuczynski](https://github.com/pkuczynski))\n- **`unsigned` on `ColumnNumericOptions` removed** — only affected decimal/float types; integer `unsigned` is unchanged ([#12133](https://github.com/typeorm/typeorm/pull/12133) by [@pkuczynski](https://github.com/pkuczynski))\n- **QueryBuilder: `onConflict()`, deprecated `orUpdate()` overload, and `setNativeParameters()` removed** — use `orIgnore()`/`orUpdate()` array signature and `setParameters()` instead ([#12090](https://github.com/typeorm/typeorm/pull/12090) by [@pkuczynski](https://github.com/pkuczynski))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#43",
+    "title": "docs/docs/releases/1.0/02-upgrading-from-0.3.md > Upgrading from 0.3 to 1.0 > Repository > `@RelationCount` decorator and `loadRelationCountAndMap` removed",
+    "text": "### `@RelationCount` decorator and `loadRelationCountAndMap` removed\n\nThe `@RelationCount` decorator and `SelectQueryBuilder.loadRelationCountAndMap()` method have been removed. Use `@VirtualColumn` or a sub-query in your query builder instead:\n\n```typescript\n// Before\n@RelationCount((post: Post) => post.categories)\ncategoryCount: number\n\n// After — use @VirtualColumn with a sub-query\n// Replace the junction table name and column names to match your schema\n@VirtualColumn({\n    query: (alias) =>\n        `SELECT COUNT(*) FROM post_categories_category WHERE postId = ${alias}.id`,\n})\ncategoryCount: number\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#13",
+    "action": "use",
+    "relevance_score": 0.9874,
+    "document_score": 0.9913,
+    "levels": {
+     "answers": 0.9874,
+     "elsewhere": 0.0039,
+     "different_case": 0.0051,
+     "unrelated": 0.0036
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0113,
+    "document_score": 0.0874,
+    "levels": {
+     "answers": 0.0113,
+     "elsewhere": 0.0761,
+     "different_case": 0.0407,
+     "unrelated": 0.8719
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#43",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.006,
+    "document_score": 0.0154,
+    "levels": {
+     "answers": 0.006,
+     "elsewhere": 0.0094,
+     "different_case": 0.017,
+     "unrelated": 0.9676
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1963
+  },
+  "timing": {
+   "total_ms": 66,
+   "rerank_ms": 66,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 2368,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

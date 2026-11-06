@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/019.rerank",
+ "recorded_at": "2026-11-06T13:37:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1083,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "114.518173",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=161,cfOrigin;dur=0,cfWorker;dur=258"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: If a power of two between 2^-243 and 2^10, it is a single byte between 1 and 254.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#1",
+    "title": "tsdb/docs/format/memory_snapshot.md > Memory Snapshot Format > Series records",
+    "text": "### Series records\n\nThis record is a snapshot of a single series. Only one series exists per record.\nIt includes the metadata of the series and the in-memory chunk data if it exists.\nThe sampleBuf is the last 4 samples in the in-memory chunk.\n\n```\n┌──────────────────────────┬────────────────────────────┐\n│     Record Type <byte>   │   Series Ref <uint64>      │\n├──────────────────────────┴────────────────────────────┤\n│               Number of Labels <uvarint>              │\n├──────────────────────────────┬────────────────────────┤\n│     len(name_1) <uvarint>    │    name_1 <bytes>      │\n├──────────────────────────────┼────────────────────────┤\n│     len(val_1) <uvarint>     │    val_1 <bytes>       │\n├──────────────────────────────┴────────────────────────┤\n│                         . . .                         │\n├──────────────────────────────┬────────────────────────┤\n│     len(name_N) <uvarint>    │    name_N <bytes>      │\n├──────────────────────────────┼────────────────────────┤\n│     len(val_N) <uvarint>     │    val_N <bytes>       │\n├──────────────────────────────┴────────────────────────┤\n│                  Chunk Range <int64>                  │\n├───────────────────────────────────────────────────────┤\n│                 Chunk Exists <uvarint>                │\n│ # 1 if head chunk exists, 0 otherwise to detect a nil |\n| # chunk. Below fields exists only when it's 1 here.   |\n├───────────────────────────┬───────────────────────────┤\n│     Chunk Mint <int64>    │    Chunk Maxt <int64>     │\n├───────────────────────────┴───────────────────────────┤\n│                 Chunk Encoding <byte>                 │\n├──────────────────────────────┬────────────────────────┤\n│      len(Chunk) <uvarint>    │    Chunk <bytes>       │\n├──────────────────────────┬───┴────────────────────────┤\n|  sampleBuf[0].t <int64>  |  sampleBuf[0].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[1].t <int64>  |  sampleBuf[1].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[2].t <int64>  |  sampleBuf[2].v <float64>  | \n├──────────────────────────┼────────────────────────────┤\n|  sampleBuf[3].t <int64>  |  sampleBuf[3].v <float64>  | \n└──────────────────────────┴────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/wal.md#3",
+    "title": "tsdb/docs/format/wal.md > WAL Disk Format > Segment encoding > Records encoding",
+    "text": "### Records encoding\n\nEach record fragment is encoded as:\n\n```\n┌───────────┬──────────┬────────────┬──────────────┐\n│ type <1b> │ len <2b> │ CRC32 <4b> │ data <bytes> │\n└───────────┴──────────┴────────────┴──────────────┘\n```\n\nThe initial type byte is made up of three components: a 3-bit reserved field,\na 1-bit zstd compression flag, a 1-bit snappy compression flag, and a 3-bit type flag.\n\n```\n┌─────────────────┬──────────────────┬────────────────────┬──────────────────┐\n│ reserved <3bit> │ zstd_flag <1bit> │ snappy_flag <1bit> │ type_flag <3bit> │\n└─────────────────┴──────────────────┴────────────────────┴──────────────────┘\n```\n\nThe lowest 3 bits within the type flag represent the record type as follows:\n\n* `0`: rest of page will be empty\n* `1`: a full record encoded in a single fragment\n* `2`: first fragment of a record\n* `3`: middle fragment of a record\n* `4`: final fragment of a record\n\nAfter the type byte, 2-byte length and then 4-byte checksum of the following data are encoded.\n\nAll float values are represented using the [IEEE 754 format](https://en.wikipedia.org/wiki/IEEE_754)."
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `ChunkRef` > `HeadChunkRef`",
+    "text": "#### `HeadChunkRef`\n\nA `HeadChunkRef` is an 8 byte integer that packs together:\n\n* 5 Bytes for `HeadSeriesRef`.\n* 3 Bytes for `HeadChunkID` (uint64) (see below).\n\nThere are two implications here:\n\n* While `HeadSeriesRef`s can during ingestion go higher, during querying they are limited to 2^40.  Querying too high numbers will lead to query failures (but not impact ingestion).\n* `ChunkID` keeps growing as we enter new chunks until Prometheus restarts. If Prometheus runs too long, we might hit 2^24.\n  ([957 years](https://www.wolframalpha.com/input/?i=2%5E24+*+120+*+15+seconds+in+years) at 1 sample per 15 seconds).  If `ChunkID=len(mmappedchunks)` then it's the head chunk."
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "title": "docs/configuration/unit_testing_rules.md > Test file format > `<series>`",
+    "text": "### `<series>`\n\n```yaml\n# This follows the usual series notation '<metric name>{<label name>=<label value>, ...}'\n# Examples:\n#      series_name{label1=\"value1\", label2=\"value2\"}\n#      go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}\nseries: <string>\n\n# This uses expanding notation.\n# Expanding notation:\n#     'a+bxn' becomes 'a a+b a+(2*b) a+(3*b) … a+(n*b)'\n#     Read this as series starts at a, then n further samples incrementing by b.\n#     'a-bxn' becomes 'a a-b a-(2*b) a-(3*b) … a-(n*b)'\n#     Read this as series starts at a, then n further samples decrementing by b (or incrementing by negative b).\n#     'axn' becomes 'a a a … a' (a n+1 times) - it's a shorthand for 'a+0xn'\n# There are special values to indicate missing and stale samples:\n#     '_' represents a missing sample from scrape\n#     'stale' indicates a stale sample\n# Examples:\n#     1. '-2+4x3' becomes '-2 2 6 10' - series starts at -2, then 3 further samples incrementing by 4.\n#     2. ' 1-2x4' becomes '1 -1 -3 -5 -7' - series starts at 1, then 4 further samples decrementing by 2.\n#     3. ' 1x4' becomes '1 1 1 1 1' - shorthand for '1+0x4', series starts at 1, then 4 further samples incrementing by 0.\n#     4. ' 1 _x3 stale' becomes '1 _ _ _ stale' - the missing sample cannot increment, so 3 missing samples are produced by the '_x3' expression.\n#\n# Native histogram notation:\n#     Native histograms can be used instead of floating point numbers using the following notation:\n#     {{schema:1 sum:-0.3 count:3.1 z_bucket:7.1 z_bucket_w:0.05 buckets:[5.1 10 7] offset:-3 n_buckets:[4.1 5] n_offset:-5 counter_reset_hint:gauge}}\n#     Native histograms support the same expanding notation as floating point numbers, i.e. 'axn', 'a+bxn' and 'a-bxn'.\n#     All properties are optional and default to 0. The order is not important. The following properties are supported:\n#     - schema (int):\n#         Currently valid schema numbers are -53 and -4 <= n <= 8.\n#         Schema -53 is the custom buckets schema, upper bucket boundaries are defined in custom_values\n#         like for classic histograms, and you shouldn't use z_bucket, z_bucket_w, n_buckets, n_offset.\n#         The rest are base-2 standard schemas, where 1.0 is a bucket boundary in each case, and\n#         then each power of two is divided into 2^n logarithmic buckets.  Or\n#         in other words, each bucket boundary is the previous boundary times\n#         2^(2^-n).\n#     - sum (float):\n#         The sum of all observations, including the zero bucket.\n#     - count (non-negative float):\n#         The number of observations, including those that are NaN and including the zero bucket.\n#     - z_bucket (non-negative float):\n#         The sum of all observations in the zero bucket.\n#     - z_bucket_w (non-negative float):\n#         The width of the zero bucket.\n#         If z_bucket_w > 0, the zero bucket contains all observations -z_bucket_w <= x <= z_bucket_w.\n#         Otherwise, the zero bucket only contains observations that are exactly 0.\n#     - buckets (list of non-negative floats):\n#         Observation counts in positive buckets. Each represents an absolute count.\n#     - offset (int):\n#         The starting index of the first entry in the positive buckets.\n#     - n_buckets (list of non-negative floats):\n#         Observation counts in negative buckets. Each represents an absolute count.\n#     - n_offset (int):\n#         The starting index of the first entry in the negative buckets.\n#     - counter_reset_hint (one of 'unknown', 'reset', 'not_reset' or 'gauge')"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#21",
+    "title": "docs/querying/operators.md > Aggregation operators > Detailed explanations > `sum`",
+    "text": "#### `sum`\n\n`sum(v)` sums up sample values in `v` in the same way as the `+` binary operator does\nbetween two values.\n\nAll sample values being aggregated into a single resulting vector element must either be\nfloat samples or histogram samples. An aggregation of a mix of both is invalid,\nresulting in the removal of the corresponding vector element from the output\nvector, flagged by a warn-level annotation."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#8",
+    "title": "docs/querying/basics.md > Literals > Duration expressions",
+    "text": "### Duration expressions\n\nArithmetic expressions can be used wherever a time duration is expected, that is\nin [range vector selectors](#range-vector-selectors) and in\n[offset durations](#offset-modifier).\n\nIn range vectors:\n\n    rate(http_requests_total[5m * 2])     # 10 minute range\n    rate(http_requests_total[(5+2) * 1m]) # 7 minute range\n\nIn offset durations:\n\n    http_requests_total offset (1h / 2)       # 30 minute offset\n    http_requests_total offset ((2 ^ 3) * 1m) # 8 minute offset\n\nWhen using `offset` with a duration expression, you must wrap the expression in\nparentheses. Without parentheses, only the first duration value is used in the\noffset calculation.\n\nThe following operators are supported, following the usual precedence rules:\n\n* `+` – addition\n* `-` – subtraction\n* `*` – multiplication\n* `/` – division\n* `%` – modulo\n* `^` – exponentiation\n\nThe following functions can be used inside duration expressions:\n\n* `step()` resolves to the step width of a [range query](api.md#range-queries),\n  and to `0s` for an [instant query](api.md#instant-queries).\n* `range()` resolves to the full range of a range query (end time − start time),\n  and to `0s` for an instant query. This is particularly useful in combination\n  with `@ end()` to look back over the entire query range, e.g.\n  `max_over_time(metric[range()] @ end())`.\n* `min_of(<duration>, <duration>)` returns the smaller of the two durations,\n  which is useful for capping a duration at a maximum value.\n* `max_of(<duration>, <duration>)` returns the larger of the two durations,\n  which is useful for enforcing a minimum value."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#2",
+    "title": "tsdb/docs/format/memory_snapshot.md > Memory Snapshot Format > Tombstone record",
+    "text": "### Tombstone record\n\nThis includes all the tombstones in the Head block. A single record is written into\nthe snapshot for all the tombstones. The encoded tombstones uses the same encoding\nas tombstone file in blocks.\n\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                        Record Type <byte>                       │\n├───────────────────────────────────┬─────────────────────────────┤\n│ len(Encoded Tombstones) <uvarint> │ Encoded Tombstones <bytes>  │\n└───────────────────────────────────┴─────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#2",
+    "title": "docs/querying/operators.md > Binary operators",
+    "text": "## Binary operators\n\nBinary operators cover basic logical and arithmetic operations. For operations\nbetween two instant vectors, the [matching behavior](#vector-matching) can be\nmodified."
+   },
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--storage.agent.checkpoint-batch-size</code> | Size of a single WAL log entry chunk to be flushed. Has no effect without --storage.agent.checkpoint-from-in-memory-series flag. Use with agent mode only. | `1000` |\n| <code class=\"text-nowrap\">--storage.agent.no-lockfile</code> | Do not create lockfile in data directory. Use with agent mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.remote.flush-deadline</code> | How long to wait flushing sample on shutdown or config reload. | `1m` |\n| <code class=\"text-nowrap\">--storage.remote.read-sample-limit</code> | Maximum overall number of samples to return via the remote read interface, in a single query. 0 means no limit. This limit is ignored for streamed response types. Use with server mode only. | `5e7` |\n| <code class=\"text-nowrap\">--storage.remote.read-concurrent-limit</code> | Maximum number of concurrent remote read calls. 0 means no limit. Use with server mode only. | `10` |\n| <code class=\"text-nowrap\">--storage.remote.read-max-bytes-in-frame</code> | Maximum number of bytes in a single frame for streaming remote read response types before marshalling. Note that client might have limit on frame size as well. 1MB as recommended by protobuf by default. Use with server mode only. | `1048576` |\n| <code class=\"text-nowrap\">--web.search.max-limit</code> | Hard upper bound on the \"limit\" query parameter accepted by the experimental search API (--enable-feature=search-api). Requests with a higher limit are rejected with HTTP 400. 0 disables the cap. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--rules.alert.for-outage-tolerance</code> | Max time to tolerate prometheus outage for restoring \"for\" state of alert. Use with server mode only. | `1h` |\n| <code class=\"text-nowrap\">--rules.alert.for-grace-period</code> | Minimum duration between alert and restored \"for\" state. This is maintained only for alerts with configured \"for\" time greater than grace period. Use with server mode only. | `10m` |\n| <code class=\"text-nowrap\">--rules.alert.resend-delay</code> | Minimum amount of time to wait before resending an alert to Alertmanager. Use with server mode only. | `1m` |\n| <code class=\"text-nowrap\">--rules.max-concurrent-evals</code> | Global concurrency limit for independent rules that can run concurrently. When set, \"query.max-concurrency\" may need to be adjusted accordingly. Use with server mode only. | `4` |\n| <code class=\"text-nowrap\">--alertmanager.notification-queue-capacity</code> | The capacity of the queue for pending Alertmanager notifications. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--alertmanager.notification-batch-size</code> | The maximum number of notifications per batch to send to the Alertmanager. Use with server mode only. | `256` |\n| <code class=\"text-nowrap\">--alertmanager.drain-notification-queue-on-shutdown</code> | Send any outstanding Alertmanager notifications when shutting down. If false, any outstanding Alertmanager notifications will be dropped when shutting down. Use with server mode only. | `true` |\n| <code class=\"text-nowrap\">--query.lookback-delta</code> | The maximum lookback duration for retrieving metrics during expression evaluations and federation. Use with server mode only. | `5m` |\n| <code class=\"text-nowrap\">--query.timeout</code> | Maximum time a query may take before being aborted. Use with server mode only. | `2m` |\n| <code class=\"text-nowrap\">--query.max-concurrency</code> | Maximum number of queries executed concurrently. Use with server mode only. | `20` |"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#29",
+    "title": "docs/querying/operators.md > Aggregation operators > Detailed explanations > `limit_ratio`",
+    "text": "#### `limit_ratio`\n\n`limit_ratio(r, v)` returns a subset of the input samples, including\nthe original labels in the result vector.\n\nThe subset is selected in a deterministic pseudo-random way.\nThis happens independent of the sample type.\nTherefore, it works for both float samples and histogram samples.\n\n`r` can be between +1 and -1. The absolute value of `r` is used as the selection ratio,\nbut the selection order is inverted for a negative `r`, which can be used to select complements.\nFor example, `limit_ratio(0.1, ...)` returns a deterministic set of approximatiely 10% of\nthe input samples, while `limit_ratio(-0.9, ...)` returns precisely the\nremaining approximately 90% of the input samples not returned by `limit_ratio(0.1, ...)`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.001,
+     "different_case": 0.0039,
+     "unrelated": 0.9933
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/format/memory_snapshot.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0011,
+     "different_case": 0.0031,
+     "unrelated": 0.9941
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/format/wal.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.001,
+     "different_case": 0.0031,
+     "unrelated": 0.9944
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:tsdb/docs/refs.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0016,
+     "different_case": 0.0041,
+     "unrelated": 0.9929
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/operators.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0006,
+     "different_case": 0.0013,
+     "unrelated": 0.9968
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.001,
+     "different_case": 0.0037,
+     "unrelated": 0.9941
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/querying/basics.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0022,
+     "unrelated": 0.9958
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/querying/operators.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.0016,
+     "unrelated": 0.9966
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0017,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0006,
+     "different_case": 0.0021,
+     "unrelated": 0.9962
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/querying/operators.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0016,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0006,
+     "different_case": 0.0013,
+     "unrelated": 0.9971
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5084
+  },
+  "timing": {
+   "total_ms": 133,
+   "rerank_ms": 117,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6274,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

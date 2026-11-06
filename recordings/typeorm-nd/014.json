@@ -1,0 +1,140 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/014",
+ "recorded_at": "2026-11-06T13:42:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1648,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "171.94355",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=858"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#1",
+    "text": "## Default Behavior\n\nBy default, TypeORM throws an error when `null` or `undefined` values are encountered in where conditions. This prevents unexpected results and helps catch potential bugs early:\n\n```typescript\n// Both queries will throw an error\nconst posts1 = await repository.find({\n    where: {\n        text: null,\n    },\n})\n// Error: Null value encountered in property 'text' of a where condition.\n\nconst posts2 = await repository.find({\n    where: {\n        text: undefined,\n    },\n})\n// Error: Undefined value encountered in property 'text' of a where condition.\n```\n\nTo match null values in where conditions, use the `IsNull` operator (for details see [Find Options](../working-with-entity-manager/3-find-options.md)):\n\n```typescript\nconst posts = await repository.find({\n    where: {\n        text: IsNull(),\n    },\n})\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "text": "### `invalidWhereValuesBehavior` default changed to `throw`\n\n**This is a significant behavioral change that may break existing applications at runtime.**\n\nThe default behavior for null and undefined values in where conditions has changed. Previously, null and undefined values were silently ignored (the property was skipped). Now, both **throw an error by default**.\n\nThis change prevents subtle bugs where queries like `findBy({ id: undefined })` would silently return all rows instead of failing.\n\n```typescript\n// v0.3: silently returns all posts (null is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: null } })\n\n// v0.3: silently returns all posts (undefined is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: undefined } })\n```\n\nTo match null values, use the `IsNull()` operator:\n\n```typescript\nimport { IsNull } from \"typeorm\"\n\nawait repository.find({ where: { text: IsNull() } })\n```\n\nTo restore the previous behavior, set `invalidWhereValuesBehavior` in your data source options:\n\n```typescript\nnew DataSource({\n    // ...\n    invalidWhereValuesBehavior: {\n        null: \"ignore\",\n        undefined: \"ignore\",\n    },\n})\n```\n\nThis setting guards all high-level APIs — find operations, repository/manager mutation methods, and `queryBuilder.setFindOptions()` (the only QueryBuilder method that is affected). The rest of the QueryBuilder methods (`.where()`, `.andWhere()`, `.orWhere()`) are **not** affected — null and undefined values pass through as-is. See [Null and undefined handling](../../data-source/5-null-and-undefined-handling.md) for full details."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#1",
+    "b": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0107,
+     "overlapping": 0.9822,
+     "conflicting": 0.0048,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0122,
+       "restated": 0.8978,
+       "elaborated": 0.0521,
+       "different": 0.038
+      },
+      "confidence": 0.962,
+      "a": {
+       "document": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#1",
+       "quote": "By default, TypeORM throws an error when `null` or `undefined` values are encountered in where conditions.",
+       "start": 21,
+       "end": 127,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+       "quote": "### `invalidWhereValuesBehavior` default changed to `throw`\n\n**This is a significant behavioral change that may break existing applications at runtime.**\n\nThe default behavior for null and undefined values in where conditions has changed.",
+       "start": 0,
+       "end": 238,
+       "confidence": 0.991
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0139,
+       "restated": 0.5255,
+       "elaborated": 0.4293,
+       "different": 0.0313
+      },
+      "confidence": 0.9687,
+      "a": {
+       "document": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#1",
+       "quote": "By default, TypeORM throws an error when `null` or `undefined` values are encountered in where conditions.",
+       "start": 21,
+       "end": 127,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#29",
+       "quote": "Now, both **throw an error by default**.\n\nThis change prevents subtle bugs where queries like `findBy({ id: undefined })` would silently return all rows instead of failing.\n\n```typescript\n// v0.3: silently returns all posts (null is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: null } })\n\n// v0.3: silently returns all posts (undefined is ignored)\n// v1.0: throws TypeORMError\nawait repository.find({ where: { text: undefined } })\n```\n\nTo match null values, use the `IsNull()` operator:\n\n```typescript\nimport { IsNull } from \"typeorm\"\n\nawait repository.find({ where: { text: IsNull() } })\n```\n\nTo restore the previous behavior, set `invalidWhereValuesBehavior` in your data source options:\n\n```typescript\nnew DataSource({\n    // ...\n    invalidWhereValuesBehavior: {\n        null: \"ignore\",\n        undefined: \"ignore\",\n    },\n})\n```\n\nThis setting guards all high-level APIs — find operations, repository/manager mutation methods, and `queryBuilder.setFindOptions()` (the only QueryBuilder method that is affected).",
+       "start": 327,
+       "end": 1374,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 265,
+   "passage_reads": 1,
+   "passages_ms": 121,
+   "passages": 2,
+   "counterparts_ms": 227
+  },
+  "timing": {
+   "read_ms": 613,
+   "total_ms": 617
+  }
+ }
+}

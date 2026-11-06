@@ -1,0 +1,127 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/mockImplementation.rerank",
+ "recorded_at": "2026-11-06T13:42:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 987,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "61.459007",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=250"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `mockImplementation`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `mockImplementation`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/Es6ClassMocks.md#6",
+    "title": "docs/Es6ClassMocks.md > The 4 ways to create an ES6 class mock > Replacing the mock using [`mockImplementation()`](MockFunctionAPI.md#mockfnmockimplementationfn) or [`mockImplementationOnce()`](MockFunctionAPI.md#mockfnmockimplementationoncefn)",
+    "text": "### Replacing the mock using [`mockImplementation()`](MockFunctionAPI.md#mockfnmockimplementationfn) or [`mockImplementationOnce()`](MockFunctionAPI.md#mockfnmockimplementationoncefn)\n\nYou can replace all of the above mocks in order to change the implementation, for a single test or all tests, by calling `mockImplementation()` on the existing mock.\n\nCalls to jest.mock are hoisted to the top of the code. You can specify a mock later, e.g. in `beforeAll()`, by calling `mockImplementation()` (or `mockImplementationOnce()`) on the existing mock instead of using the factory parameter. This also allows you to change the mock between tests, if needed:\n\n```javascript\nimport SoundPlayer from './sound-player';\nimport SoundPlayerConsumer from './sound-player-consumer';\n\njest.mock('./sound-player');\n\ndescribe('When SoundPlayer throws an error', () => {\n  beforeAll(() => {\n    SoundPlayer.mockImplementation(() => {\n      return {\n        playSoundFile: () => {\n          throw new Error('Test error');\n        },\n      };\n    });\n  });\n\n  it('Should throw an error when calling playSomethingCool', () => {\n    const soundPlayerConsumer = new SoundPlayerConsumer();\n    expect(() => soundPlayerConsumer.playSomethingCool()).toThrow();\n  });\n});\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#2",
+    "title": "docs/MockFunctionAPI.md > Reference > `mockFn.getMockImplementation()`",
+    "text": "### `mockFn.getMockImplementation()`\n\nReturns the current implementation of the mock function set by [`mockImplementation()`](#mockfnmockimplementationfn). Returns `undefined` if no implementation has been set.\n\n```js tab\nconst mockFn = jest.fn();\n\nmockFn.getMockImplementation(); // undefined\n\nmockFn.mockImplementation(() => 42);\n\nmockFn.getMockImplementation(); // () => 42\n```\n\n```ts tab\nimport {jest} from '@jest/globals';\n\nconst mockFn = jest.fn<() => number>();\n\nmockFn.getMockImplementation(); // undefined\n\nmockFn.mockImplementation(() => 42);\n\nmockFn.getMockImplementation(); // () => 42\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#22",
+    "title": "docs/MockFunctionAPI.md > Reference > `mockFn.whenCalledWith(...args)`",
+    "text": "### `mockFn.whenCalledWith(...args)`\n\nConfigures a return value or implementation that only fires when the mock is called with arguments matching `...args`. Useful when a single mock needs to behave differently for different argument lists without branching logic inside `mockImplementation`.\n\n```js\nconst fn = jest.fn();\nfn.whenCalledWith('apple').mockReturnValue('red');\nfn.whenCalledWith('banana').mockReturnValue('yellow');\n\nfn('apple'); // 'red'\nfn('banana'); // 'yellow'\nfn('grape'); // undefined\n```\n\nThe returned object is a real `Mock`, so anything you can chain on a regular `jest.fn()` chains here too: `mockReturnValue`, `mockReturnValueOnce`, `mockResolvedValue`, `mockResolvedValueOnce`, `mockRejectedValue`, `mockRejectedValueOnce`, `mockImplementation`, `mockImplementationOnce`. Each matched call routes to that sub-mock; non-matching calls fall through to the base mock."
+   },
+   {
+    "id": "jest:docs/MockFunctions.md#6",
+    "title": "docs/MockFunctions.md > Mock Implementations",
+    "text": "## Mock Implementations\n\nStill, there are cases where it's useful to go beyond the ability to specify return values and full-on replace the implementation of a mock function. This can be done with `jest.fn` or the `mockImplementationOnce` method on mock functions.\n\n```javascript\nconst myMockFn = jest.fn(cb => cb(null, true));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n```\n\nThe `mockImplementation` method is useful when you need to define the default implementation of a mock function that is created from another module:\n\n```js title=\"foo.js\"\nmodule.exports = function () {\n  // some implementation;\n};\n```\n\n```js title=\"test.js\"\njest.mock('../foo'); // this happens automatically with automocking\nconst foo = require('../foo');\n\n// foo is a mock function\nfoo.mockImplementation(() => 42);\nfoo();\n// > 42\n```\n\nWhen you need to recreate a complex behavior of a mock function such that multiple function calls produce different results, use the `mockImplementationOnce` method:\n\n```javascript\nconst myMockFn = jest\n  .fn()\n  .mockImplementationOnce(cb => cb(null, true))\n  .mockImplementationOnce(cb => cb(null, false));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n\nmyMockFn((err, val) => console.log(val));\n// > false\n```\n\nWhen the mocked function runs out of implementations defined with `mockImplementationOnce`, it will execute the default implementation set with `jest.fn` (if it is defined):\n\n```javascript\nconst myMockFn = jest\n  .fn(() => 'default')\n  .mockImplementationOnce(() => 'first call')\n  .mockImplementationOnce(() => 'second call');\n\nconsole.log(myMockFn(), myMockFn(), myMockFn(), myMockFn());\n// > 'first call', 'second call', 'default', 'default'\n```\n\nFor cases where we have methods that are typically chained (and thus always need to return `this`), we have a sugary API to simplify this in the form of a `.mockReturnThis()` function that also sits on all mocks:\n\n```javascript\nconst myObj = {\n  myMethod: jest.fn().mockReturnThis(),\n};\n\n// is the same as\n\nconst otherObj = {\n  myMethod: jest.fn(function () {\n    return this;\n  }),\n};\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "jest:docs/MockFunctions.md#6",
+    "action": "use",
+    "relevance_score": 0.965,
+    "document_score": 0.979,
+    "levels": {
+     "answers": 0.965,
+     "elsewhere": 0.0141,
+     "different_case": 0.0111,
+     "unrelated": 0.0098
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/MockFunctionAPI.md#2",
+    "action": "expand",
+    "relevance_score": 0.1132,
+    "document_score": 0.9169,
+    "levels": {
+     "answers": 0.1132,
+     "elsewhere": 0.8036,
+     "different_case": 0.0166,
+     "unrelated": 0.0666
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/Es6ClassMocks.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0119,
+    "document_score": 0.1024,
+    "levels": {
+     "answers": 0.0119,
+     "elsewhere": 0.0906,
+     "different_case": 0.0272,
+     "unrelated": 0.8704
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/MockFunctionAPI.md#22",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0057,
+    "document_score": 0.0431,
+    "levels": {
+     "answers": 0.0057,
+     "elsewhere": 0.0374,
+     "different_case": 0.0177,
+     "unrelated": 0.9392
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1638
+  },
+  "timing": {
+   "total_ms": 80,
+   "rerank_ms": 79,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2178,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

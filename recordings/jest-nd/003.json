@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "jest-nd/003",
+ "recorded_at": "2026-11-06T13:42:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 949,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.680449",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=246"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/DynamoDB.md#1",
+    "text": "## Use jest-dynamodb Preset\n\n[Jest DynamoDB](https://github.com/shelfio/jest-dynamodb) provides all required configuration to run your tests using DynamoDB.\n\n1.  First, install `@shelf/jest-dynamodb`\n\n```bash npm2yarn\nnpm install --save-dev @shelf/jest-dynamodb\n```\n\n2.  Specify preset in your Jest configuration:\n\n```json\n{\n  \"preset\": \"@shelf/jest-dynamodb\"\n}\n```\n\n3.  Create `jest-dynamodb-config.js` and define DynamoDB tables\n\nSee [Create Table API](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#createTable-property)\n\n```js\nmodule.exports = {\n  tables: [\n    {\n      TableName: `files`,\n      KeySchema: [{AttributeName: 'id', KeyType: 'HASH'}],\n      AttributeDefinitions: [{AttributeName: 'id', AttributeType: 'S'}],\n      ProvisionedThroughput: {ReadCapacityUnits: 1, WriteCapacityUnits: 1},\n    },\n    // etc\n  ],\n};\n```\n\n4.  Configure DynamoDB client\n\n```js\nconst {DocumentClient} = require('aws-sdk/clients/dynamodb');\n\nconst isTest = process.env.JEST_WORKER_ID;\nconst config = {\n  convertEmptyValues: true,\n  ...(isTest && {\n    endpoint: 'localhost:8000',\n    sslEnabled: false,\n    region: 'local-env',\n  }),\n};\n\nconst ddb = new DocumentClient(config);\n```\n\n5.  Write tests\n\n```js\nit('should insert item into table', async () => {\n  await ddb\n    .put({TableName: 'files', Item: {id: '1', hello: 'world'}})\n    .promise();\n\n  const {Item} = await ddb.get({TableName: 'files', Key: {id: '1'}}).promise();\n\n  expect(Item).toEqual({\n    id: '1',\n    hello: 'world',\n  });\n});\n```\n\nThere's no need to load any dependencies.\n\nSee [documentation](https://github.com/shelfio/jest-dynamodb) for details."
+   },
+   {
+    "id": "jest:docs/Puppeteer.md#1",
+    "text": "## Use jest-puppeteer Preset\n\n[Jest Puppeteer](https://github.com/smooth-code/jest-puppeteer) provides all required configuration to run your tests using Puppeteer.\n\n1.  First, install `jest-puppeteer`\n\n```bash npm2yarn\nnpm install --save-dev jest-puppeteer\n```\n\n2.  Specify preset in your [Jest configuration](Configuration.md):\n\n```json\n{\n  \"preset\": \"jest-puppeteer\"\n}\n```\n\n3.  Write your test\n\n```js\ndescribe('Google', () => {\n  beforeAll(async () => {\n    await page.goto('https://google.com');\n  });\n\n  it('should be titled \"Google\"', async () => {\n    await expect(page.title()).resolves.toMatch('Google');\n  });\n});\n```\n\nThere's no need to load any dependencies. Puppeteer's `page` and `browser` classes will automatically be exposed\n\nSee [documentation](https://github.com/smooth-code/jest-puppeteer)."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/DynamoDB.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/Puppeteer.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/DynamoDB.md#1",
+    "b": "jest:docs/Puppeteer.md#1",
+    "relation": "unrelated",
+    "related": 0.0076,
+    "probabilities": {
+     "same": 0.0023,
+     "overlapping": 0.0023,
+     "conflicting": 0.003,
+     "unrelated": 0.9924
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 103
+  },
+  "timing": {
+   "read_ms": 103,
+   "total_ms": 106
+  }
+ }
+}

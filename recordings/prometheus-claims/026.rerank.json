@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/026.rerank",
+ "recorded_at": "2026-11-06T13:38:02Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1168,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.753853",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=160,cfOrigin;dur=0,cfWorker;dur=233"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: _The `info` function is an experiment to improve UX around including labels from [info metrics](https://grafana.com/blog/2021/08/04/how-to-use-promql-joins-for-more-effective-queries-of-prometheus-metrics-at-scale/#info-metrics).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#19",
+    "title": "docs/feature_flags.md > Type and Unit Labels",
+    "text": "## Type and Unit Labels\n\n`--enable-feature=type-and-unit-labels`\n\nWhen enabled, Prometheus will start injecting additional, reserved `__type__`\nand `__unit__` labels as designed in the [PROM-39 proposal](https://github.com/prometheus/proposals/pull/39).\n\nThose labels are sourced from the metadata structures of the existing scrape and ingestion formats\nlike OpenMetrics Text, Prometheus Text, Prometheus Proto, Remote Write 2 and OTLP, as well as `type` and `unit` metadata configured on recording rules. All the user provided labels with\n`__type__` and `__unit__` will be overridden.\n\nPromQL layer will handle those labels the same way `__name__` is handled, e.g. dropped\non certain operations like `-` or `+` and affected by `promql-delayed-name-removal` feature.\n\nThis feature enables important metadata information to be accessible directly with samples and PromQL layer.\n\nIt's especially useful for users who:\n\n* Want to be able to select metrics based on type or unit.\n* Want to handle cases of series with the same metric name and different type and units.\n  e.g. native histogram migrations or OpenTelemetry metrics from OTLP endpoint, without translation.\n\nIn future more [work is planned](https://github.com/prometheus/prometheus/issues/16610) that will depend on this e.g. rich PromQL UX that helps\nwhen wrong types are used on wrong functions, automatic renames, delta types and more."
+   },
+   {
+    "id": "prometheus:docs/storage.md#15",
+    "title": "docs/storage.md > Backfilling from OpenMetrics format > Usage > Longer Block Durations",
+    "text": "#### Longer Block Durations\n\nBy default, the promtool will use the default block duration (2h) for the blocks;\nthis behavior is the most generally applicable and correct. However, when backfilling\ndata over a long range of times, it may be advantageous to use a larger value for\nthe block duration to backfill faster and prevent additional compactions by TSDB later.\n\nThe `--max-block-duration` flag allows the user to configure a maximum duration of blocks.\nThe backfilling tool will pick a suitable block duration no larger than this.\n\nTo use `--max-block-duration` as is, rather than rounding it down to a duration Prometheus typically\ncompacts to, also set `--allow-incompatible-block-duration`. For example,\n`--max-block-duration=24h --allow-incompatible-block-duration` creates the daily blocks\nthat other TSDB systems, such as Cortex, Mimir and Thanos, expect.\n\nWhile larger blocks may improve the performance of backfilling large datasets,\ndrawbacks exist as well. Time-based retention policies must keep the entire block\naround if even one sample of the (potentially large) block is still within the\nretention policy. Conversely, size-based retention policies will remove the entire\nblock even if the TSDB only goes over the size limit in a minor way.\n\nTherefore, backfilling with few blocks, thereby choosing a larger block duration,\nmust be done with care and is not recommended for any production instances."
+   },
+   {
+    "id": "prometheus:docs/configuration/recording_rules.md#5",
+    "title": "docs/configuration/recording_rules.md > Recording rules > `<rule>`",
+    "text": "### `<rule>`\n\nThe syntax for recording rules is:\n\n```yaml\n# The name of the time series to output to. Must be a valid metric name.\nrecord: <string>\n\n# The PromQL expression to evaluate. Every evaluation cycle this is\n# evaluated at the current time, and the result recorded as a new set of\n# time series with the metric name as given by 'record'.\nexpr: <string>\n\n# Labels to add or overwrite before storing the result.\nlabels:\n  [ <labelname>: <labelvalue> ]\n\n# Optional metric metadata for the recorded time series.\nmetadata:\n  [ help: <string> ]\n  [ type: <string> ] # One of counter, gauge, histogram, gaugehistogram, summary, info, stateset, unknown.\n  [ unit: <string> ]\n```\n\nThe syntax for alerting rules is:\n\n```yaml\n# The name of the alert. Must be a valid label value.\nalert: <string>\n\n# The PromQL expression to evaluate. Every evaluation cycle this is\n# evaluated at the current time, and all resultant time series become\n# pending/firing alerts.\nexpr: <string>\n\n# Alerts are considered firing once they have been returned for this long.\n# Alerts which have not yet fired for long enough are considered pending.\n[ for: <duration> | default = 0s ]\n\n# How long an alert will continue firing after the condition that triggered it\n# has cleared.\n[ keep_firing_for: <duration> | default = 0s ]\n\n# Labels to add or overwrite for each alert.\nlabels:\n  [ <labelname>: <tmpl_string> ]\n\n# Annotations to add to each alert.\nannotations:\n  [ <labelname>: <tmpl_string> ]\n```\n\nSee also the\n[best practices for naming metrics created by recording rules](https://prometheus.io/docs/practices/rules/#recording-rules)."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#72",
+    "title": "docs/configuration/configuration.md > Configuration file > `<hetzner_sd_config>`",
+    "text": "The labels below are only available for targets with `role` set to `robot`:\n\n* `__meta_hetzner_robot_datacenter`: the datacenter of the server\n* `__meta_hetzner_robot_product`: the product of the server\n* `__meta_hetzner_robot_cancelled`: the server cancellation status\n\n```yaml\n# The Hetzner role of entities that should be discovered.\n# One of robot or hcloud.\nrole: <string>\n\n# The port to scrape metrics from.\n[ port: <int> | default = 80 ]\n\n# The time after which the servers are refreshed.\n[ refresh_interval: <duration> | default = 60s ]\n\n# Label selector used to filter the servers when fetching them from the API. See https://docs.hetzner.cloud/#label-selector for more details.\n# Only used when role is hcloud.\n[ label_selector: <string> ]\n\n# HTTP client settings, including authentication methods (such as basic auth and\n# authorization), proxy configurations, TLS options, custom HTTP headers, etc.\n[ <http_config> ]\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#35",
+    "title": "docs/configuration/configuration.md > Configuration file > `<aws_sd_config>` > `mq`",
+    "text": "**Broker instance labels (target-specific):**\n\n* `__meta_mq_broker_instance_endpoint`: the `https` endpoint used as the target's scrape address\n\nSee below for the configuration options for AWS discovery:\n\n```yaml\n# The AWS role to use for service discovery.\n# Must be one of: ec2, lightsail, ecs, msk, elasticache, mq, or rds.\nrole: <string>\n\n# The AWS region. If blank, the region from the instance metadata is used.\n[ region: <string> ]\n\n# Custom endpoint to be used.\n[ endpoint: <string> ]\n\n# AWS access key ID. If blank, the environment variable AWS_ACCESS_KEY_ID is used.\n[ access_key: <string> ]\n\n# AWS secret access key. If blank, the environment variable AWS_SECRET_ACCESS_KEY is used.\n[ secret_key: <secret> ]\n\n# Named AWS profile used to authenticate.\n[ profile: <string> ]\n\n# AWS Role ARN, an alternative to using AWS API keys.\n[ role_arn: <string> ]\n\n# Optional External ID that can go along with role_arn.\n[ external_id: <string> ]\n\n# Refresh interval to re-read the targets list.\n[ refresh_interval: <duration> | default = 60s ]\n\n# The port to scrape metrics from. If using the public IP address, this must\n# instead be specified in the relabeling rule.\n[ port: <int> | default = 80 ]\n\n# Filters can be used optionally to filter the instance list by other criteria (ec2 & rds role only).\n# Available filter criteria can be found here:\n# EC2:\n#  - https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html\n#  - Filter API documentation: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_Filter.html\n# RDS:\n#  - https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html\n#  - Filter API documentation: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_Filter.html\nfilters:\n  [ - name: <string>\n      values: <string>, [...] ]\n\n# List of ECS, ElastiCache, MSK, or RDS cluster identifiers (ecs, elasticache, msk, and rds roles only) to discover.\n# A List of ARNs of clusters to discover. If empty, all clusters in the region are discovered.\n# This can significantly improve performance when you only need to monitor specific clusters/caches.\n[ clusters: [<string>, ...] ]\n\n# Maximum number of AWS API requests issued concurrently while discovering\n# targets (ecs, elasticache, msk, and rds roles only). The defaults are aligned\n# with the sustained request rate limits of the respective AWS APIs.\n[ request_concurrency: <int> | default = 20 for the ecs role, 10 for the elasticache, msk and rds roles ]"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#21",
+    "title": "docs/feature_flags.md > Use Uncached IO",
+    "text": "## Use Uncached IO\n\n`--enable-feature=use-uncached-io`\n\nExperimental and only available on Linux.\n\nWhen enabled, it makes chunks writing bypass the page cache. Its primary\ngoal is to reduce confusion around page‐cache behavior and to prevent over‑allocation of\nmemory in response to misleading cache growth.\n\nThis is currently implemented using direct I/O.\n\nFor more details, see the [proposal](https://github.com/prometheus/proposals/pull/45)."
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#5",
+    "title": "docs/getting_started.md > Using the graphing interface",
+    "text": "## Using the graphing interface\n\nTo graph expressions, navigate to http://localhost:9090/query and use the \"Graph\"\ntab.\n\nFor example, enter the following expression to graph the per-second rate of chunks\nbeing created in the self-scraped Prometheus:\n\n```\nrate(prometheus_tsdb_head_chunks_created_total[1m])\n```\n\nExperiment with the graph range parameters and other settings."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#129",
+    "title": "docs/configuration/configuration.md > Configuration file > `<remote_read>`",
+    "text": "### `<remote_read>`\n\n```yaml\n# The URL of the endpoint to query from.\nurl: <string>\n\n# Name of the remote read config, which if specified must be unique among remote read configs.\n# The name will be used in metrics and logging in place of a generated value to help users distinguish between\n# remote read configs.\n[ name: <string> ]\n\n# An optional list of equality matchers which have to be\n# present in a selector to query the remote read endpoint.\nrequired_matchers:\n  [ <labelname>: <labelvalue> ... ]\n\n# Timeout for requests to the remote read endpoint.\n[ remote_timeout: <duration> | default = 1m ]\n\n# Custom HTTP headers to be sent along with each remote read request.\n# Be aware that headers that are set by Prometheus itself can't be overwritten.\nheaders:\n  [ <string>: <string> ... ]\n\n# Whether reads should be made for queries for time ranges that\n# the local storage should have complete data for.\n[ read_recent: <boolean> | default = false ]\n\n# Whether to use the external labels as selectors for the remote read endpoint.\n[ filter_external_labels: <boolean> | default = true ]\n\n# HTTP client settings, including authentication methods (such as basic auth and\n# authorization), proxy configurations, TLS options, custom HTTP headers, etc.\n[ <http_config> ]\n```\n\nThere is a list of\n[integrations](https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage)\nwith this feature."
+   },
+   {
+    "id": "prometheus:docs/stability.md#0",
+    "title": "docs/stability.md > (preamble)",
+    "text": "---\ntitle: API stability guarantees\nnav_title: API stability\nsort_rank: 11\n---\n\nPrometheus promises API stability within a major version, and strives to avoid\nbreaking changes for key features. Some features, which are cosmetic, still\nunder development, or depend on 3rd party services, are not covered by this.\n\nThings considered stable for 3.x:\n\n* The query language and data model\n* Alerting and recording rules\n* The ingestion exposition format\n* v1 HTTP API (used by dashboards and UIs), excluding endpoints explicitly marked as experimental\n* Configuration file format (minus the service discovery remote read/write, see below)\n* Rule/alert file format\n* Console template syntax and semantics\n* Remote write sending, per the [1.0 specification](https://prometheus.io/docs/concepts/remote_write_spec/) and receiving\n* Agent mode\n* OTLP receiver endpoint\n\nThings considered unstable for 3.x:\n\n* Any feature listed as experimental or subject to change, including:\n  * The [`double_exponential_smoothing` PromQL function](https://github.com/prometheus/prometheus/issues/2458)\n  * Remote read and the remote read endpoint\n* Server-side HTTPS and basic authentication\n* Service discovery integrations, with the exception of `static_configs`, `file_sd_configs` and `http_sd_config`\n* Go APIs of packages that are part of the server\n* HTML generated by the web UI\n* The metrics in the /metrics endpoint of Prometheus itself\n* Exact on-disk format. Potential changes however, will be forward compatible and transparently handled by Prometheus\n* The format of the logs\n\nPrometheus 2.x stability guarantees can be found [in the 2.x documentation](https://prometheus.io/docs/prometheus/2.55/stability/).\n\nAs long as you are not using any features marked as experimental/unstable, an\nupgrade within a major version can usually be performed without any operational\nadjustments and very little risk that anything will break. Any breaking changes\nwill be marked as `CHANGE` in release notes."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#74",
+    "title": "docs/configuration/configuration.md > Configuration file > `<ionos_sd_config>`",
+    "text": "### `<ionos_sd_config>`\n\nIONOS SD configurations allows retrieving scrape targets from\n[IONOS Cloud](https://cloud.ionos.com/) API. This service discovery uses the\nfirst NICs IP address by default, but that can be changed with relabeling. The\nfollowing meta labels are available on all targets during\n[relabeling](#relabel_config):\n\n* `__meta_ionos_server_availability_zone`: the availability zone of the server\n* `__meta_ionos_server_boot_cdrom_id`: the ID of the CD-ROM the server is booted\n  from\n* `__meta_ionos_server_boot_image_id`: the ID of the boot image or snapshot the\n  server is booted from\n* `__meta_ionos_server_boot_volume_id`: the ID of the boot volume\n* `__meta_ionos_server_cpu_family`: the CPU family of the server\n  to\n* `__meta_ionos_server_id`: the ID of the server\n* `__meta_ionos_server_ip`: comma separated list of all IPs assigned to the\n  server\n* `__meta_ionos_server_lifecycle`: the lifecycle state of the server resource\n* `__meta_ionos_server_name`: the name of the server\n* `__meta_ionos_server_nic_ip_<nic_name>`: comma separated list of IPs, grouped\n  by the name of each NIC attached to the server\n* `__meta_ionos_server_servers_id`: the ID of the servers the server belongs to\n* `__meta_ionos_server_state`: the execution state of the server\n* `__meta_ionos_server_type`: the type of the server\n\n```yaml\n# The unique ID of the data center.\ndatacenter_id: <string>\n\n# The port to scrape metrics from.\n[ port: <int> | default = 80 ]\n\n# The time after which the servers are refreshed.\n[ refresh_interval: <duration> | default = 60s ]\n\n# HTTP client settings, including authentication methods (such as basic auth and\n# authorization), proxy configurations, TLS options, custom HTTP headers, etc.\n[ <http_config> ]\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 8,
+    "id": "prometheus:docs/stability.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0088,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0055,
+     "different_case": 0.021,
+     "unrelated": 0.9702
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/getting_started.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0044,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0021,
+     "different_case": 0.0045,
+     "unrelated": 0.9912
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/feature_flags.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0022,
+     "different_case": 0.0086,
+     "unrelated": 0.9872
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/configuration/recording_rules.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0023,
+     "different_case": 0.0074,
+     "unrelated": 0.9883
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/configuration/configuration.md#129",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0009,
+     "different_case": 0.0028,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/feature_flags.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0013,
+     "different_case": 0.0028,
+     "unrelated": 0.9946
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/configuration/configuration.md#72",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0005,
+     "different_case": 0.0018,
+     "unrelated": 0.9965
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/storage.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0016,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0005,
+     "different_case": 0.0016,
+     "unrelated": 0.9968
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/configuration/configuration.md#35",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0015,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0005,
+     "different_case": 0.0017,
+     "unrelated": 0.9968
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/configuration/configuration.md#74",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0016,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0006,
+     "different_case": 0.0018,
+     "unrelated": 0.9966
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4967
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5837,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

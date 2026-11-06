@@ -1,0 +1,115 @@
+{
+ "endpoint": "grounding",
+ "tag": "fastify-claims/004.grounding",
+ "recorded_at": "2026-11-06T13:37:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1118,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "126.248703",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=431"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "text": "- Throwing a new error in a custom error handler will call the parent\n  `errorHandler`.\n  - The `onError` hook will be triggered once for the first error thrown\n  - An error will not be triggered twice from a lifecycle hook. Fastify\n    internally monitors error invocation to avoid infinite loops for errors\n    thrown in the reply phases of the lifecycle (those after the route handler)\n\nWhen using Fastify's custom error handling through\n[`setErrorHandler`](./Server.md#seterrorhandler), be aware of how errors are\npropagated between custom and default error handlers.\n\nIf a plugin's error handler re-throws an error that is not an instance of\n[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error),\nit will not propagate to the parent context error handler. Instead, it will be\ncaught by the default error handler. This can be seen in the `/bad` route of the\nexample below.\n\nTo ensure consistent error handling, throw instances of `Error`. For example,\nreplace `throw 'foo'` with `throw new Error('foo')` in the `/bad` route to\nensure errors propagate through the custom error handling chain as intended.\nThis practice helps avoid potential pitfalls when working with custom error\nhandling in Fastify.\n\nFor example:\n```js\nconst Fastify = require('fastify')\n\n// Instantiate the framework\nconst fastify = Fastify({\n  logger: true\n})\n\n// Register parent error handler\nfastify.setErrorHandler((error, request, reply) => {\n  reply.status(500).send({ ok: false })\n})\n\nfastify.register((app, options, next) => {\n  // Register child error handler\n  app.setErrorHandler((error, request, reply) => {\n    throw error\n  })\n\n  app.get('/bad', async () => {\n    // Throws a non-Error type, 'foo'\n    throw 'foo'\n  })\n\n  app.get('/good', async () => {\n    // Throws an Error instance, 'bar'\n    throw new Error('bar')\n  })\n\n  next()\n})\n\n// Run the server\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is listening at ${address}\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#2",
+    "text": "### Your first server\n<a id=\"first-server\"></a>\n\nLet's write our first server:\n```js\n// Require the framework and instantiate it\n\n// ESM\nimport Fastify from 'fastify'\n\nconst fastify = Fastify({\n  logger: true\n})\n// CommonJs\nconst fastify = require('fastify')({\n  logger: true\n})\n\n// Declare a route\nfastify.get('/', function (request, reply) {\n  reply.send({ hello: 'world' })\n})\n\n// Run the server!\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n> If you are using ECMAScript Modules (ESM) in your project, be sure to\n> include \"type\": \"module\" in your package.json.\n>```js\n>{\n>  \"type\": \"module\"\n>}\n>```\n\nDo you prefer to use `async/await`? Fastify supports it out-of-the-box.\n\n```js\n// ESM\nimport Fastify from 'fastify'\n\nconst fastify = Fastify({\n  logger: true\n})\n// CommonJs\nconst fastify = require('fastify')({\n  logger: true\n})\n\nfastify.get('/', async (request, reply) => {\n  return { hello: 'world' }\n})\n\n/**\n * Run the server!\n */\nconst start = async () => {\n  try {\n    await fastify.listen({ port: 3000 })\n  } catch (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n}\nstart()\n```\n\nAwesome, that was easy.\n\nUnfortunately, writing a complex application requires significantly more code\nthan this example. A classic problem when you are building a new application is\nhow to handle multiple files, asynchronous bootstrapping, and the architecture\nof your code."
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#4",
+    "text": "### Your first plugin\n<a id=\"first-plugin\"></a>\n\nAs with JavaScript, where everything is an object, with Fastify everything is a\nplugin.\n\nBefore digging into it, let's see how it works!\n\nLet's declare our basic server, but instead of declaring the route inside the\nentry point, we'll declare it in an external file (check out the [route\ndeclaration](../Reference/Routes.md) docs).\n```js\n// ESM\nimport Fastify from 'fastify'\nimport routes from './our-first-routes.js'\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = Fastify({\n  logger: true\n})\n\nfastify.register(routes)\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n```js\n// CommonJs\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = require('fastify')({\n  logger: true\n})\n\nfastify.register(require('./our-first-routes'))\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n\n```js\n// our-first-routes.js\n\n/**\n * Encapsulates the routes\n * @param {FastifyInstance} fastify  Encapsulated Fastify Instance\n * @param {Object} options plugin options, refer to https://fastify.dev/docs/latest/Reference/Plugins/#plugin-options\n */\nasync function routes (fastify, options) {\n  fastify.get('/', async (request, reply) => {\n    return { hello: 'world' }\n  })\n}\n\n//ESM\nexport default routes;\n\n// CommonJs\nmodule.exports = routes\n```\nIn this example, we used the `register` API, which is the core of the Fastify\nframework. It is the only way to add routes, plugins, et cetera."
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#5",
+    "text": "At the beginning of this guide, we noted that Fastify provides a foundation that\nassists with asynchronous bootstrapping of your application. Why is this\nimportant?\n\nConsider the scenario where a database connection is needed to handle data\nstorage. The database connection needs to be available before the server is\naccepting connections. How do we address this problem?\n\nA typical solution is to use a complex callback, or promises - a system that\nwill mix the framework API with other libraries and the application code.\n\nFastify handles this internally, with minimum effort!\n\nLet's rewrite the above example with a database connection.\n\n\nFirst, install `fastify-plugin` and `@fastify/mongodb`:\n\n```sh\nnpm i fastify-plugin @fastify/mongodb\n```\n\n**server.js**\n```js\n// ESM\nimport Fastify from 'fastify'\nimport dbConnector from './our-db-connector.js'\nimport routes from './our-first-routes.js'\n\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = Fastify({\n  logger: true\n})\nfastify.register(dbConnector)\nfastify.register(routes)\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n```\n\n```js\n// CommonJs\n/**\n * @type {import('fastify').FastifyInstance} Instance of Fastify\n */\nconst fastify = require('fastify')({\n  logger: true\n})\n\nfastify.register(require('./our-db-connector'))\nfastify.register(require('./our-first-routes'))\n\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is now listening on ${address}\n})\n\n```"
+   }
+  ],
+  "answer": "Require the framework and instantiate it",
+  "claims": [
+   "Require the framework and instantiate it"
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Example' of README.md in the documentation of the fastify project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.997,
+  "ungrounded": 0.003,
+  "verdict": "grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#2",
+    "share": 0.9967,
+    "share_of_answer": 0.9937,
+    "claims": [
+     0
+    ]
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#5",
+    "share": 0.0015,
+    "share_of_answer": 0.0015,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#4",
+    "share": 0.0011,
+    "share_of_answer": 0.0011,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "share": 0.0007,
+    "share_of_answer": 0.0007,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Require the framework and instantiate it",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.9969,
+    "contradicted": 0.0007,
+    "not_stated": 0.0011,
+    "not_a_claim": 0.0013,
+    "verdict": "supported",
+    "sources": {
+     "fastify:docs/Reference/Errors.md#12": 0.0007,
+     "fastify:docs/Guides/Getting-Started.md#2": 0.9968,
+     "fastify:docs/Guides/Getting-Started.md#4": 0.0011,
+     "fastify:docs/Guides/Getting-Started.md#5": 0.0015
+    },
+    "source": "fastify:docs/Guides/Getting-Started.md#2",
+    "evidence": {
+     "document": "fastify:docs/Guides/Getting-Started.md#2",
+     "quote": "Require the framework and instantiate it",
+     "start": 88,
+     "end": 128,
+     "confidence": 0.972
+    }
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.9969
+  },
+  "timing": {
+   "read_ms": 232,
+   "total_ms": 236
+  }
+ }
+}

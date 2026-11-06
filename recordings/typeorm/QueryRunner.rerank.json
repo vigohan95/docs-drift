@@ -1,0 +1,199 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/QueryRunner.rerank",
+ "recorded_at": "2026-11-06T13:42:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 980,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.599266",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=229"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `QueryRunner`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `QueryRunner`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "title": "docs/docs/data-source/3-multiple-data-sources.md > Multiple data sources, databases, schemas and replication setup > Replication > Explicitly selecting query destinations",
+    "text": "### Explicitly selecting query destinations\n\nBy default, TypeORM will send all read queries to a random read slave, and all writes to the master. This means when you first add the `replication` settings to your configuration, any existing read query runners that don't explicitly specify a replication mode will start going to a slave. This is good for scalability, but if some of those queries _must_ return up to date data, then you need to explicitly pass a replication mode when you create a query runner.\n\nIf you want to explicitly use the `master` for read queries, pass an explicit `ReplicationMode` when creating your `QueryRunner`;\n\n```typescript\nconst masterQueryRunner = dataSource.createQueryRunner(\"master\")\ntry {\n    const postsFromMaster = await dataSource\n        .createQueryBuilder(Post, \"post\", masterQueryRunner) // you can either pass QueryRunner as an optional argument with query builder\n        .setQueryRunner(masterQueryRunner) // or use setQueryRunner which sets or overrides query builder's QueryRunner\n        .getMany()\n} finally {\n    await masterQueryRunner.release()\n}\n```\n\nIf you want to use a slave in raw queries, pass `slave` as the replication mode when creating a query runner:\n\n```typescript\nconst slaveQueryRunner = dataSource.createQueryRunner(\"slave\")\ntry {\n    const userFromSlave = await slaveQueryRunner.query(\n        \"SELECT * FROM users WHERE id = $1\",\n        [userId],\n        slaveQueryRunner,\n    )\n} finally {\n    return slaveQueryRunner.release()\n}\n```\n\n**Note**: Manually created `QueryRunner` instances must be explicitly released on their own. If you don't release your query runners, they will keep a connection checked out of the pool, and prevent other queries from using it."
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#0",
+    "title": "docs/docs/query-runner.md > Query Runner > What is a QueryRunner?",
+    "text": "## What is a QueryRunner?\n\nEach new `QueryRunner` instance takes a single connection from the connection pool, if the RDBMS supports connection pooling.\nFor databases that do not support connection pools, it uses the same connection across the entire data source.\n\nThe full QueryRunner API is documented in the [migrations section](./migrations/09-api.md)."
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#1",
+    "title": "docs/docs/query-runner.md > Query Runner > Creating a new `QueryRunner` instance",
+    "text": "## Creating a new `QueryRunner` instance\n\nUse the `createQueryRunner` method to create a new `QueryRunner`:\n\n```typescript\nconst queryRunner = dataSource.createQueryRunner()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#2",
+    "title": "docs/docs/query-runner.md > Query Runner > Using `QueryRunner`",
+    "text": "## Using `QueryRunner`\n\nAfter creating a new instance of `QueryRunner`, a connection will be acquired from the pool when you issue the first query:\n\n```typescript\nconst queryRunner = dataSource.createQueryRunner()\nawait queryRunner.query(\"SELECT 1\")\nawait queryRunner.release()\n```\n\nYou can also use `connect` method to directly get a connection from the connection pool:\n\n```typescript\nconst queryRunner = dataSource.createQueryRunner()\nconst clientConnection = await queryRunner.connect()\nawait queryRunner.release()\n```\n\n**Important**: make sure to release the `QueryRunner` when it is no longer necessary to return the connection back to the connection pool:\n\n```typescript\nawait queryRunner.release()\n```\n\nAfter the `QueryRunner` is released, it is no longer possible to use the query runner methods.\n\n`QueryRunner` also has its own `EntityManager` instance, which you can use through the `manager` property to run `EntityManager` queries on a particular database connection used by the `QueryRunner` instance:\n\n```typescript\nlet queryRunner: QueryRunner\ntry {\n    queryRunner = dataSource.createQueryRunner()\n    // use a single database connection to execute multiple queries\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"junior\" },\n        { bonus: 0.2 },\n    )\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"senior\" },\n        { bonus: 0.1 },\n    )\n} catch (error) {\n    console.error(error)\n} finally {\n    // remember to release connection after you are done using it\n    await queryRunner.release()\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#3",
+    "title": "docs/docs/query-runner.md > Query Runner > Explicit Resource Management",
+    "text": "## Explicit Resource Management\n\n`QueryRunner` also supports explicit resource management:\n\n```typescript\nasync function updateSalaries() {\n    await using queryRunner = dataSource.createQueryRunner()\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"junior\" },\n        { bonus: 0.2 },\n    )\n    await queryRunner.manager.update(\n        Employee,\n        { level: \"senior\" },\n        { bonus: 0.1 },\n    )\n    // no need anymore to manually release the QueryRunner\n}\n\ntry {\n    await updateSalaries()\n} catch (error) {\n    console.error(error)\n}\n```\n\nWhen declaring a query runner like this, it will be automatically released after the last statement in the containing scope was executed."
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > Breaking changes > Removed APIs",
+    "text": "### Removed APIs\n\n- **`Connection` and `ConnectionOptions` removed** — use `DataSource` and `DataSourceOptions` instead ([#12022](https://github.com/typeorm/typeorm/pull/12022) by [@alumni](https://github.com/alumni))\n- **`.connection` property renamed to `.dataSource`** — the `connection` property on `Driver`, `QueryRunner`, `EntityManager`, `QueryBuilder`, `EntityMetadata`, and all `*Event` subscriber interfaces has been renamed to `dataSource`; a deprecated getter is provided as a bridge ([#12244](https://github.com/typeorm/typeorm/pull/12244), [#12245](https://github.com/typeorm/typeorm/pull/12245), [#12246](https://github.com/typeorm/typeorm/pull/12246), [#12249](https://github.com/typeorm/typeorm/pull/12249) by [@pkuczynski](https://github.com/pkuczynski))\n- **`ConnectionManager` and global convenience functions removed** — `createConnection`, `getConnection`, `getManager`, `getRepository`, `createQueryBuilder`, and other globals have been removed ([#12098](https://github.com/typeorm/typeorm/pull/12098) by [@michaelbromley](https://github.com/michaelbromley))\n- **`getMongoRepository` and `getMongoManager` globals removed** — use `dataSource.getMongoRepository()` and `dataSource.mongoManager` instead ([#12099](https://github.com/typeorm/typeorm/pull/12099) by [@pkuczynski](https://github.com/pkuczynski))\n- **`DataSource.name` removed** — named connections were deprecated in v0.3; `ConnectionOptionsReader.all()` renamed to `get()` ([#12136](https://github.com/typeorm/typeorm/pull/12136) by [@pkuczynski](https://github.com/pkuczynski))\n- **`TYPEORM_*` environment variable support removed** — `ConnectionOptionsEnvReader`, `ormconfig.env`, and `dotenv` auto-loading have been removed ([#12134](https://github.com/typeorm/typeorm/pull/12134) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findByIds` removed** — use `findBy` with `In` operator instead ([#12114](https://github.com/typeorm/typeorm/pull/12114) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findOneById` removed** — use `findOneBy` instead ([#12198](https://github.com/typeorm/typeorm/pull/12198) by [@pkuczynski](https://github.com/pkuczynski))\n- **`Repository.exist()` removed** — use `Repository.exists()` instead ([#12131](https://github.com/typeorm/typeorm/pull/12131) by [@pkuczynski](https://github.com/pkuczynski))\n- **`AbstractRepository`, `@EntityRepository`, and `getCustomRepository` removed** — use `Repository.extend()` instead ([#12096](https://github.com/typeorm/typeorm/pull/12096) by [@pkuczynski](https://github.com/pkuczynski))\n- **`@RelationCount` decorator removed** — use `@VirtualColumn` with a sub-query instead ([#12181](https://github.com/typeorm/typeorm/pull/12181) by [@pkuczynski](https://github.com/pkuczynski))\n- **IoC container system removed** — `useContainer()`, `getFromContainer()`, and related types have been removed ([#12180](https://github.com/typeorm/typeorm/pull/12180) by [@pkuczynski](https://github.com/pkuczynski))\n- **`readonly` column option removed** — use `update: false` instead ([#12132](https://github.com/typeorm/typeorm/pull/12132) by [@pkuczynski](https://github.com/pkuczynski))\n- **`unsigned` on `ColumnNumericOptions` removed** — only affected decimal/float types; integer `unsigned` is unchanged ([#12133](https://github.com/typeorm/typeorm/pull/12133) by [@pkuczynski](https://github.com/pkuczynski))\n- **QueryBuilder: `onConflict()`, deprecated `orUpdate()` overload, and `setNativeParameters()` removed** — use `orIgnore()`/`orUpdate()` array signature and `setParameters()` instead ([#12090](https://github.com/typeorm/typeorm/pull/12090) by [@pkuczynski](https://github.com/pkuczynski))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "title": "docs/docs/releases/1.0/01-release-notes.md > Release Notes 1.0 > New features > Query Builder",
+    "text": "### Query Builder\n\n- **`INSERT INTO ... SELECT FROM ...`** — new `valuesFromSelect()` method on `InsertQueryBuilder` for data migration and transformation queries ([#11896](https://github.com/typeorm/typeorm/pull/11896) by [@Cprakhar](https://github.com/Cprakhar))\n- **`returning` option for update/upsert** — repository and entity manager `update()` and `upsert()` methods now support a `returning` option on databases that support `RETURNING` clauses ([#11782](https://github.com/typeorm/typeorm/pull/11782) by [@naorpeled](https://github.com/naorpeled))\n- **`ifExists` parameter on all drop methods** — `dropColumn`, `dropIndex`, `dropPrimaryKey`, `dropForeignKey`, `dropUniqueConstraint`, `dropCheckConstraint`, `dropExclusionConstraint`, and their plural variants now accept an `ifExists` flag ([#12121](https://github.com/typeorm/typeorm/pull/12121) by [@pkuczynski](https://github.com/pkuczynski))\n- **Explicit resource management for `QueryRunner`** — supports `await using` syntax (TypeScript 5.2+) for automatic cleanup ([#11701](https://github.com/typeorm/typeorm/pull/11701) by [@alumni](https://github.com/alumni))"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#25",
+    "title": "docs/docs/releases/1.0/02-upgrading-from-0.3.md > Upgrading from 0.3 to 1.0 > Data Source > `.connection` property in various classes is now `.dataSource`",
+    "text": "### `.connection` property in various classes is now `.dataSource`\n\nThe `connection` property in the `Driver`, `QueryRunner`, `EntityManager`, `QueryBuilder`, `EntityMetadata` and `*Event` classes was renamed to `dataSource`. For `EntityManager`, this change was announced in 0.3, but it was not actually implemented. To ease the transition, a deprecated getter was added that returns the same value as `dataSource`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "action": "use",
+    "relevance_score": 0.9903,
+    "document_score": 0.994,
+    "levels": {
+     "answers": 0.9903,
+     "elsewhere": 0.0038,
+     "different_case": 0.0035,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 4,
+    "id": "typeorm:docs/docs/query-runner.md#3",
+    "action": "use",
+    "relevance_score": 0.9821,
+    "document_score": 0.9886,
+    "levels": {
+     "answers": 0.9821,
+     "elsewhere": 0.0064,
+     "different_case": 0.0067,
+     "unrelated": 0.0047
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/query-runner.md#2",
+    "action": "use",
+    "relevance_score": 0.9776,
+    "document_score": 0.9874,
+    "levels": {
+     "answers": 0.9776,
+     "elsewhere": 0.0098,
+     "different_case": 0.008,
+     "unrelated": 0.0046
+    }
+   },
+   {
+    "index": 5,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "action": "use",
+    "relevance_score": 0.9602,
+    "document_score": 0.9744,
+    "levels": {
+     "answers": 0.9602,
+     "elsewhere": 0.0142,
+     "different_case": 0.0206,
+     "unrelated": 0.005
+    }
+   },
+   {
+    "index": 6,
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#7",
+    "action": "use",
+    "relevance_score": 0.9563,
+    "document_score": 0.9741,
+    "levels": {
+     "answers": 0.9563,
+     "elsewhere": 0.0178,
+     "different_case": 0.0117,
+     "unrelated": 0.0143
+    }
+   },
+   {
+    "index": 7,
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0447,
+    "document_score": 0.1118,
+    "levels": {
+     "answers": 0.0447,
+     "elsewhere": 0.0671,
+     "different_case": 0.0491,
+     "unrelated": 0.8391
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/query-runner.md#0",
+    "action": "expand",
+    "relevance_score": 0.0133,
+    "document_score": 0.5211,
+    "levels": {
+     "answers": 0.0133,
+     "elsewhere": 0.5078,
+     "different_case": 0.0379,
+     "unrelated": 0.4409
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/query-runner.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0096,
+    "document_score": 0.0664,
+    "levels": {
+     "answers": 0.0096,
+     "elsewhere": 0.0568,
+     "different_case": 0.0244,
+     "unrelated": 0.9092
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3534
+  },
+  "timing": {
+   "total_ms": 98,
+   "rerank_ms": 97,
+   "questions_ms": 0,
+   "model_ms": 88,
+   "engine": {
+    "rows": 4614,
+    "branches": 8,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 88,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 85,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

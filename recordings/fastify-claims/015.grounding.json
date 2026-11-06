@@ -1,0 +1,97 @@
+{
+ "endpoint": "grounding",
+ "tag": "fastify-claims/015.grounding",
+ "recorded_at": "2026-11-06T13:37:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 956,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "100.282047",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=38,cfOrigin;dur=0,cfWorker;dur=252"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#14",
+    "text": "###### Strings\n<a id=\"send-string\"></a>\n\nIf you pass a string to `send` without a `Content-Type`, it will be sent as\n`text/plain; charset=utf-8`. If you set the `Content-Type` header and pass a\nstring to `send`, it will be serialized with the custom serializer if one is\nset, otherwise, it will be sent unmodified.\n\n> ℹ️ Note:\n> Even when the `Content-Type` header is set to `application/json`,\n> strings are sent unmodified by default. To serialize a string as JSON, you\n> must set a custom serializer:\n\n```js\nfastify.get('/json-string', async function (request, reply) {\n  reply\n    .type('application/json; charset=utf-8')\n    .serializer(JSON.stringify)\n    .send('Hello') // Returns \"Hello\" (JSON-encoded string)\n})\n```\n```js\nfastify.get('/json', options, function (request, reply) {\n  reply.send('plain string')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#8",
+    "text": "#### Example:\n\nUses **app.js** from the previous example.\n\n**test-listen.js** (testing with [`undici`](https://www.npmjs.com/package/undici))\n```js\nconst { test } = require('node:test')\nconst { Client } = require('undici')\nconst buildFastify = require('./app')\n\ntest('should work with undici', async t => {\n  t.plan(2)\n\n  const fastify = buildFastify()\n\n  await fastify.listen()\n\n   const client = new Client(\n    'http://localhost:' + fastify.server.address().port, {\n      keepAliveTimeout: 10,\n      keepAliveMaxTimeout: 10\n    }\n  )\n\n  t.after(() => {\n    fastify.close()\n    client.close()\n  })\n\n  const response = await client.request({ method: 'GET', path: '/' })\n\n  t.assert.strictEqual(await response.body.text(), '{\"hello\":\"world\"}')\n  t.assert.strictEqual(response.statusCode, 200)\n})\n```\n\nAlternatively, starting with Node.js 18,\n[`fetch`](https://nodejs.org/docs/latest-v18.x/api/globals.html#fetch)\nmay be used without requiring any extra dependencies:\n\n**test-listen.js**\n```js\nconst { test } = require('node:test')\nconst buildFastify = require('./app')\n\ntest('should work with fetch', async t => {\n  t.plan(3)\n\n  const fastify = buildFastify()\n\n  t.after(() => fastify.close())\n\n  await fastify.listen()\n\n  const response = await fetch(\n    'http://localhost:' + fastify.server.address().port\n  )\n\n  t.assert.strictEqual(response.status, 200)\n  t.assert.strictEqual(\n    response.headers.get('content-type'),\n    'application/json; charset=utf-8'\n  )\n  const jsonResult = await response.json()\n  t.assert.strictEqual(jsonResult.hello, 'world')\n})\n```\n\n**test-ready.js** (testing with\n[`SuperTest`](https://www.npmjs.com/package/supertest))\n```js\nconst { test } = require('node:test')\nconst supertest = require('supertest')\nconst buildFastify = require('./app')\n\ntest('GET `/` route', async (t) => {\n  const fastify = buildFastify()\n\n  t.after(() => fastify.close())\n\n  await fastify.ready()\n\n  const response = await supertest(fastify.server)\n    .get('/')\n    .expect(200)\n    .expect('Content-Type', 'application/json; charset=utf-8')\n  t.assert.deepStrictEqual(response.body, { hello: 'world' })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#6",
+    "text": "#### Another Example:\n\n**app.js**\n```js\nconst Fastify = require('fastify')\n\nfunction buildFastify () {\n  const fastify = Fastify()\n\n  fastify.get('/', function (request, reply) {\n    reply.send({ hello: 'world' })\n  })\n\n  return fastify\n}\n\nmodule.exports = buildFastify\n```\n\n**test.js**\n```js\nconst { test } = require('node:test')\nconst buildFastify = require('./app')\n\ntest('GET `/` route', t => {\n  t.plan(4)\n\n  const fastify = buildFastify()\n\n  // At the end of your tests it is highly recommended to call `.close()`\n  // to ensure that all connections to external services get closed.\n  t.after(() => fastify.close())\n\n  fastify.inject({\n    method: 'GET',\n    url: '/'\n  }, (err, response) => {\n    t.assert.ifError(err)\n    t.assert.strictEqual(response.statusCode, 200)\n    t.assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8')\n    t.assert.deepStrictEqual(response.json(), { hello: 'world' })\n  })\n})\n```"
+   }
+  ],
+  "answer": "Fastify natively supports `'application/json'` and `'text/plain'` content types with a default charset of `utf-8`.",
+  "claims": [
+   "Fastify natively supports `'application/json'` and `'text/plain'` content types with a default charset of `utf-8`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section '`Content-Type` Parser' of docs/Reference/ContentTypeParser.md in the documentation of the fastify project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.9305,
+  "ungrounded": 0.0695,
+  "verdict": "grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#14",
+    "share": 0.9835,
+    "share_of_answer": 0.9151,
+    "claims": [
+     0
+    ]
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#8",
+    "share": 0.0095,
+    "share_of_answer": 0.0088,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#6",
+    "share": 0.007,
+    "share_of_answer": 0.0065,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Fastify natively supports `'application/json'` and `'text/plain'` content types with a default charset of `utf-8`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.9305,
+    "contradicted": 0.0069,
+    "not_stated": 0.0558,
+    "not_a_claim": 0.0069,
+    "verdict": "supported",
+    "sources": {
+     "fastify:docs/Reference/Reply.md#14": 0.9835,
+     "fastify:docs/Guides/Testing.md#8": 0.0095,
+     "fastify:docs/Guides/Testing.md#6": 0.007
+    },
+    "source": "fastify:docs/Reference/Reply.md#14"
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.9305
+  },
+  "timing": {
+   "read_ms": 113,
+   "total_ms": 116
+  }
+ }
+}

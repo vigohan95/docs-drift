@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/043",
+ "recorded_at": "2026-11-06T13:43:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1085,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "100.759041",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=376"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5",
+    "text": "```typescript\nawait manager.upsert(\n    User,\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\" },\n    ],\n    [\"externalId\"],\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak),\n *      (externalId = cba321, firstName = Karzzir),\n *  ON CONFLICT (externalId) DO UPDATE firstName = EXCLUDED.firstName\n **/\n```\n\n- `delete` - Deletes entities by entity id, ids, given conditions, or an array of condition objects.\n\n```typescript\nawait manager.delete(User, 1)\nawait manager.delete(User, [1, 2, 3])\nawait manager.delete(User, { firstName: \"Timber\" })\n\n// Bulk deletes with different conditions for each operation\nawait manager.delete(User, [{ firstName: \"Timber\" }, { age: 18 }, { id: 42 }])\n// executes three separate DELETE queries:\n// DELETE FROM user WHERE firstName = Timber\n// DELETE FROM user WHERE age = 18\n// DELETE FROM user WHERE id = 42\n```\n\nYou can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together). This is different from passing a primitive array, which is treated as a list of IDs:\n\n```typescript\n// Primitive array — interpreted as WHERE id IN (1, 2, 3)\nawait manager.delete(User, [1, 2, 3])\n\n// Object array — each element is a separate condition (OR'd together)\nawait manager.delete(User, [{ id: 1 }, { email: \"old@example.com\" }])\n// executes DELETE FROM user WHERE id = 1 OR email = 'old@example.com'\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "text": "```typescript\nawait repository.upsert(\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\", dateAdded: \"2020-01-01\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\", dateAdded: \"2022-01-01\" },\n    ],\n    {\n        conflictPaths: [\"externalId\"],\n        skipUpdateIfNoValuesChanged: true, // supported by postgres, skips update if it would not change row values\n        indexPredicate: \"dateAdded > 2020-01-01\", // supported by postgres, allows for partial indexes\n    },\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak, dateAdded = 2020-01-01),\n *      (externalId = cba321, firstName = Karzzir, dateAdded = 2022-01-01),\n *  ON CONFLICT (externalId) WHERE ( dateAdded > 2021-01-01 ) DO UPDATE\n *  SET firstName = EXCLUDED.firstName,\n *  SET dateAdded = EXCLUDED.dateAdded,\n *  WHERE user.firstName IS DISTINCT FROM EXCLUDED.firstName OR user.dateAdded IS DISTINCT FROM EXCLUDED.dateAdded\n **/\n```\n\n- `delete` - Deletes entities by entity id, ids or given conditions:\n\n```typescript\nawait repository.delete(1)\nawait repository.delete([1, 2, 3])\nawait repository.delete({ firstName: \"Timber\" })\n```\n\n- `deleteAll` - Deletes _all_ entities of target type (without WHERE clause).\n\n```typescript\nawait repository.deleteAll()\n// executes DELETE FROM user\n```\n\nRefer also to the `clear` method, which performs database `TRUNCATE TABLE` operation instead."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "relation": "overlapping",
+    "related": 0.9965,
+    "probabilities": {
+     "same": 0.0142,
+     "overlapping": 0.9769,
+     "conflicting": 0.0055,
+     "unrelated": 0.0035
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 37,
+   "passage_reads": 1,
+   "passages_ms": 74,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 111,
+   "total_ms": 115
+  }
+ }
+}

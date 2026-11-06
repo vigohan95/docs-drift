@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/026",
+ "recorded_at": "2026-11-06T13:43:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1164,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "233.979647",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=436"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "text": "```typescript\nawait manager.save(user)\nawait manager.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n\n```typescript\nawait manager.remove(user)\nawait manager.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait manager.insert(User, {\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait manager.insert(User, [\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids, given conditions, or an array of condition objects. Sets fields from supplied partial entity.\n\n```typescript\nawait manager.update(User, { age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait manager.update(User, 1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// Bulk updates with different conditions for each operation\nawait manager.update(User, [\n    { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } },\n    { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } },\n    { criteria: { age: 18 }, data: { category: \"ADULT\" } },\n])\n// executes three separate UPDATE queries:\n// UPDATE user SET firstName = Rizzrak WHERE id = 1\n// UPDATE user SET firstName = Karzzir WHERE id = 2\n// UPDATE user SET category = ADULT WHERE age = 18\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "text": "- `save` - Saves a given entity or array of entities.\n  If the entity already exist in the database, it is updated.\n  If the entity does not exist in the database, it is inserted.\n  It saves all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped.\n  Returns the saved entity/entities.\n\n```typescript\nawait repository.save(user)\nawait repository.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Returns the removed entity/entities.\n\n```typescript\nawait repository.remove(user)\nawait repository.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait repository.insert({\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait repository.insert([\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids or given conditions. Sets fields from supplied partial entity.\n\n```typescript\nawait repository.update({ age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait repository.update(1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// optionally request RETURNING / OUTPUT values (supported drivers only)\nconst result = await repository.update(\n    1,\n    { firstName: \"Rizzrak\" },\n    { returning: [\"id\", \"firstName\"] },\n)\nconsole.log(result.raw) // [{ id: 1, firstName: \"Rizzrak\" }]\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.0102,
+     "overlapping": 0.9808,
+     "conflicting": 0.0064,
+     "unrelated": 0.0026
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0145,
+       "restated": 0.8539,
+       "elaborated": 0.1062,
+       "different": 0.0254
+      },
+      "confidence": 0.888,
+      "a": {
+       "document": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+       "quote": "It removes all given entities in a single transaction (in the case of entity, manager is not transactional).",
+       "start": 158,
+       "end": 266,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+       "quote": "- `save` - Saves a given entity or array of entities.\n  If the entity already exist in the database, it is updated.\n  If the entity does not exist in the database, it is inserted.\n  It saves all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped.\n  Returns the saved entity/entities.\n\n```typescript\nawait repository.save(user)\nawait repository.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Returns the removed entity/entities.\n\n```typescript\nawait repository.remove(user)\nawait repository.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait repository.insert({\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait repository.insert([\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids or given conditions.",
+       "start": 0,
+       "end": 1207,
+       "confidence": 0.888
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 92,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 2,
+   "counterparts_ms": 125
+  },
+  "timing": {
+   "read_ms": 299,
+   "total_ms": 303
+  }
+ }
+}

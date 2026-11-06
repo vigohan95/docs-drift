@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/DeleteDateColumn.rerank",
+ "recorded_at": "2026-11-06T13:43:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 955,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.000862",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=198"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@DeleteDateColumn`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@DeleteDateColumn`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/entity/1-entities.md#5",
+    "title": "docs/docs/entity/1-entities.md > Entities > Entity columns > Special columns",
+    "text": "### Special columns\n\nThere are several special column types with additional functionality available:\n\n- `@CreateDateColumn` is a special column that is automatically set to the entity's insertion date.\n  You don't need to set this column - it will be automatically set.\n\n- `@UpdateDateColumn` is a special column that is automatically set to the entity's update time\n  each time you call `save` of entity manager or repository, or during `upsert` operations when an update occurs.\n  You don't need to set this column - it will be automatically set.\n\n- `@DeleteDateColumn` is a special column that is automatically set to the entity's delete time each time you call soft-delete of entity manager or repository. You don't need to set this column - it will be automatically set. If the @DeleteDateColumn is set, the default scope will be \"non-deleted\".\n\n- `@VersionColumn` is a special column that is automatically set to the version of the entity (incremental number)\n  each time you call `save` of entity manager or repository, or during `upsert` operations when an update occurs.\n  You don't need to set this column - it will be automatically set."
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#10",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Column decorators > `@DeleteDateColumn`",
+    "text": "#### `@DeleteDateColumn`\n\nSpecial column that is automatically set to the entity's delete time each time you call soft-delete of entity manager or repository. You don't need to set this column - it will be automatically set.\n\nTypeORM's own soft delete functionality utilizes global scopes to only pull \"non-deleted\" entities from the database.\n\nIf the @DeleteDateColumn is set, the default scope will be \"non-deleted\".\n\n```typescript\n@Entity()\nexport class User {\n    @DeleteDateColumn()\n    deletedDate: Date\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#2",
+    "title": "docs/docs/working-with-entity-manager/3-find-options.md > Find Options > Basic options",
+    "text": "```typescript\nuserRepository.find({\n    where: [\n        { firstName: \"Timber\", lastName: \"Saw\" },\n        { firstName: \"Stan\", lastName: \"Lee\" },\n    ],\n})\n```\n\nwill execute following query:\n\n```sql\nSELECT * FROM \"user\" WHERE (\"firstName\" = 'Timber' AND \"lastName\" = 'Saw') OR (\"firstName\" = 'Stan' AND \"lastName\" = 'Lee')\n```\n\n- `order` - selection order.\n\n```typescript\nuserRepository.find({\n    order: {\n        name: \"ASC\",\n        id: \"DESC\",\n    },\n})\n```\n\nwill execute following query:\n\n```sql\nSELECT * FROM \"user\"\nORDER BY \"name\" ASC, \"id\" DESC\n```\n\n- `withDeleted` - include entities which have been soft deleted with `softDelete` or `softRemove`, e.g. have their `@DeleteDateColumn` column set. By default, soft deleted entities are not included.\n\n```typescript\nuserRepository.find({\n    withDeleted: true,\n})\n```\n\n`find*` methods which return multiple entities (`find`, `findBy`, `findAndCount`, `findAndCountBy`) also accept following options:\n\n- `skip` - offset (paginated) from where entities should be taken.\n\n```typescript\nuserRepository.find({\n    skip: 5,\n})\n```\n\n```sql\nSELECT * FROM \"user\"\nOFFSET 5\n```\n\n- `take` - limit (paginated) - max number of entities that should be taken.\n\n```typescript\nuserRepository.find({\n    take: 10,\n})\n```\n\nwill execute following query:\n\n```sql\nSELECT * FROM \"user\"\nLIMIT 10\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/entity/1-entities.md#5",
+    "action": "use",
+    "relevance_score": 0.9947,
+    "document_score": 0.9963,
+    "levels": {
+     "answers": 0.9947,
+     "elsewhere": 0.0016,
+     "different_case": 0.0017,
+     "unrelated": 0.0019
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#10",
+    "action": "use",
+    "relevance_score": 0.9871,
+    "document_score": 0.9915,
+    "levels": {
+     "answers": 0.9871,
+     "elsewhere": 0.0044,
+     "different_case": 0.0047,
+     "unrelated": 0.0038
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#2",
+    "action": "expand",
+    "relevance_score": 0.066,
+    "document_score": 0.71,
+    "levels": {
+     "answers": 0.066,
+     "elsewhere": 0.644,
+     "different_case": 0.0208,
+     "unrelated": 0.2692
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1077
+  },
+  "timing": {
+   "total_ms": 59,
+   "rerank_ms": 44,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1482,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

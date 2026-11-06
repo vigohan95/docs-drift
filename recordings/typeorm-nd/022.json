@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/022",
+ "recorded_at": "2026-11-06T13:42:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 938,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "38.784833",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=221"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "text": "Again, `@JoinColumn` must be set only on one side of the relation - the side that must have the foreign key in the database table.\n\nExample how to save such a relation:\n\n```typescript\nconst profile = new Profile()\nprofile.gender = \"male\"\nprofile.photo = \"me.jpg\"\nawait dataSource.manager.save(profile)\n\nconst user = new User()\nuser.name = \"Joe Smith\"\nuser.profile = profile\nawait dataSource.manager.save(user)\n```\n\nWith [cascades](./1-relations.md#cascades) enabled you can save this relation with only one `save` call.\n\nTo load user with profile inside you must specify relation in `FindOptions`:\n\n```typescript\nconst users = await dataSource.getRepository(User).find({\n    relations: {\n        profile: true,\n    },\n})\n```\n\nOr using `QueryBuilder` you can join them:\n\n```typescript\nconst users = await dataSource\n    .getRepository(User)\n    .createQueryBuilder(\"user\")\n    .leftJoinAndSelect(\"user.profile\", \"profile\")\n    .getMany()\n```\n\nWith eager loading enabled on a relation, you don't have to specify relations in the find command as it will ALWAYS be loaded automatically. If you use QueryBuilder eager relations are disabled, you have to use `leftJoinAndSelect` to load the relation.\n\nRelations can be uni-directional and bi-directional.\nUni-directional are relations with a relation decorator only on one side.\nBi-directional are relations with decorators on both sides of a relation."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#2",
+    "text": "## Deleting many-to-many relations\n\nWith [cascades](./1-relations.md#cascades) enabled, you can delete this relation with only one `save` call.\n\nTo delete a many-to-many relationship between two records, remove it from the corresponding field and save the record.\n\n```typescript\nconst question = await dataSource.getRepository(Question).findOne({\n    relations: {\n        categories: true,\n    },\n    where: { id: 1 },\n})\nquestion.categories = question.categories.filter((category) => {\n    return category.id !== categoryToRemove.id\n})\nawait dataSource.manager.save(question)\n```\n\nThis will only remove the record in the join table. The `question` and `categoryToRemove` records will still exist."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "b": "typeorm:docs/docs/relations/4-many-to-many-relations.md#2",
+    "relation": "unrelated",
+    "related": 0.0726,
+    "probabilities": {
+     "same": 0.015,
+     "overlapping": 0.0388,
+     "conflicting": 0.0188,
+     "unrelated": 0.9274
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 48
+  },
+  "timing": {
+   "read_ms": 48,
+   "total_ms": 51
+  }
+ }
+}

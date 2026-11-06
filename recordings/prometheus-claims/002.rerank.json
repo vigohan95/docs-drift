@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/002.rerank",
+ "recorded_at": "2026-11-06T13:37:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1035,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.937508",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=332"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Therefore, a user that would want to use Prometheus v3.0.0 as a library could do:",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/migration.md#5",
+    "title": "docs/migration.md > PromQL > holt_winters function renamed",
+    "text": "### holt_winters function renamed\n\nThe `holt_winters` function has been renamed to `double_exponential_smoothing`\nand is now guarded by the `promql-experimental-functions` feature flag.\nIf you want to keep using `holt_winters`, you have to do both of these things:\n  - Rename `holt_winters` to `double_exponential_smoothing` in your queries.\n  - Pass `--enable-feature=promql-experimental-functions` in your Prometheus\n    CLI invocation."
+   },
+   {
+    "id": "prometheus:docs/configuration/template_examples.md#6",
+    "title": "docs/configuration/template_examples.md > Defining reusable templates",
+    "text": "## Defining reusable templates\n\nPrometheus supports defining templates that can be reused. This is particularly\npowerful when combined with\n[console library](template_reference.md#console-templates) support, allowing\nsharing of templates across consoles.\n\n```\n{{/* Define the template */}}\n{{define \"myTemplate\"}}\n  do something\n{{end}}\n\n{{/* Use the template */}}\n{{template \"myTemplate\"}}\n```\n\nTemplates are limited to one argument. The `args` function can be used to wrap multiple arguments.\n\n```\n{{define \"myMultiArgTemplate\"}}\n  First argument: {{.arg0}}\n  Second argument: {{.arg1}}\n{{end}}\n{{template \"myMultiArgTemplate\" (args 1 2)}}\n```"
+   },
+   {
+    "id": "prometheus:RELEASE.md#12",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 3. Tag the library release",
+    "text": "### 3. Tag the library release\n\nGo modules versioning requires strict use of semver. Because we do not commit to\navoid code-level breaking changes for the libraries between minor releases of\nthe Prometheus server, we use major version zero releases for the libraries.\n\nTagging the new library release works similar to the normal release tagging,\nbut without the subsequent build and publish steps. Use the following commands:\n\n```bash\ntag=\"v$(./scripts/get_module_version.sh)\"\ngit tag -s \"${tag}\" -m \"${tag}\"\ngit push origin \"${tag}\"\n```"
+   },
+   {
+    "id": "prometheus:docs/migration.md#2",
+    "title": "docs/migration.md > Configuration",
+    "text": "## Configuration\n\n- The scrape job level configuration option `scrape_classic_histograms` has\n  been renamed to `always_scrape_classic_histograms`. If you use the\n  `scrape_native_histograms` scrape configuration option to ingest native\n  histograms and you also want to ingest classic histograms that an endpoint\n  might expose along with native histograms, be sure to add this configuration\n  or change your configuration from the old name.\n- The `http_config.enable_http2` in `remote_write` items default has been\n  changed to `false`. In Prometheus v2 the remote write http client would\n  default to use http2. In order to parallelize multiple remote write queues\n  across multiple sockets its preferable to not default to http2.\n  If you prefer to use http2 for remote write you must now set\n  `http_config.enable_http2: true` in your `remote_write` configuration section."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#27",
+    "title": "docs/feature_flags.md > OpenMetrics 2.0",
+    "text": "## OpenMetrics 2.0\n\n`--enable-feature=openmetrics2`\n\nEnables scraping targets that expose the [OpenMetrics 2.0](https://prometheus.io/docs/specs/om/open_metrics_spec_2_0/)\ntext format, advertised with the `application/openmetrics-text; version=2.0.0` or\n`application/openmetrics-text; version=2.0.0-rc` content type. To negotiate OpenMetrics 2.0\nwith scrape targets, add `OpenMetricsText2.0.0` and `OpenMetricsText2.0.0-rc` to\n`scrape_protocols` in the configuration.\n\nOpenMetrics 2.0 support is **experimental**. The parser is not stable\nyet, so expositions that Prometheus accepts today may be rejected by a later release.\nDo not depend on the current behavior in production.\n\nWhen this flag is disabled, an OpenMetrics 2.0 content type is treated as an\nunsupported content type: the target's `fallback_scrape_protocol` is used if\none is configured, and the scrape fails otherwise.\n\nIf you are implementing an OpenMetrics 2.0 exporter or client library, note that\na successful scrape by Prometheus is **not** a certification that your output is\nspec-compliant. Refer to [OpenMetrics 2.0 migration guide](https://prometheus.io/docs/guides/open_metrics_2_0_migration/)\ninstead. "
+   },
+   {
+    "id": "prometheus:RELEASE.md#8",
+    "title": "RELEASE.md > Releases > How to cut an individual release > 0. Updating dependencies and promoting/demoting experimental features > Manually updating React dependencies",
+    "text": "#### Manually updating React dependencies\n\nThe React application recently moved to a monorepo system with multiple internal npm packages. Dependency upgrades are\nquite sensitive for the time being.\n\nIn case you want to update the UI dependencies, you can run the following command:\n\n```bash\nmake update-npm-deps\n```\n\nOnce this step completes, please verify that no additional `node_modules` directory was created in any of the module subdirectories\n(which could indicate conflicting dependency versions across modules). Then run `make ui-build` to verify that the build is still working.\n\nNote: Once in a while, the npm dependencies should also be updated to their latest release versions (major or minor) with `make upgrade-npm-deps`,\nthough this may be done at convenient times (e.g. by the UI maintainers) that are out-of-sync with Prometheus releases."
+   },
+   {
+    "id": "prometheus:docs/migration.md#6",
+    "title": "docs/migration.md > Scrape protocols",
+    "text": "## Scrape protocols\nPrometheus v3 is more strict concerning the Content-Type header received when\nscraping. Prometheus v2 would default to the standard Prometheus text protocol\nif the target being scraped did not specify a Content-Type header or if the\nheader was unparsable or unrecognised. This could lead to incorrect data being\nparsed in the scrape. Prometheus v3 will now fail the scrape in such cases.\n\nIf a scrape target is not providing the correct Content-Type header the\nfallback protocol can be specified using the `fallback_scrape_protocol`\nparameter. See [Prometheus scrape_config documentation.](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config)\n\nThis is a **breaking change** as scrapes that may have succeeded with Prometheus v2\nmay now fail if this fallback protocol is not specified. Make sure your scrape \nendpoints respond with one of the supported Content-type headers:\n\n- `application/vnd.google.protobuf;proto=io.prometheus.client.MetricFamily;encoding=delimited`\n- `text/plain;version=0.0.4`\n- `text/plain;version=1.0.0`\n- `application/openmetrics-text;version=0.0.1`\n- `application/openmetrics-text;version=1.0.0`"
+   },
+   {
+    "id": "prometheus:docs/storage.md#15",
+    "title": "docs/storage.md > Backfilling from OpenMetrics format > Usage > Longer Block Durations",
+    "text": "#### Longer Block Durations\n\nBy default, the promtool will use the default block duration (2h) for the blocks;\nthis behavior is the most generally applicable and correct. However, when backfilling\ndata over a long range of times, it may be advantageous to use a larger value for\nthe block duration to backfill faster and prevent additional compactions by TSDB later.\n\nThe `--max-block-duration` flag allows the user to configure a maximum duration of blocks.\nThe backfilling tool will pick a suitable block duration no larger than this.\n\nTo use `--max-block-duration` as is, rather than rounding it down to a duration Prometheus typically\ncompacts to, also set `--allow-incompatible-block-duration`. For example,\n`--max-block-duration=24h --allow-incompatible-block-duration` creates the daily blocks\nthat other TSDB systems, such as Cortex, Mimir and Thanos, expect.\n\nWhile larger blocks may improve the performance of backfilling large datasets,\ndrawbacks exist as well. Time-based retention policies must keep the entire block\naround if even one sample of the (potentially large) block is still within the\nretention policy. Conversely, size-based retention policies will remove the entire\nblock even if the TSDB only goes over the size limit in a minor way.\n\nTherefore, backfilling with few blocks, thereby choosing a larger block duration,\nmust be done with care and is not recommended for any production instances."
+   },
+   {
+    "id": "prometheus:discovery/README.md#2",
+    "title": "discovery/README.md > Service Discovery > Design of a Prometheus SD > Does this make sense as an SD?",
+    "text": "### Does this make sense as an SD?\n\nThe first question to be asked is does it make sense to add this particular\nSD? An SD mechanism should be reasonably well established, and at a minimum in\nuse across multiple organizations. It should allow discovering of machines\nand/or services running somewhere. When exactly an SD is popular enough to\njustify being added to Prometheus natively is an open question.\n\nNote: As part of lifting the past moratorium on new SD implementations it was\nagreed that, in addition to the existing requirements, new service discovery \nimplementations will be required to have a committed maintainer with push access (i.e., on -team).\n\nIt should not be a brand new SD mechanism, or a variant of an established\nmechanism. We want to integrate Prometheus with the SD that's already there in\nyour infrastructure, not invent yet more ways to do service discovery. We also\ndo not add mechanisms to work around users lacking service discovery and/or\nconfiguration management infrastructure.\n\nSDs that merely discover other applications running the same software (e.g.\ntalk to one Kafka or Cassandra server to find the others) are not service\ndiscovery. In that case the SD you should be looking at is whatever decides\nthat a machine is going to be a Kafka server, likely a machine database or\nconfiguration management system.\n\nIf something is particularly custom or unusual, `file_sd` is the generic\nmechanism provided for users to hook in. Generally with Prometheus we offer a\nsingle generic mechanism for things with infinite variations, rather than\ntrying to support everything natively (see also, alertmanager webhook, remote\nread, remote write, node exporter textfile collector). For example anything\nthat would involve talking to a relational database should use `file_sd`\ninstead.\n\nFor configuration management systems like Chef, while they do have a\ndatabase/API that'd in principle make sense to talk to for service discovery,\nthe idiomatic approach is to use Chef's templating facilities to write out a\nfile for use with `file_sd`."
+   },
+   {
+    "id": "prometheus:discovery/README.md#5",
+    "title": "discovery/README.md > Service Discovery > Design of a Prometheus SD > Other implementation considerations",
+    "text": "If a system offers multiple distinct types of SD, select which is in use with a\nconfiguration option rather than returning them all from one mega SD that\nrequires relabelling to select just the one you want. So far we have only seen\nthis with Kubernetes. When a single SD with a selector vs.  multiple distinct\nSDs makes sense is an open question.\n\nIf there is a failure while processing talking to the SD, abort rather than\nreturning partial data. It is better to work from stale targets than partial\nor incorrect metadata.\n\nThe information obtained from service discovery is not considered sensitive\nsecurity wise. Do not return secrets in metadata, anyone with access to\nthe Prometheus server will be able to see them."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "prometheus:RELEASE.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0695,
+    "document_score": 0.4113,
+    "levels": {
+     "answers": 0.0695,
+     "elsewhere": 0.3418,
+     "different_case": 0.0812,
+     "unrelated": 0.5075
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/feature_flags.md#27",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0032,
+    "document_score": 0.0084,
+    "levels": {
+     "answers": 0.0032,
+     "elsewhere": 0.0053,
+     "different_case": 0.0124,
+     "unrelated": 0.9792
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/migration.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0141,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0112,
+     "different_case": 0.0193,
+     "unrelated": 0.9666
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/migration.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.006,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0037,
+     "different_case": 0.0107,
+     "unrelated": 0.9833
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/migration.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0048,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0026,
+     "different_case": 0.0057,
+     "unrelated": 0.9895
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:discovery/README.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.003,
+     "different_case": 0.0062,
+     "unrelated": 0.9887
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/template_examples.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0025,
+     "different_case": 0.0046,
+     "unrelated": 0.9909
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/storage.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0014,
+     "different_case": 0.004,
+     "unrelated": 0.9928
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:discovery/README.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0037,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0022,
+     "different_case": 0.0038,
+     "unrelated": 0.9925
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:RELEASE.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.001,
+     "different_case": 0.0022,
+     "unrelated": 0.9957
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3224
+  },
+  "timing": {
+   "total_ms": 94,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4574,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

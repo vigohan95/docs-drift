@@ -1,0 +1,140 @@
+{
+ "endpoint": "compare",
+ "tag": "jest/jest-mocked.compare",
+ "recorded_at": "2026-11-06T13:42:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1078,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "187.172228",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=339"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/UpgradingToJest29.md#7",
+    "text": "### `jest.mocked()`\n\nThe [`jest.mocked()`](MockFunctionAPI.md#jestmockedsource-options) helper method now wraps types of deep members of passed object by default. If you have used the method with `true` as the second argument, remove it to avoid type errors:\n\n```diff\n- const mockedObject = jest.mocked(someObject, true);\n+ const mockedObject = jest.mocked(someObject);\n```\n\nTo have the old shallow mocked behavior, pass `{shallow: true}` as the second argument:\n\n```diff\n- const mockedObject = jest.mocked(someObject);\n+ const mockedObject = jest.mocked(someObject, {shallow: true});\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#40",
+    "text": "### `jest.mocked(source, options?)`\n\nThe `mocked()` helper method wraps types of the `source` object and its deep nested members with type definitions of Jest mock function. You can pass `{shallow: true}` as the `options` argument to disable the deeply mocked behavior.\n\nReturns the `source` object.\n\n```ts title=\"song.ts\"\nexport const song = {\n  one: {\n    more: {\n      time: (t: number) => {\n        return t;\n      },\n    },\n  },\n};\n```\n\n```ts title=\"song.test.ts\"\nimport {expect, jest, test} from '@jest/globals';\nimport {song} from './song';\n\njest.mock('./song');\njest.spyOn(console, 'log');\n\nconst mockedSong = jest.mocked(song);\n// or through `jest.Mocked<Source>`\n// const mockedSong = song as jest.Mocked<typeof song>;\n\ntest('deep method is typed correctly', () => {\n  mockedSong.one.more.time.mockReturnValue(12);\n\n  expect(mockedSong.one.more.time(10)).toBe(12);\n  expect(mockedSong.one.more.time.mock.calls).toHaveLength(1);\n});\n\ntest('direct usage', () => {\n  jest.mocked(console.log).mockImplementation(() => {\n    return;\n  });\n\n  console.log('one more time');\n\n  expect(jest.mocked(console.log).mock.calls).toHaveLength(1);\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/UpgradingToJest29.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "jest:docs/MockFunctionAPI.md#40"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#40",
+    "duplicates": [],
+    "overlaps": [
+     "jest:docs/UpgradingToJest29.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/UpgradingToJest29.md#7",
+    "b": "jest:docs/MockFunctionAPI.md#40",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.012,
+     "overlapping": 0.9824,
+     "conflicting": 0.0042,
+     "unrelated": 0.0015
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0086,
+       "restated": 0.9602,
+       "elaborated": 0.0172,
+       "different": 0.014
+      },
+      "confidence": 0.986,
+      "a": {
+       "document": "jest:docs/UpgradingToJest29.md#7",
+       "quote": "The [`jest.mocked()`](MockFunctionAPI.md#jestmockedsource-options) helper method now wraps types of deep members of passed object by default.",
+       "start": 21,
+       "end": 162,
+       "confidence": 1
+      },
+      "b": {
+       "document": "jest:docs/MockFunctionAPI.md#40",
+       "quote": "### `jest.mocked(source, options?)`\n\nThe `mocked()` helper method wraps types of the `source` object and its deep nested members with type definitions of Jest mock function.",
+       "start": 0,
+       "end": 173,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0136,
+       "restated": 0.9248,
+       "elaborated": 0.0355,
+       "different": 0.026
+      },
+      "confidence": 0.974,
+      "a": {
+       "document": "jest:docs/UpgradingToJest29.md#7",
+       "quote": "To have the old shallow mocked behavior, pass `{shallow: true}` as the second argument:",
+       "start": 375,
+       "end": 462,
+       "confidence": 1
+      },
+      "b": {
+       "document": "jest:docs/MockFunctionAPI.md#40",
+       "quote": "You can pass `{shallow: true}` as the `options` argument to disable the deeply mocked behavior.\n\nReturns the `source` object.\n\n```ts title=\"song.ts\"\nexport const song = {\n  one: {\n    more: {\n      time: (t: number) => {\n        return t;\n      },\n    },\n  },\n};\n```\n\n```ts title=\"song.test.ts\"\nimport {expect, jest, test} from '@jest/globals';\nimport {song} from './song';\n\njest.mock('./song');\njest.spyOn(console, 'log');\n\nconst mockedSong = jest.mocked(song);\n// or through `jest.Mocked<Source>`\n// const mockedSong = song as jest.Mocked<typeof song>;\n\ntest('deep method is typed correctly', () => {\n  mockedSong.one.more.time.mockReturnValue(12);\n\n  expect(mockedSong.one.more.time(10)).toBe(12);\n  expect(mockedSong.one.more.time.mock.calls).toHaveLength(1);\n});\n\ntest('direct usage', () => {\n  jest.mocked(console.log).mockImplementation(() => {\n    return;\n  });\n\n  console.log('one more time');\n\n  expect(jest.mocked(console.log).mock.calls).toHaveLength(1);\n});\n```",
+       "start": 174,
+       "end": 1148,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 3,
+   "counterparts_ms": 100
+  },
+  "timing": {
+   "read_ms": 197,
+   "total_ms": 199
+  }
+ }
+}

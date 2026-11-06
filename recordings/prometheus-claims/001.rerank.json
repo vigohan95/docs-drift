@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/001.rerank",
+ "recorded_at": "2026-11-06T13:37:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1120,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.245316",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=163,cfOrigin;dur=0,cfWorker;dur=295"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: The y in v0.3y.z is always padded to two digits, with a leading zero if needed.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "title": "tsdb/docs/bstream.md > bstream details > Delta-of-delta encoding for timestamps",
+    "text": "## Delta-of-delta encoding for timestamps\n\nWe need to be able to encode and decode dod's for timestamps, which can be positive, zero, or negative.\nNote that int64's are implemented as [2's complement](https://en.wikipedia.org/wiki/Two%27s_complement)\n\nand look like:\n\n```\n0111...111 = maxint64\n    ...\n0000...111 = 7\n0000...110 = 6\n0000...101 = 5\n0000...100 = 4\n0000...011 = 3\n0000...010 = 2\n0000...001 = 1\n0000...000 = 0\n1111...111 = -1\n1111...110 = -2\n1111...101 = -3\n1111...100 = -4\n1111...011 = -5\n1111...010 = -6\n1111...001 = -7\n1111...000 = -8\n    ...\n1000...001 = minint64+1\n1000...000 = minint64\n```\n\nAll numbers have a prefix (of zeroes for positive numbers, of ones for negative numbers), followed by a number of significant digits at the end.\nIn all cases, the smaller the absolute value of the number, the fewer the amount of significant digits.\n\nTo encode these numbers, we use:\n* A prefix which declares the amount of bits that follow (we use a predefined list of options in order of increasing number of significant bits).\n* A number of bits which is one more than the number of significant bits.  The extra bit is needed because we deal with unsigned integers, although\n  it isn't exactly a sign bit. (See below for details).\n\nThe `bitRange` function determines whether a given integer can be represented by a number of bits.\nFor a given number of bits `nbits` we can distinguish (and thus encode) any set of `2^nbits` numbers.\nE.g. for `nbits = 3`, we can encode 8 distinct numbers, and we have a choice of choosing our boundaries.  For example -4 to 3,\n-3 to 4, 0 to 7 or even -2 to 5 (always inclusive).  (Observe in the list above that this is always true.)\nBecause we need to support positive and negative numbers equally, we choose boundaries that grow symmetrically.  Following the same example,\nwe choose -3 to 4."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#26",
+    "title": "docs/querying/functions.md > `histogram_quantile()`",
+    "text": "You can use `histogram_quantile(0, v instant-vector)` to get the estimated\nminimum value stored in a histogram.\n\nYou can use `histogram_quantile(1, v instant-vector)` to get the estimated\nmaximum value stored in a histogram.\n\nBuckets of classic histograms are cumulative. Therefore, the following should\nalways be the case:\n\n* The counts in the buckets are monotonically increasing (strictly\n  non-decreasing).\n* A lack of observations between the upper limits of two consecutive buckets\n  results in equal counts in those two buckets.\n\nHowever, floating point precision issues (e.g. small discrepancies introduced\nby computing of buckets with `sum(rate(...))`) or invalid data might violate\nthese assumptions. In that case, `histogram_quantile` would be unable to return\nmeaningful results. To mitigate the issue, `histogram_quantile` assumes that\ntiny relative differences between consecutive buckets are happening because of\nfloating point precision errors and ignores them. (The threshold to ignore a\ndifference between two buckets is a trillionth (1e-12) of the sum of both\nbuckets.) Furthermore, if there are non-monotonic bucket counts even after this\nadjustment, they are increased to the value of the previous buckets to enforce\nmonotonicity. The latter is evidence for an actual issue with the input data\nand is therefore flagged by an info-level annotation reading `input to\nhistogram_quantile needed to be fixed for monotonicity`. If you encounter this\nannotation, you should find and remove the source of the invalid data."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#7",
+    "title": "docs/querying/basics.md > Literals > Float literals and time durations",
+    "text": "### Float literals and time durations\n\nScalar float values can be written as literal integer or floating-point numbers\nin the format (whitespace only included for better readability):\n\n    [-+]?(\n          [0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\n        | 0[xX][0-9a-fA-F]+\n        | [nN][aA][nN]\n        | [iI][nN][fF]\n    )\n\nExamples:\n\n    23\n    -2.43\n    3.4e-9\n    0x8f\n    -Inf\n    NaN\n\nAdditionally, underscores (`_`) can be used in between decimal or hexadecimal\ndigits to improve readability.\n\nExamples:\n\n    1_000_000\n    .123_456_789\n    0x_53_AB_F3_82\n\nFloat literals are also used to specify durations in seconds. For convenience,\ndecimal integer numbers may be combined with the following\ntime units:\n\n* `ms` – milliseconds\n* `s` – seconds – 1s equals 1000ms\n* `m` – minutes – 1m equals 60s (ignoring leap seconds)\n* `h` – hours – 1h equals 60m\n* `d` – days – 1d equals 24h (ignoring so-called daylight saving time)\n* `w` – weeks – 1w equals 7d\n* `y` – years – 1y equals 365d (ignoring leap days)\n\nSuffixing a decimal integer number with one of the units above is a different\nrepresentation of the equivalent number of seconds as a bare float literal.\n\nExamples:\n\n    1s # Equivalent to 1.\n    2m # Equivalent to 120.\n    1ms # Equivalent to 0.001.\n    -2h # Equivalent to -7200.\n\nThe following examples do _not_ work:\n\n    0xABm # No suffixing of hexadecimal numbers.\n    1.5h # Time units cannot be combined with a floating point.\n    +Infd # No suffixing of ±Inf or NaN.\n\nMultiple units can be combined by concatenation of suffixed integers. Units\nmust be ordered from the longest to the shortest. A given unit must only appear\nonce per float literal.\n\nExamples:\n\n    1h30m # Equivalent to 5400s and thus 5400.\n    12h34m56s # Equivalent to 45296s and thus 45296.\n    54s321ms # Equivalent to 54.321."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/wal.md#1",
+    "title": "tsdb/docs/format/wal.md > WAL Disk Format > Segment filename",
+    "text": "## Segment filename\n\nThe sequence number is captured in the segment filename,\ne.g. `000000`, `000001`, `000002`, etc. The first unsigned integer represents\nthe sequence number of the segment, typically encoded with six digits."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/tombstones.md#0",
+    "title": "tsdb/docs/format/tombstones.md > Tombstones Disk Format",
+    "text": "# Tombstones Disk Format\n\nThe following describes the format of a tombstones file, which is placed\nat the top level directory of a block.\n\nThe last 8 bytes specifies the offset to the start of Stones section.\nThe stones section is 0 padded to a multiple of 4 for fast scans.\n\n```\n┌────────────────────────────┬─────────────────────┐\n│ magic(0x0130BA30) <4b>     │ version(1) <1 byte> │\n├────────────────────────────┴─────────────────────┤\n│ ┌──────────────────────────────────────────────┐ │\n│ │                Tombstone 1                   │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      ...                     │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                Tombstone N                   │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                  CRC<4b>                     │ │\n│ └──────────────────────────────────────────────┘ │\n└──────────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#6",
+    "title": "tsdb/docs/format/chunks.md > Chunk > XOR2 chunk data > Value delta encoding (`<varbit_xor2>`):",
+    "text": "### Value delta encoding (`<varbit_xor2>`):\n\nUsed after the dod≠0 control prefixes. The XOR of the current and previous value is encoded as:\n\n| Prefix | Meaning |\n|---|---|\n| `0` | XOR = 0 (value unchanged) |\n| `10` | Reuse previous leading/trailing window; `sigbits` value bits follow |\n| `110` + leading(5) + sigbits(6) + value(sigbits) | New leading/trailing window |\n| `111` | Stale NaN marker (3 bits) |"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/index.md#0",
+    "title": "tsdb/docs/format/index.md > Index Disk Format",
+    "text": "# Index Disk Format\n\nThe following describes the format of the `index` file found in each block directory.\nIt is terminated by a table of contents which serves as an entry point into the index.\n\n```\n┌────────────────────────────┬─────────────────────┐\n│ magic(0xBAAAD700) <4b>     │ version(1) <1 byte> │\n├────────────────────────────┴─────────────────────┤\n│ ┌──────────────────────────────────────────────┐ │\n│ │                 Symbol Table                 │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                    Series                    │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                 Label Index 1                │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      ...                     │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                 Label Index N                │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                   Postings 1                 │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      ...                     │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                   Postings N                 │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │               Label Offset Table             │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │             Postings Offset Table            │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      TOC                     │ │\n│ └──────────────────────────────────────────────┘ │\n└──────────────────────────────────────────────────┘\n```\n\nWhen the index is written, an arbitrary number of padding bytes may be added between the lined out main sections above. When sequentially scanning through the file, any zero bytes after a section's specified length must be skipped.\n\nMost of the sections described below start with a `len` field. It always specifies the number of bytes just before the trailing CRC32 checksum. The checksum is always calculated over those `len` bytes."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#7",
+    "title": "tsdb/docs/format/chunks.md > Chunk > XOR2 chunk data > Value delta encoding, known non-zero (`<varbit_xor2_nn>`):",
+    "text": "### Value delta encoding, known non-zero (`<varbit_xor2_nn>`):\n\nUsed after the `10` control prefix (dod=0, value known to have changed and be non-stale).\nThe delta=0 check is skipped, saving one bit on the reuse path:\n\n| Prefix | Meaning |\n|---|---|\n| `0` | Reuse previous leading/trailing window; `sigbits` value bits follow |\n| `1` + leading(5) + sigbits(6) + value(sigbits) | New leading/trailing window |"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#50",
+    "title": "docs/querying/functions.md > `resets()`",
+    "text": "## `resets()`\n\nFor each input time series, `resets(v range-vector)` returns the number of\ncounter resets within the provided time range as an instant vector. Any\ndecrease in the value between two consecutive float samples is interpreted as a\ncounter reset. A reset in a native histogram is detected in a more complex way:\nAny decrease in any bucket, including the zero bucket, or in the count of\nobservation constitutes a counter reset, but also the disappearance of any\npreviously populated bucket, a decrease of the zero-bucket width, or any schema\nchange that is not a compatible decrease of resolution.\n\n`resets` should only be used with counters (for both floats and histograms).\n\nA float sample followed by a histogram sample, or vice versa, counts as a\nreset. A counter histogram sample followed by a gauge histogram sample, or vice\nversa, also counts as a reset (but note that `resets` should not be used on\ngauges in the first place, see above)."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#25",
+    "title": "docs/querying/functions.md > `histogram_quantile()`",
+    "text": "If `b` has 0 observations, `NaN` is returned. For φ < 0, `-Inf` is\nreturned. For φ > 1, `+Inf` is returned. For φ = `NaN`, `NaN` is returned.\n\nSpecial cases for classic histograms:\n\n* If `b` contains fewer than two buckets, `NaN` is returned.\n* The highest bucket must have an upper bound of `+Inf`. (Otherwise, `NaN` is\n  returned.)\n* If a quantile is located in the highest bucket, the upper bound of the second\n  highest bucket is returned.\n* The lower limit of the lowest bucket is assumed to be 0 if the upper bound of\n  that bucket is greater than 0. In that case, the usual linear interpolation\n  is applied within that bucket. Otherwise, the upper bound of the lowest\n  bucket is returned for quantiles located in the lowest bucket.\n\nSpecial cases for native histograms:\n\n* If a native histogram with standard exponential buckets has `NaN`\n  observations and the quantile falls into one of the existing exponential\n  buckets, the result is skewed towards higher values due to `NaN`\n  observations treated as `+Inf`. This is flagged with an info level\n  annotation.\n* If a native histogram with standard exponential buckets has `NaN`\n  observations and the quantile falls above all of the existing exponential\n  buckets, `NaN` is returned. This is flagged with an info level annotation.\n* A zero bucket with finite width is assumed to contain no negative\n  observations if the histogram has observations in positive buckets, but none\n  in negative buckets.\n* A zero bucket with finite width is assumed to contain no positive\n  observations if the histogram has observations in negative buckets, but none\n  in positive buckets."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "prometheus:tsdb/docs/format/wal.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0044,
+    "document_score": 0.0102,
+    "levels": {
+     "answers": 0.0044,
+     "elsewhere": 0.0059,
+     "different_case": 0.0379,
+     "unrelated": 0.9519
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/basics.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0068,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.004,
+     "different_case": 0.0064,
+     "unrelated": 0.9868
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:tsdb/docs/format/tombstones.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0042,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0019,
+     "different_case": 0.0049,
+     "unrelated": 0.9909
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:tsdb/docs/format/index.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0031,
+     "different_case": 0.0063,
+     "unrelated": 0.9885
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/functions.md#26",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0035,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0017,
+     "different_case": 0.0046,
+     "unrelated": 0.9919
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/format/chunks.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0028,
+     "different_case": 0.0039,
+     "unrelated": 0.9916
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:tsdb/docs/format/chunks.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0021,
+     "different_case": 0.0037,
+     "unrelated": 0.9926
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/functions.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0011,
+     "different_case": 0.0029,
+     "unrelated": 0.9945
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/querying/functions.md#50",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0014,
+     "different_case": 0.0035,
+     "unrelated": 0.9938
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/bstream.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0013,
+     "different_case": 0.0037,
+     "unrelated": 0.9937
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4065
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5415,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

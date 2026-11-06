@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/006.rerank",
+ "recorded_at": "2026-11-06T13:37:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 990,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.64035",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=54,cfOrigin;dur=0,cfWorker;dur=284"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: In Vite, since `\\0` is not a permitted char in import URLs, a `\\0{id}` virtual id ends up encoded as `/@id/__x00__{id}` during dev in the browser.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/config/server-options.md#3",
+    "title": "docs/config/server-options.md > Server Options > server.port",
+    "text": "## server.port\n\n- **Type:** `number`\n- **Default:** `5173`\n\nSpecify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on."
+   },
+   {
+    "id": "vite:docs/config/preview-options.md#3",
+    "title": "docs/config/preview-options.md > Preview Options > preview.port",
+    "text": "## preview.port\n\n- **Type:** `number`\n- **Default:** `4173`\n\nSpecify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on.\n\n**Example:**\n\n```js\nexport default defineConfig({\n  server: {\n    port: 3030,\n  },\n  preview: {\n    port: 8080,\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#24",
+    "title": "docs/config/shared-options.md > Shared Options > css.preprocessorMaxWorkers",
+    "text": "## css.preprocessorMaxWorkers\n\n- **Type:** `number | true`\n- **Default:** `true`\n\nSpecifies the maximum number of threads CSS preprocessors can use. `true` means up to the number of CPUs minus 1. When set to `0`, Vite will not create any workers and will run the preprocessors in the main thread.\n\nDepending on the preprocessor options, Vite may run the preprocessors on the main thread even if this option is not set to `0`."
+   },
+   {
+    "id": "vite:docs/guide/why.md#0",
+    "title": "docs/guide/why.md > Why Vite",
+    "text": "# Why Vite\n\nAs web applications have grown in size and complexity, the tools used to build them have struggled to keep up. Developers working on large projects have experienced painfully slow dev server startups, sluggish hot updates, and long production build times. Each generation of build tooling has improved on the last, but these problems have persisted.\n\nVite was created to address this. Rather than incrementally improving existing approaches, it rethought how code should be served during development. Since then, Vite has evolved through multiple major versions, each time adapting to new capabilities in the ecosystem: from leveraging native ES modules in the browser, to adopting a fully Rust-powered toolchain.\n\nToday, Vite powers many frameworks and tools. Its architecture is designed to evolve with the web platform rather than lock into any single approach, making it a foundation you can build on for the long term."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#8",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > raw `DevEnvironment`",
+    "text": "For example, to call `transformIndexHtml` on the user module, the following plugin can be used:\n\n```ts {13-21}\nfunction vitePluginVirtualIndexHtml(): Plugin {\n  let server: ViteDevServer | undefined\n  return {\n    name: vitePluginVirtualIndexHtml.name,\n    configureServer(server_) {\n      server = server_\n    },\n    resolveId(source) {\n      return source === 'virtual:index-html' ? '\\0' + source : undefined\n    },\n    async load(id) {\n      if (id === '\\0' + 'virtual:index-html') {\n        let html: string\n        if (server) {\n          this.addWatchFile('index.html')\n          html = fs.readFileSync('index.html', 'utf-8')\n          html = await server.transformIndexHtml('/', html)\n        } else {\n          html = fs.readFileSync('dist/client/index.html', 'utf-8')\n        }\n        return `export default ${JSON.stringify(html)}`\n      }\n      return\n    },\n  }\n}\n```\n\nIf your code requires Node.js APIs, you can use `hot.send` to communicate with the code that uses Vite's APIs from the user modules. However, be aware that this approach may not work the same way after the build process.\n\n```ts\n// code using the Vite's APIs\nimport { createServer } from 'vite'\n\nconst server = await createServer({\n  plugins: [\n    // a plugin that handles `virtual:entrypoint`\n    {\n      name: 'virtual-module',\n      /* plugin implementation */\n    },\n  ],\n})\nconst ssrEnvironment = server.environments.ssr\nconst input = {}\n\n// use exposed functions by each environment factories that runs the code\n// check for each environment factories what they provide\nif (ssrEnvironment instanceof RunnableDevEnvironment) {\n  await ssrEnvironment.runner.import('virtual:entrypoint')\n} else if (ssrEnvironment instanceof CustomDevEnvironment) {\n  ssrEnvironment.runEntrypoint('virtual:entrypoint')\n} else {\n  throw new Error(`Unsupported runtime for ${ssrEnvironment.name}`)\n}\n\nconst req = new Request('http://example.com/')\n\nconst uniqueId = 'a-unique-id'\nssrEnvironment.hot.send('request', serialize({ req, uniqueId }))\nconst response = await new Promise((resolve) => {\n  ssrEnvironment.hot.on('response', (data) => {\n    data = deserialize(data)\n    if (data.uniqueId === uniqueId) {\n      resolve(data.res)\n    }\n  })\n})"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#19",
+    "title": "docs/config/server-options.md > Server Options > server.fs.deny",
+    "text": "## server.fs.deny\n\n- **Type:** `string[]`\n- **Default:** `['.env', '.env.*', '*.{crt,pem,key,p12,pfx,cer,der}', '.npmrc', '.yarnrc.yml', '**/.git/**']`\n\nBlocklist for sensitive files being restricted to be served by Vite dev server. This will have higher priority than [`server.fs.allow`](#server-fs-allow). [picomatch patterns](https://github.com/micromatch/picomatch#globbing-features) are supported.\n\nSetting this option replaces the default list entirely. Include any default patterns you want to keep in your custom list.\n\n::: tip NOTE\n\nThis blocklist does not apply to [the public directory](/guide/assets.md#the-public-directory). All files in the public directory are served without any filtering, since they are copied directly to the output directory during build.\n\n:::\n\n::: tip NOTE\n\nThe deny filter is applied against the module id and the id with query parameters stripped. Since a plugin can read files from any files in its load hook (including resolving symlinks to denied paths), Vite cannot guarantee that a denied file is inaccessible through an alternative path. If you have an alternative path, include it in the deny list as well.\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#7",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > raw `DevEnvironment`",
+    "text": "### raw `DevEnvironment`\n\nIf the environment does not implement the `RunnableDevEnvironment` or `FetchableDevEnvironment` interfaces, you need to set up the communication manually.\n\nIf your code can run in the same runtime as the user modules (i.e., it does not rely on Node.js-specific APIs), you can use a virtual module. This approach eliminates the need to access the value from the code using Vite's APIs.\n\n```ts\n// code using the Vite's APIs\nimport { createServer } from 'vite'\n\nconst server = await createServer({\n  plugins: [\n    // a plugin that handles `virtual:entrypoint`\n    {\n      name: 'virtual-module',\n      /* plugin implementation */\n    },\n  ],\n})\nconst ssrEnvironment = server.environments.ssr\nconst input = {}\n\n// use exposed functions by each environment factories that runs the code\n// check for each environment factories what they provide\nif (ssrEnvironment instanceof CustomDevEnvironment) {\n  ssrEnvironment.runEntrypoint('virtual:entrypoint')\n} else {\n  throw new Error(`Unsupported runtime for ${ssrEnvironment.name}`)\n}\n\n// -------------------------------------\n// virtual:entrypoint\nconst { createHandler } = await import('./entrypoint.js')\nconst handler = createHandler(input)\nconst response = handler(new Request('http://example.com/'))\n\n// -------------------------------------\n// ./entrypoint.js\nexport function createHandler(input) {\n  return function handler(req) {\n    return new Response('hello')\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#14",
+    "title": "docs/config/server-options.md > Server Options > server.warmup",
+    "text": "## server.warmup\n\n- **Type:** `{ clientFiles?: string[], ssrFiles?: string[] }`\n- **Related:** [Warm Up Frequently Used Files](/guide/performance.html#warm-up-frequently-used-files)\n\nWarm up files to transform and cache the results in advance. This improves the initial page load during server starts and prevents transform waterfalls.\n\n`clientFiles` are files that are used in the client only, while `ssrFiles` are files that are used in SSR only. They accept an array of file paths or [`tinyglobby` patterns](https://superchupu.dev/tinyglobby/comparison) relative to the `root`.\n\nMake sure to only add files that are frequently used to not overload the Vite dev server on startup.\n\n```js\nexport default defineConfig({\n  server: {\n    warmup: {\n      clientFiles: ['./src/components/*.vue', './src/utils/big-utils.js'],\n      ssrFiles: ['./src/server/modules/*.js'],\n    },\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#16",
+    "title": "docs/config/server-options.md > Server Options > server.middlewareMode",
+    "text": "## server.middlewareMode\n\n- **Type:** `boolean | { server: http.Server }`\n- **Default:** `false`\n\nCreate Vite server in middleware mode.\n\nIf [proxy](./server-options#server-proxy) is setup for WebSocket, the `server` should be provided to bind the proxy correctly.\n\n- **Related:** [appType](./shared-options#apptype), [SSR - Setting Up the Dev Server](/guide/ssr#setting-up-the-dev-server)\n\n- **Example:**\n\n```js twoslash\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    // don't include Vite's default HTML handling middlewares\n    appType: 'custom',\n  })\n  // Use vite's connect instance as middleware\n  app.use(vite.middlewares)\n\n  app.use('*', async (req, res) => {\n    // Since `appType` is `'custom'`, should serve response here.\n    // Note: if `appType` is `'spa'` or `'mpa'`, Vite includes middlewares\n    // to handle HTML requests and 404s so user middlewares should be added\n    // before Vite's middlewares to take effect instead\n  })\n}\n\ncreateServer()\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#2",
+    "title": "docs/guide/api-environment-runtimes.md > Environment API for Runtimes > Creating a New Environment Factory",
+    "text": "## Creating a New Environment Factory\n\nA Vite dev server exposes two environments by default: a `client` environment and an `ssr` environment. The client environment is a browser environment by default, and the module runner is implemented by importing the virtual module `/@vite/client` to client apps. The SSR environment runs in the same Node runtime as the Vite server by default and allows application servers to be used to render requests during dev with full HMR support.\n\nThe transformed source code is called a module, and the relationships between the modules processed in each environment are kept in a module graph. The transformed code for these modules is sent to the runtimes associated with each environment to be executed. When a module is evaluated in the runtime, its imported modules will be requested triggering the processing of a section of the module graph.\n\nA Vite Module Runner allows running any code by processing it with Vite plugins first. It is different from `server.ssrLoadModule` because the runner implementation is decoupled from the server. This allows library and framework authors to implement their layer of communication between the Vite server and the runner. The browser communicates with its corresponding environment using the server WebSocket and through HTTP requests. The Node Module runner can directly do function calls to process modules as it is running in the same process. Other environments could run modules connecting to a JS runtime like workerd, or a Worker Thread as Vitest does."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "vite:docs/guide/api-environment-frameworks.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0058,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0038,
+     "different_case": 0.0131,
+     "unrelated": 0.9811
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/why.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0047,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.003,
+     "different_case": 0.0033,
+     "unrelated": 0.992
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/server-options.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0015,
+     "different_case": 0.003,
+     "unrelated": 0.9939
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/api-environment-runtimes.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0041,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0026,
+     "different_case": 0.0042,
+     "unrelated": 0.9918
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-environment-frameworks.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0018,
+     "different_case": 0.0024,
+     "unrelated": 0.9946
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/config/server-options.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.001,
+     "different_case": 0.0028,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/config/preview-options.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0016,
+     "unrelated": 0.9964
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/config/server-options.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0008,
+     "different_case": 0.0015,
+     "unrelated": 0.9967
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/config/server-options.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0009,
+     "different_case": 0.0017,
+     "unrelated": 0.9965
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/config/shared-options.md#24",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0017,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0006,
+     "different_case": 0.0014,
+     "unrelated": 0.9969
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3721
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4751,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

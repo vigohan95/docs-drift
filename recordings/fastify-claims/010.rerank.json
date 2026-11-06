@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/010.rerank",
+ "recorded_at": "2026-11-06T13:37:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1198,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "113.978111",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=157,cfOrigin;dur=0,cfWorker;dur=314"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: The first one (`req-1`) was a `GET /v1`, that failed (**FAST** - `responseTime` is in `ms`) with our `503` status code and the meaningful information in the response.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#7",
+    "title": "docs/Guides/Getting-Started.md > Getting Started > Your first plugin",
+    "text": "  const schema = {\n    body: animalBodyJsonSchema,\n  }\n\n  fastify.post('/animals', { schema }, async (request, reply) => {\n    // we can use the `request.body` object to get the data sent by the client\n    const result = await collection.insertOne({ animal: request.body.animal })\n    return result\n  })\n}\n\nmodule.exports = routes\n```\n\nWow, that was fast!\n\nLet's recap what we have done here since we've introduced some new concepts.\n\nAs you can see, we used `register` for both the database connector and the\nregistration of the routes.\n\nThis is one of the best features of Fastify, it will load your plugins in the\nsame order you declare them, and it will load the next plugin only once the\ncurrent one has been loaded. In this way, we can register the database connector\nin the first plugin and use it in the second *(read\n[here](../Reference/Plugins.md#handle-the-scope) to understand how to handle the\nscope of a plugin)*.\n\nPlugin loading starts when you call `fastify.listen()`, `fastify.inject()` or\n`fastify.ready()`\n\nThe MongoDB plugin uses the `decorate` API to add custom objects to the Fastify\ninstance, making them available for use everywhere. Use of this API is\nencouraged to facilitate easy code reuse and to decrease code or logic\nduplication.\n\nTo dig deeper into how Fastify plugins work, how to develop new plugins, and for\ndetails on how to use the whole Fastify API to deal with the complexity of\nasynchronously bootstrapping an application, read [the hitchhiker's guide to\nplugins](./Plugins-Guide.md)."
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#4",
+    "title": "docs/Guides/Testing.md > Testing > Application > Benefits of using fastify.inject()",
+    "text": "### Benefits of using fastify.inject()\n\nFastify comes with built-in support for fake HTTP injection thanks to\n[`light-my-request`](https://github.com/fastify/light-my-request).\n\nBefore introducing any tests, we will use the `.inject` method to make a fake\nrequest to our route:\n\n**app.test.js**:\n\n```js\n'use strict'\n\nconst build = require('./app')\n\nconst test = async () => {\n  const app = build()\n\n  const response = await app.inject({\n    method: 'GET',\n    url: '/'\n  })\n\n  console.log('status code: ', response.statusCode)\n  console.log('body: ', response.body)\n}\ntest()\n```\n\nFirst, our code will run inside an asynchronous function, giving us access to\nasync/await.\n\n`.inject` ensures all registered plugins have booted up and our application is\nready to test. Finally, we pass the request method we want to use and a route.\nUsing await we can store the response without a callback.\n\n\n\nRun the test file in your terminal `node app.test.js`\n\n```sh\nstatus code:  200\nbody:  {\"hello\":\"world\"}\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Error Handling",
+    "text": "### Error Handling\nWhen schema validation fails for a request, Fastify will automatically return a\nstatus 400 response including the result from the validator in the payload. For\nexample, if the following schema is used for a route:\n\n```js\nconst schema = {\n  body: {\n    type: 'object',\n    properties: {\n      name: { type: 'string' }\n    },\n    required: ['name']\n  }\n}\n```\n\nIf the request fails to satisfy the schema, the route will return a response\nwith the following payload:\n\n```js\n{\n  \"statusCode\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"body should have required property 'name'\"\n}\n```\n\n> ⚠ Security Consideration: By default, validation error details from the schema\n> are included in the response payload. If your organization requires sanitizing\n> or customizing these error messages (e.g., to avoid exposing internal schema\n> details), configure a custom error handler using\n> [`setErrorHandler()`](./Server.md#seterrorhandler).\n\nTo handle errors inside the route, specify the `attachValidation` option. If\nthere is a validation error, the `validationError` property of the request will\ncontain the same `Error` object Fastify would have sent on its own, so no\nmessage has to be rebuilt from the raw validation result:\n\n- `message` is the formatted message, identical to the one in the response\n  payload above (for example `body must have required property 'name'`). It is\n  produced by [`schemaErrorFormatter`](#schemaerrorformatter), so a custom\n  formatter is reflected here too.\n- `validation` is the raw validation result, as returned by the validator.\n- `validationContext` is the part of the request that failed validation\n  (`body`, `params`, `querystring` or `headers`).\n- `code` is `FST_ERR_VALIDATION` and `statusCode` is `400`.\n- When the validator reports a list of errors (as Ajv does) and the default\n  [`schemaErrorFormatter`](#schemaerrorformatter) is used, the error is an\n  instance of [`FST_ERR_VALIDATION`](./Errors.md#fst_err_validation) without a\n  [stack trace](./Errors.md#errors-in-input-data). Errors returned by the\n  validator itself, or by a custom formatter, are used as they are."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#23",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > Removes `getDefaultRoute` and `setDefaultRoute` methods",
+    "text": "### Removes `getDefaultRoute` and `setDefaultRoute` methods\n\nThe `getDefaultRoute` and `setDefaultRoute` methods have been removed in v5.\n\nSee [#4485](https://github.com/fastify/fastify/pull/4485)\nand [#4480](https://github.com/fastify/fastify/pull/4480)\nfor more information.\nThis was already deprecated in v4 as `FSTDEP014`,\nso you should have already updated your code."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#15",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Validation > Validator Compiler > .statusCode property",
+    "text": "##### .statusCode property\n\nAll validation errors have a `.statusCode` property set to `400`, ensuring the\ndefault error handler sets the response status code to `400`.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  request.log.error(error, `This error has status code ${error.statusCode}`)\n  reply.status(error.statusCode).send(error)\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#19",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .send(data) > Response",
+    "text": "###### Response\n<a id=\"send-response\"></a>\n\n`Response` allows to manage the reply payload, status code and\nheaders in one place. The payload provided inside `Response` is\nconsidered to be pre-serialized, so they will be sent unmodified\nwithout response validation.\n\nPlease be aware when using `Response`, the status code and headers\nwill not directly reflect to `reply.statusCode` and `reply.getHeaders()`.\nSuch behavior is based on `Response` only allow `readonly` status\ncode and headers. The data is not allow to be bi-direction editing,\nand may confuse when checking the `payload` in `onSend` hooks.\n\n```js\nconst fs = require('node:fs')\nconst { ReadableStream } = require('node:stream/web')\n\nfastify.get('/streams', function (request, reply) {\n  const stream = fs.createReadStream('some-file')\n  const readableStream = ReadableStream.from(stream)\n  const response = new Response(readableStream, {\n    status: 200,\n    headers: { 'content-type': 'application/octet-stream' }\n  })\n  reply.send(response)\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#16",
+    "title": "docs/Reference/Errors.md > Errors > Fastify Error Codes",
+    "text": "| <a id=\"fst_err_send_inside_onerr\">FST_ERR_SEND_INSIDE_ONERR</a> | You cannot use `send` inside the `onError` hook. | - | [#1348](https://github.com/fastify/fastify/pull/1348) |\n| <a id=\"fst_err_send_undefined_err\">FST_ERR_SEND_UNDEFINED_ERR</a> | Undefined error has occurred. | - | [#2074](https://github.com/fastify/fastify/pull/2074) |\n| <a id=\"fst_err_bad_status_code\">FST_ERR_BAD_STATUS_CODE</a> | The status code is not valid. | Use a valid status code. | [#2082](https://github.com/fastify/fastify/pull/2082) |\n| <a id=\"fst_err_bad_trailer_name\">FST_ERR_BAD_TRAILER_NAME</a> | Called `reply.trailer` with an invalid header name. | Use a valid header name. | [#3794](https://github.com/fastify/fastify/pull/3794) |\n| <a id=\"fst_err_bad_trailer_value\">FST_ERR_BAD_TRAILER_VALUE</a> | Called `reply.trailer` with an invalid type. Expected a function. | Use a function. | [#3794](https://github.com/fastify/fastify/pull/3794) |\n| <a id=\"fst_err_failed_error_serialization\">FST_ERR_FAILED_ERROR_SERIALIZATION</a> | Failed to serialize an error. | - | [#4601](https://github.com/fastify/fastify/pull/4601) |\n| <a id=\"fst_err_missing_serialization_fn\">FST_ERR_MISSING_SERIALIZATION_FN</a> | Missing serialization function. | Add a serialization function. | [#3970](https://github.com/fastify/fastify/pull/3970) |\n| <a id=\"fst_err_missing_contenttype_serialization_fn\">FST_ERR_MISSING_CONTENTTYPE_SERIALIZATION_FN</a> | Missing `Content-Type` serialization function. | Add a serialization function. | [#4264](https://github.com/fastify/fastify/pull/4264) |\n| <a id=\"fst_err_req_invalid_validation_invocation\">FST_ERR_REQ_INVALID_VALIDATION_INVOCATION</a> | Invalid validation invocation. Missing validation function for HTTP part nor schema provided. | Add a validation function. | [#3970](https://github.com/fastify/fastify/pull/3970) |\n| <a id=\"fst_err_sch_missing_id\">FST_ERR_SCH_MISSING_ID</a> | The schema provided does not have `$id` property. | Add a `$id` property. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_sch_already_present\">FST_ERR_SCH_ALREADY_PRESENT</a> | A schema with the same `$id` already exists. | Use a different `$id`. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_sch_content_missing_schema\">FST_ERR_SCH_CONTENT_MISSING_SCHEMA</a> | A schema is missing for the corresponding content type. | Add a schema. | [#4264](https://github.com/fastify/fastify/pull/4264) |\n| <a id=\"fst_err_sch_duplicate\">FST_ERR_SCH_DUPLICATE</a> | Schema with the same attribute already present! | Use a different attribute. | [#1954](https://github.com/fastify/fastify/pull/1954) |\n| <a id=\"fst_err_sch_validation_build\">FST_ERR_SCH_VALIDATION_BUILD</a> | The JSON schema provided for validation to a route is not valid. | Fix the JSON schema. | [#2023](https://github.com/fastify/fastify/pull/2023) |\n| <a id=\"fst_err_sch_serialization_build\">FST_ERR_SCH_SERIALIZATION_BUILD</a> | The JSON schema provided for serialization of a route response is not valid. | Fix the JSON schema. | [#2023](https://github.com/fastify/fastify/pull/2023) |\n| <a id=\"fst_err_sch_response_schema_not_nested_2xx\">FST_ERR_SCH_RESPONSE_SCHEMA_NOT_NESTED_2XX</a> | Response schemas should be nested under a valid status code (2XX). | Use a valid status code. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_init_opts_invalid\">FST_ERR_INIT_OPTS_INVALID</a> | Invalid initialization options. | Use valid initialization options. | [#1471](https://github.com/fastify/fastify/pull/1471) |"
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#17",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Serialization",
+    "text": "### Serialization\n<a id=\"serialization\"></a>\n\nFastify uses [fast-json-stringify](https://www.npmjs.com/package/fast-json-stringify)\nto send data as JSON if an output schema is provided in the route options. Using\nan output schema can drastically increase throughput and help prevent accidental\ndisclosure of sensitive information.\n\nExample:\n```js\nconst schema = {\n  response: {\n    200: {\n      type: 'object',\n      properties: {\n        value: { type: 'string' },\n        otherValue: { type: 'boolean' }\n      }\n    }\n  }\n}\n\nfastify.post('/the/url', { schema }, handler)\n```\n\nThe response schema is based on the status code. To use the same schema for\nmultiple status codes, use `'2xx'` or `default`, for example:\n```js\nconst schema = {\n  response: {\n    default: {\n      type: 'object',\n      properties: {\n        error: {\n          type: 'boolean',\n          default: true\n        }\n      }\n    },\n    '2xx': {\n      type: 'object',\n      properties: {\n        value: { type: 'string' },\n        otherValue: { type: 'boolean' }\n      }\n    },\n    201: {\n      // the contract syntax\n      value: { type: 'string' }\n    }\n  }\n}\n\nfastify.post('/the/url', { schema }, handler)\n```\nA specific response schema can be defined for different content types.\nFor example:\n```js\nconst schema = {\n  response: {\n    200: {\n      description: 'Response schema that support different content types',\n      content: {\n        'application/json': {\n          schema: {\n            type: 'object',\n            properties: {\n              name: { type: 'string' },\n              image: { type: 'string' },\n              address: { type: 'string' }\n            }\n          }\n        },\n        'application/vnd.v1+json': {\n          schema: {\n            type: 'array',\n            items: { $ref: 'test' }\n          }\n        }\n      }\n    },\n    '3xx': {\n      content: {\n        'application/vnd.v2+json': {\n          schema: {\n            type: 'object',\n            properties: {\n              fullName: { type: 'string' },\n              phone: { type: 'string' }\n            }\n          }\n        }\n      }\n    },\n    default: {\n      content: {\n        // */* is match-all content-type\n        '*/*': {\n          schema: {\n            type: 'object',\n            properties: {\n              desc: { type: 'string' }\n            }\n          }\n        }\n      }\n    }\n  }\n}"
+   },
+   {
+    "id": "fastify:docs/Guides/Prototype-Poisoning.md#11",
+    "title": "docs/Guides/Prototype-Poisoning.md > History behind prototype poisoning > The solution business",
+    "text": "### The solution business\n<a id=\"pp-solution-business\"></a>\n\nMitigating the issue wasn't hard. Making it scale and safe was a bit more\ninvolved. Since we knew where harmful data can enter the system, and we knew\nwhere we used the problematic `JSON.parse()` we could replace it with a safe\nimplementation.\n\nOne problem. Validating data can be costly and we are now planning on validating\nevery incoming JSON text. The built-in `JSON.parse()` implementation is fast.\nReally really fast. It is unlikely we can build a replacement that will be more\nsecure and anywhere as fast. Especially not overnight and without introducing\nnew bugs.\n\nIt was obvious we were going to wrap the existing `JSON.parse()` method with\nsome additional logic. We just had to make sure it was not adding too much\noverhead. This isn't just a performance consideration but also a security one.\nIf we make it easy to slow down a system by simply sending specific data, we\nmake it easy to execute a [DoS\nattack](https://en.wikipedia.org/wiki/Denial-of-service_attack) at very low\ncost.\n\nI came up with a stupidly simple solution: first parse the text using the\nexisting tools. If this didn't fail, scan the original raw text for the\noffending string \"__proto__\". Only if we find it, perform an actual scan of the\nobject. We can't block every reference to \"__proto__\" — sometimes it is\nperfectly valid value (like when writing about it here and sending this text\nover to Medium for publication)."
+   },
+   {
+    "id": "fastify:SECURITY.md#8",
+    "title": "SECURITY.md > Security Policy > Handling vulnerability reports > Triage",
+    "text": "### Triage\n\n**Delay:** 4 business days\n\nWithin 4 business days, a member of the security team provides a first answer to\nthe individual who submitted the potential vulnerability. The possible responses\ncan be:\n\n* **Acceptance**: what was reported is considered as a new vulnerability\n* **Rejection**: what was reported is not considered as a new vulnerability\n* **Need more information**: the security team needs more information in order to\n  evaluate what was reported.\n\nTriaging should include updating issue fields:\n* Asset - set/create the module affected by the report\n* Severity - TBD, currently left empty"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Errors.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0082,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0047,
+     "different_case": 0.0156,
+     "unrelated": 0.9762
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Testing.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0069,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0037,
+     "different_case": 0.0179,
+     "unrelated": 0.9752
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0117,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.0086,
+     "different_case": 0.0311,
+     "unrelated": 0.9572
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0095,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0069,
+     "different_case": 0.0117,
+     "unrelated": 0.9788
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Reply.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0097,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0076,
+     "different_case": 0.0123,
+     "unrelated": 0.978
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0014,
+     "different_case": 0.0044,
+     "unrelated": 0.9925
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0018,
+     "different_case": 0.0048,
+     "unrelated": 0.9918
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Getting-Started.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0016,
+     "different_case": 0.0042,
+     "unrelated": 0.9926
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Guides/Prototype-Poisoning.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0016,
+     "different_case": 0.0054,
+     "unrelated": 0.9918
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:SECURITY.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0009,
+     "different_case": 0.003,
+     "unrelated": 0.9949
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5311
+  },
+  "timing": {
+   "total_ms": 117,
+   "rerank_ms": 116,
+   "questions_ms": 0,
+   "model_ms": 108,
+   "engine": {
+    "rows": 6501,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 108,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

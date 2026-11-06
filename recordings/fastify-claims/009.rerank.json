@@ -1,0 +1,240 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/009.rerank",
+ "recorded_at": "2026-11-06T13:37:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1061,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.147072",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=155,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: All validation errors have a `.statusCode` property set to `400`, ensuring the default error handler sets the response status code to `400`.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#3",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Properties > .statusCode",
+    "text": "##### .statusCode\n<a id=\"statusCode\"></a>\n\nThis property reads and sets the HTTP status code. It is an alias for\n`reply.code()` when used as a setter.\n```js\nif (reply.statusCode >= 299) {\n  reply.statusCode = 500\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#32",
+    "title": "docs/Reference/Server.md > Factory > `clientErrorHandler`",
+    "text": "### `clientErrorHandler`\n<a id=\"client-error-handler\"></a>\n\nSet a\n[clientErrorHandler](https://nodejs.org/api/http.html#event-clienterror)\nthat listens to `error` events emitted by client connections and responds with a\n`400`.\n\nIt is possible to override the default `clientErrorHandler` using this option.\n\n+ Default:\n```js\nfunction defaultClientErrorHandler (err, socket) {\n  if (err.code === 'ECONNRESET') {\n    return\n  }\n\n  const body = JSON.stringify({\n    error: http.STATUS_CODES['400'],\n    message: 'Client Error',\n    statusCode: 400\n  })\n  this.log.trace({ err }, 'client error')\n\n  if (socket.writable) {\n    socket.end([\n      'HTTP/1.1 400 Bad Request',\n      `Content-Length: ${body.length}`,\n      `Content-Type: application/json\\r\\n\\r\\n${body}`\n    ].join('\\r\\n'))\n  }\n}\n```\n\n> ℹ️ Note:\n> `clientErrorHandler` operates with raw sockets. The handler is expected to\n> return a properly formed HTTP response that includes a status line, HTTP headers\n> and a message body. Before attempting to write the socket, the handler should\n> check if the socket is still writable as it may have already been destroyed.\n\n```js\nconst fastify = require('fastify')({\n  clientErrorHandler: function (err, socket) {\n    const body = JSON.stringify({\n      error: {\n        message: 'Client error',\n        code: '400'\n      }\n    })\n\n    // `this` is bound to fastify instance\n    this.log.trace({ err }, 'client error')\n\n    // the handler is responsible for generating a valid HTTP response\n    socket.end([\n      'HTTP/1.1 400 Bad Request',\n      `Content-Length: ${body.length}`,\n      `Content-Type: application/json\\r\\n\\r\\n${body}`\n    ].join('\\r\\n'))\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#77",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > setReplySerializer",
+    "text": "#### setReplySerializer\n<a id=\"set-reply-serializer\"></a>\n\nSet the reply serializer for all the routes. This will be used as default if a\n[Reply.serializer(func)](./Reply.md#serializerfunc) has not been set. The\nhandler is fully encapsulated, so different plugins can set different error\nhandlers. Note: the function parameter is called only for status `2xx`. Check\nout the [`setErrorHandler`](#seterrorhandler) for errors.\n\n```js\nfastify.setReplySerializer(function (payload, statusCode){\n  // serialize the payload with a sync function\n  return `my serialized ${statusCode} content: ${payload}`\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#0",
+    "title": "docs/Reference/Lifecycle.md > Lifecycle",
+    "text": "## Lifecycle\n<a id=\"lifecycle\"></a>\n\nThis diagram shows the internal lifecycle of Fastify.\n\nThe right branch of each section shows the next phase of the lifecycle. The left\nbranch shows the corresponding error code generated if the parent throws an\nerror. All errors are automatically handled by Fastify.\n\n```\nIncoming Request\n  │\n  └─▶ Routing\n        │\n        └─▶ Instance Logger\n             │\n   4**/5** ◀─┴─▶ onRequest Hook\n                  │\n        4**/5** ◀─┴─▶ preParsing Hook\n                        │\n              4**/5** ◀─┴─▶ Parsing\n                             │\n                   4**/5** ◀─┴─▶ preValidation Hook\n                                  │\n                            400 ◀─┴─▶ Validation\n                                        │\n                              4**/5** ◀─┴─▶ preHandler Hook\n                                              │\n                                    4**/5** ◀─┴─▶ User Handler\n                                                    │\n                                                    └─▶ Reply\n                                                          │\n                                                4**/5** ◀─┴─▶ preSerialization Hook\n                                                                │\n                                                                └─▶ onSend Hook\n                                                                      │\n                                                            4**/5** ◀─┴─▶ Outgoing Response\n                                                                            │\n                                                                            └─▶ onResponse Hook\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#20",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .send(data) > Errors",
+    "text": "###### Errors\n<a id=\"errors\"></a>\n\nIf you pass to *send* an object that is an instance of *Error*, Fastify will\nautomatically create an error structured as the following:\n\n```js\n{\n  error: String        // the HTTP error message\n  code: String         // the Fastify error code\n  message: String      // the user error message\n  statusCode: Number   // the HTTP status code\n}\n```\n\nYou can add custom properties to the Error object, such as `headers`, that will\nbe used to enhance the HTTP response.\n\n> ℹ️ Note:\n> If you are passing an error to `send` and the statusCode is less than\n> 400, Fastify will automatically set it at 500.\n\nTip: you can simplify errors by using the\n[`http-errors`](https://www.npmjs.com/package/http-errors) module or\n[`@fastify/sensible`](https://github.com/fastify/fastify-sensible) plugin to\ngenerate errors:\n\n```js\nfastify.get('/', function (request, reply) {\n  reply.send(httpErrors.Gone())\n})\n```\n\nTo customize the JSON error output you can do it by:\n\n- setting a response JSON schema for the status code you need\n- add the additional properties to the `Error` instance\n\nNotice that if the returned status code is not in the response schema list, the\ndefault behavior will be applied.\n\n```js\nfastify.get('/', {\n  schema: {\n    response: {\n      501: {\n        type: 'object',\n        properties: {\n          statusCode: { type: 'number' },\n          code: { type: 'string' },\n          error: { type: 'string' },\n          message: { type: 'string' },\n          time: { type: 'string' }\n        }\n      }\n    }\n  }\n}, function (request, reply) {\n  const error = new Error('This endpoint has not been implemented')\n  error.time = 'it will be implemented in two weeks'\n  reply.code(501).send(error)\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#21",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .send(data) > Errors",
+    "text": "If you want to customize error handling, check out\n[`setErrorHandler`](./Server.md#seterrorhandler) API.\n\n> ℹ️ Note:\n> You are responsible for logging when customizing the error handler.\n\nAPI:\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  request.log.warn(error)\n  const statusCode = error.statusCode >= 400 ? error.statusCode : 500\n  reply\n    .code(statusCode)\n    .type('text/plain')\n    .send(statusCode >= 500 ? 'Internal server error' : error.message)\n})\n```\n\nBeware that calling `reply.send(error)` in your custom error handler will send\nthe error to the default error handler.\nCheck out the [Reply Lifecycle](./Lifecycle.md#reply-lifecycle)\nfor more information.\n\nThe not found errors generated by the router will use the\n[`setNotFoundHandler`](./Server.md#setnotfoundhandler)\n\nAPI:\n\n```js\nfastify.setNotFoundHandler(function (request, reply) {\n  reply\n    .code(404)\n    .type('text/plain')\n    .send('a custom not found')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "title": "docs/Reference/Errors.md > Errors > Errors In Fastify > What The Default Error Handler Sends",
+    "text": "#### What The Default Error Handler Sends\nThe default error handler serializes the error into a JSON body with the\n`statusCode`, `error`, and `message` properties, plus `code` when the error\ncarries one:\n\n```js\napp.get('/', async () => { throw new Error('kaboom') })\n```\n\n```json\n{\n  \"statusCode\": 500,\n  \"error\": \"Internal Server Error\",\n  \"message\": \"kaboom\"\n}\n```\n\nThe `error` property is the generic HTTP status text, but **`message` is\n`error.message` verbatim**. This applies to every status code, including `500`.\nFastify's built-in error serializer emits only these four properties, so the\nstack trace is not part of the default payload — but a route-level response\nschema replaces that serializer, and one that declares a `stack` property will\nserialize it.\n\n> Security:\n> Because `message` and `code` are forwarded as-is, errors thrown by libraries\n> deeper in your application are exposed to the client. A database driver\n> error, for example, can leak schema details and query text:\n>\n> ```json\n> {\n>   \"statusCode\": 500,\n>   \"code\": \"ER_BAD_FIELD_ERROR\",\n>   \"error\": \"Internal Server Error\",\n>   \"message\": \"Unknown column 'username' in 'field list'\"\n> }\n> ```\n>\n> Fastify does not distinguish between development and production here. If\n> unexpected errors must not reach the client, handle this explicitly."
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#10",
+    "title": "docs/Reference/Errors.md > Errors > Errors In Fastify > What The Default Error Handler Sends",
+    "text": "Register a [`setErrorHandler`](./Server.md#seterrorhandler) to replace the\nmessage for errors you did not raise deliberately, while letting the ones you\ndid pass through:\n\n```js\napp.setErrorHandler(function (error, request, reply) {\n  // Errors with a statusCode below 500 were raised deliberately by this\n  // application, as were validation errors. A status code below 500 is not on\n  // its own a guarantee that the message is safe to expose — narrow this\n  // condition if any of yours are not.\n  if (error.validation || (error.statusCode && error.statusCode < 500)) {\n    return reply.send(error)\n  }\n\n  // Anything else is unexpected: log it, but do not describe it to the client.\n  this.log.error({ err: error }, 'unhandled error')\n  reply.status(500).send({\n    statusCode: 500,\n    error: 'Internal Server Error',\n    message: 'Internal Server Error'\n  })\n})\n```\n\nThe handler above is registered on the root instance, so it applies to every\nroute. Error handlers are encapsulated; for how they resolve across plugin\ncontexts, see\n[the next section](#errors-in-fastify-lifecycle-hooks-and-a-custom-error-handler).\n\nNote that a route-level response schema is still applied to whatever the error\nhandler sends, and will reshape the payload accordingly — including properties\nthe built-in error serializer would have omitted, such as `stack`. See\n[Serialization](./Validation-and-Serialization.md#serialization)."
+   },
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#2",
+    "title": "docs/Reference/Lifecycle.md > Reply Lifecycle",
+    "text": "## Reply Lifecycle\n<a id=\"reply-lifecycle\"></a>\n\nWhen the user handles the request, the result may be:\n\n- In an async handler: it returns a payload or throws an `Error`\n- In a sync handler: it sends a payload or an `Error` instance\n\nIf the reply is hijacked, all subsequent steps are skipped.\nOtherwise, the data flows as follows:\n\n```\n                        ★ schema validation Error\n                                    │\n                                    └─▶ schemaErrorFormatter\n                                               │\n                          reply sent ◀── JSON ─┴─ Error instance\n                                                      │\n                                                      │         ★ throw an Error\n                     ★ send or return                 │                 │\n                            │                         │                 │\n                            │                         ▼                 │\n       reply sent ◀── JSON ─┴─ Error instance ──▶ onError Hook ◀───────┘\n                                                      │\n                                 reply sent ◀── JSON ─┴─ Error instance ──▶ setErrorHandler\n                                                                                │\n                                                                                └─▶ reply sent\n```\n\n`reply sent` means the JSON payload will be serialized by one of the following:\n- The [reply serializer](./Server.md#setreplyserializer) if set\n- The [serializer compiler](./Server.md#setserializercompiler) if a JSON schema\n  is set for the HTTP status code\n- The default `JSON.stringify` function"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#18",
+    "title": "docs/Reference/Server.md > Factory > `logController`",
+    "text": "The error-related methods share a unified signature:\n`(error, request, reply, metadata)`, where `metadata` carries any extra\nper-method data (for example, the `statusCode` passed to `serializerError`).\n`incomingRequest` and `routeNotFound` omit the `error` argument, since they fire\nat lifecycle points where no error exists. `serviceUnavailable` is a further\nexception, since no route — and therefore no `request`/`reply` — is formed.\n\n| Method | Signature | Description |\n|--------|-----------|-------------|\n| `isLogDisabled` | `(request)` | Checks whether request logging is disabled for the given request. It impacts all other log methods. |\n| `incomingRequest` | `(request, reply, metadata)` | Logs an incoming request at `info` level. |\n| `requestCompleted` | `(error, request, reply, metadata)` | Logs the outcome of a completed request. Uses `error` level when an error is present, `info` otherwise. |\n| `defaultErrorLog` | `(error, request, reply, metadata)` | Logs an error handled by the default error handler. Uses `error` for 5xx, `info` for 4xx. |\n| `streamError` | `(error, request, reply, metadata)` | Logs stream-level errors after headers have been sent. |\n| `routeNotFound` | `(request, reply, metadata)` | Logs a \"route not found\" message at `info` level. |\n| `writeHeadError` | `(error, request, reply, metadata)` | Logs a warning when `writeHead` fails during error handling. |\n| `serializerError` | `(error, request, reply, metadata)` | Logs an error when the serializer for a given status code fails. The triggering status code is available as `metadata.statusCode`. |\n| `serviceUnavailable` | `(logger, server)` | Logs a 503 when the server is closing. Always emitted, not gated by `disableRequestLogging`. |"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Lifecycle.md#0",
+    "action": "expand",
+    "relevance_score": 0.218,
+    "document_score": 0.8532,
+    "levels": {
+     "answers": 0.218,
+     "elsewhere": 0.6352,
+     "different_case": 0.0587,
+     "unrelated": 0.0881
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Reply.md#20",
+    "action": "expand",
+    "relevance_score": 0.1614,
+    "document_score": 0.7188,
+    "levels": {
+     "answers": 0.1614,
+     "elsewhere": 0.5574,
+     "different_case": 0.0463,
+     "unrelated": 0.2349
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Errors.md#10",
+    "action": "expand",
+    "relevance_score": 0.1011,
+    "document_score": 0.7611,
+    "levels": {
+     "answers": 0.1011,
+     "elsewhere": 0.66,
+     "different_case": 0.0558,
+     "unrelated": 0.1831
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Reply.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0511,
+    "document_score": 0.4287,
+    "levels": {
+     "answers": 0.0511,
+     "elsewhere": 0.3776,
+     "different_case": 0.0636,
+     "unrelated": 0.5077
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0287,
+    "document_score": 0.3006,
+    "levels": {
+     "answers": 0.0287,
+     "elsewhere": 0.2719,
+     "different_case": 0.034,
+     "unrelated": 0.6654
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#32",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0271,
+    "document_score": 0.1781,
+    "levels": {
+     "answers": 0.0271,
+     "elsewhere": 0.151,
+     "different_case": 0.1213,
+     "unrelated": 0.7006
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Reply.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0176,
+    "document_score": 0.1669,
+    "levels": {
+     "answers": 0.0176,
+     "elsewhere": 0.1494,
+     "different_case": 0.0567,
+     "unrelated": 0.7764
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Server.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.0509,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.0461,
+     "different_case": 0.0522,
+     "unrelated": 0.8969
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/Lifecycle.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0043,
+    "document_score": 0.0678,
+    "levels": {
+     "answers": 0.0043,
+     "elsewhere": 0.0635,
+     "different_case": 0.0226,
+     "unrelated": 0.9096
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#77",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0032,
+    "document_score": 0.0393,
+    "levels": {
+     "answers": 0.0032,
+     "elsewhere": 0.0361,
+     "different_case": 0.0153,
+     "unrelated": 0.9454
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4237
+  },
+  "timing": {
+   "total_ms": 97,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5427,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

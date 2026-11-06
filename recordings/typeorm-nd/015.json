@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/015",
+ "recorded_at": "2026-11-06T13:42:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 979,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.631229",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=223"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/drivers/microsoft-sqlserver.md#11",
+    "text": "#### Vector Similarity Search\n\nSQL Server provides the `VECTOR_DISTANCE` function for calculating distances between vectors:\n\n```typescript\nconst queryEmbedding = [/* your query vector */]\n\nconst results = await dataSource.query(\n    `\n    DECLARE @question AS VECTOR (1998) = @0;\n    SELECT TOP (10) dc.*,\n           VECTOR_DISTANCE('cosine', @question, embedding) AS distance\n    FROM document_chunk dc\n    ORDER BY VECTOR_DISTANCE('cosine', @question, embedding)\n`,\n    [JSON.stringify(queryEmbedding)],\n)\n```\n\n**Distance Metrics:**\n\n- `'cosine'` - Cosine distance (most common for semantic search)\n- `'euclidean'` - Euclidean (L2) distance\n- `'dot'` - Negative dot product\n\n**Requirements:**\n\n- SQL Server version with vector support enabled\n- Vector dimensions must be specified using the `length` option"
+   },
+   {
+    "id": "typeorm:docs/docs/entity/1-entities.md#12",
+    "text": "### Vector columns\n\nVector columns are supported on MariaDB/MySQL, Microsoft SQL Server, PostgreSQL (via [`pgvector`](https://github.com/pgvector/pgvector) extension) and SAP HANA Cloud, enabling storing and querying vector embeddings for similarity search and machine learning applications.\n\nTypeORM supports both `vector` and `halfvec` column types across databases:\n\n- `vector` - stores vectors as 4-byte floats (single precision)\n    - MariaDB/MySQL: native `vector` type\n    - Microsoft SQL Server: native `vector` type\n    - PostgreSQL: `vector` type, available via `pgvector` extension\n    - SAP HANA Cloud: alias for `real_vector` type\n- `halfvec` - stores vectors as 2-byte floats (half precision) for memory efficiency\n    - PostgreSQL: `halfvec` type, available via `pgvector` extension\n    - SAP HANA Cloud: alias for `half_vector` type\n\nYou can specify the number of vector dimensions using the `length` option:\n\n```typescript\n@Entity()\nexport class Post {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    // Vector without specified dimensions\n    @Column(\"vector\")\n    embedding: number[] | Buffer\n\n    // Vector with 3 dimensions: vector(3)\n    @Column(\"vector\", { length: 3 })\n    embedding_3d: number[] | Buffer\n\n    // Half-precision vector with 4 dimensions: halfvec(4) (works on PostgreSQL and SAP HANA only)\n    @Column(\"halfvec\", { length: 4 })\n    halfvec_embedding: number[] | Buffer\n}\n```\n\n> **Note**:\n>\n> - **MariaDB/MySQL**: Vectors are supported since MariaDB 11.7 and MySQL 9\n> - **Microsoft SQL Server**: Vector type support requires SQL Server 2025 (17.x) or newer.\n> - **PostgreSQL**: Vector columns require the `pgvector` extension to be installed. The extension provides the vector data types and similarity operators.\n> - **SAP HANA**: Vector columns require SAP HANA Cloud (2024Q1+) and a supported version of `@sap/hana-client`."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/drivers/microsoft-sqlserver.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/entity/1-entities.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/drivers/microsoft-sqlserver.md#11",
+    "b": "typeorm:docs/docs/entity/1-entities.md#12",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0052,
+     "overlapping": 0.9883,
+     "conflicting": 0.0042,
+     "unrelated": 0.0023
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 101,
+   "total_ms": 105
+  }
+ }
+}

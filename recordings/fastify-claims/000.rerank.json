@@ -1,0 +1,239 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/000.rerank",
+ "recorded_at": "2026-11-06T13:37:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1057,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.647202",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=348"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: If > you are running Fastify in a container (Docker, > [GCP](https://cloud.google.com/), etc.), you may need to bind to `0.0.0.0`.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#34",
+    "title": "docs/Guides/Serverless.md > Google Cloud Run > Submit build",
+    "text": "### Submit build\n\nNext, submit your app to be built into a Docker image by running the following\ncommand (replacing `PROJECT-ID` and `APP-NAME` with your GCP project id and an\napp name):\n\n```bash\ngcloud builds submit --tag gcr.io/PROJECT-ID/APP-NAME\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#31",
+    "title": "docs/Guides/Serverless.md > Google Cloud Run > Adjust Fastify server",
+    "text": "### Adjust Fastify server\n\nFor Fastify to properly listen for requests within the container, be\nsure to set the correct port and address:\n\n```js\nfunction build() {\n  const fastify = Fastify({ trustProxy: true })\n  return fastify\n}\n\nasync function start() {\n  // Google Cloud Run will set this environment variable for you, so\n  // you can also use it to detect if you are running in Cloud Run\n  const IS_GOOGLE_CLOUD_RUN = process.env.K_SERVICE !== undefined\n\n  // You must listen on the port Cloud Run provides\n  const port = process.env.PORT || 3000\n\n  // You must listen on all IPV4 addresses in Cloud Run\n  const host = IS_GOOGLE_CLOUD_RUN ? \"0.0.0.0\" : undefined\n\n  try {\n    const server = build()\n    const address = await server.listen({ port, host })\n    console.log(`Listening on ${address}`)\n  } catch (err) {\n    console.error(err)\n    process.exit(1)\n  }\n}\n\nmodule.exports = build\n\nif (require.main === module) {\n  start()\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#3",
+    "title": "docs/Guides/Getting-Started.md > Getting Started > Your first server",
+    "text": "Fastify offers an easy platform that helps to solve all of the problems outlined\nabove, and more!\n\n> **Note**\n> The above examples, and subsequent examples in this document, default to\n> listening *only* on the localhost `127.0.0.1` interface. To listen on all\n> available IPv4 interfaces the example should be modified to listen on\n> `0.0.0.0` like so:\n>\n> ```js\n> fastify.listen({ port: 3000, host: '0.0.0.0' }, function (err, address) {\n>   if (err) {\n>     fastify.log.error(err)\n>     process.exit(1)\n>   }\n>   fastify.log.info(`server listening on ${address}`)\n> })\n> ```\n>\n> Similarly, specify `::1` to accept only local connections via IPv6. Or specify\n> `::` to accept connections on all IPv6 addresses, and, if the operating system\n> supports it, also on all IPv4 addresses.\n>\n> When deploying to a Docker (or another type of) container using `0.0.0.0` or\n> `::` would be the easiest method for exposing the application.\n>\n> Note that when using `0.0.0.0`, the address provided in the callback argument\n> above will be the first address the wildcard refers to."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#54",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > listen",
+    "text": "<sup>*</sup> Using `::` for the address will listen on all IPv6 addresses and,\ndepending on OS, may also listen on [all IPv4\naddresses](https://nodejs.org/api/net.html#serverlistenport-host-backlog-callback).\n\nBe careful when deciding to listen on all interfaces; it comes with inherent\n[security\nrisks](https://web.archive.org/web/20170711105010/https://snyk.io/blog/mongodb-hack-and-secure-defaults/).\n\nThe default is to listen on `port: 0` (which picks the first available open\nport) and `host: 'localhost'`:\n\n```js\nfastify.listen((err, address) => {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n})\n```\n\nSpecifying an address is also supported:\n\n```js\nfastify.listen({ port: 3000, host: '127.0.0.1' }, (err, address) => {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n})\n```\n\nIf no callback is provided a Promise is returned:\n\n```js\nfastify.listen({ port: 3000 })\n  .then((address) => console.log(`server listening on ${address}`))\n  .catch(err => {\n    console.log('Error starting server:', err)\n    process.exit(1)\n  })\n```\n\nWhen deploying to a Docker, and potentially other, containers, it is advisable\nto listen on `0.0.0.0` because they do not default to exposing mapped ports to\n`localhost`:\n\n```js\nfastify.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Recommendations.md#1",
+    "title": "docs/Guides/Recommendations.md > Use A Reverse Proxy",
+    "text": "## Use A Reverse Proxy\n<a id=\"reverseproxy\"></a>\n\nNode.js is an early adopter of frameworks shipping with an easy-to-use web\nserver within the standard library. Previously, with languages like PHP or\nPython, one would need either a web server with specific support for the\nlanguage or the ability to set up some sort of [CGI gateway][cgi] that works\nwith the language. With Node.js, one can write an application that _directly_\nhandles HTTP requests. As a result, the temptation is to write applications that\nhandle requests for multiple domains, listen on multiple ports (i.e. HTTP _and_\nHTTPS), and then expose these applications directly to the Internet to handle\nrequests.\n\nThe Fastify team **strongly** considers this to be an anti-pattern and extremely\nbad practice:\n\n1. It adds unnecessary complexity to the application by diluting its focus.\n2. It prevents [horizontal scalability][scale-horiz].\n\nSee [Why should I use a Reverse Proxy if Node.js is Production Ready?][why-use]\nfor a more thorough discussion of why one should opt to use a reverse proxy.\n\nFor a concrete example, consider the situation where:\n\n1. The app needs multiple instances to handle load.\n1. The app needs TLS termination.\n1. The app needs to redirect HTTP requests to HTTPS.\n1. The app needs to serve multiple domains.\n1. The app needs to serve static resources, e.g. jpeg files.\n\nThere are many reverse proxy solutions available, and your environment may\ndictate the solution to use, e.g. AWS or GCP. Given the above, we could use\n[HAProxy][haproxy] or [Nginx][nginx] to solve these requirements:"
+   },
+   {
+    "id": "fastify:docs/Guides/Database.md#4",
+    "title": "docs/Guides/Database.md > Database > [Mongo](https://github.com/fastify/fastify-mongodb)",
+    "text": "### [Mongo](https://github.com/fastify/fastify-mongodb)\nInstall the plugin by running `npm i @fastify/mongodb`\n\n*Usage:*\n```javascript\nconst fastify = require('fastify')()\n\nfastify.register(require('@fastify/mongodb'), {\n  // force to close the mongodb connection when app stopped\n  // the default value is false\n  forceClose: true,\n\n  url: 'mongodb://mongo/mydb'\n})\n\nfastify.get('/user/:id', async function (req, reply) {\n  // Or this.mongo.client.db('mydb').collection('users')\n  const users = this.mongo.db.collection('users')\n\n  // if the id is an ObjectId format, you need to create a new ObjectId\n  const id = this.mongo.ObjectId(req.params.id)\n  try {\n    const user = await users.findOne({ id })\n    return user\n  } catch (err) {\n    return err\n  }\n})\n\nfastify.listen({ port: 3000 }, err => {\n  if (err) throw err\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#30",
+    "title": "docs/Guides/Serverless.md > Google Cloud Run",
+    "text": "## Google Cloud Run\n\nUnlike AWS Lambda or Google Cloud Functions, Google Cloud Run is a serverless\n**container** environment. Its primary purpose is to provide an\ninfrastructure-abstracted environment to run arbitrary containers. As a result,\nFastify can be deployed to Google Cloud Run with little-to-no code changes from\nthe way you would write your Fastify app normally.\n\n*Follow the steps below to deploy to Google Cloud Run if you are already\nfamiliar with gcloud or just follow their\n[quickstart](https://docs.cloud.google.com/run/docs/quickstarts)*."
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#1",
+    "title": "docs/Guides/Serverless.md > Should you use Fastify in a serverless platform?",
+    "text": "#### Should you use Fastify in a serverless platform?\n\nThat is up to you! Keep in mind, functions as a service should always use\nsmall and focused functions, but you can also run an entire web application with\nthem. It is important to remember that the bigger the application the slower the\ninitial boot will be. The best way to run Fastify applications in serverless\nenvironments is to use platforms like Google Cloud Run, AWS Fargate, Azure\nContainer Instances, and Vercel where the server can handle multiple requests\nat the same time and make full use of Fastify's features.\n\nOne of the best features of using Fastify in serverless applications is the ease\nof development. In your local environment, you will always run the Fastify\napplication directly without the need for any additional tools, while the same\ncode will be executed in your serverless platform of choice with an additional\nsnippet of code."
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#7",
+    "title": "docs/Guides/Testing.md > Testing > Application > Testing with a running server",
+    "text": "### Testing with a running server\nFastify can also be tested after starting the server with `fastify.listen()` or\nafter initializing routes and plugins with `fastify.ready()`."
+   },
+   {
+    "id": "fastify:docs/Guides/Recommendations.md#8",
+    "title": "docs/Guides/Recommendations.md > Kubernetes",
+    "text": "## Kubernetes\n<a id=\"kubernetes\"></a>\n\nThe `readinessProbe` uses ([by\ndefault](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes))\nthe pod IP as the hostname. Fastify listens on `127.0.0.1` by default. The probe\nwill not be able to reach the application in this case. To make it work,\nthe application must listen on `0.0.0.0` or specify a custom hostname in\nthe `readinessProbe.httpGet` spec, as per the following example:\n\n```yaml\nreadinessProbe:\n    httpGet:\n        path: /health\n        port: 4000\n    initialDelaySeconds: 30\n    periodSeconds: 30\n    timeoutSeconds: 3\n    successThreshold: 1\n    failureThreshold: 5\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#54",
+    "action": "use",
+    "relevance_score": 0.995,
+    "document_score": 0.9961,
+    "levels": {
+     "answers": 0.995,
+     "elsewhere": 0.0011,
+     "different_case": 0.0014,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Getting-Started.md#3",
+    "action": "use",
+    "relevance_score": 0.9945,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9945,
+     "elsewhere": 0.0012,
+     "different_case": 0.0015,
+     "unrelated": 0.0028
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Serverless.md#31",
+    "action": "use",
+    "relevance_score": 0.9944,
+    "document_score": 0.9957,
+    "levels": {
+     "answers": 0.9944,
+     "elsewhere": 0.0013,
+     "different_case": 0.0016,
+     "unrelated": 0.0026
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Guides/Recommendations.md#8",
+    "action": "use",
+    "relevance_score": 0.8991,
+    "document_score": 0.9074,
+    "levels": {
+     "answers": 0.8991,
+     "elsewhere": 0.0083,
+     "different_case": 0.0812,
+     "unrelated": 0.0113
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Guides/Serverless.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0142,
+    "document_score": 0.1921,
+    "levels": {
+     "answers": 0.0142,
+     "elsewhere": 0.1779,
+     "different_case": 0.0361,
+     "unrelated": 0.7718
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Serverless.md#34",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0172,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.014,
+     "different_case": 0.0138,
+     "unrelated": 0.969
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Guides/Testing.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0067,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.004,
+     "different_case": 0.0051,
+     "unrelated": 0.9882
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Guides/Recommendations.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0147,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0122,
+     "different_case": 0.0218,
+     "unrelated": 0.9635
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Serverless.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0152,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0129,
+     "different_case": 0.0207,
+     "unrelated": 0.9642
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Guides/Database.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0041,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.002,
+     "different_case": 0.0078,
+     "unrelated": 0.9881
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3466
+  },
+  "timing": {
+   "total_ms": 113,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4656,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

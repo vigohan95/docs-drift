@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/007.rerank",
+ "recorded_at": "2026-11-06T13:37:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 955,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "66.855263",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=263"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Support for hierarchical and horizontal **federation**",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/federation.md#2",
+    "title": "docs/federation.md > Use cases > Hierarchical federation",
+    "text": "### Hierarchical federation\n\nHierarchical federation allows Prometheus to scale to environments with tens of\ndata centers and millions of nodes. In this use case, the federation topology\nresembles a tree, with higher-level Prometheus servers collecting aggregated\ntime series data from a larger number of subordinated servers.\n\nFor example, a setup might consist of many per-datacenter Prometheus servers\nthat collect data in high detail (instance-level drill-down), and a set of\nglobal Prometheus servers which collect and store only aggregated data\n(job-level drill-down) from those local servers. This provides an aggregate\nglobal view and detailed local views."
+   },
+   {
+    "id": "prometheus:docs/prometheus_agent.md#2",
+    "title": "docs/prometheus_agent.md > Prometheus Agent Mode > Benefits of agent mode",
+    "text": "### Benefits of agent mode\n\n- Improved efficiency. The customized Agent TSDB WAL removes the data immediately after successful writes. If it cannot reach the remote endpoint, it persists the data temporarily on the disk until the remote endpoint is back online. This is currently limited to a two-hour buffer only, similar to non-agent Prometheus. This means that there is no need to build chunks of data in memory or maintain a full index for querying purposes. Essentially the Agent mode uses a fraction of the resources that a normal Prometheus server would use in a similar situation.\n- Agent mode enables easier [horizontal scalability for ingestion](https://prometheus.io/blog/2021/11/16/agent/#the-dream-auto-scalable-metric-ingestion)."
+   },
+   {
+    "id": "prometheus:docs/federation.md#1",
+    "title": "docs/federation.md > Use cases",
+    "text": "## Use cases\n\nThere are different use cases for federation. Commonly, it is used to either\nachieve scalable Prometheus monitoring setups or to pull related metrics from\none service's Prometheus into another."
+   },
+   {
+    "id": "prometheus:docs/index.md#1",
+    "title": "docs/index.md > Prometheus > Content",
+    "text": "## Content\n\n- [Getting started](getting_started.md)\n- [Installation](installation.md)\n- [Agent Mode](prometheus_agent.md)\n- [Configuration](configuration/configuration.md)\n- [Querying](querying/basics.md)\n- [Storage](storage.md)\n- [Federation](federation.md)\n- [Migration](migration.md)"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#29",
+    "title": "docs/feature_flags.md > Native histograms as classic histograms in PromQL",
+    "text": "## Native histograms as classic histograms in PromQL\n\n`--enable-feature=promql-native-histograms-as-classic`\n\nWhen enabled, PromQL queries for classic histogram series (e.g. `_bucket`, `_count`, `_sum`) will\nautomatically convert native histograms into classic histogram series. Currently only Native\nHistograms with Custom Buckets (NHCB) are converted.\n\nFor example, if `request_duration_seconds` is stored as an NHCB native histogram:\n\n```promql\n# Querying with a classic histogram suffix triggers the conversion:\nhistogram_quantile(0.95, rate(request_duration_seconds_bucket[5m]))\n\n# Querying without a suffix returns the regular NHCB native histogram:\nrate(request_duration_seconds[5m])\n```\n\nThis feature only affects PromQL query evaluation (e.g. the query APIs and rule evaluation). The\nconversion is applied on top of all data the query engine reads, including series fetched from\n`remote_read` endpoints. It does not apply to remote write (NHCB series are not converted when being\nforwarded to remote endpoints), the remote read API, federation, or the series API (the\n`/api/v1/series` endpoint will not return the converted classic series). Note that remote write has its\nown `convert_nhcb_to_classic` setting, see the [`remote_write`](configuration/configuration.md#remote_write)\nconfiguration.\n\nKnown limitations:\n\n* The conversion only triggers on exact metric name matchers (e.g. `request_duration_seconds_bucket`), not on\n  regex or negative name matchers.\n* Handling of collisions and transitions between stored classic series and converted NHCB series is not\n  implemented yet, so results may contain duplicates.\n* Native histograms with exponential buckets are not converted yet; support may be added later.\n* There is no control label yet; one will be added to disable and debug the conversion.\n* There is no metric counting the converted series yet; one will be added to help track the progress of\n  a migration from classic histograms to NHCB."
+   },
+   {
+    "id": "prometheus:docs/federation.md#3",
+    "title": "docs/federation.md > Use cases > Cross-service federation",
+    "text": "### Cross-service federation\n\nIn cross-service federation, a Prometheus server of one service is configured\nto scrape selected data from another service's Prometheus server to enable\nalerting and queries against both datasets within a single server.\n\nFor example, a cluster scheduler running multiple services might expose\nresource usage information (like memory and CPU usage) about service instances\nrunning on the cluster. On the other hand, a service running on that cluster\nwill only expose application-specific service metrics. Often, these two sets of\nmetrics are scraped by separate Prometheus servers. Using federation, the\nPrometheus server containing service-level metrics may pull in the cluster\nresource usage metrics about its specific service from the cluster Prometheus,\nso that both sets of metrics can be used within that server."
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#57",
+    "title": "docs/configuration/configuration.md > Configuration file > `<ec2_sd_config>`",
+    "text": "The [relabeling phase](#relabel_config) is the preferred and more powerful\nway to filter targets based on arbitrary labels. For users with thousands of\ninstances it can be more efficient to use the EC2 API directly which has\nsupport for filtering instances."
+   },
+   {
+    "id": "prometheus:docs/federation.md#0",
+    "title": "docs/federation.md > (preamble)",
+    "text": "---\ntitle: Federation\nsort_rank: 6\n---\n\nFederation allows a Prometheus server to scrape selected time series from\nanother Prometheus server.\n\n_Note about native histograms: To scrape native histograms via federation, the\nscraping Prometheus server needs to set `scrape_native_histograms: true` in its\nscrape config, implying that the protobuf format is used for scraping. Should\nthe federated metrics contain a mix of different sample types (floats of any\nflavor, counter histograms, or gauge histograms) for the same metric name, the\nfederation payload will contain multiple metric families with the same name\n(but different types – for technical reasons, float samples are always federated\nas `untyped`, while histogram samples are federated with their full type\ninformation). Technically, this violates the rules of the protobuf exposition\nformat, but Prometheus is nevertheless able to ingest all metrics correctly._"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#53",
+    "title": "docs/configuration/configuration.md > Configuration file > `<dockerswarm_sd_config>` > `nodes`",
+    "text": "The [relabeling phase](#relabel_config) is the preferred and more powerful\nway to filter tasks, services or nodes. For users with thousands of tasks it\ncan be more efficient to use the Swarm API directly which has basic support for\nfiltering nodes (using `filters`).\n\nSee [this example Prometheus configuration file](/documentation/examples/prometheus-dockerswarm.yml)\nfor a detailed example of configuring Prometheus for Docker Swarm."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#18",
+    "title": "docs/feature_flags.md > OTLP Native Delta Support > Current gotchas",
+    "text": "### Current gotchas\n\n* If delta metrics are exposed via [federation](https://prometheus.io/docs/prometheus/latest/federation/), data can be incorrectly collected if the ingestion interval is not the same as the scrape interval for the federated endpoint.\n\n* It is difficult to figure out whether a metric has delta or cumulative temporality, since there's no indication of temporality in metric names or labels. For now, if you are ingesting a mix of delta and cumulative metrics we advise you to explicitly add your own labels to distinguish them. In the future, we plan to introduce type labels to consistently distinguish metric types and potentially make PromQL functions type-aware (e.g. providing warnings when cumulative-only functions are used with delta metrics).\n\n* If there are multiple samples being ingested at the same timestamp, only one of the points is kept - the samples are **not** summed together (this is how Prometheus works in general - duplicate timestamp samples are rejected). Any aggregation will have to be done before sending samples to Prometheus."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/federation.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0773,
+    "document_score": 0.4698,
+    "levels": {
+     "answers": 0.0773,
+     "elsewhere": 0.3925,
+     "different_case": 0.0303,
+     "unrelated": 0.4999
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/federation.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0298,
+    "document_score": 0.2178,
+    "levels": {
+     "answers": 0.0298,
+     "elsewhere": 0.188,
+     "different_case": 0.0332,
+     "unrelated": 0.749
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/federation.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0256,
+    "document_score": 0.1598,
+    "levels": {
+     "answers": 0.0256,
+     "elsewhere": 0.1342,
+     "different_case": 0.0373,
+     "unrelated": 0.8029
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/index.md#1",
+    "action": "expand",
+    "relevance_score": 0.0255,
+    "document_score": 0.9803,
+    "levels": {
+     "answers": 0.0255,
+     "elsewhere": 0.9548,
+     "different_case": 0.008,
+     "unrelated": 0.0117
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/federation.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0233,
+    "document_score": 0.1216,
+    "levels": {
+     "answers": 0.0233,
+     "elsewhere": 0.0982,
+     "different_case": 0.0397,
+     "unrelated": 0.8387
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/feature_flags.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0229,
+    "document_score": 0.0692,
+    "levels": {
+     "answers": 0.0229,
+     "elsewhere": 0.0463,
+     "different_case": 0.0408,
+     "unrelated": 0.89
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/prometheus_agent.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.009,
+    "document_score": 0.0191,
+    "levels": {
+     "answers": 0.009,
+     "elsewhere": 0.0101,
+     "different_case": 0.168,
+     "unrelated": 0.8129
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/feature_flags.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0044,
+    "document_score": 0.0091,
+    "levels": {
+     "answers": 0.0044,
+     "elsewhere": 0.0047,
+     "different_case": 0.0212,
+     "unrelated": 0.9698
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/configuration/configuration.md#53",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0016,
+     "different_case": 0.0029,
+     "unrelated": 0.9941
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/configuration/configuration.md#57",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0017,
+     "different_case": 0.0034,
+     "unrelated": 0.9936
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2356
+  },
+  "timing": {
+   "total_ms": 69,
+   "rerank_ms": 69,
+   "questions_ms": 0,
+   "model_ms": 63,
+   "engine": {
+    "rows": 3866,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 63,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 61,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 96
+   }
+  }
+ }
+}

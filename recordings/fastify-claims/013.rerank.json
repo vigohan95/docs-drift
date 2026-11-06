@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/013.rerank",
+ "recorded_at": "2026-11-06T13:37:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 980,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.950623",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=278"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: When `true`, any request arriving after [`close`](#close) has been called will receive a `503 Service Unavailable` response with `Connection: close` header (HTTP/1.1).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#1",
+    "title": "docs/Reference/Lifecycle.md > Lifecycle",
+    "text": "When [`handlerTimeout`](./Server.md#factory-handler-timeout) is configured, a\ntimer starts after routing. If the response is not sent within the allowed time,\n`request.signal` is aborted and a `503 Service Unavailable` error is sent.\nThe timer is cancelled when the response completes\nor when `reply.hijack()` is called.\n\nBefore or during the `User Handler`, `reply.hijack()` can be called to:\n- Prevent Fastify from running subsequent hooks and the user handler\n- Prevent Fastify from sending the response automatically\n\nIf `reply.raw` is used to send a response, `onResponse` hooks will still\nbe executed."
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#14",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "```sh\nHTTP/1.1 503 Service Unavailable\nConnection: keep-alive\nContent-Length: 31\nContent-Type: application/json; charset=utf-8\nDate: Fri, 15 Apr 2022 23:03:15 GMT\nKeep-Alive: timeout=5\nRetry-After: 5000\n\n{\n    \"error\": true,\n    \"retryInMs\": 5000\n}\n```\n\nThen we attempted a new request (`req-2`), which was a `GET /ping`. As expected,\nsince that was not one of the requests we asked our plugin to filter, it\nsucceeded. That could also be used as a means of informing an interested party\nwhether or not we were ready to serve requests with the `ready` field. Although\n`/ping` is more commonly associated with *liveness* checks and that would be\nthe responsibility of a *readiness* check. The curious reader can get more info\non these terms in the article\n[\"Kubernetes best practices: Setting up health checks with readiness and liveness probes\"](\nhttps://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes).\n\nBelow is the response to that request:\n\n```sh\nHTTP/1.1 200 OK\nConnection: keep-alive\nContent-Length: 29\nContent-Type: application/json; charset=utf-8\nDate: Fri, 15 Apr 2022 23:03:16 GMT\nKeep-Alive: timeout=5\n\n{\n    \"error\": false,\n    \"ready\": false\n}\n```\n\nAfter that, there were more interesting log messages:\n\n<!-- markdownlint-disable -->\n```sh\n{\"time\":1650063798377,\"reqId\":\"req-3\",\"req\":{\"method\":\"POST\",\"url\":\"/webhook\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51932},\"msg\":\"incoming request\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"msg\":\"Ready for customer requests!\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"res\":{\"statusCode\":200},\"responseTime\":1.3567829988896847,\"msg\":\"request completed\"}\n```\n<!-- markdownlint-enable -->"
+   },
+   {
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#3",
+    "title": "docs/Guides/Detecting-When-Clients-Abort.md > Detecting When Clients Abort > Solution > Hands-on",
+    "text": "You can also perform this logic outside of a hook, directly in a specific route.\n\n```js\napp.get('/', async (request, reply) => {\n  request.raw.on('close', () => {\n    if (request.raw.aborted) {\n      app.log.info('request closed')\n    }\n  })\n  await sleep(3000)\n  reply.code(200).send({ ok: true })\n})\n```\n\nAt any point in your business logic, you can check if the request has been\naborted and perform alternative actions.\n\n```js\napp.get('/', async (request, reply) => {\n  await sleep(3000)\n  if (request.raw.aborted) {\n    // do something here\n  }\n  await sleep(3000)\n  reply.code(200).send({ ok: true })\n})\n```\n\nA benefit to adding this in your application code is that you can log Fastify\ndetails such as the reqId, which may be unavailable in lower-level code that\nonly has access to the raw request information."
+   },
+   {
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#2",
+    "title": "docs/Guides/Detecting-When-Clients-Abort.md > Detecting When Clients Abort > Solution > Hands-on",
+    "text": "### Hands-on\n\nSay we have the following base server set up:\n\n```js\nimport Fastify from 'fastify';\n\nconst sleep = async (time) => {\n  return await new Promise(resolve => setTimeout(resolve, time || 1000));\n}\n\nconst app = Fastify({\n  logger: {\n    transport: {\n      target: 'pino-pretty',\n      options: {\n        translateTime: 'HH:MM:ss Z',\n        ignore: 'pid,hostname',\n      },\n    },\n  },\n})\n\napp.addHook('onRequest', async (request, reply) => {\n  request.raw.on('close', () => {\n    if (request.raw.aborted) {\n      app.log.info('request closed')\n    }\n  })\n})\n\napp.get('/', async (request, reply) => {\n  await sleep(3000)\n  reply.code(200).send({ ok: true })\n})\n\nconst start = async () => {\n  try {\n    await app.listen({ port: 3000 })\n  } catch (err) {\n    app.log.error(err)\n    process.exit(1)\n  }\n}\n\nstart()\n```\n\nOur code is setting up a Fastify server which includes the following\nfunctionality:\n\n- Accepting requests at `http://localhost:3000`, with a 3 second delayed response\nof `{ ok: true }`.\n- An onRequest hook that triggers when every request is received.\n- Logic that triggers in the hook when the request is closed.\n- Logging that occurs when the closed request property `aborted` is true.\n\nWhilst the `aborted` property has been deprecated, `destroyed` is not a\nsuitable replacement as the\n[Node.js documentation suggests](https://nodejs.org/api/http.html#requestaborted).\nA request can be `destroyed` for various reasons, such as when the server closes\nthe connection. The `aborted` property is still the most reliable way to detect\nwhen a client intentionally aborts a request."
+   },
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#3",
+    "title": "docs/Reference/Lifecycle.md > Shutdown Lifecycle",
+    "text": "## Shutdown Lifecycle\n<a id=\"shutdown-lifecycle\"></a>\n\nWhen [`fastify.close()`](./Server.md#close) is called, the server goes through a\ngraceful shutdown sequence involving\n[`preClose`](./Hooks.md#pre-close) hooks, connection draining, and\n[`onClose`](./Hooks.md#on-close) hooks. See the\n[`close`](./Server.md#close) method documentation for the full step-by-step\nlifecycle."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#37",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .trailer(key, function)",
+    "text": "##### .trailer(key, function)\n<a id=\"trailer\"></a>\n\nSets a response trailer. Trailer is usually used when you need a header that\nrequires heavy resources to be sent after the `data`, for example,\n`Server-Timing` and `Etag`. It can ensure the client receives the response data\nas soon as possible.\n\n> ℹ️ Note:\n> For HTTP/1 responses, the header `Transfer-Encoding: chunked` will be added\n> once you use a trailer. HTTP/2 does not use chunked transfer encoding and\n> sends trailers using its native trailing headers support.\n\n> ℹ️ Note:\n> Any error passed to `done` callback will be ignored. If you are interested\n> in the error, you can turn on `debug` level logging.\n\n```js\nreply.trailer('server-timing', async function () {\n  return 'db;dur=53, app;dur=47.2'\n})\n\nconst { createHash } = require('node:crypto')\n// trailer function also receive two argument\n// @param {object} reply fastify reply\n// @param {string|Buffer|null} payload payload that already sent, note that it will be null when stream is sent\n// @param {function} done callback to set trailer value\nreply.trailer('content-md5', function(reply, payload, done) {\n  const hash = createHash('md5')\n  hash.update(payload)\n  done(null, hash.digest('hex'))\n})\n\n// when you prefer async-await\nreply.trailer('content-md5', async function(reply, payload) {\n  const hash = createHash('md5')\n  hash.update(payload)\n  return hash.digest('hex')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#4",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Properties > .sent",
+    "text": "##### .sent\n<a id=\"sent\"></a>\n\nAs the name suggests, `.sent` is a property to indicate if a response has been\nsent via `reply.send()`. It will also be `true` in case `reply.hijack()` was\nused.\n\nIn case a route handler is defined as an async function or it returns a promise,\nit is possible to call `reply.hijack()` to indicate that the automatic\ninvocation of `reply.send()` once the handler promise resolve should be skipped.\nBy calling `reply.hijack()`, an application claims full responsibility for the\nlow-level request and response. Moreover, hooks will not be invoked."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#31",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .hasHeader(key)",
+    "text": "##### .hasHeader(key)\n<a id=\"hasHeader\"></a>\n\nReturns a boolean indicating if the specified header has been set."
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#15",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "This time it was our simulated external provider hitting us to let us know\nauthentication had gone well and telling us what our `magicKey` was. We saved\nthat into our `magicKey` decorator and celebrated with a log message saying we\nwere now ready for customers to hit us!\n\n<!-- markdownlint-disable -->\n```sh\n{\"time\":1650063799858,\"reqId\":\"req-4\",\"req\":{\"method\":\"GET\",\"url\":\"/v1\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51934},\"msg\":\"incoming request\"}\n{\"time\":1650063800561,\"reqId\":\"req-4\",\"res\":{\"statusCode\":200},\"responseTime\":702.4662979990244,\"msg\":\"request completed\"}\n```\n<!-- markdownlint-enable -->\n\nFinally, a final `GET /v1` request was made and, this time, it succeeded. Its\nresponse was the following:\n\n```sh\nHTTP/1.1 200 OK\nConnection: keep-alive\nContent-Length: 31\nContent-Type: application/json; charset=utf-8\nDate: Fri, 15 Apr 2022 23:03:20 GMT\nKeep-Alive: timeout=5\n\n{\n    \"customer\": true,\n    \"error\": false\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#1",
+    "title": "docs/Reference/Reply.md > Reply > Introduction",
+    "text": "### Introduction\n<a id=\"introduction\"></a>\n\nThe second parameter of the handler function is `Reply`. Reply is a core Fastify\nobject that exposes the following functions and properties:\n\n- `.code(statusCode)` - Sets the status code.\n- `.status(statusCode)` - An alias for `.code(statusCode)`.\n- `.statusCode` - Read and set the HTTP status code.\n- `.elapsedTime` - Returns the amount of time passed\nsince the request was received by Fastify.\n- `.mediaType` - The media type extracted from `Content-Type` header.\n- `.server` - A reference to the fastify instance object.\n- `.header(name, value)` - Sets a response header.\n- `.headers(object)` - Sets all the keys of the object as response headers.\n- `.getHeader(name)` - Retrieve value of already set header.\n- `.getHeaders()` - Gets a shallow copy of all current response headers.\n- `.removeHeader(key)` - Remove the value of a previously set header.\n- `.hasHeader(name)` - Determine if a header has been set.\n- `.writeEarlyHints(hints, callback)` - Sends early hints to the user\n  while the response is being prepared.\n- `.trailer(key, function)` - Sets a response trailer.\n- `.hasTrailer(key)` - Determine if a trailer has been set.\n- `.removeTrailer(key)` - Remove the value of a previously set trailer.\n- `.type(value)` - Sets the header `Content-Type`.\n- `.redirect(dest, [code])` - Redirect to the specified URL, the status code is\n  optional (defaults to `302`).\n- `.callNotFound()` - Invokes the custom not found handler.\n- `.serialize(payload)` - Serializes the specified payload using the default\n  JSON serializer or using the custom serializer (if one is set) and returns the\n  serialized payload.\n- `.getSerializationFunction(schema | httpStatus, [contentType])` - Returns the\n  serialization function for the specified schema or http status, if any of\n  either are set.\n- `.compileSerializationSchema(schema, [httpStatus], [contentType])` - Compiles\n  the specified schema and returns a serialization function using the default\n  (or customized) `SerializerCompiler`. The optional `httpStatus` is forwarded\n  to the `SerializerCompiler` if provided, default to `undefined`.\n- `.serializeInput(data, schema, [,httpStatus], [contentType])` - Serializes\n  the specified data using the specified schema and returns the serialized payload.\n  If the optional `httpStatus`, and `contentType` are provided, the function\n  will use the serializer function given for that specific content type and\n  HTTP Status Code. Default to `undefined`.\n- `.serializer(function)` - Sets a custom serializer for the payload.\n- `.send(payload)` - Sends the payload to the user, could be a plain text, a\n  buffer, JSON, stream, or an Error object.\n- `.sent` - A boolean value that you can use if you need to know if `send` has\n  already been called.\n- `.hijack()` - interrupt the normal request lifecycle.\n- `.raw` - The\n  [`http.ServerResponse`](https://nodejs.org/dist/latest-v20.x/docs/api/http.html#http_class_http_serverresponse)\n  from Node core.\n- `.log` - The logger instance of the incoming request.\n- `.request` - The incoming request.\n- `.getDecorator(name)` - Returns the value of a reply decorator."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0072,
+    "document_score": 0.0261,
+    "levels": {
+     "answers": 0.0072,
+     "elsewhere": 0.0189,
+     "different_case": 0.044,
+     "unrelated": 0.9299
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Lifecycle.md#3",
+    "action": "expand",
+    "relevance_score": 0.0072,
+    "document_score": 0.8104,
+    "levels": {
+     "answers": 0.0072,
+     "elsewhere": 0.8032,
+     "different_case": 0.0249,
+     "unrelated": 0.1647
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Reply.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0062,
+    "document_score": 0.1822,
+    "levels": {
+     "answers": 0.0062,
+     "elsewhere": 0.176,
+     "different_case": 0.0352,
+     "unrelated": 0.7826
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Lifecycle.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0148,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0121,
+     "different_case": 0.0237,
+     "unrelated": 0.9615
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0079,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0054,
+     "different_case": 0.0132,
+     "unrelated": 0.9789
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0064,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0042,
+     "different_case": 0.0117,
+     "unrelated": 0.9819
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.005,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0031,
+     "different_case": 0.0065,
+     "unrelated": 0.9885
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Reply.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0059,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0042,
+     "different_case": 0.0074,
+     "unrelated": 0.9866
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Reply.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0013,
+     "different_case": 0.0033,
+     "unrelated": 0.9939
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Reply.md#31",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0017,
+     "different_case": 0.0031,
+     "unrelated": 0.9938
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4395
+  },
+  "timing": {
+   "total_ms": 95,
+   "rerank_ms": 94,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5585,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

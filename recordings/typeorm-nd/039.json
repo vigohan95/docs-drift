@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/039",
+ "recorded_at": "2026-11-06T13:43:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1126,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "211.617186",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=405"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "text": "- `merge` - Merges multiple entities into a single entity.\n\n```typescript\nconst user = new User()\nmanager.merge(User, user, { firstName: \"Timber\" }, { lastName: \"Saw\" }) // same as user.firstName = \"Timber\"; user.lastName = \"Saw\";\n```\n\n- `preload` - Creates a new entity from the given plain javascript object. If the entity already exist in the database, then\n  it loads it (and everything related to it), replaces all values with the new ones from the given object,\n  and returns the new entity. The new entity is actually loaded from the database entity with all properties\n  replaced from the new object.\n\n```typescript\nconst partialUser = {\n    id: 1,\n    firstName: \"Rizzrak\",\n    profile: {\n        id: 1,\n    },\n}\nconst user = await manager.preload(User, partialUser)\n// user will contain all missing data from partialUser with partialUser property values:\n// { id: 1, firstName: \"Rizzrak\", lastName: \"Saw\", profile: { id: 1, ... } }\n```\n\n- `save` - Saves a given entity or array of entities.\n  If the entity already exists in the database, then it's updated.\n  If the entity does not exist in the database yet, it's inserted.\n  It saves all given entities in a single transaction (in the case of entity manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped. In order to make a value `NULL`, you must manually set the property to equal `null`."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "text": "- `save` - Saves a given entity or array of entities.\n  If the entity already exist in the database, it is updated.\n  If the entity does not exist in the database, it is inserted.\n  It saves all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped.\n  Returns the saved entity/entities.\n\n```typescript\nawait repository.save(user)\nawait repository.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Returns the removed entity/entities.\n\n```typescript\nawait repository.remove(user)\nawait repository.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait repository.insert({\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait repository.insert([\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids or given conditions. Sets fields from supplied partial entity.\n\n```typescript\nawait repository.update({ age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait repository.update(1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// optionally request RETURNING / OUTPUT values (supported drivers only)\nconst result = await repository.update(\n    1,\n    { firstName: \"Rizzrak\" },\n    { returning: [\"id\", \"firstName\"] },\n)\nconsole.log(result.raw) // [{ id: 1, firstName: \"Rizzrak\" }]\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "relation": "overlapping",
+    "related": 0.997,
+    "probabilities": {
+     "same": 0.0153,
+     "overlapping": 0.9754,
+     "conflicting": 0.0062,
+     "unrelated": 0.003
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 1,
+   "counterparts_ms": 126
+  },
+  "timing": {
+   "read_ms": 244,
+   "total_ms": 248
+  }
+ }
+}

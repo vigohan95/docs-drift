@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/027.rerank",
+ "recorded_at": "2026-11-06T13:38:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1017,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.074242",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=310"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: To make it work, the application must listen on `0.0.0.0` or specify a custom hostname in the `readinessProbe.httpGet` spec, as per the following example:",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Getting-Started.md#3",
+    "title": "docs/Guides/Getting-Started.md > Getting Started > Your first server",
+    "text": "Fastify offers an easy platform that helps to solve all of the problems outlined\nabove, and more!\n\n> **Note**\n> The above examples, and subsequent examples in this document, default to\n> listening *only* on the localhost `127.0.0.1` interface. To listen on all\n> available IPv4 interfaces the example should be modified to listen on\n> `0.0.0.0` like so:\n>\n> ```js\n> fastify.listen({ port: 3000, host: '0.0.0.0' }, function (err, address) {\n>   if (err) {\n>     fastify.log.error(err)\n>     process.exit(1)\n>   }\n>   fastify.log.info(`server listening on ${address}`)\n> })\n> ```\n>\n> Similarly, specify `::1` to accept only local connections via IPv6. Or specify\n> `::` to accept connections on all IPv6 addresses, and, if the operating system\n> supports it, also on all IPv4 addresses.\n>\n> When deploying to a Docker (or another type of) container using `0.0.0.0` or\n> `::` would be the easiest method for exposing the application.\n>\n> Note that when using `0.0.0.0`, the address provided in the callback argument\n> above will be the first address the wildcard refers to."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization",
+    "text": "## Validation and Serialization\nFastify uses a schema-based approach. We recommend using\n[JSON Schema](https://json-schema.org/) to validate routes and serialize outputs.\nFastify compiles the schema into a highly performant function.\n\nValidation is only attempted if the content type is `application/json`,\nunless the body schema uses the [`content`](#body-content-type-validation)\nproperty to specify validation per content type. When the body schema defines\na `content` field, it must enumerate all possible content types the\napplication expects to handle with the associated handler.\n\nAll examples use the\n[JSON Schema Draft 7](https://json-schema.org/draft-07)\nspecification.\n\n> ⚠ Warning:\n> Treat schema definitions as application code. Validation and serialization\n> features use `new Function()`, which is unsafe with user-provided schemas. See\n> [Ajv](https://www.npmjs.com/package/ajv) and\n> [fast-json-stringify](https://www.npmjs.com/package/fast-json-stringify) for details.\n>\n> Whilst Fastify supports the\n> [`$async` Ajv feature](https://ajv.js.org/guide/async-validation.html),\n> it should not be used for initial validation. Accessing databases during\n> validation may lead to Denial of Service attacks. Use\n> [Fastify's hooks](./Hooks.md) like `preHandler` for `async` tasks after validation.\n>\n> When using custom validators with async `preValidation` hooks,\n> validators **must return** `{error}` objects instead of throwing errors.\n> Throwing errors from custom validators will cause unhandled promise rejections\n> that crash the application when combined with async hooks. See the\n> [custom validator examples](#using-other-validation-libraries) below for the\n> correct pattern."
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#31",
+    "title": "docs/Guides/Serverless.md > Google Cloud Run > Adjust Fastify server",
+    "text": "### Adjust Fastify server\n\nFor Fastify to properly listen for requests within the container, be\nsure to set the correct port and address:\n\n```js\nfunction build() {\n  const fastify = Fastify({ trustProxy: true })\n  return fastify\n}\n\nasync function start() {\n  // Google Cloud Run will set this environment variable for you, so\n  // you can also use it to detect if you are running in Cloud Run\n  const IS_GOOGLE_CLOUD_RUN = process.env.K_SERVICE !== undefined\n\n  // You must listen on the port Cloud Run provides\n  const port = process.env.PORT || 3000\n\n  // You must listen on all IPV4 addresses in Cloud Run\n  const host = IS_GOOGLE_CLOUD_RUN ? \"0.0.0.0\" : undefined\n\n  try {\n    const server = build()\n    const address = await server.listen({ port, host })\n    console.log(`Listening on ${address}`)\n  } catch (err) {\n    console.error(err)\n    process.exit(1)\n  }\n}\n\nmodule.exports = build\n\nif (require.main === module) {\n  start()\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/LTS.md#1",
+    "title": "docs/Reference/LTS.md > Long Term Support",
+    "text": "A \"month\" is defined as 30 consecutive days.\n\n> ## Security Releases and Semver\n>\n> As a consequence of providing long-term support for major releases, there are\n> occasions when breaking changes must be released as a _minor_ version\n> release. Such changes will _always_ be documented in the [release\n> notes](https://github.com/fastify/fastify/releases).\n>\n> To avoid automatically receiving breaking security updates, it is possible to\n> use the tilde (`~`) range qualifier. For example, to get patches for the 3.15\n> release, and avoid automatically updating to the 3.16 release, specify the\n> dependency as `\"fastify\": \"~3.15.x\"`. This will leave your application\n> vulnerable. Use this approach with caution."
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#0",
+    "title": "docs/Guides/Serverless.md > (preamble)",
+    "text": "<h1 align=\"center\">Serverless</h1>\n\nRun serverless applications and REST APIs using your existing Fastify\napplication. You may need to make code changes to work on your\nserverless platform of choice. This document contains a small guide\nfor the most popular serverless providers and how to use\nFastify with them."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#16",
+    "title": "docs/Reference/Server.md > Factory > `loggerInstance`",
+    "text": "### `loggerInstance`\n<a id=\"factory-logger-instance\"></a>\n\n+ Default: `null`\n\nA custom logger instance. The logger must be a Pino instance or conform to the\nPino interface by having the following methods: `info`, `error`, `debug`,\n`fatal`, `warn`, `trace`, `child`. For example:\n  ```js\n  const pino = require('pino')();\n\n  const customLogger = {\n    info: function (o, ...n) {},\n    warn: function (o, ...n) {},\n    error: function (o, ...n) {},\n    fatal: function (o, ...n) {},\n    trace: function (o, ...n) {},\n    debug: function (o, ...n) {},\n    child: function() {\n      const child = Object.create(this);\n      child.pino = pino.child(...arguments);\n      return child;\n    },\n  };\n\n  const fastify = require('fastify')({ loggerInstance: customLogger });\n  ```"
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Error Handling",
+    "text": "### Error Handling\nWhen schema validation fails for a request, Fastify will automatically return a\nstatus 400 response including the result from the validator in the payload. For\nexample, if the following schema is used for a route:\n\n```js\nconst schema = {\n  body: {\n    type: 'object',\n    properties: {\n      name: { type: 'string' }\n    },\n    required: ['name']\n  }\n}\n```\n\nIf the request fails to satisfy the schema, the route will return a response\nwith the following payload:\n\n```js\n{\n  \"statusCode\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"body should have required property 'name'\"\n}\n```\n\n> ⚠ Security Consideration: By default, validation error details from the schema\n> are included in the response payload. If your organization requires sanitizing\n> or customizing these error messages (e.g., to avoid exposing internal schema\n> details), configure a custom error handler using\n> [`setErrorHandler()`](./Server.md#seterrorhandler).\n\nTo handle errors inside the route, specify the `attachValidation` option. If\nthere is a validation error, the `validationError` property of the request will\ncontain the same `Error` object Fastify would have sent on its own, so no\nmessage has to be rebuilt from the raw validation result:\n\n- `message` is the formatted message, identical to the one in the response\n  payload above (for example `body must have required property 'name'`). It is\n  produced by [`schemaErrorFormatter`](#schemaerrorformatter), so a custom\n  formatter is reflected here too.\n- `validation` is the raw validation result, as returned by the validator.\n- `validationContext` is the part of the request that failed validation\n  (`body`, `params`, `querystring` or `headers`).\n- `code` is `FST_ERR_VALIDATION` and `statusCode` is `400`.\n- When the validator reports a list of errors (as Ajv does) and the default\n  [`schemaErrorFormatter`](#schemaerrorformatter) is used, the error is an\n  instance of [`FST_ERR_VALIDATION`](./Errors.md#fst_err_validation) without a\n  [stack trace](./Errors.md#errors-in-input-data). Errors returned by the\n  validator itself, or by a custom formatter, are used as they are."
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#17",
+    "title": "docs/Reference/Request.md > Request > Request > Properties > .hostname",
+    "text": "##### .hostname\n\nThe hostname parsed from `request.host`. For IPv6 hosts, the brackets are kept\n(for example, `[::1]`)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#11",
+    "title": "docs/Reference/TypeScript.md > Learn By Example > JSON Schema > json-schema-to-typescript",
+    "text": "Great work! Now you can make use of both JSON Schemas and TypeScript\ndefinitions."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#53",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > listen",
+    "text": "#### listen\n<a id=\"listen\"></a>\n\nStarts the server and internally waits for the `.ready()` event. The signature\nis `.listen([options][, callback])`. Both the `options` object and the\n`callback` parameters extend the [Node.js\ncore](https://nodejs.org/api/net.html#serverlistenoptions-callback) options\nobject. Thus, all core options are available with the following additional\nFastify specific options:\n\n* listenTextResolver: Set an optional resolver for the text to log after server\nhas been successfully started. It is possible to override the default\n`Server listening at [address]` log entry using this option.\n\n    ```js\n    server.listen({\n      port: 9080,\n      listenTextResolver: (address) => { return `Prometheus metrics server is listening at ${address}` }\n    })\n    ```\n\nBy default, the server will listen on the address(es) resolved by `localhost`\nwhen no specific host is provided. If listening on any available interface is\ndesired, then specifying `0.0.0.0` for the address will listen on all IPv4\naddresses. The address argument provided above will then return the first such\nIPv4 address. The following table details the possible values for `host` when\ntargeting `localhost`, and what the result of those values for `host` will be.\n\n Host          | IPv4 | IPv6\n --------------|------|-------\n `::`            | ✅<sup>*</sup> | ✅\n `::` + [`ipv6Only`](https://nodejs.org/api/net.html#serverlistenoptions-callback) | 🚫 | ✅\n `0.0.0.0`       | ✅ | 🚫\n `localhost`     | ✅ | ✅\n `127.0.0.1`     | ✅ | 🚫\n `::1`           | 🚫 | ✅"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Serverless.md#31",
+    "action": "use",
+    "relevance_score": 0.8962,
+    "document_score": 0.9063,
+    "levels": {
+     "answers": 0.8962,
+     "elsewhere": 0.0101,
+     "different_case": 0.0583,
+     "unrelated": 0.0354
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Getting-Started.md#3",
+    "action": "skip",
+    "reason": "different_case",
+    "relevance_score": 0.1904,
+    "document_score": 0.2861,
+    "levels": {
+     "answers": 0.1904,
+     "elsewhere": 0.0957,
+     "different_case": 0.5048,
+     "unrelated": 0.2091
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Server.md#53",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0598,
+    "document_score": 0.2751,
+    "levels": {
+     "answers": 0.0598,
+     "elsewhere": 0.2153,
+     "different_case": 0.1434,
+     "unrelated": 0.5815
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Request.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0075,
+    "document_score": 0.0602,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.0527,
+     "different_case": 0.0374,
+     "unrelated": 0.9025
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Guides/Serverless.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0084,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0057,
+     "different_case": 0.0056,
+     "unrelated": 0.9859
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0019,
+     "different_case": 0.0037,
+     "unrelated": 0.9925
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0009,
+     "different_case": 0.0024,
+     "unrelated": 0.9953
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/TypeScript.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0023,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0011,
+     "different_case": 0.0025,
+     "unrelated": 0.9952
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Server.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0017,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0007,
+     "different_case": 0.0016,
+     "unrelated": 0.9967
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/LTS.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0007,
+    "document_score": 0.0013,
+    "levels": {
+     "answers": 0.0007,
+     "elsewhere": 0.0006,
+     "different_case": 0.0012,
+     "unrelated": 0.9975
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3608
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4798,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

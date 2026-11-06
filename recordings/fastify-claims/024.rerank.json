@@ -1,0 +1,240 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/024.rerank",
+ "recorded_at": "2026-11-06T13:38:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1123,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.960159",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=159,cfOrigin;dur=0,cfWorker;dur=296"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: By specifying a schema as shown, you can speed up serialization by a factor of 2-3.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:CONTRIBUTING.md#9",
+    "title": "CONTRIBUTING.md > Fastify Organization Structure > Onboarding Collaborators",
+    "text": "### Onboarding Collaborators\n\nWelcome to the team! We are happy to have you. Before you start, please complete\nthe following tasks:\n1. Set up 2 factor authentication for GitHub and NPM\n    - [GitHub\n    2FA](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa)\n    - [NPM 2FA](https://docs.npmjs.com/about-two-factor-authentication/)\n2. Choose which team to join *(more than one is ok!)* based on how you want to\n   help.\n    - Core team: maintains core Fastify and its documentation\n    - Plugins team: maintains Fastify's plugins and its ecosystem\n3. Open a pull request to\n   [`fastify/fastify:HEAD`](https://github.com/fastify/fastify/pulls) that adds\n   your name, username, and email to the team you have chosen in the\n   [README.md](./README.md) and [package.json](./package.json) *(if you are part\n   of the core team)* files. The member lists are sorted alphabetically by last\n   name; make sure to add your name in the proper order.\n4. Open a pull request to\n   [`fastify/website:HEAD`](https://github.com/fastify/website/pulls) adding\n   yourself to the\n   [team.yml](https://github.com/fastify/website/blob/HEAD/static/data/team.yml)\n   file. This list is also sorted alphabetically so make sure to add your name\n   in the proper order. Use your GitHub profile icon for the `picture:` field.\n5. Read the [pinned announcements](https://github.com/orgs/fastify/discussions/categories/announcements)\n   to be updated with the organization’s news.\n6. The person who does the onboarding must open a pull request to\n   [`fastify/org-admin`](https://github.com/fastify/org-admin?tab=readme-ov-file#org-admin)\n   so an admin can add the new member to the\n   [npm org](https://www.npmjs.com/org/fastify) and the GitHub Team,\n   so that the new joiner can help maintain the official plugins.\n8. Optionally, the person can be added as an Open Collective member\n   by the lead team."
+   },
+   {
+    "id": "fastify:docs/Guides/Fluent-Schema.md#0",
+    "title": "docs/Guides/Fluent-Schema.md > Fluent Schema",
+    "text": "## Fluent Schema\n\nThe [Validation and\nSerialization](../Reference/Validation-and-Serialization.md) documentation\noutlines all parameters accepted by Fastify to set up JSON Schema Validation to\nvalidate the input, and JSON Schema Serialization to optimize the output.\n\n[`fluent-json-schema`](https://github.com/fastify/fluent-json-schema) can be\nused to simplify this task while allowing the reuse of constants."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#17",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Serialization",
+    "text": "### Serialization\n<a id=\"serialization\"></a>\n\nFastify uses [fast-json-stringify](https://www.npmjs.com/package/fast-json-stringify)\nto send data as JSON if an output schema is provided in the route options. Using\nan output schema can drastically increase throughput and help prevent accidental\ndisclosure of sensitive information.\n\nExample:\n```js\nconst schema = {\n  response: {\n    200: {\n      type: 'object',\n      properties: {\n        value: { type: 'string' },\n        otherValue: { type: 'boolean' }\n      }\n    }\n  }\n}\n\nfastify.post('/the/url', { schema }, handler)\n```\n\nThe response schema is based on the status code. To use the same schema for\nmultiple status codes, use `'2xx'` or `default`, for example:\n```js\nconst schema = {\n  response: {\n    default: {\n      type: 'object',\n      properties: {\n        error: {\n          type: 'boolean',\n          default: true\n        }\n      }\n    },\n    '2xx': {\n      type: 'object',\n      properties: {\n        value: { type: 'string' },\n        otherValue: { type: 'boolean' }\n      }\n    },\n    201: {\n      // the contract syntax\n      value: { type: 'string' }\n    }\n  }\n}\n\nfastify.post('/the/url', { schema }, handler)\n```\nA specific response schema can be defined for different content types.\nFor example:\n```js\nconst schema = {\n  response: {\n    200: {\n      description: 'Response schema that support different content types',\n      content: {\n        'application/json': {\n          schema: {\n            type: 'object',\n            properties: {\n              name: { type: 'string' },\n              image: { type: 'string' },\n              address: { type: 'string' }\n            }\n          }\n        },\n        'application/vnd.v1+json': {\n          schema: {\n            type: 'array',\n            items: { $ref: 'test' }\n          }\n        }\n      }\n    },\n    '3xx': {\n      content: {\n        'application/vnd.v2+json': {\n          schema: {\n            type: 'object',\n            properties: {\n              fullName: { type: 'string' },\n              phone: { type: 'string' }\n            }\n          }\n        }\n      }\n    },\n    default: {\n      content: {\n        // */* is match-all content-type\n        '*/*': {\n          schema: {\n            type: 'object',\n            properties: {\n              desc: { type: 'string' }\n            }\n          }\n        }\n      }\n    }\n  }\n}"
+   },
+   {
+    "id": "fastify:docs/Reference/Encapsulation.md#0",
+    "title": "docs/Reference/Encapsulation.md > Encapsulation",
+    "text": "## Encapsulation\n<a id=\"encapsulation\"></a>\n\nA fundamental feature of Fastify is the \"encapsulation context.\" It governs\nwhich [decorators](./Decorators.md), registered [hooks](./Hooks.md), and\n[plugins](./Plugins.md) are available to [routes](./Routes.md). A visual\nrepresentation of the encapsulation context is shown in the following figure:\n\n![Figure 1](../resources/encapsulation_context.svg)\n\nIn the figure above, there are several entities:\n\n1. The _root context_\n2. Three _root plugins_\n3. Two _child contexts_, each with:\n    * Two _child plugins_\n    * One _grandchild context_, each with:\n        - Three _child plugins_\n\nEvery _child context_ and _grandchild context_ has access to the _root plugins_.\nWithin each _child context_, the _grandchild contexts_ have access to the\n_child plugins_ registered within the containing _child context_, but the\ncontaining _child context_ **does not** have access to the _child plugins_\nregistered within its _grandchild context_.\n\nGiven that everything in Fastify is a [plugin](./Plugins.md) except for the\n_root context_, every \"context\" and \"plugin\" in this example is a plugin\nthat can consist of decorators, hooks, plugins, and routes. As plugins, they\nmust still signal completion either by returning a Promise (e.g., using `async`\nfunctions) or by calling the `done` function if using the callback style."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#44",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .compileSerializationSchema(schema, [httpStatus], [contentType])",
+    "text": "##### .compileSerializationSchema(schema, [httpStatus], [contentType])\n<a id=\"compileserializationschema\"></a>\n\nThis function will compile a serialization schema and\nreturn a function that can be used to serialize data.\nThe function returned (a.k.a. _serialization function_) returned is compiled\nby using the provided `SerializerCompiler`. Also this is cached by using\na `WeakMap` for reducing compilation calls.\n\nThe optional parameters `httpStatus` and `contentType`, if provided,\nare forwarded directly to the `SerializerCompiler`, so it can be used\nto compile the serialization function if a custom `SerializerCompiler` is used.\n\nThis heavily depends of the `schema#responses` attached to the route, or\nthe serialization functions compiled by using `compileSerializationSchema`.\n\n```js\nconst serialize = reply\n                  .compileSerializationSchema({\n                    type: 'object',\n                    properties: {\n                      foo: {\n                        type: 'string'\n                      }\n                    }\n                  })\nserialize({ foo: 'bar' }) // '{\"foo\":\"bar\"}'\n\n// or\n\nconst serialize = reply\n                  .compileSerializationSchema({\n                    type: 'object',\n                    properties: {\n                      foo: {\n                        type: 'string'\n                      }\n                    }\n                  }, 200)\nserialize({ foo: 'bar' }) // '{\"foo\":\"bar\"}'\n\n// or\n\nconst serialize = reply\n                  .compileSerializationSchema({\n                        '3xx': {\n                          content: {\n                            'application/json': {\n                              schema: {\n                                name: { type: 'string' },\n                                phone: { type: 'number' }\n                              }\n                            }\n                          }\n                        }\n                  }, '3xx', 'application/json')\nserialize({ name: 'Jone', phone: 201090909090 }) // '{\"name\":\"Jone\", \"phone\":201090909090}'\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#33",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Fastify > fastify< [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [Logger][LoggerGeneric]>(opts?: [FastifyServerOptions][FastifyServerOptions]): [FastifyInstance][FastifyInstance] > Example 3: HTTP2 server",
+    "text": "###### Example 3: HTTP2 server\n\nThere are two types of HTTP2 server types, insecure and secure. Both require\nspecifying the `http2` property as `true` in the `options` object. The `https`\nproperty is used for creating a secure http2 server; omitting the `https`\nproperty will create an insecure http2 server.\n\n```typescript\nconst insecureServer = fastify({ http2: true })\nconst secureServer = fastify({\n  http2: true,\n  https: {} // use the `key.pem` and `cert.pem` files from the https section\n})\n```\n\nFor more details on using HTTP2 check out the Fastify [HTTP2](./HTTP2.md)\ndocumentation page."
+   },
+   {
+    "id": "fastify:docs/Reference/Type-Providers.md#0",
+    "title": "docs/Reference/Type-Providers.md > Type Providers",
+    "text": "## Type Providers\n\nType Providers are a TypeScript feature that enables Fastify to infer type\ninformation from inline JSON Schema. They are an alternative to specifying\ngeneric arguments on routes and can reduce the need to keep associated types for\neach schema in a project."
+   },
+   {
+    "id": "fastify:docs/Guides/Recommendations.md#7",
+    "title": "docs/Guides/Recommendations.md > Common Causes Of Performance Degradation",
+    "text": "## Common Causes Of Performance Degradation\n\nThese patterns can increase latency or reduce throughput in production:\n\n- Prefer static or simple parametric routes on hot paths. RegExp routes are\n  expensive, and routes with many parameters can also hurt router performance.\n  See [Routes - Url building](../Reference/Routes.md#url-building).\n- Use route constraints carefully. Version constraints can degrade router\n  performance, and asynchronous custom constraints should be treated as a last\n  resort. See [Routes - Constraints](../Reference/Routes.md#constraints).\n- Prefer Fastify plugins/hooks over generic middleware when possible. Fastify's\n  middleware adapters work, but native integrations are typically better for\n  performance-sensitive paths. See [Middleware](../Reference/Middleware.md).\n- Define response schemas to speed up JSON serialization. See\n  [Getting Started - Serialize your data](./Getting-Started.md#serialize-data).\n- Keep Ajv `allErrors` disabled by default. Enable it only when detailed\n  validation feedback is needed (for example, form-heavy APIs), and avoid it\n  on latency-sensitive endpoints. When `allErrors: true` is enabled, validation\n  can do more work per request and make denial-of-service attacks easier on\n  untrusted inputs.\n  See also:\n  - [Validation and Serialization - Validator Compiler](../Reference/Validation-and-Serialization.md#schema-validator)\n  - [Ajv Security Risks of Trusted Schemas](https://ajv.js.org/security.html#security-risks-of-trusted-schemas)."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#19",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Serialization > Serializer Compiler",
+    "text": "#### Serializer Compiler\n<a id=\"schema-serializer\"></a>\n\nThe `serializerCompiler` returns a function that must return a string from an\ninput object. When defining a response JSON Schema, change the default\nserialization method by providing a function to serialize each route.\n\n```js\nfastify.setSerializerCompiler(({ schema, method, url, httpStatus, contentType }) => {\n  return data => JSON.stringify(data)\n})\n\nfastify.get('/user', {\n  handler (req, reply) {\n    reply.send({ id: 1, name: 'Foo', image: 'BIG IMAGE' })\n  },\n  schema: {\n    response: {\n      '2xx': {\n        type: 'object',\n        properties: {\n          id: { type: 'number' },\n          name: { type: 'string' }\n        }\n      }\n    }\n  }\n})\n```\n\n*To set a custom serializer in a specific part of the code, use\n[`reply.serializer(...)`](./Reply.md#serializerfunc).*"
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "title": "docs/Reference/Routes.md > Routes > Routes options",
+    "text": "### Routes options\n<a id=\"options\"></a>\n\n* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,\n  `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. To accept more methods,\n  the [`addHttpMethod`](./Server.md#addHttpMethod) must be used.\n  It could also be an array of methods.\n* `url`: the path of the URL to match this route (alias: `path`).\n* `schema`: an object containing the schemas for the request and response. They\n  need to be in [JSON Schema](https://json-schema.org/) format, check\n  [here](./Validation-and-Serialization.md) for more info.\n\n  * `body`: validates the body of the request if it is a POST, PUT, PATCH,\n    TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.\n  * `querystring` or `query`: validates the querystring. This can be a complete\n    JSON Schema object, with the property `type` of `object` and `properties`\n    object of parameters, or simply the values of what would be contained in the\n    `properties` object as shown below.\n  * `params`: validates the params.\n  * `response`: filter and generate a schema for the response, setting a schema\n    allows us to have 10-20% more throughput.\n* `exposeHeadRoute`: creates a sibling `HEAD` route for any `GET` routes.\n  Defaults to the value of [`exposeHeadRoutes`](./Server.md#exposeHeadRoutes)\n  instance option. If you want a custom `HEAD` handler without disabling this\n  option, make sure to define it before the `GET` route.\n* `attachValidation`: attach `validationError` to request, if there is a schema\n  validation error, instead of sending the error to the error handler. The\n  default [error format](https://ajv.js.org/api.html#error-objects) is the Ajv\n  one.\n* `onRequest(request, reply, done)`: a [function](./Hooks.md#onrequest) called\n  as soon as a request is received, it could also be an array of functions.\n* `preParsing(request, reply, payload, done)`: a\n  [function](./Hooks.md#preparsing) called before parsing the request, it could\n  also be an array of functions.\n* `preValidation(request, reply, done)`: a [function](./Hooks.md#prevalidation)\n  called after the shared `preValidation` hooks, useful if you need to perform\n  authentication at route level for example, it could also be an array of\n  functions.\n* `preHandler(request, reply, done)`: a [function](./Hooks.md#prehandler) called\n  just before the request handler, it could also be an array of functions.\n* `preSerialization(request, reply, payload, done)`: a\n  [function](./Hooks.md#preserialization) called just before the serialization,\n  it could also be an array of functions.\n* `onSend(request, reply, payload, done)`: a [function](./Hooks.md#route-hooks)\n  called right before a response is sent, it could also be an array of\n  functions.\n* `onResponse(request, reply, done)`: a [function](./Hooks.md#onresponse) called\n  when a response has been sent, so you will not be able to send more data to\n  the client. It could also be an array of functions.\n* `onTimeout(request, reply, done)`: a [function](./Hooks.md#ontimeout) called\n  when a request is timed out and the HTTP socket has been hung up.\n* `onError(request, reply, error, done)`: a [function](./Hooks.md#onerror)\n  called when an Error is thrown or sent to the client by the route handler.\n* `handler(request, reply)`: the function that will handle this request. The\n  [Fastify server](./Server.md) will be bound to `this` when the handler is\n  called. Note: using an arrow function will break the binding of `this`.\n* `errorHandler(error, request, reply)`: a custom error handler for the scope of"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "action": "expand",
+    "relevance_score": 0.2052,
+    "document_score": 0.7764,
+    "levels": {
+     "answers": 0.2052,
+     "elsewhere": 0.5712,
+     "different_case": 0.0588,
+     "unrelated": 0.1649
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0238,
+    "document_score": 0.161,
+    "levels": {
+     "answers": 0.0238,
+     "elsewhere": 0.1372,
+     "different_case": 0.0311,
+     "unrelated": 0.8079
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Recommendations.md#7",
+    "action": "expand",
+    "relevance_score": 0.018,
+    "document_score": 0.9051,
+    "levels": {
+     "answers": 0.018,
+     "elsewhere": 0.8871,
+     "different_case": 0.0156,
+     "unrelated": 0.0793
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0079,
+    "document_score": 0.0332,
+    "levels": {
+     "answers": 0.0079,
+     "elsewhere": 0.0253,
+     "different_case": 0.0121,
+     "unrelated": 0.9547
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Reply.md#44",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0076,
+    "document_score": 0.0283,
+    "levels": {
+     "answers": 0.0076,
+     "elsewhere": 0.0207,
+     "different_case": 0.0128,
+     "unrelated": 0.9589
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Fluent-Schema.md#0",
+    "action": "expand",
+    "relevance_score": 0.0052,
+    "document_score": 0.8827,
+    "levels": {
+     "answers": 0.0052,
+     "elsewhere": 0.8775,
+     "different_case": 0.0158,
+     "unrelated": 0.1015
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Type-Providers.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.0242,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.0203,
+     "different_case": 0.0099,
+     "unrelated": 0.966
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/TypeScript.md#33",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0012,
+     "different_case": 0.0026,
+     "unrelated": 0.9948
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:CONTRIBUTING.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0007,
+     "different_case": 0.0026,
+     "unrelated": 0.9954
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Encapsulation.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0009,
+     "different_case": 0.0017,
+     "unrelated": 0.9961
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4788
+  },
+  "timing": {
+   "total_ms": 98,
+   "rerank_ms": 97,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 6138,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

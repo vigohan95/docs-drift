@@ -1,0 +1,128 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/expect-assertions.rerank",
+ "recorded_at": "2026-11-06T13:42:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 955,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "45.946114",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=287"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `expect.assertions`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `expect.assertions`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/ExpectAPI.md#56",
+    "title": "docs/ExpectAPI.md > Assertion Count > `expect.assertions(number)`",
+    "text": "### `expect.assertions(number)`\n\n`expect.assertions(number)` verifies that a certain number of assertions are called during a test. This is often useful when testing asynchronous code, in order to make sure that assertions in a callback actually got called.\n\nFor example, let's say that we have a function `doAsync` that receives two callbacks `callback1` and `callback2`, it will asynchronously call both of them in an unknown order. We can test this with:\n\n```js\ntest('doAsync calls both callbacks', () => {\n  expect.assertions(2);\n  function callback1(data) {\n    expect(data).toBeTruthy();\n  }\n  function callback2(data) {\n    expect(data).toBeTruthy();\n  }\n\n  doAsync(callback1, callback2);\n});\n```\n\nThe `expect.assertions(2)` call ensures that both callbacks actually get called."
+   },
+   {
+    "id": "jest:docs/TestingAsyncCode.md#2",
+    "title": "docs/TestingAsyncCode.md > Async/Await",
+    "text": "## Async/Await\n\nAlternatively, you can use `async` and `await` in your tests. To write an async test, use the `async` keyword in front of the function passed to `test`. For example, the same `fetchData` scenario can be tested with:\n\n```js\ntest('the data is peanut butter', async () => {\n  const data = await fetchData();\n  expect(data).toBe('peanut butter');\n});\n\ntest('the fetch fails with an error', async () => {\n  expect.assertions(1);\n  try {\n    await fetchData();\n  } catch (error) {\n    expect(error).toMatch('error');\n  }\n});\n```\n\nYou can combine `async` and `await` with `.resolves` or `.rejects`.\n\n```js\ntest('the data is peanut butter', async () => {\n  await expect(fetchData()).resolves.toBe('peanut butter');\n});\n\ntest('the fetch fails with an error', async () => {\n  await expect(fetchData()).rejects.toMatch('error');\n});\n```\n\nIn these cases, `async` and `await` are effectively syntactic sugar for the same logic as the promises example uses.\n\n:::caution\n\nBe sure to return (or `await`) the promise - if you omit the `return`/`await` statement, your test will complete before the promise returned from `fetchData` resolves or rejects.\n\n:::\n\nIf you expect a promise to be rejected, use the `.catch` method. Make sure to add `expect.assertions` to verify that a certain number of assertions are called. Otherwise, a fulfilled promise would not fail the test.\n\n```js\ntest('the fetch fails with an error', () => {\n  expect.assertions(1);\n  return fetchData().catch(error => expect(error).toMatch('error'));\n});\n```"
+   },
+   {
+    "id": "jest:docs/TutorialAsync.md#4",
+    "title": "docs/TutorialAsync.md > Error handling",
+    "text": "## Error handling\n\nErrors can be handled using the `.catch` method. Make sure to add `expect.assertions` to verify that a certain number of assertions are called. Otherwise a fulfilled promise would not fail the test:\n\n```js\n// Testing for async errors using Promise.catch.\nit('tests error with promises', () => {\n  expect.assertions(1);\n  return user.getUserName(2).catch(error =>\n    expect(error).toEqual({\n      error: 'User with 2 not found.',\n    }),\n  );\n});\n\n// Or using async/await.\nit('tests error with async/await', async () => {\n  expect.assertions(1);\n  try {\n    await user.getUserName(1);\n  } catch (error) {\n    expect(error).toEqual({\n      error: 'User with 1 not found.',\n    });\n  }\n});\n```"
+   },
+   {
+    "id": "jest:docs/TutorialAsync.md#5",
+    "title": "docs/TutorialAsync.md > `.rejects`",
+    "text": "## `.rejects`\n\nThe`.rejects` helper works like the `.resolves` helper. If the promise is fulfilled, the test will automatically fail. `expect.assertions(number)` is not required but recommended to verify that a certain number of [assertions](expect#expectassertionsnumber) are called during a test. It is otherwise easy to forget to `return`/`await` the `.resolves` assertions.\n\n```js\n// Testing for async errors using `.rejects`.\nit('tests error with rejects', () => {\n  expect.assertions(1);\n  return expect(user.getUserName(3)).rejects.toEqual({\n    error: 'User with 3 not found.',\n  });\n});\n\n// Or using async/await with `.rejects`.\nit('tests error with async/await and rejects', async () => {\n  expect.assertions(1);\n  await expect(user.getUserName(3)).rejects.toEqual({\n    error: 'User with 3 not found.',\n  });\n});\n```\n\nThe code for this example is available at [examples/async](https://github.com/jestjs/jest/tree/main/examples/async).\n\nIf you'd like to test timers, like `setTimeout`, take a look at the [Timer mocks](TimerMocks.md) documentation."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "jest:docs/TutorialAsync.md#5",
+    "action": "use",
+    "relevance_score": 0.7361,
+    "document_score": 0.8976,
+    "levels": {
+     "answers": 0.7361,
+     "elsewhere": 0.1615,
+     "different_case": 0.0448,
+     "unrelated": 0.0576
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/ExpectAPI.md#56",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0266,
+    "document_score": 0.1707,
+    "levels": {
+     "answers": 0.0266,
+     "elsewhere": 0.144,
+     "different_case": 0.0364,
+     "unrelated": 0.7929
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/TutorialAsync.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0102,
+    "document_score": 0.0835,
+    "levels": {
+     "answers": 0.0102,
+     "elsewhere": 0.0733,
+     "different_case": 0.0234,
+     "unrelated": 0.8931
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/TestingAsyncCode.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0099,
+    "document_score": 0.0657,
+    "levels": {
+     "answers": 0.0099,
+     "elsewhere": 0.0558,
+     "different_case": 0.036,
+     "unrelated": 0.8983
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1449
+  },
+  "timing": {
+   "total_ms": 50,
+   "rerank_ms": 50,
+   "questions_ms": 0,
+   "model_ms": 43,
+   "engine": {
+    "rows": 1989,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 43,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 41,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

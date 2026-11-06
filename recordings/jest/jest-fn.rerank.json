@@ -1,0 +1,201 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/jest-fn.rerank",
+ "recorded_at": "2026-11-06T13:43:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1208,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "76.033569",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=264"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `jest.fn`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `jest.fn`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/JestObjectAPI.md#26",
+    "title": "docs/JestObjectAPI.md > Mock Functions > `jest.fn(implementation?)`",
+    "text": "### `jest.fn(implementation?)`\n\nReturns a new, unused [mock function](MockFunctionAPI.md). Optionally takes a mock implementation.\n\n```js\nconst mockFn = jest.fn();\nmockFn();\nexpect(mockFn).toHaveBeenCalled();\n\n// With a mock implementation:\nconst returnsTrue = jest.fn(() => true);\nconsole.log(returnsTrue()); // true;\n```\n\n:::tip\n\nSee the [Mock Functions](MockFunctionAPI.md#jestfnimplementation) page for details on TypeScript usage.\n\n:::"
+   },
+   {
+    "id": "jest:docs/JestObjectAPI.md#29",
+    "title": "docs/JestObjectAPI.md > Mock Functions > `jest.spyOn(object, methodName)`",
+    "text": "### `jest.spyOn(object, methodName)`\n\nCreates a mock function similar to `jest.fn` but also tracks calls to `object[methodName]`. Returns a Jest [mock function](MockFunctionAPI.md).\n\n:::note\n\nBy default, `jest.spyOn` also calls the **spied** method. This is different behavior from most other test libraries. If you want to overwrite the original function, you can use `jest.spyOn(object, methodName).mockImplementation(() => customImplementation)` or `object[methodName] = jest.fn(() => customImplementation)`.\n\n:::\n\n:::tip\n\nSince `jest.spyOn` is a mock, you could restore the initial state by calling [`jest.restoreAllMocks`](#jestrestoreallmocks) in the body of the callback passed to the [afterEach](GlobalAPI.md#aftereachfn-timeout) hook.\n\n:::\n\nExample:\n\n```js\nconst video = {\n  play() {\n    return true;\n  },\n};\n\nmodule.exports = video;\n```\n\nExample test:\n\n```js\nconst video = require('./video');\n\nafterEach(() => {\n  // restore the spy created with spyOn\n  jest.restoreAllMocks();\n});\n\ntest('plays video', () => {\n  const spy = jest.spyOn(video, 'play');\n  const isPlaying = video.play();\n\n  expect(spy).toHaveBeenCalled();\n  expect(isPlaying).toBe(true);\n});\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#0",
+    "title": "docs/MockFunctionAPI.md > (preamble)",
+    "text": "---\nid: mock-function-api\ntitle: Mock Functions\n---\n\nMock functions are also known as \"spies\", because they let you spy on the behavior of a function that is called indirectly by some other code, rather than only testing the output. You can create a mock function with `jest.fn()`. If no implementation is given, the mock function will return `undefined` when invoked.\n\nimport TypeScriptExamplesNote from './_TypeScriptExamplesNote.md';\n\n<TypeScriptExamplesNote />"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#11",
+    "title": "docs/MockFunctionAPI.md > Reference > `mockFn.mockRestore()`",
+    "text": "### `mockFn.mockRestore()`\n\nDoes everything that [`mockFn.mockReset()`](#mockfnmockreset) does, and also restores the original (non-mocked) implementation.\n\nThis is useful when you want to mock functions in certain test cases and restore the original implementation in others.\n\nThe [`restoreMocks`](configuration#restoremocks-boolean) configuration option is available to restore mocks automatically before each test.\n\n:::info\n\n`mockFn.mockRestore()` only works when the mock was created with `jest.spyOn()`. Thus you have to take care of restoration yourself when manually assigning `jest.fn()`.\n\n:::"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#12",
+    "title": "docs/MockFunctionAPI.md > Reference > `mockFn.mockImplementation(fn)`",
+    "text": "### `mockFn.mockImplementation(fn)`\n\nAccepts a function that should be used as the implementation of the mock. The mock itself will still record all calls that go into and instances that come from itself – the only difference is that the implementation will also be executed when the mock is called.\n\n:::tip\n\n`jest.fn(implementation)` is a shorthand for `jest.fn().mockImplementation(implementation)`.\n\n:::\n\n```js tab\nconst mockFn = jest.fn(scalar => 42 + scalar);\n\nmockFn(0); // 42\nmockFn(1); // 43\n\nmockFn.mockImplementation(scalar => 36 + scalar);\n\nmockFn(2); // 38\nmockFn(3); // 39\n```\n\n```ts tab\nimport {jest} from '@jest/globals';\n\nconst mockFn = jest.fn((scalar: number) => 42 + scalar);\n\nmockFn(0); // 42\nmockFn(1); // 43\n\nmockFn.mockImplementation(scalar => 36 + scalar);\n\nmockFn(2); // 38\nmockFn(3); // 39\n```\n\n`.mockImplementation()` can also be used to mock class constructors:\n\n```js tab={\"span\":2} title=\"SomeClass.js\"\nmodule.exports = class SomeClass {\n  method(a, b) {}\n};\n```\n\n```js title=\"SomeClass.test.js\"\nconst SomeClass = require('./SomeClass');\n\njest.mock('./SomeClass'); // this happens automatically with automocking\n\nconst mockMethod = jest.fn();\nSomeClass.mockImplementation(() => {\n  return {\n    method: mockMethod,\n  };\n});\n\nconst some = new SomeClass();\nsome.method('a', 'b');\n\nconsole.log('Calls to method:', mockMethod.mock.calls);\n```\n\n```ts tab={\"span\":2} title=\"SomeClass.ts\"\nexport class SomeClass {\n  method(a: string, b: string): void {}\n}\n```\n\n```ts title=\"SomeClass.test.ts\"\nimport {jest} from '@jest/globals';\nimport {SomeClass} from './SomeClass';\n\njest.mock('./SomeClass'); // this happens automatically with automocking\n\nconst mockMethod = jest.fn<(a: string, b: string) => void>();\njest.mocked(SomeClass).mockImplementation(() => {\n  return {\n    method: mockMethod,\n  };\n});\n\nconst some = new SomeClass();\nsome.method('a', 'b');\n\nconsole.log('Calls to method:', mockMethod.mock.calls);\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#36",
+    "title": "docs/MockFunctionAPI.md > TypeScript Usage > `jest.fn(implementation?)`",
+    "text": "### `jest.fn(implementation?)`\n\nCorrect mock typings will be inferred if implementation is passed to [`jest.fn()`](JestObjectAPI.md#jestfnimplementation). There are many use cases where the implementation is omitted. To ensure type safety you may pass a generic type argument (also see the examples above for more reference):\n\n```ts\nimport {expect, jest, test} from '@jest/globals';\nimport type add from './add';\nimport calculate from './calc';\n\ntest('calculate calls add', () => {\n  // Create a new mock that can be used in place of `add`.\n  const mockAdd = jest.fn<typeof add>();\n\n  // `.mockImplementation()` now can infer that `a` and `b` are `number`\n  // and that the returned value is a `number`.\n  mockAdd.mockImplementation((a, b) => {\n    // Yes, this mock is still adding two numbers but imagine this\n    // was a complex function we are mocking.\n    return a + b;\n  });\n\n  // `mockAdd` is properly typed and therefore accepted by anything\n  // requiring `add`.\n  calculate(mockAdd, 1, 2);\n\n  expect(mockAdd).toHaveBeenCalledTimes(1);\n  expect(mockAdd).toHaveBeenCalledWith(1, 2);\n});\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctionAPI.md#37",
+    "title": "docs/MockFunctionAPI.md > TypeScript Usage > `jest.Mock<T>`",
+    "text": "### `jest.Mock<T>`\n\nConstructs the type of a mock function, e.g. the return type of `jest.fn()`. It can be useful if you have to defined a recursive mock function:\n\n```ts\nimport {jest} from '@jest/globals';\n\nconst sumRecursively: jest.Mock<(value: number) => number> = jest.fn(value => {\n  if (value === 0) {\n    return 0;\n  } else {\n    return value + fn(value - 1);\n  }\n});\n```"
+   },
+   {
+    "id": "jest:docs/MockFunctions.md#6",
+    "title": "docs/MockFunctions.md > Mock Implementations",
+    "text": "## Mock Implementations\n\nStill, there are cases where it's useful to go beyond the ability to specify return values and full-on replace the implementation of a mock function. This can be done with `jest.fn` or the `mockImplementationOnce` method on mock functions.\n\n```javascript\nconst myMockFn = jest.fn(cb => cb(null, true));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n```\n\nThe `mockImplementation` method is useful when you need to define the default implementation of a mock function that is created from another module:\n\n```js title=\"foo.js\"\nmodule.exports = function () {\n  // some implementation;\n};\n```\n\n```js title=\"test.js\"\njest.mock('../foo'); // this happens automatically with automocking\nconst foo = require('../foo');\n\n// foo is a mock function\nfoo.mockImplementation(() => 42);\nfoo();\n// > 42\n```\n\nWhen you need to recreate a complex behavior of a mock function such that multiple function calls produce different results, use the `mockImplementationOnce` method:\n\n```javascript\nconst myMockFn = jest\n  .fn()\n  .mockImplementationOnce(cb => cb(null, true))\n  .mockImplementationOnce(cb => cb(null, false));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n\nmyMockFn((err, val) => console.log(val));\n// > false\n```\n\nWhen the mocked function runs out of implementations defined with `mockImplementationOnce`, it will execute the default implementation set with `jest.fn` (if it is defined):\n\n```javascript\nconst myMockFn = jest\n  .fn(() => 'default')\n  .mockImplementationOnce(() => 'first call')\n  .mockImplementationOnce(() => 'second call');\n\nconsole.log(myMockFn(), myMockFn(), myMockFn(), myMockFn());\n// > 'first call', 'second call', 'default', 'default'\n```\n\nFor cases where we have methods that are typically chained (and thus always need to return `this`), we have a sugary API to simplify this in the form of a `.mockReturnThis()` function that also sits on all mocks:\n\n```javascript\nconst myObj = {\n  myMethod: jest.fn().mockReturnThis(),\n};\n\n// is the same as\n\nconst otherObj = {\n  myMethod: jest.fn(function () {\n    return this;\n  }),\n};\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "jest:docs/MockFunctionAPI.md#0",
+    "action": "use",
+    "relevance_score": 0.9953,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9953,
+     "elsewhere": 0.0011,
+     "different_case": 0.0016,
+     "unrelated": 0.002
+    }
+   },
+   {
+    "index": 7,
+    "id": "jest:docs/MockFunctions.md#6",
+    "action": "use",
+    "relevance_score": 0.9805,
+    "document_score": 0.9879,
+    "levels": {
+     "answers": 0.9805,
+     "elsewhere": 0.0074,
+     "different_case": 0.0062,
+     "unrelated": 0.0059
+    }
+   },
+   {
+    "index": 4,
+    "id": "jest:docs/MockFunctionAPI.md#12",
+    "action": "expand",
+    "relevance_score": 0.0452,
+    "document_score": 0.8899,
+    "levels": {
+     "answers": 0.0452,
+     "elsewhere": 0.8447,
+     "different_case": 0.0283,
+     "unrelated": 0.0819
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/JestObjectAPI.md#26",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0272,
+    "document_score": 0.2814,
+    "levels": {
+     "answers": 0.0272,
+     "elsewhere": 0.2542,
+     "different_case": 0.0463,
+     "unrelated": 0.6723
+    }
+   },
+   {
+    "index": 3,
+    "id": "jest:docs/MockFunctionAPI.md#11",
+    "action": "expand",
+    "relevance_score": 0.0217,
+    "document_score": 0.7526,
+    "levels": {
+     "answers": 0.0217,
+     "elsewhere": 0.731,
+     "different_case": 0.0418,
+     "unrelated": 0.2056
+    }
+   },
+   {
+    "index": 5,
+    "id": "jest:docs/MockFunctionAPI.md#36",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0079,
+    "document_score": 0.0538,
+    "levels": {
+     "answers": 0.0079,
+     "elsewhere": 0.0459,
+     "different_case": 0.0262,
+     "unrelated": 0.9201
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/JestObjectAPI.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0057,
+    "document_score": 0.0732,
+    "levels": {
+     "answers": 0.0057,
+     "elsewhere": 0.0675,
+     "different_case": 0.0494,
+     "unrelated": 0.8774
+    }
+   },
+   {
+    "index": 6,
+    "id": "jest:docs/MockFunctionAPI.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0046,
+    "document_score": 0.0212,
+    "levels": {
+     "answers": 0.0046,
+     "elsewhere": 0.0167,
+     "different_case": 0.0154,
+     "unrelated": 0.9633
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3004
+  },
+  "timing": {
+   "total_ms": 81,
+   "rerank_ms": 80,
+   "questions_ms": 0,
+   "model_ms": 66,
+   "engine": {
+    "rows": 4084,
+    "branches": 8,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 66,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 62,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

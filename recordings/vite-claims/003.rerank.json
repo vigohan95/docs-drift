@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/003.rerank",
+ "recorded_at": "2026-11-06T13:37:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 921,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.99382",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=228"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: The default is [Oxc Minifier](https://oxc.rs/docs/guide/usage/minifier) which is 30 ~ 90x faster than terser and only 0.5 ~ 2% worse compression.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/cli.md#4",
+    "title": "docs/guide/cli.md > Command Line Interface > Build > `vite build` > Options",
+    "text": "#### Options\n\n| Options                        |                                                                                                                                                                                       |\n| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| `--target <target>`            | Transpile target (default: `\"baseline-widely-available\"`) (`string`)                                                                                                                  |\n| `--outDir <dir>`               | Output directory (default: `dist`) (`string`)                                                                                                                                         |\n| `--assetsDir <dir>`            | Directory under outDir to place assets in (default: `\"assets\"`) (`string`)                                                                                                            |\n| `--assetsInlineLimit <number>` | Static asset base64 inline threshold in bytes (default: `4096`) (`number`)                                                                                                            |\n| `--ssr [entry]`                | Build specified entry for server-side rendering (`string`)                                                                                                                            |\n| `--sourcemap [output]`         | Output source maps for build (default: `false`) (`boolean \\| \"inline\" \\| \"hidden\"`)                                                                                                   |\n| `--minify [minifier]`          | Enable/disable minification, or specify minifier to use (default: `\"oxc\"`) (`boolean \\| \"oxc\" \\| \"terser\" \\| \"esbuild\"`)                                                              |\n| `--manifest [name]`            | Emit build manifest json (`boolean \\| string`)                                                                                                                                        |\n| `--ssrManifest [name]`         | Emit ssr manifest json (`boolean \\| string`)                                                                                                                                          |\n| `--emptyOutDir`                | Force empty outDir when it's outside of root (`boolean`)                                                                                                                              |\n| `-w, --watch`                  | Rebuilds when modules have changed on disk (`boolean`)                                                                                                                                |\n| `-c, --config <file>`          | Use specified config file (`string`)                                                                                                                                                  |\n| `--base <path>`                | Public base path (default: `/`) (`string`)                                                                                                                                            |\n| `-l, --logLevel <level>`       | info \\| warn \\| error \\| silent (`string`)                                                                                                                                            |\n| `--clearScreen`                | Allow/disable clear screen when logging (`boolean`)                                                                                                                                   |"
+   },
+   {
+    "id": "vite:docs/plugins/index.md#4",
+    "title": "docs/plugins/index.md > Plugins > Official Plugins > [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react-swc)",
+    "text": "### [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react-swc)\n\nReplaces Oxc with [SWC](https://swc.rs/) during development for SWC plugin usage. During production builds, SWC+Oxc Transformer are used when using plugins. For big projects that require custom plugins, cold start and Hot Module Replacement (HMR) can be significantly faster, if the plugin is also available for SWC."
+   },
+   {
+    "id": "vite:packages/plugin-legacy/README.md#1",
+    "title": "packages/plugin-legacy/README.md > @vitejs/plugin-legacy [![npm](https://img.shields.io/npm/v/@vitejs/plugin-legacy.svg)](https://npmjs.com/package/@vitejs/plugin-legacy) > Usage",
+    "text": "## Usage\n\n```js\n// vite.config.js\nimport legacy from '@vitejs/plugin-legacy'\n\nexport default {\n  plugins: [\n    legacy({\n      targets: ['defaults', 'not IE 11'],\n    }),\n  ],\n}\n```\n\n> Terser must be installed for minification when using Vite versions older than 8.1.4 or when [`build.minify`](https://vite.dev/config/build-options#build-minify) is explicitly set to `terser`.\n>\n> ```sh\n> npm add -D terser\n> ```"
+   },
+   {
+    "id": "vite:docs/guide/migration.md#10",
+    "title": "docs/guide/migration.md > Migration from v7 > Rolldown > JavaScript Minification by Oxc",
+    "text": "### JavaScript Minification by Oxc\n\nThe Oxc Minifier is now used for JavaScript minification instead of esbuild. You can use the deprecated [`build.minify: 'esbuild'`](/config/build-options#build-minify) option to switch back to esbuild. This configuration option will be removed in the future and you need install `esbuild` as a `devDependency` as Vite no longer relies on esbuild directly.\n\nIf you were using the `esbuild.minify*` options to control minification behavior, you can now use `build.rolldownOptions.output.minify` instead. If you were using the `esbuild.drop` option, you can now use [`build.rolldownOptions.output.minify.compress.drop*` options](https://oxc.rs/docs/guide/usage/minifier/dead-code-elimination).\n\nProperty mangling and its related options ([`mangleProps`, `reserveProps`, `mangleQuoted`, `mangleCache`](https://esbuild.github.io/api/#mangle-props)) are not supported by Oxc. If you need these options, please see [oxc-project/oxc#15375](https://github.com/oxc-project/oxc/issues/15375).\n\nesbuild and Oxc Minifier make slightly different assumptions about source code. In case you suspect the minifier is causing breakage in your code, you can compare these assumptions here:\n\n- [esbuild minify assumptions](https://esbuild.github.io/api/#minify-considerations)\n- [Oxc Minifier assumptions](https://github.com/oxc-project/oxc/blob/main/crates/oxc_minifier/docs/ASSUMPTIONS.md)\n\nPlease report any issues you find related to minification in your JavaScript apps."
+   },
+   {
+    "id": "vite:docs/guide/features.md#9",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options > `emitDecoratorMetadata`",
+    "text": "#### `emitDecoratorMetadata`\n\n- [TypeScript documentation](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)\n\nThis option is only partially supported. Full support requires type inference by the TypeScript compiler, which is not supported. See [Oxc Transformer's documentation](https://oxc.rs/docs/guide/usage/transformer/typescript.html#decorators) for details."
+   },
+   {
+    "id": "vite:docs/guide/features.md#4",
+    "title": "docs/guide/features.md > Features > TypeScript > Transpile Only",
+    "text": "### Transpile Only\n\nNote that Vite only performs transpilation on `.ts` files and does **NOT** perform type checking. It assumes type checking is taken care of by your IDE and build process.\n\nThe reason Vite does not perform type checking as part of the transform process is because the two jobs work fundamentally differently. Transpilation can work on a per-file basis and aligns perfectly with Vite's on-demand compile model. In comparison, type checking requires knowledge of the entire module graph. Shoe-horning type checking into Vite's transform pipeline will inevitably compromise Vite's speed benefits.\n\nVite's job is to get your source modules into a form that can run in the browser as fast as possible. To that end, we recommend separating static analysis checks from Vite's transform pipeline. This principle applies to other static analysis checks such as ESLint.\n\n- For production builds, you can run `tsc --noEmit` in addition to Vite's build command.\n\n- During development, if you need more than IDE hints, we recommend running `tsc --noEmit --watch` in a separate process, or use [vite-plugin-checker](https://github.com/fi3ework/vite-plugin-checker) if you prefer having type errors directly reported in the browser.\n\nVite uses [Oxc Transformer](https://oxc.rs/docs/guide/usage/transformer.html) to transpile TypeScript into JavaScript which is faster than vanilla `tsc`, and HMR updates can reflect in the browser in under 50ms.\n\nUse the [Type-Only Imports and Export](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export) syntax to avoid potential problems like type-only imports being incorrectly bundled, for example:\n\n```ts\nimport type { T } from 'only/types'\nexport type { T }\n```"
+   },
+   {
+    "id": "vite:docs/guide/features.md#1",
+    "title": "docs/guide/features.md > Features > npm Dependency Resolving and Pre-Bundling",
+    "text": "## npm Dependency Resolving and Pre-Bundling\n\nNative ES imports do not support bare module imports like the following:\n\n```js\nimport { someMethod } from 'my-dep'\n```\n\nThe above import will throw an error in the browser. Vite will detect such bare module imports in all served source files and perform the following:\n\n1. [Pre-bundle](./dep-pre-bundling) them to improve page loading speed and convert CommonJS / UMD modules to ESM. The pre-bundling step is performed with [Rolldown](https://rolldown.rs/) and makes Vite's cold start time significantly faster than any JavaScript-based bundler.\n\n2. Rewrite the imports to valid URLs like `/node_modules/.vite/deps/my-dep.js?v=f3sf2ebd` so that the browser can import them properly.\n\n**Dependencies are Strongly Cached**\n\nVite caches dependency requests via HTTP headers, so if you wish to locally edit/debug a dependency, follow the steps [here](./dep-pre-bundling#browser-cache)."
+   },
+   {
+    "id": "vite:docs/plugins/index.md#3",
+    "title": "docs/plugins/index.md > Plugins > Official Plugins > [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react)",
+    "text": "### [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react)\n\nProvides React Fast Refresh support via [Oxc Transformer](https://oxc.rs/docs/guide/usage/transformer)."
+   },
+   {
+    "id": "vite:docs/guide/features.md#6",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options > `isolatedModules`",
+    "text": "#### `isolatedModules`\n\n- [TypeScript documentation](https://www.typescriptlang.org/tsconfig#isolatedModules)\n\nShould be set to `true`.\n\nIt is because Oxc transformer only performs transpilation without type information, it doesn't support certain features like const enum and implicit type-only imports.\n\nYou must set `\"isolatedModules\": true` in your `tsconfig.json` under `compilerOptions`, so that TS will warn you against the features that do not work with isolated transpilation.\n\nIf a dependency doesn't work well with `\"isolatedModules\": true`, you can use `\"skipLibCheck\": true` to temporarily suppress the errors until it is fixed upstream."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#2",
+    "title": "docs/guide/migration.md > Migration from v7 > Rolldown",
+    "text": "## Rolldown\n\nVite 8 uses [Rolldown](https://rolldown.rs/) and [Oxc](https://oxc.rs/) based tools instead of [esbuild](https://esbuild.github.io/) and [Rollup](https://rollupjs.org/)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/cli.md#4",
+    "action": "use",
+    "relevance_score": 0.749,
+    "document_score": 0.9359,
+    "levels": {
+     "answers": 0.749,
+     "elsewhere": 0.1869,
+     "different_case": 0.0249,
+     "unrelated": 0.0392
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/migration.md#10",
+    "action": "expand",
+    "relevance_score": 0.0557,
+    "document_score": 0.7739,
+    "levels": {
+     "answers": 0.0557,
+     "elsewhere": 0.7182,
+     "different_case": 0.0317,
+     "unrelated": 0.1944
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/migration.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0044,
+    "document_score": 0.2302,
+    "levels": {
+     "answers": 0.0044,
+     "elsewhere": 0.2258,
+     "different_case": 0.0207,
+     "unrelated": 0.7491
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:packages/plugin-legacy/README.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0127,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0093,
+     "different_case": 0.0295,
+     "unrelated": 0.9578
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/plugins/index.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0435,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0405,
+     "different_case": 0.0405,
+     "unrelated": 0.916
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/plugins/index.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0122,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0094,
+     "different_case": 0.0226,
+     "unrelated": 0.9651
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/features.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0061,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0038,
+     "different_case": 0.0089,
+     "unrelated": 0.9849
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/features.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0025,
+     "different_case": 0.0045,
+     "unrelated": 0.9909
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/features.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0037,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0018,
+     "different_case": 0.0045,
+     "unrelated": 0.9918
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/features.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0021,
+     "different_case": 0.0045,
+     "unrelated": 0.9915
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3467
+  },
+  "timing": {
+   "total_ms": 110,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4497,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

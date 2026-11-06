@@ -1,0 +1,124 @@
+{
+ "endpoint": "compare",
+ "tag": "jest/beforeEach.compare",
+ "recorded_at": "2026-11-06T13:43:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1059,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "179.46154",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=333"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#5",
+    "text": "### `beforeEach(fn, timeout)`\n\nRuns a function before each of the tests in this file runs. If the function returns a promise or is a generator, Jest waits for that promise to resolve before running the test.\n\nOptionally, you can provide a `timeout` (in milliseconds) for specifying how long to wait before aborting. The default timeout is 5 seconds.\n\nThis is often useful if you want to reset some global state that will be used by many tests.\n\nFor example:\n\n```js\nconst globalDatabase = makeGlobalDatabase();\n\nbeforeEach(() => {\n  // Clears the database and adds some testing data.\n  // Jest will wait for this promise to resolve before running tests.\n  return globalDatabase.clear().then(() => {\n    return globalDatabase.insert({testData: 'foo'});\n  });\n});\n\ntest('can find things', () => {\n  return globalDatabase.find('thing', {}, results => {\n    expect(results.length).toBeGreaterThan(0);\n  });\n});\n\ntest('can insert a thing', () => {\n  return globalDatabase.insert('thing', makeThing(), response => {\n    expect(response.success).toBeTruthy();\n  });\n});\n```\n\nHere the `beforeEach` ensures that the database is reset for each test.\n\nIf `beforeEach` is inside a `describe` block, it runs for each test in the describe block.\n\nIf you only need to run some setup code once, before any tests run, use `beforeAll` instead."
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#3",
+    "text": "## Scoping\n\nThe top level `before*` and `after*` hooks apply to every test in a file. The hooks declared inside a `describe` block apply only to the tests within that `describe` block.\n\nFor example, let's say we had not just a city database, but also a food database. We could do different setup for different tests:\n\n```js\n// Applies to all tests in this file\nbeforeEach(() => {\n  return initializeCityDatabase();\n});\n\ntest('city database has Vienna', () => {\n  expect(isCity('Vienna')).toBeTruthy();\n});\n\ntest('city database has San Juan', () => {\n  expect(isCity('San Juan')).toBeTruthy();\n});\n\ndescribe('matching cities to foods', () => {\n  // Applies only to tests in this describe block\n  beforeEach(() => {\n    return initializeFoodDatabase();\n  });\n\n  test('Vienna <3 veal', () => {\n    expect(isValidCityFoodPair('Vienna', 'Wiener Schnitzel')).toBe(true);\n  });\n\n  test('San Juan <3 plantains', () => {\n    expect(isValidCityFoodPair('San Juan', 'Mofongo')).toBe(true);\n  });\n});\n```\n\nNote that the top-level `beforeEach` is executed before the `beforeEach` inside the `describe` block. It may help to illustrate the order of execution of all hooks.\n\n```js\nbeforeAll(() => console.log('1 - beforeAll'));\nafterAll(() => console.log('1 - afterAll'));\nbeforeEach(() => console.log('1 - beforeEach'));\nafterEach(() => console.log('1 - afterEach'));\n\ntest('', () => console.log('1 - test'));\n\ndescribe('Scoped / Nested block', () => {\n  beforeAll(() => console.log('2 - beforeAll'));\n  afterAll(() => console.log('2 - afterAll'));\n  beforeEach(() => console.log('2 - beforeEach'));\n  afterEach(() => console.log('2 - afterEach'));\n\n  test('', () => console.log('2 - test'));\n});\n\n// 1 - beforeAll\n// 1 - beforeEach\n// 1 - test\n// 1 - afterEach\n// 2 - beforeAll\n// 1 - beforeEach\n// 2 - beforeEach\n// 2 - test\n// 2 - afterEach\n// 1 - afterEach\n// 2 - afterAll\n// 1 - afterAll\n```"
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#1",
+    "text": "## Repeating Setup\n\nIf you have some work you need to do repeatedly for many tests, you can use `beforeEach` and `afterEach` hooks.\n\nFor example, let's say that several tests interact with a database of cities. You have a method `initializeCityDatabase()` that must be called before each of these tests, and a method `clearCityDatabase()` that must be called after each of these tests. You can do this with:\n\n```js\nbeforeEach(() => {\n  initializeCityDatabase();\n});\n\nafterEach(() => {\n  clearCityDatabase();\n});\n\ntest('city database has Vienna', () => {\n  expect(isCity('Vienna')).toBeTruthy();\n});\n\ntest('city database has San Juan', () => {\n  expect(isCity('San Juan')).toBeTruthy();\n});\n```\n\n`beforeEach` and `afterEach` can handle asynchronous code in the same ways that [tests can handle asynchronous code](TestingAsyncCode.md) - they can either take a `done` parameter or return a promise. For example, if `initializeCityDatabase()` returned a promise that resolved when the database was initialized, we would want to return that promise:\n\n```js\nbeforeEach(() => {\n  return initializeCityDatabase();\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/GlobalAPI.md#5",
+    "b": "jest:docs/SetupAndTeardown.md#3",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0055,
+     "overlapping": 0.9892,
+     "conflicting": 0.003,
+     "unrelated": 0.0022
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "jest:docs/GlobalAPI.md#5",
+    "b": "jest:docs/SetupAndTeardown.md#1",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.005,
+     "overlapping": 0.9891,
+     "conflicting": 0.0038,
+     "unrelated": 0.002
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "jest:docs/SetupAndTeardown.md#3",
+    "b": "jest:docs/SetupAndTeardown.md#1",
+    "relation": "overlapping",
+    "related": 0.9972,
+    "probabilities": {
+     "same": 0.0051,
+     "overlapping": 0.9882,
+     "conflicting": 0.004,
+     "unrelated": 0.0028
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 42,
+   "passage_reads": 1,
+   "passages_ms": 150,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 192,
+   "total_ms": 196
+  }
+ }
+}

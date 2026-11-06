@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/012.rerank",
+ "recorded_at": "2026-11-06T13:37:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 958,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.815872",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=235"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Node core `req` and `res` objects can be either [HTTP/1](https://nodejs.org/api/http.html) or [HTTP/2](https://nodejs.org/api/http2.html). _Fastify_ supports both out of the box:",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#30",
+    "title": "docs/Reference/Server.md > Factory > `http2SessionTimeout`",
+    "text": "### `http2SessionTimeout`\n<a id=\"http2-session-timeout\"></a>\n\n+ Default: `72000`\n\nSet a default\n[timeout](https://nodejs.org/api/http2.html#http2sessionsettimeoutmsecs-callback)\nto every incoming HTTP/2 session in milliseconds. The session will be closed on\nthe timeout.\n\nThis option is needed to offer a graceful \"close\" experience when using\nHTTP/2. The low default has been chosen to mitigate denial of service attacks.\nWhen the server is behind a load balancer or can scale automatically this value\ncan be increased to fit the use case. Node core defaults this to `0`."
+   },
+   {
+    "id": "fastify:docs/Reference/Middleware.md#0",
+    "title": "docs/Reference/Middleware.md > Middleware",
+    "text": "## Middleware\n\nAs of Fastify v3.0.0, middleware is not supported out of the box and requires\nan external plugin such as\n[`@fastify/express`](https://github.com/fastify/fastify-express) or\n[`@fastify/middie`](https://github.com/fastify/middie).\n\nThe following example registers the `@fastify/express` plugin and uses Express\nmiddleware:\n\n```js\nawait fastify.register(require('@fastify/express'))\nfastify.use(require('cors')())\nfastify.use(require('dns-prefetch-control')())\nfastify.use(require('frameguard')())\nfastify.use(require('hsts')())\nfastify.use(require('ienoopen')())\nfastify.use(require('x-xss-protection')())\n```\n\n[`@fastify/middie`](https://github.com/fastify/middie) can also be used, which\nprovides support for simple Express-style middleware with improved performance:\n\n```js\nawait fastify.register(require('@fastify/middie'))\nfastify.use(require('cors')())\n```\n\nMiddleware can be encapsulated using `register`, which controls where it runs,\nas explained in the [Plugins Guide](../Guides/Plugins-Guide.md).\n\nThis is because Fastify wraps the incoming Node.js `req` and `res` objects into\n[Request](./Request.md#request) and [Reply](./Reply.md#reply) instances after\nthe middleware phase. As a result, Fastify middleware does not expose the `send`\nmethod or other methods specific to the Fastify [Reply](./Reply.md#reply)\ninstance. To create middleware, use the Node.js `req` and `res` objects.\nAlternatively, use the `preHandler` hook, which has access to the Fastify\n[Request](./Request.md#request) and [Reply](./Reply.md#reply) instances. For\nmore information, see [Hooks](./Hooks.md)."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#45",
+    "title": "docs/Reference/Server.md > RouterOptions > `onMaxParamLength`",
+    "text": "### `onMaxParamLength`\n<a id=\"on-max-param-length\"></a>\n\nFastify uses [find-my-way](https://github.com/delvedor/find-my-way) which supports,\nthe use case of a provide custom handler when `maxParamLength ` is exceed.\n\n```js\nconst fastify = require('fastify')({\n  routerOptions: {\n    maxParamLength: 10,\n    onMaxParamLength: (path, req, res) => {\n      res.statusCode = 414\n      res.end(`Bad path: ${path}`)\n    }\n  }\n})\n```\n\nAs with `defaultRoute`, `req` and `res` are the raw Node.js request/response\nobjects and do not provide Fastify's decorated helpers."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#50",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > server",
+    "text": "#### server\n<a id=\"server\"></a>\n\n`fastify.server`: The Node core\n[server](https://nodejs.org/api/http.html#class-httpserver) object as\nreturned by the [**`Fastify factory function`**](#factory).\n\n> ⚠ Warning:\n> If utilized improperly, certain Fastify features could be disrupted.\n> It is recommended to only use it for attaching listeners."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#20",
+    "title": "docs/Reference/Server.md > Factory > `serverFactory`",
+    "text": "### `serverFactory`\n<a id=\"custom-http-server\"></a>\n\nYou can pass a custom HTTP server to Fastify by using the `serverFactory`\noption.\n\n`serverFactory` is a function that takes a `handler` parameter, which takes the\n`request` and `response` objects as parameters, and an options object, which is\nthe same you have passed to Fastify.\n\n```js\nconst serverFactory = (handler, opts) => {\n  const server = http.createServer((req, res) => {\n    handler(req, res)\n  })\n\n  return server\n}\n\nconst fastify = Fastify({ serverFactory })\n\nfastify.get('/', (req, reply) => {\n  reply.send({ hello: 'world' })\n})\n\nfastify.listen({ port: 3000 })\n```\n\nInternally Fastify uses the API of Node core HTTP server, so if you are using a\ncustom server you must be sure to have the same API exposed. If not, you can\nenhance the server instance inside the `serverFactory` function before the\n`return` statement."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#40",
+    "title": "docs/Reference/Server.md > RouterOptions > `defaultRoute`",
+    "text": "### `defaultRoute`\n<a id=\"default-route\"></a>\n\nFastify uses [find-my-way](https://github.com/delvedor/find-my-way) which supports,\ncan pass a default route with the option defaultRoute.\n\n```js\nconst fastify = require('fastify')({\n  routerOptions: {\n    defaultRoute: (req, res) => {\n      res.statusCode = 404\n      res.end()\n    }\n  }\n})\n```\n\n> ℹ️ Note:\n> The `req` and `res` objects passed to `defaultRoute` are the raw Node.js\n> `IncomingMessage` and `ServerResponse` instances. They do **not** expose the\n> Fastify-specific methods available on `FastifyRequest`/`FastifyReply` (for\n> example, `res.send`)."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#44",
+    "title": "docs/Reference/Server.md > RouterOptions > `onBadUrl`",
+    "text": "### `onBadUrl`\n<a id=\"on-bad-url\"></a>\n\nFastify uses [find-my-way](https://github.com/delvedor/find-my-way) which supports,\nthe use case of a badly formatted url (eg: /hello/%world), by default find-my-way\nwill invoke the defaultRoute, unless you specify the onBadUrl option.\n\n```js\nconst fastify = require('fastify')({\n  routerOptions: {\n    onBadUrl: (path, req, res) => {\n      res.statusCode = 400\n      res.end(`Bad path: ${path}`)\n    }\n  }\n})\n```\n\nAs with `defaultRoute`, `req` and `res` are the raw Node.js request/response\nobjects and do not provide Fastify's decorated helpers."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#6",
+    "title": "docs/Reference/Server.md > Factory > `keepAliveTimeout`",
+    "text": "### `keepAliveTimeout`\n<a id=\"factory-keep-alive-timeout\"></a>\n\n+ Default: `72000` (72 seconds)\n\nDefines the server keep-alive timeout in milliseconds. See documentation for\n[`server.keepAliveTimeout`\nproperty](https://nodejs.org/api/http.html#serverkeepalivetimeout) to\nunderstand the effect of this option. This option only applies when HTTP/1 is in\nuse.\n\nWhen `serverFactory` option is specified this option is ignored."
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#10",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser > Using addContentTypeParser with fastify.register > Catch-All",
+    "text": "#### Catch-All\nTo catch all requests regardless of content type, use the `'*'` content type:\n```js\nfastify.addContentTypeParser('*', function (request, payload, done) {\n  let data = ''\n  payload.on('data', chunk => { data += chunk })\n  payload.on('end', () => {\n    done(null, data)\n  })\n})\n```\nAll requests without a corresponding content type parser will be handled by\nthis function.\n\nThis is also useful for piping the request stream. Define a content parser like:\n\n```js\nfastify.addContentTypeParser('*', function (request, payload, done) {\n  done()\n})\n```\n\nAnd then access the core HTTP request directly for piping:\n\n```js\napp.post('/hello', (request, reply) => {\n  reply.send(request.raw)\n})\n```\n\nHere is a complete example that logs incoming [json\nline](https://jsonlines.org/) objects:\n\n```js\nconst split2 = require('split2')\nconst pump = require('pump')\n\nfastify.addContentTypeParser('*', (request, payload, done) => {\n  done(null, pump(payload, split2(JSON.parse)))\n})\n\nfastify.route({\n  method: 'POST',\n  url: '/api/log/jsons',\n  handler: (req, res) => {\n    req.body.on('data', d => console.log(d)) // log every incoming object\n  }\n})\n ```\n\nFor piping file uploads, check out\n[`@fastify/multipart`](https://github.com/fastify/fastify-multipart).\n\nTo execute the content type parser on all content types, call\n`removeAllContentTypeParsers` first.\n\n```js\n// Without this call, the request body with the content type application/json would be processed by the built-in JSON parser\nfastify.removeAllContentTypeParsers()\n\nfastify.addContentTypeParser('*', function (request, payload, done) {\n  const data = ''\n  payload.on('data', chunk => { data += chunk })\n  payload.on('end', () => {\n    done(null, data)\n  })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#3",
+    "title": "docs/Reference/Server.md > Factory > `http2`",
+    "text": "### `http2`\n<a id=\"factory-http2\"></a>\n\n+ Default: `false`\n\nIf `true` Node.js core's\n[HTTP/2](https://nodejs.org/dist/latest-v20.x/docs/api/http2.html) module is\nused for binding the socket."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Server.md#44",
+    "action": "expand",
+    "relevance_score": 0.019,
+    "document_score": 0.7426,
+    "levels": {
+     "answers": 0.019,
+     "elsewhere": 0.7236,
+     "different_case": 0.0741,
+     "unrelated": 0.1833
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Server.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0155,
+    "document_score": 0.3799,
+    "levels": {
+     "answers": 0.0155,
+     "elsewhere": 0.3644,
+     "different_case": 0.0813,
+     "unrelated": 0.5388
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#45",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0085,
+    "document_score": 0.1664,
+    "levels": {
+     "answers": 0.0085,
+     "elsewhere": 0.1579,
+     "different_case": 0.1052,
+     "unrelated": 0.7284
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Server.md#40",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0081,
+    "document_score": 0.2532,
+    "levels": {
+     "answers": 0.0081,
+     "elsewhere": 0.2451,
+     "different_case": 0.0821,
+     "unrelated": 0.6647
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#50",
+    "action": "expand",
+    "relevance_score": 0.0075,
+    "document_score": 0.7131,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.7055,
+     "different_case": 0.0594,
+     "unrelated": 0.2275
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Server.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.006,
+    "document_score": 0.075,
+    "levels": {
+     "answers": 0.006,
+     "elsewhere": 0.069,
+     "different_case": 0.0609,
+     "unrelated": 0.8642
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Middleware.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0051,
+    "document_score": 0.0212,
+    "levels": {
+     "answers": 0.0051,
+     "elsewhere": 0.0162,
+     "different_case": 0.0204,
+     "unrelated": 0.9583
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Server.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0661,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0629,
+     "different_case": 0.0167,
+     "unrelated": 0.9172
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Server.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0091,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0065,
+     "different_case": 0.0194,
+     "unrelated": 0.9715
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0048,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0027,
+     "different_case": 0.0064,
+     "unrelated": 0.9887
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3490
+  },
+  "timing": {
+   "total_ms": 110,
+   "rerank_ms": 94,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4520,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

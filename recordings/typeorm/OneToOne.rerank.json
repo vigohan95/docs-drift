@@ -1,0 +1,164 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/OneToOne.rerank",
+ "recorded_at": "2026-11-06T13:42:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 931,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "68.971581",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=227"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@OneToOne`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@OneToOne`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "title": "docs/docs/getting-started.md > Getting Started > Step-by-Step Guide > Creating a one-to-one relation",
+    "text": "### Creating a one-to-one relation\n\nLet's create a one-to-one relationship with another class.\nLet's create a new class in `PhotoMetadata.ts`. This PhotoMetadata class is supposed to contain our photo's additional meta-information:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column(\"int\")\n    height: number\n\n    @Column(\"int\")\n    width: number\n\n    @Column()\n    orientation: string\n\n    @Column()\n    compressed: boolean\n\n    @Column()\n    comment: string\n\n    @OneToOne(() => Photo)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\nHere, we are using a new decorator called `@OneToOne`. It allows us to create a one-to-one relationship between two entities. We also add a `@JoinColumn` decorator, which indicates that this side of the relationship will own the relationship.\nRelations can be unidirectional or bidirectional.\nOnly one side of the relation can be the owner.\nUsing `@JoinColumn` decorator is required on the owner side of the relationship.\n\nIf you run the app, you'll see a newly generated table, and it will contain a column with a foreign key for the photo relation:\n\n```text\n+-------------+--------------+----------------------------+\n|                     photo_metadata                      |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| height      | int          |                            |\n| width       | int          |                            |\n| comment     | varchar(255) |                            |\n| compressed  | boolean      |                            |\n| orientation | varchar(255) |                            |\n| photoId     | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#11",
+    "title": "docs/docs/help/1-faq.md > FAQ > How to use TypeORM in ESM projects?",
+    "text": "## How to use TypeORM in ESM projects?\n\nMake sure to add `\"type\": \"module\"` in the `package.json` of your project so TypeORM will know to use `import( ... )` on files.\n\nTo avoid circular dependency import issues use the `Relation` wrapper type for relation type definitions in entities:\n\n```typescript\n@Entity()\nexport class User {\n    @OneToOne(() => Profile, (profile) => profile.user)\n    profile: Relation<Profile>\n}\n```\n\nDoing this prevents the type of the property from being saved in the transpiled code in the property metadata, preventing circular dependency issues.\n\nSince the type of the column is already defined using the `@OneToOne` decorator, there's no use of the additional type metadata saved by TypeScript.\n\n> Important: Do not use `Relation` on non-relation column types"
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#14",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Relation decorators > `@OneToOne`",
+    "text": "#### `@OneToOne`\n\nOne-to-one is a relation where A contains only one instance of B, and B contains only one instance of A.\nLet's take for example `User` and `Profile` entities.\nUser can have only a single profile, and a single profile is owned by only a single user.\nExample:\n\n```typescript\nimport { Entity, OneToOne, JoinColumn } from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @OneToOne((type) => Profile, (profile) => profile.user)\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nLearn more about [one-to-one relations](../relations/2-one-to-one-relations.md)."
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#37",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Other decorators > `@ForeignKey`",
+    "text": "#### `@ForeignKey`\n\nThis decorator allows you to create a database foreign key for a specific column or columns.\nThis decorator can be applied to columns or an entity itself.\nUse it on a column when an foreign key on a single column is needed\nand use it on the entity when a single foreign key on multiple columns is required.\n\n> Note: **Do not use this decorator with relations.** Foreign keys are created automatically for relations\n> which you define using [Relation decorators](#relation-decorators) (`@ManyToOne`, `@OneToOne`, etc).\n> The `@ForeignKey` decorator should only be used to create foreign keys in the database when you\n> don't want to define an equivalent entity relationship.\n\nExamples:\n\n```typescript\n@Entity(\"orders\")\n@ForeignKey(() => City, [\"cityId\", \"countryCode\"], [\"id\", \"countryCode\"])\nexport class Order {\n    @PrimaryColumn()\n    id: number\n\n    @Column(\"uuid\", { name: \"user_uuid\" })\n    @ForeignKey<User>(\"User\", \"uuid\", { name: \"FK_user_uuid\" })\n    userUuid: string\n\n    @Column({ length: 2 })\n    @ForeignKey(() => Country, \"code\")\n    countryCode: string\n\n    @Column()\n    @ForeignKey(\"cities\")\n    cityId: number\n\n    @Column()\n    dispatchCountryCode: string\n\n    @ManyToOne(() => Country)\n    dispatchCountry: Country\n\n    @Column()\n    dispatchCityId: number\n\n    @ManyToOne(() => City)\n    dispatchCity: City\n}\n```\n\n```typescript\n@Entity(\"cities\")\n@Unique([\"id\", \"countryCode\"])\nexport class City {\n    @PrimaryColumn()\n    id: number\n\n    @Column({ length: 2 })\n    @ForeignKey(\"countries\", { onDelete: \"CASCADE\", onUpdate: \"CASCADE\" })\n    countryCode: string\n\n    @Column()\n    name: string\n}\n```\n\n```typescript\n@Entity(\"countries\")\nexport class Country {\n    @PrimaryColumn({ length: 2 })\n    code: string\n\n    @Column()\n    name: string\n}\n```\n\n```typescript\n@Entity(\"users\")\nexport class User {\n    @PrimaryColumn({ name: \"ref\" })\n    id: number\n\n    @Column(\"uuid\", { unique: true })\n    uuid: string\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#0",
+    "title": "docs/docs/relations/1-relations.md > Relations > What are relations?",
+    "text": "## What are relations?\n\nRelations helps you to work with related entities easily.\nThere are several types of relations:\n\n- [one-to-one](./2-one-to-one-relations.md) using `@OneToOne`\n- [many-to-one](./3-many-to-one-one-to-many-relations.md) using `@ManyToOne`\n- [one-to-many](./3-many-to-one-one-to-many-relations.md) using `@OneToMany`\n- [many-to-many](./4-many-to-many-relations.md) using `@ManyToMany`"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "title": "docs/docs/relations/2-one-to-one-relations.md > One-to-one relations",
+    "text": "# One-to-one relations\n\nOne-to-one is a relation where A contains only one instance of B, and B contains only one instance of A.\nLet's take for example `User` and `Profile` entities.\nUser can have only a single profile, and a single profile is owned by only a single user.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class Profile {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    gender: string\n\n    @Column()\n    photo: string\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Profile } from \"./Profile\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne(() => Profile)\n    @JoinColumn()\n    profile: Profile\n}\n```\n\nHere we added `@OneToOne` to the `user` and specified the target relation type to be `Profile`.\nWe also added `@JoinColumn` which is required and must be set only on one side of the relation.\nThe side you set `@JoinColumn` on, that side's table will contain a \"relation id\" and foreign keys to the target entity table.\n\nThis example will produce the following tables:\n\n```text\n+-------------+--------------+----------------------------+\n|                        profile                          |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| gender      | varchar(255) |                            |\n| photo       | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|                          user                           |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| name        | varchar(255) |                            |\n| profileId   | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "action": "use",
+    "relevance_score": 0.9765,
+    "document_score": 0.9887,
+    "levels": {
+     "answers": 0.9765,
+     "elsewhere": 0.0122,
+     "different_case": 0.0061,
+     "unrelated": 0.0052
+    }
+   },
+   {
+    "index": 5,
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#0",
+    "action": "use",
+    "relevance_score": 0.7869,
+    "document_score": 0.8896,
+    "levels": {
+     "answers": 0.7869,
+     "elsewhere": 0.1026,
+     "different_case": 0.017,
+     "unrelated": 0.0934
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0065,
+    "document_score": 0.0511,
+    "levels": {
+     "answers": 0.0065,
+     "elsewhere": 0.0446,
+     "different_case": 0.0201,
+     "unrelated": 0.9288
+    }
+   },
+   {
+    "index": 4,
+    "id": "typeorm:docs/docs/relations/1-relations.md#0",
+    "action": "expand",
+    "relevance_score": 0.0033,
+    "document_score": 0.8113,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.8081,
+     "different_case": 0.0094,
+     "unrelated": 0.1793
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/help/1-faq.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0094,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0066,
+     "different_case": 0.0078,
+     "unrelated": 0.9828
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0065,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.004,
+     "different_case": 0.0161,
+     "unrelated": 0.9773
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2536
+  },
+  "timing": {
+   "total_ms": 87,
+   "rerank_ms": 72,
+   "questions_ms": 0,
+   "model_ms": 65,
+   "engine": {
+    "rows": 3346,
+    "branches": 6,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 65,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 62,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

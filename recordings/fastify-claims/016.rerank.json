@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/016.rerank",
+ "recorded_at": "2026-11-06T13:37:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1199,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "114.447906",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=158,cfOrigin;dur=0,cfWorker;dur=375"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Values are percent-decoded (for example `%20` becomes a space, and `%2f` becomes `/`).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#23",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > How to import",
+    "text": "#### How to import\n\nThe Fastify API is powered by the `fastify()` method. In JavaScript you would\nimport it using `const fastify = require('fastify')`. In TypeScript it is\nrecommended to use the `import/from` syntax instead so types can be resolved.\nThere are a couple supported import methods with the Fastify type system.\n\n1. `import fastify from 'fastify'`\n   - Types are resolved but not accessible using dot notation\n   - Example:\n     ```typescript\n     import fastify from 'fastify'\n\n     const f = fastify()\n     f.listen({ port: 8080 }, () => { console.log('running') })\n     ```\n   - Gain access to types with destructuring:\n     ```typescript\n     import fastify, { FastifyInstance } from 'fastify'\n\n     const f: FastifyInstance = fastify()\n     f.listen({ port: 8080 }, () => { console.log('running') })\n     ```\n   - Destructuring also works for the main API method:\n     ```typescript\n     import { fastify, FastifyInstance } from 'fastify'\n\n     const f: FastifyInstance = fastify()\n     f.listen({ port: 8080 }, () => { console.log('running') })\n     ```\n2. `import * as Fastify from 'fastify'`\n   - Types are resolved and accessible using dot notation\n   - Calling the main Fastify API method requires a slightly different syntax\n     (see example)\n   - Example:\n     ```typescript\n     import * as Fastify from 'fastify'\n\n     const f: Fastify.FastifyInstance = Fastify.fastify()\n     f.listen({ port: 8080 }, () => { console.log('running') })\n     ```\n3. `const fastify = require('fastify')`\n   - This syntax is valid and will import fastify as expected; however, types\n     will **not** be resolved\n   - Example:\n     ```typescript\n     const fastify = require('fastify')\n\n     const f = fastify()\n     f.listen({ port: 8080 }, () => { console.log('running') })\n     ```\n   - Destructuring is supported and will resolve types properly\n     ```typescript\n     const { fastify } = require('fastify')\n\n     const f = fastify()\n     f.listen({ port: 8080 }, () => { console.log('running') })\n     ```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#34",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Fastify > fastify< [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [Logger][LoggerGeneric]>(opts?: [FastifyServerOptions][FastifyServerOptions]): [FastifyInstance][FastifyInstance] > Example 4: Extended HTTP server",
+    "text": "###### Example 4: Extended HTTP server\n\nNot only can you specify the server type, but also the request and reply types.\nThus, allowing you to specify special properties, methods, and more! When\nspecified at server instantiation, the custom type becomes available on all\nfurther instances of the custom type.\n```typescript\nimport fastify from 'fastify'\nimport http from 'node:http'\n\ninterface customRequest extends http.IncomingMessage {\n  mySpecialProp: string\n}\n\nconst server = fastify<http.Server, customRequest>()\n\nserver.get('/', async (request, reply) => {\n  const someValue = request.raw.mySpecialProp // TS knows this is a string, because of the `customRequest` interface\n  return someValue.toUpperCase()\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "title": "docs/Reference/Routes.md > Routes > Routes options",
+    "text": "### Routes options\n<a id=\"options\"></a>\n\n* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,\n  `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. To accept more methods,\n  the [`addHttpMethod`](./Server.md#addHttpMethod) must be used.\n  It could also be an array of methods.\n* `url`: the path of the URL to match this route (alias: `path`).\n* `schema`: an object containing the schemas for the request and response. They\n  need to be in [JSON Schema](https://json-schema.org/) format, check\n  [here](./Validation-and-Serialization.md) for more info.\n\n  * `body`: validates the body of the request if it is a POST, PUT, PATCH,\n    TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.\n  * `querystring` or `query`: validates the querystring. This can be a complete\n    JSON Schema object, with the property `type` of `object` and `properties`\n    object of parameters, or simply the values of what would be contained in the\n    `properties` object as shown below.\n  * `params`: validates the params.\n  * `response`: filter and generate a schema for the response, setting a schema\n    allows us to have 10-20% more throughput.\n* `exposeHeadRoute`: creates a sibling `HEAD` route for any `GET` routes.\n  Defaults to the value of [`exposeHeadRoutes`](./Server.md#exposeHeadRoutes)\n  instance option. If you want a custom `HEAD` handler without disabling this\n  option, make sure to define it before the `GET` route.\n* `attachValidation`: attach `validationError` to request, if there is a schema\n  validation error, instead of sending the error to the error handler. The\n  default [error format](https://ajv.js.org/api.html#error-objects) is the Ajv\n  one.\n* `onRequest(request, reply, done)`: a [function](./Hooks.md#onrequest) called\n  as soon as a request is received, it could also be an array of functions.\n* `preParsing(request, reply, payload, done)`: a\n  [function](./Hooks.md#preparsing) called before parsing the request, it could\n  also be an array of functions.\n* `preValidation(request, reply, done)`: a [function](./Hooks.md#prevalidation)\n  called after the shared `preValidation` hooks, useful if you need to perform\n  authentication at route level for example, it could also be an array of\n  functions.\n* `preHandler(request, reply, done)`: a [function](./Hooks.md#prehandler) called\n  just before the request handler, it could also be an array of functions.\n* `preSerialization(request, reply, payload, done)`: a\n  [function](./Hooks.md#preserialization) called just before the serialization,\n  it could also be an array of functions.\n* `onSend(request, reply, payload, done)`: a [function](./Hooks.md#route-hooks)\n  called right before a response is sent, it could also be an array of\n  functions.\n* `onResponse(request, reply, done)`: a [function](./Hooks.md#onresponse) called\n  when a response has been sent, so you will not be able to send more data to\n  the client. It could also be an array of functions.\n* `onTimeout(request, reply, done)`: a [function](./Hooks.md#ontimeout) called\n  when a request is timed out and the HTTP socket has been hung up.\n* `onError(request, reply, error, done)`: a [function](./Hooks.md#onerror)\n  called when an Error is thrown or sent to the client by the route handler.\n* `handler(request, reply)`: the function that will handle this request. The\n  [Fastify server](./Server.md) will be bound to `this` when the handler is\n  called. Note: using an arrow function will break the binding of `this`.\n* `errorHandler(error, request, reply)`: a custom error handler for the scope of"
+   },
+   {
+    "id": "fastify:docs/Guides/Plugins-Guide.md#7",
+    "title": "docs/Guides/Plugins-Guide.md > The hitchhiker's guide to plugins > Hooks",
+    "text": "An alternative approach is to make use of the [onRoute hook](../Reference/Hooks.md#onroute)\nto customize application routes dynamically from inside the plugin. Every time\na new route is registered, you can read and modify the route options. For example,\nbased on a [route config option](../Reference/Routes.md#routes-options):\n\n```js\nfastify.register((instance, opts, done) => {\n  instance.decorate('util', (request, key, value) => { request[key] = value })\n\n  function handler(request, reply, done) {\n    instance.util(request, 'timestamp', new Date())\n    done()\n  }\n\n  instance.addHook('onRoute', (routeOptions) => {\n    if (routeOptions.config && routeOptions.config.useUtil === true) {\n      // set or add our handler to the route preHandler hook\n      if (!routeOptions.preHandler) {\n        routeOptions.preHandler = [handler]\n        return\n      }\n      if (Array.isArray(routeOptions.preHandler)) {\n        routeOptions.preHandler.push(handler)\n        return\n      }\n      routeOptions.preHandler = [routeOptions.preHandler, handler]\n    }\n  })\n\n  instance.get('/plugin1', {config: {useUtil: true}}, (request, reply) => {\n    reply.send(request)\n  })\n\n  instance.get('/plugin2', (request, reply) => {\n    reply.send(request)\n  })\n\n  done()\n})\n```\n\nThis variant becomes extremely useful if you plan to distribute your plugin, as\ndescribed in the next section."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#6",
+    "title": "docs/Reference/Routes.md > Routes > Url building",
+    "text": "### Url building\n<a id=\"url-building\"></a>\n\nFastify supports both static and dynamic URLs.\n\nTo register a **parametric** path, use a *colon* before the parameter name. For\n**wildcard**, use a *star*. Static routes are always checked before parametric\nand wildcard routes.\n\n```js\n// parametric\nfastify.get('/example/:userId', function (request, reply) {\n  // curl ${app-url}/example/12345\n  // userId === '12345'\n  const { userId } = request.params;\n  // your code here\n})\nfastify.get('/example/:userId/:secretToken', function (request, reply) {\n  // curl ${app-url}/example/12345/abc.zHi\n  // userId === '12345'\n  // secretToken === 'abc.zHi'\n  const { userId, secretToken } = request.params;\n  // your code here\n})\n\n// wildcard\nfastify.get('/example/*', function (request, reply) {})\n```\n\nRegular expression routes are supported, but slashes must be escaped.\nTake note that RegExp is also very expensive in terms of performance!\n```js\n// parametric with regexp\nfastify.get('/example/:file(^\\\\d+).png', function (request, reply) {\n  // curl ${app-url}/example/12345.png\n  // file === '12345'\n  const { file } = request.params;\n  // your code here\n})\n```\n\nIt is possible to define more than one parameter within the same couple of slash\n(\"/\"). Such as:\n```js\nfastify.get('/example/near/:lat-:lng/radius/:r', function (request, reply) {\n  // curl ${app-url}/example/near/15°N-30°E/radius/20\n  // lat === \"15°N\"\n  // lng === \"30°E\"\n  // r ===\"20\"\n  const { lat, lng, r } = request.params;\n  // your code here\n})\n```\n*Remember in this case to use the dash (\"-\") as parameters separator.*"
+   },
+   {
+    "id": "fastify:docs/Reference/Logging.md#10",
+    "title": "docs/Reference/Logging.md > Logging > Log Redaction",
+    "text": "### Log Redaction\n\n[Pino](https://getpino.io) supports low-overhead log redaction for masking\nvalues of specific properties in recorded logs. For example, log all HTTP\nheaders except the `Authorization` header for security:\n\n```js\nconst fastify = Fastify({\n  logger: {\n    stream: stream,\n    redact: ['req.headers.authorization'],\n    level: 'info',\n    serializers: {\n      req (request) {\n        return {\n          method: request.method,\n          url: request.url,\n          headers: request.headers,\n          host: request.host,\n          remoteAddress: request.ip,\n          remotePort: request.socket.remotePort\n        }\n      }\n    }\n  }\n})\n```\n\nSee the [Pino redaction documentation](https://getpino.io/#/docs/redaction) for\nmore details."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#46",
+    "title": "docs/Reference/Server.md > RouterOptions > `querystringParser`",
+    "text": "### `querystringParser`\n<a id=\"querystringparser\"></a>\n\nThe default query string parser that Fastify uses is a more performant fork\nof Node.js's core `querystring` module called\n[`fast-querystring`](https://github.com/anonrig/fast-querystring).\n\nYou can use this option to use a custom parser, such as\n[`qs`](https://www.npmjs.com/package/qs).\n\nIf you only want the keys (and not the values) to be case insensitive we\nrecommend using a custom parser to convert only the keys to lowercase.\n\n```js\nconst qs = require('qs')\nconst fastify = require('fastify')({\n  routerOptions: {\n    querystringParser: str => qs.parse(str)\n  }\n})\n```\n\nYou can also use Fastify's default parser but change some handling behavior,\nlike the example below for case insensitive keys and values:\n\n```js\nconst querystring = require('fast-querystring')\nconst fastify = require('fastify')({\n  routerOptions: {\n    querystringParser: str => querystring.parse(str.toLowerCase())\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#25",
+    "title": "docs/Reference/Server.md > Factory > `querystringParser`",
+    "text": "### `querystringParser`\n<a id=\"factory-querystring-parser\"></a>\n\nThe default query string parser that Fastify uses is a more performant fork\nof Node.js's core `querystring` module called\n[`fast-querystring`](https://github.com/anonrig/fast-querystring).\n\nYou can use this option to use a custom parser, such as\n[`qs`](https://www.npmjs.com/package/qs).\n\nIf you only want the keys (and not the values) to be case insensitive we\nrecommend using a custom parser to convert only the keys to lowercase.\n\n```js\nconst qs = require('qs')\nconst fastify = require('fastify')({\n  routerOptions: {\n    querystringParser: str => qs.parse(str)\n  }\n})\n```\n\nYou can also use Fastify's default parser but change some handling behavior,\nlike the example below for case insensitive keys and values:\n\n```js\nconst querystring = require('fast-querystring')\nconst fastify = require('fastify')({\n  routerOptions: {\n    querystringParser: str => querystring.parse(str.toLowerCase())\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#20",
+    "title": "docs/Reference/Routes.md > Routes > Constraints > Host Constraints",
+    "text": "#### Host Constraints\n\nProvide a `host` key in the `constraints` route option to limit the route to\ncertain values of the request `Host` header. `host` constraint values can be\nspecified as strings for exact matches or RegExps for arbitrary host matching.\n\n```js\nfastify.route({\n  method: 'GET',\n  url: '/',\n  constraints: { host: 'auth.fastify.example' },\n  handler: function (request, reply) {\n    reply.send('hello world from auth.fastify.example')\n  }\n})\n\nfastify.inject({\n  method: 'GET',\n  url: '/',\n  headers: {\n    'Host': 'fastify.example'\n  }\n}, (err, res) => {\n  // 404 because the host doesn't match the constraint\n})\n\nfastify.inject({\n  method: 'GET',\n  url: '/',\n  headers: {\n    'Host': 'auth.fastify.dev'\n  }\n}, (err, res) => {\n  // => 'hello world from auth.fastify.dev'\n})\n```\n\nRegExp `host` constraints can also be specified allowing constraining to hosts\nmatching wildcard subdomains (or any other pattern):\n\n```js\nfastify.route({\n  method: 'GET',\n  url: '/',\n  constraints: { host: /.*\\.fastify\\.example/ }, // will match any subdomain of fastify.dev\n  handler: function (request, reply) {\n    reply.send('hello world from ' + request.headers.host)\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#14",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Validation > Validator Compiler > `headers` and the `{ value }` result",
+    "text": "##### `headers` and the `{ value }` result\n\nFor the `headers` part specifically, the synchronous success `value` is applied\nthrough the additive [`request.headers`](./Request.md#headers) setter. That\nsetter *adds or overrides* headers on top of the raw request headers; it does\n**not** replace them. Raw request headers remain separately available as\n`request.raw.headers`, and any incoming header that is not present in the\nreturned `value` is still visible on `request.headers`.\n\nConsequently, a synchronous custom `headers` validator cannot remove a header by\nsimply omitting it from `value`. The same applies to the default Ajv validator:\n`request.headers` is the incoming request's headers (plus any additive values)\nand is not a sanitized, authoritative view. If your application needs a\nsanitized or allow-listed header view — for example to drive an authorization\ndecision — build and consume that view explicitly from the validated data rather\nthan re-reading `request.headers`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Server.md#46",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0114,
+    "document_score": 0.0821,
+    "levels": {
+     "answers": 0.0114,
+     "elsewhere": 0.0707,
+     "different_case": 0.0219,
+     "unrelated": 0.896
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Server.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0112,
+    "document_score": 0.08,
+    "levels": {
+     "answers": 0.0112,
+     "elsewhere": 0.0688,
+     "different_case": 0.0241,
+     "unrelated": 0.8959
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0031,
+     "different_case": 0.0048,
+     "unrelated": 0.99
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0068,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0049,
+     "different_case": 0.0036,
+     "unrelated": 0.9895
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/Routes.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0016,
+     "different_case": 0.0043,
+     "unrelated": 0.9923
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Routes.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0025,
+     "different_case": 0.0043,
+     "unrelated": 0.9917
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/TypeScript.md#34",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0012,
+     "different_case": 0.0026,
+     "unrelated": 0.9949
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Logging.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0025,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0011,
+     "different_case": 0.0027,
+     "unrelated": 0.9948
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/TypeScript.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.002,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0007,
+     "different_case": 0.002,
+     "unrelated": 0.9961
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Guides/Plugins-Guide.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0019,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0008,
+     "different_case": 0.0017,
+     "unrelated": 0.9963
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4890
+  },
+  "timing": {
+   "total_ms": 235,
+   "rerank_ms": 234,
+   "questions_ms": 0,
+   "model_ms": 108,
+   "engine": {
+    "rows": 6240,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 108,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

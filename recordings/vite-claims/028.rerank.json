@@ -1,0 +1,241 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/028.rerank",
+ "recorded_at": "2026-11-06T13:38:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 935,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "68.056862",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=243"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: During build, the `client` environment is always present, and the `ssr` environment is only present if it is explicitly configured (using `environments.ssr` or for backward compatibility `build.ssr`).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#10",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > Environments During Build",
+    "text": "## Environments During Build\n\nIn the CLI, calling `vite build` and `vite build --ssr` will still build the client only and ssr only environments for backward compatibility.\n\nWhen the `builder` option is set (even to an empty object `{}`, which is what `vite build --app` does), `vite build` opts in to building the entire app instead. This will become the default in a future major. In this mode, Vite creates a `ViteBuilder` instance (the build-time equivalent of a `ViteDevServer`) and uses it to build all configured environments for production. By default, environments are built in series, following the order of the `environments` record."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#7",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Per-environment State in Plugins",
+    "text": "## Per-environment State in Plugins\n\nGiven that the same plugin instance is used for different environments, the plugin state needs to be keyed with `this.environment`. This is the same pattern the ecosystem has already been using to keep state about modules using the `ssr` boolean as key to avoid mixing client and ssr modules state. A `Map<Environment, State>` can be used to keep the state for each environment separately. Note that for backward compatibility, `buildStart` and `buildEnd` are only called for the client environment without the `perEnvironmentStartEndDuringDev: true` flag. Same for `watchChange` and the `perEnvironmentWatchChangeDuringDev: true` flag.\n\n```js\nfunction PerEnvironmentCountTransformedModulesPlugin() {\n  const state = new Map<Environment, { count: number }>()\n  return {\n    name: 'count-transformed-modules',\n    perEnvironmentStartEndDuringDev: true,\n    buildStart() {\n      state.set(this.environment, { count: 0 })\n    },\n    transform(id) {\n      state.get(this.environment).count++\n    },\n    buildEnd() {\n      console.log(this.environment.name, state.get(this.environment).count)\n    }\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#20",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `esbuildVersion`",
+    "text": "## `esbuildVersion`\n\n**Type:** `string`\n\nOnly kept for backward compatibility."
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#21",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `rollupVersion`",
+    "text": "## `rollupVersion`\n\n**Type:** `string`\n\nOnly kept for backward compatibility."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Shared Plugins During Build",
+    "text": "## Shared Plugins During Build\n\nBefore Vite 6, the plugins pipelines worked in a different way during dev and build:\n\n- **During dev:** plugins are shared\n- **During Build:** plugins are isolated for each environment (in different processes: `vite build` then `vite build --ssr`).\n\nThis forced frameworks to share state between the `client` build and the `ssr` build through manifest files written to the file system. In Vite 6, we are now building all environments in a single process so the way the plugins pipeline and inter-environment communication can be aligned with dev.\n\nIn a future major, we could have complete alignment:\n\n- **During both dev and build:** plugins are shared, with [per-environment filtering](#per-environment-plugins-using-the-applytoenvironment-hook)\n\nThere will also be a single `ResolvedConfig` instance shared during build, allowing for caching at entire app build process level in the same way as we have been doing with `WeakMap<ResolvedConfig, CachedData>` during dev.\n\nFor Vite 6, we need to do a smaller step to keep backward compatibility. Ecosystem plugins are currently using `config.build` instead of `environment.config.build` to access configuration, so we need to create a new `ResolvedConfig` per-environment by default. A project can opt-in into sharing the full config and plugins pipeline setting `builder.sharedConfigBuild` to `true`.\n\nThis option would only work of a small subset of projects at first, so plugin authors can opt-in for a particular plugin to be shared by setting the `sharedDuringBuild` flag to `true`. This allows for easily sharing state both for regular plugins:\n\n```js\nfunction myPlugin() {\n  // Share state among all environments in dev and build\n  const sharedState = ...\n  return {\n    name: 'shared-plugin',\n    transform(code, id) { ... },\n\n    // Opt-in into a single instance for all environments\n    sharedDuringBuild: true,\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#12",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Environment in Build Hooks",
+    "text": "## Environment in Build Hooks\n\nIn the same way as during dev, plugin hooks also receive the environment instance during build, replacing the `ssr` boolean.\nThis also works for `renderChunk`, `generateBundle`, and other build only hooks."
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#3",
+    "title": "docs/guide/ssr.md > Server-Side Rendering (SSR) > Conditional Logic",
+    "text": "## Conditional Logic\n\nIf you need to perform conditional logic based on SSR vs. client, you can use\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nif (import.meta.env.SSR) {\n  // ... server only logic\n}\n```\n\nThis is statically replaced during build so it will allow tree-shaking of unused branches."
+   },
+   {
+    "id": "vite:docs/config/ssr-options.md#2",
+    "title": "docs/config/ssr-options.md > SSR Options > ssr.noExternal",
+    "text": "## ssr.noExternal\n\n- **Type:** `string | RegExp | (string | RegExp)[] | true`\n- **Related:** [SSR Externals](/guide/ssr#ssr-externals)\n\nPrevent listed dependencies from being externalized for SSR, which they will get bundled in build. By default, only linked dependencies are not externalized (for HMR). If you prefer to externalize the linked dependency, you can pass its name to the `ssr.external` option.\n\nIf `true`, no dependencies are externalized. However, dependencies explicitly listed in `ssr.external` (using `string[]` type) can take priority and still be externalized. If `ssr.target: 'node'` is set, Node.js built-ins will also be externalized by default.\n\nNote that if both `ssr.noExternal: true` and `ssr.external: true` are configured, `ssr.noExternal` takes priority and no dependencies are externalized."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#22",
+    "title": "docs/config/build-options.md > Build Options > build.ssrEmitAssets",
+    "text": "## build.ssrEmitAssets\n\n- **Type:** `boolean`\n- **Default:** `false`\n\nDuring the SSR build, static assets aren't emitted as it is assumed they would be emitted as part of the client build. This option allows frameworks to force emitting them in both the client and SSR build. It is responsibility of the framework to merge the assets with a post build step. This option will be replaced by `build.emitAssets` once Environment API is stable."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#20",
+    "title": "docs/config/build-options.md > Build Options > build.ssr",
+    "text": "## build.ssr\n\n- **Type:** `boolean | string`\n- **Default:** `false`\n- **Related:** [Server-Side Rendering](/guide/ssr)\n\nProduce SSR-oriented build. The value can be a string to directly specify the SSR entry, or `true`, which requires specifying the SSR entry via [`input`](/config/shared-options#input) or `build.rolldownOptions.input`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 9,
+    "id": "vite:docs/config/build-options.md#20",
+    "action": "use",
+    "relevance_score": 0.6076,
+    "document_score": 0.9057,
+    "levels": {
+     "answers": 0.6076,
+     "elsewhere": 0.2981,
+     "different_case": 0.0587,
+     "unrelated": 0.0356
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-frameworks.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0358,
+    "document_score": 0.3858,
+    "levels": {
+     "answers": 0.0358,
+     "elsewhere": 0.3501,
+     "different_case": 0.0832,
+     "unrelated": 0.531
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/ssr.md#3",
+    "action": "expand",
+    "relevance_score": 0.0225,
+    "document_score": 0.6376,
+    "levels": {
+     "answers": 0.0225,
+     "elsewhere": 0.6151,
+     "different_case": 0.0469,
+     "unrelated": 0.3155
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/api-environment-plugins.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0071,
+    "document_score": 0.0997,
+    "levels": {
+     "answers": 0.0071,
+     "elsewhere": 0.0925,
+     "different_case": 0.03,
+     "unrelated": 0.8703
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0065,
+    "document_score": 0.0304,
+    "levels": {
+     "answers": 0.0065,
+     "elsewhere": 0.024,
+     "different_case": 0.0427,
+     "unrelated": 0.9268
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-environment-plugins.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0045,
+    "document_score": 0.0313,
+    "levels": {
+     "answers": 0.0045,
+     "elsewhere": 0.0269,
+     "different_case": 0.0464,
+     "unrelated": 0.9223
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/config/build-options.md#22",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0211,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0182,
+     "different_case": 0.0092,
+     "unrelated": 0.9698
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/api-javascript.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0063,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0046,
+     "different_case": 0.0074,
+     "unrelated": 0.9863
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/api-javascript.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0056,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0039,
+     "different_case": 0.0058,
+     "unrelated": 0.9886
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/config/ssr-options.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0024,
+     "different_case": 0.005,
+     "unrelated": 0.9911
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2570
+  },
+  "timing": {
+   "total_ms": 123,
+   "rerank_ms": 108,
+   "questions_ms": 0,
+   "model_ms": 63,
+   "engine": {
+    "rows": 3760,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 63,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 61,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

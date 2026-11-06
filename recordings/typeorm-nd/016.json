@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/016",
+ "recorded_at": "2026-11-06T13:42:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1335,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.913982",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=561"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#10",
+    "text": "Also, since Webpack 4, when using `mode: 'production'`, files are optimized by default which includes mangling your code in order to minimize file sizes. This breaks the [migrations](../migrations/01-why.md) because TypeORM relies on their names to determine which has already been executed. You may disable minimization completely by adding:\n\n```javascript\nmodule.exports = {\n    // ... other Webpack configurations here\n    optimization: {\n        minimize: false,\n    },\n}\n```\n\nAlternatively, if you are using the `UglifyJsPlugin`, you can tell it to not change class or function names like so:\n\n```javascript\nconst UglifyJsPlugin = require(\"uglifyjs-webpack-plugin\")\n\nmodule.exports = {\n    // ... other Webpack configurations here\n    optimization: {\n        minimizer: [\n            new UglifyJsPlugin({\n                uglifyOptions: {\n                    keep_classnames: true,\n                    keep_fnames: true,\n                },\n            }),\n        ],\n    },\n}\n```\n\nLastly, make sure in your data source options, the transpiled migration files are included:\n\n```javascript\n// TypeORM Configurations\nmodule.exports = {\n    // ...\n    migrations: [__dirname + \"/migrations/**/*{.js,.ts}\"],\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/migrations/11-vite.md#0",
+    "text": "# Vite\n\nUsing TypeORM in a [Vite](https://vite.dev) project is pretty straight forward. However, when you use [migrations](../migrations/01-why.md), you will run into \"...migration name is wrong. Migration class name should have a\nJavaScript timestamp appended.\" errors when running the production build.\nOn production builds, files are [optimized by default](https://vite.dev/config/build-options#build-minify) which includes mangling your code in order to minimize file sizes.\n\nYou have 3 options to mitigate this. The 3 options are shown below as diff to this basic `vite.config.ts`\n\n```typescript\nimport legacy from \"@vitejs/plugin-legacy\"\nimport vue from \"@vitejs/plugin-vue\"\nimport path from \"path\"\nimport { defineConfig } from \"vite\"\n\n// https://vitejs.dev/config/\nexport default defineConfig({\n    build: {\n        sourcemap: true,\n    },\n    plugins: [vue(), legacy()],\n    resolve: {\n        alias: {\n            \"@\": path.resolve(__dirname, \"./src\"),\n        },\n    },\n})\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/migrations/11-vite.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/help/1-faq.md#10",
+    "b": "typeorm:docs/docs/migrations/11-vite.md#0",
+    "relation": "overlapping",
+    "related": 0.9947,
+    "probabilities": {
+     "same": 0.0128,
+     "overlapping": 0.9749,
+     "conflicting": 0.0069,
+     "unrelated": 0.0053
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 194,
+   "passage_reads": 1,
+   "passages_ms": 204,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 398,
+   "total_ms": 401
+  }
+ }
+}

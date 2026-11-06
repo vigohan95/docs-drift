@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/afterEach.rerank",
+ "recorded_at": "2026-11-06T13:42:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 875,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "39.948799",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=189"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `afterEach`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `afterEach`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/ExpectAPI.md#80",
+    "title": "docs/ExpectAPI.md > Matcher State > `expect.getState()`",
+    "text": "### `expect.getState()`\n\nReturns the current state of the `expect` module. This is useful for accessing test metadata inside `beforeEach`, `afterEach`, custom matchers, or any code that runs during a test.\n\nThe state object includes the following commonly used properties (among others). Note that these fields may be `undefined` when called outside an active test:"
+   },
+   {
+    "id": "jest:docs/GlobalAPI.md#3",
+    "title": "docs/GlobalAPI.md > Reference > `afterEach(fn, timeout)`",
+    "text": "### `afterEach(fn, timeout)`\n\nRuns a function after each one of the tests in this file completes. If the function returns a promise or is a generator, Jest waits for that promise to resolve before continuing.\n\nOptionally, you can provide a `timeout` (in milliseconds) for specifying how long to wait before aborting. The default timeout is 5 seconds.\n\nThis is often useful if you want to clean up some temporary state that is created by each test.\n\nFor example:\n\n```js\nconst globalDatabase = makeGlobalDatabase();\n\nfunction cleanUpDatabase(db) {\n  db.cleanUp();\n}\n\nafterEach(() => {\n  cleanUpDatabase(globalDatabase);\n});\n\ntest('can find things', () => {\n  return globalDatabase.find('thing', {}, results => {\n    expect(results.length).toBeGreaterThan(0);\n  });\n});\n\ntest('can insert a thing', () => {\n  return globalDatabase.insert('thing', makeThing(), response => {\n    expect(response.success).toBeTruthy();\n  });\n});\n```\n\nHere the `afterEach` ensures that `cleanUpDatabase` is called after each test runs.\n\nIf `afterEach` is inside a `describe` block, it only runs after the tests that are inside this describe block.\n\nIf you want to run some cleanup just once, after all of the tests run, use `afterAll` instead."
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#1",
+    "title": "docs/SetupAndTeardown.md > Repeating Setup",
+    "text": "## Repeating Setup\n\nIf you have some work you need to do repeatedly for many tests, you can use `beforeEach` and `afterEach` hooks.\n\nFor example, let's say that several tests interact with a database of cities. You have a method `initializeCityDatabase()` that must be called before each of these tests, and a method `clearCityDatabase()` that must be called after each of these tests. You can do this with:\n\n```js\nbeforeEach(() => {\n  initializeCityDatabase();\n});\n\nafterEach(() => {\n  clearCityDatabase();\n});\n\ntest('city database has Vienna', () => {\n  expect(isCity('Vienna')).toBeTruthy();\n});\n\ntest('city database has San Juan', () => {\n  expect(isCity('San Juan')).toBeTruthy();\n});\n```\n\n`beforeEach` and `afterEach` can handle asynchronous code in the same ways that [tests can handle asynchronous code](TestingAsyncCode.md) - they can either take a `done` parameter or return a promise. For example, if `initializeCityDatabase()` returned a promise that resolved when the database was initialized, we would want to return that promise:\n\n```js\nbeforeEach(() => {\n  return initializeCityDatabase();\n});\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "jest:docs/GlobalAPI.md#3",
+    "action": "use",
+    "relevance_score": 0.994,
+    "document_score": 0.9956,
+    "levels": {
+     "answers": 0.994,
+     "elsewhere": 0.0016,
+     "different_case": 0.0022,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/SetupAndTeardown.md#1",
+    "action": "use",
+    "relevance_score": 0.9599,
+    "document_score": 0.9831,
+    "levels": {
+     "answers": 0.9599,
+     "elsewhere": 0.0232,
+     "different_case": 0.0103,
+     "unrelated": 0.0066
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/ExpectAPI.md#80",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0319,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0286,
+     "different_case": 0.0158,
+     "unrelated": 0.9523
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 927
+  },
+  "timing": {
+   "total_ms": 66,
+   "rerank_ms": 51,
+   "questions_ms": 0,
+   "model_ms": 37,
+   "engine": {
+    "rows": 1332,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 37,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

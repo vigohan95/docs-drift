@@ -1,0 +1,163 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/PrimaryColumn.rerank",
+ "recorded_at": "2026-11-06T13:42:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1005,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "94.624321",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=319"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@PrimaryColumn`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@PrimaryColumn`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/drivers/mongodb.md#6",
+    "title": "docs/docs/drivers/mongodb.md > MongoDB > Defining entities and columns",
+    "text": "## Defining entities and columns\n\nDefining entities and columns is almost the same as in relational databases,\nthe main difference is that you must use `@ObjectIdColumn`\ninstead of `@PrimaryColumn` or `@PrimaryGeneratedColumn`.\n\nSimple entity example:\n\n```typescript\nimport { ObjectId } from \"mongodb\"\nimport { Entity, ObjectIdColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class User {\n    @ObjectIdColumn()\n    _id: ObjectId\n\n    @Column()\n    firstName: string\n\n    @Column()\n    lastName: string\n}\n```\n\nAnd this is how you bootstrap the app:\n\n```typescript\nimport { DataSource } from \"typeorm\"\n\nconst myDataSource = new DataSource({\n    type: \"mongodb\",\n    host: \"localhost\",\n    port: 27017,\n    database: \"test\",\n})\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/entity/1-entities.md#3",
+    "title": "docs/docs/entity/1-entities.md > Entities > Entity columns > Primary columns",
+    "text": "### Primary columns\n\nEach entity must have at least one primary column.\nThere are several types of primary columns:\n\n- `@PrimaryColumn()` creates a primary column which takes any value of any type. You can specify the column type. If you don't specify a column type it will be inferred from the property type. The example below will create id with `int` as type which you must manually assign before save.\n\n```typescript\nimport { Entity, PrimaryColumn } from \"typeorm\"\n\n@Entity()\nexport class User {\n    @PrimaryColumn()\n    id: number\n}\n```\n\n- `@PrimaryGeneratedColumn()` creates a primary column which value will be automatically generated with an auto-increment value. It will create `int` column with `auto-increment`/`serial`/`sequence`/`identity` (depend on the database and configuration provided). You don't have to manually assign its value before save - value will be automatically generated.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn } from \"typeorm\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n}\n```\n\n- `@PrimaryGeneratedColumn(\"uuid\")` creates a primary column which value will be automatically generated with `uuid`. Uuid is a unique string id. You don't have to manually assign its value before save - value will be automatically generated.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn } from \"typeorm\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn(\"uuid\")\n    id: string\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/entity/1-entities.md#14",
+    "title": "docs/docs/entity/1-entities.md > Entities > Column options",
+    "text": "## Column options\n\nColumn options defines additional options for your entity columns.\nYou can specify column options on `@Column`:\n\n```typescript\n@Column({\n    type: \"varchar\",\n    length: 150,\n    unique: true,\n    // ...\n})\nname: string;\n```\n\nList of available options in `ColumnOptions`:\n\n- `type: ColumnType` - Column type. One of the type listed [above](#column-types).\n- `name: string` - Column name in the database table.\n  By default the column name is generated from the name of the property.\n  You can change it by specifying your own name.\n\n- `length: number` - Column type's length. For example if you want to create `varchar(150)` type you specify column type and length options.\n- `onUpdate: string` - `ON UPDATE` trigger. Used only in [MySQL](https://dev.mysql.com/doc/refman/5.7/en/timestamp-initialization.html).\n- `nullable: boolean` - Makes column `NULL` or `NOT NULL` in the database. By default column is `nullable: false`.\n- `update: boolean` - Indicates if column value is updated by \"save\" operation. If false, you'll be able to write this value only when you first time insert the object. Default value is `true`.\n- `insert: boolean` - Indicates if column value is set the first time you insert the object. Default value is `true`.\n- `select: boolean` - Defines whether or not to hide this column by default when making queries. When set to `false`, the column data will not show with a standard query. By default column is `select: true`\n- `default: string` - Adds database-level column's `DEFAULT` value.\n- `primary: boolean` - Marks column as primary. Same if you use `@PrimaryColumn`.\n- `unique: boolean` - Marks column as unique column (creates unique constraint).\n- `comment: string` - Database's column comment. Not supported by all database types.\n- `precision: number` - The precision for a decimal (exact numeric) column (applies only for decimal column), which is the maximum\n  number of digits that are stored for the values. Used in some column types.\n- `scale: number` - The scale for a decimal (exact numeric) column (applies only for decimal column), which represents the number of digits to the right of the decimal point and must not be greater than precision. Used in some column types.\n- `unsigned: boolean` - Puts `UNSIGNED` attribute on to a numeric column. Used only in MySQL.\n- `charset: string` - Defines a column character set. Not supported by all database types.\n- `collation: string` - Defines a column collation.\n- `enum: string[]|AnyEnum` - Used in `enum` column type to specify list of allowed enum values. You can specify array of values or specify a enum class.\n- `enumName: string` - Defines the name for the used enum.\n- `asExpression: string` - Generated column expression. Supported by PostgreSQL/CockroachDB, MySQL/MariaDB, Oracle, SAP HANA, Spanner, SQLite, and SQL Server.\n- `generatedType: \"VIRTUAL\"|\"STORED\"` - Generated column type. Supported by PostgreSQL (`STORED` only), CockroachDB, MySQL/MariaDB, Oracle (`VIRTUAL` only), Spanner (`STORED` only), SQLite, and SQL Server (`STORED` only, internally mapped to `PERSISTED`).\n- `hstoreType: \"object\"|\"string\"` - Return type of `HSTORE` column. Returns value as string or as object. Used only in [Postgres](https://www.postgresql.org/docs/9.6/static/hstore.html).\n- `array: boolean` - Used for postgres and cockroachdb column types which can be array (for example int[])\n- `transformer: { from(value: DatabaseType): EntityType, to(value: EntityType): DatabaseType }` - Used to marshal properties of arbitrary type `EntityType` into a type `DatabaseType` supported by the database. Array of transformers are also supported and will be applied in natural order when writing, and in reverse order when reading. e.g. `[lowercase, encrypt]` will first lowercase the string then encrypt it when writing, and will decrypt then do nothing when reading."
+   },
+   {
+    "id": "typeorm:docs/docs/getting-started.md#12",
+    "title": "docs/docs/getting-started.md > Getting Started > Step-by-Step Guide > Creating a primary column",
+    "text": "### Creating a primary column\n\nEach entity **must** have at least one primary key column.\nThis is a requirement, and you can't avoid it.\nTo make a column a primary key, you need to use the `@PrimaryColumn` decorator.\n\n```typescript\nimport { Entity, Column, PrimaryColumn } from \"typeorm\"\n\n@Entity()\nexport class Photo {\n    @PrimaryColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @Column()\n    description: string\n\n    @Column()\n    filename: string\n\n    @Column()\n    views: number\n\n    @Column()\n    isPublished: boolean\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#2",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Column decorators > `@Column`",
+    "text": "#### `@Column`\n\nMarks a property in your entity as a table column.\nExample:\n\n```typescript\n@Entity(\"users\")\nexport class User {\n    @Column({ primary: true })\n    id: number\n\n    @Column({ type: \"varchar\", length: 200, unique: true })\n    firstName: string\n\n    @Column({ nullable: true })\n    lastName: string\n\n    @Column({ default: false })\n    isActive: boolean\n}\n```\n\n`@Column` accept several options you can use:\n\n- `type: ColumnType` - Column type. One of the [supported column types](../entity/1-entities.md#column-types).\n- `name: string` - Column name in the database table.\n  By default, the column name is generated from the name of the property.\n  You can change it by specifying your own name.\n- `length: string|number` - Column type's length. For example, if you want to create `varchar(150)` type\n  you specify column type and length options.\n- `width: number` - column type's display width. Used only for [MySQL integer types](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html). _Deprecated_ in newer MySQL versions, will be removed from TypeORM in an upcoming version.\n- `onUpdate: string` - `ON UPDATE` trigger. Used only in [MySQL](https://dev.mysql.com/doc/refman/5.7/en/timestamp-initialization.html).\n- `nullable: boolean` - determines whether the column can become `NULL` or always has to be `NOT NULL`. By default column is `nullable: false`.\n- `update: boolean` - Indicates if column value is updated by \"save\" operation. If false, you'll be able to write this value only when you first time insert the object.\n  Default value is `true`.\n- `insert: boolean` - Indicates if column value is set the first time you insert the object. Default value is `true`.\n- `select: boolean` - Defines whether or not to hide this column by default when making queries. When set to `false`, the column data will not show with a standard query. By default column is `select: true`\n- `default: string` - Adds database-level column's `DEFAULT` value.\n- `primary: boolean` - Marks column as primary. Same as using `@PrimaryColumn`.\n- `unique: boolean` - Marks column as unique column (creates unique constraint). Default value is false.\n- `comment: string` - Database's column comment. Not supported by all database types.\n- `precision: number` - The precision for a decimal (exact numeric) column (applies only for decimal column), which is the maximum\n  number of digits that are stored for the values. Used in some column types.\n- `scale: number` - The scale for a decimal (exact numeric) column (applies only for decimal column),\n  which represents the number of digits to the right of the decimal point and must not be greater than precision.\n  Used in some column types.\n- `zerofill: boolean` - Puts `ZEROFILL` attribute on to a numeric column. Used only in MySQL. If `true`, MySQL automatically adds the `UNSIGNED` attribute to this column. _Deprecated_ in newer MySQL versions, will be removed from TypeORM in an upcoming version. Use a character column and the `LPAD` function as suggested by MySQL.\n- `unsigned: boolean` - Puts `UNSIGNED` attribute on to a numeric column. Used only in MySQL.\n- `charset: string` - Defines a column character set. Not supported by all database types.\n- `collation: string` - Defines a column collation.\n- `enum: string[]|AnyEnum` - Used in `enum` column type to specify list of allowed enum values.\n  You can specify array of values or specify a enum class.\n- `enumName: string` - A name for generated enum type. If not specified, TypeORM will generate a enum type from entity and column names - so it's necessary if you intend to use the same enum type in different tables."
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#5",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Column decorators > `@PrimaryColumn`",
+    "text": "#### `@PrimaryColumn`\n\nMarks a property in your entity as a table primary column.\nSame as `@Column` decorator but sets its `primary` option to true.\n\nExample:\n\n```typescript\n@Entity()\nexport class User {\n    @PrimaryColumn()\n    id: number\n}\n```\n\n`@PrimaryColumn()` supports custom primary key constraint name:\n\n```typescript\n@Entity()\nexport class User {\n    @PrimaryColumn({ primaryKeyConstraintName: \"pk_user_id\" })\n    id: number\n}\n```\n\n> Note: when using `primaryKeyConstraintName` with multiple primary keys, the constraint name must be the same for all primary columns.\n\nLearn more about [entity columns](../entity/1-entities.md#entity-columns)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/entity/1-entities.md#3",
+    "action": "use",
+    "relevance_score": 0.993,
+    "document_score": 0.995,
+    "levels": {
+     "answers": 0.993,
+     "elsewhere": 0.002,
+     "different_case": 0.0024,
+     "unrelated": 0.0026
+    }
+   },
+   {
+    "index": 5,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#5",
+    "action": "use",
+    "relevance_score": 0.99,
+    "document_score": 0.9945,
+    "levels": {
+     "answers": 0.99,
+     "elsewhere": 0.0045,
+     "different_case": 0.0034,
+     "unrelated": 0.0021
+    }
+   },
+   {
+    "index": 4,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#2",
+    "action": "use",
+    "relevance_score": 0.8701,
+    "document_score": 0.9565,
+    "levels": {
+     "answers": 0.8701,
+     "elsewhere": 0.0864,
+     "different_case": 0.0318,
+     "unrelated": 0.0117
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/entity/1-entities.md#14",
+    "action": "use",
+    "relevance_score": 0.786,
+    "document_score": 0.906,
+    "levels": {
+     "answers": 0.786,
+     "elsewhere": 0.12,
+     "different_case": 0.0485,
+     "unrelated": 0.0455
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/getting-started.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0639,
+    "document_score": 0.2126,
+    "levels": {
+     "answers": 0.0639,
+     "elsewhere": 0.1486,
+     "different_case": 0.0342,
+     "unrelated": 0.7532
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/drivers/mongodb.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0061,
+    "document_score": 0.0192,
+    "levels": {
+     "answers": 0.0061,
+     "elsewhere": 0.0131,
+     "different_case": 0.0238,
+     "unrelated": 0.957
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3321
+  },
+  "timing": {
+   "total_ms": 114,
+   "rerank_ms": 99,
+   "questions_ms": 0,
+   "model_ms": 89,
+   "engine": {
+    "rows": 4131,
+    "branches": 6,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 89,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 85,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

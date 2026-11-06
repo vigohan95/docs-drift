@@ -1,0 +1,108 @@
+{
+ "endpoint": "grounding",
+ "tag": "fastify-claims/018.grounding",
+ "recorded_at": "2026-11-06T13:38:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1056,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "126.680412",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=45,cfOrigin;dur=0,cfWorker;dur=278"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "text": "#### What The Default Error Handler Sends\nThe default error handler serializes the error into a JSON body with the\n`statusCode`, `error`, and `message` properties, plus `code` when the error\ncarries one:\n\n```js\napp.get('/', async () => { throw new Error('kaboom') })\n```\n\n```json\n{\n  \"statusCode\": 500,\n  \"error\": \"Internal Server Error\",\n  \"message\": \"kaboom\"\n}\n```\n\nThe `error` property is the generic HTTP status text, but **`message` is\n`error.message` verbatim**. This applies to every status code, including `500`.\nFastify's built-in error serializer emits only these four properties, so the\nstack trace is not part of the default payload — but a route-level response\nschema replaces that serializer, and one that declares a `stack` property will\nserialize it.\n\n> Security:\n> Because `message` and `code` are forwarded as-is, errors thrown by libraries\n> deeper in your application are exposed to the client. A database driver\n> error, for example, can leak schema details and query text:\n>\n> ```json\n> {\n>   \"statusCode\": 500,\n>   \"code\": \"ER_BAD_FIELD_ERROR\",\n>   \"error\": \"Internal Server Error\",\n>   \"message\": \"Unknown column 'username' in 'field list'\"\n> }\n> ```\n>\n> Fastify does not distinguish between development and production here. If\n> unexpected errors must not reach the client, handle this explicitly."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#22",
+    "text": "###### Async-Await and Promises\n<a id=\"async-await-promise\"></a>\n\nFastify natively handles promises and supports async-await.\n\n*Note that in the following examples we are not using reply.send.*\n```js\nconst { promisify } = require('node:util')\nconst delay = promisify(setTimeout)\n\nfastify.get('/promises', options, function (request, reply) {\n return delay(200).then(() => { return { hello: 'world' }})\n})\n\nfastify.get('/async-await', options, async function (request, reply) {\n  await delay(200)\n  return { hello: 'world' }\n})\n```\n\nRejected promises default to a `500` HTTP status code. Reject the promise, or\n`throw` in an `async function`, with an object that has `statusCode` (or\n`status`) and `message` properties to modify the reply.\n\n```js\nfastify.get('/teapot', async function (request, reply) {\n  const err = new Error()\n  err.statusCode = 418\n  err.message = 'short and stout'\n  throw err\n})\n\nfastify.get('/botnet', async function (request, reply) {\n  throw { statusCode: 418, message: 'short and stout' }\n  // will return to the client the same json\n})\n```\n\nIf you want to know more please review\n[Routes#async-await](./Routes.md#async-await)."
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#10",
+    "text": "Register a [`setErrorHandler`](./Server.md#seterrorhandler) to replace the\nmessage for errors you did not raise deliberately, while letting the ones you\ndid pass through:\n\n```js\napp.setErrorHandler(function (error, request, reply) {\n  // Errors with a statusCode below 500 were raised deliberately by this\n  // application, as were validation errors. A status code below 500 is not on\n  // its own a guarantee that the message is safe to expose — narrow this\n  // condition if any of yours are not.\n  if (error.validation || (error.statusCode && error.statusCode < 500)) {\n    return reply.send(error)\n  }\n\n  // Anything else is unexpected: log it, but do not describe it to the client.\n  this.log.error({ err: error }, 'unhandled error')\n  reply.status(500).send({\n    statusCode: 500,\n    error: 'Internal Server Error',\n    message: 'Internal Server Error'\n  })\n})\n```\n\nThe handler above is registered on the root instance, so it applies to every\nroute. Error handlers are encapsulated; for how they resolve across plugin\ncontexts, see\n[the next section](#errors-in-fastify-lifecycle-hooks-and-a-custom-error-handler).\n\nNote that a route-level response schema is still applied to whatever the error\nhandler sends, and will reshape the payload accordingly — including properties\nthe built-in error serializer would have omitted, such as `stack`. See\n[Serialization](./Validation-and-Serialization.md#serialization)."
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#9",
+    "text": "##### customer-routes.js\n\n```js\nconst fp = require('fastify-plugin')\n\nconst provider = require('./provider')\n\nmodule.exports = fp(async function (fastify) {\n  fastify.get('*', async function (request ,reply) {\n    try {\n      const data = await provider.fetchSensitiveData(request.server.magicKey)\n      return { customer: true, error: false }\n    } catch (error) {\n      request.log.error({\n        error,\n        message: 'Failed at fetching sensitive data from provider',\n      })\n\n      reply.statusCode = 500\n      return { customer: null, error: true }\n    }\n  })\n})\n```\n\nThere is a very specific change on the previously existing files that is worth\nmentioning: Beforehand we were using the `server.listen` callback to start the\nauthentication process with the external provider and we were decorating the\n`server` object right before initializing the server. That was bloating our\nserver initialization setup with unnecessary code and didn't have much to do\nwith starting the Fastify server. It was a business logic that didn't have its\nspecific place in the code base.\n\nNow we've implemented the `delayIncomingRequests` plugin in the\n`delay-incoming-requests.js` file. That's, in truth, a module split into two\ndifferent plugins that will build up to a single use-case. That's the brains of\nour operation. Let's walk through what the plugins do:"
+   }
+  ],
+  "answer": "The API should now return a HTTP 500 error `{\"statusCode\":500,\"error\":\"Internal Server Error\",\"message\":\"Must be admin\"}`",
+  "claims": [
+   "The API should now return a HTTP 500 error `{\"statusCode\":500,\"error\":\"Internal Server Error\",\"message\":\"Must be admin\"}`"
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Learn By Example > Using Generics' of docs/Reference/TypeScript.md in the documentation of the fastify project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0063,
+  "ungrounded": 0.9937,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#9",
+    "share": 0,
+    "share_of_answer": 0.0019,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#22",
+    "share": 0,
+    "share_of_answer": 0.0016,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#10",
+    "share": 0,
+    "share_of_answer": 0.0016,
+    "claims": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "share": 0,
+    "share_of_answer": 0.0012,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "The API should now return a HTTP 500 error `{\"statusCode\":500,\"error\":\"Internal Server Error\",\"message\":\"Must be admin\"}`",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0063,
+    "contradicted": 0.0048,
+    "not_stated": 0.9842,
+    "not_a_claim": 0.0047,
+    "verdict": "not_stated",
+    "sources": {
+     "fastify:docs/Reference/Errors.md#9": 0.1965,
+     "fastify:docs/Reference/Reply.md#22": 0.2466,
+     "fastify:docs/Reference/Errors.md#10": 0.2544,
+     "fastify:docs/Guides/Delay-Accepting-Requests.md#9": 0.3025
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0063
+  },
+  "timing": {
+   "read_ms": 134,
+   "total_ms": 138
+  }
+ }
+}

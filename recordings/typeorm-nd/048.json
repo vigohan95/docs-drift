@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "typeorm-nd/048",
+ "recorded_at": "2026-11-06T13:43:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 966,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.413601",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=38,cfOrigin;dur=0,cfWorker;dur=235"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/entity/1-entities.md#0",
+    "text": "## What is an Entity?\n\nEntity is a class that maps to a database table (or collection when using MongoDB).\nYou can create an entity by defining a new class and mark it with `@Entity()`:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    firstName: string\n\n    @Column()\n    lastName: string\n\n    @Column()\n    isActive: boolean\n}\n```\n\nThis will create following database table:\n\n```text\n+-------------+--------------+----------------------------+\n|                          user                           |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| firstName   | varchar(255) |                            |\n| lastName    | varchar(255) |                            |\n| isActive    | boolean      |                            |\n+-------------+--------------+----------------------------+\n```\n\nBasic entities consist of columns and relations.\nEach entity **MUST** have a primary column (or an `ObjectId` column if are using MongoDB).\n\nEach entity must be registered in your data source options:\n\n```typescript\nimport { DataSource } from \"typeorm\"\nimport { User } from \"./entities/User\"\n\nconst myDataSource = new DataSource({\n    type: \"mysql\",\n    host: \"localhost\",\n    port: 3306,\n    username: \"test\",\n    password: \"test\",\n    database: \"test\",\n    entities: [User],\n})\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/entity/5-view-entities.md#0",
+    "text": "## What is a ViewEntity?\n\nView entity is a class that maps to a database view.\nYou can create a view entity by defining a new class and mark it with `@ViewEntity()`:\n\n`@ViewEntity()` accepts following options:\n\n- `name` - view name. If not specified, then view name is generated from entity class name.\n- `database` - database name in selected DB server.\n- `schema` - schema name.\n- `expression` - view definition. **Required parameter**.\n- `dependsOn` - List of other views on which the current views depends. If your view uses another view in its definition, you can add it here so that [migrations](../migrations/01-why.md) are generated in the correct order.\n\n`expression` can be string with properly escaped columns and tables, depend on database used (postgres in example):\n\n```typescript\n@ViewEntity({\n    expression: `\n        SELECT \"post\".\"id\" AS \"id\", \"post\".\"name\" AS \"name\", \"category\".\"name\" AS \"categoryName\"\n        FROM \"post\" \"post\"\n        LEFT JOIN \"category\" \"category\" ON \"post\".\"categoryId\" = \"category\".\"id\"\n    `\n})\n```\n\nor an instance of QueryBuilder\n\n```typescript\n@ViewEntity({\n    expression: (dataSource: DataSource) => dataSource\n        .createQueryBuilder()\n        .select(\"post.id\", \"id\")\n        .addSelect(\"post.name\", \"name\")\n        .addSelect(\"category.name\", \"categoryName\")\n        .from(Post, \"post\")\n        .leftJoin(Category, \"category\", \"category.id = post.categoryId\")\n})\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/entity/1-entities.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/entity/5-view-entities.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/entity/1-entities.md#0",
+    "b": "typeorm:docs/docs/entity/5-view-entities.md#0",
+    "relation": "unrelated",
+    "related": 0.0116,
+    "probabilities": {
+     "same": 0.0042,
+     "overlapping": 0.0035,
+     "conflicting": 0.004,
+     "unrelated": 0.9884
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36
+  },
+  "timing": {
+   "read_ms": 36,
+   "total_ms": 39
+  }
+ }
+}

@@ -1,0 +1,179 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/JoinTable.rerank",
+ "recorded_at": "2026-11-06T13:42:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1084,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.283936",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=414"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `@JoinTable`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `@JoinTable`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#31",
+    "title": "docs/docs/getting-started.md > Getting Started > Step-by-Step Guide > Creating a many-to-many relation",
+    "text": "### Creating a many-to-many relation\n\nLet's create a many-to-many relation.\nLet's say a photo can be in many albums, and each album can contain many photos.\nLet's create an `Album` class:\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\n\n@Entity()\nexport class Album {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @ManyToMany(() => Photo, (photo) => photo.albums)\n    @JoinTable()\n    photos: Photo[]\n}\n```\n\n`@JoinTable` is required to specify that this is the owner side of the relationship.\n\nNow let's add the inverse side of our relation to the `Photo` class:\n\n```typescript\nexport class Photo {\n    // ... other columns\n\n    @ManyToMany(() => Album, (album) => album.photos)\n    albums: Album[]\n}\n```\n\nAfter you run the application, the ORM will create an **album_photos_photo_albums** _junction table_:\n\n```text\n+-------------+--------------+----------------------------+\n|                album_photos_photo_albums                |\n+-------------+--------------+----------------------------+\n| album_id    | int          | PRIMARY KEY FOREIGN KEY    |\n| photo_id    | int          | PRIMARY KEY FOREIGN KEY    |\n+-------------+--------------+----------------------------+\n```\n\nRemember to register the `Album` class with your connection in the ORM:"
+   },
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "title": "docs/docs/help/1-faq.md > FAQ > What does \"owner side\" in a relations mean or why we need to use `@JoinColumn` and `@JoinTable`?",
+    "text": "## What does \"owner side\" in a relations mean or why we need to use `@JoinColumn` and `@JoinTable`?\n\nLet's start with `one-to-one` relation.\nLet's say we have two entities: `User` and `Photo`:\n\n```typescript\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne()\n    photo: Photo\n}\n```\n\n```typescript\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @OneToOne()\n    user: User\n}\n```\n\nThis example does not have a `@JoinColumn` which is incorrect.\nWhy? Because to make a real relation, we need to create a column in the database.\nWe need to create a column `userId` in `photo` or `photoId` in `user`.\nBut which column should be created - `userId` or `photoId`?\nTypeORM cannot decide for you.\nTo make a decision, you must use `@JoinColumn` on one of the sides.\nIf you put `@JoinColumn` in `Photo` then a column called `userId` will be created in the `photo` table.\nIf you put `@JoinColumn` in `User` then a column called `photoId` will be created in the `user` table.\nThe side with `@JoinColumn` will be called the \"owner side of the relationship\".\nThe other side of the relation, without `@JoinColumn`, is called the \"inverse (non-owner) side of relationship\".\n\nIt is the same in a `@ManyToMany` relation. You use `@JoinTable` to show the owner side of the relation.\n\nIn `@ManyToOne` or `@OneToMany` relations, `@JoinColumn` is not necessary because\nboth decorators are different, and the table where you put the `@ManyToOne` decorator will have the relational column.\n\n`@JoinColumn` and `@JoinTable` decorators can also be used to specify additional\njoin column / junction table settings, like join column name or junction table name."
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#19",
+    "title": "docs/docs/help/3-decorator-reference.md > Decorator reference > Relation decorators > `@JoinTable`",
+    "text": "#### `@JoinTable`\n\nUsed for `many-to-many` relations and describes join columns of the \"junction\" table.\nJunction table is a special, separate table created automatically by TypeORM with columns referenced to the related entities.\nYou can change the name of the generated \"junction\" table, the column names inside the junction table, their referenced\ncolumns with the `joinColumn`- and `inverseJoinColumn` attributes, and the created foreign keys names.\nYou can also set parameter `synchronize` to false to skip schema update(same way as in @Entity)\n\nExample:\n\n```typescript\n@Entity()\nexport class Post {\n    @ManyToMany((type) => Category)\n    @JoinTable({\n        name: \"question_categories\",\n        joinColumn: {\n            name: \"question\",\n            referencedColumnName: \"id\",\n            foreignKeyConstraintName: \"fk_question_categories_questionId\",\n        },\n        inverseJoinColumn: {\n            name: \"category\",\n            referencedColumnName: \"id\",\n            foreignKeyConstraintName: \"fk_question_categories_categoryId\",\n        },\n        synchronize: false,\n    })\n    categories: Category[]\n}\n```\n\nIf the destination table has composite primary keys,\nthen an array of properties must be sent to the `@JoinTable` decorator."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "title": "docs/docs/relations/1-relations.md > Relations > `@JoinColumn` options",
+    "text": "## `@JoinColumn` options\n\n`@JoinColumn` not only defines which side of the relation contains the join column with a foreign key,\nbut also allows you to customize join column name and referenced column name.\n\nWhen we set `@JoinColumn`, it automatically creates a column in the database named `propertyName + referencedColumnName`.\nFor example:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn() // this decorator is optional for @ManyToOne, but required for @OneToOne\ncategory: Category;\n```\n\nThis code will create a `categoryId` column in the database.\nIf you want to change this name in the database you can specify a custom join column name:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ name: \"cat_id\" })\ncategory: Category;\n```\n\nJoin columns are always a reference to some other columns (using a foreign key).\nBy default your relation always refers to the primary column of the related entity.\nIf you want to create relation with other columns of the related entity -\nyou can specify them in `@JoinColumn` as well:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ referencedColumnName: \"name\" })\ncategory: Category;\n```\n\nThe relation now refers to `name` of the `Category` entity, instead of `id`.\nColumn name for that relation will become `categoryName`.\n\nYou can also join multiple columns. Note that they do not reference the primary column of the related entity by default: you must provide the referenced column name.\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn([\n    { name: \"category_id\", referencedColumnName: \"id\" },\n    { name: \"locale_id\", referencedColumnName: \"locale_id\" }\n])\ncategory: Category;\n```\n\n> **Note:** When using composite `@JoinColumn` or `@JoinTable`, TypeORM automatically sorts the foreign key columns to match the referenced entity's primary key order. This ensures compatibility with databases like MySQL, MSSQL, and SAP HANA that require FK columns to reference PK columns in index order."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#6",
+    "title": "docs/docs/relations/1-relations.md > Relations > `@JoinTable` options",
+    "text": "## `@JoinTable` options\n\n`@JoinTable` is used for `many-to-many` relations and describes join columns of the \"junction\" table.\nA junction table is a special separate table created automatically by TypeORM with columns that refer to the related entities.\nYou can change column names inside junction tables and their referenced columns with `@JoinColumn`:\nYou can also change the name of the generated \"junction\" table.\n\n```typescript\n@ManyToMany(type => Category)\n@JoinTable({\n    name: \"question_categories\", // table name for the junction table of this relation\n    joinColumn: {\n        name: \"question\",\n        referencedColumnName: \"id\"\n    },\n    inverseJoinColumn: {\n        name: \"category\",\n        referencedColumnName: \"id\"\n    }\n})\ncategories: Category[];\n```\n\nIf the destination table has composite primary keys,\nthen an array of properties must be sent to `@JoinTable`."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#0",
+    "title": "docs/docs/relations/4-many-to-many-relations.md > Many-to-many relations > What are many-to-many relations?",
+    "text": "## What are many-to-many relations?\n\nMany-to-many is a relation where A contains multiple instances of B, and B contains multiple instances of A.\nLet's take for example `Question` and `Category` entities.\nA question can have multiple categories, and each category can have multiple questions.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class Category {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\nimport { Category } from \"./Category\"\n\n@Entity()\nexport class Question {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    title: string\n\n    @Column()\n    text: string\n\n    @ManyToMany(() => Category)\n    @JoinTable()\n    categories: Category[]\n}\n```\n\n`@JoinTable()` is required for `@ManyToMany` relations.\nYou must put `@JoinTable` on one (owning) side of relation.\nThe `deferrable` relation option applies to both foreign keys on the junction table; see [relation options](./1-relations.md#relation-options).\n\nThis example will produce following tables:\n\n```text\n+-------------+--------------+----------------------------+\n|                        category                         |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| name        | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|                        question                         |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| title       | varchar(255) |                            |\n| text        | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|              question_categories_category               |\n+-------------+--------------+----------------------------+\n| questionId  | int          | PRIMARY KEY FOREIGN KEY    |\n| categoryId  | int          | PRIMARY KEY FOREIGN KEY    |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "title": "docs/docs/relations/4-many-to-many-relations.md > Many-to-many relations > Bi-directional relations",
+    "text": "## Bi-directional relations\n\nRelations can be uni-directional and bi-directional.\nUni-directional relations are relations with a relation decorator only on one side.\nBi-directional relations are relations with decorators on both sides of a relation.\n\nWe just created a uni-directional relation. Let's make it bi-directional:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from \"typeorm\"\nimport { Question } from \"./Question\"\n\n@Entity()\nexport class Category {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @ManyToMany(() => Question, (question) => question.categories)\n    questions: Question[]\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\nimport { Category } from \"./Category\"\n\n@Entity()\nexport class Question {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    title: string\n\n    @Column()\n    text: string\n\n    @ManyToMany(() => Category, (category) => category.questions)\n    @JoinTable()\n    categories: Category[]\n}\n```\n\nWe just made our relation bi-directional. Note that the inverse relation does not have a `@JoinTable`.\n`@JoinTable` must be only on one side of the relation.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst categoriesWithQuestions = await dataSource\n    .getRepository(Category)\n    .createQueryBuilder(\"category\")\n    .leftJoinAndSelect(\"category.questions\", \"question\")\n    .getMany()\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 5,
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#0",
+    "action": "use",
+    "relevance_score": 0.9945,
+    "document_score": 0.9963,
+    "levels": {
+     "answers": 0.9945,
+     "elsewhere": 0.0018,
+     "different_case": 0.0018,
+     "unrelated": 0.0019
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/getting-started.md#31",
+    "action": "use",
+    "relevance_score": 0.9936,
+    "document_score": 0.9954,
+    "levels": {
+     "answers": 0.9936,
+     "elsewhere": 0.0018,
+     "different_case": 0.0021,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 6,
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "action": "use",
+    "relevance_score": 0.9895,
+    "document_score": 0.9931,
+    "levels": {
+     "answers": 0.9895,
+     "elsewhere": 0.0036,
+     "different_case": 0.0037,
+     "unrelated": 0.0032
+    }
+   },
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#19",
+    "action": "use",
+    "relevance_score": 0.9861,
+    "document_score": 0.9908,
+    "levels": {
+     "answers": 0.9861,
+     "elsewhere": 0.0046,
+     "different_case": 0.0046,
+     "unrelated": 0.0047
+    }
+   },
+   {
+    "index": 4,
+    "id": "typeorm:docs/docs/relations/1-relations.md#6",
+    "action": "use",
+    "relevance_score": 0.9598,
+    "document_score": 0.9823,
+    "levels": {
+     "answers": 0.9598,
+     "elsewhere": 0.0224,
+     "different_case": 0.0104,
+     "unrelated": 0.0073
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "action": "use",
+    "relevance_score": 0.5621,
+    "document_score": 0.9141,
+    "levels": {
+     "answers": 0.5621,
+     "elsewhere": 0.352,
+     "different_case": 0.036,
+     "unrelated": 0.0499
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "action": "expand",
+    "relevance_score": 0.0908,
+    "document_score": 0.8516,
+    "levels": {
+     "answers": 0.0908,
+     "elsewhere": 0.7608,
+     "different_case": 0.0517,
+     "unrelated": 0.0966
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3396
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4341,
+    "branches": 7,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

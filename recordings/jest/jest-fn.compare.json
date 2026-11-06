@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "jest/jest-fn.compare",
+ "recorded_at": "2026-11-06T13:43:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 937,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "94.78685",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=29,cfOrigin;dur=0,cfWorker;dur=224"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/MockFunctionAPI.md#0",
+    "text": "---\nid: mock-function-api\ntitle: Mock Functions\n---\n\nMock functions are also known as \"spies\", because they let you spy on the behavior of a function that is called indirectly by some other code, rather than only testing the output. You can create a mock function with `jest.fn()`. If no implementation is given, the mock function will return `undefined` when invoked.\n\nimport TypeScriptExamplesNote from './_TypeScriptExamplesNote.md';\n\n<TypeScriptExamplesNote />"
+   },
+   {
+    "id": "jest:docs/MockFunctions.md#6",
+    "text": "## Mock Implementations\n\nStill, there are cases where it's useful to go beyond the ability to specify return values and full-on replace the implementation of a mock function. This can be done with `jest.fn` or the `mockImplementationOnce` method on mock functions.\n\n```javascript\nconst myMockFn = jest.fn(cb => cb(null, true));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n```\n\nThe `mockImplementation` method is useful when you need to define the default implementation of a mock function that is created from another module:\n\n```js title=\"foo.js\"\nmodule.exports = function () {\n  // some implementation;\n};\n```\n\n```js title=\"test.js\"\njest.mock('../foo'); // this happens automatically with automocking\nconst foo = require('../foo');\n\n// foo is a mock function\nfoo.mockImplementation(() => 42);\nfoo();\n// > 42\n```\n\nWhen you need to recreate a complex behavior of a mock function such that multiple function calls produce different results, use the `mockImplementationOnce` method:\n\n```javascript\nconst myMockFn = jest\n  .fn()\n  .mockImplementationOnce(cb => cb(null, true))\n  .mockImplementationOnce(cb => cb(null, false));\n\nmyMockFn((err, val) => console.log(val));\n// > true\n\nmyMockFn((err, val) => console.log(val));\n// > false\n```\n\nWhen the mocked function runs out of implementations defined with `mockImplementationOnce`, it will execute the default implementation set with `jest.fn` (if it is defined):\n\n```javascript\nconst myMockFn = jest\n  .fn(() => 'default')\n  .mockImplementationOnce(() => 'first call')\n  .mockImplementationOnce(() => 'second call');\n\nconsole.log(myMockFn(), myMockFn(), myMockFn(), myMockFn());\n// > 'first call', 'second call', 'default', 'default'\n```\n\nFor cases where we have methods that are typically chained (and thus always need to return `this`), we have a sugary API to simplify this in the form of a `.mockReturnThis()` function that also sits on all mocks:\n\n```javascript\nconst myObj = {\n  myMethod: jest.fn().mockReturnThis(),\n};\n\n// is the same as\n\nconst otherObj = {\n  myMethod: jest.fn(function () {\n    return this;\n  }),\n};\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/MockFunctionAPI.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/MockFunctions.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/MockFunctionAPI.md#0",
+    "b": "jest:docs/MockFunctions.md#6",
+    "relation": "overlapping",
+    "related": 0.9988,
+    "probabilities": {
+     "same": 0.0031,
+     "overlapping": 0.9933,
+     "conflicting": 0.0024,
+     "unrelated": 0.0012
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 74,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 105,
+   "total_ms": 108
+  }
+ }
+}

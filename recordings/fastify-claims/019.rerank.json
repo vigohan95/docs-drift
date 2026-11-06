@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/019.rerank",
+ "recorded_at": "2026-11-06T13:38:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1016,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.050751",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=316"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Added async-await support for [plugins](../Reference/Plugins.md#async-await) ([#2093](https://github.com/fastify/fastify/pull/2093))",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#37",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .trailer(key, function)",
+    "text": "##### .trailer(key, function)\n<a id=\"trailer\"></a>\n\nSets a response trailer. Trailer is usually used when you need a header that\nrequires heavy resources to be sent after the `data`, for example,\n`Server-Timing` and `Etag`. It can ensure the client receives the response data\nas soon as possible.\n\n> ℹ️ Note:\n> For HTTP/1 responses, the header `Transfer-Encoding: chunked` will be added\n> once you use a trailer. HTTP/2 does not use chunked transfer encoding and\n> sends trailers using its native trailing headers support.\n\n> ℹ️ Note:\n> Any error passed to `done` callback will be ignored. If you are interested\n> in the error, you can turn on `debug` level logging.\n\n```js\nreply.trailer('server-timing', async function () {\n  return 'db;dur=53, app;dur=47.2'\n})\n\nconst { createHash } = require('node:crypto')\n// trailer function also receive two argument\n// @param {object} reply fastify reply\n// @param {string|Buffer|null} payload payload that already sent, note that it will be null when stream is sent\n// @param {function} done callback to set trailer value\nreply.trailer('content-md5', function(reply, payload, done) {\n  const hash = createHash('md5')\n  hash.update(payload)\n  done(null, hash.digest('hex'))\n})\n\n// when you prefer async-await\nreply.trailer('content-md5', async function(reply, payload) {\n  const hash = createHash('md5')\n  hash.update(payload)\n  return hash.digest('hex')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#71",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > version",
+    "text": "#### version\n<a id=\"version\"></a>\n\nFastify version of the instance. Used for plugin support. See\n[Plugins](./Plugins.md#handle-the-scope) for information on how the version is\nused by plugins."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#45",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Reply > fastify.FastifyReply<[RequestGeneric][FastifyRequestGenericInterface], [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [ContextConfig][ContextConfigGeneric]>",
+    "text": "##### fastify.FastifyReply<[RequestGeneric][FastifyRequestGenericInterface], [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [ContextConfig][ContextConfigGeneric]>\n[src](https://github.com/fastify/fastify/blob/main/types/reply.d.ts#L32)\n\nThis interface contains the custom properties that Fastify adds to the standard\nNode.js reply object. The properties added here disregard what kind of reply\nobject (http vs http2).\n\nIf you need to add custom properties to the FastifyReply object (such as when\nusing the `decorateReply` method) you need to use declaration merging on this\ninterface.\n\nA basic example is provided in the [`FastifyReply`][FastifyReply] section. For a\nmore detailed example check out the Learn By Example section:\n[Plugins](#plugins)"
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#0",
+    "title": "docs/Reference/Routes.md > Routes",
+    "text": "## Routes\n\nThe route methods configure the endpoints of the application. Routes can be\ndeclared using the shorthand method or the full declaration.\n\n- [Full declaration](#full-declaration)\n- [Routes options](#routes-options)\n- [Shorthand declaration](#shorthand-declaration)\n- [Url building](#url-building)\n- [Async Await](#async-await)\n- [Promise resolution](#promise-resolution)\n- [Route Prefixing](#route-prefixing)\n  - [Handling of / route inside prefixed\n    plugins](#handling-of--route-inside-prefixed-plugins)\n- [Custom Log Level](#custom-log-level)\n- [Custom Log Serializer](#custom-log-serializer)\n- [Config](#config)\n- [Constraints](#constraints)\n  - [Version Constraints](#version-constraints)\n  - [Host Constraints](#host-constraints)"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#41",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Request > fastify.FastifyRequest< [RequestGeneric][FastifyRequestGenericInterface], [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric]>",
+    "text": "##### fastify.FastifyRequest< [RequestGeneric][FastifyRequestGenericInterface], [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric]>\n[src](https://github.com/fastify/fastify/blob/main/types/request.d.ts#L15)\n\nThis interface contains properties of Fastify request object. The properties\nadded here disregard what kind of request object (http vs http2) and disregard\nwhat route level it is serving; thus calling `request.body` inside a GET request\nwill not throw an error (but good luck sending a GET request with a body 😉).\n\nIf you need to add custom properties to the `FastifyRequest` object (such as\nwhen using the [`decorateRequest`][DecorateRequest] method) you need to use\ndeclaration merging on this interface.\n\nA basic example is provided in the [`FastifyRequest`][FastifyRequest] section.\nFor a more detailed example check out the Learn By Example section:\n[Plugins](#plugins)"
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#10",
+    "title": "docs/Reference/Routes.md > Routes > Promise resolution",
+    "text": "### Promise resolution\n<a id=\"promise-resolution\"></a>\n\nIf the handler is an `async` function or returns a promise, be aware of the\nspecial behavior to support callback and promise control-flow. When the\nhandler's promise resolves, the reply is automatically sent with its value\nunless you explicitly await or return `reply` in the handler.\n\n1. If using `async/await` or promises but responding with `reply.send`:\n    - **Do** `return reply` / `await reply`.\n    - **Do not** forget to call `reply.send`.\n2. If using `async/await` or promises:\n    - **Do not** use `reply.send`.\n    - **Do** return the value to send.\n\nThis approach supports both `callback-style` and `async-await` with minimal\ntrade-off. However, it is recommended to use only one style for consistent\nerror handling within your application.\n\n> ℹ️ Note:\n> Every async function returns a promise by itself."
+   },
+   {
+    "id": "fastify:docs/Reference/Encapsulation.md#4",
+    "title": "docs/Reference/Encapsulation.md > Sharing Between Contexts",
+    "text": "Restarting the server and re-issuing the requests for `/two` and `/three`:\n\n```sh\ncurl http://127.0.0.1:8000/two\n# {\"answer\":42,\"foo\":\"foo\",\"bar\":\"bar\"}\ncurl http://127.0.0.1:8000/three\n# {\"answer\":42,\"foo\":\"foo\",\"bar\":\"bar\"}\n```\n\n`fastify-plugin` breaks encapsulation only for the plugin it wraps. Plugins\nregistered inside it without `fastify-plugin` still create new encapsulated\ncontexts:\n\n```js\n'use strict'\n\nconst fastify = require('fastify')()\nconst fp = require('fastify-plugin')\n\nfastify.register(fp(async function sharedContext (childServer) {\n  childServer.decorate('foo', 'foo')\n\n  childServer.register(async function encapsulatedContext (grandchildServer) {\n    grandchildServer.decorate('bar', 'bar')\n  })\n}))\n\nawait fastify.ready()\n\nconsole.log(fastify.foo) // 'foo'\nconsole.log(fastify.bar) // undefined\n```\n\nThe `foo` decorator is available in the root context because it is added\ndirectly by the plugin wrapped with `fastify-plugin`. The nested `register`\ncall still creates a grandchild context, so the `bar` decorator remains\navailable only in that context and its children.\n\n[fastify-plugin]: https://github.com/fastify/fastify-plugin"
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#16",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Conclusion",
+    "text": "## Conclusion\n\nSpecifics of the implementation will vary from one problem to another, but the\nmain goal of this guide was to show a very specific use case of an issue that\ncould be solved within Fastify's ecosystem.\n\nThis guide is a tutorial on the use of plugins, decorators, and hooks to solve\nthe problem of delaying serving specific requests on our application. It's not\nproduction-ready, as it keeps local state (the `magicKey`) and it's not\nhorizontally scalable (we don't want to flood our provider, right?). One way of\nimproving it would be storing the `magicKey` somewhere else (perhaps a cache\ndatabase?).\n\nThe keywords here were [Decorators](../Reference/Decorators.md),\n[Hooks](../Reference/Hooks.md), and [Plugins](../Reference/Plugins.md).\nCombining what Fastify has to offer can lead to very ingenious and creative\nsolutions to a wide variety of problems. Let's be creative! :)"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#15",
+    "title": "docs/Reference/TypeScript.md > Learn By Example > Plugins > Creating Type Definitions for a Fastify Plugin",
+    "text": "#### Creating Type Definitions for a Fastify Plugin\n\nThis plugin guide is for Fastify plugins written in JavaScript. The steps\noutlined in this example are for adding TypeScript support for users consuming\nyour plugin.\n\n1. Initialize a new npm project and install required dependencies\n   ```bash\n   npm init -y\n   npm i fastify-plugin\n   ```\n2. Create two files `index.js` and `index.d.ts`\n3. Modify the package json to include these files under the `main` and `types`\n   properties (the name does not have to be `index` explicitly, but it is\n   recommended the files have the same name):\n   ```json\n   {\n     \"main\": \"index.js\",\n     \"types\": \"index.d.ts\"\n   }\n   ```\n4. Open `index.js` and add the following code:\n   ```javascript\n   // fastify-plugin is highly recommended for any plugin you write\n   const fp = require('fastify-plugin')\n\n   function myPlugin (instance, options, done) {\n\n     // decorate the fastify instance with a custom function called myPluginFunc\n     instance.decorate('myPluginFunc', (input) => {\n       return input.toUpperCase()\n     })\n\n     done()\n   }\n\n   module.exports = fp(myPlugin, {\n     name: 'my-plugin' // this is used by fastify-plugin to derive the property name\n   })\n   ```\n5. Open `index.d.ts` and add the following code:\n   ```typescript\n   import { FastifyPluginCallback } from 'fastify'\n\n   interface PluginOptions {\n     //...\n   }\n\n   // Optionally, you can add any additional exports.\n   // Here we are exporting the decorator we added.\n   export interface myPluginFunc {\n     (input: string): string\n   }\n\n   // Most importantly, use declaration merging to add the custom property to the Fastify type system\n   declare module 'fastify' {\n     interface FastifyInstance {\n       myPluginFunc: myPluginFunc\n     }\n   }\n\n   // fastify-plugin automatically adds named export, so be sure to add also this type\n   // the variable name is derived from `options.name` property if `module.exports.myPlugin` is missing\n   export const myPlugin: FastifyPluginCallback<PluginOptions>\n\n   // fastify-plugin automatically adds `.default` property to the exported plugin. See the note below\n   export default myPlugin\n   ```"
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#1",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Core concepts",
+    "text": "### Core concepts\nValidation and serialization are handled by two customizable dependencies:\n- [Ajv v8](https://www.npmjs.com/package/ajv) for request validation\n- [fast-json-stringify](https://www.npmjs.com/package/fast-json-stringify) for\n  response body serialization\n\nThese dependencies share only the JSON schemas added to Fastify's instance via\n`.addSchema(schema)`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Reply.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0121,
+    "document_score": 0.0336,
+    "levels": {
+     "answers": 0.0121,
+     "elsewhere": 0.0215,
+     "different_case": 0.0763,
+     "unrelated": 0.8901
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Routes.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0101,
+    "document_score": 0.4657,
+    "levels": {
+     "answers": 0.0101,
+     "elsewhere": 0.4556,
+     "different_case": 0.0265,
+     "unrelated": 0.5078
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Routes.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0082,
+    "document_score": 0.0622,
+    "levels": {
+     "answers": 0.0082,
+     "elsewhere": 0.0541,
+     "different_case": 0.0864,
+     "unrelated": 0.8514
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#71",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0409,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.0379,
+     "different_case": 0.0203,
+     "unrelated": 0.9388
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/TypeScript.md#45",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0132,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0106,
+     "different_case": 0.0183,
+     "unrelated": 0.9685
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/TypeScript.md#41",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0311,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0285,
+     "different_case": 0.0252,
+     "unrelated": 0.9437
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Encapsulation.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0056,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0035,
+     "different_case": 0.0076,
+     "unrelated": 0.9868
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0065,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0045,
+     "different_case": 0.0074,
+     "unrelated": 0.9861
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/TypeScript.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0022,
+     "different_case": 0.0068,
+     "unrelated": 0.989
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0045,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0027,
+     "different_case": 0.0047,
+     "unrelated": 0.9908
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3700
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 4890,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

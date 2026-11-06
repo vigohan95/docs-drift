@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/015.rerank",
+ "recorded_at": "2026-11-06T13:37:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 998,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.345284",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=309"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: If `modernTargets` is not set, it is **not recommended** to use the `true` value (which uses auto-detection) because `core-js@3` is very aggressive in polyfill inclusions due to all the bleeding edge features it supports.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/config/build-options.md#13",
+    "title": "docs/config/build-options.md > Build Options > build.rolldownOptions",
+    "text": "## build.rolldownOptions\n\n- **Type:** [`RolldownOptions`](https://rolldown.rs/reference/)\n\nDirectly customize the underlying Rolldown bundle. This is the same as options that can be exported from a Rolldown config file and will be merged with Vite's internal Rolldown options. See [Rolldown options docs](https://rolldown.rs/reference/) for more details.\n\nVite overrides Rolldown's default for `preserveEntrySignatures`. When this option is not set, Vite uses `false` for regular client builds, `'strict'` for library builds, and `'allow-extension'` for SSR builds.\n\nInstead of `build.rolldownOptions.input`, it is recommended to set the top-level [`input`](/config/shared-options#input) option, because it will be used in dev as well. If `build.rolldownOptions.input` is set, it overrides the top-level `input` option for build only."
+   },
+   {
+    "id": "vite:docs/guide/features.md#0",
+    "title": "docs/guide/features.md > Features",
+    "text": "# Features\n\nAt the very basic level, developing using Vite is not that different from using a static file server. However, Vite provides many enhancements over native ESM imports to support various features that are typically seen in bundler-based setups."
+   },
+   {
+    "id": "vite:docs/guide/features.md#6",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options > `isolatedModules`",
+    "text": "#### `isolatedModules`\n\n- [TypeScript documentation](https://www.typescriptlang.org/tsconfig#isolatedModules)\n\nShould be set to `true`.\n\nIt is because Oxc transformer only performs transpilation without type information, it doesn't support certain features like const enum and implicit type-only imports.\n\nYou must set `\"isolatedModules\": true` in your `tsconfig.json` under `compilerOptions`, so that TS will warn you against the features that do not work with isolated transpilation.\n\nIf a dependency doesn't work well with `\"isolatedModules\": true`, you can use `\"skipLibCheck\": true` to temporarily suppress the errors until it is fixed upstream."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#22",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Syntax Error / Type Error happens",
+    "text": "### Syntax Error / Type Error happens\n\nVite cannot handle and does not support code that only runs on non-strict mode (sloppy mode). This is because Vite uses ESM and it is always [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) inside ESM.\n\nFor example, you might see these errors.\n\n> [ERROR] With statements cannot be used with the \"esm\" output format due to strict mode\n\n> TypeError: Cannot create property 'foo' on boolean 'false'\n\nIf these codes are used inside dependencies, you could use [`patch-package`](https://github.com/ds300/patch-package) (or [`yarn patch`](https://yarnpkg.com/cli/patch) or [`pnpm patch`](https://pnpm.io/cli/patch)) for an escape hatch."
+   },
+   {
+    "id": "vite:docs/guide/env-and-mode.md#4",
+    "title": "docs/guide/env-and-mode.md > Env Variables and Modes > Env Variables > `.env` Files",
+    "text": ":::\n\nAlso, Vite uses [dotenv-expand](https://github.com/motdotla/dotenv-expand) to expand variables written in env files out of the box. To learn more about the syntax, check out [their docs](https://github.com/motdotla/dotenv-expand#what-rules-does-the-expansion-engine-follow).\n\nNote that if you want to use `$` inside your environment value, you have to escape it with `\\`.\n\n```[.env]\nKEY=123\nNEW_KEY1=test$foo   # test\nNEW_KEY2=test\\$foo  # test$foo\nNEW_KEY3=test$KEY   # test123\n```\n\n::: details Expanding variables in reverse order\n\nVite supports expanding variables in reverse order.\nFor example, the `.env` below will be evaluated as `VITE_FOO=foobar`, `VITE_BAR=bar`.\n\n```[.env]\nVITE_FOO=foo${VITE_BAR}\nVITE_BAR=bar\n```\n\nThis does not work in shell scripts and other tools like `docker compose`.\nThat said, Vite supports this behavior as this has been supported by `dotenv-expand` for a long time and other tools in JavaScript ecosystem use older versions that support this behavior.\n\nTo avoid interop issues, it is recommended to avoid relying on this behavior. Vite may start emitting warnings for this behavior in the future.\n\n:::\n\n:::warning Ignoring local `.env` files\n\n`.env.*.local` files are local-only and can contain sensitive variables. You should add `*.local` to your `.gitignore` to avoid them being checked into git."
+   },
+   {
+    "id": "vite:docs/guide/why.md#5",
+    "title": "docs/guide/why.md > Why Vite > Where Vite is Heading",
+    "text": "## Where Vite is Heading\n\nVite's architecture continues to evolve. Several efforts are shaping its future:\n\n- **Full bundle mode**: Unbundled ESM was the right tradeoff when Vite was created because no tool was both fast enough and had the HMR and plugin capabilities needed to bundle during dev. Rolldown changes that. Since exceptionally large codebases can experience slow page loads due to the high number of unbundled network requests, the team is exploring a mode where the dev server bundles code similarly to production, reducing network overhead.\n\n- **Environment API**: Instead of treating \"client\" and \"SSR\" as the only two build targets, the [Environment API](./api-environment-instances.md) lets frameworks define custom environments (edge runtimes, service workers, and other deployment targets), each with their own module resolution and execution rules. As where and how code runs continues to diversify, Vite's model expands with it.\n\n- **Evolving with JavaScript**: With Oxc and Rolldown closely collaborating with Vite, new language features and standards can be adopted quickly across the entire toolchain, without waiting on upstream dependencies.\n\nVite's goal is not to be the final tool, but to be one that keeps evolving with the web platform, and with the developers building on it."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#7",
+    "title": "docs/guide/api-plugin.md > Plugin API > Rolldown Hooks",
+    "text": "## Rolldown Hooks\n\nDuring dev, the Vite dev server creates a plugin container that invokes [Rolldown Build Hooks](https://rolldown.rs/apis/plugin-api#build-hooks) the same way Rolldown does it.\n\nAll rolldown hooks are [per-environment hooks](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks).\n\nThe following hooks are called once on server start:\n\n- [`options`](https://rolldown.rs/reference/Interface.Plugin#options)\n- [`buildStart`](https://rolldown.rs/reference/Interface.Plugin#buildstart)\n\nThe following hooks are called on each incoming module request:\n\n- [`resolveId`](https://rolldown.rs/reference/Interface.Plugin#resolveid)\n- [`load`](https://rolldown.rs/reference/Interface.Plugin#load)\n- [`transform`](https://rolldown.rs/reference/Interface.Plugin#transform)\n\nThese hooks also have an extended `options` parameter with additional Vite-specific properties. You can read more in the [SSR documentation](/guide/ssr#ssr-specific-plugin-logic).\n\nSome `resolveId` calls' `importer` value may be an absolute path for a generic `index.html` at root as it's not always possible to derive the actual importer due to Vite's unbundled dev server pattern. For imports handled within Vite's resolve pipeline, the importer can be tracked during the import analysis phase, providing the correct `importer` value.\n\nThe following hooks are called when the server is closed:\n\n- [`buildEnd`](https://rolldown.rs/reference/Interface.Plugin#buildend)\n- [`closeBundle`](https://rolldown.rs/reference/Interface.Plugin#closebundle)\n\nNote that the [`moduleParsed`](https://rolldown.rs/reference/Interface.Plugin#moduleparsed) hook is **not** called during dev, because Vite avoids full AST parses for better performance.\n\n[Output Generation Hooks](https://rolldown.rs/apis/plugin-api#output-generation-hooks) (except `closeBundle`) are **not** called during dev."
+   },
+   {
+    "id": "vite:docs/guide/index.md#10",
+    "title": "docs/guide/index.md > Getting Started > Using Unreleased Commits",
+    "text": "## Using Unreleased Commits\n\nIf you can't wait for a new release to test the latest features, you can install a specific commit of Vite with https://pkg.pr.new:\n\n::: code-group\n\n```bash [npm]\n$ npm install -D https://pkg.pr.new/vite@SHA\n```\n\n```bash [Yarn]\n$ yarn add -D https://pkg.pr.new/vite@SHA\n```\n\n```bash [pnpm]\n$ pnpm add -D https://pkg.pr.new/vite@SHA\n```\n\n```bash [Bun]\n$ bun add -D https://pkg.pr.new/vite@SHA\n```\n\n:::\n\nReplace `SHA` with any of [Vite's commit SHAs](https://github.com/vitejs/vite/commits/main/). Note that only commits within the last month will work, as older commit releases are purged.\n\nAlternatively, you can also clone the [vite repo](https://github.com/vitejs/vite) to your local machine and then build and link it yourself ([pnpm](https://pnpm.io/) is required):\n\n```bash\ngit clone https://github.com/vitejs/vite.git\ncd vite\npnpm install\ncd packages/vite\npnpm run build\npnpm link # use your preferred package manager for this step\n```\n\nThen go to your Vite based project and run `pnpm link vite` (or the package manager that you used to link `vite` globally). Now restart the development server to ride on the bleeding edge!\n\nTo learn more about how and when Vite does releases, check out the [Releases](../releases.md) documentation.\n\n::: tip Dependencies using Vite\nTo replace the Vite version used by dependencies transitively, you should use [npm overrides](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#overrides) or [pnpm overrides](https://pnpm.io/settings#overrides).\n:::"
+   },
+   {
+    "id": "vite:docs/guide/features.md#20",
+    "title": "docs/guide/features.md > Features > CSS > CSS Pre-processors",
+    "text": "### CSS Pre-processors\n\nBecause Vite targets modern browsers only, it is recommended to use native CSS variables with PostCSS plugins that implement CSSWG drafts (e.g. [postcss-nesting](https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting)) and author plain, future-standards-compliant CSS.\n\nThat said, Vite does provide built-in support for `.scss`, `.sass`, `.less`, `.styl` and `.stylus` files. There is no need to install Vite-specific plugins for them, but the corresponding pre-processor itself must be installed:\n\n```bash\n# .scss and .sass\nnpm add -D sass-embedded # or sass\n\n# .less\nnpm add -D less\n\n# .styl and .stylus\nnpm add -D stylus\n```\n\nIf using Vue single file components, this also automatically enables `<style lang=\"sass\">` et al.\n\nVite improves `@import` resolving for Sass and Less so that Vite aliases are also respected. In addition, relative `url()` references inside imported Sass/Less files that are in different directories from the root file are also automatically rebased to ensure correctness. Rebasing `url()` references that start with a variable or an interpolation is not supported due to its API constraints.\n\n`@import` alias and url rebasing are not supported for Stylus due to its API constraints.\n\nYou can also use CSS modules combined with pre-processors by prepending `.module` to the file extension, for example `style.module.scss`."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Module externalized for browser compatibility",
+    "text": "### Module externalized for browser compatibility\n\nWhen you use a Node.js module in the browser, Vite will output the following warning.\n\n> Module \"fs\" has been externalized for browser compatibility. Cannot access \"fs.readFile\" in client code.\n\nThis is because Vite does not automatically polyfill Node.js modules.\n\nWe recommend avoiding Node.js modules for browser code to reduce the bundle size, although you can add polyfills manually. If the module is imported from a third-party library (that's meant to be used in the browser), it's advised to report the issue to the respective library."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/features.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0048,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.003,
+     "different_case": 0.0036,
+     "unrelated": 0.9917
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/troubleshooting.md#22",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0015,
+     "different_case": 0.0045,
+     "unrelated": 0.9924
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/config/build-options.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0017,
+     "different_case": 0.0048,
+     "unrelated": 0.9921
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/env-and-mode.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0013,
+     "different_case": 0.0043,
+     "unrelated": 0.993
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/features.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0018,
+     "different_case": 0.0062,
+     "unrelated": 0.9905
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/features.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0014,
+     "different_case": 0.0033,
+     "unrelated": 0.9941
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/index.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0021,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0009,
+     "different_case": 0.0035,
+     "unrelated": 0.9944
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/troubleshooting.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0012,
+     "different_case": 0.0024,
+     "unrelated": 0.9951
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/why.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0011,
+    "document_score": 0.0022,
+    "levels": {
+     "answers": 0.0011,
+     "elsewhere": 0.0011,
+     "different_case": 0.0028,
+     "unrelated": 0.995
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-plugin.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.001,
+    "document_score": 0.0018,
+    "levels": {
+     "answers": 0.001,
+     "elsewhere": 0.0008,
+     "different_case": 0.0018,
+     "unrelated": 0.9964
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3843
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4873,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

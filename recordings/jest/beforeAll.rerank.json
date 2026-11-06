@@ -1,0 +1,127 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/beforeAll.rerank",
+ "recorded_at": "2026-11-06T13:43:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1011,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "58.009953",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=61,cfOrigin;dur=0,cfWorker;dur=234"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `beforeAll`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `beforeAll`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#4",
+    "title": "docs/GlobalAPI.md > Reference > `beforeAll(fn, timeout)`",
+    "text": "### `beforeAll(fn, timeout)`\n\nRuns a function before any of the tests in this file run. If the function returns a promise or is a generator, Jest waits for that promise to resolve before running tests.\n\nOptionally, you can provide a `timeout` (in milliseconds) for specifying how long to wait before aborting. The default timeout is 5 seconds.\n\nThis is often useful if you want to set up some global state that will be used by many tests.\n\nFor example:\n\n```js\nconst globalDatabase = makeGlobalDatabase();\n\nbeforeAll(() => {\n  // Clears the database and adds some testing data.\n  // Jest will wait for this promise to resolve before running tests.\n  return globalDatabase.clear().then(() => {\n    return globalDatabase.insert({testData: 'foo'});\n  });\n});\n\n// Since we only set up the database once in this example, it's important\n// that our tests don't modify it.\ntest('can find things', () => {\n  return globalDatabase.find('thing', {}, results => {\n    expect(results.length).toBeGreaterThan(0);\n  });\n});\n```\n\nHere the `beforeAll` ensures that the database is set up before tests run. If setup was synchronous, you could do this without `beforeAll`. The key is that Jest will wait for a promise to resolve, so you can have asynchronous setup as well.\n\nIf `beforeAll` is inside a `describe` block, it runs at the beginning of the describe block.\n\nIf you want to run something before every test instead of before any test runs, use `beforeEach` instead."
+   },
+   {
+    "id": "jest:docs/GlobalAPI.md#5",
+    "title": "docs/GlobalAPI.md > Reference > `beforeEach(fn, timeout)`",
+    "text": "### `beforeEach(fn, timeout)`\n\nRuns a function before each of the tests in this file runs. If the function returns a promise or is a generator, Jest waits for that promise to resolve before running the test.\n\nOptionally, you can provide a `timeout` (in milliseconds) for specifying how long to wait before aborting. The default timeout is 5 seconds.\n\nThis is often useful if you want to reset some global state that will be used by many tests.\n\nFor example:\n\n```js\nconst globalDatabase = makeGlobalDatabase();\n\nbeforeEach(() => {\n  // Clears the database and adds some testing data.\n  // Jest will wait for this promise to resolve before running tests.\n  return globalDatabase.clear().then(() => {\n    return globalDatabase.insert({testData: 'foo'});\n  });\n});\n\ntest('can find things', () => {\n  return globalDatabase.find('thing', {}, results => {\n    expect(results.length).toBeGreaterThan(0);\n  });\n});\n\ntest('can insert a thing', () => {\n  return globalDatabase.insert('thing', makeThing(), response => {\n    expect(response.success).toBeTruthy();\n  });\n});\n```\n\nHere the `beforeEach` ensures that the database is reset for each test.\n\nIf `beforeEach` is inside a `describe` block, it runs for each test in the describe block.\n\nIf you only need to run some setup code once, before any tests run, use `beforeAll` instead."
+   },
+   {
+    "id": "jest:docs/JestObjectAPI.md#61",
+    "title": "docs/JestObjectAPI.md > Misc > `jest.retryTimes(numRetries, options?)`",
+    "text": "Each attempt runs the block's `beforeAll` hooks, child tests and nested describes, and `afterAll` hooks. When a retryable test or hook failure is recorded, passing tests run again with the rest of the block. If `entireDescribe` is omitted or `false`, `jest.retryTimes()` keeps its existing per-test behavior.\n\nNested describe retry settings compose from the innermost block outwards. Each time an ancestor starts a new attempt, its descendant retry budgets start again. The maximum number of times a test can run from nested describe retries is therefore the product of `(numRetries + 1)` for each configured block. A block configured with zero describe retries still defines a retry boundary and disables per-test retries in its subtree.\n\n`afterAll` hooks still run after every attempt, but failures from `afterAll` and process-level errors do not trigger a describe retry. If either occurs during an attempt, no further attempts run, even if another failure would otherwise be retried, and all errors remain reported.\n\nUnhandled rejections owned by a test, `beforeAll`, `beforeEach`, or `afterEach` participate in describe retries. Ownerless rejections remain reported, while `afterAll` failures remain non-retryable.\n\nWhen test randomization is enabled, each describe block keeps the order selected for its first attempt across all of its retries."
+   },
+   {
+    "id": "jest:docs/SetupAndTeardown.md#2",
+    "title": "docs/SetupAndTeardown.md > One-Time Setup",
+    "text": "## One-Time Setup\n\nIn some cases, you only need to do setup once, at the beginning of a file. This can be especially bothersome when the setup is asynchronous, so you can't do it inline. Jest provides `beforeAll` and `afterAll` hooks to handle this situation.\n\nFor example, if both `initializeCityDatabase()` and `clearCityDatabase()` returned promises, and the city database could be reused between tests, we could change our test code to:\n\n```js\nbeforeAll(() => {\n  return initializeCityDatabase();\n});\n\nafterAll(() => {\n  return clearCityDatabase();\n});\n\ntest('city database has Vienna', () => {\n  expect(isCity('Vienna')).toBeTruthy();\n});\n\ntest('city database has San Juan', () => {\n  expect(isCity('San Juan')).toBeTruthy();\n});\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "jest:docs/GlobalAPI.md#4",
+    "action": "use",
+    "relevance_score": 0.9934,
+    "document_score": 0.9953,
+    "levels": {
+     "answers": 0.9934,
+     "elsewhere": 0.0019,
+     "different_case": 0.0025,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/JestObjectAPI.md#61",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0417,
+    "document_score": 0.4135,
+    "levels": {
+     "answers": 0.0417,
+     "elsewhere": 0.3718,
+     "different_case": 0.071,
+     "unrelated": 0.5155
+    }
+   },
+   {
+    "index": 3,
+    "id": "jest:docs/SetupAndTeardown.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0076,
+    "document_score": 0.0473,
+    "levels": {
+     "answers": 0.0076,
+     "elsewhere": 0.0397,
+     "different_case": 0.0149,
+     "unrelated": 0.9378
+    }
+   },
+   {
+    "index": 1,
+    "id": "jest:docs/GlobalAPI.md#5",
+    "action": "expand",
+    "relevance_score": 0.0054,
+    "document_score": 0.521,
+    "levels": {
+     "answers": 0.0054,
+     "elsewhere": 0.5156,
+     "different_case": 0.0338,
+     "unrelated": 0.4452
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1534
+  },
+  "timing": {
+   "total_ms": 83,
+   "rerank_ms": 82,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2074,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

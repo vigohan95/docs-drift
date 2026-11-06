@@ -1,0 +1,108 @@
+{
+ "endpoint": "grounding",
+ "tag": "vite-claims/010.grounding",
+ "recorded_at": "2026-11-06T13:37:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1066,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "102.571648",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=278"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "text": "# `this.environment` in Hooks\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nBefore Vite 6, only two environments were available: `client` and `ssr`. A single `options.ssr` plugin hook argument in `resolveId`, `load` and `transform` allowed plugin authors to differentiate between these two environments when processing modules in plugin hooks. In Vite 6, a Vite application can define any number of named environments as needed. We're introducing `this.environment` in the plugin context to interact with the environment of the current module in hooks.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`this.environment` was introduced in `v6.0`. The deprecation of `options.ssr` is planned for a future major. At that point we'll start recommending migrating your plugins to use the new API. To identify your usage, set `future.removePluginHookSsrArgument` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/per-environment-apis.md#1",
+    "text": "## Motivation\n\nIn Vite v5 and before, a single Vite dev server always had two environments (`client` and `ssr`). The `server.moduleGraph` had mixed modules from both of these environments. Nodes were connected through `clientImportedModules` and `ssrImportedModules` lists (but a single `importers` list was maintained for each). A transformed module was represented by an `id` and a `ssr` boolean. This boolean needed to be passed to APIs, for example `server.moduleGraph.getModuleByUrl(url, ssr)` and `server.transformRequest(url, { ssr })`.\n\nIn Vite v6, it is now possible to create any number of custom environments (`client`, `ssr`, `edge`, etc). A single `ssr` boolean isn't enough anymore. Instead of changing the APIs to be of the form `server.transformRequest(url, { environment })`, we moved these methods to the environment instance allowing them to be called without a Vite dev server."
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#2",
+    "text": "## Closing the Gap Between Build and Dev\n\nFor a simple SPA/MPA, no new APIs around environments are exposed to the config. Internally, Vite will apply the options to a `client` environment, but it's not necessary to know of this concept when configuring Vite. The config and behavior from Vite 5 should work seamlessly here.\n\nWhen we move to a typical server-side rendered (SSR) app, we'll have two environments:\n\n- `client`: runs the app in the browser.\n- `ssr`: runs the app in node (or other server runtimes) which renders pages before sending them to the browser.\n\nIn dev, Vite executes the server code in the same Node process as the Vite dev server, giving a close approximation to the production environment. However, it is also possible for servers to run in other JS runtimes, like [Cloudflare's workerd](https://github.com/cloudflare/workerd) which have different constraints. Modern apps may also run in more than two environments, e.g. a browser, a node server, and an edge server. Vite 5 didn't allow these environments to be properly represented.\n\nVite 6 allows users to configure their app during build and dev to map all of its environments. During dev, a single Vite dev server can now be used to run code in multiple different environments concurrently. The app source code is still transformed by Vite dev server. On top of the shared HTTP server, middlewares, resolved config, and plugins pipeline, the Vite dev server now has a set of independent dev environments. Each of them is configured to match the production environment as closely as possible, and is connected to a dev runtime where the code is executed (for workerd, the server code can now run in miniflare locally). In the client, the browser imports and executes the code. In other environments, a module runner fetches and evaluates the transformed code.\n\n![Vite Environments](../images/vite-environments.svg)"
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#1",
+    "text": "## Formalizing Environments\n\nVite 6 formalizes the concept of Environments. Until Vite 5, there were two implicit Environments (`client`, and optionally `ssr`). The new Environment API allows users and framework authors to create as many environments as needed to map the way their apps work in production. This new capability required a big internal refactoring, but a lot of effort has been placed on backward compatibility. The initial goal of Vite 6 is to move the ecosystem to the new major as smoothly as possible, delaying the adoption of the APIs until enough users have migrated and frameworks and plugin authors have validated the new design."
+   }
+  ],
+  "answer": "Given that there were only two Environments until Vite 6 (`client` and `ssr`), a `ssr` boolean was enough to identify the current environment in Vite APIs.",
+  "claims": [
+   "Given that there were only two Environments until Vite 6 (`client` and `ssr`), a `ssr` boolean was enough to identify the current environment in Vite APIs."
+  ],
+  "evidence": "all",
+  "instructions": "The statement comes from the section 'Environment API for Plugins > Accessing the Current Environment in Hooks' of docs/guide/api-environment-plugins.md in the documentation of the vite project; the sources are other sections of the same documentation. Mark it contradicted only when a source states an incompatible value, version, limit or rule for the same thing in the same scope. Example values in code samples are not contradictions."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.9756,
+  "ungrounded": 0.0244,
+  "verdict": "grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "vite:docs/changes/per-environment-apis.md#1",
+    "share": 0.9856,
+    "share_of_answer": 0.9615,
+    "claims": [
+     0
+    ]
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#1",
+    "share": 0.0066,
+    "share_of_answer": 0.0064,
+    "claims": []
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#2",
+    "share": 0.0049,
+    "share_of_answer": 0.0048,
+    "claims": []
+   },
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "share": 0.0029,
+    "share_of_answer": 0.0028,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Given that there were only two Environments until Vite 6 (`client` and `ssr`), a `ssr` boolean was enough to identify the current environment in Vite APIs.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.9756,
+    "contradicted": 0.0103,
+    "not_stated": 0.0096,
+    "not_a_claim": 0.0046,
+    "verdict": "supported",
+    "sources": {
+     "vite:docs/changes/this-environment-in-hooks.md#0": 0.0029,
+     "vite:docs/changes/per-environment-apis.md#1": 0.9856,
+     "vite:docs/guide/api-environment.md#2": 0.0049,
+     "vite:docs/guide/api-environment.md#1": 0.0066
+    },
+    "source": "vite:docs/changes/per-environment-apis.md#1"
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.9756
+  },
+  "timing": {
+   "read_ms": 139,
+   "total_ms": 143
+  }
+ }
+}

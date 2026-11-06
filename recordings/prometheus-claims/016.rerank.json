@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus-claims/016.rerank",
+ "recorded_at": "2026-11-06T13:37:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1180,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "94.308319",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=162,cfOrigin;dur=0,cfWorker;dur=325"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: To negotiate OpenMetrics 2.0 with scrape targets, add `OpenMetricsText2.0.0` and `OpenMetricsText2.0.0-rc` to `scrape_protocols` in the configuration.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#8",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "### `<scrape_config>`\n\nA `scrape_config` section specifies a set of targets and parameters describing how\nto scrape them. In the general case, one scrape configuration specifies a single\njob. In advanced configurations, this may change.\n\nTargets may be statically configured via the `static_configs` parameter or\ndynamically discovered using one of the supported service-discovery mechanisms.\n\nAdditionally, `relabel_configs` allow advanced modifications to any\ntarget and its labels before scraping.\n\n```yaml\n# The job name assigned to scraped metrics by default.\njob_name: <job_name>\n\n# How frequently to scrape targets from this job.\n[ scrape_interval: <duration> | default = <global_config.scrape_interval> ]\n\n# Per-scrape timeout when scraping this job.\n# It cannot be greater than the scrape interval.\n[ scrape_timeout: <duration> | default = <global_config.scrape_timeout> ]\n\n# The protocols to negotiate during a scrape with the client.\n# Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n# OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n# If not set in the global config, the default value depends on the \n# setting of scrape_native_histograms. If false, it is\n# [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n# If true, it is\n# [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n[ scrape_protocols: [<string>, ...] | default = <dynamic> ]\n\n# Fallback protocol to use if a scrape returns blank, unparsable, or otherwise\n# invalid Content-Type.\n# Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n# OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n[ fallback_scrape_protocol: <string> ]\n\n# The HTTP resource path on which to fetch metrics from targets.\n[ metrics_path: <path> | default = /metrics ]\n\n# honor_labels controls how Prometheus handles conflicts between labels that are\n# already present in scraped data and labels that Prometheus would attach\n# server-side (\"job\" and \"instance\" labels, manually configured target\n# labels, and labels generated by service discovery implementations).\n#\n# If honor_labels is set to \"true\", label conflicts are resolved by keeping label\n# values from the scraped data and ignoring the conflicting server-side labels.\n#\n# If honor_labels is set to \"false\", label conflicts are resolved by renaming\n# conflicting labels in the scraped data to \"exported_<original-label>\" (for\n# example \"exported_instance\", \"exported_job\") and then attaching server-side\n# labels.\n#\n# Setting honor_labels to \"true\" is useful for use cases such as federation and\n# scraping the Pushgateway, where all labels specified in the target should be\n# preserved.\n#\n# Note that any globally configured \"external_labels\" are unaffected by this\n# setting. In communication with external systems, they are always applied only\n# when a time series does not have a given label yet and are ignored otherwise.\n[ honor_labels: <boolean> | default = false ]"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#6",
+    "title": "docs/getting_started.md > Starting up some sample targets",
+    "text": "## Starting up some sample targets\n\nLet's add additional targets for Prometheus to scrape.\n\nThe Node Exporter is used as an example target, for more information on using it\n[see these instructions.](https://prometheus.io/docs/guides/node-exporter/)\n\n```bash\ntar -xzvf node_exporter-*.*.tar.gz\ncd node_exporter-*.*/\n\n# Start 3 example targets in separate terminals:\n./node_exporter --web.listen-address 127.0.0.1:8080\n./node_exporter --web.listen-address 127.0.0.1:8081\n./node_exporter --web.listen-address 127.0.0.1:8082\n```\n\nYou should now have example targets listening on http://localhost:8080/metrics,\nhttp://localhost:8081/metrics, and http://localhost:8082/metrics."
+   },
+   {
+    "id": "prometheus:docs/migration.md#2",
+    "title": "docs/migration.md > Configuration",
+    "text": "## Configuration\n\n- The scrape job level configuration option `scrape_classic_histograms` has\n  been renamed to `always_scrape_classic_histograms`. If you use the\n  `scrape_native_histograms` scrape configuration option to ingest native\n  histograms and you also want to ingest classic histograms that an endpoint\n  might expose along with native histograms, be sure to add this configuration\n  or change your configuration from the old name.\n- The `http_config.enable_http2` in `remote_write` items default has been\n  changed to `false`. In Prometheus v2 the remote write http client would\n  default to use http2. In order to parallelize multiple remote write queues\n  across multiple sockets its preferable to not default to http2.\n  If you prefer to use http2 for remote write you must now set\n  `http_config.enable_http2: true` in your `remote_write` configuration section."
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#7",
+    "title": "docs/getting_started.md > Configure Prometheus to monitor the sample targets",
+    "text": "## Configure Prometheus to monitor the sample targets\n\nNow we will configure Prometheus to scrape these new targets. Let's group all\nthree endpoints into one job called `node`. We will imagine that the\nfirst two endpoints are production targets, while the third one represents a\ncanary instance. To model this in Prometheus, we can add several groups of\nendpoints to a single job, adding extra labels to each group of targets. In\nthis example, we will add the `group=\"production\"` label to the first group of\ntargets, while adding `group=\"canary\"` to the second.\n\nTo achieve this, add the following job definition to the `scrape_configs`\nsection in your `prometheus.yml` and restart your Prometheus instance:\n\n```yaml\nscrape_configs:\n  - job_name:       'node'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:8080', 'localhost:8081']\n        labels:\n          group: 'production'\n\n      - targets: ['localhost:8082']\n        labels:\n          group: 'canary'\n```\n\nGo to the expression browser and verify that Prometheus now has information\nabout time series that these example endpoints expose, such as `node_cpu_seconds_total`.\n\nTo check that Prometheus is scraping the new targets, go to\n[localhost:9090/targets](http://localhost:9090/targets), or open the **Status**\nmenu and select **Target health**. Under the `node` job you should see the three\nendpoints, each with a state of `UP`. Following the configuration above,\n`localhost:8080` and `localhost:8081` are labeled `group=\"production\"` and\n`localhost:8082` is labeled `group=\"canary\"`. If an endpoint shows `DOWN`, make\nsure the corresponding Node Exporter is still running on that port."
+   },
+   {
+    "id": "prometheus:docs/migration.md#1",
+    "title": "docs/migration.md > Flags",
+    "text": "## Flags\n\n- The following feature flags have been removed and they have been added to the\n  default behavior of Prometheus v3:\n  - `promql-at-modifier`\n  - `promql-negative-offset`\n  - `new-service-discovery-manager`\n  - `expand-external-labels`\n      - Environment variable references `${var}` or `$var` in external label values\n    are replaced according to the values of the current environment variables.\n      - References to undefined variables are replaced by the empty string.\n    The `$` character can be escaped by using `$$`.\n  - `no-default-scrape-port`\n      - Prometheus v3 will no longer add ports to scrape targets according to the\n    specified scheme. Target will now appear in labels as configured.\n      - If you rely on scrape targets like\n      `https://example.com/metrics` or `http://example.com/metrics` to be\n      represented as `https://example.com/metrics:443` and\n      `http://example.com/metrics:80` respectively, add them to your target URLs\n  - `agent`\n      - Instead use the dedicated `--agent` CLI flag.\n  - `remote-write-receiver`\n      - Instead use the dedicated `--web.enable-remote-write-receiver` CLI flag to enable the remote write receiver.\n  - `auto-gomemlimit`\n      - Prometheus v3 will automatically set `GOMEMLIMIT` to match the Linux\n      container memory limit. If there is no container limit, or the process is\n      running outside of containers, the system memory total is used. To disable\n      this, `--no-auto-gomemlimit` is available.\n  - `auto-gomaxprocs`\n      - Prometheus v3 will automatically set `GOMAXPROCS` to match the Linux\n      container CPU quota. To disable this, `--no-auto-gomaxprocs` is available.\n\n  Prometheus v3 will log a warning if you continue to pass these to\n  `--enable-feature`.\n\n- Starting from v3.9, the feature flag `native-histograms` is a no-op. Native\n  histograms are a stable feature now, but scraping them has to be enabled via\n  the `scrape_native_histograms` global or per-scrape configuration option\n  (added in v3.8)."
+   },
+   {
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#2",
+    "title": "documentation/examples/remote_storage/remote_storage_adapter/README.md > Remote storage adapter > Configuring Prometheus",
+    "text": "## Configuring Prometheus\n\nTo configure Prometheus to send samples to this binary, add the following to your `prometheus.yml`:\n\n```yaml\n# Remote write configuration (for Graphite, OpenTSDB, or InfluxDB).\nremote_write:\n  - url: \"http://localhost:9201/write\"\n\n# Remote read configuration (for InfluxDB only at the moment).\nremote_read:\n  - url: \"http://localhost:9201/read\"\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#112",
+    "title": "docs/configuration/configuration.md > Configuration file > `<static_config>`",
+    "text": "### `<static_config>`\n\nA `static_config` allows specifying a list of targets and a common label set\nfor them.  It is the canonical way to specify static targets in a scrape\nconfiguration.\n\n```yaml\n# The targets specified by the static config.\ntargets:\n  [ - '<host>' ]\n\n# Labels assigned to all metrics scraped from the targets.\nlabels:\n  [ <labelname>: <labelvalue> ... ]\n```\n\nThe special labels mentioned in the [relabeling](#relabel_config) section can also be\nused here to override the respective settings in the scrape configuration. This is\nespecially useful when combined with any of the service discovery mechanisms that do not\nsupport these settings directly."
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#73",
+    "title": "docs/command-line/promtool.md > Commands > `promtool tsdb` > `promtool tsdb create-blocks-from openmetrics`",
+    "text": "##### `promtool tsdb create-blocks-from openmetrics`\n\nImport samples from OpenMetrics input and produce TSDB blocks. Please refer to the storage docs for more details."
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#75",
+    "title": "docs/command-line/promtool.md > Commands > `promtool tsdb` > `promtool tsdb create-blocks-from openmetrics` > Arguments",
+    "text": "###### Arguments\n\n| Argument | Description | Default | Required |\n| --- | --- | --- | --- |\n| input file | OpenMetrics file to read samples from. |  | Yes |\n| output directory | Output directory for generated blocks. | `data/` |  |"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.159,
+    "document_score": 0.3181,
+    "levels": {
+     "answers": 0.159,
+     "elsewhere": 0.159,
+     "different_case": 0.0643,
+     "unrelated": 0.6177
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "action": "expand",
+    "relevance_score": 0.0398,
+    "document_score": 0.6621,
+    "levels": {
+     "answers": 0.0398,
+     "elsewhere": 0.6223,
+     "different_case": 0.0616,
+     "unrelated": 0.2763
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/configuration/configuration.md#112",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.02,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0172,
+     "different_case": 0.0116,
+     "unrelated": 0.9684
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:docs/command-line/promtool.md#73",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0141,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0113,
+     "different_case": 0.0082,
+     "unrelated": 0.9777
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/getting_started.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0047,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0024,
+     "different_case": 0.0043,
+     "unrelated": 0.9911
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/command-line/promtool.md#75",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0112,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.009,
+     "different_case": 0.0073,
+     "unrelated": 0.9815
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0097,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0075,
+     "different_case": 0.0066,
+     "unrelated": 0.9837
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/getting_started.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0036,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0016,
+     "different_case": 0.0052,
+     "unrelated": 0.9912
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/migration.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0044,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0028,
+     "different_case": 0.0046,
+     "unrelated": 0.9911
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/migration.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0023,
+     "different_case": 0.004,
+     "unrelated": 0.9921
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4274
+  },
+  "timing": {
+   "total_ms": 149,
+   "rerank_ms": 133,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 5464,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 85,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

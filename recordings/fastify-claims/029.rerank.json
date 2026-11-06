@@ -1,0 +1,242 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify-claims/029.rerank",
+ "recorded_at": "2026-11-06T13:38:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 976,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.862335",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=293"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: Currently, none of the HTTP/2-specific APIs are available through _Fastify_, but Node's `req` and `res` can be accessed through the `Request` and `Reply` interfaces.",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#4",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser > Using addContentTypeParser with fastify.register > Correct Usage",
+    "text": "#### Correct Usage\n```js\nconst fastify = require('fastify')();\n\n\nfastify.register((fastify, opts) => {\n  fastify.addContentTypeParser('application/json', function (request, payload, done) {\n    jsonParser(payload, function (err, body) {\n      done(err, body)\n    })\n  })\n\n  fastify.get('/hello', async (req, res) => {});\n});\n```\n\nIn addition to `addContentTypeParser`, the `hasContentTypeParser`,\n`removeContentTypeParser`, and `removeAllContentTypeParsers` APIs are available."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#18",
+    "title": "docs/Reference/Routes.md > Routes > Constraints > Version Constraints",
+    "text": "#### Version Constraints\n\nYou can provide a `version` key in the `constraints` option to a route.\nVersioned routes allows multiple handlers to be declared for the same HTTP\nroute path, matched according to the request's `Accept-Version` header.\nThe `Accept-Version` header value should follow the\n[semver](https://semver.org/) specification, and routes should be declared\nwith exact semver versions for matching.\n\nFastify will require a request `Accept-Version` header to be set if the route\nhas a version set, and will prefer a versioned route to a non-versioned route\nfor the same path. Advanced version ranges and pre-releases currently are not\nsupported.\n\n> ℹ️ Note:\n> Using this feature can degrade the router's performance.\n\n```js\nfastify.route({\n  method: 'GET',\n  url: '/',\n  constraints: { version: '1.2.0' },\n  handler: function (request, reply) {\n    reply.send({ hello: 'world' })\n  }\n})\n\nfastify.inject({\n  method: 'GET',\n  url: '/',\n  headers: {\n    'Accept-Version': '1.x' // it could also be '1.2.0' or '1.2.x'\n  }\n}, (err, res) => {\n  // { hello: 'world' }\n})\n```\n\n> ⚠ Warning:\n> Set a\n> [`Vary`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Vary)\n> header in responses with the value used for versioning\n> (e.g., `'Accept-Version'`) to prevent cache poisoning attacks.\n> This can also be configured in a Proxy/CDN.\n>\n> ```js\n> const append = require('vary').append\n> fastify.addHook('onSend', (req, reply, payload, done) => {\n>   if (req.headers['accept-version']) { // or the custom header being used\n>     let value = reply.getHeader('Vary') || ''\n>     const header = Array.isArray(value) ? value.join(', ') : String(value)\n>     if ((value = append(header, 'Accept-Version'))) { // or the custom header being used\n>       reply.header('Vary', value)\n>     }\n>   }\n>  done()\n> })\n> ```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#20",
+    "title": "docs/Reference/Server.md > Factory > `serverFactory`",
+    "text": "### `serverFactory`\n<a id=\"custom-http-server\"></a>\n\nYou can pass a custom HTTP server to Fastify by using the `serverFactory`\noption.\n\n`serverFactory` is a function that takes a `handler` parameter, which takes the\n`request` and `response` objects as parameters, and an options object, which is\nthe same you have passed to Fastify.\n\n```js\nconst serverFactory = (handler, opts) => {\n  const server = http.createServer((req, res) => {\n    handler(req, res)\n  })\n\n  return server\n}\n\nconst fastify = Fastify({ serverFactory })\n\nfastify.get('/', (req, reply) => {\n  reply.send({ hello: 'world' })\n})\n\nfastify.listen({ port: 3000 })\n```\n\nInternally Fastify uses the API of Node core HTTP server, so if you are using a\ncustom server you must be sure to have the same API exposed. If not, you can\nenhance the server instance inside the `serverFactory` function before the\n`return` statement."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#57",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > routing",
+    "text": "#### routing\n<a id=\"routing\"></a>\n\nMethod to access the `lookup` method of the internal router and match the\nrequest to the appropriate handler:\n\n```js\nfastify.routing(req, res)\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#23",
+    "title": "docs/Guides/Serverless.md > Google Firebase Functions > Add Custom `contentTypeParser` to Fastify instance and define endpoints",
+    "text": "### Add Custom `contentTypeParser` to Fastify instance and define endpoints\n\nFirebase Function's HTTP layer already parses the request and makes a JSON\npayload available through the property `payload.body` below. It also provides\naccess to the raw body, unparsed, which is useful for calculating request\nsignatures to validate HTTP webhooks.\n\nAdd as follows to the `registerRoutes()` function:\n\n```js\nasync function registerRoutes (fastify) {\n  fastify.addContentTypeParser(\"application/json\", {}, (req, payload, done) => {\n    // useful to include the request's raw body on the `req` object that will\n    // later be available in your other routes so you can calculate the HMAC\n    // if needed\n    req.rawBody = payload.rawBody\n\n    // payload.body is already the parsed JSON so we just fire the done callback\n    // with it\n    done(null, payload.body)\n  })\n\n  // define your endpoints here...\n  fastify.post(\"/some-route-here\", async (request, reply) => {})\n\n  fastify.get('/', async (request, reply) => {\n    reply.send({message: 'Hello World!'})\n  })\n}\n```\n\n**Failing to add this `ContentTypeParser` may lead to the Fastify process\nremaining stuck and not processing any other requests after receiving one with\nthe Content-Type `application/json`.**\n\nWhen using Typescript, since the type of `payload` is a native `IncomingMessage`\nthat gets modified by Firebase, it won't be able to find the property\n`payload.body`.\n\nIn order to suppress the error, you can use the following signature:\n\n```ts\ndeclare module 'http' {\n\tinterface IncomingMessage {\n\t\tbody?: unknown;\n\t}\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#12",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "It's noteworthy that we didn't use the `fastify-plugin` wrapper in the `delay`\nfactory. That's because we wanted the `onRequest` hook to only be set within\nthat specific scope and not to the scope that called it (in our case, the main\n`server` object defined in `index.js`). `fastify-plugin` sets the\n`skip-override` hidden property, which has a practical effect of making whatever\nchanges we make to our `fastify` object available to the upper scope. That's\nalso why we used it with the `customerRoutes` plugin: we wanted those routes to\nbe available to its calling scope, the `delay` plugin. For more info on that\nsubject refer to [Plugins](../Reference/Plugins.md#handle-the-scope).\n\nLet's see how that behaves in action. If we fired our server up with `node\nindex.js` and made a few requests to test things out. These were the logs we'd\nsee (some bloat was removed to ease things up):\n\n<!-- markdownlint-disable -->\n```sh\n{\"time\":1650063793316,\"msg\":\"Doing magic!\"}\n{\"time\":1650063793316,\"msg\":\"Server listening at http://127.0.0.1:1234\"}\n{\"time\":1650063795030,\"reqId\":\"req-1\",\"req\":{\"method\":\"GET\",\"url\":\"/v1\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51928},\"msg\":\"incoming request\"}\n{\"time\":1650063795033,\"reqId\":\"req-1\",\"res\":{\"statusCode\":503},\"responseTime\":2.5721680000424385,\"msg\":\"request completed\"}\n{\"time\":1650063796248,\"reqId\":\"req-2\",\"req\":{\"method\":\"GET\",\"url\":\"/ping\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51930},\"msg\":\"incoming request\"}\n{\"time\":1650063796248,\"reqId\":\"req-2\",\"res\":{\"statusCode\":200},\"responseTime\":0.4802369996905327,\"msg\":\"request completed\"}\n{\"time\":1650063798377,\"reqId\":\"req-3\",\"req\":{\"method\":\"POST\",\"url\":\"/webhook\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51932},\"msg\":\"incoming request\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"msg\":\"Ready for customer requests!\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"res\":{\"statusCode\":200},\"responseTime\":1.3567829988896847,\"msg\":\"request completed\"}\n{\"time\":1650063799858,\"reqId\":\"req-4\",\"req\":{\"method\":\"GET\",\"url\":\"/v1\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51934},\"msg\":\"incoming request\"}\n{\"time\":1650063800561,\"reqId\":\"req-4\",\"res\":{\"statusCode\":200},\"responseTime\":702.4662979990244,\"msg\":\"request completed\"}\n```\n<!-- markdownlint-enable -->"
+   },
+   {
+    "id": "fastify:docs/Reference/Warnings.md#4",
+    "title": "docs/Reference/Warnings.md > Warnings > Fastify Deprecation Codes",
+    "text": "### Fastify Deprecation Codes\n\nDeprecation codes are supported by the Node.js CLI options:\n\n- [--no-deprecation](https://nodejs.org/api/cli.html#no-deprecation)\n- [--throw-deprecation](https://nodejs.org/api/cli.html#throw-deprecation)\n- [--trace-deprecation](https://nodejs.org/api/cli.html#trace-deprecation)\n\nThere are currently no active deprecation codes because the APIs deprecated in\nFastify v5 have been removed in Fastify v6.\n\n| Code | Description | How to solve | Discussion |\n| ---- | ----------- | ------------ | ---------- |"
+   },
+   {
+    "id": "fastify:docs/Reference/Index.md#0",
+    "title": "docs/Reference/Index.md > Core Documents",
+    "text": "## Core Documents\n<a id=\"reference-core-docs\"></a>\n\nFor the full table of contents, see [below](#reference-toc). The following list\nis a subset of the full table of contents that details core Fastify APIs and\nconcepts, ordered by likely importance to the reader:\n\n+ [Server](./Server.md): Documents the core Fastify API. Includes documentation\n  for the factory function and the resulting server instance.\n+ [Lifecycle](./Lifecycle.md): Explains the Fastify request lifecycle and\n  illustrates where [Hooks](./Hooks.md) are available for integrating with it.\n+ [Routes](./Routes.md): Details how to register routes with Fastify and how\n  Fastify builds and evaluates the routing trie.\n+ [Request](./Request.md): Details Fastify's request object that is passed into\n  each request handler.\n+ [Reply](./Reply.md): Details Fastify's response object available to each\n  request handler.\n+ [Validation and Serialization](./Validation-and-Serialization.md): Details\n  Fastify's support for validating incoming data and how Fastify serializes data\n  for responses.\n+ [Plugins](./Plugins.md): Explains Fastify's plugin architecture and API.\n+ [Encapsulation](./Encapsulation.md): Explains a core concept upon which all\n  Fastify plugins are built.\n+ [Decorators](./Decorators.md): Explains the server, request, and response\n  decorator APIs.\n+ [Hooks](./Hooks.md): Details the API that allows plugins to integrate with\n  the request lifecycle."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#40",
+    "title": "docs/Reference/Server.md > RouterOptions > `defaultRoute`",
+    "text": "### `defaultRoute`\n<a id=\"default-route\"></a>\n\nFastify uses [find-my-way](https://github.com/delvedor/find-my-way) which supports,\ncan pass a default route with the option defaultRoute.\n\n```js\nconst fastify = require('fastify')({\n  routerOptions: {\n    defaultRoute: (req, res) => {\n      res.statusCode = 404\n      res.end()\n    }\n  }\n})\n```\n\n> ℹ️ Note:\n> The `req` and `res` objects passed to `defaultRoute` are the raw Node.js\n> `IncomingMessage` and `ServerResponse` instances. They do **not** expose the\n> Fastify-specific methods available on `FastifyRequest`/`FastifyReply` (for\n> example, `res.send`)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#5",
+    "title": "docs/Reference/TypeScript.md > Learn By Example > Using Generics",
+    "text": "4. Build and run the server code with `npm run build` and `npm run start`\n5. Query the API\n   ```bash\n   curl localhost:8080/auth?username=admin&password=Password123!\n   ```\n   And it should return back `logged in!`\n6. But wait there's more! The generic interfaces are also available inside route\n   level hook methods. Modify the previous route by adding a `preValidation`\n   hook:\n   ```typescript\n   server.get<{\n     Querystring: IQuerystring,\n     Headers: IHeaders,\n     Reply: IReply\n   }>('/auth', {\n     preValidation: (request, reply, done) => {\n       const { username, password } = request.query\n       done(username !== 'admin' ? new Error('Must be admin') : undefined) // only validate `admin` account\n     }\n   }, async (request, reply) => {\n     const customerHeader = request.headers['h-Custom']\n     // do something with request data\n     return { success: true }\n   })\n   ```\n7. Build and run and query with the `username` query string option set to\n   anything other than `admin`. The API should now return a HTTP 500 error\n   `{\"statusCode\":500,\"error\":\"Internal Server Error\",\"message\":\"Must be\n   admin\"}`\n\n🎉 Good work, now you can define interfaces for each route and have strictly\ntyped request and reply instances. Other parts of the Fastify type system rely\non generic properties. Make sure to reference the detailed type system\ndocumentation below to learn more about what is available."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/Server.md#40",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0866,
+    "document_score": 0.3985,
+    "levels": {
+     "answers": 0.0866,
+     "elsewhere": 0.3119,
+     "different_case": 0.0866,
+     "unrelated": 0.5149
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Index.md#0",
+    "action": "expand",
+    "relevance_score": 0.0079,
+    "document_score": 0.6871,
+    "levels": {
+     "answers": 0.0079,
+     "elsewhere": 0.6792,
+     "different_case": 0.0334,
+     "unrelated": 0.2795
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0065,
+    "document_score": 0.0211,
+    "levels": {
+     "answers": 0.0065,
+     "elsewhere": 0.0146,
+     "different_case": 0.0212,
+     "unrelated": 0.9577
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Guides/Serverless.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.0099,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.006,
+     "different_case": 0.0165,
+     "unrelated": 0.9735
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/TypeScript.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0039,
+    "document_score": 0.031,
+    "levels": {
+     "answers": 0.0039,
+     "elsewhere": 0.0272,
+     "different_case": 0.0575,
+     "unrelated": 0.9115
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#57",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.0386,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.0348,
+     "different_case": 0.0162,
+     "unrelated": 0.9452
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0075,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0057,
+     "different_case": 0.0096,
+     "unrelated": 0.9829
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Routes.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.002,
+     "different_case": 0.0046,
+     "unrelated": 0.9916
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Warnings.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0036,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0018,
+     "different_case": 0.0048,
+     "unrelated": 0.9916
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0036,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0019,
+     "different_case": 0.0052,
+     "unrelated": 0.9912
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4436
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 5626,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

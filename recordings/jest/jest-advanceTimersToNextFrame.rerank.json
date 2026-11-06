@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "jest/jest-advanceTimersToNextFrame.rerank",
+ "recorded_at": "2026-11-06T13:43:18Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2208,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.765568",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=169"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `jest.advanceTimersToNextFrame`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `jest.advanceTimersToNextFrame`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/JestObjectAPI.md#51",
+    "title": "docs/JestObjectAPI.md > Fake Timers > `jest.advanceTimersToNextFrame()`",
+    "text": "### `jest.advanceTimersToNextFrame()`\n\nAdvances all timers by the needed milliseconds to execute callbacks currently scheduled with `requestAnimationFrame`. `advanceTimersToNextFrame()` is a helpful way to execute code that is scheduled using `requestAnimationFrame`.\n\n:::info\n\nThis function is not available when using legacy fake timers implementation.\n\n:::"
+   },
+   {
+    "id": "jest:docs/TimerMocks.md#5",
+    "title": "docs/TimerMocks.md > Advance Timers to the next Frame",
+    "text": "## Advance Timers to the next Frame\n\nIn applications, often you want to schedule work inside of an animation frame (with `requestAnimationFrame`). We expose a convenience method `jest.advanceTimersToNextFrame()` to advance all timers enough milliseconds to execute all actively scheduled animation frames.\n\nFor mock timing purposes, animation frames are executed every `16ms` (mapping to roughly `60` frames per second) after the clock starts. When you schedule a callback in an animation frame (with `requestAnimationFrame(callback)`), the `callback` will be called when the clock has advanced `16ms`. `jest.advanceTimersToNextFrame()` will advance the clock just enough to get to the next `16ms` increment. If the clock has already advanced `6ms` since a animation frame `callback` was scheduled, then the clock will be advanced by `10ms`.\n\n```javascript\njest.useFakeTimers();\nit('calls the animation frame callback after advanceTimersToNextFrame()', () => {\n  const callback = jest.fn();\n\n  requestAnimationFrame(callback);\n\n  // At this point in time, the callback should not have been called yet\n  expect(callback).not.toHaveBeenCalled();\n\n  jest.advanceTimersToNextFrame();\n\n  // Now our callback should have been called!\n  expect(callback).toHaveBeenCalled();\n  expect(callback).toHaveBeenCalledTimes(1);\n});\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "jest:docs/TimerMocks.md#5",
+    "action": "use",
+    "relevance_score": 0.9937,
+    "document_score": 0.9955,
+    "levels": {
+     "answers": 0.9937,
+     "elsewhere": 0.0018,
+     "different_case": 0.0022,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/JestObjectAPI.md#51",
+    "action": "expand",
+    "relevance_score": 0.0303,
+    "document_score": 0.6527,
+    "levels": {
+     "answers": 0.0303,
+     "elsewhere": 0.6225,
+     "different_case": 0.0271,
+     "unrelated": 0.3202
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 586
+  },
+  "timing": {
+   "total_ms": 40,
+   "rerank_ms": 39,
+   "questions_ms": 0,
+   "model_ms": 33,
+   "engine": {
+    "rows": 824,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1024,
+    "long": 0,
+    "total_ms": 33,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 30,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

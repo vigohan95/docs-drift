@@ -1,0 +1,243 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite-claims/019.rerank",
+ "recorded_at": "2026-11-06T13:37:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 976,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.526817",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=49,cfOrigin;dur=0,cfWorker;dur=230"
+ },
+ "request": {
+  "query": "Which passages state the facts needed to check this statement: You can also use this information for [103 Early Hints](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/103).",
+  "instructions": "A passage answers only if it states the same fact, value, limit, version or rule that the statement is about, whether it agrees or disagrees with the statement.",
+  "documents": [
+   {
+    "id": "vite:docs/config/index.md#1",
+    "title": "docs/config/index.md > Configuring Vite > Config Intellisense",
+    "text": "## Config Intellisense\n\nSince Vite ships with TypeScript typings, you can leverage your IDE's intellisense with JSDoc type hints:\n\n```js\n/** @type {import('vite').UserConfig} */\nexport default {\n  // ...\n}\n```\n\nAlternatively, you can use the `defineConfig` helper which should provide intellisense without the need for JSDoc annotations:\n\n```js\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  // ...\n})\n```\n\nVite also supports TypeScript config files. You can use `vite.config.ts` with the `defineConfig` helper function above, or with the `satisfies` operator:\n\n```ts\nimport type { UserConfig } from 'vite'\n\nexport default {\n  // ...\n} satisfies UserConfig\n```"
+   },
+   {
+    "id": "vite:docs/plugins/index.md#8",
+    "title": "docs/plugins/index.md > Plugins > Rolldown Built-in Plugins",
+    "text": "## Rolldown Built-in Plugins\n\nVite uses [Rolldown](https://rolldown.rs/) under the hood and it provides a few built-in plugins for common use cases.\n\nRead the [Rolldown Built-in Plugins section](https://rolldown.rs/builtin-plugins/) for more information."
+   },
+   {
+    "id": "vite:docs/releases.md#6",
+    "title": "docs/releases.md > Releases > Pre Releases",
+    "text": "## Pre Releases\n\nMinor releases typically go through a non-fixed number of beta releases. Major releases will go through an alpha phase and a beta phase.\n\nPre-releases allow early adopters and maintainers from the Ecosystem to do integration and stability testing, and provide feedback. Do not use pre-releases in production. All pre-releases are considered unstable and may ship breaking changes in between. Always pin to exact versions when using pre-releases."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#0",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting",
+    "text": "# Troubleshooting\n\nSee [Rollup's troubleshooting guide](https://rollupjs.org/troubleshooting/) for more information too.\n\nIf the suggestions here don't work, please try posting questions on [GitHub Discussions](https://github.com/vitejs/vite/discussions) or in the `#help` channel of [Vite Land Discord](https://chat.vite.dev)."
+   },
+   {
+    "id": "vite:docs/guide/env-and-mode.md#8",
+    "title": "docs/guide/env-and-mode.md > Env Variables and Modes > Modes > NODE_ENV and Modes",
+    "text": "### NODE_ENV and Modes\n\nIt's important to note that `NODE_ENV` (`process.env.NODE_ENV`) and modes are two different concepts. Here's how different commands affect the `NODE_ENV` and mode:\n\n| Command                                              | NODE_ENV        | Mode            |\n| ---------------------------------------------------- | --------------- | --------------- |\n| `vite build`                                         | `\"production\"`  | `\"production\"`  |\n| `vite build --mode development`                      | `\"production\"`  | `\"development\"` |\n| `NODE_ENV=development vite build`                    | `\"development\"` | `\"production\"`  |\n| `NODE_ENV=development vite build --mode development` | `\"development\"` | `\"development\"` |\n\nThe different values of `NODE_ENV` and mode also reflect on its corresponding `import.meta.env` properties:\n\n| Command                | `import.meta.env.PROD` | `import.meta.env.DEV` |\n| ---------------------- | ---------------------- | --------------------- |\n| `NODE_ENV=production`  | `true`                 | `false`               |\n| `NODE_ENV=development` | `false`                | `true`                |\n| `NODE_ENV=other`       | `false`                | `true`                |\n\n| Command              | `import.meta.env.MODE` |\n| -------------------- | ---------------------- |\n| `--mode production`  | `\"production\"`         |\n| `--mode development` | `\"development\"`        |\n| `--mode staging`     | `\"staging\"`            |\n\n:::tip `NODE_ENV` in `.env` files\n\n`NODE_ENV=...` can be set in the command, and also in your `.env` file. If `NODE_ENV` is specified in a `.env.[mode]` file, the mode can be used to control its value. However, both `NODE_ENV` and modes remain as two different concepts.\n\nThe main benefit with `NODE_ENV=...` in the command is that it allows Vite to detect the value early. It also allows you to read `process.env.NODE_ENV` in your Vite config as Vite can only load the env files once the config is evaluated.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/why.md#4",
+    "title": "docs/guide/why.md > Why Vite > A Unified Toolchain",
+    "text": "## A Unified Toolchain\n\nVite originally relied on two separate tools under the hood: [esbuild](https://esbuild.github.io/) for fast compilation during development, and [Rollup](https://rollupjs.org/) for thorough optimization in production builds. This worked, but maintaining two pipelines introduced inconsistencies: different transformation behaviors, separate plugin systems, and growing glue code to keep them aligned.\n\n[Rolldown](https://rolldown.rs/) was built to unify both into a single bundler: written in Rust for native speed, and compatible with the same plugin API the ecosystem already relied on. It uses [Oxc](https://oxc.rs/) for parsing, transforming, and minifying. This gives Vite an end-to-end toolchain where the build tool, bundler, and compiler are maintained together and evolve as a unit.\n\nThe result is one consistent pipeline from development to [production](./build.md). The migration was done carefully: a [technical preview](https://voidzero.dev/posts/announcing-rolldown-vite) shipped first so early adopters could validate the change, ecosystem CI caught compatibility issues early, and a compatibility layer preserved existing configurations."
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#26",
+    "title": "docs/config/shared-options.md > Shared Options > css.transformer",
+    "text": "## css.transformer\n\n- **Experimental:** [Give Feedback](https://github.com/vitejs/vite/discussions/13835)\n- **Type:** `'postcss' | 'lightningcss'`\n- **Default:** `'postcss'`\n\nSelects the engine used for CSS processing. Check out [Lightning CSS](../guide/features.md#lightning-css) for more information.\n\n::: info Duplicate `@import`s\nNote that postcss (postcss-import) has a different behavior with duplicated `@import` from browsers. See [postcss/postcss-import#462](https://github.com/postcss/postcss-import/issues/462).\n:::"
+   },
+   {
+    "id": "vite:docs/guide/features.md#4",
+    "title": "docs/guide/features.md > Features > TypeScript > Transpile Only",
+    "text": "### Transpile Only\n\nNote that Vite only performs transpilation on `.ts` files and does **NOT** perform type checking. It assumes type checking is taken care of by your IDE and build process.\n\nThe reason Vite does not perform type checking as part of the transform process is because the two jobs work fundamentally differently. Transpilation can work on a per-file basis and aligns perfectly with Vite's on-demand compile model. In comparison, type checking requires knowledge of the entire module graph. Shoe-horning type checking into Vite's transform pipeline will inevitably compromise Vite's speed benefits.\n\nVite's job is to get your source modules into a form that can run in the browser as fast as possible. To that end, we recommend separating static analysis checks from Vite's transform pipeline. This principle applies to other static analysis checks such as ESLint.\n\n- For production builds, you can run `tsc --noEmit` in addition to Vite's build command.\n\n- During development, if you need more than IDE hints, we recommend running `tsc --noEmit --watch` in a separate process, or use [vite-plugin-checker](https://github.com/fi3ework/vite-plugin-checker) if you prefer having type errors directly reported in the browser.\n\nVite uses [Oxc Transformer](https://oxc.rs/docs/guide/usage/transformer.html) to transpile TypeScript into JavaScript which is faster than vanilla `tsc`, and HMR updates can reflect in the browser in under 50ms.\n\nUse the [Type-Only Imports and Export](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export) syntax to avoid potential problems like type-only imports being incorrectly bundled, for example:\n\n```ts\nimport type { T } from 'only/types'\nexport type { T }\n```"
+   },
+   {
+    "id": "vite:docs/guide/features.md#14",
+    "title": "docs/guide/features.md > Features > Frameworks",
+    "text": "## Frameworks\n\nAll modern frameworks maintain integrations with Vite. Most framework plugins are maintained by each framework team, with the exception of the official Vue and React Vite plugins that are maintained in the vite org:\n\n- Vue support via [@vitejs/plugin-vue](https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue)\n- Vue JSX support via [@vitejs/plugin-vue-jsx](https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue-jsx)\n- React support via [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react)\n- React using SWC support via [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react-swc)\n- [React Server Components (RSC)](https://react.dev/reference/rsc/server-components) support via [@vitejs/plugin-rsc](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-rsc)\n\nCheck out the [Plugins Guide](/plugins/) for more information."
+   },
+   {
+    "id": "vite:docs/guide/using-plugins.md#2",
+    "title": "docs/guide/using-plugins.md > Using Plugins > Finding Plugins",
+    "text": "## Finding Plugins\n\n:::tip NOTE\nVite aims to provide out-of-the-box support for common web development patterns. Before searching for a Vite or compatible Rollup plugin, check out the [Features Guide](../guide/features.md). A lot of the cases where a plugin would be needed in a Rollup project are already covered in Vite.\n:::\n\nCheck out the [Plugins section](../plugins/) for information about official plugins. Community plugins that are published to npm are listed in [Vite Plugin Registry](https://registry.vite.dev/plugins)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/plugins/index.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0108,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0075,
+     "different_case": 0.0075,
+     "unrelated": 0.9816
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/config/index.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0056,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0026,
+     "different_case": 0.006,
+     "unrelated": 0.9884
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/troubleshooting.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0056,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0032,
+     "different_case": 0.0043,
+     "unrelated": 0.9901
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/features.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0019,
+     "different_case": 0.0061,
+     "unrelated": 0.9896
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/env-and-mode.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0041,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0019,
+     "different_case": 0.0043,
+     "unrelated": 0.9916
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/features.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0018,
+     "different_case": 0.0038,
+     "unrelated": 0.9924
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/releases.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0021,
+     "different_case": 0.0035,
+     "unrelated": 0.9926
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/config/shared-options.md#26",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0015,
+     "different_case": 0.0039,
+     "unrelated": 0.9928
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/why.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0031,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0015,
+     "different_case": 0.003,
+     "unrelated": 0.9939
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/using-plugins.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0033,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0017,
+     "different_case": 0.0035,
+     "unrelated": 0.9932
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3181
+  },
+  "timing": {
+   "total_ms": 108,
+   "rerank_ms": 93,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 4371,
+    "branches": 10,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

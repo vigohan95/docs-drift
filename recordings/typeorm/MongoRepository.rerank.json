@@ -1,0 +1,165 @@
+{
+ "endpoint": "rerank",
+ "tag": "typeorm/MongoRepository.rerank",
+ "recorded_at": "2026-11-06T13:42:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1254,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "61.453568",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=565"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `MongoRepository`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `MongoRepository`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "title": "docs/docs/data-source/4-data-source-api.md > DataSource API",
+    "text": "```typescript\nconst userMetadata = dataSource.getMetadata(User)\n// now you can get any information about User entity\n```\n\n- `getRepository` - Gets `Repository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getRepository(User)\n// now you can call repository methods, for example find:\nconst users = await repository.find()\n```\n\n- `getTreeRepository` - Gets `TreeRepository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getTreeRepository(Category)\n// now you can call tree repository methods, for example findTrees:\nconst categories = await repository.findTrees()\n```\n\n- `getMongoRepository` - Gets `MongoRepository` of the given entity.\n  This repository is used for entities in MongoDB dataSource.\n  Learn more about [MongoDB support](../drivers/mongodb.md).\n\n```typescript\nconst repository = dataSource.getMongoRepository(User)\n// now you can call mongodb-specific repository methods, for example createEntityCursor:\nconst categoryCursor = repository.createEntityCursor()\nconst category1 = await categoryCursor.next()\nconst category2 = await categoryCursor.next()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/drivers/mongodb.md#9",
+    "title": "docs/docs/drivers/mongodb.md > MongoDB > Using `MongoEntityManager` and `MongoRepository`",
+    "text": "## Using `MongoEntityManager` and `MongoRepository`\n\nYou can use the majority of methods inside the `EntityManager` (except for RDBMS-specific, like `query` and `transaction`).\nFor example:\n\n```typescript\nconst timber = await myDataSource.manager.findOneBy(User, {\n    firstName: \"Timber\",\n    lastName: \"Saw\",\n})\n```\n\nFor MongoDB there is also a separate `MongoEntityManager` which extends `EntityManager`.\n\n```typescript\nconst timber = await myDataSource.manager.findOneBy(User, {\n    firstName: \"Timber\",\n    lastName: \"Saw\",\n})\n```\n\nJust like separate like `MongoEntityManager` there is a `MongoRepository` with extended `Repository`:\n\n```typescript\nconst timber = await myDataSource.getMongoRepository(User).findOneBy({\n    firstName: \"Timber\",\n    lastName: \"Saw\",\n})\n```\n\nUse Advanced options in find():\n\nEqual:\n\n```typescript\nconst timber = await myDataSource.getMongoRepository(User).find({\n    where: {\n        firstName: { $eq: \"Timber\" },\n    },\n})\n```\n\nLessThan:\n\n```typescript\nconst timber = await myDataSource.getMongoRepository(User).find({\n    where: {\n        age: { $lt: 60 },\n    },\n})\n```\n\nIn:\n\n```typescript\nconst timber = await myDataSource.getMongoRepository(User).find({\n    where: {\n        firstName: { $in: [\"Timber\", \"Zhang\"] },\n    },\n})\n```\n\nNot in:\n\n```typescript\nconst timber = await myDataSource.getMongoRepository(User).find({\n    where: {\n        firstName: { $not: { $in: [\"Timber\", \"Zhang\"] } },\n    },\n})\n```\n\nOr:\n\n```typescript\nconst timber = await myDataSource.getMongoRepository(User).find({\n    where: {\n        $or: [{ firstName: \"Timber\" }, { firstName: \"Zhang\" }],\n    },\n})\n```\n\nQuerying subdocuments\n\n```typescript\nconst users = await myDataSource.getMongoRepository(User).find({\n    where: {\n        \"profile.education\": { $eq: \"Tree School\" },\n    },\n})\n```\n\nQuerying Array of subdocuments\n\n```typescript\n// Query users with photos of size less than 500\nconst users = await myDataSource.getMongoRepository(User).find({\n    where: {\n        \"photos.size\": { $lt: 500 },\n    },\n})\n```\n\nBoth `MongoEntityManager` and `MongoRepository` contain a lot of useful MongoDB-specific methods:"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#14",
+    "title": "docs/docs/releases/1.0/02-upgrading-from-0.3.md > Upgrading from 0.3 to 1.0 > Driver changes > MongoDB > `stats()` method removed",
+    "text": "#### `stats()` method removed\n\nThe `stats()` method has been removed from `MongoQueryRunner`, `MongoEntityManager`, and `MongoRepository`. The underlying `collStats` command was deprecated in MongoDB server 6.2 and the `Collection.stats()` method was removed in MongoDB Driver v7.\n\nUse the [`$collStats`](https://www.mongodb.com/docs/manual/reference/operator/aggregation/collStats/) aggregation stage instead. Note that the response shape is different — properties like `count`, `size`, and `storageSize` are nested under `storageStats` rather than at the top level.\n\n```typescript\n// Before\nconst stats = await mongoRepository.stats()\nconsole.log(stats.count)\nconsole.log(stats.size)\nconsole.log(stats.totalIndexSize)\n\n// After — use $collStats aggregation stage\nconst [stats] = await dataSource.mongoManager\n    .aggregate(MyEntity, [{ $collStats: { storageStats: {} } }])\n    .toArray()\nconsole.log(stats.storageStats.count)\nconsole.log(stats.storageStats.size)\nconsole.log(stats.storageStats.totalIndexSize)\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#39",
+    "title": "docs/docs/releases/1.0/02-upgrading-from-0.3.md > Upgrading from 0.3 to 1.0 > Repository > `findOneById`",
+    "text": "### `findOneById`\n\nThe deprecated `findOneById` method has been removed from `EntityManager`, `Repository`, `BaseEntity`, `MongoEntityManager`, and `MongoRepository`. Use `findOneBy` instead:\n\n```typescript\n// Before\nconst user = await manager.findOneById(User, 1)\nconst user = await repository.findOneById(1)\nconst user = await User.findOneById(1)\n\n// After\nconst user = await manager.findOneBy(User, { id: 1 })\nconst user = await repository.findOneBy({ id: 1 })\nconst user = await User.findOneBy({ id: 1 })\n```\n\nFor MongoDB entities with `@ObjectIdColumn()`, `findOneBy` works the same way — TypeORM automatically translates the property name to `_id`."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/2-working-with-repository.md#0",
+    "title": "docs/docs/working-with-entity-manager/2-working-with-repository.md > Repository",
+    "text": "# Repository\n\n`Repository` is just like `EntityManager` but its operations are limited to a concrete entity.\nYou can access the repository via EntityManager.\n\nExample:\n\n```typescript\nimport { User } from \"./entity/User\"\n\nconst userRepository = dataSource.getRepository(User)\nconst user = await userRepository.findOneBy({\n    id: 1,\n})\nuser.name = \"Umed\"\nawait userRepository.save(user)\n```\n\nThere are 3 types of repositories:\n\n- `Repository` - Regular repository for any entity.\n- `TreeRepository` - Repository, extensions of `Repository` used for tree-entities\n  (like entities marked with `@Tree` decorator).\n  Has special methods to work with tree structures.\n- `MongoRepository` - Repository with special functions used only with MongoDB."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#14",
+    "title": "docs/docs/working-with-entity-manager/6-repository-api.md > Repository APIs > `MongoRepository` API",
+    "text": "## `MongoRepository` API\n\nFor `MongoRepository` API refer to [the MongoDB documentation](../drivers/mongodb.md)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#14",
+    "action": "use",
+    "relevance_score": 0.9549,
+    "document_score": 0.968,
+    "levels": {
+     "answers": 0.9549,
+     "elsewhere": 0.0131,
+     "different_case": 0.0146,
+     "unrelated": 0.0174
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0161,
+    "document_score": 0.1572,
+    "levels": {
+     "answers": 0.0161,
+     "elsewhere": 0.1411,
+     "different_case": 0.0253,
+     "unrelated": 0.8175
+    }
+   },
+   {
+    "index": 5,
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#14",
+    "action": "expand",
+    "relevance_score": 0.0137,
+    "document_score": 0.8265,
+    "levels": {
+     "answers": 0.0137,
+     "elsewhere": 0.8128,
+     "different_case": 0.0218,
+     "unrelated": 0.1516
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#39",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0118,
+    "document_score": 0.0373,
+    "levels": {
+     "answers": 0.0118,
+     "elsewhere": 0.0254,
+     "different_case": 0.0307,
+     "unrelated": 0.932
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/drivers/mongodb.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0097,
+    "document_score": 0.0826,
+    "levels": {
+     "answers": 0.0097,
+     "elsewhere": 0.0729,
+     "different_case": 0.0277,
+     "unrelated": 0.8898
+    }
+   },
+   {
+    "index": 4,
+    "id": "typeorm:docs/docs/working-with-entity-manager/2-working-with-repository.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0047,
+    "document_score": 0.0168,
+    "levels": {
+     "answers": 0.0047,
+     "elsewhere": 0.0122,
+     "different_case": 0.0122,
+     "unrelated": 0.971
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2207
+  },
+  "timing": {
+   "total_ms": 372,
+   "rerank_ms": 371,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 3017,
+    "branches": 6,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}
