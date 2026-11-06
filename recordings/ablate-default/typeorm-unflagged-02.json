@@ -1,0 +1,83 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/typeorm-unflagged-02",
+ "recorded_at": "2026-11-06T13:48:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1034,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "110.640604",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=314"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "text": "### Creating a one-to-one relation\n\nLet's create a one-to-one relationship with another class.\nLet's create a new class in `PhotoMetadata.ts`. This PhotoMetadata class is supposed to contain our photo's additional meta-information:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column(\"int\")\n    height: number\n\n    @Column(\"int\")\n    width: number\n\n    @Column()\n    orientation: string\n\n    @Column()\n    compressed: boolean\n\n    @Column()\n    comment: string\n\n    @OneToOne(() => Photo)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\nHere, we are using a new decorator called `@OneToOne`. It allows us to create a one-to-one relationship between two entities. We also add a `@JoinColumn` decorator, which indicates that this side of the relationship will own the relationship.\nRelations can be unidirectional or bidirectional.\nOnly one side of the relation can be the owner.\nUsing `@JoinColumn` decorator is required on the owner side of the relationship.\n\nIf you run the app, you'll see a newly generated table, and it will contain a column with a foreign key for the photo relation:\n\n```text\n+-------------+--------------+----------------------------+\n|                     photo_metadata                      |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| height      | int          |                            |\n| width       | int          |                            |\n| comment     | varchar(255) |                            |\n| compressed  | boolean      |                            |\n| orientation | varchar(255) |                            |\n| photoId     | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "text": "## What does \"owner side\" in a relations mean or why we need to use `@JoinColumn` and `@JoinTable`?\n\nLet's start with `one-to-one` relation.\nLet's say we have two entities: `User` and `Photo`:\n\n```typescript\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne()\n    photo: Photo\n}\n```\n\n```typescript\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @OneToOne()\n    user: User\n}\n```\n\nThis example does not have a `@JoinColumn` which is incorrect.\nWhy? Because to make a real relation, we need to create a column in the database.\nWe need to create a column `userId` in `photo` or `photoId` in `user`.\nBut which column should be created - `userId` or `photoId`?\nTypeORM cannot decide for you.\nTo make a decision, you must use `@JoinColumn` on one of the sides.\nIf you put `@JoinColumn` in `Photo` then a column called `userId` will be created in the `photo` table.\nIf you put `@JoinColumn` in `User` then a column called `photoId` will be created in the `user` table.\nThe side with `@JoinColumn` will be called the \"owner side of the relationship\".\nThe other side of the relation, without `@JoinColumn`, is called the \"inverse (non-owner) side of relationship\".\n\nIt is the same in a `@ManyToMany` relation. You use `@JoinTable` to show the owner side of the relation.\n\nIn `@ManyToOne` or `@OneToMany` relations, `@JoinColumn` is not necessary because\nboth decorators are different, and the table where you put the `@ManyToOne` decorator will have the relational column.\n\n`@JoinColumn` and `@JoinTable` decorators can also be used to specify additional\njoin column / junction table settings, like join column name or junction table name."
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/getting-started.md#23",
+    "b": "typeorm:docs/docs/help/1-faq.md#4",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0044,
+     "overlapping": 0.9882,
+     "conflicting": 0.0052,
+     "unrelated": 0.0022
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 120,
+   "total_ms": 124
+  }
+ }
+}

@@ -1,0 +1,303 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/fastify-register.compare",
+ "recorded_at": "2026-11-06T13:49:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1303,
+ "response_headers": {
+  "x-clocked-credits": "14",
+  "x-clocked-model-ms": "339.676506",
+  "x-clocked-cost-usd": "0.002789",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=562"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "text": "### Using addContentTypeParser with fastify.register\nWhen using `addContentTypeParser` with `fastify.register`, avoid `await`\nwhen registering routes. Using `await` makes route registration asynchronous,\npotentially registering routes before `addContentTypeParser` is set."
+   },
+   {
+    "id": "fastify:docs/Reference/Plugins.md#1",
+    "text": "### Plugin Options\n<a id=\"plugin-options\"></a>\n\nThe optional `options` parameter for `fastify.register` supports a predefined\nset of options that Fastify itself will use, except when the plugin has been\nwrapped with [fastify-plugin](https://github.com/fastify/fastify-plugin). This\noptions object will also be passed to the plugin upon invocation, regardless of\nwhether or not the plugin has been wrapped. The currently supported list of\nFastify specific options is:\n\n+ [`logLevel`](./Routes.md#custom-log-level)\n+ [`logSerializers`](./Routes.md#custom-log-serializer)\n+ [`prefix`](#route-prefixing-option)\n\nThese options will be ignored when used with fastify-plugin.\n\nTo avoid collisions, a plugin should consider namespacing its options. For\nexample, a plugin `foo` might be registered like so:\n\n```js\nfastify.register(require('fastify-foo'), {\n  prefix: '/foo',\n  foo: {\n    fooOption1: 'value',\n    fooOption2: 'value'\n  }\n})\n```\n\nIf collisions are not a concern, the plugin may accept the options object as-is:\n\n```js\nfastify.register(require('fastify-foo'), {\n  prefix: '/foo',\n  fooOption1: 'value',\n  fooOption2: 'value'\n})\n```\n\nThe `options` parameter can also be a `Function` evaluated at plugin registration,\nproviding access to the Fastify instance via the first argument:\n\n```js\nconst fp = require('fastify-plugin')\n\nfastify.register(fp((fastify, opts, done) => {\n  fastify.decorate('foo_bar', { hello: 'world' })\n\n  done()\n}))\n\n// The opts argument of fastify-foo will be { hello: 'world' }\nfastify.register(require('fastify-foo'), parent => parent.foo_bar)\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#84",
+    "text": "#### schemaController\n<a id=\"schema-controller\"></a>\n\nThis property can be used to fully manage:\n- `bucket`: where the schemas of your application will be stored\n- `compilersFactory`: what module must compile the JSON schemas\n\nIt can be useful when your schemas are stored in another data structure that is\nunknown to Fastify.\n\nAnother use case is to tweak all the schemas processing. Doing so it is possible\nto use Ajv v8 JTD or Standalone feature. To use such as JTD or the Standalone\nmode, refers to the [`@fastify/ajv-compiler`\ndocumentation](https://github.com/fastify/ajv-compiler#usage).\n\n```js\nconst fastify = Fastify({\n  schemaController: {\n    /**\n     * This factory is called whenever `fastify.register()` is called.\n     * It may receive as input the schemas of the parent context if some schemas have been added.\n     * @param {object} parentSchemas these schemas will be returned by the\n     * `getSchemas()` method function of the returned `bucket`.\n     */\n    bucket: function factory (parentSchemas) {\n      return {\n        add (inputSchema) {\n          // This function must store the schema added by the user.\n          // This function is invoked when `fastify.addSchema()` is called.\n        },\n        getSchema (schema$id) {\n          // This function must return the raw schema requested by the `schema$id`.\n          // This function is invoked when `fastify.getSchema(id)` is called.\n          return aSchema\n        },\n        getSchemas () {\n          // This function must return all the schemas referenced by the routes schemas' $ref\n          // It must return a JSON where the property is the schema `$id` and the value is the raw JSON Schema.\n          const allTheSchemaStored = {\n            'schema$id1': schema1,\n            'schema$id2': schema2\n          }\n          return allTheSchemaStored\n        }\n      }\n    },\n\n    /**\n     * The compilers factory lets you fully control the validator and serializer\n     * in the Fastify's lifecycle, providing the encapsulation to your compilers.\n     */\n    compilersFactory: {\n      /**\n       * This factory is called whenever a new validator instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`. Needed to resolve the external references $ref.\n       * @param {object} ajvServerOption the server `ajv` options to build your compilers accordingly\n       */\n      buildValidator: function factory (externalSchemas, ajvServerOption) {\n        // This factory function must return a schema validator compiler.\n        // See [#schema-validator](./Validation-and-Serialization.md#schema-validator) for details.\n        const yourAjvInstance = new Ajv(ajvServerOption.customOptions)\n        return function validatorCompiler ({ schema, method, url, httpPart }) {\n          return yourAjvInstance.compile(schema)\n        }\n      },"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#85",
+    "text": "      /**\n       * This factory is called whenever a new serializer instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`. Needed to resolve the external references $ref.\n       * @param {object} serializerOptsServerOption the server `serializerOpts`\n       * options to build your compilers accordingly\n       */\n      buildSerializer: function factory (externalSchemas, serializerOptsServerOption) {\n        // This factory function must return a schema serializer compiler.\n        // See [#schema-serializer](./Validation-and-Serialization.md#schema-serializer) for details.\n        return function serializerCompiler ({ schema, method, url, httpStatus, contentType }) {\n          return data => JSON.stringify(data)\n        }\n      }\n    }\n  }\n});\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#53",
+    "text": "##### fastify.FastifyRegister(plugin: [FastifyPluginAsync][FastifyPluginAsync], opts: [FastifyRegisterOptions][FastifyRegisterOptions])\n[src](https://github.com/fastify/fastify/blob/main/types/register.d.ts#L9)\n\nThis type interface specifies the type for the\n[`fastify.register()`](./Server.md#register) method. The type interface returns\na function signature with an underlying generic `Options` which is defaulted to\n[FastifyPluginOptions][FastifyPluginOptions]. It infers this generic from the\nFastifyPlugin parameter when calling this function so there is no need to\nspecify the underlying generic. The options parameter is the intersection of the\nplugin's options and two additional optional properties: `prefix: string` and\n`logLevel`: [LogLevel][LogLevel].\n\nBelow is an example of the options inference in action:\n\n```typescript\nconst server = fastify()\n\nconst plugin: FastifyPluginCallback<{\n  option1: string;\n  option2: boolean;\n}> = function (instance, opts, done) { }\n\nserver().register(plugin, {}) // Error - options object is missing required properties\nserver().register(plugin, { option1: '', option2: true }) // OK - options object contains required properties\n```\n\nSee the Learn By Example, [Plugins](#plugins) section for more detailed examples\nof creating TypeScript plugins in Fastify."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Plugins.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/TypeScript.md#53"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#84",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#85"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#85",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#84"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#53",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Plugins.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "b": "fastify:docs/Reference/Plugins.md#1",
+    "relation": "unrelated",
+    "related": 0.0178,
+    "probabilities": {
+     "same": 0.0066,
+     "overlapping": 0.0062,
+     "conflicting": 0.005,
+     "unrelated": 0.9822
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "b": "fastify:docs/Reference/Server.md#84",
+    "relation": "unrelated",
+    "related": 0.0115,
+    "probabilities": {
+     "same": 0.0044,
+     "overlapping": 0.0039,
+     "conflicting": 0.0032,
+     "unrelated": 0.9885
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "b": "fastify:docs/Reference/Server.md#85",
+    "relation": "unrelated",
+    "related": 0.0115,
+    "probabilities": {
+     "same": 0.0046,
+     "overlapping": 0.004,
+     "conflicting": 0.0029,
+     "unrelated": 0.9885
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "b": "fastify:docs/Reference/TypeScript.md#53",
+    "relation": "unrelated",
+    "related": 0.0186,
+    "probabilities": {
+     "same": 0.0072,
+     "overlapping": 0.007,
+     "conflicting": 0.0044,
+     "unrelated": 0.9814
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Plugins.md#1",
+    "b": "fastify:docs/Reference/Server.md#84",
+    "relation": "unrelated",
+    "related": 0.021,
+    "probabilities": {
+     "same": 0.0083,
+     "overlapping": 0.0072,
+     "conflicting": 0.0055,
+     "unrelated": 0.979
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Plugins.md#1",
+    "b": "fastify:docs/Reference/Server.md#85",
+    "relation": "unrelated",
+    "related": 0.0123,
+    "probabilities": {
+     "same": 0.0049,
+     "overlapping": 0.0047,
+     "conflicting": 0.0028,
+     "unrelated": 0.9877
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Plugins.md#1",
+    "b": "fastify:docs/Reference/TypeScript.md#53",
+    "relation": "overlapping",
+    "related": 0.9947,
+    "probabilities": {
+     "same": 0.0123,
+     "overlapping": 0.975,
+     "conflicting": 0.0074,
+     "unrelated": 0.0053
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0146,
+       "restated": 0.9317,
+       "elaborated": 0.0189,
+       "different": 0.0348
+      },
+      "confidence": 0.527,
+      "a": {
+       "document": "fastify:docs/Reference/Plugins.md#1",
+       "quote": "The optional `options` parameter for `fastify.register` supports a predefined",
+       "start": 48,
+       "end": 125,
+       "confidence": 0.527
+      },
+      "b": {
+       "document": "fastify:docs/Reference/TypeScript.md#53",
+       "quote": "The options parameter is the intersection of the\nplugin's options and two additional optional properties: `prefix: string` and\n`logLevel`: [LogLevel][LogLevel].\n\nBelow is an example of the options inference in action:\n\n```typescript\nconst server = fastify()\n\nconst plugin: FastifyPluginCallback<{\n  option1: string;\n  option2: boolean;\n}> = function (instance, opts, done) { }\n\nserver().register(plugin, {}) // Error - options object is missing required properties\nserver().register(plugin, { option1: '', option2: true }) // OK - options object contains required properties\n```\n\nSee the Learn By Example, [Plugins](#plugins) section for more detailed examples\nof creating TypeScript plugins in Fastify.",
+       "start": 603,
+       "end": 1306,
+       "confidence": 0.977
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#84",
+    "b": "fastify:docs/Reference/Server.md#85",
+    "relation": "overlapping",
+    "related": 0.9204,
+    "probabilities": {
+     "same": 0.2636,
+     "overlapping": 0.6064,
+     "conflicting": 0.0504,
+     "unrelated": 0.0796
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.8359,
+       "restated": 0.0782,
+       "elaborated": 0.0411,
+       "different": 0.0448
+      },
+      "confidence": 0.803,
+      "a": {
+       "document": "fastify:docs/Reference/Server.md#84",
+       "quote": "/**",
+       "start": 2070,
+       "end": 2073,
+       "confidence": 0.803
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#85",
+       "quote": "/**\n       * This factory is called whenever a new serializer instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`.",
+       "start": 0,
+       "end": 433,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#84",
+    "b": "fastify:docs/Reference/TypeScript.md#53",
+    "relation": "unrelated",
+    "related": 0.0172,
+    "probabilities": {
+     "same": 0.0067,
+     "overlapping": 0.0062,
+     "conflicting": 0.0043,
+     "unrelated": 0.9828
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#85",
+    "b": "fastify:docs/Reference/TypeScript.md#53",
+    "relation": "unrelated",
+    "related": 0.0334,
+    "probabilities": {
+     "same": 0.0106,
+     "overlapping": 0.0118,
+     "conflicting": 0.0109,
+     "unrelated": 0.9666
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   6,
+   7
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   6,
+   7
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 97,
+   "passage_reads": 1,
+   "passages_ms": 130,
+   "passages": 3,
+   "counterparts_ms": 131
+  },
+  "timing": {
+   "read_ms": 358,
+   "total_ms": 365
+  }
+ }
+}

@@ -1,0 +1,83 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/typeorm-flagged-01",
+ "recorded_at": "2026-11-06T13:48:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 983,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "135.901763",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=265"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "text": "```typescript\nawait manager.save(user)\nawait manager.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n\n```typescript\nawait manager.remove(user)\nawait manager.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait manager.insert(User, {\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait manager.insert(User, [\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids, given conditions, or an array of condition objects. Sets fields from supplied partial entity.\n\n```typescript\nawait manager.update(User, { age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait manager.update(User, 1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// Bulk updates with different conditions for each operation\nawait manager.update(User, [\n    { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } },\n    { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } },\n    { criteria: { age: 18 }, data: { category: \"ADULT\" } },\n])\n// executes three separate UPDATE queries:\n// UPDATE user SET firstName = Rizzrak WHERE id = 1\n// UPDATE user SET firstName = Karzzir WHERE id = 2\n// UPDATE user SET category = ADULT WHERE age = 18\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#3",
+    "text": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together):\n\n```typescript\nawait repository.update([{ status: \"expired\" }, { flagged: true }], {\n    active: false,\n})\n// executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true\n```\n\n- `updateAll` - Updates _all_ entities of target type (without WHERE clause). Sets fields from supplied partial entity.\n\n```typescript\nawait repository.updateAll({ category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT\n\nawait repository.updateAll(\n    { category: \"ADULT\" },\n    { returning: \"*\" }, // limited to drivers that support returning clauses\n)\n```\n\n- `upsert` - Inserts a new entity or array of entities unless they already exist in which case they are updated instead. Supported by AuroraDataApi, Cockroach, Mysql, Postgres, and Sqlite database drivers.\n\nWhen an upsert operation results in an update (due to a conflict), special columns like `@UpdateDateColumn` and `@VersionColumn` are automatically updated to their current values.\n\nColumns marked with `update: false` or defined as computed generated columns (via `asExpression`/`generatedType`) are **never** included in the update set on conflict. If all non-conflict columns are excluded by these rules (i.e. there are no updatable columns), the upsert degrades to an insert-or-ignore operation and the existing row is left completely unchanged. On databases that support conflict targets (e.g. PostgreSQL, CockroachDB), this is scoped to the specified conflict columns; on MySQL-family databases, `INSERT IGNORE` is used which applies to all unique constraints."
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#3",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#3",
+    "relation": "overlapping",
+    "related": 0.9567,
+    "probabilities": {
+     "same": 0.0108,
+     "overlapping": 0.9238,
+     "conflicting": 0.022,
+     "unrelated": 0.0433
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 53,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 147,
+   "total_ms": 150
+  }
+ }
+}

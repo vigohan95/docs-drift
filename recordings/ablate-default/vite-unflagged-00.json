@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/vite-unflagged-00",
+ "recorded_at": "2026-11-06T13:48:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 967,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "124.234945",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=268"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/config/server-options.md#16",
+    "text": "## server.middlewareMode\n\n- **Type:** `boolean | { server: http.Server }`\n- **Default:** `false`\n\nCreate Vite server in middleware mode.\n\nIf [proxy](./server-options#server-proxy) is setup for WebSocket, the `server` should be provided to bind the proxy correctly.\n\n- **Related:** [appType](./shared-options#apptype), [SSR - Setting Up the Dev Server](/guide/ssr#setting-up-the-dev-server)\n\n- **Example:**\n\n```js twoslash\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    // don't include Vite's default HTML handling middlewares\n    appType: 'custom',\n  })\n  // Use vite's connect instance as middleware\n  app.use(vite.middlewares)\n\n  app.use('*', async (req, res) => {\n    // Since `appType` is `'custom'`, should serve response here.\n    // Note: if `appType` is `'spa'` or `'mpa'`, Vite includes middlewares\n    // to handle HTML requests and 404s so user middlewares should be added\n    // before Vite's middlewares to take effect instead\n  })\n}\n\ncreateServer()\n```"
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#38",
+    "text": "## appType\n\n- **Type:** `'spa' | 'mpa' | 'custom'`\n- **Default:** `'spa'`\n\nWhether your application is a Single Page Application (SPA), a [Multi Page Application (MPA)](../guide/build#multi-page-app), or Custom Application (SSR and frameworks with custom HTML handling):\n\n- `'spa'`: include HTML middlewares and use SPA fallback. Configure [sirv](https://github.com/lukeed/sirv) with `single: true` in preview\n- `'mpa'`: include HTML middlewares\n- `'custom'`: don't include HTML middlewares\n\nLearn more in Vite's [SSR guide](/guide/ssr#vite-cli). Related: [`server.middlewareMode`](./server-options#server-middlewaremode)."
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/config/server-options.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#38",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/config/server-options.md#16",
+    "b": "vite:docs/config/shared-options.md#38",
+    "relation": "overlapping",
+    "related": 0.9817,
+    "probabilities": {
+     "same": 0.0053,
+     "overlapping": 0.9619,
+     "conflicting": 0.0145,
+     "unrelated": 0.0183
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 62,
+   "passages": 1,
+   "counterparts_ms": 46
+  },
+  "timing": {
+   "read_ms": 136,
+   "total_ms": 140
+  }
+ }
+}

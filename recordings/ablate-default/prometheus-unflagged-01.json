@@ -1,0 +1,83 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/prometheus-unflagged-01",
+ "recorded_at": "2026-11-06T13:48:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 997,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "112.53005",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=263"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/operators.md#16",
+    "text": "### One-to-one vector matches\n\n**One-to-one** finds a unique pair of entries from each side of the operation.\nIn the default case, that is an operation following the format `vector1 <operator> vector2`.\nTwo entries match if they have the exact same set of labels and corresponding values.\nThe `ignoring` keyword allows ignoring certain labels when matching, while the\n`on` keyword allows reducing the set of considered labels to a provided list:\n\n    <vector expr> <bin-op> ignoring(<label list>) <vector expr>\n    <vector expr> <bin-op> on(<label list>) <vector expr>\n\nExample input:\n\n    method_code:http_errors:rate5m{method=\"get\", code=\"500\"}  24\n    method_code:http_errors:rate5m{method=\"get\", code=\"404\"}  30\n    method_code:http_errors:rate5m{method=\"put\", code=\"501\"}  3\n    method_code:http_errors:rate5m{method=\"post\", code=\"500\"} 6\n    method_code:http_errors:rate5m{method=\"post\", code=\"404\"} 21\n\n    method:http_requests:rate5m{method=\"get\"}  600\n    method:http_requests:rate5m{method=\"del\"}  34\n    method:http_requests:rate5m{method=\"post\"} 120\n\nExample query:\n\n    method_code:http_errors:rate5m{code=\"500\"} / ignoring(code) method:http_requests:rate5m\n\nThis returns a result vector containing the fraction of HTTP requests with status code\nof 500 for each method, as measured over the last 5 minutes. Without `ignoring(code)` there\nwould have been no match as the metrics do not share the same set of labels.\nThe entries with methods `put` and `del` have no match and will not show up in the result:\n\n    {method=\"get\"}  0.04            //  24 / 600\n    {method=\"post\"} 0.05            //   6 / 120"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "text": "* If a fill modifier is used on the \"many\" side of a match, it will only fill in a single series\n  for the \"many\" side of each match group, using the group's matching labels as the series identity.\n* If a fill modifier is used on the \"one\" side of a match and the grouping modifier specifies\n  label names to include from the \"one\" side (e.g. `left_vector * on(instance, job) group_left(info_label) fill_right(1) right_vector`), those labels will not be filled in for missing\n  series, as there is no source for their values.\n\nFill modifiers are not supported for set operators (`and`, `or`, `unless`), as the purpose of those\noperators is to filter series based on presence or absence in the other vector.\n\nExample query, filling in missing series on the either side with `0`:\n\n    method_code:http_errors:rate5m{status=\"500\"} / ignoring(code) fill(0) method:http_requests:rate5m\n\nThis returns a result vector containing the fraction of HTTP requests with status code\nof 500 for each method, as measured over the last 5 minutes. The entries with methods `put` and `del`\nare now included in the result with a filled-in default sample value of `0`, as they had no matching\nseries on the respective other side:\n\n    {method=\"get\"}  0.04            #  24 / 600\n    {method=\"put\"}  +Inf            #   3 /   0 (missing right side filled in)\n    {method=\"del\"}  0               #   0 /  34 (missing left side filled in)\n    {method=\"post\"} 0.05            #   6 / 120"
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/operators.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/operators.md#16",
+    "b": "prometheus:docs/querying/operators.md#19",
+    "relation": "overlapping",
+    "related": 0.9909,
+    "probabilities": {
+     "same": 0.0151,
+     "overlapping": 0.9639,
+     "conflicting": 0.0119,
+     "unrelated": 0.0091
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 38,
+   "passage_reads": 1,
+   "passages_ms": 86,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 124,
+   "total_ms": 129
+  }
+ }
+}

@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/prometheus-flagged-00",
+ "recorded_at": "2026-11-06T13:48:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1060,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "182.192257",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=344"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#2",
+    "text": "## Configuring Prometheus to monitor itself\n\nPrometheus collects metrics from _targets_ by scraping metrics HTTP\nendpoints. Since Prometheus exposes data in the same\nmanner about itself, it can also scrape and monitor its own health.\n\nWhile a Prometheus server that collects only data about itself is not very\nuseful, it is a good starting example. Save the following basic\nPrometheus configuration as a file named `prometheus.yml`:\n\n```yaml\nglobal:\n  scrape_interval:     15s # By default, scrape targets every 15 seconds.\n\n  # Attach these labels to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  external_labels:\n    monitor: 'codelab-monitor'\n\n# A scrape configuration containing exactly one endpoint to scrape:\n# Here it's Prometheus itself.\nscrape_configs:\n  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.\n  - job_name: 'prometheus'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:9090']\n```\n\nFor a complete specification of configuration options, see the\n[configuration documentation](configuration/configuration.md)."
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#2",
+    "b": "prometheus:docs/getting_started.md#2",
+    "relation": "overlapping",
+    "related": 0.9795,
+    "probabilities": {
+     "same": 0.011,
+     "overlapping": 0.9318,
+     "conflicting": 0.0366,
+     "unrelated": 0.0205
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 1,
+   "counterparts_ms": 74
+  },
+  "timing": {
+   "read_ms": 194,
+   "total_ms": 199
+  }
+ }
+}

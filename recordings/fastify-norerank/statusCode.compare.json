@@ -1,0 +1,326 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/statusCode.compare",
+ "recorded_at": "2026-11-06T13:49:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1525,
+ "response_headers": {
+  "x-clocked-credits": "24",
+  "x-clocked-model-ms": "576.17857",
+  "x-clocked-cost-usd": "0.004781",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=831"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "text": "#### What The Default Error Handler Sends\nThe default error handler serializes the error into a JSON body with the\n`statusCode`, `error`, and `message` properties, plus `code` when the error\ncarries one:\n\n```js\napp.get('/', async () => { throw new Error('kaboom') })\n```\n\n```json\n{\n  \"statusCode\": 500,\n  \"error\": \"Internal Server Error\",\n  \"message\": \"kaboom\"\n}\n```\n\nThe `error` property is the generic HTTP status text, but **`message` is\n`error.message` verbatim**. This applies to every status code, including `500`.\nFastify's built-in error serializer emits only these four properties, so the\nstack trace is not part of the default payload — but a route-level response\nschema replaces that serializer, and one that declares a `stack` property will\nserialize it.\n\n> Security:\n> Because `message` and `code` are forwarded as-is, errors thrown by libraries\n> deeper in your application are exposed to the client. A database driver\n> error, for example, can leak schema details and query text:\n>\n> ```json\n> {\n>   \"statusCode\": 500,\n>   \"code\": \"ER_BAD_FIELD_ERROR\",\n>   \"error\": \"Internal Server Error\",\n>   \"message\": \"Unknown column 'username' in 'field list'\"\n> }\n> ```\n>\n> Fastify does not distinguish between development and production here. If\n> unexpected errors must not reach the client, handle this explicitly."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#22",
+    "text": "###### Async-Await and Promises\n<a id=\"async-await-promise\"></a>\n\nFastify natively handles promises and supports async-await.\n\n*Note that in the following examples we are not using reply.send.*\n```js\nconst { promisify } = require('node:util')\nconst delay = promisify(setTimeout)\n\nfastify.get('/promises', options, function (request, reply) {\n return delay(200).then(() => { return { hello: 'world' }})\n})\n\nfastify.get('/async-await', options, async function (request, reply) {\n  await delay(200)\n  return { hello: 'world' }\n})\n```\n\nRejected promises default to a `500` HTTP status code. Reject the promise, or\n`throw` in an `async function`, with an object that has `statusCode` (or\n`status`) and `message` properties to modify the reply.\n\n```js\nfastify.get('/teapot', async function (request, reply) {\n  const err = new Error()\n  err.statusCode = 418\n  err.message = 'short and stout'\n  throw err\n})\n\nfastify.get('/botnet', async function (request, reply) {\n  throw { statusCode: 418, message: 'short and stout' }\n  // will return to the client the same json\n})\n```\n\nIf you want to know more please review\n[Routes#async-await](./Routes.md#async-await)."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#24",
+    "text": "##### .code(statusCode)\n<a id=\"code\"></a>\n\nIf not set via `reply.code`, the resulting `statusCode` will be `200`.\n\n`.status(statusCode)` is an alias of `.code(statusCode)`."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#18",
+    "text": "The error-related methods share a unified signature:\n`(error, request, reply, metadata)`, where `metadata` carries any extra\nper-method data (for example, the `statusCode` passed to `serializerError`).\n`incomingRequest` and `routeNotFound` omit the `error` argument, since they fire\nat lifecycle points where no error exists. `serviceUnavailable` is a further\nexception, since no route — and therefore no `request`/`reply` — is formed.\n\n| Method | Signature | Description |\n|--------|-----------|-------------|\n| `isLogDisabled` | `(request)` | Checks whether request logging is disabled for the given request. It impacts all other log methods. |\n| `incomingRequest` | `(request, reply, metadata)` | Logs an incoming request at `info` level. |\n| `requestCompleted` | `(error, request, reply, metadata)` | Logs the outcome of a completed request. Uses `error` level when an error is present, `info` otherwise. |\n| `defaultErrorLog` | `(error, request, reply, metadata)` | Logs an error handled by the default error handler. Uses `error` for 5xx, `info` for 4xx. |\n| `streamError` | `(error, request, reply, metadata)` | Logs stream-level errors after headers have been sent. |\n| `routeNotFound` | `(request, reply, metadata)` | Logs a \"route not found\" message at `info` level. |\n| `writeHeadError` | `(error, request, reply, metadata)` | Logs a warning when `writeHead` fails during error handling. |\n| `serializerError` | `(error, request, reply, metadata)` | Logs an error when the serializer for a given status code fails. The triggering status code is available as `metadata.statusCode`. |\n| `serviceUnavailable` | `(logger, server)` | Logs a 503 when the server is closing. Always emitted, not gated by `disableRequestLogging`. |"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "text": "### Error Handling\nWhen schema validation fails for a request, Fastify will automatically return a\nstatus 400 response including the result from the validator in the payload. For\nexample, if the following schema is used for a route:\n\n```js\nconst schema = {\n  body: {\n    type: 'object',\n    properties: {\n      name: { type: 'string' }\n    },\n    required: ['name']\n  }\n}\n```\n\nIf the request fails to satisfy the schema, the route will return a response\nwith the following payload:\n\n```js\n{\n  \"statusCode\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"body should have required property 'name'\"\n}\n```\n\n> ⚠ Security Consideration: By default, validation error details from the schema\n> are included in the response payload. If your organization requires sanitizing\n> or customizing these error messages (e.g., to avoid exposing internal schema\n> details), configure a custom error handler using\n> [`setErrorHandler()`](./Server.md#seterrorhandler).\n\nTo handle errors inside the route, specify the `attachValidation` option. If\nthere is a validation error, the `validationError` property of the request will\ncontain the same `Error` object Fastify would have sent on its own, so no\nmessage has to be rebuilt from the raw validation result:\n\n- `message` is the formatted message, identical to the one in the response\n  payload above (for example `body must have required property 'name'`). It is\n  produced by [`schemaErrorFormatter`](#schemaerrorformatter), so a custom\n  formatter is reflected here too.\n- `validation` is the raw validation result, as returned by the validator.\n- `validationContext` is the part of the request that failed validation\n  (`body`, `params`, `querystring` or `headers`).\n- `code` is `FST_ERR_VALIDATION` and `statusCode` is `400`.\n- When the validator reports a list of errors (as Ajv does) and the default\n  [`schemaErrorFormatter`](#schemaerrorformatter) is used, the error is an\n  instance of [`FST_ERR_VALIDATION`](./Errors.md#fst_err_validation) without a\n  [stack trace](./Errors.md#errors-in-input-data). Errors returned by the\n  validator itself, or by a custom formatter, are used as they are."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#22",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#24",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#18",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Errors.md#9",
+    "b": "fastify:docs/Reference/Reply.md#22",
+    "relation": "overlapping",
+    "related": 0.9924,
+    "probabilities": {
+     "same": 0.0206,
+     "overlapping": 0.9657,
+     "conflicting": 0.0062,
+     "unrelated": 0.0076
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#9",
+    "b": "fastify:docs/Reference/Reply.md#24",
+    "relation": "unrelated",
+    "related": 0.1124,
+    "probabilities": {
+     "same": 0.0166,
+     "overlapping": 0.068,
+     "conflicting": 0.0278,
+     "unrelated": 0.8876
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#9",
+    "b": "fastify:docs/Reference/Server.md#18",
+    "relation": "overlapping",
+    "related": 0.6559,
+    "probabilities": {
+     "same": 0.0239,
+     "overlapping": 0.6137,
+     "conflicting": 0.0183,
+     "unrelated": 0.3441
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#9",
+    "b": "fastify:docs/Reference/Server.md#88",
+    "relation": "overlapping",
+    "related": 0.9888,
+    "probabilities": {
+     "same": 0.0244,
+     "overlapping": 0.9538,
+     "conflicting": 0.0107,
+     "unrelated": 0.0112
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#9",
+    "b": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "relation": "overlapping",
+    "related": 0.9928,
+    "probabilities": {
+     "same": 0.0168,
+     "overlapping": 0.9694,
+     "conflicting": 0.0067,
+     "unrelated": 0.0072
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#22",
+    "b": "fastify:docs/Reference/Reply.md#24",
+    "relation": "unrelated",
+    "related": 0.146,
+    "probabilities": {
+     "same": 0.0196,
+     "overlapping": 0.0937,
+     "conflicting": 0.0327,
+     "unrelated": 0.854
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#22",
+    "b": "fastify:docs/Reference/Server.md#18",
+    "relation": "unrelated",
+    "related": 0.0927,
+    "probabilities": {
+     "same": 0.018,
+     "overlapping": 0.0563,
+     "conflicting": 0.0184,
+     "unrelated": 0.9073
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#22",
+    "b": "fastify:docs/Reference/Server.md#88",
+    "relation": "overlapping",
+    "related": 0.9745,
+    "probabilities": {
+     "same": 0.0229,
+     "overlapping": 0.9415,
+     "conflicting": 0.0101,
+     "unrelated": 0.0255
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#22",
+    "b": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "relation": "unrelated",
+    "related": 0.4621,
+    "probabilities": {
+     "same": 0.0146,
+     "overlapping": 0.4332,
+     "conflicting": 0.0143,
+     "unrelated": 0.5379
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#24",
+    "b": "fastify:docs/Reference/Server.md#18",
+    "relation": "unrelated",
+    "related": 0.0272,
+    "probabilities": {
+     "same": 0.0052,
+     "overlapping": 0.0107,
+     "conflicting": 0.0112,
+     "unrelated": 0.9728
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#24",
+    "b": "fastify:docs/Reference/Server.md#88",
+    "relation": "unrelated",
+    "related": 0.1809,
+    "probabilities": {
+     "same": 0.0221,
+     "overlapping": 0.1079,
+     "conflicting": 0.0509,
+     "unrelated": 0.8191
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#24",
+    "b": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "relation": "unrelated",
+    "related": 0.0941,
+    "probabilities": {
+     "same": 0.016,
+     "overlapping": 0.0534,
+     "conflicting": 0.0247,
+     "unrelated": 0.9059
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#18",
+    "b": "fastify:docs/Reference/Server.md#88",
+    "relation": "overlapping",
+    "related": 0.8779,
+    "probabilities": {
+     "same": 0.0269,
+     "overlapping": 0.8237,
+     "conflicting": 0.0273,
+     "unrelated": 0.1221
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#18",
+    "b": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "relation": "unrelated",
+    "related": 0.0924,
+    "probabilities": {
+     "same": 0.0179,
+     "overlapping": 0.0563,
+     "conflicting": 0.0181,
+     "unrelated": 0.9076
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#88",
+    "b": "fastify:docs/Reference/Validation-and-Serialization.md#20",
+    "relation": "overlapping",
+    "related": 0.9786,
+    "probabilities": {
+     "same": 0.017,
+     "overlapping": 0.9503,
+     "conflicting": 0.0113,
+     "unrelated": 0.0214
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   2,
+   3,
+   4,
+   7,
+   12,
+   14
+  ],
+  "stages": {
+   "pairs_reread": 9,
+   "pairs_ms": 135,
+   "passage_reads": 1,
+   "passages_ms": 465,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 597,
+   "total_ms": 605
+  }
+ }
+}

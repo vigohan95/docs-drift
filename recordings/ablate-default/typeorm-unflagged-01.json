@@ -1,0 +1,78 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/typeorm-unflagged-01",
+ "recorded_at": "2026-11-06T13:48:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 820,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "23.833729",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=152"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#2",
+    "text": "## Using multiple databases within a single data source\n\nTo use multiple databases in a single data source,\nyou can specify database name per-entity:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity({ database: \"secondDB\" })\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    firstName: string\n\n    @Column()\n    lastName: string\n}\n```\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity({ database: \"thirdDB\" })\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n}\n```\n\n`User` entity will be created inside `secondDB` database and `Photo` entity inside `thirdDB` database.\nAll other entities will be created in a default database defined in the data source options.\n\nIf you want to select data from a different database you only need to provide an entity:\n\n```typescript\nconst users = await dataSource\n    .createQueryBuilder()\n    .select()\n    .from(User, \"user\")\n    .addFrom(Photo, \"photo\")\n    .andWhere(\"photo.userId = user.id\")\n    .getMany() // userId is not a foreign key since its cross-database request\n```\n\nThis code will produce following SQL query (depend on database type):\n\n```sql\nSELECT * FROM \"secondDB\".\"user\" \"user\", \"thirdDB\".\"photo\" \"photo\"\n    WHERE \"photo\".\"userId\" = \"user\".\"id\"\n```\n\nYou can also specify a table path instead of the entity:\n\n```typescript\nconst users = await dataSource\n    .createQueryBuilder()\n    .select()\n    .from(\"secondDB.user\", \"user\")\n    .addFrom(\"thirdDB.photo\", \"photo\")\n    .andWhere(\"photo.userId = user.id\")\n    .getMany() // userId is not a foreign key since its cross-database request\n```\n\nThis feature is supported only in mysql and mssql databases."
+   },
+   {
+    "id": "typeorm:docs/docs/query-builder/1-select-query-builder.md#31",
+    "text": "## Use custom index\n\nYou can provide a certain index for database server to use in some cases. This feature is only supported in MySQL.\n\n```typescript\nconst users = await dataSource\n    .getRepository(User)\n    .createQueryBuilder(\"user\")\n    .useIndex(\"my_index\") // name of index\n    .getMany()\n```"
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/query-builder/1-select-query-builder.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#2",
+    "b": "typeorm:docs/docs/query-builder/1-select-query-builder.md#31",
+    "relation": "unrelated",
+    "related": 0.0078,
+    "probabilities": {
+     "same": 0.002,
+     "overlapping": 0.0021,
+     "conflicting": 0.0038,
+     "unrelated": 0.9922
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30
+  },
+  "timing": {
+   "read_ms": 30,
+   "total_ms": 31
+  }
+ }
+}

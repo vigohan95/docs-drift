@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/prometheus-flagged-01",
+ "recorded_at": "2026-11-06T13:48:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1020,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "184.300159",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=321"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#9",
+    "text": "## Configure rules for aggregating scraped data into new time series\n\nThough not a problem in our example, queries that aggregate over thousands of\ntime series can get slow when computed ad-hoc. To make this more efficient,\nPrometheus can prerecord expressions into new persisted\ntime series via configured _recording rules_. Let's say we are interested in\nrecording the per-second rate of cpu time (`node_cpu_seconds_total`) averaged\nover all cpus per instance (but preserving the `job`, `instance` and `mode`\ndimensions) as measured over a window of 5 minutes. We could write this as:\n\n```\navg by (job, instance, mode) (rate(node_cpu_seconds_total[5m]))\n```\n\nTry graphing this expression.\n\nTo record the time series resulting from this expression into a new metric\ncalled `job_instance_mode:node_cpu_seconds:avg_rate5m`, create a file\nwith the following recording rule and save it as `prometheus.rules.yml`:\n\n```yaml\ngroups:\n- name: cpu-node\n  rules:\n  - record: job_instance_mode:node_cpu_seconds:avg_rate5m\n    expr: avg by (job, instance, mode) (rate(node_cpu_seconds_total[5m]))\n```\n\nTo make Prometheus pick up this new rule, add a `rule_files` statement in your `prometheus.yml`. The config should now\nlook like this:\n\n```yaml\nglobal:\n  scrape_interval:     15s # By default, scrape targets every 15 seconds.\n  evaluation_interval: 15s # Evaluate rules every 15 seconds.\n\n  # Attach these extra labels to all timeseries collected by this Prometheus instance.\n  external_labels:\n    monitor: 'codelab-monitor'\n\nrule_files:\n  - 'prometheus.rules.yml'\n\nscrape_configs:\n  - job_name: 'prometheus'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:9090']\n\n  - job_name:       'node'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:8080', 'localhost:8081']\n        labels:\n          group: 'production'\n\n      - targets: ['localhost:8082']\n        labels:\n          group: 'canary'\n```"
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#2",
+    "b": "prometheus:docs/getting_started.md#9",
+    "relation": "overlapping",
+    "related": 0.9941,
+    "probabilities": {
+     "same": 0.0107,
+     "overlapping": 0.9732,
+     "conflicting": 0.0101,
+     "unrelated": 0.0059
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 38,
+   "passage_reads": 1,
+   "passages_ms": 100,
+   "passages": 2,
+   "counterparts_ms": 61
+  },
+  "timing": {
+   "read_ms": 199,
+   "total_ms": 203
+  }
+ }
+}

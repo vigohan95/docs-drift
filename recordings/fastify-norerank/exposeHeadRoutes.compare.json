@@ -1,0 +1,362 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/exposeHeadRoutes.compare",
+ "recorded_at": "2026-11-06T13:48:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1632,
+ "response_headers": {
+  "x-clocked-credits": "29",
+  "x-clocked-model-ms": "722.160563",
+  "x-clocked-cost-usd": "0.005777",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=949"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "text": "### `exposeHeadRoutes` true by default\n\nStarting with v4, every `GET` route will create a sibling `HEAD` route.\nYou can revert this behavior by setting `exposeHeadRoutes: false` in the server\noptions."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "text": "### `HEAD` routes requires to register before `GET` when `exposeHeadRoutes: true`\n\nWe have a more strict requirement for custom `HEAD` route when\n`exposeHeadRoutes: true`.\n\nWhen you provides a custom `HEAD` route, you must either explicitly\nset `exposeHeadRoutes` to `false`\n\n```js\n// v4\nfastify.get('/route', {\n\n}, (req, reply) => {\n  reply.send({ hello: 'world' });\n});\n\nfastify.head('/route', (req, reply) => {\n  // ...\n});\n```\n\n```js\n// v5\nfastify.get('/route', {\n  exposeHeadRoutes: false\n}, (req, reply) => {\n  reply.send({ hello: 'world' });\n});\n\nfastify.head('/route', (req, reply) => {\n  // ...\n});\n```\n\nor place the `HEAD` route before `GET`.\n\n```js\n// v5\nfastify.head('/route', (req, reply) => {\n  // ...\n});\n\nfastify.get('/route', {\n\n}, (req, reply) => {\n  reply.send({ hello: 'world' });\n});\n```\n\nThis was changed in [#2700](https://github.com/fastify/fastify/pull/2700),\nand the old behavior was deprecated in v4 as `FSTDEP007`."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "text": "### Routes options\n<a id=\"options\"></a>\n\n* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,\n  `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. To accept more methods,\n  the [`addHttpMethod`](./Server.md#addHttpMethod) must be used.\n  It could also be an array of methods.\n* `url`: the path of the URL to match this route (alias: `path`).\n* `schema`: an object containing the schemas for the request and response. They\n  need to be in [JSON Schema](https://json-schema.org/) format, check\n  [here](./Validation-and-Serialization.md) for more info.\n\n  * `body`: validates the body of the request if it is a POST, PUT, PATCH,\n    TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.\n  * `querystring` or `query`: validates the querystring. This can be a complete\n    JSON Schema object, with the property `type` of `object` and `properties`\n    object of parameters, or simply the values of what would be contained in the\n    `properties` object as shown below.\n  * `params`: validates the params.\n  * `response`: filter and generate a schema for the response, setting a schema\n    allows us to have 10-20% more throughput.\n* `exposeHeadRoute`: creates a sibling `HEAD` route for any `GET` routes.\n  Defaults to the value of [`exposeHeadRoutes`](./Server.md#exposeHeadRoutes)\n  instance option. If you want a custom `HEAD` handler without disabling this\n  option, make sure to define it before the `GET` route.\n* `attachValidation`: attach `validationError` to request, if there is a schema\n  validation error, instead of sending the error to the error handler. The\n  default [error format](https://ajv.js.org/api.html#error-objects) is the Ajv\n  one.\n* `onRequest(request, reply, done)`: a [function](./Hooks.md#onrequest) called\n  as soon as a request is received, it could also be an array of functions.\n* `preParsing(request, reply, payload, done)`: a\n  [function](./Hooks.md#preparsing) called before parsing the request, it could\n  also be an array of functions.\n* `preValidation(request, reply, done)`: a [function](./Hooks.md#prevalidation)\n  called after the shared `preValidation` hooks, useful if you need to perform\n  authentication at route level for example, it could also be an array of\n  functions.\n* `preHandler(request, reply, done)`: a [function](./Hooks.md#prehandler) called\n  just before the request handler, it could also be an array of functions.\n* `preSerialization(request, reply, payload, done)`: a\n  [function](./Hooks.md#preserialization) called just before the serialization,\n  it could also be an array of functions.\n* `onSend(request, reply, payload, done)`: a [function](./Hooks.md#route-hooks)\n  called right before a response is sent, it could also be an array of\n  functions.\n* `onResponse(request, reply, done)`: a [function](./Hooks.md#onresponse) called\n  when a response has been sent, so you will not be able to send more data to\n  the client. It could also be an array of functions.\n* `onTimeout(request, reply, done)`: a [function](./Hooks.md#ontimeout) called\n  when a request is timed out and the HTTP socket has been hung up.\n* `onError(request, reply, error, done)`: a [function](./Hooks.md#onerror)\n  called when an Error is thrown or sent to the client by the route handler.\n* `handler(request, reply)`: the function that will handle this request. The\n  [Fastify server](./Server.md) will be bound to `this` when the handler is\n  called. Note: using an arrow function will break the binding of `this`.\n* `errorHandler(error, request, reply)`: a custom error handler for the scope of"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "text": "## Factory\n<a id=\"factory\"></a>\n\nThe Fastify module exports a factory function that is used to create new\n<code><b>Fastify server</b></code> instances. This factory function accepts an\noptions object which is used to customize the resulting instance. This document\ndescribes the properties available in that options object.\n\n- [Factory](#factory)\n  - [`http`](#http)\n  - [`http2`](#http2)\n  - [`https`](#https)\n  - [`connectionTimeout`](#connectiontimeout)\n  - [`keepAliveTimeout`](#keepalivetimeout)\n  - [`forceCloseConnections`](#forcecloseconnections)\n  - [`maxRequestsPerSocket`](#maxrequestspersocket)\n  - [`requestTimeout`](#requesttimeout)\n  - [`bodyLimit`](#bodylimit)\n  - [`onProtoPoisoning`](#onprotopoisoning)\n  - [`onConstructorPoisoning`](#onconstructorpoisoning)\n  - [`logger`](#logger)\n  - [`loggerInstance`](#loggerinstance)\n  - [`logController`](#logcontroller)\n  - [`serverFactory`](#serverfactory)\n  - [`requestIdHeader`](#requestidheader)\n  - [`genReqId`](#genreqid)\n  - [`trustProxy`](#trustproxy)\n  - [`pluginTimeout`](#plugintimeout)\n  - [`exposeHeadRoutes`](#exposeheadroutes)\n  - [`return503OnClosing`](#return503onclosing)\n  - [`ajv`](#ajv)\n  - [`serializerOpts`](#serializeropts)\n  - [`http2SessionTimeout`](#http2sessiontimeout)\n  - [`frameworkErrors`](#frameworkerrors)\n  - [`clientErrorHandler`](#clienterrorhandler)\n  - [`rewriteUrl`](#rewriteurl)\n  - [`allowErrorHandlerOverride`](#allowerrorhandleroverride)\n  - [RouterOptions](#routeroptions)\n    - [`allowUnsafeRegex`](#allowunsaferegex)\n    - [`buildPrettyMeta`](#buildprettymeta)\n    - [`caseSensitive`](#casesensitive)\n    - [`compile`](#compile)\n    - [`constraints`](#constraints)\n    - [`defaultRoute`](#defaultroute)\n    - [`ignoreDuplicateSlashes`](#ignoreduplicateslashes)\n    - [`ignoreTrailingSlash`](#ignoretrailingslash)\n    - [`maxParamLength`](#maxparamlength)\n    - [`onBadUrl`](#onbadurl)\n    - [`onMaxParamLength`](#onmaxparamlength)\n    - [`querystringParser`](#querystringparser)\n    - [`useSemicolonDelimiter`](#usesemicolondelimiter)\n- [Instance](#instance)\n  - [Server Methods](#server-methods)\n    - [server](#server)\n    - [after](#after)\n    - [ready](#ready)\n    - [listen](#listen)\n    - [addresses](#addresses)\n    - [routing](#routing)\n    - [route](#route)\n    - [hasRoute](#hasroute)\n    - [findRoute](#findroute)\n    - [close](#close)\n    - [decorate\\*](#decorate)\n    - [register](#register)\n    - [addHook](#addhook)\n    - [prefix](#prefix)\n    - [pluginName](#pluginname)\n    - [hasPlugin](#hasplugin)\n    - [listeningOrigin](#listeningorigin)\n    - [log](#log)\n    - [version](#version)\n    - [inject](#inject)\n    - [addHttpMethod](#addHttpMethod)\n    - [addSchema](#addschema)\n    - [getSchemas](#getschemas)\n    - [getSchema](#getschema)\n    - [setReplySerializer](#setreplyserializer)\n    - [setValidatorCompiler](#setvalidatorcompiler)\n    - [setSchemaErrorFormatter](#setschemaerrorformatter)\n    - [setSerializerCompiler](#setserializercompiler)\n    - [validatorCompiler](#validatorcompiler)\n    - [serializerCompiler](#serializercompiler)\n    - [schemaErrorFormatter](#schemaerrorformatter)\n    - [schemaController](#schemacontroller)\n    - [setNotFoundHandler](#setnotfoundhandler)\n    - [setErrorHandler](#seterrorhandler)\n    - [setChildLoggerFactory](#setchildloggerfactory)\n    - [setGenReqId](#setgenreqid)\n    - [addConstraintStrategy](#addconstraintstrategy)\n    - [hasConstraintStrategy](#hasconstraintstrategy)\n    - [printRoutes](#printroutes)\n    - [printPlugins](#printplugins)"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#26",
+    "text": "### `exposeHeadRoutes`\n<a id=\"exposeHeadRoutes\"></a>\n\n+ Default: `true`\n\nAutomatically creates a sibling `HEAD` route for each `GET` route defined. If\nyou want a custom `HEAD` handler without disabling this option, make sure to\ndefine it before the `GET` route."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#26"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#26"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#26"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#26",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Guides/Migration-Guide-V4.md#6",
+     "fastify:docs/Guides/Migration-Guide-V5.md#14",
+     "fastify:docs/Reference/Routes.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "b": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "relation": "overlapping",
+    "related": 0.9936,
+    "probabilities": {
+     "same": 0.0232,
+     "overlapping": 0.9584,
+     "conflicting": 0.012,
+     "unrelated": 0.0064
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "b": "fastify:docs/Reference/Routes.md#2",
+    "relation": "overlapping",
+    "related": 0.9923,
+    "probabilities": {
+     "same": 0.045,
+     "overlapping": 0.9362,
+     "conflicting": 0.011,
+     "unrelated": 0.0077
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "overlapping",
+    "related": 0.8378,
+    "probabilities": {
+     "same": 0.045,
+     "overlapping": 0.7721,
+     "conflicting": 0.0207,
+     "unrelated": 0.1622
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "b": "fastify:docs/Reference/Server.md#26",
+    "relation": "overlapping",
+    "related": 0.9929,
+    "probabilities": {
+     "same": 0.2046,
+     "overlapping": 0.7773,
+     "conflicting": 0.011,
+     "unrelated": 0.0071
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0125,
+       "restated": 0.9496,
+       "elaborated": 0.0304,
+       "different": 0.0075
+      },
+      "confidence": 0.9925,
+      "a": {
+       "document": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+       "quote": "### `exposeHeadRoutes` true by default",
+       "start": 0,
+       "end": 38,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#26",
+       "quote": "### `exposeHeadRoutes`\n<a id=\"exposeHeadRoutes\"></a>\n\n+ Default: `true`\n\nAutomatically creates a sibling `HEAD` route for each `GET` route defined.",
+       "start": 0,
+       "end": 147,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "b": "fastify:docs/Reference/Routes.md#2",
+    "relation": "overlapping",
+    "related": 0.9935,
+    "probabilities": {
+     "same": 0.0147,
+     "overlapping": 0.9693,
+     "conflicting": 0.0095,
+     "unrelated": 0.0065
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "unrelated",
+    "related": 0.498,
+    "probabilities": {
+     "same": 0.0374,
+     "overlapping": 0.4392,
+     "conflicting": 0.0213,
+     "unrelated": 0.502
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "b": "fastify:docs/Reference/Server.md#26",
+    "relation": "overlapping",
+    "related": 0.9934,
+    "probabilities": {
+     "same": 0.0231,
+     "overlapping": 0.9613,
+     "conflicting": 0.009,
+     "unrelated": 0.0066
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0238,
+       "restated": 0.6011,
+       "elaborated": 0.0993,
+       "different": 0.2758
+      },
+      "confidence": 0.7242,
+      "a": {
+       "document": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+       "quote": "### `HEAD` routes requires to register before `GET` when `exposeHeadRoutes: true`",
+       "start": 0,
+       "end": 81,
+       "confidence": 0.979
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#26",
+       "quote": "### `exposeHeadRoutes`\n<a id=\"exposeHeadRoutes\"></a>\n\n+ Default: `true`\n\nAutomatically creates a sibling `HEAD` route for each `GET` route defined.",
+       "start": 0,
+       "end": 147,
+       "confidence": 0.996
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0225,
+       "restated": 0.7054,
+       "elaborated": 0.2482,
+       "different": 0.0239
+      },
+      "confidence": 0.9761,
+      "a": {
+       "document": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+       "quote": "or place the `HEAD` route before `GET`.",
+       "start": 613,
+       "end": 652,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#26",
+       "quote": "If\nyou want a custom `HEAD` handler without disabling this option, make sure to\ndefine it before the `GET` route.",
+       "start": 148,
+       "end": 261,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Routes.md#2",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "overlapping",
+    "related": 0.6691,
+    "probabilities": {
+     "same": 0.0715,
+     "overlapping": 0.572,
+     "conflicting": 0.0256,
+     "unrelated": 0.3309
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Routes.md#2",
+    "b": "fastify:docs/Reference/Server.md#26",
+    "relation": "overlapping",
+    "related": 0.991,
+    "probabilities": {
+     "same": 0.0786,
+     "overlapping": 0.9019,
+     "conflicting": 0.0105,
+     "unrelated": 0.009
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0234,
+       "restated": 0.9498,
+       "elaborated": 0.014,
+       "different": 0.0128
+      },
+      "confidence": 0.9872,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#2",
+       "quote": "If you want a custom `HEAD` handler without disabling this",
+       "start": 1312,
+       "end": 1370,
+       "confidence": 0.998
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#26",
+       "quote": "If\nyou want a custom `HEAD` handler without disabling this option, make sure to\ndefine it before the `GET` route.",
+       "start": 148,
+       "end": 261,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#0",
+    "b": "fastify:docs/Reference/Server.md#26",
+    "relation": "overlapping",
+    "related": 0.896,
+    "probabilities": {
+     "same": 0.043,
+     "overlapping": 0.8345,
+     "conflicting": 0.0185,
+     "unrelated": 0.104
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   3,
+   6,
+   8
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   6,
+   7,
+   8,
+   9
+  ],
+  "stages": {
+   "pairs_reread": 4,
+   "pairs_ms": 112,
+   "passage_reads": 1,
+   "passages_ms": 518,
+   "passages": 5,
+   "counterparts_ms": 119
+  },
+  "timing": {
+   "read_ms": 745,
+   "total_ms": 755
+  }
+ }
+}

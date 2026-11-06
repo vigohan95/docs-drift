@@ -1,0 +1,374 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/preParsing.compare",
+ "recorded_at": "2026-11-06T13:49:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1328,
+ "response_headers": {
+  "x-clocked-credits": "18",
+  "x-clocked-model-ms": "445.674595",
+  "x-clocked-cost-usd": "0.003586",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=615"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "text": "### Changed preParsing hook behavior ([#2286](https://github.com/fastify/fastify/pull/2286))\n\nFrom Fastify v3, the behavior of the `preParsing` hook will change slightly\nto support request payload manipulation.\n\nThe hook now takes an additional argument, `payload`, and therefore the new hook\nsignature is `fn(request, reply, payload, done)` or `async fn(request, reply,\npayload)`.\n\nThe hook can optionally return a new stream via `done(null, stream)` or\nreturning the stream in case of async functions.\n\nIf the hook returns a new stream, it will be used instead of the original one in\nsubsequent hooks. A sample use case for this is handling compressed requests.\n\nThe new stream should add the `receivedEncodedLength` property to the stream\nthat should reflect the actual data size received from the client. For instance,\nin a compressed request it should be the size of the compressed payload. This\nproperty can (and should) be dynamically updated during `data` events.\n\nThe old syntax of Fastify v2 without payload is supported but it is deprecated."
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "text": "### preParsing\n\nIf you are using the `preParsing` hook, you can transform the request payload\nstream before it is parsed. It receives the request and reply objects as other\nhooks, and a stream with the current request payload.\n\nIf it returns a value (via `return` or via the callback function), it must\nreturn a stream.\n\nFor instance, you can decompress the request body:\n\n```js\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Some code\n  done(null, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preParsing', async (request, reply, payload) => {\n  // Some code\n  await asyncMethod()\n  return newPayload\n})\n```\n\n> ℹ️ Note:\n> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.\n\n> ℹ️ Note:\n> You should also add a `receivedEncodedLength` property to the\n> returned stream. This property is used to correctly match the request payload\n> with the `Content-Length` header value. Ideally, this property should be updated\n> on each received chunk.\n\n> ℹ️ Note:\n> The size of the returned stream is checked to not exceed the limit\n> set in [`bodyLimit`](./Server.md#bodylimit) option."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#12",
+    "text": "### `bodyLimit`\n<a id=\"factory-body-limit\"></a>\n\n+ Default: `1048576` (1MiB)\n\nDefines the maximum payload, in bytes, the server is allowed to accept.\nThe default body reader sends [`FST_ERR_CTP_BODY_TOO_LARGE`](./Errors.md#fst_err_ctp_body_too_large)\nreply, if the size of the body exceeds this limit.\nIf [`preParsing` hook](./Hooks.md#preparsing) is provided, this limit is applied\nto the size of the stream the hook returns (i.e. the size of \"decoded\" body)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#73",
+    "text": "##### fastify.preParsingHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L35)\n\n`preParsing` is the second hook to be executed in the request lifecycle. The\nprevious hook was `onRequest`, the next hook will be `preValidation`.\n\nNotice: in the `preParsing` hook, request.body will always be null, because the\nbody parsing happens before the `preValidation` hook.\n\nNotice: you should also add `receivedEncodedLength` property to the returned\nstream. This property is used to correctly match the request payload with the\n`Content-Length` header value. Ideally, this property should be updated on each\nreceived chunk."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Hooks.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Guides/Migration-Guide-V3.md#5",
+     "fastify:docs/Reference/Server.md#12",
+     "fastify:docs/Reference/TypeScript.md#73"
+    ],
+    "conflicts": [
+     "fastify:docs/Reference/TypeScript.md#73"
+    ]
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Hooks.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#73",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Hooks.md#3"
+    ],
+    "conflicts": [
+     "fastify:docs/Reference/Hooks.md#3"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "b": "fastify:docs/Reference/Hooks.md#3",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0077,
+     "overlapping": 0.986,
+     "conflicting": 0.004,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0125,
+       "restated": 0.9254,
+       "elaborated": 0.0396,
+       "different": 0.0225
+      },
+      "confidence": 0.9775,
+      "a": {
+       "document": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+       "quote": "The new stream should add the `receivedEncodedLength` property to the stream",
+       "start": 665,
+       "end": 741,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "### preParsing\n\nIf you are using the `preParsing` hook, you can transform the request payload\nstream before it is parsed.",
+       "start": 0,
+       "end": 121,
+       "confidence": 0.998
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0078,
+       "restated": 0.9556,
+       "elaborated": 0.0266,
+       "different": 0.01
+      },
+      "confidence": 0.975,
+      "a": {
+       "document": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+       "quote": "The new stream should add the `receivedEncodedLength` property to the stream",
+       "start": 665,
+       "end": 741,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "It receives the request and reply objects as other\nhooks, and a stream with the current request payload.\n\nIf it returns a value (via `return` or via the callback function), it must\nreturn a stream.\n\nFor instance, you can decompress the request body:\n\n```js\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Some code\n  done(null, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preParsing', async (request, reply, payload) => {\n  // Some code\n  await asyncMethod()\n  return newPayload\n})\n```\n\n> ℹ️ Note:\n> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.\n\n> ℹ️ Note:\n> You should also add a `receivedEncodedLength` property to the\n> returned stream.",
+       "start": 122,
+       "end": 924,
+       "confidence": 0.975
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "b": "fastify:docs/Reference/Server.md#12",
+    "relation": "overlapping",
+    "related": 0.8719,
+    "probabilities": {
+     "same": 0.0224,
+     "overlapping": 0.8161,
+     "conflicting": 0.0334,
+     "unrelated": 0.1281
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "b": "fastify:docs/Reference/TypeScript.md#73",
+    "relation": "overlapping",
+    "related": 0.9817,
+    "probabilities": {
+     "same": 0.021,
+     "overlapping": 0.8958,
+     "conflicting": 0.0648,
+     "unrelated": 0.0183
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Hooks.md#3",
+    "b": "fastify:docs/Reference/Server.md#12",
+    "relation": "overlapping",
+    "related": 0.9942,
+    "probabilities": {
+     "same": 0.0067,
+     "overlapping": 0.9773,
+     "conflicting": 0.0102,
+     "unrelated": 0.0058
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0123,
+       "restated": 0.8753,
+       "elaborated": 0.0421,
+       "different": 0.0703
+      },
+      "confidence": 0.9297,
+      "a": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "> The size of the returned stream is checked to not exceed the limit",
+       "start": 1107,
+       "end": 1175,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#12",
+       "quote": "### `bodyLimit`\n<a id=\"factory-body-limit\"></a>\n\n+ Default: `1048576` (1MiB)\n\nDefines the maximum payload, in bytes, the server is allowed to accept.\nThe default body reader sends [`FST_ERR_CTP_BODY_TOO_LARGE`](./Errors.md#fst_err_ctp_body_too_large)\nreply, if the size of the body exceeds this limit.\nIf [`preParsing` hook](./Hooks.md#preparsing) is provided, this limit is applied\nto the size of the stream the hook returns (i.e. the size of \"decoded\" body).",
+       "start": 0,
+       "end": 460,
+       "confidence": 0.967
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Hooks.md#3",
+    "b": "fastify:docs/Reference/TypeScript.md#73",
+    "relation": "overlapping",
+    "related": 0.9893,
+    "probabilities": {
+     "same": 0.0165,
+     "overlapping": 0.939,
+     "conflicting": 0.0338,
+     "unrelated": 0.0107
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0092,
+       "restated": 0.9717,
+       "elaborated": 0.0112,
+       "different": 0.0079
+      },
+      "confidence": 0.9921,
+      "a": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "> In the [preParsing](#preparsing) hook, `request.body` will always be",
+       "start": 660,
+       "end": 730,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/TypeScript.md#73",
+       "quote": "The\nprevious hook was `onRequest`, the next hook will be `preValidation`.\n\nNotice: in the `preParsing` hook, request.body will always be null, because the\nbody parsing happens before the `preValidation` hook.\n\nNotice: you should also add `receivedEncodedLength` property to the returned\nstream.",
+       "start": 526,
+       "end": 820,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.8755,
+       "restated": 0.0952,
+       "elaborated": 0.0128,
+       "different": 0.0165
+      },
+      "confidence": 0.9835,
+      "a": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "This property is used to correctly match the request payload",
+       "start": 925,
+       "end": 985,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "fastify:docs/Reference/TypeScript.md#73",
+       "quote": "This property is used to correctly match the request payload with the\n`Content-Length` header value.",
+       "start": 821,
+       "end": 921,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.4556,
+       "restated": 0.5001,
+       "elaborated": 0.0243,
+       "different": 0.0201
+      },
+      "confidence": 0.9799,
+      "a": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "Ideally, this property should be updated",
+       "start": 1028,
+       "end": 1068,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/TypeScript.md#73",
+       "quote": "Ideally, this property should be updated on each\nreceived chunk.",
+       "start": 922,
+       "end": 986,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": [
+     {
+      "kind": "rule_or_condition",
+      "kinds": {
+       "value": 0.1062,
+       "date_or_version": 0.0201,
+       "rule_or_condition": 0.7895,
+       "scope": 0.0336,
+       "name": 0.0216,
+       "no_conflict": 0.0289
+      },
+      "confidence": 0.9711,
+      "a": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "> In the [preParsing](#preparsing) hook, `request.body` will always be",
+       "start": 660,
+       "end": 730,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/TypeScript.md#73",
+       "quote": "The\nprevious hook was `onRequest`, the next hook will be `preValidation`.\n\nNotice: in the `preParsing` hook, request.body will always be null, because the\nbody parsing happens before the `preValidation` hook.\n\nNotice: you should also add `receivedEncodedLength` property to the returned\nstream.",
+       "start": 526,
+       "end": 820,
+       "confidence": 0.999
+      }
+     }
+    ]
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#12",
+    "b": "fastify:docs/Reference/TypeScript.md#73",
+    "relation": "unrelated",
+    "related": 0.2113,
+    "probabilities": {
+     "same": 0.0287,
+     "overlapping": 0.1551,
+     "conflicting": 0.0274,
+     "unrelated": 0.7887
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0,
+   3,
+   4
+  ],
+  "conflicts": [
+   4
+  ],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 67,
+   "passage_reads": 1,
+   "passages_ms": 172,
+   "passages": 9,
+   "counterparts_ms": 208,
+   "kinds_ms": 21
+  },
+  "timing": {
+   "read_ms": 465,
+   "total_ms": 472
+  }
+ }
+}

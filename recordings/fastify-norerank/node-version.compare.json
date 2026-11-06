@@ -1,0 +1,240 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/node-version.compare",
+ "recorded_at": "2026-11-06T13:48:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1122,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "164.795454",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=438"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "text": "### Hands-on\n\nFor this sample solution we'll be using the following:\n\n- `node.js v16.14.2`\n- `npm 8.5.0`\n- `fastify 4.0.0-rc.1`\n- `fastify-plugin 3.0.1`\n- `undici 5.0.0`\n\nSay we have the following base server set up at first:\n\n```js\nconst Fastify = require('fastify')\n\nconst provider = require('./provider')\n\nconst server = Fastify({ logger: true })\nconst USUAL_WAIT_TIME_MS = 5000\n\nserver.get('/ping', function (request, reply) {\n  reply.send({ error: false, ready: request.server.magicKey !== null })\n})\n\nserver.post('/webhook', function (request, reply) {\n  // It's good practice to validate webhook requests come from\n  // who you expect. This is skipped in this sample for the sake\n  // of simplicity\n\n  const { magicKey } = request.body\n  request.server.magicKey = magicKey\n  request.log.info('Ready for customer requests!')\n\n  reply.send({ error: false })\n})\n\nserver.get('/v1*', async function (request, reply) {\n  try {\n    const data = await provider.fetchSensitiveData(request.server.magicKey)\n    return { customer: true, error: false }\n  } catch (error) {\n    request.log.error({\n      error,\n      message: 'Failed at fetching sensitive data from provider',\n    })\n\n    reply.statusCode = 500\n    return { customer: null, error: true }\n  }\n})\n\nserver.decorate('magicKey')\n\nserver.listen({ port: '1234' }, () => {\n  provider.thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS)\n    .catch((error) => {\n      server.log.error({\n        error,\n        message: 'Got an error while trying to get the magic key!'\n      })\n\n      // Since we won't be able to serve requests, might as well wrap\n      // things up\n      server.close(() => process.exit(1))\n    })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "text": "## Long Term Support Cycle\n\nFastify v5 will only support Node.js v20+. If you are using an older version of\nNode.js, you will need to upgrade to a newer version to use Fastify v5.\n\nFastify v4 is still supported until June 30, 2025. If you are unable to upgrade,\nyou should consider buying an end-of-life support plan from HeroDevs."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "text": "### Why Node.js v20?\n\nFastify v5 will only support Node.js v20+ because it has significant differences\ncompared to v18, such as\nbetter support for `node:test`. This allows us to provide a better developer\nexperience and streamline maintenance.\n\nNode.js v18 will exit Long Term Support on April 30, 2025, so you should be planning\nto upgrade to v20 anyway."
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#8",
+    "text": "#### Example:\n\nUses **app.js** from the previous example.\n\n**test-listen.js** (testing with [`undici`](https://www.npmjs.com/package/undici))\n```js\nconst { test } = require('node:test')\nconst { Client } = require('undici')\nconst buildFastify = require('./app')\n\ntest('should work with undici', async t => {\n  t.plan(2)\n\n  const fastify = buildFastify()\n\n  await fastify.listen()\n\n   const client = new Client(\n    'http://localhost:' + fastify.server.address().port, {\n      keepAliveTimeout: 10,\n      keepAliveMaxTimeout: 10\n    }\n  )\n\n  t.after(() => {\n    fastify.close()\n    client.close()\n  })\n\n  const response = await client.request({ method: 'GET', path: '/' })\n\n  t.assert.strictEqual(await response.body.text(), '{\"hello\":\"world\"}')\n  t.assert.strictEqual(response.statusCode, 200)\n})\n```\n\nAlternatively, starting with Node.js 18,\n[`fetch`](https://nodejs.org/docs/latest-v18.x/api/globals.html#fetch)\nmay be used without requiring any extra dependencies:\n\n**test-listen.js**\n```js\nconst { test } = require('node:test')\nconst buildFastify = require('./app')\n\ntest('should work with fetch', async t => {\n  t.plan(3)\n\n  const fastify = buildFastify()\n\n  t.after(() => fastify.close())\n\n  await fastify.listen()\n\n  const response = await fetch(\n    'http://localhost:' + fastify.server.address().port\n  )\n\n  t.assert.strictEqual(response.status, 200)\n  t.assert.strictEqual(\n    response.headers.get('content-type'),\n    'application/json; charset=utf-8'\n  )\n  const jsonResult = await response.json()\n  t.assert.strictEqual(jsonResult.hello, 'world')\n})\n```\n\n**test-ready.js** (testing with\n[`SuperTest`](https://www.npmjs.com/package/supertest))\n```js\nconst { test } = require('node:test')\nconst supertest = require('supertest')\nconst buildFastify = require('./app')\n\ntest('GET `/` route', async (t) => {\n  const fastify = buildFastify()\n\n  t.after(() => fastify.close())\n\n  await fastify.ready()\n\n  const response = await supertest(fastify.server)\n    .get('/')\n    .expect(200)\n    .expect('Content-Type', 'application/json; charset=utf-8')\n  t.assert.deepStrictEqual(response.body, { hello: 'world' })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#7",
+    "text": "### `forceCloseConnections`\n<a id=\"forcecloseconnections\"></a>\n\n+ Default: `\"idle\"` if the HTTP server allows it, `false` otherwise\n\nWhen set to `true`, upon [`close`](#close) the server will iterate the current\npersistent connections and [destroy their\nsockets](https://nodejs.org/dist/latest-v16.x/docs/api/net.html#socketdestroyerror).\n\nWhen used with HTTP/2 server, it will also close all active HTTP/2 sessions.\n\n> ℹ️ Note:\n> Since Node.js v24 active sessions are closed by default\n\n\n> ⚠ Warning:\n> Connections are not inspected to determine if requests have\n> been completed.\n\nFastify will prefer the HTTP server's\n[`closeAllConnections`](https://nodejs.org/dist/latest-v18.x/docs/api/http.html#servercloseallconnections)\nmethod if supported, otherwise, it will use internal connection tracking.\n\nWhen set to `\"idle\"`, upon [`close`](#close) the server will iterate the current\npersistent connections which are not sending a request or waiting for a response\nand destroy their sockets. The value is only supported if the HTTP server\nsupports the\n[`closeIdleConnections`](https://nodejs.org/dist/latest-v18.x/docs/api/http.html#servercloseidleconnections)\nmethod, otherwise attempting to set it will throw an exception."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "b": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "relation": "unrelated",
+    "related": 0.0151,
+    "probabilities": {
+     "same": 0.0052,
+     "overlapping": 0.0057,
+     "conflicting": 0.0042,
+     "unrelated": 0.9849
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "b": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "relation": "unrelated",
+    "related": 0.0271,
+    "probabilities": {
+     "same": 0.0094,
+     "overlapping": 0.0098,
+     "conflicting": 0.008,
+     "unrelated": 0.9729
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "b": "fastify:docs/Guides/Testing.md#8",
+    "relation": "unrelated",
+    "related": 0.108,
+    "probabilities": {
+     "same": 0.027,
+     "overlapping": 0.0684,
+     "conflicting": 0.0126,
+     "unrelated": 0.892
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "b": "fastify:docs/Reference/Server.md#7",
+    "relation": "unrelated",
+    "related": 0.0069,
+    "probabilities": {
+     "same": 0.0027,
+     "overlapping": 0.0025,
+     "conflicting": 0.0018,
+     "unrelated": 0.9931
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "b": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "relation": "overlapping",
+    "related": 0.993,
+    "probabilities": {
+     "same": 0.0282,
+     "overlapping": 0.9585,
+     "conflicting": 0.0063,
+     "unrelated": 0.007
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "b": "fastify:docs/Guides/Testing.md#8",
+    "relation": "unrelated",
+    "related": 0.0076,
+    "probabilities": {
+     "same": 0.0027,
+     "overlapping": 0.0031,
+     "conflicting": 0.0018,
+     "unrelated": 0.9924
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "b": "fastify:docs/Reference/Server.md#7",
+    "relation": "unrelated",
+    "related": 0.0058,
+    "probabilities": {
+     "same": 0.0024,
+     "overlapping": 0.0022,
+     "conflicting": 0.0013,
+     "unrelated": 0.9942
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "b": "fastify:docs/Guides/Testing.md#8",
+    "relation": "unrelated",
+    "related": 0.0116,
+    "probabilities": {
+     "same": 0.0052,
+     "overlapping": 0.0041,
+     "conflicting": 0.0024,
+     "unrelated": 0.9884
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "b": "fastify:docs/Reference/Server.md#7",
+    "relation": "unrelated",
+    "related": 0.0054,
+    "probabilities": {
+     "same": 0.0021,
+     "overlapping": 0.0021,
+     "conflicting": 0.0012,
+     "unrelated": 0.9946
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Testing.md#8",
+    "b": "fastify:docs/Reference/Server.md#7",
+    "relation": "unrelated",
+    "related": 0.0078,
+    "probabilities": {
+     "same": 0.0032,
+     "overlapping": 0.0029,
+     "conflicting": 0.0017,
+     "unrelated": 0.9922
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   4
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 91,
+   "passage_reads": 1,
+   "passages_ms": 88,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 178,
+   "total_ms": 184
+  }
+ }
+}

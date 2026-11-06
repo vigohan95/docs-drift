@@ -1,0 +1,197 @@
+{
+ "endpoint": "compare",
+ "tag": "ablate-default/vite-flagged-00",
+ "recorded_at": "2026-11-06T13:48:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1107,
+ "response_headers": {
+  "x-clocked-credits": "11",
+  "x-clocked-model-ms": "258.224379",
+  "x-clocked-cost-usd": "0.002191",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=399"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#5",
+    "text": "## The `hotUpdate` Hook\n\n- **Type:** `(this: { environment: DevEnvironment }, options: HotUpdateOptions) => Array<EnvironmentModuleNode> | void | Promise<Array<EnvironmentModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](#per-environment-hooks-and-global-hooks)\n- **See also:** [HMR API](./api-hmr)\n\nThe `hotUpdate` hook allows plugins to perform custom HMR update handling for a given environment. When a file changes, the HMR algorithm is run for each environment in series according to the order in `server.environments`, so the `hotUpdate` hook will be called multiple times. The hook receives a context object with the following signature:\n\n```ts\ninterface HotUpdateOptions {\n  type: 'create' | 'update' | 'delete'\n  file: string\n  timestamp: number\n  modules: Array<EnvironmentModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\n- `this.environment` is the module execution environment where a file update is currently being processed.\n\n- `modules` is an array of modules in this environment that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n- `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file, and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "text": "### `handleHotUpdate`\n\n- **Type:** `(ctx: HmrContext) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [HMR API](./api-hmr)\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Perform custom HMR update handling. The hook receives a context object with the following signature:\n\n  ```ts\n  interface HmrContext {\n    file: string\n    timestamp: number\n    modules: Array<ModuleNode>\n    read: () => string | Promise<string>\n    server: ViteDevServer\n  }\n  ```\n\n  - `modules` is an array of modules that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n  - `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior.\n\n  The hook can choose to:\n  - Filter and narrow down the affected module list so that the HMR is more accurate.\n\n  - Return an empty array and perform a full reload:\n\n    ```js\n    handleHotUpdate({ server, modules, timestamp }) {\n      // Invalidate modules manually\n      const invalidatedModules = new Set()\n      for (const mod of modules) {\n        server.moduleGraph.invalidateModule(\n          mod,\n          invalidatedModules,\n          timestamp,\n          true\n        )\n      }\n      server.ws.send({ type: 'full-reload' })\n      return []\n    }\n    ```"
+   }
+  ],
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "default",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-plugin.md#17"
+    ],
+    "conflicts": [
+     "vite:docs/guide/api-plugin.md#17"
+    ]
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-plugins.md#5"
+    ],
+    "conflicts": [
+     "vite:docs/guide/api-environment-plugins.md#5"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-plugins.md#5",
+    "b": "vite:docs/guide/api-plugin.md#17",
+    "relation": "overlapping",
+    "related": 0.9918,
+    "probabilities": {
+     "same": 0.0168,
+     "overlapping": 0.9019,
+     "conflicting": 0.0731,
+     "unrelated": 0.0082
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0141,
+       "restated": 0.9032,
+       "elaborated": 0.0655,
+       "different": 0.0172
+      },
+      "confidence": 0.9828,
+      "a": {
+       "document": "vite:docs/guide/api-environment-plugins.md#5",
+       "quote": "The hook receives a context object with the following signature:",
+       "start": 616,
+       "end": 680,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-plugin.md#17",
+       "quote": "The hook receives a context object with the following signature:\n\n  ```ts\n  interface HmrContext {\n    file: string\n    timestamp: number\n    modules: Array<ModuleNode>\n    read: () => string | Promise<string>\n    server: ViteDevServer\n  }\n  ```\n\n  - `modules` is an array of modules that are affected by the changed file.",
+       "start": 331,
+       "end": 653,
+       "confidence": 0.998
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.7667,
+       "restated": 0.1771,
+       "elaborated": 0.0369,
+       "different": 0.0193
+      },
+      "confidence": 0.9807,
+      "a": {
+       "document": "vite:docs/guide/api-environment-plugins.md#5",
+       "quote": "It's an array because a single file may map to multiple served modules (e.g.",
+       "start": 1103,
+       "end": 1179,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "vite:docs/guide/api-plugin.md#17",
+       "quote": "It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n  - `read` is an async read function that returns the content of the file.",
+       "start": 654,
+       "end": 817,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.6462,
+       "restated": 0.304,
+       "elaborated": 0.0276,
+       "different": 0.0222
+      },
+      "confidence": 0.9778,
+      "a": {
+       "document": "vite:docs/guide/api-environment-plugins.md#5",
+       "quote": "This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file, and direct `fs.readFile` will return empty content.",
+       "start": 1265,
+       "end": 1447,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-plugin.md#17",
+       "quote": "This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file and direct `fs.readFile` will return empty content.",
+       "start": 818,
+       "end": 999,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": [
+     {
+      "kind": "name",
+      "kinds": {
+       "value": 0.0189,
+       "date_or_version": 0.0291,
+       "rule_or_condition": 0.0303,
+       "scope": 0.0233,
+       "name": 0.8711,
+       "no_conflict": 0.0272
+      },
+      "confidence": 0.869,
+      "a": {
+       "document": "vite:docs/guide/api-environment-plugins.md#5",
+       "quote": "## The `hotUpdate` Hook",
+       "start": 0,
+       "end": 23,
+       "confidence": 0.869
+      },
+      "b": {
+       "document": "vite:docs/guide/api-plugin.md#17",
+       "quote": "### `handleHotUpdate`\n\n- **Type:** `(ctx: HmrContext) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [HMR API](./api-hmr)\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Perform custom HMR update handling.",
+       "start": 0,
+       "end": 330,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 6,
+   "counterparts_ms": 135,
+   "kinds_ms": 20
+  },
+  "timing": {
+   "read_ms": 273,
+   "total_ms": 279
+  }
+ }
+}

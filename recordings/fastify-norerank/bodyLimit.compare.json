@@ -1,0 +1,327 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/bodyLimit.compare",
+ "recorded_at": "2026-11-06T13:49:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1971,
+ "response_headers": {
+  "x-clocked-credits": "34",
+  "x-clocked-model-ms": "839.118958",
+  "x-clocked-cost-usd": "0.006773",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=165,cfOrigin;dur=0,cfWorker;dur=1075"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#9",
+    "text": "##### Custom Parser Options\n+ `parseAs` (string): `'string'` or `'buffer'` to designate how the incoming\n  data should be collected. Default: `'buffer'`.\n+ `bodyLimit` (number): The maximum payload size, in bytes, that the custom\n  parser will accept. Defaults to the global body limit passed to the [`Fastify\n  factory function`](./Server.md#bodylimit)."
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#17",
+    "text": "| <a id=\"fst_err_force_close_connections_idle_not_available\">FST_ERR_FORCE_CLOSE_CONNECTIONS_IDLE_NOT_AVAILABLE</a> | Cannot set forceCloseConnections to `idle` as your HTTP server does not support `closeIdleConnections` method. | Use a different value for `forceCloseConnections`. | [#3925](https://github.com/fastify/fastify/pull/3925) |\n| <a id=\"fst_err_duplicated_route\">FST_ERR_DUPLICATED_ROUTE</a> | The HTTP method already has a registered controller for that URL. | Use a different URL or register the controller for another HTTP method. | [#2954](https://github.com/fastify/fastify/pull/2954) |\n| <a id=\"fst_err_bad_url\">FST_ERR_BAD_URL</a> | The router received an invalid URL. | Use a valid URL. | [#2106](https://github.com/fastify/fastify/pull/2106) |\n| <a id=\"fst_err_max_param_length\">FST_ERR_MAX_PARAM_LENGTH</a> | The router received an URL that exceed max param length. | Adjust the param length or increase the max param length to meet your needs. | [#2106](https://github.com/fastify/fastify/pull/6716) |\n| <a id=\"fst_err_async_constraint\">FST_ERR_ASYNC_CONSTRAINT</a> | The router received an error when using asynchronous constraints. | - | [#4323](https://github.com/fastify/fastify/pull/4323) |\n| <a id=\"fst_err_invalid_url\">FST_ERR_INVALID_URL</a> | URL must be a string. | Use a string for the URL. | [#3653](https://github.com/fastify/fastify/pull/3653) |\n| <a id=\"fst_err_route_options_not_obj\">FST_ERR_ROUTE_OPTIONS_NOT_OBJ</a> | Options for the route must be an object. | Use an object for the route options. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_duplicated_handler\">FST_ERR_ROUTE_DUPLICATED_HANDLER</a> | Duplicate handler for the route is not allowed. | Use a different handler. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_handler_not_fn\">FST_ERR_ROUTE_HANDLER_NOT_FN</a> | Handler for the route must be a function. | Use a function for the handler. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_missing_handler\">FST_ERR_ROUTE_MISSING_HANDLER</a> | Missing handler function for the route. | Add a handler function. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_method_invalid\">FST_ERR_ROUTE_METHOD_INVALID</a> | Method is not a valid value. | Use a valid value for the method. | [#4750](https://github.com/fastify/fastify/pull/4750) |\n| <a id=\"fst_err_route_method_already_supported\">FST_ERR_ROUTE_METHOD_ALREADY_SUPPORTED</a> | The HTTP method is already supported. | Pass `{ overrideExisting: true }` to explicitly override it. | [#6909](https://github.com/fastify/fastify/pull/6909) |\n| <a id=\"fst_err_route_method_not_supported\">FST_ERR_ROUTE_METHOD_NOT_SUPPORTED</a> | Method is not supported for the route. | Use a supported method. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_log_level_invalid\">FST_ERR_ROUTE_LOG_LEVEL_INVALID</a> | `logLevel` must match a configured logger level. | Use one of the configured logger levels for the route. | [#6523](https://github.com/fastify/fastify/pull/6523) |\n| <a id=\"fst_err_route_body_validation_schema_not_supported\">FST_ERR_ROUTE_BODY_VALIDATION_SCHEMA_NOT_SUPPORTED</a> | Body validation schema route is not supported. | Use a different different method for the route. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_body_limit_option_not_int\">FST_ERR_ROUTE_BODY_LIMIT_OPTION_NOT_INT</a> | `bodyLimit` option must be an integer. | Use an integer for the `bodyLimit` option. | [#4554](https://github.com/fastify/fastify/pull/4554) |"
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "text": "### preParsing\n\nIf you are using the `preParsing` hook, you can transform the request payload\nstream before it is parsed. It receives the request and reply objects as other\nhooks, and a stream with the current request payload.\n\nIf it returns a value (via `return` or via the callback function), it must\nreturn a stream.\n\nFor instance, you can decompress the request body:\n\n```js\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Some code\n  done(null, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preParsing', async (request, reply, payload) => {\n  // Some code\n  await asyncMethod()\n  return newPayload\n})\n```\n\n> ℹ️ Note:\n> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.\n\n> ℹ️ Note:\n> You should also add a `receivedEncodedLength` property to the\n> returned stream. This property is used to correctly match the request payload\n> with the `Content-Length` header value. Ideally, this property should be updated\n> on each received chunk.\n\n> ℹ️ Note:\n> The size of the returned stream is checked to not exceed the limit\n> set in [`bodyLimit`](./Server.md#bodylimit) option."
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#11",
+    "text": "##### .routeOptions\n\nThe route [`option`](./Routes.md#routes-options) object.\n- `bodyLimit` - Either server limit or route limit.\n- `handlerTimeout` - The handler timeout configured for this route.\n- `config` - The [`config`](./Routes.md#routes-config) object for this route.\n- `method` - The HTTP method for the route.\n- `url` - The path of the URL to match this route.\n- `handler` - The handler for this route.\n- `attachValidation` - Attach `validationError` to request (if there is\n  a schema defined).\n- `logLevel` - Log level defined for this route.\n- `schema` - The JSON schemas definition for this route.\n- `version` - A semver compatible string that defines the version of the\n  endpoint.\n- `exposeHeadRoute` - Creates a sibling HEAD route for any GET routes.\n- `prefixTrailingSlash` - String used to determine how to handle passing `/`\n  as a route with a prefix."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#3",
+    "text": "  the request. Overrides the default error global handler, and anything set by\n  [`setErrorHandler`](./Server.md#seterrorhandler), for requests to the route.\n  To access the default handler, you can access `instance.errorHandler`. Note\n  that this will point to fastify's default `errorHandler` only if a plugin\n  hasn't overridden it already.\n* `childLoggerFactory(logger, binding, opts, rawReq)`: a custom factory function\n  that will be called to produce a child logger instance for every request.\n  See [`childLoggerFactory`](./Server.md#childloggerfactory) for more info.\n  Overrides the default logger factory, and anything set by\n  [`setChildLoggerFactory`](./Server.md#setchildloggerfactory), for requests to\n  the route. To access the default factory, you can access\n  `instance.childLoggerFactory`. Note that this will point to Fastify's default\n  `childLoggerFactory` only if a plugin hasn't overridden it already.\n* `validatorCompiler({ schema, method, url, httpPart })`: function that builds\n  schemas for request validations. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#schema-validator)\n  documentation.\n* `serializerCompiler({ schema, method, url, httpStatus, contentType })`:\n  function that builds schemas for response serialization. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#schema-serializer)\n  documentation.\n* `schemaErrorFormatter(errors, dataVar)`: function that formats the errors from\n  the validation compiler. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#error-handling)\n  documentation. Overrides the global schema error formatter handler, and\n  anything set by `setSchemaErrorFormatter`, for requests to the route.\n* `bodyLimit`: prevents the default JSON body parser from parsing request bodies\n  larger than this number of bytes. Must be an integer. You may also set this\n  option globally when first creating the Fastify instance with\n  `fastify(options)`. Defaults to `1048576` (1 MiB).\n* `handlerTimeout`: maximum number of milliseconds for the route's full\n  lifecycle. Overrides the server-level\n  [`handlerTimeout`](./Server.md#factory-handler-timeout). Must be a positive\n  integer. When the timeout fires, `request.signal` is aborted and a 503 error\n  is sent through the error handler (which can be customized per-route).\n* `logLevel`: set log level for this route. See below.\n* `logSerializers`: set serializers to log for this route.\n* `config`: object used to store custom configuration.\n* `version`: a [semver](https://semver.org/) compatible string that defined the\n  version of the endpoint. [Example](#version-constraints).\n* `constraints`: defines route restrictions based on request properties or\n  values, enabling customized matching using\n  [find-my-way](https://github.com/delvedor/find-my-way) constraints. Includes\n  built-in `version` and `host` constraints, with support for custom constraint\n  strategies.\n* `prefixTrailingSlash`: string used to determine how to handle passing `/` as a\n  route with a prefix.\n  * `both` (default): Will register both `/prefix` and `/prefix/`.\n  * `slash`: Will register only `/prefix/`.\n  * `no-slash`: Will register only `/prefix`."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "text": "## Factory\n<a id=\"factory\"></a>\n\nThe Fastify module exports a factory function that is used to create new\n<code><b>Fastify server</b></code> instances. This factory function accepts an\noptions object which is used to customize the resulting instance. This document\ndescribes the properties available in that options object.\n\n- [Factory](#factory)\n  - [`http`](#http)\n  - [`http2`](#http2)\n  - [`https`](#https)\n  - [`connectionTimeout`](#connectiontimeout)\n  - [`keepAliveTimeout`](#keepalivetimeout)\n  - [`forceCloseConnections`](#forcecloseconnections)\n  - [`maxRequestsPerSocket`](#maxrequestspersocket)\n  - [`requestTimeout`](#requesttimeout)\n  - [`bodyLimit`](#bodylimit)\n  - [`onProtoPoisoning`](#onprotopoisoning)\n  - [`onConstructorPoisoning`](#onconstructorpoisoning)\n  - [`logger`](#logger)\n  - [`loggerInstance`](#loggerinstance)\n  - [`logController`](#logcontroller)\n  - [`serverFactory`](#serverfactory)\n  - [`requestIdHeader`](#requestidheader)\n  - [`genReqId`](#genreqid)\n  - [`trustProxy`](#trustproxy)\n  - [`pluginTimeout`](#plugintimeout)\n  - [`exposeHeadRoutes`](#exposeheadroutes)\n  - [`return503OnClosing`](#return503onclosing)\n  - [`ajv`](#ajv)\n  - [`serializerOpts`](#serializeropts)\n  - [`http2SessionTimeout`](#http2sessiontimeout)\n  - [`frameworkErrors`](#frameworkerrors)\n  - [`clientErrorHandler`](#clienterrorhandler)\n  - [`rewriteUrl`](#rewriteurl)\n  - [`allowErrorHandlerOverride`](#allowerrorhandleroverride)\n  - [RouterOptions](#routeroptions)\n    - [`allowUnsafeRegex`](#allowunsaferegex)\n    - [`buildPrettyMeta`](#buildprettymeta)\n    - [`caseSensitive`](#casesensitive)\n    - [`compile`](#compile)\n    - [`constraints`](#constraints)\n    - [`defaultRoute`](#defaultroute)\n    - [`ignoreDuplicateSlashes`](#ignoreduplicateslashes)\n    - [`ignoreTrailingSlash`](#ignoretrailingslash)\n    - [`maxParamLength`](#maxparamlength)\n    - [`onBadUrl`](#onbadurl)\n    - [`onMaxParamLength`](#onmaxparamlength)\n    - [`querystringParser`](#querystringparser)\n    - [`useSemicolonDelimiter`](#usesemicolondelimiter)\n- [Instance](#instance)\n  - [Server Methods](#server-methods)\n    - [server](#server)\n    - [after](#after)\n    - [ready](#ready)\n    - [listen](#listen)\n    - [addresses](#addresses)\n    - [routing](#routing)\n    - [route](#route)\n    - [hasRoute](#hasroute)\n    - [findRoute](#findroute)\n    - [close](#close)\n    - [decorate\\*](#decorate)\n    - [register](#register)\n    - [addHook](#addhook)\n    - [prefix](#prefix)\n    - [pluginName](#pluginname)\n    - [hasPlugin](#hasplugin)\n    - [listeningOrigin](#listeningorigin)\n    - [log](#log)\n    - [version](#version)\n    - [inject](#inject)\n    - [addHttpMethod](#addHttpMethod)\n    - [addSchema](#addschema)\n    - [getSchemas](#getschemas)\n    - [getSchema](#getschema)\n    - [setReplySerializer](#setreplyserializer)\n    - [setValidatorCompiler](#setvalidatorcompiler)\n    - [setSchemaErrorFormatter](#setschemaerrorformatter)\n    - [setSerializerCompiler](#setserializercompiler)\n    - [validatorCompiler](#validatorcompiler)\n    - [serializerCompiler](#serializercompiler)\n    - [schemaErrorFormatter](#schemaerrorformatter)\n    - [schemaController](#schemacontroller)\n    - [setNotFoundHandler](#setnotfoundhandler)\n    - [setErrorHandler](#seterrorhandler)\n    - [setChildLoggerFactory](#setchildloggerfactory)\n    - [setGenReqId](#setgenreqid)\n    - [addConstraintStrategy](#addconstraintstrategy)\n    - [hasConstraintStrategy](#hasconstraintstrategy)\n    - [printRoutes](#printroutes)\n    - [printPlugins](#printplugins)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#9",
+    "b": "fastify:docs/Reference/Errors.md#17",
+    "relation": "unrelated",
+    "related": 0.2493,
+    "probabilities": {
+     "same": 0.0357,
+     "overlapping": 0.161,
+     "conflicting": 0.0526,
+     "unrelated": 0.7507
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#9",
+    "b": "fastify:docs/Reference/Hooks.md#3",
+    "relation": "overlapping",
+    "related": 0.977,
+    "probabilities": {
+     "same": 0.0085,
+     "overlapping": 0.9411,
+     "conflicting": 0.0274,
+     "unrelated": 0.023
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#9",
+    "b": "fastify:docs/Reference/Request.md#11",
+    "relation": "overlapping",
+    "related": 0.987,
+    "probabilities": {
+     "same": 0.0113,
+     "overlapping": 0.9639,
+     "conflicting": 0.0117,
+     "unrelated": 0.013
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#9",
+    "b": "fastify:docs/Reference/Routes.md#3",
+    "relation": "overlapping",
+    "related": 0.9761,
+    "probabilities": {
+     "same": 0.0279,
+     "overlapping": 0.7718,
+     "conflicting": 0.1764,
+     "unrelated": 0.0239
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#9",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "overlapping",
+    "related": 0.6279,
+    "probabilities": {
+     "same": 0.0222,
+     "overlapping": 0.5666,
+     "conflicting": 0.0391,
+     "unrelated": 0.3721
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#17",
+    "b": "fastify:docs/Reference/Hooks.md#3",
+    "relation": "unrelated",
+    "related": 0.0116,
+    "probabilities": {
+     "same": 0.0039,
+     "overlapping": 0.0042,
+     "conflicting": 0.0036,
+     "unrelated": 0.9884
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#17",
+    "b": "fastify:docs/Reference/Request.md#11",
+    "relation": "unrelated",
+    "related": 0.134,
+    "probabilities": {
+     "same": 0.0253,
+     "overlapping": 0.0778,
+     "conflicting": 0.0309,
+     "unrelated": 0.866
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#17",
+    "b": "fastify:docs/Reference/Routes.md#3",
+    "relation": "unrelated",
+    "related": 0.1526,
+    "probabilities": {
+     "same": 0.0275,
+     "overlapping": 0.092,
+     "conflicting": 0.0331,
+     "unrelated": 0.8474
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#17",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "unrelated",
+    "related": 0.0233,
+    "probabilities": {
+     "same": 0.0078,
+     "overlapping": 0.0094,
+     "conflicting": 0.0061,
+     "unrelated": 0.9767
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Hooks.md#3",
+    "b": "fastify:docs/Reference/Request.md#11",
+    "relation": "overlapping",
+    "related": 0.7826,
+    "probabilities": {
+     "same": 0.0144,
+     "overlapping": 0.7152,
+     "conflicting": 0.0529,
+     "unrelated": 0.2174
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Hooks.md#3",
+    "b": "fastify:docs/Reference/Routes.md#3",
+    "relation": "overlapping",
+    "related": 0.8108,
+    "probabilities": {
+     "same": 0.0155,
+     "overlapping": 0.7329,
+     "conflicting": 0.0624,
+     "unrelated": 0.1892
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Hooks.md#3",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "unrelated",
+    "related": 0.0232,
+    "probabilities": {
+     "same": 0.0072,
+     "overlapping": 0.0087,
+     "conflicting": 0.0072,
+     "unrelated": 0.9768
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Request.md#11",
+    "b": "fastify:docs/Reference/Routes.md#3",
+    "relation": "overlapping",
+    "related": 0.9905,
+    "probabilities": {
+     "same": 0.019,
+     "overlapping": 0.9615,
+     "conflicting": 0.01,
+     "unrelated": 0.0095
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Request.md#11",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "unrelated",
+    "related": 0.2786,
+    "probabilities": {
+     "same": 0.038,
+     "overlapping": 0.2124,
+     "conflicting": 0.0282,
+     "unrelated": 0.7214
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Routes.md#3",
+    "b": "fastify:docs/Reference/Server.md#0",
+    "relation": "unrelated",
+    "related": 0.4082,
+    "probabilities": {
+     "same": 0.0254,
+     "overlapping": 0.3585,
+     "conflicting": 0.0243,
+     "unrelated": 0.5918
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   1,
+   2,
+   3,
+   4,
+   9,
+   10,
+   12
+  ],
+  "stages": {
+   "pairs_reread": 8,
+   "pairs_ms": 167,
+   "passage_reads": 1,
+   "passages_ms": 660,
+   "passages": 1,
+   "counterparts_ms": 42
+  },
+  "timing": {
+   "read_ms": 866,
+   "total_ms": 877
+  }
+ }
+}

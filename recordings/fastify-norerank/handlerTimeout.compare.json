@@ -1,0 +1,578 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/handlerTimeout.compare",
+ "recorded_at": "2026-11-06T13:49:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2384,
+ "response_headers": {
+  "x-clocked-credits": "56",
+  "x-clocked-model-ms": "1395.697487",
+  "x-clocked-cost-usd": "0.011155",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=1645"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#18",
+    "text": "| <a id=\"fst_err_handler_timeout\">FST_ERR_HANDLER_TIMEOUT</a> | Request timed out. | Increase the `handlerTimeout` option or optimize the handler. | - |\n| <a id=\"fst_err_route_handler_timeout_option_not_int\">FST_ERR_ROUTE_HANDLER_TIMEOUT_OPTION_NOT_INT</a> | `handlerTimeout` option must be a positive integer. | Use a positive integer for the `handlerTimeout` option. | - |\n| <a id=\"fst_err_route_rewrite_not_str\">FST_ERR_ROUTE_REWRITE_NOT_STR</a> | `rewriteUrl` needs to be of type `string`. | Use a string for the `rewriteUrl`. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_missing_content_type\">FST_ERR_ROUTE_MISSING_CONTENT_TYPE</a> | `Content-Type` header is required for the request. | Send request with `Content-Type` header. | [#6832](https://github.com/fastify/fastify/pull/6832) |\n| <a id=\"fst_err_reopened_close_server\">FST_ERR_REOPENED_CLOSE_SERVER</a> | Fastify has already been closed and cannot be reopened. | - | [#2415](https://github.com/fastify/fastify/pull/2415) |\n| <a id=\"fst_err_reopened_server\">FST_ERR_REOPENED_SERVER</a> | Fastify is already started. | - | [#2415](https://github.com/fastify/fastify/pull/2415) |\n| <a id=\"fst_err_plugin_version_mismatch\">FST_ERR_PLUGIN_VERSION_MISMATCH</a> | Installed Fastify plugin mismatched expected version. | Use a compatible version of the plugin. | [#2549](https://github.com/fastify/fastify/pull/2549) |\n| <a id=\"fst_err_plugin_callback_not_fn\">FST_ERR_PLUGIN_CALLBACK_NOT_FN</a> | Callback for a hook is not a function. | Use a function for the callback. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_not_valid\">FST_ERR_PLUGIN_NOT_VALID</a> | Plugin must be a function or a promise. | Use a function or a promise for the plugin. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_root_plg_booted\">FST_ERR_ROOT_PLG_BOOTED</a> | Root plugin has already booted. | - | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_parent_plugin_booted\">FST_ERR_PARENT_PLUGIN_BOOTED</a> | Impossible to load plugin because the parent (mapped directly from `avvio`) | - | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_timeout\">FST_ERR_PLUGIN_TIMEOUT</a> | Plugin did not start in time. | Increase the timeout for the plugin. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_not_present_in_instance\">FST_ERR_PLUGIN_NOT_PRESENT_IN_INSTANCE</a> | The decorator is not present in the instance. | - | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_plugin_invalid_async_handler\">FST_ERR_PLUGIN_INVALID_ASYNC_HANDLER</a> | The plugin being registered mixes async and callback styles. | - | [#5141](https://github.com/fastify/fastify/pull/5141) |\n| <a id=\"fst_err_plugin_dependency_not_registered\">FST_ERR_PLUGIN_DEPENDENCY_NOT_REGISTERED</a> | The dependency of a plugin is not registered. | Register the missing dependency before registering this plugin. | [#6774](https://github.com/fastify/fastify/pull/6774) |\n| <a id=\"fst_err_validation\">FST_ERR_VALIDATION</a> | The Request failed the payload validation. | Check the request payload. | [#4824](https://github.com/fastify/fastify/pull/4824) |\n| <a id=\"fst_err_listen_options_invalid\">FST_ERR_LISTEN_OPTIONS_INVALID</a> | Invalid listen options. | Check the listen options. | [#4886](https://github.com/fastify/fastify/pull/4886) |\n| <a id=\"fst_err_error_handler_not_fn\">FST_ERR_ERROR_HANDLER_NOT_FN</a> | Error Handler must be a function | Provide a function to `setErrorHandler`. | [#5317](https://github.com/fastify/fastify/pull/5317) | <a id=\"fst_err_error_handler_already_set\">FST_ERR_ERROR_HANDLER_ALREADY_SET</a> | Error Handler already set in this scope. Set `allowErrorHandlerOverride: true` to allow overriding. | By default, `setErrorHandler` can only be called once per encapsulation context. | [#6097](https://github.com/fastify/fastify/pull/6098) |"
+   },
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#1",
+    "text": "When [`handlerTimeout`](./Server.md#factory-handler-timeout) is configured, a\ntimer starts after routing. If the response is not sent within the allowed time,\n`request.signal` is aborted and a `503 Service Unavailable` error is sent.\nThe timer is cancelled when the response completes\nor when `reply.hijack()` is called.\n\nBefore or during the `User Handler`, `reply.hijack()` can be called to:\n- Prevent Fastify from running subsequent hooks and the user handler\n- Prevent Fastify from sending the response automatically\n\nIf `reply.raw` is used to send a response, `onResponse` hooks will still\nbe executed."
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#11",
+    "text": "##### .routeOptions\n\nThe route [`option`](./Routes.md#routes-options) object.\n- `bodyLimit` - Either server limit or route limit.\n- `handlerTimeout` - The handler timeout configured for this route.\n- `config` - The [`config`](./Routes.md#routes-config) object for this route.\n- `method` - The HTTP method for the route.\n- `url` - The path of the URL to match this route.\n- `handler` - The handler for this route.\n- `attachValidation` - Attach `validationError` to request (if there is\n  a schema defined).\n- `logLevel` - Log level defined for this route.\n- `schema` - The JSON schemas definition for this route.\n- `version` - A semver compatible string that defines the version of the\n  endpoint.\n- `exposeHeadRoute` - Creates a sibling HEAD route for any GET routes.\n- `prefixTrailingSlash` - String used to determine how to handle passing `/`\n  as a route with a prefix."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#3",
+    "text": "  the request. Overrides the default error global handler, and anything set by\n  [`setErrorHandler`](./Server.md#seterrorhandler), for requests to the route.\n  To access the default handler, you can access `instance.errorHandler`. Note\n  that this will point to fastify's default `errorHandler` only if a plugin\n  hasn't overridden it already.\n* `childLoggerFactory(logger, binding, opts, rawReq)`: a custom factory function\n  that will be called to produce a child logger instance for every request.\n  See [`childLoggerFactory`](./Server.md#childloggerfactory) for more info.\n  Overrides the default logger factory, and anything set by\n  [`setChildLoggerFactory`](./Server.md#setchildloggerfactory), for requests to\n  the route. To access the default factory, you can access\n  `instance.childLoggerFactory`. Note that this will point to Fastify's default\n  `childLoggerFactory` only if a plugin hasn't overridden it already.\n* `validatorCompiler({ schema, method, url, httpPart })`: function that builds\n  schemas for request validations. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#schema-validator)\n  documentation.\n* `serializerCompiler({ schema, method, url, httpStatus, contentType })`:\n  function that builds schemas for response serialization. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#schema-serializer)\n  documentation.\n* `schemaErrorFormatter(errors, dataVar)`: function that formats the errors from\n  the validation compiler. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#error-handling)\n  documentation. Overrides the global schema error formatter handler, and\n  anything set by `setSchemaErrorFormatter`, for requests to the route.\n* `bodyLimit`: prevents the default JSON body parser from parsing request bodies\n  larger than this number of bytes. Must be an integer. You may also set this\n  option globally when first creating the Fastify instance with\n  `fastify(options)`. Defaults to `1048576` (1 MiB).\n* `handlerTimeout`: maximum number of milliseconds for the route's full\n  lifecycle. Overrides the server-level\n  [`handlerTimeout`](./Server.md#factory-handler-timeout). Must be a positive\n  integer. When the timeout fires, `request.signal` is aborted and a 503 error\n  is sent through the error handler (which can be customized per-route).\n* `logLevel`: set log level for this route. See below.\n* `logSerializers`: set serializers to log for this route.\n* `config`: object used to store custom configuration.\n* `version`: a [semver](https://semver.org/) compatible string that defined the\n  version of the endpoint. [Example](#version-constraints).\n* `constraints`: defines route restrictions based on request properties or\n  values, enabling customized matching using\n  [find-my-way](https://github.com/delvedor/find-my-way) constraints. Includes\n  built-in `version` and `host` constraints, with support for custom constraint\n  strategies.\n* `prefixTrailingSlash`: string used to determine how to handle passing `/` as a\n  route with a prefix.\n  * `both` (default): Will register both `/prefix` and `/prefix/`.\n  * `slash`: Will register only `/prefix/`.\n  * `no-slash`: Will register only `/prefix`."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#10",
+    "text": "### `handlerTimeout`\n<a id=\"factory-handler-timeout\"></a>\n\n+ Default: `0` (no timeout)\n\nDefines the maximum number of milliseconds allowed for processing a request\nthrough the entire route lifecycle (from routing through onRequest, parsing,\nvalidation, handler execution, and serialization). If the response is not sent\nwithin this time, a `503 Service Unavailable` error is returned and\n`request.signal` is aborted.\n\nUnlike `connectionTimeout` and `requestTimeout` (which operate at the socket\nlevel), `handlerTimeout` is an application-level timeout that works correctly\nwith HTTP keep-alive connections. It can be overridden per-route via\n[route options](./Routes.md#routes-options). When set at both levels, the\nroute-level value takes precedence. Routes without an explicit `handlerTimeout`\ninherit the server default. Once a server-level timeout is set, individual\nroutes cannot opt out of it — they can only override it with a different\npositive integer.\n\nThe timeout is **cooperative**: when it fires, Fastify sends the 503 error\nresponse, but the handler's async work continues to run. Use\n[`request.signal`](./Request.md) to detect cancellation and stop ongoing work\n(database queries, HTTP requests, etc.). APIs that accept a `signal` option\n(`fetch()`, database drivers, `stream.pipeline()`) will cancel automatically."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#11",
+    "text": "The timeout error (`FST_ERR_HANDLER_TIMEOUT`) is sent through the route's\n[error handler](./Routes.md#routes-options), which can be customized per-route\nto change the status code or response body.\n\nWhen `reply.hijack()` is called, the timeout timer is cleared — the handler\ntakes full responsibility for the response lifecycle.\n\n> ℹ️ Note:\n> `handlerTimeout` does not apply to 404 handlers or custom not-found handlers\n> set via `setNotFoundHandler()`, as they bypass the route handler lifecycle.\n\n```js\nconst fastify = require('fastify')({\n  handlerTimeout: 10000 // 10s default for all routes\n})\n\n// Override per-route\nfastify.get('/slow-report', { handlerTimeout: 120000 }, async (request) => {\n  // Use request.signal for cooperative cancellation\n  const data = await db.query(longQuery, { signal: request.signal })\n  return data\n})\n\n// Customize the timeout response\nfastify.get('/custom-timeout', {\n  handlerTimeout: 5000,\n  errorHandler: (error, request, reply) => {\n    if (error.code === 'FST_ERR_HANDLER_TIMEOUT') {\n      reply.code(504).send({ error: 'Gateway Timeout' })\n    } else {\n      reply.send(error)\n    }\n  }\n}, async (request) => {\n  const result = await externalService.call({ signal: request.signal })\n  return result\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#18",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Routes.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#10"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#10"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Errors.md#18",
+     "fastify:docs/Reference/Server.md#10",
+     "fastify:docs/Reference/Server.md#11"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#10",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Lifecycle.md#1",
+     "fastify:docs/Reference/Request.md#11",
+     "fastify:docs/Reference/Routes.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Routes.md#3"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Errors.md#18",
+    "b": "fastify:docs/Reference/Lifecycle.md#1",
+    "relation": "overlapping",
+    "related": 0.8865,
+    "probabilities": {
+     "same": 0.0289,
+     "overlapping": 0.8338,
+     "conflicting": 0.0238,
+     "unrelated": 0.1135
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#18",
+    "b": "fastify:docs/Reference/Request.md#11",
+    "relation": "overlapping",
+    "related": 0.613,
+    "probabilities": {
+     "same": 0.0277,
+     "overlapping": 0.5695,
+     "conflicting": 0.0158,
+     "unrelated": 0.387
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#18",
+    "b": "fastify:docs/Reference/Routes.md#3",
+    "relation": "overlapping",
+    "related": 0.9273,
+    "probabilities": {
+     "same": 0.0312,
+     "overlapping": 0.8709,
+     "conflicting": 0.0252,
+     "unrelated": 0.0727
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.1058,
+       "restated": 0.8479,
+       "elaborated": 0.0218,
+       "different": 0.0245
+      },
+      "confidence": 0.9755,
+      "a": {
+       "document": "fastify:docs/Reference/Errors.md#18",
+       "quote": "| <a id=\"fst_err_route_handler_timeout_option_not_int\">FST_ERR_ROUTE_HANDLER_TIMEOUT_OPTION_NOT_INT</a> | `handlerTimeout` option must be a positive integer.",
+       "start": 153,
+       "end": 310,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Routes.md#3",
+       "quote": "Must be a positive\n  integer.",
+       "start": 2184,
+       "end": 2213,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#18",
+    "b": "fastify:docs/Reference/Server.md#10",
+    "relation": "overlapping",
+    "related": 0.7486,
+    "probabilities": {
+     "same": 0.0335,
+     "overlapping": 0.6941,
+     "conflicting": 0.021,
+     "unrelated": 0.2514
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#18",
+    "b": "fastify:docs/Reference/Server.md#11",
+    "relation": "overlapping",
+    "related": 0.9783,
+    "probabilities": {
+     "same": 0.0528,
+     "overlapping": 0.9064,
+     "conflicting": 0.0191,
+     "unrelated": 0.0217
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Lifecycle.md#1",
+    "b": "fastify:docs/Reference/Request.md#11",
+    "relation": "overlapping",
+    "related": 0.9851,
+    "probabilities": {
+     "same": 0.0111,
+     "overlapping": 0.9664,
+     "conflicting": 0.0076,
+     "unrelated": 0.0149
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Lifecycle.md#1",
+    "b": "fastify:docs/Reference/Routes.md#3",
+    "relation": "overlapping",
+    "related": 0.9922,
+    "probabilities": {
+     "same": 0.0192,
+     "overlapping": 0.9612,
+     "conflicting": 0.0118,
+     "unrelated": 0.0078
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Lifecycle.md#1",
+    "b": "fastify:docs/Reference/Server.md#10",
+    "relation": "overlapping",
+    "related": 0.995,
+    "probabilities": {
+     "same": 0.0226,
+     "overlapping": 0.9629,
+     "conflicting": 0.0094,
+     "unrelated": 0.005
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.017,
+       "restated": 0.829,
+       "elaborated": 0.0329,
+       "different": 0.1211
+      },
+      "confidence": 0.708,
+      "a": {
+       "document": "fastify:docs/Reference/Lifecycle.md#1",
+       "quote": "When [`handlerTimeout`](./Server.md#factory-handler-timeout) is configured, a",
+       "start": 0,
+       "end": 77,
+       "confidence": 0.708
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#10",
+       "quote": "### `handlerTimeout`\n<a id=\"factory-handler-timeout\"></a>\n\n+ Default: `0` (no timeout)\n\nDefines the maximum number of milliseconds allowed for processing a request\nthrough the entire route lifecycle (from routing through onRequest, parsing,\nvalidation, handler execution, and serialization).",
+       "start": 0,
+       "end": 291,
+       "confidence": 0.917
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0125,
+       "restated": 0.9645,
+       "elaborated": 0.0095,
+       "different": 0.0135
+      },
+      "confidence": 0.9865,
+      "a": {
+       "document": "fastify:docs/Reference/Lifecycle.md#1",
+       "quote": "If the response is not sent within the allowed time,",
+       "start": 106,
+       "end": 158,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#10",
+       "quote": "If the response is not sent\nwithin this time, a `503 Service Unavailable` error is returned and\n`request.signal` is aborted.\n\nUnlike `connectionTimeout` and `requestTimeout` (which operate at the socket\nlevel), `handlerTimeout` is an application-level timeout that works correctly\nwith HTTP keep-alive connections.",
+       "start": 292,
+       "end": 606,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Lifecycle.md#1",
+    "b": "fastify:docs/Reference/Server.md#11",
+    "relation": "overlapping",
+    "related": 0.9883,
+    "probabilities": {
+     "same": 0.0535,
+     "overlapping": 0.9241,
+     "conflicting": 0.0107,
+     "unrelated": 0.0117
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Request.md#11",
+    "b": "fastify:docs/Reference/Routes.md#3",
+    "relation": "overlapping",
+    "related": 0.9944,
+    "probabilities": {
+     "same": 0.0127,
+     "overlapping": 0.9763,
+     "conflicting": 0.0054,
+     "unrelated": 0.0056
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Request.md#11",
+    "b": "fastify:docs/Reference/Server.md#10",
+    "relation": "overlapping",
+    "related": 0.9911,
+    "probabilities": {
+     "same": 0.0136,
+     "overlapping": 0.9709,
+     "conflicting": 0.0065,
+     "unrelated": 0.0089
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0221,
+       "restated": 0.8456,
+       "elaborated": 0.0328,
+       "different": 0.0995
+      },
+      "confidence": 0.778,
+      "a": {
+       "document": "fastify:docs/Reference/Request.md#11",
+       "quote": "- `handlerTimeout` - The handler timeout configured for this route.",
+       "start": 130,
+       "end": 197,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#10",
+       "quote": "It can be overridden per-route via\n[route options](./Routes.md#routes-options).",
+       "start": 607,
+       "end": 686,
+       "confidence": 0.778
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Request.md#11",
+    "b": "fastify:docs/Reference/Server.md#11",
+    "relation": "overlapping",
+    "related": 0.6819,
+    "probabilities": {
+     "same": 0.0305,
+     "overlapping": 0.6188,
+     "conflicting": 0.0326,
+     "unrelated": 0.3181
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Routes.md#3",
+    "b": "fastify:docs/Reference/Server.md#10",
+    "relation": "overlapping",
+    "related": 0.9926,
+    "probabilities": {
+     "same": 0.0191,
+     "overlapping": 0.9627,
+     "conflicting": 0.0109,
+     "unrelated": 0.0074
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0093,
+       "restated": 0.9565,
+       "elaborated": 0.014,
+       "different": 0.0202
+      },
+      "confidence": 0.9798,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#3",
+       "quote": "* `handlerTimeout`: maximum number of milliseconds for the route's full",
+       "start": 2013,
+       "end": 2084,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#10",
+       "quote": "### `handlerTimeout`\n<a id=\"factory-handler-timeout\"></a>\n\n+ Default: `0` (no timeout)\n\nDefines the maximum number of milliseconds allowed for processing a request\nthrough the entire route lifecycle (from routing through onRequest, parsing,\nvalidation, handler execution, and serialization).",
+       "start": 0,
+       "end": 291,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0162,
+       "restated": 0.9149,
+       "elaborated": 0.0219,
+       "different": 0.047
+      },
+      "confidence": 0.953,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#3",
+       "quote": "When the timeout fires, `request.signal` is aborted and a 503 error",
+       "start": 2214,
+       "end": 2281,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#10",
+       "quote": "If the response is not sent\nwithin this time, a `503 Service Unavailable` error is returned and\n`request.signal` is aborted.\n\nUnlike `connectionTimeout` and `requestTimeout` (which operate at the socket\nlevel), `handlerTimeout` is an application-level timeout that works correctly\nwith HTTP keep-alive connections.",
+       "start": 292,
+       "end": 606,
+       "confidence": 0.997
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0127,
+       "restated": 0.953,
+       "elaborated": 0.018,
+       "different": 0.0163
+      },
+      "confidence": 0.9837,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#3",
+       "quote": "Overrides the server-level",
+       "start": 2098,
+       "end": 2124,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#10",
+       "quote": "It can be overridden per-route via\n[route options](./Routes.md#routes-options).",
+       "start": 607,
+       "end": 686,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0225,
+       "restated": 0.8964,
+       "elaborated": 0.0219,
+       "different": 0.0592
+      },
+      "confidence": 0.677,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#3",
+       "quote": "Overrides the server-level",
+       "start": 2098,
+       "end": 2124,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#10",
+       "quote": "When set at both levels, the\nroute-level value takes precedence.",
+       "start": 687,
+       "end": 751,
+       "confidence": 0.677
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Routes.md#3",
+    "b": "fastify:docs/Reference/Server.md#11",
+    "relation": "overlapping",
+    "related": 0.9886,
+    "probabilities": {
+     "same": 0.0392,
+     "overlapping": 0.935,
+     "conflicting": 0.0144,
+     "unrelated": 0.0114
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0162,
+       "restated": 0.7857,
+       "elaborated": 0.03,
+       "different": 0.1681
+      },
+      "confidence": 0.795,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#3",
+       "quote": "is sent through the error handler (which can be customized per-route).",
+       "start": 2284,
+       "end": 2354,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#11",
+       "quote": "The timeout error (`FST_ERR_HANDLER_TIMEOUT`) is sent through the route's\n[error handler](./Routes.md#routes-options), which can be customized per-route\nto change the status code or response body.\n\nWhen `reply.hijack()` is called, the timeout timer is cleared — the handler\ntakes full responsibility for the response lifecycle.\n\n> ℹ️ Note:\n> `handlerTimeout` does not apply to 404 handlers or custom not-found handlers\n> set via `setNotFoundHandler()`, as they bypass the route handler lifecycle.\n\n```js\nconst fastify = require('fastify')({\n  handlerTimeout: 10000 // 10s default for all routes\n})\n\n// Override per-route\nfastify.get('/slow-report', { handlerTimeout: 120000 }, async (request) => {\n  // Use request.signal for cooperative cancellation\n  const data = await db.query(longQuery, { signal: request.signal })\n  return data\n})\n\n// Customize the timeout response\nfastify.get('/custom-timeout', {\n  handlerTimeout: 5000,\n  errorHandler: (error, request, reply) => {\n    if (error.code === 'FST_ERR_HANDLER_TIMEOUT') {\n      reply.code(504).send({ error: 'Gateway Timeout' })\n    } else {\n      reply.send(error)\n    }\n  }\n}, async (request) => {\n  const result = await externalService.call({ signal: request.signal })\n  return result\n})\n```",
+       "start": 0,
+       "end": 1248,
+       "confidence": 0.795
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#10",
+    "b": "fastify:docs/Reference/Server.md#11",
+    "relation": "overlapping",
+    "related": 0.9898,
+    "probabilities": {
+     "same": 0.048,
+     "overlapping": 0.9272,
+     "conflicting": 0.0146,
+     "unrelated": 0.0102
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   2,
+   7,
+   10,
+   12,
+   13
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14
+  ],
+  "stages": {
+   "pairs_reread": 5,
+   "pairs_ms": 149,
+   "passage_reads": 1,
+   "passages_ms": 903,
+   "passages": 12,
+   "counterparts_ms": 379
+  },
+  "timing": {
+   "read_ms": 1426,
+   "total_ms": 1438
+  }
+ }
+}

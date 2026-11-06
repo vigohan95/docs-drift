@@ -1,0 +1,209 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-norerank/DELETE.compare",
+ "recorded_at": "2026-11-06T13:48:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1463,
+ "response_headers": {
+  "x-clocked-credits": "23",
+  "x-clocked-model-ms": "558.974489",
+  "x-clocked-cost-usd": "0.004582",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=46,cfOrigin;dur=0,cfWorker;dur=738"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "text": "### Remove support for DELETE with a `Content-Type: application/json` header and an empty body\n\nIn v4, Fastify allowed `DELETE` requests with a `Content-Type: application/json`\nheader and an empty body was accepted.\nThis is no longer allowed in v5.\n\nSee [#5419](https://github.com/fastify/fastify/pull/5419) for more information."
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "text": "Note that for `GET` and `HEAD` requests, the payload is never parsed. For\n`OPTIONS` and `DELETE` requests, the payload is parsed only if a valid\n`content-type` header is provided. Unlike `POST`, `PUT`, and `PATCH`, the\n[catch-all](#catch-all) parser is not executed, and the payload is simply not\nparsed.\n\n> ⚠ Warning:\n> When using regular expressions to detect `Content-Type`, it is important to\n> ensure proper detection. For example, to match `application/*`, use\n> `/^application\\/([\\w-]+);?/` to match the\n> [essence MIME type](https://mimesniff.spec.whatwg.org/#mime-type-miscellaneous)\n> only.\n>\n> Additionally, if the route uses per-content-type body validation via\n> `schema.body.content`, the schema is selected by an **exact match** on the\n> essence MIME type, not by the parser's regex. A regex parser that accepts\n> content types with no matching key in the `content` schema map will result\n> in those requests **not being validated**. Ensure every content type matched\n> by the regex has a corresponding entry in the schema's `content` map. See\n> [Validation and Serialization](./Validation-and-Serialization.md) for details.\n\n> ℹ️ Note:\n> Fastify validates the request's `Content-Type` header before selecting a body\n> parser. String, `RegExp`, and [catch-all](#catch-all) parsers therefore will\n> never handle an invalid header. An `onRequest` hook can rewrite a malformed\n> header prior to validation:\n>\n> ```js\n> fastify.addHook('onRequest', async function rewriteContentType (request) {\n>   if (request.headers['content-type'] === 'application/json,application/json') {\n>     request.headers['content-type'] = 'application/json'\n>   }\n> })\n> ```\n>\n> Apply only unambiguous rewrites and reject other malformed values. An invalid\n> media type can select a different body parser or `schema.body.content`\n> validation schema. Rewrite the header before accessing `request.mediaType`,\n> which parses and caches the current value."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "text": "### Routes options\n<a id=\"options\"></a>\n\n* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,\n  `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. To accept more methods,\n  the [`addHttpMethod`](./Server.md#addHttpMethod) must be used.\n  It could also be an array of methods.\n* `url`: the path of the URL to match this route (alias: `path`).\n* `schema`: an object containing the schemas for the request and response. They\n  need to be in [JSON Schema](https://json-schema.org/) format, check\n  [here](./Validation-and-Serialization.md) for more info.\n\n  * `body`: validates the body of the request if it is a POST, PUT, PATCH,\n    TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.\n  * `querystring` or `query`: validates the querystring. This can be a complete\n    JSON Schema object, with the property `type` of `object` and `properties`\n    object of parameters, or simply the values of what would be contained in the\n    `properties` object as shown below.\n  * `params`: validates the params.\n  * `response`: filter and generate a schema for the response, setting a schema\n    allows us to have 10-20% more throughput.\n* `exposeHeadRoute`: creates a sibling `HEAD` route for any `GET` routes.\n  Defaults to the value of [`exposeHeadRoutes`](./Server.md#exposeHeadRoutes)\n  instance option. If you want a custom `HEAD` handler without disabling this\n  option, make sure to define it before the `GET` route.\n* `attachValidation`: attach `validationError` to request, if there is a schema\n  validation error, instead of sending the error to the error handler. The\n  default [error format](https://ajv.js.org/api.html#error-objects) is the Ajv\n  one.\n* `onRequest(request, reply, done)`: a [function](./Hooks.md#onrequest) called\n  as soon as a request is received, it could also be an array of functions.\n* `preParsing(request, reply, payload, done)`: a\n  [function](./Hooks.md#preparsing) called before parsing the request, it could\n  also be an array of functions.\n* `preValidation(request, reply, done)`: a [function](./Hooks.md#prevalidation)\n  called after the shared `preValidation` hooks, useful if you need to perform\n  authentication at route level for example, it could also be an array of\n  functions.\n* `preHandler(request, reply, done)`: a [function](./Hooks.md#prehandler) called\n  just before the request handler, it could also be an array of functions.\n* `preSerialization(request, reply, payload, done)`: a\n  [function](./Hooks.md#preserialization) called just before the serialization,\n  it could also be an array of functions.\n* `onSend(request, reply, payload, done)`: a [function](./Hooks.md#route-hooks)\n  called right before a response is sent, it could also be an array of\n  functions.\n* `onResponse(request, reply, done)`: a [function](./Hooks.md#onresponse) called\n  when a response has been sent, so you will not be able to send more data to\n  the client. It could also be an array of functions.\n* `onTimeout(request, reply, done)`: a [function](./Hooks.md#ontimeout) called\n  when a request is timed out and the HTTP socket has been hung up.\n* `onError(request, reply, error, done)`: a [function](./Hooks.md#onerror)\n  called when an Error is thrown or sent to the client by the route handler.\n* `handler(request, reply)`: the function that will handle this request. The\n  [Fastify server](./Server.md) will be bound to `this` when the handler is\n  called. Note: using an arrow function will break the binding of `this`.\n* `errorHandler(error, request, reply)`: a custom error handler for the scope of"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#73",
+    "text": "#### addHttpMethod\n<a id=\"addHttpMethod\"></a>\n\nFastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,\n`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.\nThe `addHttpMethod` method allows to add any non standard HTTP\nmethods to the server that are [supported by Node.js](https://nodejs.org/api/http.html#httpmethods).\n\nThe method accepts an optional configuration object:\n\n| Property | Type | Default | Description |\n| -------- | ---- | ------- | ----------- |\n| `hasBody` | `boolean` | `false` | Whether the method accepts a request body. |\n| `overrideExisting` | `boolean` | `false` | Whether to explicitly override an existing method. |\n\n```js\n// Add a new HTTP method called 'MKCOL' that supports a request body\nfastify.addHttpMethod('MKCOL', { hasBody: true,  })\n\n// Add a new HTTP method called 'COPY' that does not support a request body\nfastify.addHttpMethod('COPY')\n```\n\nAfter calling `addHttpMethod`, it is possible to use the route shorthand\nmethods to define routes for the new HTTP method:\n\n```js\nfastify.addHttpMethod('MKCOL', { hasBody: true })\nfastify.mkcol('/', (req, reply) => {\n  // Handle the 'MKCOL' request\n})\n```\n\nCalling `addHttpMethod` for an existing method requires `overrideExisting: true`\nand overrides its body behavior.\n\n```js\nfastify.addHttpMethod('GET', {\n  hasBody: true,\n  overrideExisting: true\n})\n```\n\nOmitting `overrideExisting: true` when the method already exists throws\n`FST_ERR_ROUTE_METHOD_ALREADY_SUPPORTED`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#73"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#73",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Routes.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "b": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "relation": "overlapping",
+    "related": 0.9152,
+    "probabilities": {
+     "same": 0.0188,
+     "overlapping": 0.7633,
+     "conflicting": 0.1331,
+     "unrelated": 0.0848
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "b": "fastify:docs/Reference/Routes.md#2",
+    "relation": "overlapping",
+    "related": 0.7359,
+    "probabilities": {
+     "same": 0.0268,
+     "overlapping": 0.5723,
+     "conflicting": 0.1368,
+     "unrelated": 0.2641
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "b": "fastify:docs/Reference/Server.md#73",
+    "relation": "unrelated",
+    "related": 0.3184,
+    "probabilities": {
+     "same": 0.0346,
+     "overlapping": 0.0917,
+     "conflicting": 0.1921,
+     "unrelated": 0.6816
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "b": "fastify:docs/Reference/Routes.md#2",
+    "relation": "overlapping",
+    "related": 0.8283,
+    "probabilities": {
+     "same": 0.0242,
+     "overlapping": 0.7427,
+     "conflicting": 0.0614,
+     "unrelated": 0.1717
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "b": "fastify:docs/Reference/Server.md#73",
+    "relation": "unrelated",
+    "related": 0.1694,
+    "probabilities": {
+     "same": 0.0425,
+     "overlapping": 0.0947,
+     "conflicting": 0.0322,
+     "unrelated": 0.8306
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Routes.md#2",
+    "b": "fastify:docs/Reference/Server.md#73",
+    "relation": "overlapping",
+    "related": 0.9896,
+    "probabilities": {
+     "same": 0.0186,
+     "overlapping": 0.9626,
+     "conflicting": 0.0084,
+     "unrelated": 0.0104
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0133,
+       "restated": 0.9474,
+       "elaborated": 0.0162,
+       "different": 0.0231
+      },
+      "confidence": 0.9769,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#2",
+       "quote": "TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.",
+       "start": 642,
+       "end": 699,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#73",
+       "quote": "#### addHttpMethod\n<a id=\"addHttpMethod\"></a>\n\nFastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,\n`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.\nThe `addHttpMethod` method allows to add any non standard HTTP\nmethods to the server that are [supported by Node.js](https://nodejs.org/api/http.html#httpmethods).\n\nThe method accepts an optional configuration object:\n\n| Property | Type | Default | Description |\n| -------- | ---- | ------- | ----------- |\n| `hasBody` | `boolean` | `false` | Whether the method accepts a request body.",
+       "start": 0,
+       "end": 558,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   5
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   3,
+   5
+  ],
+  "stages": {
+   "pairs_reread": 5,
+   "pairs_ms": 101,
+   "passage_reads": 1,
+   "passages_ms": 389,
+   "passages": 1,
+   "counterparts_ms": 90
+  },
+  "timing": {
+   "read_ms": 578,
+   "total_ms": 586
+  }
+ }
+}
