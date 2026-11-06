@@ -1,0 +1,31 @@
+[Unit]
+Description=Docs Drift live trial (checks one pair of passages or one public repository per request)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=docsdrift
+Group=docsdrift
+WorkingDirectory=/opt/docs-drift
+EnvironmentFile=/etc/docsdrift-live.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 -m live.server
+Restart=always
+RestartSec=3
+
+# the service needs to read its code, write its ledger and log, and reach the network; nothing else
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6
+ReadWritePaths=/var/lib/docsdrift-live
+MemoryMax=600M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

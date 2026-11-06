@@ -154,6 +154,19 @@ def false_positive_items(reports: dict, labels: dict) -> str:
 
 def build() -> str:
     reg, prs = load("review/defects.json"), load("review/upstream_prs.json")
+    live = load("review/live.json")
+    if live["api"]:
+        try_title = "Try it live"
+        try_intro = ("Send one pair of passages, or a public GitHub repository, through the same pipeline. Requests go to a "
+                     "small service that holds the Clocked key; it has a fixed credit budget, a cap per request and a rate "
+                     "limit, and it says so when the budget is used up.")
+    else:
+        try_title = "See what the two endpoints say about one pair"
+        try_intro = ("Three real pairs of passages, with the recorded answers of Clocked /compare (in both orders) and "
+                     "/grounding for each. The service that checks pasted passages and scans a repository on request is in "
+                     "live/ in the repository; it is not deployed at the moment, so this block shows recordings.")
+    # embedded so that the block also works when the page is opened from disk
+    examples_json = json.dumps(load("docs/live-examples.json"), ensure_ascii=False).replace("</", "<" + chr(92) + "/")
     labels, s = load("review/labels_v2.json"), load("review/summary.json")
     rerank = load("runs/rerank-ablation.json")
     reports = {n: load(f"reports/{n}.json") for n in TARGETS if (ROOT / "reports" / f"{n}.json").exists()}
@@ -202,6 +215,14 @@ def build() -> str:
   <p class="lede">For maintainers. It reads a project's docs, pairs the passages that restate each other, and uses the Clocked API to pick the pairs worth a person's time. Every item shows both passages with file and line. It is a list to review, not a verdict: about half of it is real ({a['reported_true']} of {a['reported']}, {round(100 * a['reported_true'] / a['reported'])}%), and on four projects it had not seen before, none of its {s['validation']['reported']} items was ({s['validation']['reported_true']} of {s['validation']['reported']}).</p>
   <p class="score">{a['projects']} real projects. {len(defects)} defects backed by source code. {pr_words}.</p>
 </header>
+
+<section id="try">
+  <h2>{try_title}</h2>
+  <p class="plain">{try_intro}</p>
+  <div id="live" data-api="{E(live['api'])}"></div>
+  <noscript><p class="note">This block needs JavaScript. Everything below it is static and does not.</p></noscript>
+  <script type="application/json" id="live-examples">{examples_json}</script>
+</section>
 
 <section class="hero" aria-label="Three contradictions">
 {hero}
@@ -298,6 +319,7 @@ python -m pytest -q</code></pre>
 <footer>
   <p>Built for the Clocked Build Challenge on <code>/compare</code>, <code>/grounding</code> and <code>/rerank</code>. Quoted documentation belongs to its projects and is shown under their licenses.</p>
 </footer>
+<script src="live.js" defer></script>
 </body>
 </html>
 """

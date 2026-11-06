@@ -73,7 +73,7 @@ recorded in `recordings/`, and a scan of a project at its pinned commit replays 
 git clone https://github.com/vigohan95/docs-drift && cd docs-drift
 python scripts/fetch_targets.py fastify                   # clones fastify at the pinned commit into ../targets/fastify
 python -m docsdrift scan ../targets/fastify --offline     # 149 pairs read, 6 flagged, 5 listed
-python -m pytest -q                                       # 107 tests, no network
+python -m pytest -q                                       # 176 tests, no network
 ```
 
 Open `docs/index.html` in a browser for the page with all sixteen defects.
@@ -103,6 +103,24 @@ It prints the list and writes a JSON report to `reports/<name>.json`. On the pro
 ```
 
 `pip install -e .` adds a `docsdrift` command that does the same as `python -m docsdrift`.
+
+## Live trial service
+
+`live/` is a small HTTP service for the demo page. Given two pasted passages it runs `/compare` in both orders and
+`/grounding`, and answers whether the pair would be listed, with the conflict kind, the confidence, each endpoint's
+own conclusion and the credits used. Given a public GitHub repository it reads the documentation Markdown from the
+archive (nothing is unpacked or executed), sends up to 24 candidate pairs through the same pipeline, and reports
+progress while it works.
+
+It has hard limits: a total credit budget, a cap per request, a rate limit per address, one job at a time, input
+size limits, and a plain "budget is used up" answer when the credits run out. The limits and what it keeps of a
+visitor's input are listed in [`live/README.md`](live/README.md). 62 offline tests cover them.
+
+**It is built and tested but not deployed.** The cloud provider's API refused the build machine's address when the
+deployment was attempted, so no server exists. The demo page therefore shows, for three real pairs, the answers the
+service gave when it was run locally with a real key (recorded in `docs/live-examples.json`), and says that they are
+recordings. When a service address is set in `review/live.json` and the page is rebuilt, the same block checks
+pasted passages and scans a repository on request, and falls back to the recordings if the service cannot be reached.
 
 ## How it works
 
@@ -184,9 +202,10 @@ review/              verdict for every finding, the defect registry, upstream PR
 experiments/         ablations and rule search
 upstream-patches/    one small patch per defect, with a draft of the pull request text
 docs/                the static demo page (GitHub Pages serves this folder)
+live/                the live trial service for the page (built and tested, not deployed) and deployment drafts
 scripts/             fetch the pinned targets, build the page, render it for a visual check
 video/               storyboard and scripts for the demo video
-tests/               107 tests
+tests/               176 tests
 day1/                the first day's probes and scripts, kept for the record
 ```
 

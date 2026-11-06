@@ -17,10 +17,16 @@ Docs Drift gives maintainers a short list of places where their documentation co
 
    149 pairs read, 6 flagged by `/compare`, 5 listed. Add `--no-gate`, `--no-swap` or `--no-elsewhere` to see what
    each stage changes, and `--all` to see what was kept off the list.
-3. Run the tests: `python -m pytest -q` (107 tests, no network).
+3. Run the tests: `python -m pytest -q` (176 tests, no network).
 
 With a key (`CLOCKED_API_KEY`), `python -m docsdrift scan /path/to/any/repo` runs it live. A scan cost 166 to 1,045
 credits on the projects measured.
+
+The block at the top of the demo page shows three real pairs with what `/compare` (both orders) and `/grounding`
+answered for each. Those are recordings. The service that would check pasted passages and scan a repository on
+request is in `live/`, with its limits and 62 offline tests; it is not deployed, because the cloud provider's API
+refused the build machine's address. To try your own input, run the command line tool or `python -m live.server`
+with a key.
 
 ## What each endpoint's output changes
 
@@ -48,8 +54,9 @@ Group award (Verify, Compare, or Rerank):
 - **Explanation and reproducibility (10).** Every request and response is recorded; scans replay offline; the numbers
   in the README are recomputed by the tests.
 
-Best Overall App: the tool uses three of the nine endpoints and is a command-line tool with a static report page, so
-it is not built to score on "additional endpoints" or on interface polish.
+Best Overall App: the tool uses three of the nine endpoints and is a command-line tool with a static report page
+(the live trial service is written and tested but not hosted), so it is not built to score on "additional
+endpoints" or on interface polish.
 
 ## What it does not do
 

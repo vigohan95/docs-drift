@@ -74,8 +74,15 @@ def test_page_wording_about_who_decides():
     assert "0 of 8" in PAGE            # the validation result is on the page, not hidden
 
 
-def test_page_has_no_scripts_or_remote_assets():
-    assert "<script" not in PAGE
+def test_page_content_does_not_depend_on_scripts_and_loads_no_remote_assets():
+    # one local script, for the "Try it live" block only, plus its inline example data
+    scripts = re.findall(r"<script\b[^>]*>", PAGE)
+    assert scripts == ['<script type="application/json" id="live-examples">', '<script src="live.js" defer>']
+    assert (ROOT / "docs" / "live.js").exists()
+    static = re.sub(r"<script\b.*?</script>", "", PAGE, flags=re.S)
+    for d in REG["defects"]:                                # every defect is in the static HTML
+        assert f'id="{d["id"]}"' in static
+    assert "<noscript>" in static and "The numbers, including the bad ones" in static
     assert re.findall(r'(?:src|href)="(https?://[^"]+)"', PAGE) == [u for u in re.findall(r'href="(https?://[^"]+)"', PAGE)]
     assert all(u.startswith("https://github.com/") for u in re.findall(r'href="(https?://[^"]+)"', PAGE))
     assert 'href="style.css"' in PAGE and (ROOT / "docs" / "style.css").exists()
