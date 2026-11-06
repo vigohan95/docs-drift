@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/46/46d1465cf3aa042aa8d5",
+ "request_hash": "46d1465cf3aa042aa8d51854a45ff4c07e02434493c228bbc57feeffe98b3bcd",
+ "recorded_at": "2026-11-06T14:15:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 967,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.270369",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=269"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#19",
+    "text": "### @ManyToOne()\n\n> `@ManyToOne()` decorator extend the `@Property()` decorator, so you can use all its parameters.\n\nMany instances of the current Entity refer to One instance of the referred Entity.\n\nSee [Defining Entities](./relationships.md#manytoone) for more examples.\n\n| Parameter    | Type                                          | Optional | Description                                                                                                                                                 |\n|--------------|-----------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| `entity`     | `string` &#124; `() => EntityName`            | yes      | Set target entity type.                                                                                                                                     |\n| `cascade`    | `Cascade[]`                                   | yes      | Set what actions on owning entity should be cascaded to the relationship. Defaults to `[Cascade.PERSIST, Cascade.MERGE]` (see [Cascading](./cascading.md)). |\n| `eager`      | `boolean`                                     | yes      | Always load the relationship. (Discouraged for use with to-many relations.)                                                                                 |\n| `inversedBy` | `(string & keyof T) ` &#124; ` (e: T) => any` | yes      | Point to the inverse side property name.                                                                                                                    |\n| `ref`        | `boolean`                                     | yes      | Wrap the entity in [`Reference` wrapper](type-safe-relations.md).                                                                                           |\n| `primary`    | `boolean`                                     | yes      | Use this relation as primary key.                                                                                                                           |\n| `deleteRule` | `string`                                      | yes      | [Referential integrity](./cascading.md#declarative-referential-integrity).                                                                                  |\n| `updateRule` | `string`                                      | yes      | [Referential integrity](./cascading.md#declarative-referential-integrity).                                                                                  |\n| `deferMode`  | `immediate` &#124; `deferred`                 | yes      | only for postgres unique constraints                                                                                                                        |"
+   },
+   {
+    "id": "mikro-orm:docs/docs/relationships.md#3",
+    "text": "## OneToMany\n\n> One instance of the current Entity has Many instances (references) to the referred Entity.\n\nAgain, all of the following is equivalent:\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'reflect-metadata', value: 'reflect-metadata'},\n    {label: 'ts-morph', value: 'ts-morph'},\n]\n  }\n>\n  <TabItem value=\"define-entity-class\">\n\n```ts\nimport { defineEntity, p } from '@mikro-orm/core';\n\nconst AuthorSchema = defineEntity({\n  name: 'Author',\n  properties: {\n    id: p.integer().primary(),\n    books: () => p.oneToMany(Book).mappedBy('author'),\n  },\n});\n\nexport class Author extends AuthorSchema.class {}\nAuthorSchema.setClass(Author);\n```\n\n  </TabItem>\n\n  <TabItem value=\"define-entity\">\n\n```ts\nimport { defineEntity, InferEntity, p } from '@mikro-orm/core';\n\nexport const Author = defineEntity({\n  name: 'Author',\n  properties: {\n    id: p.integer().primary(),\n    books: () => p.oneToMany(Book).mappedBy('author'),\n  },\n});\n\nexport type IAuthor = InferEntity<typeof Author>;\n```\n\n  </TabItem>\n  <TabItem value=\"reflect-metadata\">\n\n```ts\n@Entity()\nexport class Author {\n\n  @OneToMany(() => Book, book => book.author)\n  books1 = new Collection<Book>(this);\n\n  @OneToMany({ mappedBy: book => book.author }) // referenced entity type can be sniffed too\n  books2 = new Collection<Book>(this);\n\n  @OneToMany({ entity: () => Book, mappedBy: 'author', orphanRemoval: true })\n  books3 = new Collection<Book>(this);\n\n}\n```\n\n  </TabItem>\n  <TabItem value=\"ts-morph\">\n\n```ts\n@Entity()\nexport class Author {\n\n  @OneToMany(() => Book, book => book.author)\n  books = new Collection<Book>(this);\n\n}\n```\n\n  </TabItem>\n</Tabs>\n\nAs you can see, OneToMany is the inverse side of ManyToOne (which is the owning side). More about how collections work can be found on [collections page](./collections.md).\n\nYou can also specify how operations on given entity should [cascade](./cascading.md) to the referred entities. There is also more aggressive remove mode called [Orphan Removal](./cascading.md#orphan-removal) (`books3` example)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/relationships.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/decorators.md#19",
+    "b": "mikro-orm:docs/docs/relationships.md#3",
+    "relation": "unrelated",
+    "related": 0.3918,
+    "probabilities": {
+     "same": 0.0246,
+     "overlapping": 0.3514,
+     "conflicting": 0.0158,
+     "unrelated": 0.6082
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 54
+  },
+  "timing": {
+   "read_ms": 53,
+   "total_ms": 58
+  }
+ }
+}

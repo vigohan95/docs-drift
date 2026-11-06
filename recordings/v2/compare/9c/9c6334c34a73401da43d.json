@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9c/9c6334c34a73401da43d",
+ "request_hash": "9c6334c34a73401da43dda9cbf2cbaa2adc3d20d41f4586be2d7a18f58a4854b",
+ "recorded_at": "2026-11-06T14:14:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 853,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.908192",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=154"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#5",
+    "text": "## Instance methods {#methods}\n\nInstances of `Models` are [documents](documents.html). Documents have\nmany of their own [built-in instance methods](api/document.html).\nWe may also define our own custom document instance methods.\n\n```javascript\n// define a schema\nconst animalSchema = new Schema({ name: String, type: String },\n  {\n  // Assign a function to the \"methods\" object of our animalSchema through schema options.\n  // By following this approach, there is no need to create a separate TS type to define the type of the instance functions.\n    methods: {\n      findSimilarTypes() {\n        return mongoose.model('Animal').find({ type: this.type });\n      }\n    }\n  });\n\n// Or, assign a function to the \"methods\" object of our animalSchema\nanimalSchema.methods.findSimilarTypes = function() {\n  return mongoose.model('Animal').find({ type: this.type });\n};\n```\n\nNow all of our `animal` instances have a `findSimilarTypes` method available\nto them.\n\n```javascript\nconst Animal = mongoose.model('Animal', animalSchema);\nconst dog = new Animal({ type: 'dog' });\n\nconst dogs = await dog.findSimilarTypes();\nconsole.log(dogs); // woof\n```\n\n* Overwriting a default mongoose document method may lead to unpredictable results. See [this](api/schema.html#schema_Schema-reserved) for more details.\n* The example above uses the `Schema.methods` object directly to save an instance method. You can also use the [`Schema.method()` helper](api/schema.html#schema_Schema-method).\n* Do **not** declare methods using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so your method will **not** have access to the document and the above examples will not work."
+   },
+   {
+    "id": "mongoose:docs/guide.md#7",
+    "text": "## Query Helpers {#query-helpers}\n\nYou can also add query helper functions, which are like instance methods\nbut for mongoose queries. Query helper methods let you extend mongoose's\n[chainable query builder API](queries.html).\n\n```javascript\n// define a schema\nconst animalSchema = new Schema({ name: String, type: String },\n  {\n  // Assign a function to the \"query\" object of our animalSchema through schema options.\n  // By following this approach, there is no need to create a separate TS type to define the type of the query functions.\n    query: {\n      byName(name) {\n        return this.where({ name: new RegExp(name, 'i') });\n      }\n    }\n  });\n\n// Or, Assign a function to the \"query\" object of our animalSchema\nanimalSchema.query.byName = function(name) {\n  return this.where({ name: new RegExp(name, 'i') });\n};\n\nconst Animal = mongoose.model('Animal', animalSchema);\n\nconst animals = await Animal.find().byName('fido').exec();\nconsole.log(animals);\n\nconst animal = await Animal.findOne().byName('fido').exec();\nconsole.log(animal);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/guide.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#5",
+    "b": "mongoose:docs/guide.md#7",
+    "relation": "unrelated",
+    "related": 0.0152,
+    "probabilities": {
+     "same": 0.0042,
+     "overlapping": 0.0044,
+     "conflicting": 0.0067,
+     "unrelated": 0.9848
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 36
+  }
+ }
+}

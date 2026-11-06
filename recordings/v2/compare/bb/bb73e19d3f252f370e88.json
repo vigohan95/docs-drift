@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bb/bb73e19d3f252f370e88",
+ "request_hash": "bb73e19d3f252f370e888f45170c013722fc87a4687d8497d6bf993f6a08d494",
+ "recorded_at": "2026-11-06T14:17:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 6464,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "163.581666",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=311"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "eslint:docs/src/extend/code-path-analysis.md#0",
+    "text": "---\ntitle: Code Path Analysis Details\n---\n\nESLint's rules can use code paths.\nThe code path is execution routes of programs.\nIt forks/joins at such as `if` statements.\n\n```js\nif (a && b) {\n\tfoo();\n}\nbar();\n```\n\n:::img-container\n![Code Path Example](../assets/images/code-path-analysis/helo.svg)\n:::\n\n::: tip\nYou can view code path diagrams for any JavaScript code using [Code Explorer](https://explorer.eslint.org).\n:::"
+   },
+   {
+    "id": "eslint:docs/src/extend/custom-rule-tutorial.md#7",
+    "text": "## Step 4: Add Rule Visitor Methods\n\nDefine the rule's `create` function, which accepts a `context` object and returns an object with a property for each syntax node type you want to handle. In this case, you want to handle `VariableDeclarator` nodes.\nYou can choose any [ESTree node type](https://github.com/estree/estree) or [selector](selectors).\n\n::: tip\nYou can view the AST for any JavaScript code using [Code Explorer](https://explorer.eslint.org). This is helpful in determining the type of nodes you'd like to target.\n:::\n\nInside the `VariableDeclarator` visitor method, check if the node represents a `const` variable declaration, if its name is `foo`, and if it's not assigned to the string `\"bar\"`. You do this by evaluating the `node` passed to the `VariableDeclaration` method.\n\nIf the `const foo` declaration is assigned a value of `\"bar\"`, then the rule does nothing. If `const foo` **is not** assigned a value of `\"bar\"`, then `context.report()` reports an error to ESLint. The error report includes information about the error and how to fix it.\n\n```javascript\n// enforce-foo-bar.js\n{% raw %}\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n        docs: {\n            description: \"Enforce that a variable named `foo` can only be assigned a value of 'bar'.\"\n        },\n        fixable: \"code\",\n        schema: [],\n        languages: [\"js/js\"]\n    },\n    create(context) {\n        return {\n\n            // Performs action in the function on every variable declarator\n            VariableDeclarator(node) {\n\n                // Check if a `const` variable declaration\n                if (node.parent.kind === \"const\") {\n\n                    // Check if variable name is `foo`\n                    if (node.id.type === \"Identifier\" && node.id.name === \"foo\") {\n\n                        // Check if value of variable is \"bar\"\n                        if (node.init && node.init.type === \"Literal\" && node.init.value !== \"bar\") {\n\n                            /*\n                             * Report error to ESLint. Error message uses\n                             * a message placeholder to include the incorrect value\n                             * in the error message.\n                             * Also includes a `fix(fixer)` function that replaces\n                             * any values assigned to `const foo` with \"bar\".\n                             */\n                            context.report({\n                                node,\n                                message: 'Value other than \"bar\" assigned to `const foo`. Unexpected value: {{ notBar }}.',\n                                data: {\n                                    notBar: node.init.value\n                                },\n                                fix(fixer) {\n                                    return fixer.replaceText(node.init, '\"bar\"');\n                                }\n                            });\n                        }\n                    }\n                }\n            }\n        };\n    }\n};\n{% endraw %}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "eslint:docs/src/extend/code-path-analysis.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "eslint:docs/src/extend/custom-rule-tutorial.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "eslint:docs/src/extend/code-path-analysis.md#0",
+    "b": "eslint:docs/src/extend/custom-rule-tutorial.md#7",
+    "relation": "overlapping",
+    "related": 0.6082,
+    "probabilities": {
+     "same": 0.0219,
+     "overlapping": 0.5708,
+     "conflicting": 0.0155,
+     "unrelated": 0.3918
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 54,
+   "passage_reads": 1,
+   "passages_ms": 123,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 175,
+   "total_ms": 181
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/22/22492e927e4137019484",
+ "request_hash": "22492e927e4137019484060caf19ec214a689c103c6b964740f684e7e0b87e45",
+ "recorded_at": "2026-11-06T14:13:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 901,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "23.490335",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=169"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/ECMAScriptModules.md#2",
+    "text": "## `require()` of ESM\n\nOn Node v24.9 and later, Jest supports `require()`-ing an ES module from CJS code, mirroring [Node's own `require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require).\n\n```js title=\"main.test.cjs\"\nconst {value, default: defaultExport} = require('./esm-module.mjs');\n```\n\nCalling `require()` on an ESM file with top-level `await` (or whose graph contains TLA) throws `ERR_REQUIRE_ASYNC_MODULE`. Use `await import(...)` for those files. The same error is thrown when a configured [transformer](Configuration.md#transform-objectstring-pathtotransformer--pathtotransformer-object) or [resolver](Configuration.md#resolver-string) only supports async operation - `require()` cannot wait for it.\n\nPackages resolve through the [`require` and `module-sync` conditions](https://nodejs.org/api/packages.html#community-conditions-definitions), as they do in Node. A package that exposes its ESM entry point under `module-sync` can therefore be `require()`d, and one that exposes it only under `import` cannot - Node refuses that too, with `ERR_PACKAGE_PATH_NOT_EXPORTED`. A `module-sync` entry point whose graph contains top-level `await` throws `ERR_REQUIRE_ASYNC_MODULE`.\n\n`jest.mock` does _not_ apply when the resolved file is ESM - `jest.mock` is for CJS targets. To mock an ESM file you `require()`, register the mock via `jest.unstable_mockModule` - it applies both to the file you `require()` and to the ESM dependencies it imports. `jest.requireActual` bypasses it, as it does for CJS mocks.\n\nOn Node versions older than v24.9, `require()` of an ESM file still throws `ERR_REQUIRE_ESM`."
+   },
+   {
+    "id": "jest:docs/ManualMocks.md#5",
+    "text": "The example mock shown here uses [`jest.createMockFromModule`](JestObjectAPI.md#jestcreatemockfrommodulemodulename) to generate an automatic mock, and overrides its default behavior. This is the recommended approach, but is completely optional. If you do not want to use the automatic mock at all, you can export your own functions from the mock file. One downside to fully manual mocks is that they're manual – meaning you have to manually update them any time the module they are mocking changes. Because of this, it's best to use or extend the automatic mock when it works for your needs.\n\nTo ensure that a manual mock and its real implementation stay in sync, it might be useful to require the real module using [`jest.requireActual(moduleName)`](JestObjectAPI.md#jestrequireactualmodulename) in your manual mock and amending it with mock functions before exporting it.\n\nThe code for this example is available at [examples/manual-mocks](https://github.com/jestjs/jest/tree/main/examples/manual-mocks)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/ECMAScriptModules.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/ManualMocks.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/ECMAScriptModules.md#2",
+    "b": "jest:docs/ManualMocks.md#5",
+    "relation": "unrelated",
+    "related": 0.0278,
+    "probabilities": {
+     "same": 0.0083,
+     "overlapping": 0.009,
+     "conflicting": 0.0105,
+     "unrelated": 0.9722
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30
+  },
+  "timing": {
+   "read_ms": 30,
+   "total_ms": 32
+  }
+ }
+}

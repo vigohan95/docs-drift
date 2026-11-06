@@ -1,0 +1,280 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/f2/f220485742a1ab4b79ba",
+ "request_hash": "f220485742a1ab4b79ba1c12beedbd082470b2c5d00ae9a9d11791aa5fc6a705",
+ "recorded_at": "2026-11-06T14:14:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1086,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "98.04438",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=162,cfOrigin;dur=0,cfWorker;dur=249"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) ## MongoDB Driver 4.0 {#mongodb-driver-40} (2) ## Version Requirements {#version-requirements} Mongoose now requires Node.js >= 14.0.0 and MongoDB Node Driver >= 5.0.0. See [the MongoDB Node Driver migration guide](https://github.com/mongodb/node-mongodb-native/blob/main/etc/notes/CHANGES_5.0.0.md) for detailed info.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_6.md#2",
+    "title": "docs/migrating_to_6.md > Migrating from 5.x to 6.x > Version Requirements {#version-requirements}",
+    "text": "## Version Requirements {#version-requirements}\n\nMongoose now requires Node.js >= 12.0.0. Mongoose still supports MongoDB server versions back to 3.0.0."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#1",
+    "title": "docs/migrating_to_5.md > Migrating from 4.x to 5.x > Version Requirements {#version-requirements}",
+    "text": "## Version Requirements {#version-requirements}\n\nMongoose now requires Node.js >= 4.0.0 and MongoDB >= 3.0.0.\n[MongoDB 2.6](https://www.mongodb.com/blog/post/mongodb-2-6-end-of-life) and\n[Node.js < 4](https://github.com/nodejs/Release) where both EOL-ed in 2016."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#0",
+    "title": "docs/migrating_to_6.md > Migrating from 5.x to 6.x",
+    "text": "# Migrating from 5.x to 6.x\n\n<style>\n  ul > li {\n    padding: 4px 0px;\n  }\n</style>\n\nPlease note: we plan to discontinue Mongoose 5 support on March 1, 2024.\nPlease see our [version support guide](./version-support.html).\n\nThere are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)\nyou should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.\n\nIf you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration guide](migrating_to_5.html) and upgrade to Mongoose 5.x first.\n\n* [Version Requirements](#version-requirements)\n* [MongoDB Driver 4.0](#mongodb-driver-40)\n* [No More Deprecation Warning Options](#no-more-deprecation-warning-options)\n* [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)\n* [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)\n* [Duplicate Query Execution](#duplicate-query-execution)\n* [`Model.exists()` Returns a lean document instead of Boolean](#model-exists-returns-a-lean-document-instead-of-boolean)\n* [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)\n* [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)\n* [Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()`](#simplified-isvalidobjectid-and-separate-isobjectidorhexstring)\n* [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)\n* [Schema Defined Document Key Order](#schema-defined-document-key-order)\n* [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)\n* [Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`](#removed-omitundefined)\n* [Document Parameter to Default Functions](#document-parameter-to-default-functions)\n* [Arrays are Proxies](#arrays-are-proxies)\n* [`typePojoToMixed`](#typepojotomixed)\n* [`strictPopulate()`](#strictpopulate)\n* [Subdocument `ref` Function Context](#subdocument-ref-function-context)\n* [Schema Reserved Names Warning](#schema-reserved-names-warning)\n* [Subdocument Paths](#subdocument-paths)\n* [Creating Aggregation Cursors](#creating-aggregation-cursors)\n* [`autoCreate` Defaults to `true`](#autocreate-defaults-to-true)\n* [No More `context: 'query'`](#no-more-context-query)\n* [Custom Validators with Populated Paths](#custom-validators-with-populated-paths)\n* [Disconnected Event with Replica Sets](#disconnected-event-with-replica-sets)\n* [Removed `execPopulate()`](#removed-execpopulate)\n* [`create()` with Empty Array](#create-with-empty-array)\n* [Removed Nested Path Merging](#removed-nested-path-merging)\n* [ObjectId `valueOf()`](#objectid-valueof)\n* [Immutable `createdAt`](#immutable-createdat)\n* [Removed Validator `isAsync`](#removed-validator-isasync)\n* [Removed `safe`](#removed-safe)\n* [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)\n* [No default model for `Query.prototype.populate()`](#no-default-model-for-query-prototype-populate)\n* [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)\n* [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)\n* [MongoDB Driver's New URL Parser Incompatible with Some npm Packages](#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages)\n* [Lodash `.isEmpty()` returns false for ObjectIds](#lodash-object-id)\n* [mongoose.modelSchemas removed](#model-schemas)"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_7.md#0",
+    "title": "docs/migrating_to_7.md > Migrating from 6.x to 7.x",
+    "text": "# Migrating from 6.x to 7.x\n\n<style>\n  ul > li {\n    padding: 4px 0px;\n  }\n</style>\n\nThere are several backwards-breaking changes\nyou should be aware of when migrating from Mongoose 6.x to Mongoose 7.x.\n\nIf you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration guide](migrating_to_6.html) and upgrade to Mongoose 6.x first.\n\n* [Version Requirements](#version-requirements)\n* [`strictQuery`](#strictquery)\n* [Removed `remove()`](#removed-remove)\n* [Dropped callback support](#dropped-callback-support)\n* [Removed `update()`](#removed-update)\n* [ObjectId requires `new`](#objectid-requires-new)\n* [`id` setter](#id-setter)\n* [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)\n* [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)\n* [Copy schema options in `Schema.prototype.add()`](#copy-schema-options-in-schema-prototype-add)\n* [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)\n* [Removed support for custom promise libraries](#removed-support-for-custom-promise-libraries)\n* [Removed mapReduce](#removed-mapreduce)\n* [Deprecated `keepAlive`](#deprecated-keepalive)\n* [TypeScript-specific changes](#typescript-specific-changes)\n  * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)\n  * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)"
+   },
+   {
+    "id": "mongoose:docs/migration.md#4",
+    "title": "docs/migration.md > Migrating from 3.x to 4.x > More Info {#moreinfo}",
+    "text": "## More Info {#moreinfo}\n\nRelated blog posts:\n\n* [Introducing Version 4.0 of the Mongoose NodeJS ODM](http://www.mongodb.com/blog/post/introducing-version-40-mongoose-nodejs-odm)"
+   },
+   {
+    "id": "mongoose:docs/atlas-search.md#10",
+    "title": "docs/atlas-search.md > Atlas Search > Vector Search",
+    "text": "## Vector Search\n\nFor semantic search using vector embeddings, use the `$vectorSearch` stage.\nSee the complete [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html) guide for detailed examples."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_9.md#13",
+    "title": "docs/migrating_to_9.md > Migrating from 8.x to 9.x > Node.js version support",
+    "text": "## Node.js version support\n\nMongoose 9 requires Node.js 20.19.0 or higher."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#0",
+    "title": "docs/migrating_to_5.md > Migrating from 4.x to 5.x",
+    "text": "# Migrating from 4.x to 5.x\n\nPlease note: we plan to discontinue Mongoose 5 support on March 1, 2024.\nPlease see our [version support guide](./version-support.html).\n\nThere are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/History.md)\nyou should be aware of when migrating from Mongoose 4.x to Mongoose 5.x.\n\nIf you're still on Mongoose 3.x, please read the [Mongoose 3.x to 4.x migration guide](migration.html).\n\n* [Version Requirements](#version-requirements)\n* [Query Middleware](#query-middleware)\n* [Promises and Callbacks for `mongoose.connect()`](#promises-and-callbacks)\n* [Connection Logic and `useMongoClient`](#connection-logic)\n* [Setter Order](#setter-order)\n* [Checking if a path is populated](#id-getter)\n* [Return Values for `remove()` and `deleteX()`](#return-value-for-delete)\n* [Aggregation Cursors](#aggregation-cursors)\n* [geoNear](#geonear)\n* [Required URI encoding of connection strings](#uri-encoding)\n* [Passwords which contain certain characters](#password-characters)\n* [Domain sockets](#domain-sockets)\n* [`toObject()` Options](#toobject-options)\n* [Aggregate Parameters](#aggregate-parameters)\n* [Boolean Casting](#boolean-casting)\n* [Query Casting](#query-casting)\n* [Post Save Hooks Get Flow Control](#post-save-flow-control)\n* [The `$pushAll` Operator](#pushall)\n* [Always Use Forward Key Order](#retain-key-order)\n* [Run setters on queries](#run-setters-on-queries)\n* [Pre-compiled Browser Bundle](#browser-bundle)\n* [Save Errors](#save-errors)\n* [Init hook signatures](#init-hooks)\n* [`numAffected` and `save()`](#save-num-affected)\n* [`remove()` and debouncing](#remove-debounce)\n* [`getPromiseConstructor()`](#get-promise-constructor)\n* [Passing Parameters from Pre Hooks](#pre-hook-params)\n* [`required` validator for arrays](#array-required)\n* [debug output defaults to stdout instead of stderr](#debug-output)\n* [Overwriting filter properties](#overwrite-filter)\n* [`bulkWrite()` results](#bulkwrite-results)\n* [Strict SSL validation](#strict-ssl-validation)"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_8.md#0",
+    "title": "docs/migrating_to_8.md > Migrating from 7.x to 8.x",
+    "text": "# Migrating from 7.x to 8.x\n\n<style>\n  ul > li {\n    padding: 4px 0px;\n  }\n</style>\n\nThere are several backwards-breaking changes you should be aware of when migrating from Mongoose 7.x to Mongoose 8.x.\n\nIf you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x migration guide](migrating_to_7.html) and upgrade to Mongoose 7.x first before upgrading to Mongoose 8.\n\nWe also recommend reviewing the [MongoDB Node.js driver's release notes for v6.0.0](https://github.com/mongodb/node-mongodb-native/releases/tag/v6.0.0) before upgrading to Mongoose 8.\n\n* [Removed `rawResult` option for `findOneAndUpdate()`](#removed-rawresult-option-for-findoneandupdate)\n* [`Document.prototype.deleteOne()` now returns a query](#document-prototype-deleteone-now-returns-a-query)\n* [MongoDB Node Driver 6.0](#mongodb-node-driver-6)\n* [Removed `findOneAndRemove()`](#removed-findoneandremove)\n* [Removed `count()`](#removed-count)\n* [Removed id Setter](#removed-id-setter)\n* [`null` is valid for non-required string enums](#null-is-valid-for-non-required-string-enums)\n* [Apply minimize when `save()` updates an existing document](#apply-minimize-when-save-updates-an-existing-document)\n* [Apply base schema paths before discriminator paths](#apply-base-schema-paths-before-discriminator-paths)\n* [Removed `overwrite` option for `findOneAndUpdate()`](#removed-overwrite-option-for-findoneandupdate)\n* [Changed behavior for `findOneAndUpdate()` with `orFail()` and upsert](#changed-behavior-for-findoneandupdate-with-orfail-and-upsert)\n* [`create()` waits until all saves are done before throwing any error](#create-waits-until-all-saves-are-done-before-throwing-any-error)\n* [`Model.validate()` returns copy of object](#model-validate-returns-copy-of-object)\n* [Allow `null` For Optional Fields in TypeScript](#allow-null-for-optional-fields-in-typescript)\n* [Model constructor properties are all optional in TypeScript](#model-constructor-properties-are-all-optional-in-typescript)\n* [Infer `distinct()` return types from schema](#infer-distinct-return-types-from-schema)"
+   },
+   {
+    "id": "mongoose:docs/nextjs.md#9",
+    "title": "docs/nextjs.md > Using Mongoose With [Next.js](https://nextjs.org/) > Next.js Edge Runtime",
+    "text": "## Next.js Edge Runtime\n\nMongoose does **not** currently support [Next.js Edge Runtime](https://nextjs.org/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes#edge-runtime).\nThere is no way for Mongoose to connect to MongoDB in Edge Runtime, because [Edge Runtime currently doesn't support Node.js `net` API](https://edge-runtime.vercel.app/features/available-apis#unsupported-apis), which is what the MongoDB Node Driver uses to connect to MongoDB."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#38",
+    "title": "docs/migrating_to_6.md > Migrating from 5.x to 6.x > MongoDB Driver's New URL Parser Incompatible with Some npm Packages {#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages}",
+    "text": "## MongoDB Driver's New URL Parser Incompatible with Some npm Packages {#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages}\n\nThe MongoDB Node driver version that Mongoose 6 uses relies on a [URL parser module](https://npmjs.com/package/whatwg-url) that has several known compatibility issues with other npm packages.\nThis can lead to errors like `Invalid URL: mongodb+srv://username:password@development.xyz.mongodb.net/abc` if you use one of the incompatible packages.\n[You can find a list of incompatible packages here](https://mongoosejs.com/docs/incompatible_packages.html)."
+   },
+   {
+    "id": "mongoose:docs/incompatible_packages.md#0",
+    "title": "docs/incompatible_packages.md > Incompatible packages",
+    "text": "# Incompatible packages\n\nThe following npm packages are known to be incompatible with Mongoose:\n\n* [collections](https://www.npmjs.com/package/collections): polluted globals cause issues with the MongoDB Node driver's URL parser. See [GitHub issue 12671](https://github.com/Automattic/mongoose/issues/12671#issuecomment-1374942680). This affects any [package that depends on collections](https://www.npmjs.com/package/collections?activeTab=dependents).\n* [excel-export](https://www.npmjs.com/package/excel-export): has dependency on `collections`"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "mongoose:docs/migrating_to_5.md#1",
+    "action": "use",
+    "relevance_score": 0.6456,
+    "document_score": 0.6716,
+    "levels": {
+     "answers": 0.6456,
+     "elsewhere": 0.026,
+     "different_case": 0.1921,
+     "unrelated": 0.1362
+    }
+   },
+   {
+    "index": 0,
+    "id": "mongoose:docs/migrating_to_6.md#2",
+    "action": "skip",
+    "reason": "different_case",
+    "relevance_score": 0.0868,
+    "document_score": 0.1208,
+    "levels": {
+     "answers": 0.0868,
+     "elsewhere": 0.034,
+     "different_case": 0.7315,
+     "unrelated": 0.1477
+    }
+   },
+   {
+    "index": 6,
+    "id": "mongoose:docs/migrating_to_9.md#13",
+    "action": "skip",
+    "reason": "different_case",
+    "relevance_score": 0.0419,
+    "document_score": 0.069,
+    "levels": {
+     "answers": 0.0419,
+     "elsewhere": 0.0271,
+     "different_case": 0.743,
+     "unrelated": 0.188
+    }
+   },
+   {
+    "index": 4,
+    "id": "mongoose:docs/migration.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0107,
+    "document_score": 0.0571,
+    "levels": {
+     "answers": 0.0107,
+     "elsewhere": 0.0464,
+     "different_case": 0.0248,
+     "unrelated": 0.9181
+    }
+   },
+   {
+    "index": 7,
+    "id": "mongoose:docs/migrating_to_5.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0102,
+    "document_score": 0.2999,
+    "levels": {
+     "answers": 0.0102,
+     "elsewhere": 0.2897,
+     "different_case": 0.0417,
+     "unrelated": 0.6584
+    }
+   },
+   {
+    "index": 2,
+    "id": "mongoose:docs/migrating_to_6.md#0",
+    "action": "expand",
+    "relevance_score": 0.0082,
+    "document_score": 0.6941,
+    "levels": {
+     "answers": 0.0082,
+     "elsewhere": 0.6859,
+     "different_case": 0.0429,
+     "unrelated": 0.263
+    }
+   },
+   {
+    "index": 8,
+    "id": "mongoose:docs/migrating_to_8.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0075,
+    "document_score": 0.0701,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.0626,
+     "different_case": 0.1033,
+     "unrelated": 0.8266
+    }
+   },
+   {
+    "index": 3,
+    "id": "mongoose:docs/migrating_to_7.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0052,
+    "document_score": 0.0967,
+    "levels": {
+     "answers": 0.0052,
+     "elsewhere": 0.0916,
+     "different_case": 0.037,
+     "unrelated": 0.8663
+    }
+   },
+   {
+    "index": 9,
+    "id": "mongoose:docs/nextjs.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0064,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0036,
+     "different_case": 0.0127,
+     "unrelated": 0.9808
+    }
+   },
+   {
+    "index": 10,
+    "id": "mongoose:docs/migrating_to_6.md#38",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0095,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0066,
+     "different_case": 0.0183,
+     "unrelated": 0.9723
+    }
+   },
+   {
+    "index": 11,
+    "id": "mongoose:docs/incompatible_packages.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0024,
+     "different_case": 0.0055,
+     "unrelated": 0.9902
+    }
+   },
+   {
+    "index": 5,
+    "id": "mongoose:docs/atlas-search.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0035,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0017,
+     "different_case": 0.0024,
+     "unrelated": 0.9941
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5671
+  },
+  "timing": {
+   "total_ms": 103,
+   "rerank_ms": 101,
+   "questions_ms": 0,
+   "model_ms": 88,
+   "engine": {
+    "rows": 6139,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 88,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 85,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 208
+   }
+  }
+ }
+}

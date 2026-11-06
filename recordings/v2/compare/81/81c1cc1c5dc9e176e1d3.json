@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/81/81c1cc1c5dc9e176e1d3",
+ "request_hash": "81c1cc1c5dc9e176e1d3803561fcb45054e65995fd53a404869734781bcf9d98",
+ "recorded_at": "2026-11-06T14:14:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1164,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "110.815521",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=445"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#10",
+    "text": "## Virtuals {#virtuals}\n\n[Virtuals](api/schema.html#schema_Schema-virtual) are document properties that\nyou can get and set but that do not get persisted to MongoDB. The getters\nare useful for formatting or combining fields, while setters are useful for\nde-composing a single value into multiple values for storage.\n\n```javascript\n// define a schema\nconst personSchema = new Schema({\n  name: {\n    first: String,\n    last: String\n  }\n});\n\n// compile our model\nconst Person = mongoose.model('Person', personSchema);\n\n// create a document\nconst axl = new Person({\n  name: { first: 'Axl', last: 'Rose' }\n});\n```\n\nSuppose you want to print out the person's full name. You could do it yourself:\n\n```javascript\nconsole.log(axl.name.first + ' ' + axl.name.last); // Axl Rose\n```\n\nBut [concatenating](https://masteringjs.io/tutorials/fundamentals/string-concat) the first and\nlast name every time can get cumbersome.\nAnd what if you want to do some extra processing on the name, like\n[removing diacritics](https://www.npmjs.com/package/diacritics)? A\n[virtual property getter](api/virtualtype.html#virtualtype_VirtualType-get) lets you\ndefine a `fullName` property that won't get persisted to MongoDB.\n\n```javascript\n// That can be done either by adding it to schema options:\nconst personSchema = new Schema({\n  name: {\n    first: String,\n    last: String\n  }\n}, {\n  virtuals: {\n    fullName: {\n      get() {\n        return this.name.first + ' ' + this.name.last;\n      }\n    }\n  }\n});\n\n// Or by using the virtual method as following:\npersonSchema.virtual('fullName').get(function() {\n  return this.name.first + ' ' + this.name.last;\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/guide.md#12",
+    "text": "You can also add a custom setter to your virtual that will let you set both\nfirst name and last name via the `fullName` virtual.\n\n```javascript\n// Again that can be done either by adding it to schema options:\nconst personSchema = new Schema({\n  name: {\n    first: String,\n    last: String\n  }\n}, {\n  virtuals: {\n    fullName: {\n      get() {\n        return this.name.first + ' ' + this.name.last;\n      },\n      set(v) {\n        this.name.first = v.substr(0, v.indexOf(' '));\n        this.name.last = v.substr(v.indexOf(' ') + 1);\n      }\n    }\n  }\n});\n\n// Or by using the virtual method as following:\npersonSchema.virtual('fullName').\n  get(function() {\n    return this.name.first + ' ' + this.name.last;\n  }).\n  set(function(v) {\n    this.name.first = v.substr(0, v.indexOf(' '));\n    this.name.last = v.substr(v.indexOf(' ') + 1);\n  });\n\naxl.fullName = 'William Rose'; // Now `axl.name.first` is \"William\"\n```\n\nVirtual property setters are applied before other validation. So the example\nabove would still work even if the `first` and `last` name fields were\nrequired.\n\nOnly non-virtual properties work as part of queries and for field selection.\nSince virtuals are not stored in MongoDB, you can't query with them.\n\nYou can [learn more about virtuals here](https://masteringjs.io/tutorials/mongoose/virtuals)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/guide.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#10",
+    "b": "mongoose:docs/guide.md#12",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0043,
+     "overlapping": 0.9904,
+     "conflicting": 0.0038,
+     "unrelated": 0.0015
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 79,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 162,
+   "total_ms": 166
+  }
+ }
+}

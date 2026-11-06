@@ -1,0 +1,100 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/9f/9ffbb24acbf7458720b8",
+ "request_hash": "9ffbb24acbf7458720b833855bee3fe63d6c43267497f9f1233acfebab20d9aa",
+ "recorded_at": "2026-11-06T14:12:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1010,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.015869",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=38,cfOrigin;dur=0,cfWorker;dur=296"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "text": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together):\n\n```typescript\nawait manager.update(User, [{ status: \"expired\" }, { flagged: true }], {\n    active: false,\n})\n// executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true\n```\n\n- `updateAll` - Updates _all_ entities of target type (without WHERE clause). Sets fields from supplied partial entity.\n\n```typescript\nawait manager.updateAll(User, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT\n```\n\n- `upsert` - Inserts a new entity or array of entities unless they already exist in which case they are updated instead. Supported by AuroraDataApi, Cockroach, Mysql, Postgres, and Sqlite database drivers.\n\nWhen an upsert operation results in an update (due to a conflict), special columns like `@UpdateDateColumn` and `@VersionColumn` are automatically updated to their current values.\n\nColumns marked with `update: false` or defined as computed generated columns (via `asExpression`/`generatedType`) are **never** included in the update set on conflict. If all non-conflict columns are excluded by these rules (i.e. there are no updatable columns), the upsert degrades to an insert-or-ignore operation and the existing row is left completely unchanged. On databases that support conflict targets (e.g. PostgreSQL, CockroachDB), this is scoped to the specified conflict columns; on MySQL-family databases, `INSERT IGNORE` is used which applies to all unique constraints."
+   }
+  ],
+  "answer": "await manager.update(User, [ { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } }, { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } }, { criteria: { age: 18 }, data: { category: \"ADULT\" } }, ]) // executes three separate UPDATE queries: // UPDATE user SET firstName = Rizzrak WHERE id = 1 // UPDATE user SET firstName = Karzzir WHERE id = 2 // UPDATE user SET category = ADULT WHERE age = 18 ``` You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause).",
+  "claims": [
+   "await manager.update(User, [ { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } }, { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } }, { criteria: { age: 18 }, data: { category: \"ADULT\" } }, ]) // executes three separate UPDATE queries: // UPDATE user SET firstName = Rizzrak WHERE id = 1 // UPDATE user SET firstName = Karzzir WHERE id = 2 // UPDATE user SET category = ADULT WHERE age = 18 ```",
+   "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause)."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.2374,
+  "ungrounded": 0.7626,
+  "verdict": "contradicted",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "share": 1,
+    "share_of_answer": 0.2374,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "await manager.update(User, [ { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } }, { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } }, { criteria: { age: 18 }, data: { category: \"ADULT\" } }, ]) // executes three separate UPDATE queries: // UPDATE user SET firstName = Rizzrak WHERE id = 1 // UPDATE user SET firstName = Karzzir WHERE id = 2 // UPDATE user SET category = ADULT WHERE age = 18 ```",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4988,
+    "supported": 0.0168,
+    "contradicted": 0.9006,
+    "not_stated": 0.0751,
+    "not_a_claim": 0.0075,
+    "verdict": "contradicted",
+    "sources": {
+     "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause).",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5012,
+    "supported": 0.457,
+    "contradicted": 0.2671,
+    "not_stated": 0.2671,
+    "not_a_claim": 0.0087,
+    "verdict": "supported",
+    "sources": {
+     "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4": 1
+    },
+    "source": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "evidence": {
+     "document": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+     "quote": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together):",
+     "start": 0,
+     "end": 135,
+     "confidence": 0.995
+    }
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0168
+  },
+  "timing": {
+   "read_ms": 99,
+   "total_ms": 102
+  }
+ }
+}

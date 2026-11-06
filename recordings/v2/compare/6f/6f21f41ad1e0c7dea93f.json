@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6f/6f21f41ad1e0c7dea93f",
+ "request_hash": "6f21f41ad1e0c7dea93f4d2730e40a9d3993ecb58667278a36d5d85945b04b21",
+ "recorded_at": "2026-11-06T14:12:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1502,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "155.847008",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=38,cfOrigin;dur=0,cfWorker;dur=724"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#8",
+    "text": "### `<scrape_config>`\n\nA `scrape_config` section specifies a set of targets and parameters describing how\nto scrape them. In the general case, one scrape configuration specifies a single\njob. In advanced configurations, this may change.\n\nTargets may be statically configured via the `static_configs` parameter or\ndynamically discovered using one of the supported service-discovery mechanisms.\n\nAdditionally, `relabel_configs` allow advanced modifications to any\ntarget and its labels before scraping.\n\n```yaml\n# The job name assigned to scraped metrics by default.\njob_name: <job_name>\n\n# How frequently to scrape targets from this job.\n[ scrape_interval: <duration> | default = <global_config.scrape_interval> ]\n\n# Per-scrape timeout when scraping this job.\n# It cannot be greater than the scrape interval.\n[ scrape_timeout: <duration> | default = <global_config.scrape_timeout> ]\n\n# The protocols to negotiate during a scrape with the client.\n# Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n# OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n# If not set in the global config, the default value depends on the \n# setting of scrape_native_histograms. If false, it is\n# [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n# If true, it is\n# [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n[ scrape_protocols: [<string>, ...] | default = <dynamic> ]\n\n# Fallback protocol to use if a scrape returns blank, unparsable, or otherwise\n# invalid Content-Type.\n# Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n# OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n[ fallback_scrape_protocol: <string> ]\n\n# The HTTP resource path on which to fetch metrics from targets.\n[ metrics_path: <path> | default = /metrics ]\n\n# honor_labels controls how Prometheus handles conflicts between labels that are\n# already present in scraped data and labels that Prometheus would attach\n# server-side (\"job\" and \"instance\" labels, manually configured target\n# labels, and labels generated by service discovery implementations).\n#\n# If honor_labels is set to \"true\", label conflicts are resolved by keeping label\n# values from the scraped data and ignoring the conflicting server-side labels.\n#\n# If honor_labels is set to \"false\", label conflicts are resolved by renaming\n# conflicting labels in the scraped data to \"exported_<original-label>\" (for\n# example \"exported_instance\", \"exported_job\") and then attaching server-side\n# labels.\n#\n# Setting honor_labels to \"true\" is useful for use cases such as federation and\n# scraping the Pushgateway, where all labels specified in the target should be\n# preserved.\n#\n# Note that any globally configured \"external_labels\" are unaffected by this\n# setting. In communication with external systems, they are always applied only\n# when a time series does not have a given label yet and are ignored otherwise.\n[ honor_labels: <boolean> | default = false ]"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#2",
+    "b": "prometheus:docs/configuration/configuration.md#8",
+    "relation": "overlapping",
+    "related": 0.9984,
+    "probabilities": {
+     "same": 0.004,
+     "overlapping": 0.9909,
+     "conflicting": 0.0035,
+     "unrelated": 0.0016
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 270,
+   "passage_reads": 1,
+   "passages_ms": 243,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 513,
+   "total_ms": 518
+  }
+ }
+}

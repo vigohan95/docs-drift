@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2c/2cfc0f408bb4443f51ab",
+ "request_hash": "2cfc0f408bb4443f51abf82646f972daea65985dba27fd5ac6a1233812ac46fe",
+ "recorded_at": "2026-11-06T14:21:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2791,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "104.776989",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=45,cfOrigin;dur=0,cfWorker;dur=231"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/learn/setup-teardown.md#6",
+    "text": "## Cleanup with `onTestFinished`\n\nSometimes you create a resource inside a test that needs to be cleaned up afterwards. You could use `afterEach`, but that means the cleanup is separated from the setup, which can make the test harder to follow. [`onTestFinished`](/api/hooks#ontestfinished) lets you register a cleanup function right where you create the resource:\n\n```js\nimport { expect, onTestFinished, test } from 'vitest'\n\ntest('creates a temporary file', () => {\n  const file = createTempFile()\n  onTestFinished(() => {\n    deleteTempFile(file)\n  })\n\n  expect(file.exists()).toBe(true)\n})\n```\n\nA similar pattern works with `beforeEach`. You can return a cleanup function and Vitest will call it after each test. This is especially nice when the setup and teardown are closely related:\n\n```js\nimport { beforeEach } from 'vitest'\n\nbeforeEach(() => {\n  const server = startServer()\n  return () => {\n    server.close()\n  }\n})\n```"
+   },
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "text": "#### Within Each Test File\n\nThe execution follows this order:\n\n1. **File-level code:** All code outside `describe` blocks runs immediately\n2. **Test collection:** `describe` blocks are processed, and tests are registered as side effects of importing the test file\n3. **[`aroundAll`](/api/hooks#aroundall) hooks:** Wrap around all tests in the suite (must call `runSuite()`)\n4. **[`beforeAll`](/api/hooks#beforeall) hooks:** Run once before any tests in the suite\n5. **For each test:**\n   - [`aroundEach`](/api/hooks#aroundeach) hooks wrap around the test (must call `runTest()`)\n   - `beforeEach` hooks execute (in order defined, or based on [`sequence.hooks`](/config/sequence#sequence-hooks))\n   - Test function executes\n   - `afterEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - Cleanup functions returned from `beforeEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - [`onTestFinished`](/api/hooks#ontestfinished) callbacks run (always in reverse order)\n   - If test failed: [`onTestFailed`](/api/hooks#ontestfailed) callbacks run\n   - Note: if `repeats` or `retry` are set, all of these steps are executed again\n6. **[`afterAll`](/api/hooks#afterall) hooks:** Run once after all tests in the suite complete\n7. **Cleanup functions returned from `beforeAll` hooks:** Run once after all tests in the suite complete"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/learn/setup-teardown.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/learn/setup-teardown.md#6",
+    "b": "vitest:docs/guide/lifecycle.md#9",
+    "relation": "overlapping",
+    "related": 0.9957,
+    "probabilities": {
+     "same": 0.0053,
+     "overlapping": 0.9853,
+     "conflicting": 0.0052,
+     "unrelated": 0.0043
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 114,
+   "total_ms": 117
+  }
+ }
+}

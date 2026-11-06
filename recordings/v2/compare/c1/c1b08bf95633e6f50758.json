@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c1/c1b08bf95633e6f50758",
+ "request_hash": "c1b08bf95633e6f507584c17443017c2b39d4b396890793561e9d09ca819fab0",
+ "recorded_at": "2026-11-06T14:15:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1018,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "182.714624",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=333"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#2",
+    "text": "The `RequestContext.getEntityManager()` method then checks `AsyncLocalStorage` static instance used for creating new EM forks in the `RequestContext.create()` method.\n\nThe [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage) class from Node.js core is the magician here. It allows us to track the context throughout the async calls. It allows us to decouple the [`EntityManager`](/api/core/class/EntityManager) fork creation (usually in a middleware as shown in the previous section) from its usage through the global [`EntityManager`](/api/core/class/EntityManager) instance.\n\n:::\n\n```ts title='app.ts'\nimport { MikroORM, RequestContext } from '@mikro-orm/core';\nimport { fastify } from 'fastify';\nimport config from './mikro-orm.config.js';\n\nexport async function bootstrap(port = 3001) {\n  const orm = await MikroORM.init(config);\n  const app = fastify();\n\n  // register request context hook\n  app.addHook('onRequest', (request, reply, done) => {\n    RequestContext.create(orm.em, done);\n  });\n\n  // shut down the connection when closing the app\n  app.addHook('onClose', async () => {\n    await orm.close();\n  });\n\n  // register routes here\n  // ...\n\n  const url = await app.listen({ port });\n\n  return { app, url };\n}\n```\n\nAnd use this function in the `server.ts` file - you can wipe all the code you had so far and replace it with the following:"
+   },
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#5",
+    "text": "### How does `RequestContext` helper work?\n\nInternally all `EntityManager` methods that work with the Identity Map (e.g. `em.find()` or `em.getReference()`) first call `em.getContext()` to access the contextual fork. This method will first check if you are running inside `RequestContext` handler and prefer the `EntityManager` fork from it.\n\n```ts\n// we call em.find() on the global EM instance\nconst res = await orm.em.find(Book, {});\n\n// but under the hood this resolves to\nconst res = await orm.em.getContext().find(Book, {});\n\n// which then resolves to\nconst res = await RequestContext.getEntityManager().find(Book, {});\n```\n\nThe `RequestContext.getEntityManager()` method then checks `AsyncLocalStorage` static instance we use for creating new EM forks in the `RequestContext.create()` method.\n\n> The context resolution works only on the global `EntityManager` instance, so if you use `em.fork()` directly, you will not get the request scoped `EntityManager` automatically unless you pass the `useContext: true` option to it.\n>\n> ```ts\n> // `em` will respect the async context\n> const em = orm.em.fork({ useContext: true });\n> ```\n\nThe [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage) class from Node.js core is the magician here. It allows you to track the context throughout the async calls. It allows you to decouple the `EntityManager` fork creation (usually in a middleware as shown in previous section) from its usage through the global `EntityManager` instance."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/identity-map.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/03-project-setup.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/03-project-setup.md#2",
+    "b": "mikro-orm:docs/docs/identity-map.md#5",
+    "relation": "overlapping",
+    "related": 0.9964,
+    "probabilities": {
+     "same": 0.0621,
+     "overlapping": 0.9284,
+     "conflicting": 0.0058,
+     "unrelated": 0.0036
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9871,
+       "restated": 0.0058,
+       "elaborated": 0.0038,
+       "different": 0.0032
+      },
+      "confidence": 0.9968,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/03-project-setup.md#2",
+       "quote": "It allows us to decouple the [`EntityManager`](/api/core/class/EntityManager) fork creation (usually in a middleware as shown in the previous section) from its usage through the global [`EntityManager`](/api/core/class/EntityManager) instance.",
+       "start": 369,
+       "end": 612,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/identity-map.md#5",
+       "quote": "It allows you to track the context throughout the async calls.",
+       "start": 1277,
+       "end": 1339,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9701,
+       "restated": 0.0166,
+       "elaborated": 0.0077,
+       "different": 0.0056
+      },
+      "confidence": 0.9944,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/03-project-setup.md#2",
+       "quote": "It allows us to decouple the [`EntityManager`](/api/core/class/EntityManager) fork creation (usually in a middleware as shown in the previous section) from its usage through the global [`EntityManager`](/api/core/class/EntityManager) instance.",
+       "start": 369,
+       "end": 612,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/identity-map.md#5",
+       "quote": "It allows you to decouple the `EntityManager` fork creation (usually in a middleware as shown in previous section) from its usage through the global `EntityManager` instance.",
+       "start": 1340,
+       "end": 1514,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 2,
+   "counterparts_ms": 75
+  },
+  "timing": {
+   "read_ms": 195,
+   "total_ms": 200
+  }
+ }
+}

@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/7a/7af83c5cbbbb9cbc73e0",
+ "request_hash": "7af83c5cbbbb9cbc73e08ad5dbe85606253e0f9434b9d7839187543f12f365a9",
+ "recorded_at": "2026-11-06T14:14:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1080,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "192.00009",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=378"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/faq.md#6",
+    "text": "**A**. The `type` property is special in mongoose, so when you say\n`type: String`, mongoose interprets it as a type declaration. In the\nabove schema, mongoose thinks `asset` is a string, not an object. Do\nthis instead:\n\n```javascript\nconst holdingSchema = new Schema({\n  // This is how you tell mongoose you mean `asset` is an object with\n  // a string property `type`, as opposed to telling mongoose that `asset`\n  // is a string.\n  asset: {\n    type: { type: String },\n    ticker: String\n  }\n});\n```\n\n<hr id=\"populate_sort_order\" />\n\n<a class=\"anchor\" href=\"#populate_sort_order\">**Q**</a>. I'm populating a nested property under an array like the below code:\n\n```javascript\nnew Schema({\n  arr: [{\n    child: { ref: 'OtherModel', type: Schema.Types.ObjectId }\n  }]\n});\n```\n\n`.populate({ path: 'arr.child', options: { sort: 'name' } })` won't sort by `arr.child.name`?\n\n**A**. See [this GitHub issue](https://github.com/Automattic/mongoose/issues/2202). It's a known issue but one that's exceptionally difficult to fix.\n\n<hr id=\"model_functions_hanging\" />\n\n<a class=\"anchor\" href=\"#model_functions_hanging\">**Q**</a>. All function calls on my models hang, what am I doing wrong?\n\n**A**. By default, mongoose will buffer your function calls until it can\nconnect to MongoDB. Read the [buffering section of the connection docs](connections.html#buffering)\nfor more information."
+   },
+   {
+    "id": "mongoose:docs/schematypes.md#3",
+    "text": "## The `type` Key {#type-key}\n\n`type` is a special property in Mongoose schemas. When Mongoose finds\na nested property named `type` in your schema, Mongoose assumes that\nit needs to define a SchemaType with the given type.\n\n```javascript\n// 3 string SchemaTypes: 'name', 'nested.firstName', 'nested.lastName'\nconst schema = new Schema({\n  name: { type: String },\n  nested: {\n    firstName: { type: String },\n    lastName: { type: String }\n  }\n});\n```\n\nAs a consequence, [you need a little extra work to define a property named `type` in your schema](faq.html#type-key).\nFor example, suppose you're building a stock portfolio app, and you\nwant to store the asset's `type` (stock, bond, ETF, etc.). Naively,\nyou might define your schema as shown below:\n\n```javascript\nconst holdingSchema = new Schema({\n  // You might expect `asset` to be an object that has 2 properties,\n  // but unfortunately `type` is special in Mongoose so mongoose\n  // interprets this schema to mean that `asset` is a string\n  asset: {\n    type: String,\n    ticker: String\n  }\n});\n```\n\nHowever, when Mongoose sees `type: String`, it assumes that you mean\n`asset` should be a string, not an object with a property `type`.\nThe correct way to define an object with a property `type` is shown\nbelow.\n\n```javascript\nconst holdingSchema = new Schema({\n  asset: {\n    // Workaround to make sure Mongoose knows `asset` is an object\n    // and `asset.type` is a string, rather than thinking `asset`\n    // is a string.\n    type: { type: String },\n    ticker: String\n  }\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/faq.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/schematypes.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/schematypes.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/faq.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/faq.md#6",
+    "b": "mongoose:docs/schematypes.md#3",
+    "relation": "overlapping",
+    "related": 0.9979,
+    "probabilities": {
+     "same": 0.0127,
+     "overlapping": 0.9805,
+     "conflicting": 0.0047,
+     "unrelated": 0.0021
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.006,
+       "restated": 0.9846,
+       "elaborated": 0.0052,
+       "different": 0.0042
+      },
+      "confidence": 0.9958,
+      "a": {
+       "document": "mongoose:docs/faq.md#6",
+       "quote": "The `type` property is special in mongoose, so when you say",
+       "start": 7,
+       "end": 66,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mongoose:docs/schematypes.md#3",
+       "quote": "## The `type` Key {#type-key}\n\n`type` is a special property in Mongoose schemas.",
+       "start": 0,
+       "end": 80,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0062,
+       "restated": 0.9759,
+       "elaborated": 0.0131,
+       "different": 0.0049
+      },
+      "confidence": 0.9951,
+      "a": {
+       "document": "mongoose:docs/faq.md#6",
+       "quote": "The `type` property is special in mongoose, so when you say",
+       "start": 7,
+       "end": 66,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mongoose:docs/schematypes.md#3",
+       "quote": "Naively,\nyou might define your schema as shown below:\n\n```javascript\nconst holdingSchema = new Schema({\n  // You might expect `asset` to be an object that has 2 properties,\n  // but unfortunately `type` is special in Mongoose so mongoose\n  // interprets this schema to mean that `asset` is a string\n  asset: {\n    type: String,\n    ticker: String\n  }\n});\n```\n\nHowever, when Mongoose sees `type: String`, it assumes that you mean\n`asset` should be a string, not an object with a property `type`.\nThe correct way to define an object with a property `type` is shown\nbelow.\n\n```javascript\nconst holdingSchema = new Schema({\n  asset: {\n    // Workaround to make sure Mongoose knows `asset` is an object\n    // and `asset.type` is a string, rather than thinking `asset`\n    // is a string.\n    type: { type: String },\n    ticker: String\n  }\n});\n```",
+       "start": 697,
+       "end": 1539,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 37,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 2,
+   "counterparts_ms": 111
+  },
+  "timing": {
+   "read_ms": 233,
+   "total_ms": 237
+  }
+ }
+}

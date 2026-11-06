@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/96/9623b13f8e0cb4ab0464",
+ "request_hash": "9623b13f8e0cb4ab04642b25e0d7be822c028fad7d770df5f399128e40e0e600",
+ "recorded_at": "2026-11-06T14:15:18Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1117,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "229.123169",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=446"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/repositories.md#7",
+    "text": "## Removed methods from `EntityRepository` interface\n\nFollowing methods are no longer available on the `EntityRepository` instance since v6:\n\n- `persist`\n- `persistAndFlush`\n- `remove`\n- `removeAndFlush`\n- `flush`\n\nThey were confusing as they gave a false sense of working with a scoped context (e.g. only with a `User` type), while in fact, they were only shortcuts for the same methods of underlying `EntityManager`. You should work with the `EntityManager` directly instead of using a repository when it comes to entity persistence, repositories should be treated as an extension point for custom logic (e.g. wrapping query builder usage).\n\n> Alternatively, you can use the `repository.getEntityManager()` method to access those methods directly on the `EntityManager`.\n\nIf you want to keep those methods on repository level, you can define a custom base repository and use it globally:\n\n```ts\nimport { EntityManager, EntityRepository } from '@mikro-orm/mysql';\n\nexport class ExtendedEntityRepository<T extends object> extends EntityRepository<T> {\n\n  persist(entity: object | object[]): EntityManager {\n    return this.em.persist(entity);\n  }\n\n  async persistAndFlush(entity: object | object[]): Promise<void> {\n    this.em.persist(entity);\n    await this.em.flush();\n  }\n\n  remove(entity: object): EntityManager {\n    return this.em.remove(entity);\n  }\n\n  async removeAndFlush(entity: object): Promise<void> {\n    this.em.remove(entity);\n    await this.em.flush();\n  }\n\n  async flush(): Promise<void> {\n    return this.em.flush();\n  }\n\n}\n```\n\nAnd specify it in the ORM config:\n\n```ts\nMikroORM.init({\n  entityRepository: ExtendedEntityRepository,\n});\n```\n\nYou might as well want to use the `EntityRepositoryType` symbol, possibly in a custom base entity (as shown above)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#5",
+    "text": "## Removed methods from `EntityRepository`\n\nFollowing methods are no longer available on the `EntityRepository` instance.\n\n- `persist`\n- `persistAndFlush`\n- `remove`\n- `removeAndFlush`\n- `flush`\n\nThey were confusing as they gave a false sense of working with a scoped context (e.g. only with a `User` type), while in fact, they were only shortcuts for the same methods of underlying `EntityManager`. You should work with the `EntityManager` directly instead of using a repository when it comes to entity persistence, repositories should be treated as an extension point for custom logic (e.g. wrapping query builder usage).\n\n```diff\n-userRepository.persist(user);\n-await userRepository.flush();\n+em.persist(user);\n+await em.flush();\n```\n\n> Alternatively, you can use the `repository.getEntityManager()` method to access those methods directly on the `EntityManager`.\n\nIf you want to keep those methods on repository level, you can define custom base repository and use it globally:\n\n```ts\nimport { EntityManager, EntityRepository, AnyEntity } from '@mikro-orm/mysql';\n\nexport class ExtendedEntityRepository<T extends object> extends EntityRepository<T> {\n\n  persist(entity: AnyEntity | AnyEntity[]): EntityManager {\n    return this.em.persist(entity);\n  }\n\n  async persistAndFlush(entity: AnyEntity | AnyEntity[]): Promise<void> {\n    await this.em.persistAndFlush(entity);\n  }\n\n  remove(entity: AnyEntity): EntityManager {\n    return this.em.remove(entity);\n  }\n\n  async removeAndFlush(entity: AnyEntity): Promise<void> {\n    await this.em.removeAndFlush(entity);\n  }\n\n  async flush(): Promise<void> {\n    return this.em.flush();\n  }\n\n}\n```\n\nAnd specify it in the ORM config:\n\n```ts\nMikroORM.init({\n   entityRepository: ExtendedEntityRepository,\n})\n```\n\nYou might as well want to use the `EntityRepositoryType` symbol, possibly in a custom base entity."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/repositories.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v5-to-v6.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/repositories.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/repositories.md#7",
+    "b": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#5",
+    "relation": "overlapping",
+    "related": 0.9972,
+    "probabilities": {
+     "same": 0.0203,
+     "overlapping": 0.9697,
+     "conflicting": 0.0072,
+     "unrelated": 0.0028
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.033,
+       "restated": 0.8697,
+       "elaborated": 0.0847,
+       "different": 0.0127
+      },
+      "confidence": 0.9873,
+      "a": {
+       "document": "mikro-orm:docs/docs/repositories.md#7",
+       "quote": "## Removed methods from `EntityRepository` interface",
+       "start": 0,
+       "end": 52,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#5",
+       "quote": "## Removed methods from `EntityRepository`\n\nFollowing methods are no longer available on the `EntityRepository` instance.\n\n- `persist`\n- `persistAndFlush`\n- `remove`\n- `removeAndFlush`\n- `flush`\n\nThey were confusing as they gave a false sense of working with a scoped context (e.g. only with a `User` type), while in fact, they were only shortcuts for the same methods of underlying `EntityManager`.",
+       "start": 0,
+       "end": 399,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0104,
+       "restated": 0.9553,
+       "elaborated": 0.0255,
+       "different": 0.0088
+      },
+      "confidence": 0.9912,
+      "a": {
+       "document": "mikro-orm:docs/docs/repositories.md#7",
+       "quote": "You should work with the `EntityManager` directly instead of using a repository when it comes to entity persistence, repositories should be treated as an extension point for custom logic (e.g.",
+       "start": 419,
+       "end": 611,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#5",
+       "quote": "You should work with the `EntityManager` directly instead of using a repository when it comes to entity persistence, repositories should be treated as an extension point for custom logic (e.g. wrapping query builder usage).\n\n```diff\n-userRepository.persist(user);\n-await userRepository.flush();\n+em.persist(user);\n+await em.flush();\n```\n\n> Alternatively, you can use the `repository.getEntityManager()` method to access those methods directly on the `EntityManager`.\n\nIf you want to keep those methods on repository level, you can define custom base repository and use it globally:\n\n```ts\nimport { EntityManager, EntityRepository, AnyEntity } from '@mikro-orm/mysql';\n\nexport class ExtendedEntityRepository<T extends object> extends EntityRepository<T> {\n\n  persist(entity: AnyEntity | AnyEntity[]): EntityManager {\n    return this.em.persist(entity);\n  }\n\n  async persistAndFlush(entity: AnyEntity | AnyEntity[]): Promise<void> {\n    await this.em.persistAndFlush(entity);\n  }\n\n  remove(entity: AnyEntity): EntityManager {\n    return this.em.remove(entity);\n  }\n\n  async removeAndFlush(entity: AnyEntity): Promise<void> {\n    await this.em.removeAndFlush(entity);\n  }\n\n  async flush(): Promise<void> {\n    return this.em.flush();\n  }\n\n}\n```\n\nAnd specify it in the ORM config:\n\n```ts\nMikroORM.init({\n   entityRepository: ExtendedEntityRepository,\n})\n```\n\nYou might as well want to use the `EntityRepositoryType` symbol, possibly in a custom base entity.",
+       "start": 400,
+       "end": 1853,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 80,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 2,
+   "counterparts_ms": 120
+  },
+  "timing": {
+   "read_ms": 284,
+   "total_ms": 289
+  }
+ }
+}

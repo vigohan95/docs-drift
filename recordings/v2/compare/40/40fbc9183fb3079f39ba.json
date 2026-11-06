@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/40/40fbc9183fb3079f39ba",
+ "request_hash": "40fbc9183fb3079f39bad2eb71b1b5e6cacfa4c01714c074ed1b23cda1a81994",
+ "recorded_at": "2026-11-06T14:13:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 968,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "120.147102",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=40,cfOrigin;dur=0,cfWorker;dur=254"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#1",
+    "text": "## Per-environment Hooks and Global Hooks\n\nPlugins run on a shared pipeline, but their hooks fall into two categories depending on whether they run once for the whole server or once for each environment.\n\nGlobal hooks are called a single time, independent of the configured environments. They handle app-wide concerns such as resolving the config or setting up the dev and preview servers, so `this.environment` is not relevant to them. Config resolution related hooks and server related hooks are global hooks.\n\nPer-environment hooks are called once for each environment, and expose the current environment through `this.environment` in their context. All [Rolldown hooks](/guide/api-plugin#rolldown-hooks) are per-environment, as are other Vite-specific hooks that handle modules. However, note that `buildStart` and `buildEnd` are only called for the client environment without [the `perEnvironmentStartEndDuringDev: true` flag](#per-environment-state-in-plugins)."
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "text": "## Motivation\n\nThe [`handleHotUpdate` hook](/guide/api-plugin.md#handlehotupdate) allows to perform custom HMR update handling. A list of modules to be updated is passed in the `HmrContext`.\n\n```ts\ninterface HmrContext {\n  file: string\n  timestamp: number\n  modules: Array<ModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThis hook is called once for all environments, and the passed modules have mixed information from the Client and SSR environments only. Once frameworks move to custom environments, a new hook that is called for each of them is needed.\n\nThe new `hotUpdate` hook works in the same way as `handleHotUpdate` but it is called for each environment and receives a new `HotUpdateOptions` instance:\n\n```ts\ninterface HotUpdateOptions {\n  type: 'create' | 'update' | 'delete'\n  file: string\n  timestamp: number\n  modules: Array<EnvironmentModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThe current dev environment can be accessed like in other Plugin hooks with `this.environment`. The `modules` list will now be module nodes from the current environment only. Each environment update can define different update strategies.\n\nThis hook is also now called for additional watch events and not only for `'update'`. Use `type` to differentiate between them."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-plugins.md#1",
+    "b": "vite:docs/changes/hotupdate-hook.md#1",
+    "relation": "overlapping",
+    "related": 0.593,
+    "probabilities": {
+     "same": 0.0132,
+     "overlapping": 0.5692,
+     "conflicting": 0.0107,
+     "unrelated": 0.407
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 49,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 133,
+   "total_ms": 135
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d5/d5f3aba295db9f19ef93",
+ "request_hash": "d5f3aba295db9f19ef93b1869eedb369fba9ffc38b3c0e4af5970a18b04e8eae",
+ "recorded_at": "2026-11-06T14:13:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 908,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "43.235393",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=172"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:packages/diff-sequences/README.md#6",
+    "text": "## Example of callback functions to emulate diff command\n\nLinux or Unix has a `diff` command to compare files line by line. Its output is a **shortest edit script**:\n\n- **c**hange adjacent lines from the first file to lines from the second file\n- **d**elete lines from the first file\n- **a**ppend or insert lines from the second file\n\n```js\n// Given zero-based half-open range [start, end) of array indexes,\n// return one-based closed range [start + 1, end] as string.\nconst getRange = (start, end) =>\n  start + 1 === end ? `${start + 1}` : `${start + 1},${end}`;\n\n// Given index intervals of lines to delete or insert, or both, or neither,\n// push formatted diff lines onto array.\nconst pushDelIns = (aLines, aIndex, aEnd, bLines, bIndex, bEnd, array) => {\n  const deleteLines = aIndex !== aEnd;\n  const insertLines = bIndex !== bEnd;\n  const changeLines = deleteLines && insertLines;\n  if (changeLines) {\n    array.push(`${getRange(aIndex, aEnd)}c${getRange(bIndex, bEnd)}`);\n  } else if (deleteLines) {\n    array.push(`${getRange(aIndex, aEnd)}d${String(bIndex)}`);\n  } else if (insertLines) {\n    array.push(`${String(aIndex)}a${getRange(bIndex, bEnd)}`);\n  } else {\n    return;\n  }\n\n  for (; aIndex !== aEnd; aIndex += 1) {\n    array.push(`< ${aLines[aIndex]}`); // delete is less than\n  }\n\n  if (changeLines) {\n    array.push('---');\n  }\n\n  for (; bIndex !== bEnd; bIndex += 1) {\n    array.push(`> ${bLines[bIndex]}`); // insert is greater than\n  }\n};\n\n// Given content of two files, return emulated output of diff utility.\nconst findShortestEditScript = (a, b) => {\n  const aLines = a.split('\\n');\n  const bLines = b.split('\\n');\n  const aLength = aLines.length;\n  const bLength = bLines.length;\n\n  const isCommon = (aIndex, bIndex) => aLines[aIndex] === bLines[bIndex];\n\n  let aIndex = 0;\n  let bIndex = 0;\n  const array = [];\n  const foundSubsequence = (nCommon, aCommon, bCommon) => {\n    pushDelIns(aLines, aIndex, aCommon, bLines, bIndex, bCommon, array);\n    aIndex = aCommon + nCommon; // number of lines compared in a\n    bIndex = bCommon + nCommon; // number of lines compared in b\n  };\n\n  diff(aLength, bLength, isCommon, foundSubsequence);\n\n  // After the last common subsequence, push remaining change lines.\n  pushDelIns(aLines, aIndex, aLength, bLines, bIndex, bLength, array);"
+   },
+   {
+    "id": "jest:packages/diff-sequences/README.md#10",
+    "text": "## Example of callback functions to find diff items\n\nHere is simplified code to find changed and unchanged substrings **within adjacent changed lines** in expected and received values after a test fails in Jest:\n\n```js\n// Return diff items for strings (compatible with diff-match-patch package).\nconst findDiffItems = (a, b) => {\n  const isCommon = (aIndex, bIndex) => a[aIndex] === b[bIndex];\n\n  let aIndex = 0;\n  let bIndex = 0;\n  const array = [];\n  const foundSubsequence = (nCommon, aCommon, bCommon) => {\n    if (aIndex !== aCommon) {\n      array.push([-1, a.slice(aIndex, aCommon)]); // delete is -1\n    }\n    if (bIndex !== bCommon) {\n      array.push([1, b.slice(bIndex, bCommon)]); // insert is 1\n    }\n\n    aIndex = aCommon + nCommon; // number of characters compared in a\n    bIndex = bCommon + nCommon; // number of characters compared in b\n    array.push([0, a.slice(aCommon, aIndex)]); // common is 0\n  };\n\n  diff(a.length, b.length, isCommon, foundSubsequence);\n\n  // After the last common subsequence, push remaining change items.\n  if (aIndex !== a.length) {\n    array.push([-1, a.slice(aIndex)]);\n  }\n  if (bIndex !== b.length) {\n    array.push([1, b.slice(bIndex)]);\n  }\n\n  return array;\n};\n\nconst expectedDeleted = ['\"sorting\": Object {', '\"ascending\": true,'].join(\n  '\\n',\n);\nconst receivedInserted = [\n  '\"sorting\": Array [',\n  'Object {',\n  '\"descending\": false,',\n].join('\\n');\n\nconst diffItems = findDiffItems(expectedDeleted, receivedInserted);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:packages/diff-sequences/README.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:packages/diff-sequences/README.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:packages/diff-sequences/README.md#6",
+    "b": "jest:packages/diff-sequences/README.md#10",
+    "relation": "unrelated",
+    "related": 0.0549,
+    "probabilities": {
+     "same": 0.0135,
+     "overlapping": 0.0318,
+     "conflicting": 0.0097,
+     "unrelated": 0.9451
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 53
+  },
+  "timing": {
+   "read_ms": 52,
+   "total_ms": 55
+  }
+ }
+}

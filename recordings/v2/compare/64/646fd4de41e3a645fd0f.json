@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/64/646fd4de41e3a645fd0f",
+ "request_hash": "646fd4de41e3a645fd0f5ca1a40d21ac69cd4ad96cf82f773696e8ac09990160",
+ "recorded_at": "2026-11-06T14:13:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 910,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.46784",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=230"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#48",
+    "text": "#### Array of objects\n\nThe array of objects API is most verbose, but it makes the type inference a painless task. A `table` can be inlined:\n\n```ts\nimport {test} from '@jest/globals';\n\ntest.each([\n  {name: 'a', path: 'path/to/a', count: 1, write: true},\n  {name: 'b', path: 'path/to/b', count: 3},\n])('inline table', ({name, path, count, write}) => {\n  // arguments are typed as expected, e.g. `write: boolean | undefined`\n});\n```\n\nOr declared separately as a variable:\n\n```ts\nimport {test} from '@jest/globals';\n\nconst table = [\n  {a: 1, b: 2, expected: 'three', extra: true},\n  {a: 3, b: 4, expected: 'seven', extra: false},\n  {a: 5, b: 6, expected: 'eleven'},\n];\n\ntest.each(table)('table as a variable', ({a, b, expected, extra}) => {\n  // again everything is typed as expected, e.g. `extra: boolean | undefined`\n});\n```"
+   },
+   {
+    "id": "jest:docs/GlobalAPI.md#50",
+    "text": "#### Template literal\n\nIf all input values are of the same type, the template literal API will type the arguments correctly:\n\n```ts\nimport {test} from '@jest/globals';\n\ntest.each`\n  a    | b    | expected\n  ${1} | ${2} | ${3}\n  ${3} | ${4} | ${7}\n  ${5} | ${6} | ${11}\n`('template literal example same type', ({a, b, expected}) => {\n  // all arguments are of type `number` because all inputs (a, b, expected) are of type `number`\n});\n```\n\nIf the inputs have different types, the arguments will be typed as a union of all the input types (i.e. type of the variables inside the template literal):\n\n```ts\nimport {test} from '@jest/globals';\n\ntest.each`\n  a    | b    | expected\n  ${1} | ${2} | ${'three'}\n  ${3} | ${4} | ${'seven'}\n  ${5} | ${6} | ${'eleven'}\n`('template literal example different types', ({a, b, expected}) => {\n  // all arguments are of type `number | string` because some inputs (a, b) are of type `number` and some others (expected) are of type `string`\n});\n```\n\nOtherwise, if you want each argument to have the right type, you have to explicitly provide the generic type argument:\n\n```ts\nimport {test} from '@jest/globals';\n\ntest.each<{a: number; b: number; expected: string; extra?: boolean}>`\n  a    | b    | expected    | extra\n  ${1} | ${2} | ${'three'}  | ${true}\n  ${3} | ${4} | ${'seven'}  | ${false}\n  ${5} | ${6} | ${'eleven'}\n`('template literal example', ({a, b, expected, extra}) => {\n  // all arguments are typed as expected, e.g. `a: number`, `expected: string`, `extra: boolean | undefined`\n});\n```\n\n:::caution\n\nKeep in mind the variables inside the template literal are not type checked, so you have to ensure that their types are correct.\n\n```ts\nimport {test} from '@jest/globals';\n\ntest.each<{a: number; expected: string}>`\n  a                            | expected\n  ${1}                         | ${'one'}\n  ${'will not raise TS error'} | ${'two'}\n  ${3}                         | ${'three'}\n`('template literal with wrongly typed input', ({a, expected}) => {\n  // all arguments are typed as stated in the generic: `a: number`, `expected: string`\n  // WARNING: `a` is of type `number` but will be a string in the 2nd test case.\n});\n```\n\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/GlobalAPI.md#48",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/GlobalAPI.md#50",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/GlobalAPI.md#48",
+    "b": "jest:docs/GlobalAPI.md#50",
+    "relation": "unrelated",
+    "related": 0.0199,
+    "probabilities": {
+     "same": 0.006,
+     "overlapping": 0.0088,
+     "conflicting": 0.0052,
+     "unrelated": 0.9801
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 52
+  },
+  "timing": {
+   "read_ms": 52,
+   "total_ms": 54
+  }
+ }
+}

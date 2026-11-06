@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c4/c4135d8f2584c3fe42d2",
+ "request_hash": "c4135d8f2584c3fe42d2c040acb6e3b29dfea72976eb46ae980086fe9cceaef3",
+ "recorded_at": "2026-11-06T14:19:25Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1886,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "38.405473",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=162"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/actionCreatorMiddleware.mdx#3",
+    "text": "### `createActionCreatorInvariantMiddleware`\n\nCreates an instance of the action creator check middleware, with the given options.\n\nYou will most likely not need to call this yourself, as `getDefaultMiddleware` already does so.\nExample:\n\n```ts\n// file: reducer.ts noEmit\n\nexport default function (state = {}, action: any) {\n  return state\n}\n\n// file: store.ts\n\nimport {\n  configureStore,\n  createActionCreatorInvariantMiddleware,\n  Tuple,\n} from '@reduxjs/toolkit'\nimport reducer from './reducer'\n\n// Augment middleware to consider all functions with a static type property to be action creators\nconst isActionCreator = (\n  action: unknown,\n): action is Function & { type: unknown } =>\n  typeof action === 'function' && 'type' in action\n\nconst actionCreatorMiddleware = createActionCreatorInvariantMiddleware({\n  isActionCreator,\n})\n\nconst store = configureStore({\n  reducer,\n  middleware: () => new Tuple(actionCreatorMiddleware),\n})\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/api/serializabilityMiddleware.mdx#3",
+    "text": "### `createSerializableStateInvariantMiddleware`\n\nCreates an instance of the serializability check middleware, with the given options.\n\nYou will most likely not need to call this yourself, as `getDefaultMiddleware` already does so.\n\nExample:\n\n```ts\n// file: reducer.ts noEmit\n\nexport default function (state = {}, action: any) {\n  return state\n}\n\n// file: store.ts\n\nimport { Iterable } from 'immutable'\nimport {\n  configureStore,\n  createSerializableStateInvariantMiddleware,\n  isPlain,\n  Tuple,\n} from '@reduxjs/toolkit'\nimport reducer from './reducer'\n\n// Augment middleware to consider Immutable.JS iterables serializable\nconst isSerializable = (value: any) =>\n  Iterable.isIterable(value) || isPlain(value)\n\nconst getEntries = (value: any) =>\n  Iterable.isIterable(value) ? value.entries() : Object.entries(value)\n\nconst serializableMiddleware = createSerializableStateInvariantMiddleware({\n  isSerializable,\n  getEntries,\n})\n\nconst store = configureStore({\n  reducer,\n  middleware: () => new Tuple(serializableMiddleware),\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/actionCreatorMiddleware.mdx#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/api/serializabilityMiddleware.mdx#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/api/actionCreatorMiddleware.mdx#3",
+    "b": "redux-toolkit:docs/api/serializabilityMiddleware.mdx#3",
+    "relation": "unrelated",
+    "related": 0.1094,
+    "probabilities": {
+     "same": 0.0242,
+     "overlapping": 0.0675,
+     "conflicting": 0.0178,
+     "unrelated": 0.8906
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 48
+  },
+  "timing": {
+   "read_ms": 48,
+   "total_ms": 50
+  }
+ }
+}

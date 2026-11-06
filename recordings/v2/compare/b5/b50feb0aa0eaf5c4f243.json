@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b5/b50feb0aa0eaf5c4f243",
+ "request_hash": "b50feb0aa0eaf5c4f243197bce85243b62d0ee9336ab6caead887a2d970fd0aa",
+ "recorded_at": "2026-11-06T14:15:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1022,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.974241",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=272"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#9",
+    "text": "### Relation modifiers: `.ref()` and `.lazyRef()`\n\nFor `m:1` / `1:1` relations, you can opt into compile-time populate-state safety:\n\n- **`.ref()`** wraps the runtime value in a `Reference`, exposing `.$` / `.get()` / `.load()` — see [`Ref<T>`](./type-safe-relations.md#reference-wrapper).\n- **`.lazyRef()`** is a type-only marker — the runtime stays a plain entity (no wrapper), but TypeScript hides non-PK access until `Loaded<>` narrows it. See [`LazyRef<T>`](./type-safe-relations.md#lazyreft--type-only-reference).\n\n```ts\nconst BookSchema = defineEntity({\n  name: 'Book',\n  properties: {\n    id: p.integer().primary(),\n    author: () => p.manyToOne(AuthorSchema).ref(),       // `Ref<Author>`\n    publisher: () => p.manyToOne(PublisherSchema).lazyRef(), // `LazyRef<Publisher>`\n  },\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-constructors.md#2",
+    "text": "```ts\n@ManyToOne({ entity: () => Author, ref: true })\nauthor: Ref<Author>;\n\nconstructor(dto: { title: string; author: number }) {\n  this.title = dto.title;\n  this.author = ref(Author, dto.author);\n}\n```\n\nOr, to keep the runtime as a plain entity (no wrapper) while still getting compile-time populate-state safety, declare the property as [`LazyRef<T>`](./type-safe-relations.md#lazyreft--type-only-reference) and assign with `rel()`:\n\n```ts\n@ManyToOne({ entity: () => Author })\nauthor: LazyRef<Author>;\n\nconstructor(dto: { title: string; author: number }) {\n  this.title = dto.title;\n  this.author = rel(Author, dto.author);\n}\n```\n\nThe `rel` and `ref` helpers will accept both primary key and entity instance, as well as empty value (`null` or `undefined`).\n\n```ts\nbook.author = ref(Author, null);\nbook.author = ref(Author, undefined);\nbook.author = ref(null);\nbook.author = ref(undefined);\nbook.author = ref(Author, 1);\nbook.author = ref(Author, author);\nbook.author = ref(author);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-constructors.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/define-entity.md#9",
+    "b": "mikro-orm:docs/docs/entity-constructors.md#2",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0113,
+     "overlapping": 0.982,
+     "conflicting": 0.0047,
+     "unrelated": 0.002
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 53,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 81,
+   "total_ms": 84
+  }
+ }
+}

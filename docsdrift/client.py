@@ -267,5 +267,13 @@ class Clocked:
 
     def save_index(self):
         with _lock:
-            (self.recordings / "index.json").write_text(
-                json.dumps(self._index, indent=0, sort_keys=True), encoding="utf-8")
+            idx_file = self.recordings / "index.json"
+            merged = {}
+            if idx_file.exists():  # another process may have added entries meanwhile
+                try:
+                    merged = json.loads(idx_file.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    merged = {}
+            merged.update(self._index)
+            self._index = merged
+            idx_file.write_text(json.dumps(merged, indent=0, sort_keys=True), encoding="utf-8")

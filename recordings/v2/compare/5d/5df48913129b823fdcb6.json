@@ -1,0 +1,151 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5d/5df48913129b823fdcb6",
+ "request_hash": "5df48913129b823fdcb64f98aa6adab2edf4accba296dfdc55a881348b0d1cab",
+ "recorded_at": "2026-11-06T14:15:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1119,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "224.57843",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=419"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "text": "## Population where condition\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nWhen you use populate hints in `em.find()` and similar methods, by default all related entities are populated. Consider the following example - it would find all authors that have books with given IDs, and populate their books collection with **all** books, not just those matching the condition:\n\n```ts\n// finds authors with books 1, 2, 3 - but populates ALL their books\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nIf you wanted to populate only the books that match the filter condition, you can use `PopulateHint.INFER`:\n\n```ts\n// finds authors with books 1, 2, 3 - and populates ONLY those books\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```\n\nThis behaviour is configurable both globally and locally via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` (default) and `PopulateHint.INFER`. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\nMikroORM.init({\n  populateWhere: PopulateHint.INFER, // infer populate condition from the filter\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "text": "## Population no longer infers the where condition by default\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nPreviously when you used populate hints in `em.find()` and similar methods, the query for your entity would be analysed and parts of it extracted and used for the population. Following example would find all authors that have books with given IDs, and populate their books collection, again using this PK condition, resulting in only such books being in those collections.\n\n```ts\n// this would end up with `Author.books` collections having only books of PK 1, 2, 3\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nFollowing this example, if you wanted to load all books, you would need a separate `em.populate()` call:\n\n```ts\nconst a = await em.find(Author, { books: [1, 2, 3] });\nawait em.populate(a, ['books']);\n```\n\nThis behaviour changed and is now configurable both globally and locally, via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` and `PopulateHint.INFER`, the former being the default in v5, the latter being the default behaviour in v4. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\n// revert back to the old behaviour locally\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18"
+    ],
+    "conflicts": [
+     "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18"
+    ]
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/configuration.md#23"
+    ],
+    "conflicts": [
+     "mikro-orm:docs/docs/configuration.md#23"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/configuration.md#23",
+    "b": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "relation": "conflicting",
+    "related": 0.9893,
+    "probabilities": {
+     "same": 0.0147,
+     "overlapping": 0.1618,
+     "conflicting": 0.8129,
+     "unrelated": 0.0107
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0068,
+       "restated": 0.9649,
+       "elaborated": 0.0181,
+       "different": 0.0102
+      },
+      "confidence": 0.9898,
+      "a": {
+       "document": "mikro-orm:docs/docs/configuration.md#23",
+       "quote": "Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.",
+       "start": 1055,
+       "end": 1171,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+       "quote": "Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\n// revert back to the old behaviour locally\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```",
+       "start": 1165,
+       "end": 1456,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": [
+     {
+      "kind": "rule_or_condition",
+      "kinds": {
+       "value": 0.0045,
+       "date_or_version": 0.0078,
+       "rule_or_condition": 0.9643,
+       "scope": 0.0102,
+       "name": 0.0042,
+       "no_conflict": 0.0089
+      },
+      "confidence": 0.696,
+      "a": {
+       "document": "mikro-orm:docs/docs/configuration.md#23",
+       "quote": "When you use populate hints in `em.find()` and similar methods, by default all related entities are populated.",
+       "start": 117,
+       "end": 227,
+       "confidence": 0.696
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+       "quote": "Following example would find all authors that have books with given IDs, and populate their books collection, again using this PK condition, resulting in only such books being in those collections.\n\n```ts\n// this would end up with `Author.books` collections having only books of PK 1, 2, 3\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nFollowing this example, if you wanted to load all books, you would need a separate `em.populate()` call:\n\n```ts\nconst a = await em.find(Author, { books: [1, 2, 3] });\nawait em.populate(a, ['books']);\n```\n\nThis behaviour changed and is now configurable both globally and locally, via `populateWhere` option.",
+       "start": 324,
+       "end": 1005,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 5,
+   "counterparts_ms": 95,
+   "kinds_ms": 26
+  },
+  "timing": {
+   "read_ms": 240,
+   "total_ms": 244
+  }
+ }
+}

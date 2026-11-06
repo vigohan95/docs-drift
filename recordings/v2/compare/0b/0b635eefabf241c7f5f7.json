@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0b/0b635eefabf241c7f5f7",
+ "request_hash": "0b635eefabf241c7f5f7327239b50b04e1c8e9976609b1a7b70cdf05aefd0b1a",
+ "recorded_at": "2026-11-06T14:14:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 842,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.526463",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=177"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_6.md#0",
+    "text": "# Migrating from 5.x to 6.x\n\n<style>\n  ul > li {\n    padding: 4px 0px;\n  }\n</style>\n\nPlease note: we plan to discontinue Mongoose 5 support on March 1, 2024.\nPlease see our [version support guide](./version-support.html).\n\nThere are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)\nyou should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.\n\nIf you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration guide](migrating_to_5.html) and upgrade to Mongoose 5.x first.\n\n* [Version Requirements](#version-requirements)\n* [MongoDB Driver 4.0](#mongodb-driver-40)\n* [No More Deprecation Warning Options](#no-more-deprecation-warning-options)\n* [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)\n* [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)\n* [Duplicate Query Execution](#duplicate-query-execution)\n* [`Model.exists()` Returns a lean document instead of Boolean](#model-exists-returns-a-lean-document-instead-of-boolean)\n* [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)\n* [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)\n* [Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()`](#simplified-isvalidobjectid-and-separate-isobjectidorhexstring)\n* [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)\n* [Schema Defined Document Key Order](#schema-defined-document-key-order)\n* [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)\n* [Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`](#removed-omitundefined)\n* [Document Parameter to Default Functions](#document-parameter-to-default-functions)\n* [Arrays are Proxies](#arrays-are-proxies)\n* [`typePojoToMixed`](#typepojotomixed)\n* [`strictPopulate()`](#strictpopulate)\n* [Subdocument `ref` Function Context](#subdocument-ref-function-context)\n* [Schema Reserved Names Warning](#schema-reserved-names-warning)\n* [Subdocument Paths](#subdocument-paths)\n* [Creating Aggregation Cursors](#creating-aggregation-cursors)\n* [`autoCreate` Defaults to `true`](#autocreate-defaults-to-true)\n* [No More `context: 'query'`](#no-more-context-query)\n* [Custom Validators with Populated Paths](#custom-validators-with-populated-paths)\n* [Disconnected Event with Replica Sets](#disconnected-event-with-replica-sets)\n* [Removed `execPopulate()`](#removed-execpopulate)\n* [`create()` with Empty Array](#create-with-empty-array)\n* [Removed Nested Path Merging](#removed-nested-path-merging)\n* [ObjectId `valueOf()`](#objectid-valueof)\n* [Immutable `createdAt`](#immutable-createdat)\n* [Removed Validator `isAsync`](#removed-validator-isasync)\n* [Removed `safe`](#removed-safe)\n* [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)\n* [No default model for `Query.prototype.populate()`](#no-default-model-for-query-prototype-populate)\n* [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)\n* [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)\n* [MongoDB Driver's New URL Parser Incompatible with Some npm Packages](#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages)\n* [Lodash `.isEmpty()` returns false for ObjectIds](#lodash-object-id)\n* [mongoose.modelSchemas removed](#model-schemas)"
+   },
+   {
+    "id": "mongoose:docs/schematypes.md#23",
+    "text": "### Double {#double}\n\nMongoose supports [64-bit IEEE 754-2008 floating point numbers](https://en.wikipedia.org/wiki/IEEE_754-2008_revision) as a SchemaType.\nDoubles are stored as [BSON type \"double\" in MongoDB](https://www.mongodb.com/docs/manual/reference/bson-types/).\n\n```javascript\nconst temperatureSchema = new Schema({\n  celsius: Double\n});\nconst Temperature = mongoose.model('Temperature', temperatureSchema);\n\nconst temperature = new Temperature({ celsius: 1339 });\ntemperature.celsius instanceof bson.Double; // true\n```\n\nThere are several types of values that will be successfully cast to a Double.\n\n```javascript\nnew Temperature({ celsius: '1.2e12' }).celsius; // 1200000000000 as a Double\nnew Temperature({ celsius: true }).celsius; // 1 as a Double\nnew Temperature({ celsius: false }).celsius; // 0 as a Double\nnew Temperature({ celsius: { valueOf: () => 83.0033 } }).celsius; // 83 as a Double\nnew Temperature({ celsius: '' }).celsius; // null\n```\n\nThe following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:\n\n* strings that do not represent a numeric string, a NaN or a null-ish value\n* objects that don't have a `valueOf()` function\n* an input that represents a value outside the bounds of a IEEE 754-2008 floating point"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_6.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/schematypes.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/migrating_to_6.md#0",
+    "b": "mongoose:docs/schematypes.md#23",
+    "relation": "unrelated",
+    "related": 0.0034,
+    "probabilities": {
+     "same": 0.0012,
+     "overlapping": 0.0011,
+     "conflicting": 0.0012,
+     "unrelated": 0.9966
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 43
+  },
+  "timing": {
+   "read_ms": 43,
+   "total_ms": 47
+  }
+ }
+}

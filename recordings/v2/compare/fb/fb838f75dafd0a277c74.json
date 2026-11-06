@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/fb/fb838f75dafd0a277c74",
+ "request_hash": "fb838f75dafd0a277c74c91d91379db2d3e84336cf250e4255d81f7c4d154640",
+ "recorded_at": "2026-11-06T14:13:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1117,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "122.691231",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=331"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#2",
+    "text": "### `RunnableDevEnvironment`\n\n`RunnableDevEnvironment` is an environment that can communicate arbitrary JavaScript values with your application code. Importing a module returns its real, live exports (functions, class instances, and any other values), so frameworks can run their server entries directly. The implicit `ssr` environment and other non-client environments use a `RunnableDevEnvironment` by default during dev. You can guard access to the runner with the `isRunnableDevEnvironment` function.\n\nIts `runner` is a `ModuleRunner`. You import modules through it with `runner.import(url)`, which fetches, transforms, and evaluates a module from the Vite module graph (the `url` accepts a file path, server path, or id relative to the root) and returns the instantiated module with full HMR support. It is the modern replacement for `server.ssrLoadModule`, so frameworks can migrate to it to enable HMR for their SSR dev story.\n\n:::info Why it can communicate arbitrary values\nA `RunnableDevEnvironment` evaluates modules in the same runtime as the Vite server, so values cross the boundary in-process instead of being serialized. This is what distinguishes it from [`FetchableDevEnvironment`](#fetchabledevenvironment), which can only communicate through serialized `Request`/`Response` objects over the Fetch API. As a result, using a `RunnableDevEnvironment` requires the runner's runtime to be the same as the one the Vite server is running in.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#5",
+    "text": "## `ModuleRunner`\n\nA module runner is instantiated in the target runtime. All APIs in the next section are imported from `vite/module-runner` unless stated otherwise. This export entry point is kept as lightweight as possible, only exporting the minimal needed to create module runners.\n\n**Type Signature:**\n\n```ts\nexport class ModuleRunner {\n  constructor(\n    public options: ModuleRunnerOptions,\n    public evaluator: ModuleEvaluator = new ESModulesEvaluator(),\n    private debug?: ModuleRunnerDebugger,\n  ) {}\n  /**\n   * URL to execute.\n   * Accepts file path, server path, or id relative to the root.\n   */\n  public async import<T = any>(url: string): Promise<T>\n  /**\n   * Clear all caches including HMR listeners.\n   */\n  public clearCache(): void\n  /**\n   * Clear all caches, remove all HMR listeners, reset sourcemap support.\n   * This method doesn't stop the HMR connection.\n   */\n  public async close(): Promise<void>\n  /**\n   * Returns `true` if the runner has been closed by calling `close()`.\n   */\n  public isClosed(): boolean\n}\n```\n\nThe module evaluator in `ModuleRunner` is responsible for executing the code. Vite exports `ESModulesEvaluator` out of the box, it uses `new AsyncFunction` to evaluate the code. You can provide your own implementation if your JavaScript runtime doesn't support unsafe evaluation.\n\nModule runner exposes `import` method. When Vite server triggers `full-reload` HMR event, all affected modules will be re-executed. Be aware that Module Runner doesn't update `exports` object when this happens (it overrides it), you would need to run `import` or get the module from `evaluatedModules` again if you rely on having the latest `exports` object.\n\n**Example Usage:**\n\n```js\nimport {\n  ModuleRunner,\n  ESModulesEvaluator,\n  createNodeImportMeta,\n} from 'vite/module-runner'\nimport { transport } from './rpc-implementation.js'\n\nconst moduleRunner = new ModuleRunner(\n  {\n    transport,\n    createImportMeta: createNodeImportMeta, // if the module runner runs in Node.js\n  },\n  new ESModulesEvaluator(),\n)\n\nawait moduleRunner.import('/src/entry-point.js')\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-frameworks.md#2",
+    "b": "vite:docs/guide/api-environment-runtimes.md#5",
+    "relation": "overlapping",
+    "related": 0.997,
+    "probabilities": {
+     "same": 0.0075,
+     "overlapping": 0.9862,
+     "conflicting": 0.0033,
+     "unrelated": 0.003
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 97,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 131,
+   "total_ms": 135
+  }
+ }
+}

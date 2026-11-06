@@ -1,0 +1,76 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/aa/aa48ab391cfa73553918",
+ "request_hash": "aa48ab391cfa73553918a8b136bf371f35784664b5d94d97d5c479d2424b92f8",
+ "recorded_at": "2026-11-06T14:12:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1138,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "69.800991",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=296"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#19",
+    "text": "### Start timestamp encoding\n\nThe ST header is one byte:\n\n  ```\n  ┌───────────────────────┬───────────────────────┐\n  │ first_st_known<1 bit> │ st_changed_on<7 bits> │\n  └───────────────────────┴───────────────────────┘\n  ```\n\nwhere the highest bit `first_st_known` indicates if `st_0` is present or not.\nIf the lower 7bits `st_changed_on` is 0, no `st_i (i>0)` is present.\nOtherwise `st_i (i>=st_changed_on)` is present, while\n`st_i (0<i<st_changed_on)` is not present.\n\nOnce a chunk has at least 127 samples,\n`st_changed_on` is set to 127 (0x7F) and the 128th and further samples will\nhave `st_i` present.\n\n* `st_0` is encoded as a `<varint>` if present.\n* `st_1` is encoded as a `<varbit_int>` delta from the timestamp of the\n  previous sample (or from 0 if not previously set).\n* `st_i` (i > 1) is encoded as a `<varbit_int>` \"delta of delta\" of the ST\n  difference from the previous sample."
+   }
+  ],
+  "answer": "Due to the 7 bit limitation, once a chunk has at least 127 samples, `st_changed_on` is set to 127 (0xEF) and the 127th and further samples will have `st_i` present.",
+  "claims": [
+   "Due to the 7 bit limitation, once a chunk has at least 127 samples, `st_changed_on` is set to 127 (0xEF) and the 127th and further samples will have `st_i` present."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0027,
+  "ungrounded": 0.9973,
+  "verdict": "contradicted",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#19",
+    "share": 0,
+    "share_of_answer": 0.0027,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Due to the 7 bit limitation, once a chunk has at least 127 samples, `st_changed_on` is set to 127 (0xEF) and the 127th and further samples will have `st_i` present.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0027,
+    "contradicted": 0.9898,
+    "not_stated": 0.0043,
+    "not_a_claim": 0.0033,
+    "verdict": "contradicted",
+    "sources": {
+     "prometheus:tsdb/docs/format/chunks.md#19": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0027
+  },
+  "timing": {
+   "read_ms": 127,
+   "total_ms": 130
+  }
+ }
+}

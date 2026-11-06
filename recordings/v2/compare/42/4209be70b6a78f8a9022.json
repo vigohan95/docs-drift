@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/42/4209be70b6a78f8a9022",
+ "request_hash": "4209be70b6a78f8a90225b7d23d6e0349beb8a2754ae0b29bc33bb854e2b302f",
+ "recorded_at": "2026-11-06T14:15:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 956,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "95.810434",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=252"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#1",
+    "text": "## Persist and Flush\n\nThere are 2 methods you should first understand to learn how persisting works in MikroORM: `em.persist()` and `em.flush()`.\n\n`em.persist(entity)` is used to mark new entities for future persisting. It will make the entity managed by given `EntityManager` and once `flush` will be called, it will be written to the database.\n\nTo understand `flush`, lets first define what managed entity is: An entity is managed if it’s fetched from the database (via `em.find()`, `em.findOne()` or via other managed entity) or registered as new through `em.persist()`.\n\n`em.flush()` will go through all managed entities, compute appropriate change sets and perform according database queries. As an entity loaded from database becomes managed automatically, you do not have to call persist on those, and flush is enough to update them.\n\n```ts\nconst book = await em.findOne(Book, 1);\nbook.title = 'How to persist things...';\n\n// no need to persist `book` as its already managed by the EM\nawait em.flush();\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#13",
+    "text": "```ts\nconst user = await em.findOne(UserSchema, 1);\nuser.bio = '...';\n\n// no need to persist `user` as it's already managed by the EM\nawait em.flush();\n```\n\nLet's try to create our first record in the database, add this to the `server.ts` file:\n\n```ts title='server.ts'\nimport { MikroORM } from '@mikro-orm/sqlite';\nimport config from './mikro-orm.config.js';\nimport { UserSchema } from './modules/user/user.entity.js';\n\nconst orm = await MikroORM.init(config);\n\n// create new user entity instance via em.create()\nconst user = orm.em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\n\n// em.create() auto-persists, so just flush\nawait orm.em.flush();\n\n// after the entity is flushed, it becomes managed, and has the PK available\nconsole.log('user id is:', user.id);\n```\n\nNow run the script again via `npm start`, and you will see an error:\n\n```\nValidationError: Using global EntityManager instance methods for context specific actions is disallowed.\nIf you need to work with the global instance's identity map, use `allowGlobalContext` configuration option\nor `fork()` instead.\n```\n\nRemember we said the `orm.em` is a global [`EntityManager`](/api/core/class/EntityManager) instance? Looks like it is not a good idea to use it, in fact, it is disallowed by default. Before we get to the bottom of this message, let's quickly define two more terms we haven't touched yet - the Identity Map and Unit of Work."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-manager.md#1",
+    "b": "mikro-orm:docs/docs/guide/01-first-entity.md#13",
+    "relation": "overlapping",
+    "related": 0.9918,
+    "probabilities": {
+     "same": 0.0381,
+     "overlapping": 0.9424,
+     "conflicting": 0.0113,
+     "unrelated": 0.0082
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 74,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 105,
+   "total_ms": 108
+  }
+ }
+}

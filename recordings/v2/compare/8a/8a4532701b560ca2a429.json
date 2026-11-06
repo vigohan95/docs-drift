@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/8a/8a4532701b560ca2a429",
+ "request_hash": "8a4532701b560ca2a429f3510cdede5eef66750ac7d9ce0964e2f11cd56fcea9",
+ "recorded_at": "2026-11-06T14:13:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 906,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.822464",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=160"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/ECMAScriptModules.md#3",
+    "text": "## Divergences from Node\n\nJest's module system diverges from Node's in a few places:\n\n- In a graph that mixes ESM and CJS, the CJS dependencies execute after the graph resolves but before the ESM bodies run, so a CJS module can run earlier relative to its ESM siblings than it would in Node. As in Node, a graph with a resolution or import-attribute error executes nothing on Node 24.9+; the legacy loader on older versions still executes a CJS dependency while linking, before a later graph error surfaces.\n- Automock metadata is collected after the importing graph resolves, one mocked module at a time: each decision loads its real module, so a load failure in one mocked module's own graph does not undo the metadata loads that came before it.\n- The named exports of a CJS module imported from ESM are a superset of Node's: keys present on `module.exports` after evaluation are exposed in addition to what static analysis finds.\n- Writes to and deletes from `require.cache` are silently ignored.\n- The static members of `require('module')` (such as `Module._resolveFilename`) come from the host Node, not from Jest's module system.\n- `require()` of an ES module that is part of a graph currently being loaded throws `ERR_REQUIRE_CYCLE_MODULE` even when the required module is not an ancestor of the requiring module.\n- The `'module.exports'` named export of an imported CJS module is exposed on every Node version, including versions older than v23 where Node itself does not provide it.\n- Importing JSON without `with {type: 'json'}` emits a warning instead of throwing. This becomes an error in a future major version.\n- An `application/wasm` data: URI requires the `;base64` parameter and reports a descriptive error without it, where Node hands the percent-decoded text to WebAssembly and fails with `CompileError`.\n- A bare core specifier with a query or fragment (`import 'fs?q'`) throws `ERR_UNKNOWN_BUILTIN_MODULE`, where Node treats the whole string as a package name and fails with `ERR_MODULE_NOT_FOUND`. The `node:`-prefixed form throws the same error in both.\n- Source phase imports (`import source` / `import.source()`, used for WebAssembly) throw `ERR_SOURCE_PHASE_NOT_DEFINED`: Node attaches the compiled `WebAssembly.Module` to the target through an internal API that `node:vm` does not expose, so Jest cannot provide the source object.\n- Stack traces show file paths, not `file://` URLs."
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#1",
+    "text": "## Compatibility\n\n- Jest 30 drops support for Node 14, 16, 19, and 21. The minimum supported Node versions are now 18.x. Ensure your environment is using a compatible Node release before upgrading.\n- The minimum TypeScript version is now 5.4. Update TypeScript, if you are using type definitions of Jest (or any of its packages).\n- The `jest-environment-jsdom` package now uses JSDOM v26. This update may introduce behavior changes in the DOM environment. If you encounter differences in DOM behavior or new warnings, refer to the JSDOM release notes for [v21–26](https://github.com/jsdom/jsdom/compare/v21.0.0...v26.0.0)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/ECMAScriptModules.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/UpgradingToJest30.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/ECMAScriptModules.md#3",
+    "b": "jest:docs/UpgradingToJest30.md#1",
+    "relation": "unrelated",
+    "related": 0.0052,
+    "probabilities": {
+     "same": 0.0022,
+     "overlapping": 0.0017,
+     "conflicting": 0.0013,
+     "unrelated": 0.9948
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36
+  },
+  "timing": {
+   "read_ms": 36,
+   "total_ms": 38
+  }
+ }
+}

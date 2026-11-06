@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/55/55ad26a8d4ecf901aad0",
+ "request_hash": "55ad26a8d4ecf901aad0f30f06ea980bc4ac48ca27f15333c7b428af37c8e23e",
+ "recorded_at": "2026-11-06T14:18:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1343,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "235.987007",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=443"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "text": "#### Infinite Query endpoint definition\n\nInfinite query endpoints (defined with `build.infiniteQuery()`) are used to cache multi-page data sets from the server. They have all the same callbacks and options as standard query endpoints, but also require an additional [`infiniteQueryOptions`](#infinitequeryoptions) field to specify how to calculate the unique parameters to fetch each page.\n\nFor infinite query endpoints, there is a separation between the \"query arg\" used for the cache key, and the \"page param\" used to fetch a specific page. For example, a Pokemon API endpoint might have a string query arg like `\"fire\"` , but use a page number as the param to determine which page to fetch out of the results. The `query` and `queryFn` methods will receive a combined `{queryArg, pageParam}` object as the argument, rather than just the `queryArg` by itself.\n\n```ts title=\"Infinite Query endpoint definition\" no-transpile\nexport type PageParamFunction<DataType, PageParam, QueryArg> = (\n  firstPage: DataType,\n  allPages: Array<DataType>,\n  firstPageParam: PageParam,\n  allPageParams: Array<PageParam>,\n  queryArg: QueryArg,\n) => PageParam | undefined | null\n\ntype InfiniteQueryCombinedArg<QueryArg, PageParam> = {\n  queryArg: QueryArg\n  pageParam: PageParam\n}\n\nexport type InfiniteQueryDefinition<\n  QueryArg,\n  PageParam,\n  BaseQuery extends BaseQueryFn,\n  TagTypes extends string,\n  ResultType,\n  ReducerPath extends string = string,\n> =\n  // Infinite queries have all the same options as query endpoints,\n  // but store the `{pages, pageParams}` structure, and receive an object\n  // with both `{queryArg, pageParam}` as the arg for `query` and `queryFn`.\n  QueryDefinition<\n    InfiniteQueryCombinedArg<QueryArg, PageParam>,\n    BaseQuery,\n    TagTypes,\n    InfiniteData<ResultType>\n  > & {\n    /**\n     * Required options to configure the infinite query behavior.\n     * `initialPageParam` and `getNextPageParam` are required, to\n     * ensure the infinite query can properly fetch the next page of data.\n     * `initialPageParam` may be specified when using the\n     * endpoint, to override the default value.\n     */\n    infiniteQueryOptions: {\n      /**\n       * The initial page parameter to use for the first page fetch.\n       */\n      initialPageParam: PageParam\n      /**\n       * This function is required to automatically get the next cursor for infinite queries.\n       * The result will also be used to determine the value of `hasNextPage`.\n       */\n      getNextPageParam: PageParamFunction<DataType, PageParam, QueryArg>\n      /**\n       * This function can be set to automatically get the previous cursor for infinite queries.\n       * The result will also be used to determine the value of `hasPreviousPage`.\n       */\n      getPreviousPageParam?: PageParamFunction<DataType, PageParam, QueryArg>\n      /**\n       * If specified, only keep this many pages in cache at once.\n       * If additional pages are fetched, older pages in the other\n       * direction will be dropped from the cache.\n       */\n      maxPages?: number\n      /**\n       * Defaults to `true`. When this is `true` and an infinite query endpoint is refetched\n       * (due to tag invalidation, polling, arg change configuration, or manual refetching),\n       * RTK Query will try to sequentially refetch all pages currently in the cache.\n       * When `false` only the first page will be refetched.\n       */\n      refetchCachedPages?: boolean\n    }\n  }\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#3",
+    "text": "### Query Args, Page Params, and Cache Structure\n\nWith standard query endpoints:\n\n- You specify the \"query arg\" value, which is passed to the `query` or `queryFn` function that will calculate the desired URL or do the actual fetching\n- The query arg is also serialized to generate the unique internal key for this specific cache entry\n- The single response value is directly stored as the `data` field in the cache entry\n\nInfinite queries work similarly, but have a couple additional layers:\n\n- You still specify a \"query arg\", which is still used to generate the unique cache key for this specific cache entry\n- However, there is a separation between the \"query arg\" used for the cache key, and the \"page param\" used to fetch a specific page. Since both are useful for determining what to fetch, **your `query` and `queryFn` methods will receive a combined object with `{queryArg, pageParam}` as the first argument, instead of just the `queryArg` by itself**.\n- The `data` field in the cache entry stores a `{pages: DataType[], pageParams: PageParam[]}` structure that contains _all_ of the fetched page results and their corresponding page params used to fetch them.\n\nFor example, a Pokemon API endpoint might have a string query arg like `\"fire\"`, but use a page number as the param to determine which page to fetch out of the results. For a query like `useGetPokemonInfiniteQuery('fire')`, the resulting cache data might look like this:\n\n```ts no-transpile\n{\n  queries: {\n    \"getPokemon('fire')\": {\n      data: {\n        pages: [\n          [\"Charmander\", \"Charmeleon\"],\n          [\"Charizard\", \"Vulpix\"],\n          [\"Magmar\", \"Flareon\"]\n        ],\n        pageParams: [\n          1,\n          2,\n          3\n        ]\n      }\n    }\n  }\n}\n```\n\nThis structure allows flexibility in how your UI chooses to render the data (showing individual pages, flattening into a single list), enables limiting how many pages are kept in cache, and makes it possible to dynamically determine the next or previous page to fetch based on either the data or the page params."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#3",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/api/createApi.mdx#10"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "b": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#3",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0082,
+     "overlapping": 0.9865,
+     "conflicting": 0.0032,
+     "unrelated": 0.0022
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0049,
+       "restated": 0.9788,
+       "elaborated": 0.0113,
+       "different": 0.005
+      },
+      "confidence": 0.995,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "For example, a Pokemon API endpoint might have a string query arg like `\"fire\"` , but use a page number as the param to determine which page to fetch out of the results.",
+       "start": 543,
+       "end": 712,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#3",
+       "quote": "### Query Args, Page Params, and Cache Structure\n\nWith standard query endpoints:\n\n- You specify the \"query arg\" value, which is passed to the `query` or `queryFn` function that will calculate the desired URL or do the actual fetching\n- The query arg is also serialized to generate the unique internal key for this specific cache entry\n- The single response value is directly stored as the `data` field in the cache entry\n\nInfinite queries work similarly, but have a couple additional layers:\n\n- You still specify a \"query arg\", which is still used to generate the unique cache key for this specific cache entry\n- However, there is a separation between the \"query arg\" used for the cache key, and the \"page param\" used to fetch a specific page.",
+       "start": 0,
+       "end": 743,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0069,
+       "restated": 0.9797,
+       "elaborated": 0.0091,
+       "different": 0.0042
+      },
+      "confidence": 0.9958,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "The `query` and `queryFn` methods will receive a combined `{queryArg, pageParam}` object as the argument, rather than just the `queryArg` by itself.",
+       "start": 713,
+       "end": 861,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#3",
+       "quote": "Since both are useful for determining what to fetch, **your `query` and `queryFn` methods will receive a combined object with `{queryArg, pageParam}` as the first argument, instead of just the `queryArg` by itself**.\n- The `data` field in the cache entry stores a `{pages: DataType[], pageParams: PageParam[]}` structure that contains _all_ of the fetched page results and their corresponding page params used to fetch them.\n\nFor example, a Pokemon API endpoint might have a string query arg like `\"fire\"`, but use a page number as the param to determine which page to fetch out of the results.",
+       "start": 744,
+       "end": 1338,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 43,
+   "passage_reads": 1,
+   "passages_ms": 91,
+   "passages": 2,
+   "counterparts_ms": 116
+  },
+  "timing": {
+   "read_ms": 250,
+   "total_ms": 256
+  }
+ }
+}

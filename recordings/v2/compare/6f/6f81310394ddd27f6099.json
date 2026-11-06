@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6f/6f81310394ddd27f6099",
+ "request_hash": "6f81310394ddd27f60991a130908a1916fd5a91afeea7df8fdf5235b4fa2c5e4",
+ "recorded_at": "2026-11-06T14:18:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 965,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "45.320897",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=194"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+    "text": "### Typing Async Thunks Inside `createSlice`\n\nAs of 2.0, `createSlice` allows [defining thunks inside of `reducers` using a callback syntax](../api/createSlice.mdx#the-reducers-creator-callback-notation).\n\nTyping for the `create.asyncThunk` method works in the same way as [`createAsyncThunk`](#createasyncthunk), with one key difference.\n\nA type for `state` and/or `dispatch` _cannot_ be provided as part of the `ThunkApiConfig`, as this would cause circular types.\n\nInstead, it is necessary to assert the type when needed - `getState() as RootState`. You may also include an explicit return type for the payload function as well, in order to break the circular type inference cycle.\n\n```ts no-transpile\ncreate.asyncThunk<Todo, string, { rejectValue: { error: string } }>(\n  // highlight-start\n  // may need to include an explicit return type\n  async (id: string, thunkApi): Promise<Todo> => {\n    // Cast types for `getState` and `dispatch` manually\n    const state = thunkApi.getState() as RootState\n    const dispatch = thunkApi.dispatch as AppDispatch\n    // highlight-end\n    try {\n      const todo = await fetchTodo()\n      return todo\n    } catch (e) {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no!',\n      })\n    }\n  },\n)\n```\n\nFor common thunk API configuration options, a [`withTypes` helper](../usage/usage-with-typescript#defining-a-pre-typed-createasyncthunk) is provided:\n\n```ts no-transpile\nreducers: (create) => {\n  const createAThunk = create.asyncThunk.withTypes<{\n    rejectValue: { error: string }\n  }>()\n\n  return {\n    fetchTodo: createAThunk<Todo, string>(async (id, thunkApi) => {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no!',\n      })\n    }),\n    fetchTodos: createAThunk<Todo[], string>(async (id, thunkApi) => {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no, not again!',\n      })\n    }),\n  }\n}\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage-with-typescript.mdx#12",
+    "text": "### Typing `dispatch` and `getState`\n\n`createApi` exposes the standard Redux `dispatch` and `getState` methods in several places, such as the `lifecycleApi` argument in lifecycle methods, or the `baseQueryApi` argument passed to `queryFn` methods and base query functions.\n\nNormally, [your application infers `RootState` and `AppDispatch` types from the store setup](/tutorials/quick-start#define-root-state-and-dispatch-types). Since `createApi` has to be called prior to creating the Redux store and is used as part of the store setup sequence, it can't directly know or use those types - it would cause a circular type inference error.\n\nBy default, `dispatch` usages inside of `createApi` will be typed as `ThunkDispatch`, and `getState` usages are typed as `() => unknown`. You will need to assert the type when needed - `getState() as RootState`. You may also include an explicit return type for the function as well, in order to break the circular type inference cycle:\n\n```ts no-transpile\nconst api = createApi({\n  baseQuery,\n  endpoints: (build) => ({\n    getTodos: build.query<Todo[], void>({\n      async queryFn() {\n        // highlight-start\n        // Cast state as `RootState`\n        const state = getState() as RootState\n        // highlight-end\n        const text = state.todoTexts[queryFnCalls]\n        return { data: [{ id: `${queryFnCalls++}`, text }] }\n      },\n    }),\n  }),\n})\n```\n\nIf you need the type of the state that contains only the API slice, use `ApiRootState<Definitions, TagTypes, ReducerPath>` from `@reduxjs/toolkit/query`. It replaces RTK Query's `RootState` type export, which is now deprecated because it is easy to auto-import by mistake in place of your app's own `RootState` type."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage-with-typescript.mdx#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+    "b": "redux-toolkit:docs/rtk-query/usage-with-typescript.mdx#12",
+    "relation": "unrelated",
+    "related": 0.1303,
+    "probabilities": {
+     "same": 0.0203,
+     "overlapping": 0.091,
+     "conflicting": 0.0191,
+     "unrelated": 0.8697
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 56
+  },
+  "timing": {
+   "read_ms": 55,
+   "total_ms": 59
+  }
+ }
+}

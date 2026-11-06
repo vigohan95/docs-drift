@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/70/702897f2fb79f48d5119",
+ "request_hash": "702897f2fb79f48d5119e515c399819a00d864c2ce13e0d183e0751cfdeb22f5",
+ "recorded_at": "2026-11-06T14:20:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2109,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "174.628544",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=362"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/config/include-source.md#1",
+    "text": "## Example\n\n```js\nimport { defineConfig } from 'vitest/config'\n\nexport default defineConfig({\n  test: {\n    includeSource: ['src/**/*.{js,ts}'],\n  },\n})\n```\n\nThen you can write tests inside your source files:\n\n```ts [src/index.ts]\nexport function add(...args: number[]) {\n  return args.reduce((a, b) => a + b, 0)\n}\n\n// #region in-source test suites\nif (import.meta.vitest) {\n  const { it, expect } = import.meta.vitest\n  it('add', () => {\n    expect(add()).toBe(0)\n    expect(add(1)).toBe(1)\n    expect(add(1, 2, 3)).toBe(6)\n  })\n}\n// #endregion\n```\n\nFor your production build, you need to replace the `import.meta.vitest` with `undefined`, letting the bundler do the dead code elimination.\n\n::: code-group\n\n```js [vite.config.ts]\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  define: { // [!code ++]\n    'import.meta.vitest': 'undefined', // [!code ++]\n  }, // [!code ++]\n})\n```\n\n```js [rolldown.config.js]\nimport { defineConfig } from 'rolldown/config'\n\nexport default defineConfig({\n  transform: {\n    define: { // [!code ++]\n      'import.meta.vitest': 'undefined', // [!code ++]\n    }, // [!code ++]\n  },\n})\n```\n\n```js [rollup.config.js]\nimport replace from '@rollup/plugin-replace' // [!code ++]\n\nexport default {\n  plugins: [\n    replace({ // [!code ++]\n      'import.meta.vitest': 'undefined', // [!code ++]\n    }) // [!code ++]\n  ],\n  // other options\n}\n```\n\n```js [build.config.js]\nimport { defineBuildConfig } from 'unbuild'\n\nexport default defineBuildConfig({\n  replace: { // [!code ++]\n    'import.meta.vitest': 'undefined', // [!code ++]\n  }, // [!code ++]\n  // other options\n})\n```\n\n```js [webpack.config.js]\nconst webpack = require('webpack')\n\nmodule.exports = {\n  plugins: [\n    new webpack.DefinePlugin({ // [!code ++]\n      'import.meta.vitest': 'undefined', // [!code ++]\n    })// [!code ++]\n  ],\n}\n```\n\n:::\n\n::: tip\nTo get TypeScript support for `import.meta.vitest`, add `vitest/importMeta` to your `tsconfig.json`:\n\n```json [tsconfig.json]\n{\n  \"compilerOptions\": {\n    \"types\": [\"vitest/importMeta\"]\n  }\n}\n```\n\n:::"
+   },
+   {
+    "id": "vitest:docs/guide/in-source.md#3",
+    "text": "## Production Build\n\nFor the production build, you will need to set the `define` options in your config file, letting the bundler do the dead code elimination. For example, in Vite\n\n```ts [vite.config.ts]\n/// <reference types=\"vitest/config\" />\n\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  test: {\n    includeSource: ['src/**/*.{js,ts}'],\n  },\n  define: { // [!code ++]\n    'import.meta.vitest': 'undefined', // [!code ++]\n  }, // [!code ++]\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/config/include-source.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/guide/in-source.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/in-source.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/config/include-source.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/config/include-source.md#1",
+    "b": "vitest:docs/guide/in-source.md#3",
+    "relation": "overlapping",
+    "related": 0.9968,
+    "probabilities": {
+     "same": 0.0267,
+     "overlapping": 0.9643,
+     "conflicting": 0.0059,
+     "unrelated": 0.0032
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0152,
+       "restated": 0.9452,
+       "elaborated": 0.0269,
+       "different": 0.0127
+      },
+      "confidence": 0.9873,
+      "a": {
+       "document": "vitest:docs/config/include-source.md#1",
+       "quote": "For your production build, you need to replace the `import.meta.vitest` with `undefined`, letting the bundler do the dead code elimination.",
+       "start": 551,
+       "end": 690,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/guide/in-source.md#3",
+       "quote": "## Production Build\n\nFor the production build, you will need to set the `define` options in your config file, letting the bundler do the dead code elimination.",
+       "start": 0,
+       "end": 159,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.038,
+       "restated": 0.8728,
+       "elaborated": 0.0725,
+       "different": 0.0167
+      },
+      "confidence": 0.9833,
+      "a": {
+       "document": "vitest:docs/config/include-source.md#1",
+       "quote": "```js [vite.config.ts]",
+       "start": 708,
+       "end": 730,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/guide/in-source.md#3",
+       "quote": "For example, in Vite\n\n```ts [vite.config.ts]\n/// <reference types=\"vitest/config\" />\n\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  test: {\n    includeSource: ['src/**/*.{js,ts}'],\n  },\n  define: { // [!code ++]\n    'import.meta.vitest': 'undefined', // [!code ++]\n  }, // [!code ++]\n})\n```",
+       "start": 160,
+       "end": 473,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 65,
+   "passages": 2,
+   "counterparts_ms": 86
+  },
+  "timing": {
+   "read_ms": 186,
+   "total_ms": 190
+  }
+ }
+}

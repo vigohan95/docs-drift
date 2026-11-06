@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4b/4b07934df72255819242",
+ "request_hash": "4b07934df72255819242d13cd306cc5078465b2d0f0eb9e1b8e7c0a5a0166f51",
+ "recorded_at": "2026-11-06T14:15:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 900,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "71.329376",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=30,cfOrigin;dur=0,cfWorker;dur=198"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#13",
+    "text": "### Implicit Serialization\n\nWhen you call `toJSON()` or `toObject()` on an entity, serialization is driven by the `populate` hints used when loading:\n\n```ts\nconst user = await em.findOne(User, 1, {\n  populate: ['books'],\n  fields: ['name', 'books.title'],\n});\n\nconst dto = wrap(user).toObject();\n// Only includes: id, name, books[].id, books[].title\n```\n\nKey behaviors:\n- Only populated relations are serialized as objects\n- Unpopulated relations serialize as foreign key values\n- The `fields` option controls which properties appear in output"
+   },
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#5",
+    "text": "### Foreign keys and `forceObject`\n\nUnpopulated relations are serialized as foreign key values, e.g. `{ author: 1 }`, if you want to enforce objects, e.g. `{ author: { id: 1 } }`, use `serialization: { forceObject: true }` in your ORM config.\n\nFor strict typings to respect the global config option, you need to define it on your entity class via `Config` symbol:\n\n```ts\nimport { Config, Entity, ManyToOne, PrimaryKey, Ref, wrap } from '@mikro-orm/core';\n\n@Entity()\nclass Book {\n\n  [Config]?: DefineConfig<{ forceObject: true }>;\n\n  @PrimaryKey()\n  id!: number;\n\n  @ManyToOne(() => User, { ref: true })\n  author!: Ref<User>;\n\n}\n\nconst book = await em.findOneOrFail(Book, 1);\nconst dto = wrap(book).toObject();\nconst identityId = dto.author.id; // without the Config symbol, `dto.identity` would resolve to number\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/architecture.md#13",
+    "b": "mikro-orm:docs/docs/serializing.md#5",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0042,
+     "overlapping": 0.9918,
+     "conflicting": 0.0025,
+     "unrelated": 0.0015
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 78,
+   "total_ms": 80
+  }
+ }
+}

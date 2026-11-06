@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/24/2434f8fe9013b726ed5e",
+ "request_hash": "2434f8fe9013b726ed5efff447a3693147c6e217f9cc5dc8cde0fc320fd4af48",
+ "recorded_at": "2026-11-06T14:18:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3337,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "224.502148",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=376"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "text": "## Defining Infinite Query Endpoints\n\nInfinite query endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.infiniteQuery()` method. They are an extension of standard query endpoints - you can specify [the same options as standard queries](./queries.mdx#defining-query-endpoints) (providing either `query` or `queryFn`, customizing with `transformResponse`, lifecycles with `onCacheEntryAdded` and `onQueryStarted`, defining tags, etc). However, they also require an additional `infiniteQueryOptions` field to specify the infinite query behavior.\n\nWith TypeScript, you must supply 3 generic arguments: `build.infiniteQuery<ResultType, QueryArg, PageParam>`, where `ResultType` is the contents of a single page, `QueryArg` is the type passed in as the cache key, and `PageParam` is the value used to request a specific page. If there is no argument, use `void` for the arg type instead."
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+    "text": "## Defining Query Endpoints\n\nQuery endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.query()` method.\n\nQuery endpoints should define either a `query` callback that constructs the URL (including any URL query params), or [a `queryFn` callback](./customizing-queries.mdx#customizing-queries-with-queryfn) that may do arbitrary async logic and return a result.\n\nIf the `query` callback needs additional data to generate the URL, it should be written to take a single argument. If you need to pass in multiple parameters, pass them formatted as a single \"options object\".\n\nQuery endpoints may also modify the response contents before the result is cached, define \"tags\" to identify cache invalidation, and provide cache entry lifecycle callbacks to run additional logic as cache entries are added and removed.\n\nWhen used with TypeScript, you should supply generics for the return type and the expected query argument: `build.query<ReturnType, ArgType>`. If there is no argument, use `void` for the arg type instead.\n\n```ts title=\"Example of all query endpoint options\"\n// file: types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: api.ts\n// Or from '@reduxjs/toolkit/query/react'\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\nimport type { Post } from './types'\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({\n    baseUrl: '/',\n  }),\n  tagTypes: ['Post'],\n  endpoints: (build) => ({\n    // highlight-start\n    // The query accepts a number and returns a Post\n    getPost: build.query<Post, number>({\n      // note: an optional `queryFn` may be used in place of `query`\n      query: (id) => ({ url: `post/${id}` }),\n      // Pick out data and prevent nested properties in a hook or selector\n      transformResponse: (response: { data: Post }, meta, arg) => response.data,\n      // Pick out errors and prevent nested properties in a hook or selector\n      transformErrorResponse: (\n        response: { status: string | number },\n        meta,\n        arg,\n      ) => response.status,\n      providesTags: (result, error, id) => [{ type: 'Post', id }],\n      // The 2nd parameter is the destructured `QueryLifecycleApi`\n      async onQueryStarted(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          queryFulfilled,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // The 2nd parameter is the destructured `QueryCacheLifecycleApi`\n      async onCacheEntryAdded(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          cacheEntryRemoved,\n          cacheDataLoaded,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // highlight-end\n    }),\n  }),\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/usage/queries.mdx#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "b": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+    "relation": "overlapping",
+    "related": 0.9966,
+    "probabilities": {
+     "same": 0.0102,
+     "overlapping": 0.9811,
+     "conflicting": 0.0053,
+     "unrelated": 0.0034
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0319,
+       "restated": 0.7854,
+       "elaborated": 0.0328,
+       "different": 0.1499
+      },
+      "confidence": 0.8501,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+       "quote": "If there is no argument, use `void` for the arg type instead.",
+       "start": 902,
+       "end": 963,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+       "quote": "If there is no argument, use `void` for the arg type instead.\n\n```ts title=\"Example of all query endpoint options\"\n// file: types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: api.ts\n// Or from '@reduxjs/toolkit/query/react'\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\nimport type { Post } from './types'\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({\n    baseUrl: '/',\n  }),\n  tagTypes: ['Post'],\n  endpoints: (build) => ({\n    // highlight-start\n    // The query accepts a number and returns a Post\n    getPost: build.query<Post, number>({\n      // note: an optional `queryFn` may be used in place of `query`\n      query: (id) => ({ url: `post/${id}` }),\n      // Pick out data and prevent nested properties in a hook or selector\n      transformResponse: (response: { data: Post }, meta, arg) => response.data,\n      // Pick out errors and prevent nested properties in a hook or selector\n      transformErrorResponse: (\n        response: { status: string | number },\n        meta,\n        arg,\n      ) => response.status,\n      providesTags: (result, error, id) => [{ type: 'Post', id }],\n      // The 2nd parameter is the destructured `QueryLifecycleApi`\n      async onQueryStarted(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          queryFulfilled,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // The 2nd parameter is the destructured `QueryCacheLifecycleApi`\n      async onCacheEntryAdded(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          cacheEntryRemoved,\n          cacheDataLoaded,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // highlight-end\n    }),\n  }),\n})\n```",
+       "start": 1033,
+       "end": 2860,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 99,
+   "passages": 1,
+   "counterparts_ms": 103
+  },
+  "timing": {
+   "read_ms": 237,
+   "total_ms": 242
+  }
+ }
+}

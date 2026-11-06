@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f2/f2e09eaada1406a27402",
+ "request_hash": "f2e09eaada1406a27402c673682125f65e9dbf4bf08cfd70fc32c8646f0c349b",
+ "recorded_at": "2026-11-06T14:14:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1078,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "138.817499",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=366"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/1-promise.md#4",
+    "text": "### `promise.json(schema)`\n\n**Returns: `Promise<StandardSchemaV1InferOutput<Schema>>`**\n\nA shortcut method that gives a Promise returning a JSON object validated with a [Standard Schema](https://standardschema.dev)-compatible validator, such as [Zod](https://github.com/colinhacks/zod) or [Valibot](https://valibot.dev). The promise resolves with the output of the schema, and the return type is inferred from it.\n\nA custom [`parseJson`](2-options.md#parsejson) option runs first, so the schema receives the parsed body. The `validate` method of the schema may return a Promise.\n\nAn empty response body parses to an empty string, the same as for [`promise.json<T>()`](1-promise.md#promisejsont), so the schema receives `''`.\n\nThrows a [`SchemaValidationError`](8-errors.md#schemavalidationerror) when the body does not match the schema.\n\n> [!NOTE]\n> A `TypeError` is thrown when the argument does not follow the Standard Schema specification, for example when it has no `~standard.validate` method.\n\n```js\nimport got from 'got';\nimport {z} from 'zod';\n\nconst userSchema = z.object({name: z.string()});\n\nconst user = await got('https://example.com/user').json(userSchema);\n\nconsole.log(user.name);\n```"
+   },
+   {
+    "id": "got:documentation/8-errors.md#7",
+    "text": "### `SchemaValidationError`\n\nWhen the response body does not match the [Standard Schema](https://standardschema.dev) validator passed to [`promise.json(schema)`](1-promise.md#promisejsonschema). Includes an `issues` property with the issues from the schema. Each issue has a `message` and an optional `path`.\n\nIt intentionally does not extend [`RequestError`](#requesterror), because the request succeeded. The user-provided schema did not accept the data, so it has no `code`, `options`, `request`, `response` or `timings` property, and it is not passed to [`beforeError` hooks](9-hooks.md#beforeerror).\n\n```js\nimport got, {SchemaValidationError} from 'got';\nimport {z} from 'zod';\n\nconst userSchema = z.object({name: z.string()});\n\ntry {\n\tconst user = await got('https://example.com/user').json(userSchema);\n\tconsole.log(user.name);\n} catch (error) {\n\tif (error instanceof SchemaValidationError) {\n\t\tconsole.error(error.issues);\n\t} else {\n\t\tthrow error;\n\t}\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/1-promise.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "got:documentation/8-errors.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/8-errors.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "got:documentation/1-promise.md#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/1-promise.md#4",
+    "b": "got:documentation/8-errors.md#7",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0061,
+     "overlapping": 0.9886,
+     "conflicting": 0.0035,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0086,
+       "restated": 0.9702,
+       "elaborated": 0.0137,
+       "different": 0.0076
+      },
+      "confidence": 0.9924,
+      "a": {
+       "document": "got:documentation/1-promise.md#4",
+       "quote": "Throws a [`SchemaValidationError`](8-errors.md#schemavalidationerror) when the body does not match the schema.",
+       "start": 726,
+       "end": 836,
+       "confidence": 1
+      },
+      "b": {
+       "document": "got:documentation/8-errors.md#7",
+       "quote": "### `SchemaValidationError`\n\nWhen the response body does not match the [Standard Schema](https://standardschema.dev) validator passed to [`promise.json(schema)`](1-promise.md#promisejsonschema).",
+       "start": 0,
+       "end": 194,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 96,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 1,
+   "counterparts_ms": 50
+  },
+  "timing": {
+   "read_ms": 216,
+   "total_ms": 220
+  }
+ }
+}

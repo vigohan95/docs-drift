@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/64/641072e9d4fd8483400f",
+ "request_hash": "641072e9d4fd8483400f1d801511922032c820b3fc49428c8ea42cc139183d06",
+ "recorded_at": "2026-11-06T14:12:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 952,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.620415",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=43,cfOrigin;dur=0,cfWorker;dur=201"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#22",
+    "text": "#### `ecs`\n\nThe `ecs` role discovers targets from AWS ECS containers. \n\nECS service discovery supports all ECS networking modes:\n- **awsvpc mode** (Fargate and EC2 with ENI): Uses the task's private IP address from its elastic network interface\n- **bridge mode** (EC2): Uses the EC2 host instance's private IP address\n- **host mode** (EC2): Uses the EC2 host instance's private IP address\n\nThe private IP address is used by default, but may be changed to the public IP address with relabeling.\n\nThe IAM credentials used must have the following permissions to discover scrape targets:\n\n- `ecs:ListClusters`\n- `ecs:DescribeClusters`\n- `ecs:ListServices`\n- `ecs:DescribeServices`\n- `ecs:ListTasks`\n- `ecs:DescribeTasks`\n- `ecs:DescribeContainerInstances` (required for EC2 launch type tasks)\n- `ec2:DescribeInstances` (required for EC2 launch type tasks)\n- `ec2:DescribeNetworkInterfaces` (required to get public IP for awsvpc mode tasks)\n\nThe following meta labels are available on targets during [relabeling](#relabel_config):\n\n* `__meta_ecs_cluster`: the name of the ECS cluster\n* `__meta_ecs_cluster_arn`: the ARN of the ECS cluster\n* `__meta_ecs_service`: the name of the ECS service\n* `__meta_ecs_service_arn`: the ARN of the ECS service\n* `__meta_ecs_service_status`: the status of the ECS service\n* `__meta_ecs_task_group`: the ECS task group (typically service:service-name)\n* `__meta_ecs_task_arn`: the ARN of the ECS task\n* `__meta_ecs_task_definition`: the ARN of the ECS task definition\n* `__meta_ecs_ip_address`: the private IP address of the task\n* `__meta_ecs_launch_type`: the launch type of the task (EC2 or Fargate)\n* `__meta_ecs_desired_status`: the desired status of the task\n* `__meta_ecs_last_status`: the last known status of the task\n* `__meta_ecs_health_status`: the health status of the task\n* `__meta_ecs_platform_family`: the platform family (e.g., Linux, Windows)\n* `__meta_ecs_platform_version`: the platform version\n* `__meta_ecs_subnet_id`: the subnet ID where the task is running\n* `__meta_ecs_availability_zone`: the availability zone where the task is running\n* `__meta_ecs_region`: the AWS region\n* `__meta_ecs_public_ip`: the public IP address (from ENI for awsvpc mode, from EC2 instance for bridge/host mode), if available\n* `__meta_ecs_network_mode`: the network mode of the task (awsvpc or bridge)\n* `__meta_ecs_container_instance_arn`: the ARN of the container instance (EC2 launch type only)\n* `__meta_ecs_ec2_instance_id`: the EC2 instance ID (EC2 launch type only)\n* `__meta_ecs_ec2_instance_type`: the EC2 instance type (EC2 launch type only)\n* `__meta_ecs_ec2_instance_private_ip`: the private IP address of the EC2 instance (EC2 launch type only)\n* `__meta_ecs_ec2_instance_public_ip`: the public IP address of the EC2 instance, if available (EC2 launch type only)\n* `__meta_ecs_tag_cluster_<tagkey>`: each cluster tag value, keyed by tag name\n* `__meta_ecs_tag_service_<tagkey>`: each service tag value, keyed by tag name\n* `__meta_ecs_tag_task_<tagkey>`: each task tag value, keyed by tag name\n* `__meta_ecs_tag_ec2_<tagkey>`: each EC2 instance tag value, keyed by tag name (EC2 launch type only)"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#23",
+    "text": "#### `msk`\n\nThe `msk` role discovers targets from AWS MSK (Managed Streaming for Apache Kafka) provisioned clusters.\n\n**Important**: This service discovery only works with **provisioned clusters**. Serverless clusters are not supported as they do not expose individual broker nodes.\n\nDiscovery includes:\n- **Broker nodes**: Kafka broker instances (supports both ZooKeeper-based and KRaft-based clusters)\n- **KRaft Controller nodes**: Controller instances (KRaft-based clusters only)\n\nNote: ZooKeeper nodes are not discoverable via the MSK API. For monitoring, MSK provides:\n- **JMX Exporter**: Available on both broker and KRaft controller nodes (when enabled)\n- **Node Exporter**: Available on broker nodes only (when enabled)\n\nThe IAM credentials used must have the following permissions to discover\nscrape targets:\n\n- `kafka:DescribeClusterV2`\n- `kafka:ListClustersV2`\n- `kafka:ListNodes`\n\nThe following meta labels are available on targets during [relabeling](#relabel_config):\n\n* `__meta_msk_cluster_name`: the name of the MSK cluster\n* `__meta_msk_cluster_arn`: the ARN of the MSK cluster\n* `__meta_msk_cluster_state`: the state of the MSK cluster (e.g., ACTIVE, CREATING, DELETING)\n* `__meta_msk_cluster_type`: the type of the MSK cluster (always PROVISIONED, as serverless clusters are skipped)\n* `__meta_msk_cluster_version`: the current version of the MSK cluster\n* `__meta_msk_cluster_kafka_version`: the Kafka version running on the cluster\n* `__meta_msk_cluster_jmx_exporter_enabled`: whether JMX exporter is enabled on the cluster; this label is absent (not `false`) when Open Monitoring is not enabled on the cluster\n* `__meta_msk_cluster_configuration_arn`: the ARN of the MSK configuration; this label is absent when the cluster is not using custom config\n* `__meta_msk_cluster_configuration_revision`: the revision of the MSK configuration; this label is absent when the cluster is not using custom config\n* `__meta_msk_cluster_tag_<tagkey>`: each cluster tag value, keyed by tag name\n* `__meta_msk_node_type`: the type of the node (BROKER or CONTROLLER)\n* `__meta_msk_node_arn`: the ARN of the node\n* `__meta_msk_node_added_time`: the time the node was added to the cluster\n* `__meta_msk_node_instance_type`: the instance type of the node\n* `__meta_msk_node_attached_eni`: the ID of the attached ENI\n* `__meta_msk_broker_id`: the broker ID (broker nodes only)\n* `__meta_msk_broker_endpoint_index`: the index of the broker endpoint (broker nodes only)\n* `__meta_msk_broker_client_subnet`: the client subnet of the broker (broker nodes only)\n* `__meta_msk_broker_client_vpc_ip`: the VPC IP address of the broker (broker nodes only)\n* `__meta_msk_broker_node_exporter_enabled`: whether node exporter is enabled on brokers (broker nodes only); this label is absent (not `false`) when Open Monitoring is not enabled on the cluster\n* `__meta_msk_controller_endpoint_index`: the index of the controller endpoint (controller nodes only)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#22",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#22",
+    "b": "prometheus:docs/configuration/configuration.md#23",
+    "relation": "unrelated",
+    "related": 0.0035,
+    "probabilities": {
+     "same": 0.0014,
+     "overlapping": 0.0012,
+     "conflicting": 0.0009,
+     "unrelated": 0.9965
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 61
+  },
+  "timing": {
+   "read_ms": 61,
+   "total_ms": 64
+  }
+ }
+}

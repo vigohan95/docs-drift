@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/58/58046b131e6ebc4b8500",
+ "request_hash": "58046b131e6ebc4b85003285678512c49977f37134d0491be8dd11a686b18288",
+ "recorded_at": "2026-11-06T14:14:24Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 960,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "83.440606",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=219"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/geojson.md#3",
+    "text": "## Geospatial Queries with Mongoose {#querying}\n\nMongoose queries support the same [geospatial query operators](http://thecodebarbarian.com/80-20-guide-to-mongodb-geospatial-queries)\nthat the MongoDB driver does. For example, the below script saves a\n`city` document those `location` property is a GeoJSON point representing\nthe city of Denver, Colorado. It then queries for all documents within\na polygon representing the state of Colorado using\n[the MongoDB `$geoWithin` operator](https://www.mongodb.com/docs/manual/reference/operator/query/geoWithin/).\n\n<img src=\"https://i.imgur.com/i32pWnC.png\" alt=\"Colorado GeoJSON Polygon\">\n\n```javascript acquit:geojson.*driver query\nconst City = db.model('City', new Schema({\n  name: String,\n  location: pointSchema\n}));\n\nconst colorado = {\n  type: 'Polygon',\n  coordinates: [[\n    [-109, 41],\n    [-102, 41],\n    [-102, 37],\n    [-109, 37],\n    [-109, 41]\n  ]]\n};\nconst denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };\nreturn City.create({ name: 'Denver', location: denver }).\n  then(() => City.findOne({\n    location: {\n      $geoWithin: {\n        $geometry: colorado\n      }\n    }\n  })).\n  then(doc => assert.equal(doc.name, 'Denver'));\n```\n\nMongoose also has a [`within()` helper](api/query.html#query_Query-within)\nthat's a shorthand for `$geoWithin`.\n\n```javascript acquit:geojson.*within helper\nconst denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };\nreturn City.create({ name: 'Denver', location: denver }).\n  then(() => City.findOne().where('location').within(colorado)).\n  then(doc => assert.equal(doc.name, 'Denver'));\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_9.md#17",
+    "text": "### Query use$geoWithin removed, now always true\n\n`mongoose.Query` had a `use$geoWithin` property that could configure converting `$geoWithin` to `$within` to support MongoDB versions before 2.4.\nThat property has been removed in Mongoose 9. `$geoWithin` is now never converted to `$within`, because MongoDB no longer supports `$within`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/geojson.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_9.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/geojson.md#3",
+    "b": "mongoose:docs/migrating_to_9.md#17",
+    "relation": "overlapping",
+    "related": 0.5278,
+    "probabilities": {
+     "same": 0.0133,
+     "overlapping": 0.5005,
+     "conflicting": 0.014,
+     "unrelated": 0.4722
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 46,
+   "passage_reads": 1,
+   "passages_ms": 48,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 92,
+   "total_ms": 96
+  }
+ }
+}

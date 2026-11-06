@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bc/bc221b70cf0f6b621336",
+ "request_hash": "bc221b70cf0f6b62133681c27cd11b81b0da750698eaa89512b8b1f0c3bd7641",
+ "recorded_at": "2026-11-06T14:21:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2077,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "130.367489",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=252"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/migration/jest.md#3",
+    "text": "## `mock.mockReset`\n\nJest's [`mockReset`](https://jestjs.io/docs/mock-function-api#mockfnmockreset) replaces the mock implementation with an\nempty function that returns `undefined`.\n\nVitest's [`mockReset`](/api/mock#mockreset) resets the mock implementation to its original.\nThat is, resetting a mock created by `vi.fn(impl)` will reset the mock implementation to `impl`."
+   },
+   {
+    "id": "vitest:docs/api/mock.md#12",
+    "text": "## mockReset\n\n```ts\nfunction mockReset(): Mock<T>\n```\n\nDoes what [`mockClear`](#mockclear) does and resets the mock implementation. This also resets all \"once\" implementations.\n\nNote that resetting a mock from `vi.fn()` will set the implementation to an empty function that returns `undefined`.\nResetting a mock from `vi.fn(impl)` will reset the implementation to `impl`.\n\nThe mock's `prototype` chain follows along: it reverts to the original class for `vi.fn(impl)` and `vi.spyOn()`, and to a plain object for `vi.fn()`, so instances constructed after the reset no longer pass `instanceof` checks against a previously set class implementation.\n\nThis is useful when you want to reset a mock to its original state.\n\n```ts\nconst person = {\n  greet: (name: string) => `Hello ${name}`,\n}\nconst spy = vi.spyOn(person, 'greet').mockImplementation(() => 'mocked')\nexpect(person.greet('Alice')).toBe('mocked')\nexpect(spy.mock.calls).toEqual([['Alice']])\n\n// clear call history and reset implementation, but method is still spied\nspy.mockReset()\nexpect(spy.mock.calls).toEqual([])\nexpect(person.greet).toBe(spy)\nexpect(person.greet('Bob')).toBe('Hello Bob')\nexpect(spy.mock.calls).toEqual([['Bob']])\n```\n\nTo automatically call this method before each test, enable the [`mockReset`](/config/mockreset) setting in the configuration."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/migration/jest.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/api/mock.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/migration/jest.md#3",
+    "b": "vitest:docs/api/mock.md#12",
+    "relation": "overlapping",
+    "related": 0.9967,
+    "probabilities": {
+     "same": 0.0112,
+     "overlapping": 0.9763,
+     "conflicting": 0.0092,
+     "unrelated": 0.0033
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 61,
+   "passages": 1,
+   "counterparts_ms": 52
+  },
+  "timing": {
+   "read_ms": 142,
+   "total_ms": 145
+  }
+ }
+}

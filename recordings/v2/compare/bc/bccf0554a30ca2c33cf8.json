@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bc/bccf0554a30ca2c33cf8",
+ "request_hash": "bccf0554a30ca2c33cf864315e67209757c09ac299bf7d2c60a532ff9f352d06",
+ "recorded_at": "2026-11-06T14:18:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1967,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "214.643875",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=541"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+    "text": "### Typing Async Thunks Inside `createSlice`\n\nAs of 2.0, `createSlice` allows [defining thunks inside of `reducers` using a callback syntax](../api/createSlice.mdx#the-reducers-creator-callback-notation).\n\nTyping for the `create.asyncThunk` method works in the same way as [`createAsyncThunk`](#createasyncthunk), with one key difference.\n\nA type for `state` and/or `dispatch` _cannot_ be provided as part of the `ThunkApiConfig`, as this would cause circular types.\n\nInstead, it is necessary to assert the type when needed - `getState() as RootState`. You may also include an explicit return type for the payload function as well, in order to break the circular type inference cycle.\n\n```ts no-transpile\ncreate.asyncThunk<Todo, string, { rejectValue: { error: string } }>(\n  // highlight-start\n  // may need to include an explicit return type\n  async (id: string, thunkApi): Promise<Todo> => {\n    // Cast types for `getState` and `dispatch` manually\n    const state = thunkApi.getState() as RootState\n    const dispatch = thunkApi.dispatch as AppDispatch\n    // highlight-end\n    try {\n      const todo = await fetchTodo()\n      return todo\n    } catch (e) {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no!',\n      })\n    }\n  },\n)\n```\n\nFor common thunk API configuration options, a [`withTypes` helper](../usage/usage-with-typescript#defining-a-pre-typed-createasyncthunk) is provided:\n\n```ts no-transpile\nreducers: (create) => {\n  const createAThunk = create.asyncThunk.withTypes<{\n    rejectValue: { error: string }\n  }>()\n\n  return {\n    fetchTodo: createAThunk<Todo, string>(async (id, thunkApi) => {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no!',\n      })\n    }),\n    fetchTodos: createAThunk<Todo[], string>(async (id, thunkApi) => {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no, not again!',\n      })\n    }),\n  }\n}\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/api/createSlice.mdx#11",
+    "text": "The configuration object can also contain [`options`](./createAsyncThunk#options).\n\n```ts no-transpile\ncreate.asyncThunk(\n  async (id: string, thunkApi) => {\n    const res = await fetch(`myApi/todos?id=${id}`)\n    return (await res.json()) as Item\n  },\n  {\n    pending: (state) => {\n      state.loading = true\n    },\n    rejected: (state, action) => {\n      state.error = action.payload ?? action.error\n    },\n    fulfilled: (state, action) => {\n      state.todos.push(action.payload)\n    },\n    settled: (state, action) => {\n      state.loading = false\n    }\n    options: {\n      idGenerator: uuid,\n    },\n  }\n)\n```\n\n:::note\n\nTyping for the `create.asyncThunk` works in the same way as [`createAsyncThunk`](../usage/usage-with-typescript#createasyncthunk), with one key difference.\n\nA type for `state` and/or `dispatch` _cannot_ be provided as part of the `ThunkApiConfig`, as this would cause circular types.\n\nInstead, it is necessary to assert the type when needed - `getState() as RootState`. You may also include an explicit return type for the payload function as well, in order to break the circular type inference cycle.\n\n```ts no-transpile\ncreate.asyncThunk<Todo, string, { rejectValue: { error: string } }>(\n  // highlight-start\n  // may need to include an explicit return type\n  async (id: string, thunkApi): Promise<Todo> => {\n    // Cast types for `getState` and `dispatch` manually\n    const state = thunkApi.getState() as RootState\n    const dispatch = thunkApi.dispatch as AppDispatch\n    // highlight-end\n    try {\n      const todo = await fetchTodo()\n      return todo\n    } catch (e) {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no!',\n      })\n    }\n  },\n)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/api/createSlice.mdx#11"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/api/createSlice.mdx#11",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/usage/usage-with-typescript.md#19"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+    "b": "redux-toolkit:docs/api/createSlice.mdx#11",
+    "relation": "overlapping",
+    "related": 0.9966,
+    "probabilities": {
+     "same": 0.022,
+     "overlapping": 0.9683,
+     "conflicting": 0.0063,
+     "unrelated": 0.0034
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.8983,
+       "restated": 0.0693,
+       "elaborated": 0.0182,
+       "different": 0.0143
+      },
+      "confidence": 0.9857,
+      "a": {
+       "document": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+       "quote": "Typing for the `create.asyncThunk` method works in the same way as [`createAsyncThunk`](#createasyncthunk), with one key difference.",
+       "start": 206,
+       "end": 338,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/api/createSlice.mdx#11",
+       "quote": "action.error\n    },\n    fulfilled: (state, action) => {\n      state.todos.push(action.payload)\n    },\n    settled: (state, action) => {\n      state.loading = false\n    }\n    options: {\n      idGenerator: uuid,\n    },\n  }\n)\n```\n\n:::note\n\nTyping for the `create.asyncThunk` works in the same way as [`createAsyncThunk`](../usage/usage-with-typescript#createasyncthunk), with one key difference.\n\nA type for `state` and/or `dispatch` _cannot_ be provided as part of the `ThunkApiConfig`, as this would cause circular types.\n\nInstead, it is necessary to assert the type when needed - `getState() as RootState`.",
+       "start": 390,
+       "end": 996,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9885,
+       "restated": 0.0053,
+       "elaborated": 0.0034,
+       "different": 0.0028
+      },
+      "confidence": 0.9972,
+      "a": {
+       "document": "redux-toolkit:docs/usage/usage-with-typescript.md#19",
+       "quote": "You may also include an explicit return type for the payload function as well, in order to break the circular type inference cycle.",
+       "start": 553,
+       "end": 684,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/api/createSlice.mdx#11",
+       "quote": "You may also include an explicit return type for the payload function as well, in order to break the circular type inference cycle.\n\n```ts no-transpile\ncreate.asyncThunk<Todo, string, { rejectValue: { error: string } }>(\n  // highlight-start\n  // may need to include an explicit return type\n  async (id: string, thunkApi): Promise<Todo> => {\n    // Cast types for `getState` and `dispatch` manually\n    const state = thunkApi.getState() as RootState\n    const dispatch = thunkApi.dispatch as AppDispatch\n    // highlight-end\n    try {\n      const todo = await fetchTodo()\n      return todo\n    } catch (e) {\n      throw thunkApi.rejectWithValue({\n        error: 'Oh no!'",
+       "start": 997,
+       "end": 1667,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 197,
+   "passage_reads": 1,
+   "passages_ms": 87,
+   "passages": 2,
+   "counterparts_ms": 102
+  },
+  "timing": {
+   "read_ms": 386,
+   "total_ms": 390
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/78/788f6653ce22343510b6",
+ "request_hash": "788f6653ce22343510b6e017dab7eea6208312b7962a09c620ee5aca985b61b0",
+ "recorded_at": "2026-11-06T14:12:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 931,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.736769",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=210"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#13",
+    "text": "#### `@VirtualColumn`\n\nSpecial column that is never saved to the database and thus acts as a readonly property.\nEach time you call `find` or `findOne` from the entity manager, the value is recalculated based on the query function that was provided in the VirtualColumn Decorator. The alias argument passed to the query references the exact entity alias of the generated query behind the scenes.\n\n```typescript\n@Entity({ name: \"companies\", alias: \"COMP\" })\nexport class Company extends BaseEntity {\n    @PrimaryColumn(\"varchar\", { length: 50 })\n    name: string\n\n    @VirtualColumn({\n        query: (alias) =>\n            `SELECT COUNT(\"name\") FROM \"employees\" WHERE \"companyName\" = ${alias}.name`,\n    })\n    totalEmployeesCount: number\n\n    @OneToMany((type) => Employee, (employee) => employee.company)\n    employees: Employee[]\n}\n\n@Entity({ name: \"employees\" })\nexport class Employee extends BaseEntity {\n    @PrimaryColumn(\"varchar\", { length: 50 })\n    name: string\n\n    @ManyToOne((type) => Company, (company) => company.employees)\n    company: Company\n}\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#43",
+    "text": "### `@RelationCount` decorator and `loadRelationCountAndMap` removed\n\nThe `@RelationCount` decorator and `SelectQueryBuilder.loadRelationCountAndMap()` method have been removed. Use `@VirtualColumn` or a sub-query in your query builder instead:\n\n```typescript\n// Before\n@RelationCount((post: Post) => post.categories)\ncategoryCount: number\n\n// After — use @VirtualColumn with a sub-query\n// Replace the junction table name and column names to match your schema\n@VirtualColumn({\n    query: (alias) =>\n        `SELECT COUNT(*) FROM post_categories_category WHERE postId = ${alias}.id`,\n})\ncategoryCount: number\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#43",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/help/3-decorator-reference.md#13",
+    "b": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#43",
+    "relation": "overlapping",
+    "related": 0.9963,
+    "probabilities": {
+     "same": 0.0085,
+     "overlapping": 0.9838,
+     "conflicting": 0.0041,
+     "unrelated": 0.0037
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 54,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 82,
+   "total_ms": 84
+  }
+ }
+}

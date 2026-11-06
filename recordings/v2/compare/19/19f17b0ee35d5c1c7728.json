@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/19/19f17b0ee35d5c1c7728",
+ "request_hash": "19f17b0ee35d5c1c7728be590ec7ff77dba687e48350ef1de1308fd78af0a96b",
+ "recorded_at": "2026-11-06T14:15:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1010,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "120.528126",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=259"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:README.md#6",
+    "text": "## Unit of Work\n\n> Unit of Work maintains a list of objects (_entities_) affected by a business transaction\n> and coordinates the writing out of changes. [(Martin Fowler)](https://www.martinfowler.com/eaaCatalog/unitOfWork.html)\n\nWhen you call `em.flush()`, all computed changes are queried inside a database transaction. This means you can control transaction boundaries simply by making changes to your entities and calling `flush()` when ready.\n\n```typescript\nconst author = await em.findOneOrFail(Author, 1, {\n  populate: ['books'],\n});\nauthor.name = 'Jon Snow II';\nauthor.books.getItems().forEach(book => book.title += ' (2nd ed.)');\nauthor.books.add(orm.em.create(Book, { title: 'New Book', author }));\n\n// Flush computes change sets and executes them in a single transaction\nawait em.flush();\n```\n\nThe above flush will execute:\n\n```sql\nbegin;\nupdate \"author\" set \"name\" = 'Jon Snow II' where \"id\" = 1;\nupdate \"book\"\n  set \"title\" = case\n    when (\"id\" = 1) then 'My Life on The Wall (2nd ed.)'\n    when (\"id\" = 2) then 'Another Book (2nd ed.)'\n    else \"title\" end\n  where \"id\" in (1, 2);\ninsert into \"book\" (\"title\", \"author_id\") values ('New Book', 1);\ncommit;\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#4",
+    "text": "## Implicit Transactions\n\nFirst and most important implication of having Unit of Work is that it allows handling transactions automatically.\n\nWhen you call `em.flush()`, all computed changes are queried inside a database transaction (if supported by given driver). This means that you can control the boundaries of transactions simply by calling `em.persist()` and once all your changes are ready, simply calling `flush()` will run them inside a transaction.\n\n> You can also control the transaction boundaries manually via `em.transactional(cb)`.\n\n```ts\nconst user = await em.findOne(User, 1);\nuser.email = 'foo@bar.com';\nconst car = new Car();\nuser.cars.add(car);\n\n// thanks to bi-directional cascading you only need to persist user entity\n// flushing will create a transaction, insert new car and update user with new email\nawait em.persist(user).flush();\n```\n\nYou can find more information about transactions in [Transactions and concurrency](transactions.md) page."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:README.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/unit-of-work.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:README.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:README.md#6",
+    "b": "mikro-orm:docs/docs/unit-of-work.md#4",
+    "relation": "overlapping",
+    "related": 0.9982,
+    "probabilities": {
+     "same": 0.0069,
+     "overlapping": 0.9879,
+     "conflicting": 0.0034,
+     "unrelated": 0.0018
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0088,
+       "restated": 0.9704,
+       "elaborated": 0.0125,
+       "different": 0.0083
+      },
+      "confidence": 0.9917,
+      "a": {
+       "document": "mikro-orm:README.md#6",
+       "quote": "When you call `em.flush()`, all computed changes are queried inside a database transaction.",
+       "start": 230,
+       "end": 321,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/unit-of-work.md#4",
+       "quote": "## Implicit Transactions\n\nFirst and most important implication of having Unit of Work is that it allows handling transactions automatically.\n\nWhen you call `em.flush()`, all computed changes are queried inside a database transaction (if supported by given driver).",
+       "start": 0,
+       "end": 264,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 53,
+   "passages": 1,
+   "counterparts_ms": 50
+  },
+  "timing": {
+   "read_ms": 131,
+   "total_ms": 133
+  }
+ }
+}

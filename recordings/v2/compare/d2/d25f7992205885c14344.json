@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d2/d25f7992205885c14344",
+ "request_hash": "d25f7992205885c14344ec9d7630e92f774955060f47d4fd9a89dd39cdcde25f",
+ "recorded_at": "2026-11-06T14:15:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1119,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "106.285276",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=41,cfOrigin;dur=0,cfWorker;dur=387"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#8",
+    "text": "### Defining the primary key\n\nEvery entity needs to have a primary key. You define it using the `.primary()` builder method. For a single numeric primary key, auto-increment is assumed automatically:\n\n```ts\nid: p.integer().primary(),\n```\n\nIn case you want to use `bigint` column type, use the `p.bigint()` builder. BigInts are mapped to `string` by default, as JavaScript `number` cannot safely represent large integers:\n\n```ts\nid: p.bigint().primary(),\n```\n\nAnother common use case is UUID. You can use `onCreate` to generate a value when the entity is first persisted:\n\n```ts\nimport { v4 } from 'uuid';\n\n// ...\nuuid: p.uuid().primary().onCreate(() => v4()),\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#7",
+    "text": "### Type inference with `defineEntity`\n\nOne of the benefits of `defineEntity` is that optional properties are inferred automatically! When you use `.default()`, `.onCreate()`, or `.onUpdate()`, the property is automatically marked as optional in TypeScript.\n\nIn our `BaseEntity`, all three properties are optional:\n- `id` is a single numeric primary key, so auto-increment is assumed\n- `createdAt` uses `.onCreate()`\n- `updatedAt` uses `.onCreate()` and `.onUpdate()`\n\nSo TypeScript already knows these are optional in `em.create()` calls - no additional configuration needed!\n\nRunning the `npm start`, you will see the `Article` entity will get persisted and logged to the console:\n\n```\n[query] begin\n[query] insert into `article` (`author_id`, `created_at`, `description`, `slug`, `text`, `title`, `updated_at`) values (1, 1662908804371, 'Foo is bar', 'foo', 'Lorem impsum...', 'Foo', 1662908804371) [took 0 ms]\n[query] commit\nArticle {\n  id: 1,\n  createdAt: 2022-09-11T15:06:44.371Z,\n  updatedAt: 2022-09-11T15:06:44.371Z,\n  slug: 'foo',\n  title: 'Foo',\n  description: 'Foo is bar',\n  text: 'Lorem impsum...',\n  author: (User) { id: 1 }\n}\n```\n\nRemember the entity references and loaded state we discussed earlier? You can see that here in action, the `Article.author` is an entity reference with just the primary key. It is automatically logged as `(User)` so you can easily tell the loaded state of any entity, but it is in fact the very same `User` entity instance:\n\n```ts\nconsole.log('it really is a User', article.author instanceof User); // true\nconsole.log('but not initialized', wrap(article.author).isInitialized()); // false\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#8",
+    "b": "mikro-orm:docs/docs/guide/02-relationships.md#7",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0106,
+     "overlapping": 0.9827,
+     "conflicting": 0.004,
+     "unrelated": 0.0027
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 86,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 114,
+   "total_ms": 118
+  }
+ }
+}

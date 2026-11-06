@@ -1,0 +1,237 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3b/3b9c8d84f8ca5ee79e01",
+ "request_hash": "3b9c8d84f8ca5ee79e0105e066ee380b137096c4cfc5ea42d6d0d21933afba91",
+ "recorded_at": "2026-11-06T14:12:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1450,
+ "response_headers": {
+  "x-clocked-credits": "11",
+  "x-clocked-model-ms": "272.148417",
+  "x-clocked-cost-usd": "0.002191",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=698"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#131",
+    "text": "# Configures data retention settings for TSDB.\n#\n# Note: When retention is changed at runtime, the retention\n# settings are updated immediately, but block deletion based on the new retention policy\n# occurs during the next block reload cycle. This happens automatically within 1 minute\n# or when a compaction completes, whichever comes first.\n[ retention: <retention> ] :\n  # How long to retain samples in storage. If neither this option nor the size option\n  # is set, the retention time defaults to 15d. Setting this to 0 disables time-based retention.\n  # This option takes precedence over the deprecated command-line flag --storage.tsdb.retention.time.\n  [ time: <duration> ]\n\n  # Maximum number of bytes that can be stored for blocks. A unit is required,\n  # supported units: B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B.\n  # If set to 0 or not set, size-based retention is disabled.\n  # This option takes precedence over the deprecated command-line flag --storage.tsdb.retention.size.\n  [ size: <size> | default = 0 ]\n\n  # Maximum percent of total disk space allowed for storage of blocks. Alternative to `size` and\n  # behaves the same as if size was calculated by hand as a percentage of the total storage capacity.\n  # Prometheus will fail to start if this config is enabled, but it fails to query the total storage capacity.\n  # The total disk space allowed will automatically adapt to volume resize.\n  # If set to 0 or not set, percentage-based retention is disabled.\n  #\n  # This is an experimental feature, this behaviour could change or be removed in the future.\n  [ percentage: <uint> | default = 0 ]\n```"
+   },
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "text": "### Operational aspects\n\nPrometheus has several flags that configure local storage. The most important are:\n\n- `--storage.tsdb.path`: Where Prometheus writes its database. Defaults to `data/`.\n- `--storage.tsdb.retention.time`: How long to retain samples in storage. If neither\n  this flag nor `storage.tsdb.retention.size` is set, the retention time defaults to\n  `15d`. Supported units: y, w, d, h, m, s, ms.\n- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.\n  The oldest data will be removed first. Defaults to `0` or disabled. Units supported:\n  B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. Only\n  the persistent blocks are deleted to honor this retention although WAL and m-mapped\n  chunks are counted in the total size. So the minimum requirement for the disk is the\n  peak space taken by the `wal` (the WAL and Checkpoint) and `chunks_head`\n  (m-mapped Head chunks) directory combined (peaks every 2 hours).\n- `--storage.tsdb.wal-compression`: Enables compression of the write-ahead log (WAL).\n  Depending on your data, you can expect the WAL size to be halved with little extra\n  CPU load. This flag was introduced in 2.11.0 and enabled by default in 2.20.0.\n  Note that once enabled, downgrading Prometheus to a version below 2.11.0 will\n  require deleting the WAL."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#131",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/storage.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/configuration/configuration.md#131"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#131",
+    "b": "prometheus:docs/storage.md#5",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9871,
+     "conflicting": 0.0045,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0056,
+       "restated": 0.9774,
+       "elaborated": 0.0111,
+       "different": 0.006
+      },
+      "confidence": 0.994,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#131",
+       "quote": "If neither this option nor the size option",
+       "start": 415,
+       "end": 457,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "If neither\n  this flag nor `storage.tsdb.retention.size` is set, the retention time defaults to\n  `15d`.",
+       "start": 267,
+       "end": 371,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.025,
+       "restated": 0.7084,
+       "elaborated": 0.0853,
+       "different": 0.1813
+      },
+      "confidence": 0.8187,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#131",
+       "quote": "# Maximum number of bytes that can be stored for blocks.",
+       "start": 683,
+       "end": 739,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "Supported units: y, w, d, h, m, s, ms.\n- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.\n  The oldest data will be removed first.",
+       "start": 372,
+       "end": 543,
+       "confidence": 0.998
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0188,
+       "restated": 0.929,
+       "elaborated": 0.0288,
+       "different": 0.0234
+      },
+      "confidence": 0.9766,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#131",
+       "quote": "# If set to 0 or not set, size-based retention is disabled.",
+       "start": 862,
+       "end": 921,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "Defaults to `0` or disabled.",
+       "start": 544,
+       "end": 572,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.7875,
+       "restated": 0.155,
+       "elaborated": 0.0399,
+       "different": 0.0177
+      },
+      "confidence": 0.9823,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#131",
+       "quote": "# supported units: B, KB, MB, GB, TB, PB, EB.",
+       "start": 762,
+       "end": 807,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "Units supported:\n  B, KB, MB, GB, TB, PB, EB.",
+       "start": 573,
+       "end": 618,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9892,
+       "restated": 0.0043,
+       "elaborated": 0.0034,
+       "different": 0.0031
+      },
+      "confidence": 0.9969,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#131",
+       "quote": "Ex: \"512MB\".",
+       "start": 808,
+       "end": 820,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "Ex: \"512MB\".",
+       "start": 619,
+       "end": 631,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9886,
+       "restated": 0.005,
+       "elaborated": 0.0033,
+       "different": 0.003
+      },
+      "confidence": 0.997,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#131",
+       "quote": "Based on powers-of-2, so 1KB is 1024B.",
+       "start": 821,
+       "end": 859,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "Based on powers-of-2, so 1KB is 1024B.",
+       "start": 632,
+       "end": 670,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 204,
+   "passage_reads": 1,
+   "passages_ms": 125,
+   "passages": 6,
+   "counterparts_ms": 153
+  },
+  "timing": {
+   "read_ms": 482,
+   "total_ms": 486
+  }
+ }
+}

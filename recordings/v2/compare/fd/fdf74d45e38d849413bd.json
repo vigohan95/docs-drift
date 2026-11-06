@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/fd/fdf74d45e38d849413bd",
+ "request_hash": "fdf74d45e38d849413bd6f78d0f4c22567db0afdff018cb867698aa8ae9cdb20",
+ "recorded_at": "2026-11-06T14:19:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2621,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.615358",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=283"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#45",
+    "text": "#### `responseSchema`\n\n_(optional)_\n\n[summary](docblock://query/endpointDefinitions.ts?token=CommonEndpointDefinition.responseSchema)\n\n[examples](docblock://query/endpointDefinitions.ts?token=CommonEndpointDefinition.responseSchema)"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#23",
+    "text": "## Runtime Validation using Schemas\n\nEndpoints can use any [Standard Schema](https://standardschema.dev/) compliant library for runtime validation of query args, responses, and errors. See [API reference](../api/createApi.mdx#schema-validation) for full list of available schemas.\n\nWhen used with TypeScript, schemas can also be used to [infer the type of that value instead of having to declare it](../usage-with-typescript.mdx#schema-validation).\n\nMost commonly, you'll want to use `responseSchema` to validate the response from the server (or `rawResponseSchema` when using `transformResponse`).\n\n```ts title=\"Using responseSchema\" no-transpile\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'\nimport * as v from 'valibot'\n\nconst pokemonSchema = v.object({\n  id: v.number(),\n  name: v.string(),\n})\ntype Pokemon = v.InferOutput<typeof pokemonSchema>\nconst transformedPokemonSchema = v.object({\n  ...pokemonSchema.entries,\n  id: v.string(),\n})\ntype TransformedPokemon = v.InferOutput<typeof transformedPokemonSchema>\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: 'https://example.com/pokemon' }),\n  endpoints: (build) => ({\n    getInfinitePokemon: build.infiniteQuery<Pokemon[], string, number>({\n      query: ({ queryArg, pageParam }) => `type/${queryArg}?page=${pageParam}`,\n      // argSchema for infinite queries must have both queryArg and pageParam\n      argSchema: v.object({\n        queryArg: v.string(),\n        pageParam: v.number(),\n      }),\n      responseSchema: v.array(pokemonSchema),\n    }),\n    getTransformedPokemon: build.infiniteQuery<\n      TransformedPokemon[],\n      string,\n      number\n    >({\n      query: ({ queryArg, pageParam }) => `type/${queryArg}?page=${pageParam}`,\n      argSchema: v.object({\n        queryArg: v.string(),\n        pageParam: v.number(),\n      }),\n      rawResponseSchema: v.array(pokemonSchema),\n      transformResponse: (response) =>\n        response.map((pokemon) => ({\n          ...pokemon,\n          id: String(pokemon.id),\n        })),\n      // responseSchema can still be provided, to validate the transformed response\n      responseSchema: v.array(transformedPokemonSchema),\n    }),\n  }),\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#45",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/createApi.mdx#45",
+    "b": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#23",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0063,
+     "overlapping": 0.9889,
+     "conflicting": 0.0026,
+     "unrelated": 0.0023
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 102,
+   "total_ms": 105
+  }
+ }
+}

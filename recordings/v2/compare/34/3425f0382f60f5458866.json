@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/34/3425f0382f60f5458866",
+ "request_hash": "3425f0382f60f5458866e1a620712444e6bc6aa0146c4d48b79130c66ef81009",
+ "recorded_at": "2026-11-06T14:12:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 980,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "111.388605",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=295"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "text": "### Creating a one-to-one relation\n\nLet's create a one-to-one relationship with another class.\nLet's create a new class in `PhotoMetadata.ts`. This PhotoMetadata class is supposed to contain our photo's additional meta-information:\n\n```typescript\nimport {\n    Entity,\n    Column,\n    PrimaryGeneratedColumn,\n    OneToOne,\n    JoinColumn,\n} from \"typeorm\"\nimport { Photo } from \"./Photo\"\n\n@Entity()\nexport class PhotoMetadata {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column(\"int\")\n    height: number\n\n    @Column(\"int\")\n    width: number\n\n    @Column()\n    orientation: string\n\n    @Column()\n    compressed: boolean\n\n    @Column()\n    comment: string\n\n    @OneToOne(() => Photo)\n    @JoinColumn()\n    photo: Photo\n}\n```\n\nHere, we are using a new decorator called `@OneToOne`. It allows us to create a one-to-one relationship between two entities. We also add a `@JoinColumn` decorator, which indicates that this side of the relationship will own the relationship.\nRelations can be unidirectional or bidirectional.\nOnly one side of the relation can be the owner.\nUsing `@JoinColumn` decorator is required on the owner side of the relationship.\n\nIf you run the app, you'll see a newly generated table, and it will contain a column with a foreign key for the photo relation:\n\n```text\n+-------------+--------------+----------------------------+\n|                     photo_metadata                      |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| height      | int          |                            |\n| width       | int          |                            |\n| comment     | varchar(255) |                            |\n| compressed  | boolean      |                            |\n| orientation | varchar(255) |                            |\n| photoId     | int          | FOREIGN KEY                |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "text": "## `@JoinColumn` options\n\n`@JoinColumn` not only defines which side of the relation contains the join column with a foreign key,\nbut also allows you to customize join column name and referenced column name.\n\nWhen we set `@JoinColumn`, it automatically creates a column in the database named `propertyName + referencedColumnName`.\nFor example:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn() // this decorator is optional for @ManyToOne, but required for @OneToOne\ncategory: Category;\n```\n\nThis code will create a `categoryId` column in the database.\nIf you want to change this name in the database you can specify a custom join column name:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ name: \"cat_id\" })\ncategory: Category;\n```\n\nJoin columns are always a reference to some other columns (using a foreign key).\nBy default your relation always refers to the primary column of the related entity.\nIf you want to create relation with other columns of the related entity -\nyou can specify them in `@JoinColumn` as well:\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn({ referencedColumnName: \"name\" })\ncategory: Category;\n```\n\nThe relation now refers to `name` of the `Category` entity, instead of `id`.\nColumn name for that relation will become `categoryName`.\n\nYou can also join multiple columns. Note that they do not reference the primary column of the related entity by default: you must provide the referenced column name.\n\n```typescript\n@ManyToOne(type => Category)\n@JoinColumn([\n    { name: \"category_id\", referencedColumnName: \"id\" },\n    { name: \"locale_id\", referencedColumnName: \"locale_id\" }\n])\ncategory: Category;\n```\n\n> **Note:** When using composite `@JoinColumn` or `@JoinTable`, TypeORM automatically sorts the foreign key columns to match the referenced entity's primary key order. This ensures compatibility with databases like MySQL, MSSQL, and SAP HANA that require FK columns to reference PK columns in index order."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/1-relations.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/getting-started.md#23",
+    "b": "typeorm:docs/docs/relations/1-relations.md#5",
+    "relation": "overlapping",
+    "related": 0.9946,
+    "probabilities": {
+     "same": 0.0132,
+     "overlapping": 0.9751,
+     "conflicting": 0.0063,
+     "unrelated": 0.0054
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 65,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 149,
+   "total_ms": 153
+  }
+ }
+}

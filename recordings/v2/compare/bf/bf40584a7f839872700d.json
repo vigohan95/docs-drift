@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bf/bf40584a7f839872700d",
+ "request_hash": "bf40584a7f839872700d63f01842cd48211e4dc453f72b909104c18860c4ae9d",
+ "recorded_at": "2026-11-06T14:14:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 851,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.640673",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=158"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_5.md#2",
+    "text": "## Query Middleware {#query-middleware}\n\nQuery middleware is now compiled when you call `mongoose.model()` or `db.model()`. If you add query middleware after calling `mongoose.model()`, that middleware will **not** get called.\n\n```javascript\nconst schema = new Schema({ name: String });\nconst MyModel = mongoose.model('Test', schema);\nschema.pre('find', () => { console.log('find!'); });\n\nMyModel.find().exec(function() {\n  // In mongoose 4.x, the above `.find()` will print \"find!\"\n  // In mongoose 5.x, \"find!\" will **not** be printed.\n  // Call `pre('find')` **before** calling `mongoose.model()` to make the middleware apply.\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#31",
+    "text": "## `bulkWrite()` results {#bulkwrite-results}\n\nMongoose 5.x uses version 3.x of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb). MongoDB driver 3.x changed the format of\nthe result of [`bulkWrite()` calls](api/model.html#model_Model-bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).\n\n```javascript\nconst Model = mongoose.model('Test', new Schema({ name: String }));\n\nconst res = await Model.bulkWrite([{ insertOne: { document: { name: 'test' } } }]);\n\nconsole.log(res);\n```\n\nIn Mongoose 4.x, the above will print:\n\n```txt\nBulkWriteResult {\n  ok: [Getter],\n  nInserted: [Getter],\n  nUpserted: [Getter],\n  nMatched: [Getter],\n  nModified: [Getter],\n  nRemoved: [Getter],\n  getInsertedIds: [Function],\n  getUpsertedIds: [Function],\n  getUpsertedIdAt: [Function],\n  getRawResponse: [Function],\n  hasWriteErrors: [Function],\n  getWriteErrorCount: [Function],\n  getWriteErrorAt: [Function],\n  getWriteErrors: [Function],\n  getLastOp: [Function],\n  getWriteConcernError: [Function],\n  toJSON: [Function],\n  toString: [Function],\n  isOk: [Function],\n  insertedCount: 1,\n  matchedCount: 0,\n  modifiedCount: 0,\n  deletedCount: 0,\n  upsertedCount: 0,\n  upsertedIds: {},\n  insertedIds: { '0': 5be9a3101638a066702a0d38 },\n  n: 1 }\n```\n\nIn Mongoose 5.x, the script will print:\n\n```txt\nBulkWriteResult {\n  result: \n  { ok: 1,\n    writeErrors: [],\n    writeConcernErrors: [],\n    insertedIds: [ [Object] ],\n    nInserted: 1,\n    nUpserted: 0,\n    nMatched: 0,\n    nModified: 0,\n    nRemoved: 0,\n    upserted: [],\n    lastOp: { ts: [Object], t: 1 } },\n  insertedCount: 1,\n  matchedCount: 0,\n  modifiedCount: 0,\n  deletedCount: 0,\n  upsertedCount: 0,\n  upsertedIds: {},\n  insertedIds: { '0': 5be9a1c87decfc6443dd9f18 },\n  n: 1 }\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_5.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/migrating_to_5.md#2",
+    "b": "mongoose:docs/migrating_to_5.md#31",
+    "relation": "unrelated",
+    "related": 0.0033,
+    "probabilities": {
+     "same": 0.0012,
+     "overlapping": 0.0011,
+     "conflicting": 0.0009,
+     "unrelated": 0.9967
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 36
+  }
+ }
+}

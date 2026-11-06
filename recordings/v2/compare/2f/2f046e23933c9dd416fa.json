@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2f/2f046e23933c9dd416fa",
+ "request_hash": "2f046e23933c9dd416fae2b6ae8f0a7f58e6ac5f5b806eba6b1b37a2020b26a7",
+ "recorded_at": "2026-11-06T14:17:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1871,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.342815",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=176"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "eslint:docs/src/use/migrate-to-10.0.0.md#24",
+    "text": "You can make changes for the removed `context` methods using the [`eslint-transforms`](https://www.npmjs.com/package/eslint-transforms) utility. To use the utility, first install it and then run the `v9-rule-migration` transform, like this:\n\n```shell\n# install the utility\nnpm install eslint-transforms -g\n\n# apply the transform to one file\neslint-transforms v9-rule-migration rule.js\n\n# apply the transform to all files in a directory\neslint-transforms v9-rule-migration rules/\n```\n\nThe removed `context` properties must be done manually as there may not be a direct one-to-one replacement.\n\n**Related issue(s):** [eslint/eslint#16999](https://github.com/eslint/eslint/issues/16999)"
+   },
+   {
+    "id": "eslint:docs/src/use/migrate-to-9.0.0.md#31",
+    "text": "## <a name=\"codepath-precalc\"></a> Code paths are now precalculated\n\nPrior to ESLint v9.0.0, code paths were calculated during the same AST traversal used by rules, meaning that the information passed to methods like `onCodePathStart` and `onCodePathSegmentStart` was incomplete. Specifically, array properties like `CodePath#childCodePaths` and `CodePathSegment#nextSegments` began empty and then were filled with the appropriate information as the traversal completed, meaning that those arrays could have different elements depending on when you checked their values.\n\nESLint v9.0.0 now precalculates code path information before the traversal used by rules. As a result, the code path information is now complete regardless of where it is accessed inside of a rule.\n\n**Codemod:** The migration codemods do not cover code path precalculation. Rules that rely on when `CodePath` or `CodePathSegment` array properties are populated must be reviewed manually. The [@eslint/v8-to-v9-custom-rules](#use-migration-codemods) codemod only migrates removed `CodePath#currentSegments` usage.\n\n**To address:** If you are accessing any array properties on `CodePath` or `CodePathSegment`, you'll need to update your code. Specifically:\n\n- If you are checking the `length` of any array properties, ensure you are using relative comparison operators like `<`, `>`, `<=`, and `>=` instead of equals.\n- If you are accessing the `nextSegments`, `prevSegments`, `allNextSegments`, or `allPrevSegments` properties on a `CodePathSegment`, or `CodePath#childCodePaths`, verify that your code will still work as expected. To be backwards compatible, consider moving the logic that checks these properties into `onCodePathEnd`.\n\n**Related Issues(s):** [#16999](https://github.com/eslint/eslint/issues/16999)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "eslint:docs/src/use/migrate-to-10.0.0.md#24",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "eslint:docs/src/use/migrate-to-9.0.0.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "eslint:docs/src/use/migrate-to-10.0.0.md#24",
+    "b": "eslint:docs/src/use/migrate-to-9.0.0.md#31",
+    "relation": "unrelated",
+    "related": 0.0813,
+    "probabilities": {
+     "same": 0.0153,
+     "overlapping": 0.0479,
+     "conflicting": 0.0181,
+     "unrelated": 0.9187
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 43
+  },
+  "timing": {
+   "read_ms": 42,
+   "total_ms": 45
+  }
+ }
+}

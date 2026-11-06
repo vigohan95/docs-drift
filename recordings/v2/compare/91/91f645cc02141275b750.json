@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/91/91f645cc02141275b750",
+ "request_hash": "91f645cc02141275b7502ae7b2d4eebdc0ef0767a0d7726e3375f381cf194700",
+ "recorded_at": "2026-11-06T14:14:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1005,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "70.789984",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=214"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#44",
+    "text": "## option: timestamps {#timestamps}\n\nThe `timestamps` option tells Mongoose to assign `createdAt` and `updatedAt` fields\nto your schema. The type assigned is [Date](schematypes.html#dates).\n\nBy default, the names of the fields are `createdAt` and `updatedAt`. Customize\nthe field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.\n\nThe way `timestamps` works under the hood is:\n\n* If you create a new document, mongoose simply sets `createdAt`, and `updatedAt` to the time of creation.\n* If you update a document, mongoose will add `updatedAt` to the `$set` object.\n* If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.\n\n```javascript\nconst thingSchema = new Schema({ /* ... */ }, { timestamps: { createdAt: 'created_at' } });\nconst Thing = mongoose.model('Thing', thingSchema);\nconst thing = new Thing();\nawait thing.save(); // `created_at` & `updatedAt` will be included\n\n// With updates, Mongoose will add `updatedAt` to `$set`\nawait Thing.updateOne({}, { $set: { name: 'Test' } });\n\n// If you set upsert: true, Mongoose will add `created_at` to `$setOnInsert` as well\nawait Thing.findOneAndUpdate({}, { $set: { name: 'Test2' } });\n\n// Mongoose also adds timestamps to bulkWrite() operations\n// See https://mongoosejs.com/docs/api/model.html#model_Model-bulkWrite\nawait Thing.bulkWrite([\n  {\n    insertOne: {\n      document: {\n        name: 'Jean-Luc Picard',\n        ship: 'USS Stargazer'\n      // Mongoose will add `created_at` and `updatedAt`\n      }\n    }\n  },\n  {\n    updateOne: {\n      filter: { name: 'Jean-Luc Picard' },\n      update: {\n        $set: {\n          ship: 'USS Enterprise'\n        // Mongoose will add `updatedAt`\n        }\n      }\n    }\n  }\n]);\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#32",
+    "text": "## Immutable `createdAt` {#immutable-createdat}\n\nIf you set `timestamps: true`, Mongoose will now make the `createdAt` property `immutable`. See [gh-10139](https://github.com/Automattic/mongoose/issues/10139)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#44",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#32",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#44",
+    "b": "mongoose:docs/migrating_to_6.md#32",
+    "relation": "overlapping",
+    "related": 0.9876,
+    "probabilities": {
+     "same": 0.0059,
+     "overlapping": 0.9628,
+     "conflicting": 0.0189,
+     "unrelated": 0.0124
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 50,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 80,
+   "total_ms": 83
+  }
+ }
+}

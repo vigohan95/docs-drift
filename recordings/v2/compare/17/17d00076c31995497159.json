@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/17/17d00076c31995497159",
+ "request_hash": "17d00076c3199549715937f1c5fddf8b8960aebb18c1b7e9ec924b5e83f6ef41",
+ "recorded_at": "2026-11-06T14:14:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 926,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.412319",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=198"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/1-promise.md#4",
+    "text": "### `promise.json(schema)`\n\n**Returns: `Promise<StandardSchemaV1InferOutput<Schema>>`**\n\nA shortcut method that gives a Promise returning a JSON object validated with a [Standard Schema](https://standardschema.dev)-compatible validator, such as [Zod](https://github.com/colinhacks/zod) or [Valibot](https://valibot.dev). The promise resolves with the output of the schema, and the return type is inferred from it.\n\nA custom [`parseJson`](2-options.md#parsejson) option runs first, so the schema receives the parsed body. The `validate` method of the schema may return a Promise.\n\nAn empty response body parses to an empty string, the same as for [`promise.json<T>()`](1-promise.md#promisejsont), so the schema receives `''`.\n\nThrows a [`SchemaValidationError`](8-errors.md#schemavalidationerror) when the body does not match the schema.\n\n> [!NOTE]\n> A `TypeError` is thrown when the argument does not follow the Standard Schema specification, for example when it has no `~standard.validate` method.\n\n```js\nimport got from 'got';\nimport {z} from 'zod';\n\nconst userSchema = z.object({name: z.string()});\n\nconst user = await got('https://example.com/user').json(userSchema);\n\nconsole.log(user.name);\n```"
+   },
+   {
+    "id": "got:documentation/9-hooks.md#10",
+    "text": "#### `beforeError`\n\n**Type: `BeforeErrorHook[]`**\\\n**Default: `[]`**\n\n```ts\n(error: RequestError) => Promisable<Error>\n```\n\nCalled with a [`RequestError`](8-errors.md#requesterror) instance. The error is passed to the hook right before it's thrown.\n\n> [!NOTE]\n> A [`SchemaValidationError`](8-errors.md#schemavalidationerror) is not passed to this hook, because it does not extend `RequestError`.\n\nThis hook can return any `Error` instance, allowing you to:\n- Return custom error classes for better error handling in your application\n- Extend `RequestError` with additional properties\n- Return plain `Error` instances when you don't need Got-specific error information\n\nThis is especially useful when you want to have more detailed errors or maintain backward compatibility with existing error handling code.\n\n```js\nimport got from 'got';\n\n// Modify and return the error\nawait got('https://api.github.com/repos/sindresorhus/got/commits', {\n\tresponseType: 'json',\n\thooks: {\n\t\tbeforeError: [\n\t\t\terror => {\n\t\t\t\tconst {response} = error;\n\t\t\t\tif (response && response.body) {\n\t\t\t\t\terror.name = 'GitHubError';\n\t\t\t\t\terror.message = `${response.body.message} (${response.statusCode})`;\n\t\t\t\t}\n\n\t\t\t\treturn error;\n\t\t\t}\n\t\t]\n\t}\n});\n\n// Return a custom error class\nclass CustomAPIError extends Error {\n\tconstructor(message, statusCode) {\n\t\tsuper(message);\n\t\tthis.name = 'CustomAPIError';\n\t\tthis.statusCode = statusCode;\n\t}\n}\n\nawait got('https://api.example.com/endpoint', {\n\thooks: {\n\t\tbeforeError: [\n\t\t\terror => {\n\t\t\t\t// Return a custom error for backward compatibility with your application\n\t\t\t\treturn new CustomAPIError(\n\t\t\t\t\terror.message,\n\t\t\t\t\terror.response?.statusCode\n\t\t\t\t);\n\t\t\t}\n\t\t]\n\t}\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/1-promise.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/9-hooks.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/1-promise.md#4",
+    "b": "got:documentation/9-hooks.md#10",
+    "relation": "unrelated",
+    "related": 0.0047,
+    "probabilities": {
+     "same": 0.0017,
+     "overlapping": 0.0016,
+     "conflicting": 0.0014,
+     "unrelated": 0.9953
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

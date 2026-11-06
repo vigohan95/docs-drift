@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/31/319ac3439438b063d6e3",
+ "request_hash": "319ac3439438b063d6e3347e6466884fde0f480ea8b248a786bee3b18675af88",
+ "recorded_at": "2026-11-06T14:11:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1006,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "111.579838",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=259"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#0",
+    "text": "## What are many-to-many relations?\n\nMany-to-many is a relation where A contains multiple instances of B, and B contains multiple instances of A.\nLet's take for example `Question` and `Category` entities.\nA question can have multiple categories, and each category can have multiple questions.\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column } from \"typeorm\"\n\n@Entity()\nexport class Category {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\nimport { Category } from \"./Category\"\n\n@Entity()\nexport class Question {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    title: string\n\n    @Column()\n    text: string\n\n    @ManyToMany(() => Category)\n    @JoinTable()\n    categories: Category[]\n}\n```\n\n`@JoinTable()` is required for `@ManyToMany` relations.\nYou must put `@JoinTable` on one (owning) side of relation.\nThe `deferrable` relation option applies to both foreign keys on the junction table; see [relation options](./1-relations.md#relation-options).\n\nThis example will produce following tables:\n\n```text\n+-------------+--------------+----------------------------+\n|                        category                         |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| name        | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|                        question                         |\n+-------------+--------------+----------------------------+\n| id          | int          | PRIMARY KEY AUTO_INCREMENT |\n| title       | varchar(255) |                            |\n| text        | varchar(255) |                            |\n+-------------+--------------+----------------------------+\n\n+-------------+--------------+----------------------------+\n|              question_categories_category               |\n+-------------+--------------+----------------------------+\n| questionId  | int          | PRIMARY KEY FOREIGN KEY    |\n| categoryId  | int          | PRIMARY KEY FOREIGN KEY    |\n+-------------+--------------+----------------------------+\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "text": "## Bi-directional relations\n\nRelations can be uni-directional and bi-directional.\nUni-directional relations are relations with a relation decorator only on one side.\nBi-directional relations are relations with decorators on both sides of a relation.\n\nWe just created a uni-directional relation. Let's make it bi-directional:\n\n```typescript\nimport { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from \"typeorm\"\nimport { Question } from \"./Question\"\n\n@Entity()\nexport class Category {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @ManyToMany(() => Question, (question) => question.categories)\n    questions: Question[]\n}\n```\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\nimport { Category } from \"./Category\"\n\n@Entity()\nexport class Question {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    title: string\n\n    @Column()\n    text: string\n\n    @ManyToMany(() => Category, (category) => category.questions)\n    @JoinTable()\n    categories: Category[]\n}\n```\n\nWe just made our relation bi-directional. Note that the inverse relation does not have a `@JoinTable`.\n`@JoinTable` must be only on one side of the relation.\n\nBi-directional relations allow you to join relations from both sides using `QueryBuilder`:\n\n```typescript\nconst categoriesWithQuestions = await dataSource\n    .getRepository(Category)\n    .createQueryBuilder(\"category\")\n    .leftJoinAndSelect(\"category.questions\", \"question\")\n    .getMany()\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/relations/4-many-to-many-relations.md#0",
+    "b": "typeorm:docs/docs/relations/4-many-to-many-relations.md#6",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.0153,
+     "overlapping": 0.978,
+     "conflicting": 0.0041,
+     "unrelated": 0.0026
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 86,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 120,
+   "total_ms": 124
+  }
+ }
+}

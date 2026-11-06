@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a6/a6e1b8894330d87e7640",
+ "request_hash": "a6e1b8894330d87e76402e50e376042ecc8b7bf0bc726e4d4440d6291cf1757e",
+ "recorded_at": "2026-11-06T14:11:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 950,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "114.505347",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=267"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "text": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together):\n\n```typescript\nawait manager.update(User, [{ status: \"expired\" }, { flagged: true }], {\n    active: false,\n})\n// executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true\n```\n\n- `updateAll` - Updates _all_ entities of target type (without WHERE clause). Sets fields from supplied partial entity.\n\n```typescript\nawait manager.updateAll(User, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT\n```\n\n- `upsert` - Inserts a new entity or array of entities unless they already exist in which case they are updated instead. Supported by AuroraDataApi, Cockroach, Mysql, Postgres, and Sqlite database drivers.\n\nWhen an upsert operation results in an update (due to a conflict), special columns like `@UpdateDateColumn` and `@VersionColumn` are automatically updated to their current values.\n\nColumns marked with `update: false` or defined as computed generated columns (via `asExpression`/`generatedType`) are **never** included in the update set on conflict. If all non-conflict columns are excluded by these rules (i.e. there are no updatable columns), the upsert degrades to an insert-or-ignore operation and the existing row is left completely unchanged. On databases that support conflict targets (e.g. PostgreSQL, CockroachDB), this is scoped to the specified conflict columns; on MySQL-family databases, `INSERT IGNORE` is used which applies to all unique constraints."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "text": "```typescript\nawait repository.upsert(\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\", dateAdded: \"2020-01-01\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\", dateAdded: \"2022-01-01\" },\n    ],\n    {\n        conflictPaths: [\"externalId\"],\n        skipUpdateIfNoValuesChanged: true, // supported by postgres, skips update if it would not change row values\n        indexPredicate: \"dateAdded > 2020-01-01\", // supported by postgres, allows for partial indexes\n    },\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak, dateAdded = 2020-01-01),\n *      (externalId = cba321, firstName = Karzzir, dateAdded = 2022-01-01),\n *  ON CONFLICT (externalId) WHERE ( dateAdded > 2021-01-01 ) DO UPDATE\n *  SET firstName = EXCLUDED.firstName,\n *  SET dateAdded = EXCLUDED.dateAdded,\n *  WHERE user.firstName IS DISTINCT FROM EXCLUDED.firstName OR user.dateAdded IS DISTINCT FROM EXCLUDED.dateAdded\n **/\n```\n\n- `delete` - Deletes entities by entity id, ids or given conditions:\n\n```typescript\nawait repository.delete(1)\nawait repository.delete([1, 2, 3])\nawait repository.delete({ firstName: \"Timber\" })\n```\n\n- `deleteAll` - Deletes _all_ entities of target type (without WHERE clause).\n\n```typescript\nawait repository.deleteAll()\n// executes DELETE FROM user\n```\n\nRefer also to the `clear` method, which performs database `TRUNCATE TABLE` operation instead."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "relation": "overlapping",
+    "related": 0.965,
+    "probabilities": {
+     "same": 0.0152,
+     "overlapping": 0.9371,
+     "conflicting": 0.0127,
+     "unrelated": 0.035
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 52,
+   "passage_reads": 1,
+   "passages_ms": 75,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 126,
+   "total_ms": 130
+  }
+ }
+}

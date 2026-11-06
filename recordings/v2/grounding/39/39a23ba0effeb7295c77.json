@@ -1,0 +1,100 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/39/39a23ba0effeb7295c77",
+ "request_hash": "39a23ba0effeb7295c77b4c03e99dc59235ea8f869cb0a0a73b703e8ff23b7e2",
+ "recorded_at": "2026-11-06T14:13:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 937,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "87.53779",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=224"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:packages/diff-sequences/README.md#10",
+    "text": "## Example of callback functions to find diff items\n\nHere is simplified code to find changed and unchanged substrings **within adjacent changed lines** in expected and received values after a test fails in Jest:\n\n```js\n// Return diff items for strings (compatible with diff-match-patch package).\nconst findDiffItems = (a, b) => {\n  const isCommon = (aIndex, bIndex) => a[aIndex] === b[bIndex];\n\n  let aIndex = 0;\n  let bIndex = 0;\n  const array = [];\n  const foundSubsequence = (nCommon, aCommon, bCommon) => {\n    if (aIndex !== aCommon) {\n      array.push([-1, a.slice(aIndex, aCommon)]); // delete is -1\n    }\n    if (bIndex !== bCommon) {\n      array.push([1, b.slice(bIndex, bCommon)]); // insert is 1\n    }\n\n    aIndex = aCommon + nCommon; // number of characters compared in a\n    bIndex = bCommon + nCommon; // number of characters compared in b\n    array.push([0, a.slice(aCommon, aIndex)]); // common is 0\n  };\n\n  diff(a.length, b.length, isCommon, foundSubsequence);\n\n  // After the last common subsequence, push remaining change items.\n  if (aIndex !== a.length) {\n    array.push([-1, a.slice(aIndex)]);\n  }\n  if (bIndex !== b.length) {\n    array.push([1, b.slice(bIndex)]);\n  }\n\n  return array;\n};\n\nconst expectedDeleted = ['\"sorting\": Object {', '\"ascending\": true,'].join(\n  '\\n',\n);\nconst receivedInserted = [\n  '\"sorting\": Array [',\n  'Object {',\n  '\"descending\": false,',\n].join('\\n');\n\nconst diffItems = findDiffItems(expectedDeleted, receivedInserted);\n```"
+   }
+  ],
+  "answer": "Call `diff` with the **lengths** of sequences and your **callback** functions: ## Usage of `diff()` Given JavaScript **values**, `diff(a, b, options?)` does the following:",
+  "claims": [
+   "Call `diff` with the **lengths** of sequences and your **callback** functions:",
+   "## Usage of `diff()` Given JavaScript **values**, `diff(a, b, options?)` does the following:"
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.1893,
+  "ungrounded": 0.8107,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "jest:packages/diff-sequences/README.md#10",
+    "share": 1,
+    "share_of_answer": 0.1893,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Call `diff` with the **lengths** of sequences and your **callback** functions:",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4588,
+    "supported": 0.3975,
+    "contradicted": 0.0172,
+    "not_stated": 0.5699,
+    "not_a_claim": 0.0154,
+    "verdict": "not_stated",
+    "sources": {
+     "jest:packages/diff-sequences/README.md#10": 1
+    },
+    "source": null,
+    "evidence": {
+     "document": "jest:packages/diff-sequences/README.md#10",
+     "quote": "diff(a.length, b.length, isCommon, foundSubsequence);",
+     "start": 924,
+     "end": 977,
+     "confidence": 1
+    }
+   },
+   {
+    "claim": "## Usage of `diff()` Given JavaScript **values**, `diff(a, b, options?)` does the following:",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5412,
+    "supported": 0.0127,
+    "contradicted": 0.0602,
+    "not_stated": 0.9142,
+    "not_a_claim": 0.0129,
+    "verdict": "not_stated",
+    "sources": {
+     "jest:packages/diff-sequences/README.md#10": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 1,
+   "supported": 0.0127
+  },
+  "timing": {
+   "read_ms": 95,
+   "total_ms": 98
+  }
+ }
+}

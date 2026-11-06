@@ -1,0 +1,213 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a5/a576076c66425734abca",
+ "request_hash": "a576076c66425734abca963ee5c6ce6db24b0e43065e730d36111660e5bdadc7",
+ "recorded_at": "2026-11-06T14:14:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1305,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "214.134882",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=531"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#9",
+    "text": "## `@CreateRequestContext()` decorator\n\n> Before v6, `@CreateRequestContext()` was called `@UseRequestContext()`.\n\nMiddlewares are executed only for regular HTTP request handlers, what if you need a request scoped method outside of that? One example of that is queue handlers or scheduled tasks (e.g. CRON jobs).\n\nIn those cases, you can use the `@CreateRequestContext()` decorator. It requires you to first inject the `MikroORM` instance (or an `EntityManager` or some `EntityRepository`) to current context, it will then be used to create a new context for you. Under the hood, the decorator will register the new request context for your method and execute it inside the context (via `RequestContext.create()`).\n\n> `@CreateRequestContext()` should be used only on the top level methods. It should not be nested - a method decorated with it should not call another method that is also decorated with it.\n\n```ts\nexport class MyService {\n\n  // or `private readonly em: EntityManager`\n  constructor(private readonly orm: MikroORM) { }\n\n  @CreateRequestContext()\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```\n\nAlternatively you can provide a callback that will return one of `MikroORM`, `EntityManager` or `EntityRepository` instance.\n\n```ts\nimport { DI } from '..';\n\nexport class MyService {\n\n  @CreateRequestContext(() => DI.em)\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```\n\nThe callback will receive current `this` in the first parameter. You can use it to link the `EntityManager` or `EntityRepository` too:\n\n```ts\nexport class MyService {\n\n  constructor(private readonly userRepository: EntityRepository<User>) { }\n\n  @CreateRequestContext<MyService>(t => t.userRepository)\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+    "text": "## Request scoped handlers in queues\n\n> `@CreateRequestContext()` decorator is available in the `@mikro-orm/decorators` package (in `@mikro-orm/core` before v7).\n\n> Before v6, `@CreateRequestContext()` was called `@UseRequestContext()`.\n\nAs mentioned in the [docs](./identity-map.md), you need a clean state for each request. That is handled automatically thanks to the `RequestContext` helper registered via middleware.\n\nBut middlewares are executed only for regular HTTP request handles, what if you need a request scoped method outside of that? One example of that is queue handlers or scheduled tasks.\n\nYou can use the `@CreateRequestContext()` decorator. It requires you to first inject the `MikroORM` instance to current context, it will be then used to create the context for you. Under the hood, the decorator will register new request context for your method and execute it inside the context.\n\n> `@CreateRequestContext()` should be used only on the top level methods. It should not be nested - a method decorated with it should not call another method that is also decorated with it.\n\n```ts\n@Controller()\nexport class MyService {\n\n  constructor(private readonly orm: MikroORM) { }\n\n  @CreateRequestContext()\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```\n\nAlternatively you can provide a callback that will return the `MikroORM` instance."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/usage-with-nestjs.md#8"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/identity-map.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/identity-map.md#9",
+    "b": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0112,
+     "overlapping": 0.9819,
+     "conflicting": 0.0048,
+     "unrelated": 0.0022
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0241,
+       "restated": 0.9292,
+       "elaborated": 0.0342,
+       "different": 0.0125
+      },
+      "confidence": 0.9875,
+      "a": {
+       "document": "mikro-orm:docs/docs/identity-map.md#9",
+       "quote": "Middlewares are executed only for regular HTTP request handlers, what if you need a request scoped method outside of that?",
+       "start": 115,
+       "end": 237,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+       "quote": "That is handled automatically thanks to the `RequestContext` helper registered via middleware.\n\nBut middlewares are executed only for regular HTTP request handles, what if you need a request scoped method outside of that?",
+       "start": 326,
+       "end": 547,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0526,
+       "restated": 0.8286,
+       "elaborated": 0.1078,
+       "different": 0.011
+      },
+      "confidence": 0.617,
+      "a": {
+       "document": "mikro-orm:docs/docs/identity-map.md#9",
+       "quote": "One example of that is queue handlers or scheduled tasks (e.g.",
+       "start": 238,
+       "end": 300,
+       "confidence": 0.617
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+       "quote": "One example of that is queue handlers or scheduled tasks.\n\nYou can use the `@CreateRequestContext()` decorator.",
+       "start": 548,
+       "end": 659,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0237,
+       "restated": 0.7792,
+       "elaborated": 0.1841,
+       "different": 0.013
+      },
+      "confidence": 0.987,
+      "a": {
+       "document": "mikro-orm:docs/docs/identity-map.md#9",
+       "quote": "It should not be nested - a method decorated with it should not call another method that is also decorated with it.",
+       "start": 790,
+       "end": 905,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+       "quote": "It requires you to first inject the `MikroORM` instance to current context, it will be then used to create the context for you.",
+       "start": 660,
+       "end": 787,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.912,
+       "restated": 0.036,
+       "elaborated": 0.0416,
+       "different": 0.0104
+      },
+      "confidence": 0.9896,
+      "a": {
+       "document": "mikro-orm:docs/docs/identity-map.md#9",
+       "quote": "Under the hood, the decorator will register the new request context for your method and execute it inside the context (via `RequestContext.create()`).",
+       "start": 564,
+       "end": 714,
+       "confidence": 0.994
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+       "quote": "Under the hood, the decorator will register new request context for your method and execute it inside the context.\n\n> `@CreateRequestContext()` should be used only on the top level methods.",
+       "start": 788,
+       "end": 977,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.0209,
+       "restated": 0.4265,
+       "elaborated": 0.5371,
+       "different": 0.0156
+      },
+      "confidence": 0.9844,
+      "a": {
+       "document": "mikro-orm:docs/docs/identity-map.md#9",
+       "quote": "It should not be nested - a method decorated with it should not call another method that is also decorated with it.",
+       "start": 790,
+       "end": 905,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/usage-with-nestjs.md#8",
+       "quote": "It should not be nested - a method decorated with it should not call another method that is also decorated with it.\n\n```ts\n@Controller()\nexport class MyService {\n\n  constructor(private readonly orm: MikroORM) { }\n\n  @CreateRequestContext()\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```\n\nAlternatively you can provide a callback that will return the `MikroORM` instance.",
+       "start": 978,
+       "end": 1387,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 39,
+   "passage_reads": 1,
+   "passages_ms": 136,
+   "passages": 5,
+   "counterparts_ms": 208
+  },
+  "timing": {
+   "read_ms": 383,
+   "total_ms": 387
+  }
+ }
+}

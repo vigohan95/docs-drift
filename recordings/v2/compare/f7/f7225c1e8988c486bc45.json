@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f7/f7225c1e8988c486bc45",
+ "request_hash": "f7225c1e8988c486bc45a46fa89d185d16892d872cef084b08c258d753a6ae25",
+ "recorded_at": "2026-11-06T14:12:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 936,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.886271",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=229"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "text": "```typescript\nconst userMetadata = dataSource.getMetadata(User)\n// now you can get any information about User entity\n```\n\n- `getRepository` - Gets `Repository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getRepository(User)\n// now you can call repository methods, for example find:\nconst users = await repository.find()\n```\n\n- `getTreeRepository` - Gets `TreeRepository` of the given entity.\n  You can also specify a table name and if repository for given table is found it will be returned.\n  Learn more about [Repositories](../working-with-entity-manager/2-working-with-repository.md).\n\n```typescript\nconst repository = dataSource.getTreeRepository(Category)\n// now you can call tree repository methods, for example findTrees:\nconst categories = await repository.findTrees()\n```\n\n- `getMongoRepository` - Gets `MongoRepository` of the given entity.\n  This repository is used for entities in MongoDB dataSource.\n  Learn more about [MongoDB support](../drivers/mongodb.md).\n\n```typescript\nconst repository = dataSource.getMongoRepository(User)\n// now you can call mongodb-specific repository methods, for example createEntityCursor:\nconst categoryCursor = repository.createEntityCursor()\nconst category1 = await categoryCursor.next()\nconst category2 = await categoryCursor.next()\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#14",
+    "text": "#### `stats()` method removed\n\nThe `stats()` method has been removed from `MongoQueryRunner`, `MongoEntityManager`, and `MongoRepository`. The underlying `collStats` command was deprecated in MongoDB server 6.2 and the `Collection.stats()` method was removed in MongoDB Driver v7.\n\nUse the [`$collStats`](https://www.mongodb.com/docs/manual/reference/operator/aggregation/collStats/) aggregation stage instead. Note that the response shape is different — properties like `count`, `size`, and `storageSize` are nested under `storageStats` rather than at the top level.\n\n```typescript\n// Before\nconst stats = await mongoRepository.stats()\nconsole.log(stats.count)\nconsole.log(stats.size)\nconsole.log(stats.totalIndexSize)\n\n// After — use $collStats aggregation stage\nconst [stats] = await dataSource.mongoManager\n    .aggregate(MyEntity, [{ $collStats: { storageStats: {} } }])\n    .toArray()\nconsole.log(stats.storageStats.count)\nconsole.log(stats.storageStats.size)\nconsole.log(stats.storageStats.totalIndexSize)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/data-source/4-data-source-api.md#2",
+    "b": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#14",
+    "relation": "unrelated",
+    "related": 0.1396,
+    "probabilities": {
+     "same": 0.0156,
+     "overlapping": 0.1089,
+     "conflicting": 0.0151,
+     "unrelated": 0.8604
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 45
+  },
+  "timing": {
+   "read_ms": 45,
+   "total_ms": 48
+  }
+ }
+}

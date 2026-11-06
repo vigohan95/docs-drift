@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c5/c513fd08829fb29a3f3c",
+ "request_hash": "c513fd08829fb29a3f3c72cd246e2034ac5c2f2199eb50ee36383facb38cfe2d",
+ "recorded_at": "2026-11-06T14:13:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1137,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "228.858721",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=438"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#2",
+    "text": "### `RunnableDevEnvironment`\n\n`RunnableDevEnvironment` is an environment that can communicate arbitrary JavaScript values with your application code. Importing a module returns its real, live exports (functions, class instances, and any other values), so frameworks can run their server entries directly. The implicit `ssr` environment and other non-client environments use a `RunnableDevEnvironment` by default during dev. You can guard access to the runner with the `isRunnableDevEnvironment` function.\n\nIts `runner` is a `ModuleRunner`. You import modules through it with `runner.import(url)`, which fetches, transforms, and evaluates a module from the Vite module graph (the `url` accepts a file path, server path, or id relative to the root) and returns the instantiated module with full HMR support. It is the modern replacement for `server.ssrLoadModule`, so frameworks can migrate to it to enable HMR for their SSR dev story.\n\n:::info Why it can communicate arbitrary values\nA `RunnableDevEnvironment` evaluates modules in the same runtime as the Vite server, so values cross the boundary in-process instead of being serialized. This is what distinguishes it from [`FetchableDevEnvironment`](#fetchabledevenvironment), which can only communicate through serialized `Request`/`Response` objects over the Fetch API. As a result, using a `RunnableDevEnvironment` requires the runner's runtime to be the same as the one the Vite server is running in.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "text": "```ts\nexport class RunnableDevEnvironment extends DevEnvironment {\n  public readonly runner: ModuleRunner\n}\n\nclass ModuleRunner {\n  /**\n   * URL to execute.\n   * Accepts file path, server path, or id relative to the root.\n   * Returns an instantiated module (same as in ssrLoadModule)\n   */\n  public async import(url: string): Promise<Record<string, any>>\n  /**\n   * Other ModuleRunner methods...\n   */\n}\n\nif (isRunnableDevEnvironment(server.environments.ssr)) {\n  await server.environments.ssr.runner.import('/entry-point.js')\n}\n```\n\n:::warning\nThe `runner` is evaluated lazily only when it's accessed for the first time. Beware that Vite enables source map support when the `runner` is created by calling `process.setSourceMapsEnabled` or by overriding `Error.prepareStackTrace` if it's not available.\n:::\n\nGiven a Vite server configured in middleware mode as described by the [SSR setup guide](/guide/ssr#setting-up-the-dev-server), let's implement the SSR middleware using the environment API. Remember that it doesn't have to be called `ssr`, so we'll name it `server` in this example. Error handling is omitted.\n\n```js\nimport fs from 'node:fs'\nimport path from 'node:path'\nimport { createServer } from 'vite'\n\nconst viteServer = await createServer({\n  server: { middlewareMode: true },\n  appType: 'custom',\n  environments: {\n    server: {\n      // by default, modules are run in the same process as the vite server\n    },\n  },\n})\n\n// You might need to cast this to RunnableDevEnvironment in TypeScript or\n// use isRunnableDevEnvironment to guard the access to the runner\nconst serverEnvironment = viteServer.environments.server\n\napp.use('*', async (req, res, next) => {\n  const url = req.originalUrl\n\n  // 1. Read index.html\n  const indexHtmlPath = path.resolve(import.meta.dirname, 'index.html')\n  let template = fs.readFileSync(indexHtmlPath, 'utf-8')\n\n  // 2. Apply Vite HTML transforms. This injects the Vite HMR client,\n  //    and also applies HTML transforms from Vite plugins, e.g. global\n  //    preambles from @vitejs/plugin-react\n  template = await viteServer.transformIndexHtml(url, template)\n\n  // 3. Load the server entry. import(url) automatically transforms\n  //    ESM source code to be usable in Node.js! There is no bundling\n  //    required, and provides full HMR support.\n  const { render } = await serverEnvironment.runner.import(\n    '/src/entry-server.js',\n  )"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-frameworks.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-frameworks.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-frameworks.md#2",
+    "b": "vite:docs/guide/api-environment-frameworks.md#3",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0073,
+     "overlapping": 0.9867,
+     "conflicting": 0.0037,
+     "unrelated": 0.0022
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.008,
+       "restated": 0.9759,
+       "elaborated": 0.0084,
+       "different": 0.0076
+      },
+      "confidence": 0.9924,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#2",
+       "quote": "You import modules through it with `runner.import(url)`, which fetches, transforms, and evaluates a module from the Vite module graph (the `url` accepts a file path, server path, or id relative to the root) and returns the instantiated module with full HMR support.",
+       "start": 540,
+       "end": 805,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#3",
+       "quote": "There is no bundling\n  //    required, and provides full HMR support.\n  const { render } = await serverEnvironment.runner.import(\n    '/src/entry-server.js',\n  )",
+       "start": 2229,
+       "end": 2390,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 122,
+   "passages": 2,
+   "counterparts_ms": 83
+  },
+  "timing": {
+   "read_ms": 240,
+   "total_ms": 245
+  }
+ }
+}

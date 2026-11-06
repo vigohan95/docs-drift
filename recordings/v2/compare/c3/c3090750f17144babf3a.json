@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c3/c3090750f17144babf3a",
+ "request_hash": "c3090750f17144babf3a9da67bc03c3d408e55567bb9ccbc9ad28b90d5fe3156",
+ "recorded_at": "2026-11-06T14:15:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 933,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "108.856001",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=253"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/loading-strategies.md#4",
+    "text": "### Per-parent limiting\n\nYou can limit the number of items loaded per parent entity using the `limit` option in `populateHints`. This is useful when a relation can have many items (e.g., thousands of posts per user) but you only need a few per parent.\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts'],\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n// each user.posts collection will have at most 5 items (the most recent ones)\n```\n\nYou can also use `offset` for pagination:\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts'],\n  populateHints: {\n    posts: { limit: 5, offset: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n```\n\nDifferent limits can be applied at each level of nested population:\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts.comments'],\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n    'posts.comments': { limit: 3 },\n  },\n});\n```\n\nThe `orderBy` in `populateHints` takes precedence over nested `FindOptions.orderBy`. If neither is provided, the relation's default ordering is used.\n\nCollections loaded with a limit are marked as **partial and readonly** — you cannot add or remove items from them, which prevents the Unit of Work from treating unloaded items as removals.\n\nUnder the hood, SQL drivers use `ROW_NUMBER() OVER (PARTITION BY ...)` window functions to efficiently limit per parent in a single query. MongoDB uses an aggregation pipeline with `$group` and `$slice`.\n\n> When `limit` is set, the loading strategy is automatically forced to `select-in`, since the `joined` strategy cannot apply per-parent limiting within a join.\n\nThis also works with `em.populate()`:\n\n```ts\nawait em.populate(users, ['posts'], {\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/populating-relations.md#4",
+    "text": "## Loading strategies\n\nThe way that MikroORM fetches the data based on populate hint is also configurable. By default, MikroORM uses a \"select in\" strategy which runs one separate query for each level of a populate. If you're using an SQL database you can also ask MikroORM to use a join for all tables involved in the populate and run it as a single query. This is again configurable globally or per query.\n\nYou can also use `populateHints` to override the strategy or join type for individual relations:\n\n```ts\nconst tags = await em.find(BookTag, {}, {\n  populate: ['books.author'],\n  strategy: 'joined',\n  populateHints: {\n    'books.author': { strategy: 'select-in' },\n  },\n});\n```\n\nYou can also use `populateHints` to limit the number of items loaded per parent:\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts'],\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n```\n\nFor more information see the [Loading Strategies section](./loading-strategies.md#per-parent-limiting)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/loading-strategies.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/populating-relations.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/loading-strategies.md#4",
+    "b": "mikro-orm:docs/docs/populating-relations.md#4",
+    "relation": "overlapping",
+    "related": 0.9987,
+    "probabilities": {
+     "same": 0.0035,
+     "overlapping": 0.9926,
+     "conflicting": 0.0026,
+     "unrelated": 0.0013
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 117,
+   "total_ms": 120
+  }
+ }
+}

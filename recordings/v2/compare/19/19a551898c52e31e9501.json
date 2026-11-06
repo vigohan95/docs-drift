@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/19/19a551898c52e31e9501",
+ "request_hash": "19a551898c52e31e9501724aa6c7db5e3c5899b366ff4e729d8bf931dcefb89c",
+ "recorded_at": "2026-11-06T14:20:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 970,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.748674",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=212"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/mocking/classes.md#2",
+    "text": ":::\n\nNow, when we create a new instance of the `Dog` class its `speak` method (alongside `feed` and `greet`) is already mocked:\n\n```ts\nconst Cooper = new Dog('Cooper')\nCooper.speak() // loud bark!\nCooper.greet() // Hi! My name is Cooper!\n\n// you can use built-in assertions to check the validity of the call\nexpect(Cooper.speak).toHaveBeenCalled()\nexpect(Cooper.greet).toHaveBeenCalled()\n\nconst Max = new Dog('Max')\n\n// methods are not shared between instances if you assigned them directly\nexpect(Max.speak).not.toHaveBeenCalled()\nexpect(Max.greet).not.toHaveBeenCalled()\n```\n\nYou don't have to redefine every method as a class field. Instances keep the prototype chain of the class you pass to `vi.fn`, so prototype methods stay available on instances, both during and after construction, and instances pass `instanceof` checks against that class:\n\n```ts\nclass OriginalDog {\n  constructor(name) {\n    this.name = name\n  }\n\n  speak() {\n    return 'bark!'\n  }\n}\n\nconst MockedDog = vi.fn(OriginalDog)\nconst dog = new MockedDog('Cooper')\n\ndog.speak() // bark!\ndog instanceof MockedDog // true\ndog instanceof OriginalDog // true\n```\n\nNote that nothing is mocked in this example. Unlike the `speak = vi.fn()` field in the `Dog` example above, the instance doesn't receive its own mock function. `dog.speak` is found through the prototype chain and refers to the original class method (`dog.speak === MockedDog.prototype.speak`), so call assertions throw:"
+   },
+   {
+    "id": "vitest:docs/api/vi.md#17",
+    "text": "### vi.fn\n\n```ts\nfunction fn(fn?: Procedure | Constructable): Mock\n```\n\nCreates a spy on a function, but can also be initiated without one. Every time a function is invoked, it stores its call arguments, returns, and instances. Additionally, you can manipulate its behavior with [methods](/api/mock).\nIf no function is given, mock will return `undefined` when invoked.\n\n```ts\nconst getApples = vi.fn(() => 0)\n\ngetApples()\n\nexpect(getApples).toHaveBeenCalled()\nexpect(getApples).toHaveReturnedWith(0)\n\ngetApples.mockReturnValueOnce(5)\n\nconst res = getApples()\nexpect(res).toBe(5)\nexpect(getApples).toHaveNthReturnedWith(2, 5)\n```\n\nYou can also pass down a class to `vi.fn`:\n\n```ts\nconst Cart = vi.fn(class {\n  get() {\n    return 0\n  }\n})\n\nconst cart = new Cart()\nexpect(Cart).toHaveBeenCalled()\nexpect(cart.get()).toBe(0)\n```\n\nInstances keep the prototype chain of the implementation class, so its prototype methods are available on instances, and `instanceof` checks against the implementation class pass. See [Mocking Classes](/guide/mocking/classes) for details."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/mocking/classes.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/api/vi.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/mocking/classes.md#2",
+    "b": "vitest:docs/api/vi.md#17",
+    "relation": "overlapping",
+    "related": 0.9981,
+    "probabilities": {
+     "same": 0.0046,
+     "overlapping": 0.9904,
+     "conflicting": 0.003,
+     "unrelated": 0.0019
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 101,
+   "total_ms": 105
+  }
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/32/32a47ba25a08e592dfb0",
+ "request_hash": "32a47ba25a08e592dfb0722470307afe5ee626d9a2d137ac851b2e71d0830347",
+ "recorded_at": "2026-11-06T14:14:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1102,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "219.977055",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=382"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#35",
+    "text": "## Locking support\n\nYou can set the `LockMode` via `qb.setLockMode()`.\n\n```ts\nconst qb = em.createQueryBuilder(Test);\nqb.select('*').where({ name: 'Lol 321' }).setLockMode(LockMode.PESSIMISTIC_READ);\n\nconsole.log(qb.getQuery()); // for MySQL\n// select `e0`.* from `test` as `e0` where `e0`.`name` = ? lock in share mode\n```\n\nAvailable lock modes:\n\n| Mode                                 | Postgres                 | MySQL                            |\n| ------------------------------------ | ------------------------ | -------------------------------- |\n| `LockMode.PESSIMISTIC_READ`          | `for share`              | `lock in share mode`             |\n| `LockMode.PESSIMISTIC_WRITE`         | `for update`             | `for update`                     |\n| `LockMode.PESSIMISTIC_PARTIAL_WRITE` | `for update skip locked` | `for update skip locked`         |\n| `LockMode.PESSIMISTIC_WRITE_OR_FAIL` | `for update nowait`      | `for update nowait`              |\n| `LockMode.PESSIMISTIC_PARTIAL_READ`  | `for share skip locked`  | `lock in share mode skip locked` |\n| `LockMode.PESSIMISTIC_READ_OR_FAIL`  | `for share nowait`       | `lock in share mode nowait`      |\n\nOptionally you can also pass list of table aliases you want to lock via second parameter:\n\n```ts\nconst qb = em.createQueryBuilder(User, 'u');\nqb.select('*')\n  .leftJoinAndSelect('u.identities', 'i')\n  .where({ name: 'Jon' })\n  .setLockMode(LockMode.PESSIMISTIC_READ, ['u']);\n\nconsole.log(qb.getQuery()); // for Postgres\n// select ...\n//   from \"user\" as \"u\"\n//   left join \"identity\" as \"i\" on \"u\".\"id\" = \"i\".\"user_id\"\n//   where \"u\".\"name\" = 'Jon'\n//   for update of \"u\" skip locked\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#23",
+    "text": "You can use pessimistic locks in three different scenarios:\n\n1. Using `em.findOne(className, id, { lockMode: LockMode.PESSIMISTIC_WRITE })` or `em.findOne(className, id, { lockMode: LockMode.PESSIMISTIC_READ })`\n2. Using `em.lock(entity, LockMode.PESSIMISTIC_WRITE)` or `em.lock(entity, LockMode.PESSIMISTIC_READ)`\n3. Using `QueryBuilder.setLockMode(LockMode.PESSIMISTIC_WRITE)` or `QueryBuilder.setLockMode(LockMode.PESSIMISTIC_READ)`\n\nOptionally you can also pass list of table aliases you want to lock via `lockTableAliases` option:\n\n```ts\nconst res = await em.find(User, { name: 'Jon' }, {\n  populate: ['identities'],\n  strategy: LoadStrategy.JOINED,\n  lockMode: LockMode.PESSIMISTIC_READ,\n  lockTableAliases: ['u0'],\n});\n\n// select ...\n//   from \"user\" as \"u0\"\n//   left join \"identity\" as \"i1\" on \"u0\".\"id\" = \"i1\".\"user_id\"\n//   where \"u0\".\"name\" = 'Jon'\n//   for update of \"u0\" skip locked\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#35",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/transactions.md#23"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#23",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/query-builder.md#35"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/query-builder.md#35",
+    "b": "mikro-orm:docs/docs/transactions.md#23",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0063,
+     "overlapping": 0.9854,
+     "conflicting": 0.006,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0109,
+       "restated": 0.8044,
+       "elaborated": 0.0471,
+       "different": 0.1375
+      },
+      "confidence": 0.8625,
+      "a": {
+       "document": "mikro-orm:docs/docs/query-builder.md#35",
+       "quote": "You can set the `LockMode` via `qb.setLockMode()`.",
+       "start": 20,
+       "end": 70,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/transactions.md#23",
+       "quote": "Using `QueryBuilder.setLockMode(LockMode.PESSIMISTIC_WRITE)` or `QueryBuilder.setLockMode(LockMode.PESSIMISTIC_READ)`\n\nOptionally you can also pass list of table aliases you want to lock via `lockTableAliases` option:\n\n```ts\nconst res = await em.find(User, { name: 'Jon' }, {\n  populate: ['identities'],\n  strategy: LoadStrategy.JOINED,\n  lockMode: LockMode.PESSIMISTIC_READ,\n  lockTableAliases: ['u0'],\n});\n\n// select ...\n//   from \"user\" as \"u0\"\n//   left join \"identity\" as \"i1\" on \"u0\".\"",
+       "start": 318,
+       "end": 809,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 3,
+   "counterparts_ms": 101
+  },
+  "timing": {
+   "read_ms": 231,
+   "total_ms": 234
+  }
+ }
+}

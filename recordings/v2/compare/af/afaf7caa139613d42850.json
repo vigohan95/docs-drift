@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/af/afaf7caa139613d42850",
+ "request_hash": "afaf7caa139613d42850af935ddadcd452eb965eee96bdf9a2f8cafedde59d53",
+ "recorded_at": "2026-11-06T14:15:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 848,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.290592",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=157"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/composite-keys.md#10",
+    "text": "  </TabItem>\n\n<TabItem value=\"define-entity\">\n\n```ts\nexport const Order = defineEntity({\n  name: 'Order',\n  properties: {\n    id: p.integer().primary().autoincrement(),\n    customer: () => p.manyToOne(Customer),\n    items: () => p.oneToMany(OrderItem).mappedBy('order'),\n    paid: p.boolean().default(false),\n    shipped: p.boolean().default(false),\n    created: p.datetime().onCreate(() => new Date()),\n  },\n});\n\nexport const Product = defineEntity({\n  name: 'Product',\n  properties: {\n    id: p.integer().primary().autoincrement(),\n    name: p.string(),\n    currentPrice: p.float(),\n  },\n});\n\nexport const OrderItem = defineEntity({\n  name: 'OrderItem',\n  properties: {\n    order: () => p.manyToOne(Order).primary(),\n    product: () => p.manyToOne(Product).primary(),\n    amount: p.integer().default(1),\n    offeredPrice: p.float(),\n  },\n  primaryKeys: ['order', 'product'],\n});\n```\n\n</TabItem>\n<TabItem value=\"reflect-metadata\">\n\n```ts\n@Entity()\nexport class Order {\n\n  @PrimaryKey()\n  id!: number;\n\n  @ManyToOne(() => Customer)\n  customer: Customer;\n\n  @OneToMany(() => OrderItem, item => item.order)\n  items = new Collection<OrderItem>(this);\n\n  @Property()\n  paid = false;\n\n  @Property()\n  shipped = false;\n\n  @Property()\n  created = new Date();\n\n  constructor(customer: Customer) {\n    this.customer = customer;\n  }\n\n}\n\n@Entity()\nexport class Product {\n\n  @PrimaryKey()\n  id!: number;\n\n  @Property()\n  name!: string;\n\n  @Property()\n  currentPrice!: number;\n\n}\n\n@Entity()\nexport class OrderItem {\n\n  @ManyToOne(() => Order, { primary: true })\n  order: Order;\n\n  @ManyToOne(() => Product, { primary: true })\n  product: Product;\n\n  @Property()\n  amount = 1;\n\n  @Property()\n  offeredPrice: number;\n\n  [PrimaryKeyProp]?: ['order', 'product']; // this is needed for proper type checks in `FilterQuery`\n\n  constructor(order: Order, product: Product, amount = 1) {\n    this.order = order;\n    this.product = product;\n    this.offeredPrice = product.currentPrice;\n  }\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#6",
+    "text": "### @Filter()\n\n`@Filter()` decorator is used to define filters on entities. Filters allow automatic application of conditions to queries.\n\nSee [Filters](./filters.md) for more details.\n\n| Parameter | Type                                          | Optional | Description                                                             |\n|-----------|-----------------------------------------------|----------|-------------------------------------------------------------------------|\n| `name`    | `string`                                      | no       | Filter name used to enable/disable it.                                  |\n| `cond`    | `FilterQuery` &#124; `Function`               | no       | Filter condition or callback returning the condition.                   |\n| `default` | `boolean`                                     | yes      | Whether the filter is enabled by default.                               |\n| `args`    | `boolean`                                     | yes      | Whether the filter accepts arguments.                                   |\n\n```ts\n@Entity()\n@Filter({ name: 'isActive', cond: { active: true }, default: true })\nexport class User {\n\n  @PrimaryKey()\n  id!: number;\n\n  @Property()\n  active!: boolean;\n\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/composite-keys.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/composite-keys.md#10",
+    "b": "mikro-orm:docs/docs/decorators.md#6",
+    "relation": "unrelated",
+    "related": 0.0053,
+    "probabilities": {
+     "same": 0.0019,
+     "overlapping": 0.0017,
+     "conflicting": 0.0017,
+     "unrelated": 0.9947
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36
+  },
+  "timing": {
+   "read_ms": 36,
+   "total_ms": 38
+  }
+ }
+}

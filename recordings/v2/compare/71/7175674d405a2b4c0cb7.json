@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/71/7175674d405a2b4c0cb7",
+ "request_hash": "7175674d405a2b4c0cb7c74f5b9bfeb9df2ad51dc9929cb29d1afd13243694d2",
+ "recorded_at": "2026-11-06T14:15:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1102,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "182.952097",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=384"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#15",
+    "text": "### Streaming\n\nIf you want to process large amount of entities without loading them all into memory at once, you can use `em.stream()` method. It returns an async iterable, so you can use it in `for await ... of` loop.\n\n```ts\nconst stream = em.stream(Book, {\n  populate: ['author'],\n  where: { price: { $gt: 100 } },\n  orderBy: { id: 'ASC' },\n});\n\nfor await (const book of stream) {\n  console.log(book.title);\n  console.log(book.author.name);\n}\n```\n\nThere are several constraints when using streaming:\n\n- Returned entities are not managed. Identity holds only for the returned entity graph.\n- Joined strategy is enforced for all populated relations.\n- When populating to-many relations, only fully hydrated entities will be returned.\n- You should provide an `orderBy` clause to ensure consistent ordering.\n- With mongodb driver, only root entities can be streamed, `populate` option is ignored.\n\nTo stream results row-by-row, use `mergeResults: false` option. In this mode, if you populate to-many relations, you will get duplicated root entities, one per each row (due to the cartesian product caused by the to-many join).\n\n```ts\nconst stream = em.stream(Book, {\n  populate: ['author'],\n  where: { price: { $gt: 100 } },\n  orderBy: { id: 'ASC' },\n  mergeResults: false,\n});\n```\n\nTo stream raw results, use `QueryBuilder.stream()` or `driver.stream()` methods directly. Read more about this in the [Streaming guide](./streaming.md)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/streaming.md#5",
+    "text": "## MongoDB limitations\n\nWhen using MongoDB driver, only root entities can be streamed. The `populate` option is ignored and no relations are populated. If you need to access relations, use `em.populate` on the streamed results explicitly. Note that you should either clear the EntityManager afterward, or use a temporary fork.\n\n```ts\nconst stream = em.stream(Book, {\n  where: { price: { $gt: 100 } },\n  orderBy: { id: 'ASC' },\n});\n\nfor await (const book of stream) {\n  console.log(book.title);\n  const fork = em.fork();\n  await fork.populate(book, ['author']);\n  console.log(book.author.name);\n}\n```\n\nFor virtual entities that are backed by aggregation pipelines, you can stream them as well, but your `expression` needs to return a stream. To do that, you can use `em.streamAggregate()` method (as opposed to `em.aggregate()` which returns all the results directly). To be able to have a single virtual entity definition that works both with `em.find` and `em.stream`, use the 4th parameter of the `expression` callback to detect whether streaming is requested:\n\n```ts\nconst BookWithAuthor = defineEntity({\n  name: 'BookWithAuthor',\n  expression: (em: EntityManager, where, options, stream) => {\n    const pipeline = [\n      { $match: { /* ... */ } },\n      { $lookup: { /* ... */ } },\n      // ...\n    ];\n\n    if (stream) {\n      return em.streamAggregate(Book, pipeline);\n    }\n\n    return em.aggregate(Book, pipeline);\n  },\n  properties: {\n    title: p.string(),\n    authorName: p.string(),\n  },\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#15",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/streaming.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/streaming.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/entity-manager.md#15"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-manager.md#15",
+    "b": "mikro-orm:docs/docs/streaming.md#5",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0068,
+     "overlapping": 0.9864,
+     "conflicting": 0.0044,
+     "unrelated": 0.0024
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0056,
+       "restated": 0.9841,
+       "elaborated": 0.0056,
+       "different": 0.0046
+      },
+      "confidence": 0.9954,
+      "a": {
+       "document": "mikro-orm:docs/docs/entity-manager.md#15",
+       "quote": "- With mongodb driver, only root entities can be streamed, `populate` option is ignored.",
+       "start": 806,
+       "end": 894,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/streaming.md#5",
+       "quote": "## MongoDB limitations\n\nWhen using MongoDB driver, only root entities can be streamed.",
+       "start": 0,
+       "end": 86,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0096,
+       "restated": 0.9666,
+       "elaborated": 0.017,
+       "different": 0.0068
+      },
+      "confidence": 0.9932,
+      "a": {
+       "document": "mikro-orm:docs/docs/entity-manager.md#15",
+       "quote": "- With mongodb driver, only root entities can be streamed, `populate` option is ignored.",
+       "start": 806,
+       "end": 894,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/streaming.md#5",
+       "quote": "The `populate` option is ignored and no relations are populated.",
+       "start": 87,
+       "end": 151,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 98,
+   "passages": 2,
+   "counterparts_ms": 62
+  },
+  "timing": {
+   "read_ms": 193,
+   "total_ms": 197
+  }
+ }
+}

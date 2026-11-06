@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d3/d3b16c76112a705736f8",
+ "request_hash": "d3b16c76112a705736f88253c6004c84a2523e742f2a881166c0edea9f0b6a43",
+ "recorded_at": "2026-11-06T14:15:29Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1090,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "120.817886",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=351"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#2",
+    "text": "### Type-safe `$` access\n\nWhen a collection is populated, MikroORM types it as `LoadedCollection`, which exposes a `$` accessor (and its alias `get()`). This gives you type-safe access to the collection that TypeScript knows is initialized:\n\n```ts\nconst author = await em.findOne(Author, '...', { populate: ['books'] });\n\n// `author.books.$` is typed as `Collection<Book>` — TypeScript knows it's loaded\nfor (const book of author.books.$) {\n  console.log(book.title);\n}\n```\n\nWithout the populate hint, accessing `$` is a compile error, preventing you from accidentally working with an uninitialized collection:\n\n```ts\nconst author = await em.findOne(Author, '...');\n\n// TS Error: Property '$' does not exist on type 'Collection<Book>'\nfor (const book of author.books.$) { ... }\n```\n\nYou can also use the `Loaded` type in function signatures to require a populated collection:\n\n```ts\nfunction listBookTitles(author: Loaded<Author, 'books'>): string[] {\n  // Type-safe — books is guaranteed to be loaded\n  return author.books.$.map(book => book.title);\n}\n```\n\nSee the [Type-Safe Relations](./type-safe-relations.md) guide for full documentation on `Loaded`, `Ref`, and the `$` accessor."
+   },
+   {
+    "id": "mikro-orm:docs/docs/type-safe-relations.md#13",
+    "text": "### Using `Loaded` in Function Signatures\n\nYou can require populated relations in your function parameters:\n\n```ts\nfunction sendWelcomeEmail(user: Loaded<User, 'identity'>) {\n  // Type-safe - identity is guaranteed to be loaded\n  const email = user.identity.$.email;\n  mailer.send(email, 'Welcome!');\n}\n\n// Works - identity is populated\nconst user1 = await em.findOneOrFail(User, 1, { populate: ['identity'] });\nsendWelcomeEmail(user1);\n\n// Compile error - identity not populated\nconst user2 = await em.findOneOrFail(User, 1);\nsendWelcomeEmail(user2);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/type-safe-relations.md#13"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/type-safe-relations.md#13",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/collections.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/collections.md#2",
+    "b": "mikro-orm:docs/docs/type-safe-relations.md#13",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.007,
+     "overlapping": 0.9887,
+     "conflicting": 0.0028,
+     "unrelated": 0.0015
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0139,
+       "restated": 0.9378,
+       "elaborated": 0.0266,
+       "different": 0.0217
+      },
+      "confidence": 0.9783,
+      "a": {
+       "document": "mikro-orm:docs/docs/collections.md#2",
+       "quote": "You can also use the `Loaded` type in function signatures to require a populated collection:",
+       "start": 783,
+       "end": 875,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/type-safe-relations.md#13",
+       "quote": "### Using `Loaded` in Function Signatures\n\nYou can require populated relations in your function parameters:\n\n```ts\nfunction sendWelcomeEmail(user: Loaded<User, 'identity'>) {\n  // Type-safe - identity is guaranteed to be loaded\n  const email = user.identity.$.email;\n  mailer.send(email, 'Welcome!')",
+       "start": 0,
+       "end": 299,
+       "confidence": 0.996
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 54,
+   "passage_reads": 1,
+   "passages_ms": 103,
+   "passages": 1,
+   "counterparts_ms": 50
+  },
+  "timing": {
+   "read_ms": 207,
+   "total_ms": 211
+  }
+ }
+}

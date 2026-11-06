@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/df/dfdbceb7babe349e2895",
+ "request_hash": "dfdbceb7babe349e28950fadfc79981bf1e2067a3931c7b50318773fc9dfc32d",
+ "recorded_at": "2026-11-06T14:14:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1084,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "225.700762",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=380"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#0",
+    "text": "# Connections\n\nYou can connect to MongoDB with the `mongoose.connect()` method.\n\n```javascript\nmongoose.connect('mongodb://127.0.0.1:27017/myapp');\n```\n\nThis is the minimum needed to connect the `myapp` database running locally on the default port (27017).\nFor local MongoDB databases, we recommend using `127.0.0.1` instead of `localhost`.\nThat is because Node.js 18 and up prefer IPv6 addresses, which means, on many machines, Node.js will resolve `localhost` to the IPv6 address `::1` and Mongoose will be unable to connect, unless the mongodb instance is running with ipv6 enabled.\n\nYou can also specify several more parameters in the `uri`:\n\n```javascript\nmongoose.connect('mongodb://username:password@host:port/database?options...');\n```\n\nSee the [mongodb connection string spec](https://www.mongodb.com/docs/manual/reference/connection-string/) for more details.\n\n<ul class=\"toc\">\n  <li><a href=\"#buffering\">Buffering</a></li>\n  <li><a href=\"#error-handling\">Error Handling</a></li>\n  <li><a href=\"#options\">Options</a></li>\n  <li><a href=\"#serverselectiontimeoutms\">serverSelectionTimeoutMS</a></li>\n  <li><a href=\"#connection-string-options\">Connection String Options</a></li>\n  <li><a href=\"#connection-events\">Connection Events</a></li>\n  <li><a href=\"#keepAlive\">A note about keepAlive</a></li>\n  <li><a href=\"#server-selection\">Server Selection</a></li>\n  <li><a href=\"#replicaset_connections\">Replica Set Connections</a></li>\n  <li><a href=\"#replicaset-hostnames\">Replica Set Host Names</a></li>\n  <li><a href=\"#mongos_connections\">Multi-mongos support</a></li>\n  <li><a href=\"#multiple_connections\">Multiple connections</a></li>\n  <li><a href=\"#connection_pools\">Connection Pools</a></li>\n  <li><a href=\"#multi-tenant-connections\">Multi Tenant Connections</a></li>\n</ul>"
+   },
+   {
+    "id": "mongoose:docs/faq.md#0",
+    "text": "# FAQ\n\n<style>\nhr {\n  display: block;\n  margin-top: 40px;\n  margin-bottom: 40px;\n  border: 0px;\n  height: 1px;\n  background-color: #232323;\n  width: 100%;\n}\n</style>\n\n<hr id=\"localhost-ipv6\" />\n\n<a class=\"anchor\" href=\"#localhost-ipv6\">**Q**</a>. I get an error `connect ECONNREFUSED ::1:27017` when connecting to `localhost`. Why?\n\nThe easy solution is to replace `localhost` with `127.0.0.1`.\n\nThe reason why this error happens is that Node.js 18 and up prefer IPv6 addresses over IPv4 by default.\nAnd, most Linux and OSX machines have a `::1     localhost` entry in `/etc/hosts` by default.\nThat means that Node.js 18 will assume that `localhost` means the IPv6 `::1` address.\nAnd MongoDB doesn't accept IPv6 connections by default.\n\nYou can also fix this error by [enabling IPv6 support on your MongoDB server](https://www.mongodb.com/docs/manual/core/security-mongodb-configuration/).\n\n<hr id=\"operation-buffering-timed-out\" />\n\n<a class=\"anchor\" href=\"#operation-buffering-timed-out\">**Q**</a>. Operation `...` timed out after 10000 ms. What gives?\n\n**A**. At its core, this issue stems from not connecting to MongoDB.\nYou can use Mongoose before connecting to MongoDB, but you must connect at some point. For example:\n\n```javascript\nawait mongoose.createConnection(mongodbUri).asPromise();\n\nconst Test = mongoose.model('Test', schema);\n\nawait Test.findOne(); // Will throw \"Operation timed out\" error because didn't call `mongoose.connect()`\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/faq.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/faq.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/connections.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/connections.md#0",
+    "b": "mongoose:docs/faq.md#0",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0039,
+     "overlapping": 0.9921,
+     "conflicting": 0.0026,
+     "unrelated": 0.0015
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0092,
+       "restated": 0.942,
+       "elaborated": 0.0314,
+       "different": 0.0174
+      },
+      "confidence": 0.9826,
+      "a": {
+       "document": "mongoose:docs/connections.md#0",
+       "quote": "For local MongoDB databases, we recommend using `127.0.0.1` instead of `localhost`.",
+       "start": 257,
+       "end": 340,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mongoose:docs/faq.md#0",
+       "quote": "I get an error `connect ECONNREFUSED ::1:27017` when connecting to `localhost`.",
+       "start": 247,
+       "end": 326,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0063,
+       "restated": 0.972,
+       "elaborated": 0.0154,
+       "different": 0.0064
+      },
+      "confidence": 0.9936,
+      "a": {
+       "document": "mongoose:docs/connections.md#0",
+       "quote": "For local MongoDB databases, we recommend using `127.0.0.1` instead of `localhost`.",
+       "start": 257,
+       "end": 340,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mongoose:docs/faq.md#0",
+       "quote": "Why?\n\nThe easy solution is to replace `localhost` with `127.0.0.1`.\n\nThe reason why this error happens is that Node.js 18 and up prefer IPv6 addresses over IPv4 by default.\nAnd, most Linux and OSX machines have a `::1     localhost` entry in `/etc/hosts` by default.\nThat means that Node.js 18 will assume that `localhost` means the IPv6 `::1` address.\nAnd MongoDB doesn't accept IPv6 connections by default.\n\nYou can also fix this error by [enabling IPv6 support on your MongoDB server](https://www.mongodb.com/docs/manual/core/security-mongodb-configuration/).\n\n<hr id=\"operation-buffering-timed-out\" />\n\n<a class=\"anchor\" href=\"#operation-buffering-timed-out\">**Q**</a>.",
+       "start": 327,
+       "end": 1000,
+       "confidence": 0.996
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 96,
+   "passages": 3,
+   "counterparts_ms": 107
+  },
+  "timing": {
+   "read_ms": 237,
+   "total_ms": 241
+  }
+ }
+}

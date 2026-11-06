@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4b/4bfaa54784b3c89de23f",
+ "request_hash": "4bfaa54784b3c89de23f761ac1ce8dd570cf31a173cc8386faeea7fe52631d9e",
+ "recorded_at": "2026-11-06T14:15:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1114,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "179.815262",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=425"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#19",
+    "text": "## Formulas\n\n`@Formula()` decorator can be used to map some SQL snippet to your entity. The SQL fragment can be as complex as you want and even include subselects.\n\n<Tabs\ngroupId=\"entity-def\"\ndefaultValue=\"define-entity-class\"\nvalues={[\n{label: 'defineEntity + class', value: 'define-entity-class'},\n{label: 'defineEntity', value: 'define-entity'},\n{label: 'reflect-metadata', value: 'reflect-metadata'},\n{label: 'ts-morph', value: 'ts-morph'},\n]\n}\n>\n  <TabItem value=\"define-entity-class\">\n\n```ts title=\"./entities/Box.ts\"\nconst BoxSchema = defineEntity({\n  name: 'Box',\n  properties: {\n    objectVolume: p.integer().formula('obj_length * obj_height * obj_width'),\n  },\n});\n\nexport class Box extends BoxSchema.class {}\nBoxSchema.setClass(Box);\n```\n\n  </TabItem>\n\n  <TabItem value=\"define-entity\">\n\n```ts title=\"./entities/Box.ts\"\nexport const Box = defineEntity({\n  name: 'Box',\n  properties: {\n    objectVolume: p.integer().formula('obj_length * obj_height * obj_width'),\n  },\n});\n```\n\n  </TabItem>\n<TabItem value=\"reflect-metadata\">\n\n```ts title=\"./entities/Box.ts\"\n@Formula('obj_length * obj_height * obj_width')\nobjectVolume?: number;\n```\n\n  </TabItem>\n  <TabItem value=\"ts-morph\">\n\n```ts title=\"./entities/Box.ts\"\n@Formula('obj_length * obj_height * obj_width')\nobjectVolume?: number;\n```\n\n  </TabItem>\n</Tabs>\n\nFormulas will be added to the select clause automatically. You can define the formula as a callback that receives a `columns` object mapping property names to their unquoted column references (e.g., `alias.field_name`). Use the `quote` helper for proper identifier quoting across all database platforms:"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#64",
+    "text": "## Formula callback signature changed\n\nThe [`formula`](./defining-entities.md#formulas) callback signature has changed. The parameters are now swapped, with `columns` as the first parameter and `table` as the second parameter.\n\nThe `columns` parameter contains **unquoted** `alias.fieldName` references for each property. You should use the `quote` helper for proper identifier quoting, which handles database-specific quoting (backticks for MySQL, double quotes for PostgreSQL, square brackets for MSSQL).\n\n```diff\n-import { Entity, Formula } from '@mikro-orm/core';\n+import { Entity, Formula, quote } from '@mikro-orm/core';\n\n-@Formula(alias => `${alias}.price * 1.19`)\n+@Formula(cols => quote`${cols.price} * 1.19`)\npriceTaxed?: number;\n```\n\nThe `quote` helper ensures proper identifier quoting across all database platforms:\n- MySQL/SQLite: `` `b0`.`price` * 1.19 ``\n- PostgreSQL: `\"b0\".\"price\" * 1.19`\n- MSSQL: `[b0].[price] * 1.19`\n\nFor backwards compatibility, `cols.toString()` returns the table alias (quoted), so the old syntax using template literals with the alias still works for simple cases:\n\n```ts\n// Old syntax still works for the alias\nformula: cols => `${cols}.first_name || ' ' || ${cols}.last_name`\n```\n\nHowever, this only quotes the alias, not the column names. For full identifier quoting, use the `quote` helper."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#19",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v6-to-v7.md#64"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#64",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/defining-entities.md#19"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/defining-entities.md#19",
+    "b": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#64",
+    "relation": "overlapping",
+    "related": 0.9962,
+    "probabilities": {
+     "same": 0.0087,
+     "overlapping": 0.9832,
+     "conflicting": 0.0043,
+     "unrelated": 0.0038
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0158,
+       "restated": 0.7635,
+       "elaborated": 0.0308,
+       "different": 0.1899
+      },
+      "confidence": 0.8101,
+      "a": {
+       "document": "mikro-orm:docs/docs/defining-entities.md#19",
+       "quote": "Use the `quote` helper for proper identifier quoting across all database platforms:",
+       "start": 1538,
+       "end": 1621,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#64",
+       "quote": "You should use the `quote` helper for proper identifier quoting, which handles database-specific quoting (backticks for MySQL, double quotes for PostgreSQL, square brackets for MSSQL).\n\n```diff\n-import { Entity, Formula } from '@mikro-orm/core';\n+import { Entity, Formula, quote } from '@mikro-orm/core';\n\n-@Formula(alias => `${alias}.price * 1.19`)\n+@Formula(cols => quote`${cols.price} * 1.19`)\npriceTaxed?: number;\n```\n\nThe `quote` helper ensures proper identifier quoting across all database platforms:\n- MySQL/SQLite: `` `b0`.`price` * 1.19 ``\n- PostgreSQL: `\"b0\".\"",
+       "start": 322,
+       "end": 892,
+       "confidence": 0.92
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 86,
+   "passages": 1,
+   "counterparts_ms": 88
+  },
+  "timing": {
+   "read_ms": 206,
+   "total_ms": 211
+  }
+ }
+}

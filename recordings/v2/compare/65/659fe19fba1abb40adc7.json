@@ -1,0 +1,237 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/65/659fe19fba1abb40adc7",
+ "request_hash": "659fe19fba1abb40adc7dbd68859b7617e32480bf4a826654123c6d0675511ac",
+ "recorded_at": "2026-11-06T14:15:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1239,
+ "response_headers": {
+  "x-clocked-credits": "13",
+  "x-clocked-model-ms": "320.351097",
+  "x-clocked-cost-usd": "0.002590",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=525"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#4",
+    "text": "## Implicit serialization\n\nImplicit serialization means calling `toObject()` or `toJSON()` on the entity, as opposed to explicitly using the `serialize()` helper. Since v6, it works entirely based on `populate` hints. This means that, unless you explicitly marked some entity as populated via `wrap(entity).populated()`, it will be part of the serialized form only if it was part of the `populate` hint:\n\n```ts\n// let's say both Author and Book entity has a m:1 relation to Publisher entity\n// we only populate the publisher relation of the Book entity\nconst user = await em.findOneOrFail(Author, 1, {\n  populate: ['books.publisher'],\n});\n\nconst dto = wrap(user).toObject();\nconsole.log(dto.publisher); // only the FK, e.g. `123`\nconsole.log(dto.books[0].publisher); // populated, e.g. `{ id: 123, name: '...' }`\n```\n\nMoreover, the implicit serialization now respects the partial loading hints too. Previously, all loaded properties were serialized, partial loading worked only on the database query level. Since v6, we also prune the data on runtime. This means that unless the property is part of the partial loading hint (`fields` option), it won't be part of the DTO. Main difference here is the primary and foreign keys, that are often automatically selected as they are needed to build the entity graph, but will no longer be part of the DTO.\n\n```ts\nconst user = await em.findOneOrFail(Author, 1, {\n  fields: ['books.publisher.name'],\n});\n\nconst dto = wrap(user).toObject();\n// only the publisher's name will be available + primary keys\n// `{ id: 1, books: [{ id: 2, publisher: { id: 3, name: '...' } }] }`\n```\n\n**This also works for embeddables, including nesting and object mode.**\n\nPrimary keys are automatically included. If you want to hide them, you have two options:\n\n- use `hidden: true` in the property options\n- use `serialization: { includePrimaryKeys: false }` in the ORM config"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+    "text": "## Implicit serialization changes\n\nImplicit serialization, so calling `toObject()` or `toJSON()` on the entity, as opposed to explicitly using the `serialize()` helper, now works entirely based on `populate` hints. This means that, unless you explicitly marked some entity as populated via `wrap(entity).populated()`, it will be part of the serialized form only if it was part of the `populate` hint:\n\n```ts\n// let's say both Author and Book entity has a m:1 relation to Publisher entity\n// we only populate the publisher relation of the Book entity\nconst user = await em.findOneOrFail(Author, 1, {\n  populate: ['books.publisher'],\n});\n\nconst dto = wrap(user).toObject();\nconsole.log(dto.publisher); // only the FK, e.g. `123`\nconsole.log(dto.books[0].publisher); // populated, e.g. `{ id: 123, name: '...' }`\n```\n\nMoreover, the implicit serialization now respects the partial loading hints too. Previously, all loaded properties were serialized, partial loading worked only on the database query level. Since v6, we also prune the data on runtime. This means that unless the property is part of the partial loading hint (`fields` option), it won't be part of the DTO - only exception is the primary key, you can optionally hide it via `hidden: true` in the property options. Main difference here will be the foreign keys, those are often automatically selected as they are needed to build the entity graph, but will no longer be part of the DTO.\n\n```ts\nconst user = await em.findOneOrFail(Author, 1, {\n  fields: ['books.publisher.name'],\n});\n\nconst dto = wrap(user).toObject();\n// only the publisher's name will be available, previously there would be also `book.author`\n// `{ id: 1, books: [{ id: 2, publisher: { id: 3, name: '...' } }] }`\n```\n\n**This also works for embeddables, including nesting and object mode.**"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/serializing.md#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/serializing.md#4",
+    "b": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+    "relation": "overlapping",
+    "related": 0.9897,
+    "probabilities": {
+     "same": 0.0158,
+     "overlapping": 0.637,
+     "conflicting": 0.3369,
+     "unrelated": 0.0103
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.119,
+       "restated": 0.8157,
+       "elaborated": 0.0546,
+       "different": 0.0107
+      },
+      "confidence": 0.9893,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#4",
+       "quote": "## Implicit serialization",
+       "start": 0,
+       "end": 25,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+       "quote": "## Implicit serialization changes\n\nImplicit serialization, so calling `toObject()` or `toJSON()` on the entity, as opposed to explicitly using the `serialize()` helper, now works entirely based on `populate` hints.",
+       "start": 0,
+       "end": 214,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9894,
+       "restated": 0.0038,
+       "elaborated": 0.0043,
+       "different": 0.0025
+      },
+      "confidence": 0.9975,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#4",
+       "quote": "This means that, unless you explicitly marked some entity as populated via `wrap(entity).populated()`, it will be part of the serialized form only if it was part of the `populate` hint:",
+       "start": 218,
+       "end": 403,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+       "quote": "This means that, unless you explicitly marked some entity as populated via `wrap(entity).populated()`, it will be part of the serialized form only if it was part of the `populate` hint:\n\n```ts\n// let's say both Author and Book entity has a m:1 relation to Publisher entity\n// we only populate the publisher relation of the Book entity\nconst user = await em.findOneOrFail(Author, 1, {\n  populate: ['books.publisher'],\n});\n\nconst dto = wrap(user).toObject();\nconsole.log(dto.publisher); // only the FK, e.g. `123`\nconsole.log(dto.books[0].publisher); // populated, e.g. `{ id: 123, name: '...'",
+       "start": 215,
+       "end": 806,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9777,
+       "restated": 0.0094,
+       "elaborated": 0.0081,
+       "different": 0.0048
+      },
+      "confidence": 0.9952,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#4",
+       "quote": "Moreover, the implicit serialization now respects the partial loading hints too.",
+       "start": 818,
+       "end": 898,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+       "quote": "}`\n```\n\nMoreover, the implicit serialization now respects the partial loading hints too.",
+       "start": 807,
+       "end": 895,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9836,
+       "restated": 0.0076,
+       "elaborated": 0.0046,
+       "different": 0.0042
+      },
+      "confidence": 0.9958,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#4",
+       "quote": "Previously, all loaded properties were serialized, partial loading worked only on the database query level.",
+       "start": 899,
+       "end": 1006,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+       "quote": "Previously, all loaded properties were serialized, partial loading worked only on the database query level.",
+       "start": 896,
+       "end": 1003,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9868,
+       "restated": 0.0043,
+       "elaborated": 0.0051,
+       "different": 0.0038
+      },
+      "confidence": 0.9962,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#4",
+       "quote": "Since v6, we also prune the data on runtime.",
+       "start": 1007,
+       "end": 1051,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+       "quote": "Since v6, we also prune the data on runtime.",
+       "start": 1004,
+       "end": 1048,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9892,
+       "restated": 0.0043,
+       "elaborated": 0.0037,
+       "different": 0.0029
+      },
+      "confidence": 0.9971,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#4",
+       "quote": "```ts",
+       "start": 405,
+       "end": 410,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+       "quote": "} }] }`\n```\n\n**This also works for embeddables, including nesting and object mode.**",
+       "start": 1734,
+       "end": 1818,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 99,
+   "passages": 9,
+   "counterparts_ms": 199
+  },
+  "timing": {
+   "read_ms": 334,
+   "total_ms": 338
+  }
+ }
+}

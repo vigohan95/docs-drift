@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ab/abde846e0713df136010",
+ "request_hash": "abde846e0713df1360103a2d4bb05b32aca449762128de492414c84aa12a1789",
+ "recorded_at": "2026-11-06T14:17:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1573,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "125.690979",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=271"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "eslint:docs/src/use/migrate-to-9.0.0.md#36",
+    "text": "## <a name=\"stricter-rule-tester\"></a> Stricter `RuleTester` checks\n\nIn order to aid in the development of high-quality custom rules that are free from common bugs, ESLint v9.0.0 implements several changes to `RuleTester`:\n\n1. **Test case `output` must be different from `code`.** In ESLint v8.x, if `output` is the same as `code`, it asserts that there was no autofix. When looking at a test case, it's not always immediately clear whether `output` differs from `code`, especially if the strings are longer or multiline, making it difficult for developers to determine whether or not the test case expects an autofix. In ESLint v9.0.0, to avoid this ambiguity, `RuleTester` now throws an error if the test `output` has the same value as the test `code`. Therefore, specifying `output` now necessarily means that the test case expects an autofix and asserts its result. If the test case doesn't expect an autofix, omit the `output` property or set it to `null`. This asserts that there was no autofix.\n1. **Test error objects must specify `message` or `messageId`.** To improve the quality of test coverage, `RuleTester` now throws an error if neither `message` nor `messageId` is specified on test error objects.\n1. **Test error object must specify `suggestions` if the actual error provides suggestions.** In ESLint v8.x, if the `suggestions` property was omitted from test error objects, `RuleTester` wasn't performing any checks related to suggestions, so it was easy to forget to assert if a test case produces suggestions. In ESLint v9.0.0, omitting the `suggestions` property asserts that the actual error does not provide suggestions, while you need to specify the `suggestions` property if the actual error does provide suggestions. We highly recommend that you test suggestions in detail by specifying an array of test suggestion objects, but you can also specify `suggestions: <number>` to assert just the number of suggestions.\n1. **Test suggestion objects must specify `output`.** To improve the quality of test coverage, `RuleTester` now throws an error if `output` property is not specified on test suggestion objects.\n1. **Test suggestion objects must specify `desc` or `messageId`.** To improve the quality of test coverage, `RuleTester` now throws an error if neither `desc` nor `messageId` property is specified on test suggestion objects. It's also not allowed to specify both. If you want to assert the suggestion description text in addition to the `messageId`, then also add the `data` property.\n1. **Suggestion messages must be unique.** Because suggestions are typically displayed in an editor as a dropdown list, it's important that no two suggestions for the same lint problem have the same message. Otherwise, it's impossible to know what any given suggestion will do. This additional check runs automatically.\n1. **Suggestions must change the code.** Suggestions are expected to fix the reported problem by changing the code. `RuleTester` now throws an error if the suggestion test `output` is the same as the test `code`.\n1. **Suggestions must generate valid syntax.** In order for rule suggestions to be helpful, they need to be valid syntax. `RuleTester` now parses the output of suggestions using the same language options as the `code` value and throws an error if parsing fails.\n1. **Test cases must be unique.** Identical test cases can cause confusion and be hard to detect manually in a long test file. Duplicates are now automatically detected and can be safely removed.\n1. **`filename` and `only` must be of the expected type.** `RuleTester` now checks the type of `filename` and `only` properties of test objects. If specified, `filename` must be a string value. If specified, `only` must be a boolean value."
+   },
+   {
+    "id": "eslint:docs/src/extend/custom-rules.md#10",
+    "text": "#### `messageId`s\n\n`messageId`s are the recommended approach to reporting messages in `context.report()` calls because of the following benefits:\n\n- Rule violation messages can be stored in a central `meta.messages` object for convenient management.\n- Rule violation messages do not need to be repeated in both the rule file and rule test file.\n- As a result, the barrier for changing rule violation messages is lower, encouraging more frequent contributions to improve and optimize them for the greatest clarity and usefulness.\n\nRule file:\n\n```js\n{% raw %}\n// avoid-name.js\n\nmodule.exports = {\n    meta: {\n        messages: {\n            avoidName: \"Avoid using variables named '{{ name }}'\"\n        }\n    },\n    create(context) {\n        return {\n            Identifier(node) {\n                if (node.name === \"foo\") {\n                    context.report({\n                        node,\n                        messageId: \"avoidName\",\n                        data: {\n                            name: \"foo\",\n                        }\n                    });\n                }\n            }\n        };\n    }\n};\n{% endraw %}\n```\n\nIn the file to lint:\n\n```javascript\n// someFile.js\n\nvar foo = 2;\n//  ^ error: Avoid using variables named 'foo'\n```\n\nIn your tests:\n\n```javascript\n// avoid-name.test.js\n\nvar rule = require(\"../../../lib/rules/avoid-name\");\nvar RuleTester = require(\"eslint\").RuleTester;\n\nvar ruleTester = new RuleTester();\nruleTester.run(\"avoid-name\", rule, {\n\tvalid: [\"bar\", \"baz\"],\n\tinvalid: [\n\t\t{\n\t\t\tcode: \"foo\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"avoidName\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t],\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "eslint:docs/src/use/migrate-to-9.0.0.md#36",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "eslint:docs/src/extend/custom-rules.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "eslint:docs/src/use/migrate-to-9.0.0.md#36",
+    "b": "eslint:docs/src/extend/custom-rules.md#10",
+    "relation": "overlapping",
+    "related": 0.7136,
+    "probabilities": {
+     "same": 0.0132,
+     "overlapping": 0.692,
+     "conflicting": 0.0084,
+     "unrelated": 0.2864
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 61,
+   "passage_reads": 1,
+   "passages_ms": 78,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 138,
+   "total_ms": 144
+  }
+ }
+}

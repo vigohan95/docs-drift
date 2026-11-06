@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/41/4127168ac67a38b44e82",
+ "request_hash": "4127168ac67a38b44e82ed2f94c551cc78408de064d188a70946a81ddcb19501",
+ "recorded_at": "2026-11-06T14:14:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 931,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.863297",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=189"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/10-instances.md#5",
+    "text": "### `got.extend(…options, …instances)`\n\n**Tip:**\n> - `options` can include `handlers` and `mutableDefaults`.\n\n**Note:**\n> - Properties that are not enumerable, such as `body`, `json`, and `form`, will not be merged. Pass them to each request instead of to `got.extend()`: an instance created with one keeps it in its recorded options, so `got.extend(instance, …)` can throw when another argument sets a different kind of payload.\n\nConfigure a new `got` instance with merged default options. The options are merged with the parent instance's `defaults.options` using [`options.merge(…)`](2-options.md#merge).\n\n```js\nimport got from 'got';\n\nconst client = got.extend({\n\tprefixUrl: 'https://httpbin.org',\n\theaders: {\n\t\t'x-foo': 'bar'\n\t}\n});\n\nconst {headers} = await client.get('headers').json();\nconsole.log(headers['x-foo']); //=> 'bar'\n\nconst jsonClient = client.extend({\n\tresponseType: 'json',\n\tresolveBodyOnly: true,\n\theaders: {\n\t\t'x-lorem': 'impsum'\n\t}\n});\n\nconst {headers: headers2} = await jsonClient.get('headers');\nconsole.log(headers2['x-foo']);   //=> 'bar'\nconsole.log(headers2['x-lorem']); //=> 'impsum'\n```\n\n**Note:**\n> - Handlers can be asynchronous and can return a `Promise`, but never a `Promise<Stream>` when `options.isStream` is `true` (set internally for `got.stream()` requests).\n> - Streams must always be handled synchronously.\n> - In order to perform async work using streams, the `beforeRequest` hook should be used instead."
+   },
+   {
+    "id": "got:documentation/2-options.md#51",
+    "text": "### `http2`\n\n**Type: `boolean`**\\\n**Default: `false`**\n\nIf `true`, Got will use its built-in HTTP/2 client when ALPN selects HTTP/2.\n\n**Note:**\n> - ALPN negotiation will take place in order to determine if the server actually supports HTTP/2. If it doesn't, HTTP/1.1 will be used. When a custom `agent.https` instance is set, Got uses that native HTTPS agent directly and skips HTTP/2 negotiation.\n\n**Note:**\n> - If the `request` option returns a request or response, it controls the transport and Got's HTTP/2 client is bypassed. Return `undefined` to fall back to Got's built-in transport.\n\n**Note:**\n> - There is no direct [`h2c` Upgrade](https://datatracker.ietf.org/doc/html/rfc9113#section-11.2) support. However, you can provide a `h2session` option in a `beforeRequest` hook. See [an example](examples/h2c.js).\n\n```js\nimport got from 'got';\n\nconst {statusCode} = await got(\n\t'https://httpbin.org/anything',\n\t{\n\t\thttp2: true\n\t}\n);\n\nconsole.log(statusCode);\n//=> 200\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/10-instances.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/2-options.md#51",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/10-instances.md#5",
+    "b": "got:documentation/2-options.md#51",
+    "relation": "unrelated",
+    "related": 0.0039,
+    "probabilities": {
+     "same": 0.0013,
+     "overlapping": 0.0013,
+     "conflicting": 0.0013,
+     "unrelated": 0.9961
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 62
+  },
+  "timing": {
+   "read_ms": 62,
+   "total_ms": 64
+  }
+ }
+}

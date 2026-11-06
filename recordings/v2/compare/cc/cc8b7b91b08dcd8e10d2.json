@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/cc/cc8b7b91b08dcd8e10d2",
+ "request_hash": "cc8b7b91b08dcd8e10d2576035e6fedcf94cb7aecc0d1bb1d4579bb5bd1e9013",
+ "recorded_at": "2026-11-06T14:15:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1102,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "161.478333",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=39,cfOrigin;dur=0,cfWorker;dur=369"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "text": "### Persist and Flush\n\nThere are 2 methods we should first describe to understand how persisting works in MikroORM: [`em.persist()`](/api/core/class/EntityManager#persist) and [`em.flush()`](/api/core/class/EntityManager#flush).\n\n[`em.persist(entity)`](/api/core/class/EntityManager#persist) is used to mark new entities for future persisting. It will make the entity managed by the [`EntityManager`](/api/core/class/EntityManager) and once `flush` will be called, it will be written to the database.\n\nWe use [`em.create()`](/api/core/class/EntityManager#create) to create entity instances.\n\n```ts\n// create a new user entity instance\nconst user = em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\n\n// em.create() automatically calls persist(), so we just need to flush\nawait em.flush();\n\n// alternatively, you can persist manually:\nconst user2 = em.create(UserSchema, { ... }, { persist: false });\nem.persist(user2);\nawait em.flush();\n```\n\nTo understand `flush`, let's first define what managed entity is: An entity is managed if it's fetched from the database (via [`em.find()`](/api/core/class/EntityManager#find)) or registered as new through [`em.persist()`](/api/core/class/EntityManager#persist) and flushed later (only after the `flush` it becomes managed).\n\n[`em.flush()`](/api/core/class/EntityManager#flush) will go through all managed entities, compute appropriate change sets and perform according database queries. As an entity loaded from the database becomes managed\nautomatically, you do not have to call persist on those, and flush is enough to update them."
+   },
+   {
+    "id": "mikro-orm:docs/docs/quick-start.md#8",
+    "text": "## EntityManager\n\nWhen you have your entities defined, you can start using ORM via `EntityManager`.\n\nTo save entity state to database, you need to persist it. Persist determines whether to use `insert` or `update` and\ncomputes appropriate change-set. Entity references that are not persisted yet (does not have identifier) will be cascade\npersisted automatically.\n\n```ts\n// use em.create() to create entity instances\nconst author = em.create(Author, {\n  name: 'Jon Snow',\n  email: 'snow@wall.st',\n  born: new Date(),\n});\n\nconst publisher = em.create(Publisher, { name: '7K publisher' });\n\nconst book1 = em.create(Book, {\n  title: 'My Life on The Wall, part 1',\n  author,\n  publisher,\n});\nconst book2 = em.create(Book, {\n  title: 'My Life on The Wall, part 2',\n  author,\n  publisher,\n});\nconst book3 = em.create(Book, {\n  title: 'My Life on The Wall, part 3',\n  author,\n  publisher,\n});\n\n// em.create() auto-persists by default, so just flush\nawait em.flush();\n```\n\nTo fetch entities from database you can use `find()` and `findOne()` of `EntityManager`:\n\n```ts\nconst authors = em.findAll(Author, {\n  populate: ['books'],\n});\n\nfor (const author of authors) {\n  console.log(author); // instance of Author entity\n  console.log(author.name); // Jon Snow\n\n  for (const book of author.books) { // iterating books collection\n    console.log(book); // instance of Book entity\n    console.log(book.title); // My Life on The Wall, part 1/2/3\n  }\n}\n```\n\nTake a look at docs about [working with `EntityManager`](./entity-manager.md)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/quick-start.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "b": "mikro-orm:docs/docs/quick-start.md#8",
+    "relation": "overlapping",
+    "related": 0.999,
+    "probabilities": {
+     "same": 0.0024,
+     "overlapping": 0.9944,
+     "conflicting": 0.0022,
+     "unrelated": 0.001
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 1,
+   "counterparts_ms": 52
+  },
+  "timing": {
+   "read_ms": 173,
+   "total_ms": 176
+  }
+ }
+}

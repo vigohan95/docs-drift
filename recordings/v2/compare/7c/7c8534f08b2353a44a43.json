@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/7c/7c8534f08b2353a44a43",
+ "request_hash": "7c8534f08b2353a44a436555e4adacfd390f3285cd6eb3eb59a88a8e80744cfe",
+ "recorded_at": "2026-11-06T14:13:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 942,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "38.841023",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=29,cfOrigin;dur=0,cfWorker;dur=196"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#2",
+    "text": "## Conventions\n\nIf the plugin doesn't use Vite specific hooks and can be implemented as a [Compatible Rolldown Plugin](#rolldown-plugin-compatibility), then it is recommended to use the [Rolldown Plugin naming conventions](https://rolldown.rs/apis/plugin-api#conventions).\n\n- Rolldown Plugins should have a clear name with `rolldown-plugin-` prefix.\n- Include `rolldown-plugin` and `vite-plugin` keywords in package.json `keywords` field.\n\nThis exposes the plugin to be also used in pure Rolldown or Rollup based projects.\n\nFor Vite only plugins\n\n- Vite Plugins should have a clear name with `vite-plugin-` prefix.\n- Include `vite-plugin` keyword in package.json `keywords` field.\n- Include a section in the plugin docs detailing why it is a Vite only plugin (for example, it uses Vite specific plugin hooks).\n\nIf your plugin is only going to work for a particular framework, its name should be included as part of the prefix.\n\n- `vite-plugin-vue-` prefix for Vue Plugins\n- `vite-plugin-react-` prefix for React Plugins\n- `vite-plugin-svelte-` prefix for Svelte Plugins\n\nSee also [Virtual Modules Convention](https://rolldown.rs/apis/plugin-api#virtual-modules)."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#6",
+    "text": "### Importing a Virtual File\n\nVirtual modules allow you to pass build time information to the source files using normal ESM import syntax. See [Virtual Modules Convention](https://rolldown.rs/apis/plugin-api#virtual-modules) for the full convention.\n\n```js\nimport { exactRegex } from '@rolldown/pluginutils'\n\nexport default function myPlugin() {\n  const virtualModuleId = 'virtual:my-module'\n  const resolvedVirtualModuleId = '\\0' + virtualModuleId\n\n  return {\n    name: 'my-plugin', // required, will show up in warnings and errors\n    resolveId: {\n      filter: { id: exactRegex(virtualModuleId) },\n      handler() {\n        return resolvedVirtualModuleId\n      },\n    },\n    load: {\n      filter: { id: exactRegex(resolvedVirtualModuleId) },\n      handler() {\n        return `export const msg = \"from virtual module\"`\n      },\n    },\n  }\n}\n```\n\nWhich allows importing the module in JavaScript:\n\n```js\nimport { msg } from 'virtual:my-module'\n\nconsole.log(msg)\n```\n\nIn Vite, since `\\0` is not a permitted char in import URLs, a `\\0{id}` virtual id ends up encoded as `/@id/__x00__{id}` during dev in the browser. The id is decoded back before entering the plugins pipeline, so this is not seen by plugin hooks code."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-plugin.md#2",
+    "b": "vite:docs/guide/api-plugin.md#6",
+    "relation": "unrelated",
+    "related": 0.4689,
+    "probabilities": {
+     "same": 0.0343,
+     "overlapping": 0.3993,
+     "conflicting": 0.0353,
+     "unrelated": 0.5311
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 48
+  },
+  "timing": {
+   "read_ms": 48,
+   "total_ms": 51
+  }
+ }
+}

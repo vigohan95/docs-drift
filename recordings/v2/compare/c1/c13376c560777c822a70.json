@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c1/c13376c560777c822a70",
+ "request_hash": "c13376c560777c822a70fd3b2de6465204c6a4b5e01f44cb0c2d6e8aaeb93fe6",
+ "recorded_at": "2026-11-06T14:21:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1087,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "187.120605",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=350"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "text": "#### Within Each Test File\n\nThe execution follows this order:\n\n1. **File-level code:** All code outside `describe` blocks runs immediately\n2. **Test collection:** `describe` blocks are processed, and tests are registered as side effects of importing the test file\n3. **[`aroundAll`](/api/hooks#aroundall) hooks:** Wrap around all tests in the suite (must call `runSuite()`)\n4. **[`beforeAll`](/api/hooks#beforeall) hooks:** Run once before any tests in the suite\n5. **For each test:**\n   - [`aroundEach`](/api/hooks#aroundeach) hooks wrap around the test (must call `runTest()`)\n   - `beforeEach` hooks execute (in order defined, or based on [`sequence.hooks`](/config/sequence#sequence-hooks))\n   - Test function executes\n   - `afterEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - Cleanup functions returned from `beforeEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - [`onTestFinished`](/api/hooks#ontestfinished) callbacks run (always in reverse order)\n   - If test failed: [`onTestFailed`](/api/hooks#ontestfailed) callbacks run\n   - Note: if `repeats` or `retry` are set, all of these steps are executed again\n6. **[`afterAll`](/api/hooks#afterall) hooks:** Run once after all tests in the suite complete\n7. **Cleanup functions returned from `beforeAll` hooks:** Run once after all tests in the suite complete"
+   },
+   {
+    "id": "vitest:docs/api/hooks.md#8",
+    "text": "## aroundAll\n\n```ts\nfunction aroundAll(\n  body: (\n    runSuite: () => Promise<void>,\n    context: ModuleContext,\n  ) => Promise<void>,\n  timeout?: number,\n): void\n```\n\nRegister a callback function that wraps around all tests within the current suite. The callback receives a `runSuite` function that **must** be called to run the suite's tests.\n\nThe `runSuite()` function runs all tests in the suite, including `beforeAll`/`afterAll`/`beforeEach`/`afterEach` hooks, `aroundEach` hooks, and fixtures.\n\n::: warning\nYou **must** call `runSuite()` within your callback. If `runSuite()` is not called, the hook will fail with an error and all tests in the suite will be skipped.\n:::\n\nOptionally, you can provide a timeout (in milliseconds) for specifying how long to wait before terminating. The timeout applies independently to the setup phase (before `runSuite()`) and teardown phase (after `runSuite()`). The default is 10 seconds, and can be configured globally with [`hookTimeout`](/config/hooktimeout).\n\n```ts\nimport { aroundAll, test } from 'vitest'\n\naroundAll(async (runSuite) => {\n  await tracer.trace('test-suite', runSuite)\n})\n\ntest('test 1', () => {\n  // Runs within the tracing span\n})\n\ntest('test 2', () => {\n  // Also runs within the same tracing span\n})\n```\n\n::: tip When to use `aroundAll`\nUse `aroundAll` when your suite needs to run **inside a context** that wraps around all tests, such as:\n\n- Wrapping an entire suite in [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) context\n- Wrapping a suite with tracing spans\n- Database transactions\n\nIf you just need to run code once before and after all tests, prefer using [`beforeAll`](#beforeall) with a cleanup return function:\n\n```ts\nbeforeAll(async () => {\n  await server.start()\n  return async () => {\n    await server.stop()\n  }\n})\n```\n\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/api/hooks.md#8"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/api/hooks.md#8",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/guide/lifecycle.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/lifecycle.md#9",
+    "b": "vitest:docs/api/hooks.md#8",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9886,
+     "conflicting": 0.003,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0158,
+       "restated": 0.8701,
+       "elaborated": 0.0434,
+       "different": 0.0707
+      },
+      "confidence": 0.9293,
+      "a": {
+       "document": "vitest:docs/guide/lifecycle.md#9",
+       "quote": "3.",
+       "start": 264,
+       "end": 266,
+       "confidence": 0.949
+      },
+      "b": {
+       "document": "vitest:docs/api/hooks.md#8",
+       "quote": "The callback receives a `runSuite` function that **must** be called to run the suite's tests.\n\nThe `runSuite()` function runs all tests in the suite, including `beforeAll`/`afterAll`/`beforeEach`/`afterEach` hooks, `aroundEach` hooks, and fixtures.\n\n::: warning\nYou **must** call `runSuite()` within your callback.",
+       "start": 251,
+       "end": 565,
+       "confidence": 0.993
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 96,
+   "passages": 2,
+   "counterparts_ms": 68
+  },
+  "timing": {
+   "read_ms": 199,
+   "total_ms": 202
+  }
+ }
+}

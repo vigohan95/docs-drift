@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e9/e904810cfc57b69cd961",
+ "request_hash": "e904810cfc57b69cd961e15e00c9b29a18cca5a2f863c3817779540f93466ccd",
+ "recorded_at": "2026-11-06T14:14:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 935,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.072383",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=31,cfOrigin;dur=0,cfWorker;dur=236"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#11",
+    "text": "Now, mongoose will call your getter function every time you access the\n`fullName` property:\n\n```javascript\nconsole.log(axl.fullName); // Axl Rose\n```\n\nIf you use `toJSON()` or `toObject()` Mongoose will *not* include virtuals by default.\nPass `{ virtuals: true }` to [`toJSON()`](api/document.html#document_Document-toJSON) or `toObject()` to include virtuals.\n\n```javascript\n// Convert `doc` to a POJO, with virtuals attached\ndoc.toObject({ virtuals: true });\n\n// Equivalent:\ndoc.toJSON({ virtuals: true });\n```\n\nThe above caveat for `toJSON()` also includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).\nTo include virtuals in `JSON.stringify()` output, you can either call `toObject({ virtuals: true })` on the document before calling `JSON.stringify()`, or set the `toJSON: { virtuals: true }` option on your schema.\n\n```javascript\n// Explicitly add virtuals to `JSON.stringify()` output\nJSON.stringify(doc.toObject({ virtuals: true }));\n\n// Or, to automatically attach virtuals to `JSON.stringify()` output:\nconst personSchema = new Schema({\n  name: {\n    first: String,\n    last: String\n  }\n}, {\n  toJSON: { virtuals: true } // <-- include virtuals in `JSON.stringify()`\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#36",
+    "text": "## `toObject()` and `toJSON()` Use Nested Schema `minimize` {#toobject-and-tojson-use-nested-schema-minimize}\n\nThis change was technically released with 5.10.5, but [caused issues for users migrating from 5.9.x to 6.x](https://github.com/Automattic/mongoose/issues/10827).\nIn Mongoose `< 5.10.5`, `toObject()` and `toJSON()` would use the top-level schema's `minimize` option by default.\n\n```javascript\nconst child = new Schema({ thing: Schema.Types.Mixed });\nconst parent = new Schema({ child }, { minimize: false });\nconst Parent = model('Parent', parent);\nconst p = new Parent({ child: { thing: {} } });\n\n// In v5.10.4, would contain `child.thing` because `toObject()` uses `parent` schema's `minimize` option\n// In `>= 5.10.5`, `child.thing` is omitted because `child` schema has `minimize: true`\nconsole.log(p.toObject());\n```\n\nAs a workaround, you can either explicitly pass `minimize` to `toObject()` or `toJSON()`:\n\n```javascript\nconsole.log(p.toObject({ minimize: false }));\n```\n\nOr define the `child` schema inline (Mongoose 6 only) to inherit the parent's `minimize` option.\n\n```javascript\nconst parent = new Schema({\n  // Implicitly creates a new schema with the top-level schema's `minimize` option.\n  child: { type: { thing: Schema.Types.Mixed } }\n}, { minimize: false });\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#36",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#11",
+    "b": "mongoose:docs/migrating_to_6.md#36",
+    "relation": "unrelated",
+    "related": 0.4045,
+    "probabilities": {
+     "same": 0.0179,
+     "overlapping": 0.3724,
+     "conflicting": 0.0143,
+     "unrelated": 0.5955
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 54
+  },
+  "timing": {
+   "read_ms": 54,
+   "total_ms": 56
+  }
+ }
+}

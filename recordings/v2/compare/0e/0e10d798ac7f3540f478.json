@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0e/0e10d798ac7f3540f478",
+ "request_hash": "0e10d798ac7f3540f478adcd74636e9f62cfb5ba4c4163997b10d4f73520355a",
+ "recorded_at": "2026-11-06T14:15:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 941,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.407806",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=228"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/loading-strategies.md#3",
+    "text": "## Per-relation populate overrides\n\nWhile the `strategy` option applies to all populated relations, you can use `populateHints` to override the loading strategy or join type for individual relations. The keys are the same dot-separated paths used in the `populate` option, and they support autocomplete.\n\n```ts\nconst author = await orm.em.findOne(Author, 1, {\n  populate: ['books.inspiredBy'],\n  strategy: 'joined',\n  populateHints: {\n    'books.inspiredBy': { strategy: 'select-in' },\n  },\n});\n```\n\nThis will load books via a join, but use a separate `select-in` query for the `inspiredBy` relation.\n\nYou can also override the join type. For example, a non-nullable `ManyToOne` relation defaults to `inner join` with the `joined` strategy. You can force a `left join` instead:\n\n```ts\nconst books = await orm.em.find(Book, {}, {\n  populate: ['author'],\n  strategy: 'joined',\n  populateHints: {\n    author: { joinType: 'left join' },\n  },\n});\n```\n\nBoth `strategy` and `joinType` can be combined in a single hint, and you can provide hints for multiple relations at once:\n\n```ts\nconst author = await orm.em.findOne(Author, 1, {\n  populate: ['books.inspiredBy', 'favouriteBook'],\n  strategy: 'joined',\n  populateHints: {\n    books: { joinType: 'inner join' },\n    'books.inspiredBy': { strategy: 'select-in' },\n    favouriteBook: { joinType: 'left join' },\n  },\n});\n```\n\nHints for paths that don't match any populate entry are silently ignored."
+   },
+   {
+    "id": "mikro-orm:docs/docs/populating-relations.md#4",
+    "text": "## Loading strategies\n\nThe way that MikroORM fetches the data based on populate hint is also configurable. By default, MikroORM uses a \"select in\" strategy which runs one separate query for each level of a populate. If you're using an SQL database you can also ask MikroORM to use a join for all tables involved in the populate and run it as a single query. This is again configurable globally or per query.\n\nYou can also use `populateHints` to override the strategy or join type for individual relations:\n\n```ts\nconst tags = await em.find(BookTag, {}, {\n  populate: ['books.author'],\n  strategy: 'joined',\n  populateHints: {\n    'books.author': { strategy: 'select-in' },\n  },\n});\n```\n\nYou can also use `populateHints` to limit the number of items loaded per parent:\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts'],\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n```\n\nFor more information see the [Loading Strategies section](./loading-strategies.md#per-parent-limiting)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/loading-strategies.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/populating-relations.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/loading-strategies.md#3",
+    "b": "mikro-orm:docs/docs/populating-relations.md#4",
+    "relation": "overlapping",
+    "related": 0.9988,
+    "probabilities": {
+     "same": 0.0025,
+     "overlapping": 0.9938,
+     "conflicting": 0.0024,
+     "unrelated": 0.0012
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 74,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 102,
+   "total_ms": 106
+  }
+ }
+}

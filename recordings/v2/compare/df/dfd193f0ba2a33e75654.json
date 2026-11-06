@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/df/dfd193f0ba2a33e75654",
+ "request_hash": "dfd193f0ba2a33e756544b00c22c488da368e3460fb9b043b4e96ecbbbc8954d",
+ "recorded_at": "2026-11-06T14:10:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1293,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "197.116539",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=556"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "text": "### Routes options\n<a id=\"options\"></a>\n\n* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,\n  `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. To accept more methods,\n  the [`addHttpMethod`](./Server.md#addHttpMethod) must be used.\n  It could also be an array of methods.\n* `url`: the path of the URL to match this route (alias: `path`).\n* `schema`: an object containing the schemas for the request and response. They\n  need to be in [JSON Schema](https://json-schema.org/) format, check\n  [here](./Validation-and-Serialization.md) for more info.\n\n  * `body`: validates the body of the request if it is a POST, PUT, PATCH,\n    TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.\n  * `querystring` or `query`: validates the querystring. This can be a complete\n    JSON Schema object, with the property `type` of `object` and `properties`\n    object of parameters, or simply the values of what would be contained in the\n    `properties` object as shown below.\n  * `params`: validates the params.\n  * `response`: filter and generate a schema for the response, setting a schema\n    allows us to have 10-20% more throughput.\n* `exposeHeadRoute`: creates a sibling `HEAD` route for any `GET` routes.\n  Defaults to the value of [`exposeHeadRoutes`](./Server.md#exposeHeadRoutes)\n  instance option. If you want a custom `HEAD` handler without disabling this\n  option, make sure to define it before the `GET` route.\n* `attachValidation`: attach `validationError` to request, if there is a schema\n  validation error, instead of sending the error to the error handler. The\n  default [error format](https://ajv.js.org/api.html#error-objects) is the Ajv\n  one.\n* `onRequest(request, reply, done)`: a [function](./Hooks.md#onrequest) called\n  as soon as a request is received, it could also be an array of functions.\n* `preParsing(request, reply, payload, done)`: a\n  [function](./Hooks.md#preparsing) called before parsing the request, it could\n  also be an array of functions.\n* `preValidation(request, reply, done)`: a [function](./Hooks.md#prevalidation)\n  called after the shared `preValidation` hooks, useful if you need to perform\n  authentication at route level for example, it could also be an array of\n  functions.\n* `preHandler(request, reply, done)`: a [function](./Hooks.md#prehandler) called\n  just before the request handler, it could also be an array of functions.\n* `preSerialization(request, reply, payload, done)`: a\n  [function](./Hooks.md#preserialization) called just before the serialization,\n  it could also be an array of functions.\n* `onSend(request, reply, payload, done)`: a [function](./Hooks.md#route-hooks)\n  called right before a response is sent, it could also be an array of\n  functions.\n* `onResponse(request, reply, done)`: a [function](./Hooks.md#onresponse) called\n  when a response has been sent, so you will not be able to send more data to\n  the client. It could also be an array of functions.\n* `onTimeout(request, reply, done)`: a [function](./Hooks.md#ontimeout) called\n  when a request is timed out and the HTTP socket has been hung up.\n* `onError(request, reply, error, done)`: a [function](./Hooks.md#onerror)\n  called when an Error is thrown or sent to the client by the route handler.\n* `handler(request, reply)`: the function that will handle this request. The\n  [Fastify server](./Server.md) will be bound to `this` when the handler is\n  called. Note: using an arrow function will break the binding of `this`.\n* `errorHandler(error, request, reply)`: a custom error handler for the scope of"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#73",
+    "text": "#### addHttpMethod\n<a id=\"addHttpMethod\"></a>\n\nFastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,\n`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.\nThe `addHttpMethod` method allows to add any non standard HTTP\nmethods to the server that are [supported by Node.js](https://nodejs.org/api/http.html#httpmethods).\n\nThe method accepts an optional configuration object:\n\n| Property | Type | Default | Description |\n| -------- | ---- | ------- | ----------- |\n| `hasBody` | `boolean` | `false` | Whether the method accepts a request body. |\n| `overrideExisting` | `boolean` | `false` | Whether to explicitly override an existing method. |\n\n```js\n// Add a new HTTP method called 'MKCOL' that supports a request body\nfastify.addHttpMethod('MKCOL', { hasBody: true,  })\n\n// Add a new HTTP method called 'COPY' that does not support a request body\nfastify.addHttpMethod('COPY')\n```\n\nAfter calling `addHttpMethod`, it is possible to use the route shorthand\nmethods to define routes for the new HTTP method:\n\n```js\nfastify.addHttpMethod('MKCOL', { hasBody: true })\nfastify.mkcol('/', (req, reply) => {\n  // Handle the 'MKCOL' request\n})\n```\n\nCalling `addHttpMethod` for an existing method requires `overrideExisting: true`\nand overrides its body behavior.\n\n```js\nfastify.addHttpMethod('GET', {\n  hasBody: true,\n  overrideExisting: true\n})\n```\n\nOmitting `overrideExisting: true` when the method already exists throws\n`FST_ERR_ROUTE_METHOD_ALREADY_SUPPORTED`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#73"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#73",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Routes.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Routes.md#2",
+    "b": "fastify:docs/Reference/Server.md#73",
+    "relation": "overlapping",
+    "related": 0.9972,
+    "probabilities": {
+     "same": 0.0092,
+     "overlapping": 0.9843,
+     "conflicting": 0.0037,
+     "unrelated": 0.0028
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0079,
+       "restated": 0.9711,
+       "elaborated": 0.0116,
+       "different": 0.0095
+      },
+      "confidence": 0.9905,
+      "a": {
+       "document": "fastify:docs/Reference/Routes.md#2",
+       "quote": "* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,",
+       "start": 41,
+       "end": 108,
+       "confidence": 0.996
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Server.md#73",
+       "quote": "#### addHttpMethod\n<a id=\"addHttpMethod\"></a>\n\nFastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,\n`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.\nThe `addHttpMethod` method allows to add any non standard HTTP\nmethods to the server that are [supported by Node.js](https://nodejs.org/api/http.html#httpmethods).\n\nThe method accepts an optional configuration object:\n\n| Property | Type | Default | Description |\n| -------- | ---- | ------- | ----------- |\n| `hasBody` | `boolean` | `false` | Whether the method accepts a request body.",
+       "start": 0,
+       "end": 558,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 113,
+   "passage_reads": 1,
+   "passages_ms": 87,
+   "passages": 1,
+   "counterparts_ms": 92
+  },
+  "timing": {
+   "read_ms": 292,
+   "total_ms": 299
+  }
+ }
+}

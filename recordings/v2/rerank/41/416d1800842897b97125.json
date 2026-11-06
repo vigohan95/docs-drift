@@ -1,0 +1,277 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/41/416d1800842897b97125",
+ "request_hash": "416d1800842897b971258154ca198615faedf2c708ea1369ece5448fa7bcfd28",
+ "recorded_at": "2026-11-06T14:15:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3253,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "120.779427",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=189,cfOrigin;dur=0,cfWorker;dur=251"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity. (2) Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`. Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#1",
+    "title": "docs/docs/unit-of-work.md > Persisting Managed Entities",
+    "text": "## Persisting Managed Entities\n\nThe identity map has a second use-case. When you call `em.flush()`, MikroORM will ask the identity map for all objects that are currently managed. This means you don't have to call `em.persist()` over and over again to pass known objects to the `EntityManager`. This is a NO-OP for known entities, but leads to much code written that is confusing to other developers.\n\nThe following code WILL update your database with the changes made to the `Author` object, even if you did not call `em.persist()`:\n\n```ts\nconst jon = await em.findOne(Author, 1);\njon.email = 'foo@bar.com';\nawait em.flush();\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "title": "docs/docs/guide/01-first-entity.md > Working with Entity Manager > Unit of Work and Identity Map",
+    "text": "### Unit of Work and Identity Map\n\nMikroORM uses the Identity Map pattern to track objects. Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`. This allows MikroORM room for optimizations. If you call the EntityManager and ask for an entity with a specific ID twice, it will return the same instance:\n\n```ts\nconst jon1 = await em.findOne(Author, 1);\nconst jon2 = await em.findOne(Author, 1);\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nThe Identity Map only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before. But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key."
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#0",
+    "title": "docs/docs/unit-of-work.md > (preamble)",
+    "text": "---\ntitle: Unit of Work and Transactions\nsidebar_label: Unit of Work\n---\n\nMikroORM uses the Identity Map pattern to track objects. Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`.\n\nThis allows MikroORM room for optimizations. If you call the EntityManager and ask for an entity with a specific ID twice, it will return the same instance:\n\n```ts\nconst jon1 = await em.findOne(Author, 1);\nconst jon2 = await em.findOne(Author, 1);\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nOnly one SELECT query will be fired against the database here. In the second `findOne()` call MikroORM will check the identity map first and will skip the database round trip as it will find the entity already loaded.\n\nThe identity map being indexed by primary keys only allows shortcuts when you ask for objects by primary key. When you query by other properties, you will still get the same reference, but two separate database calls will be made:\n\n```ts\nconst jon1 = await em.findOne(Author, { name: 'Jon Snow' });\nconst jon2 = await em.findOne(Author, { name: 'Jon Snow' });\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nMikroORM only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before. But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key."
+   },
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#6",
+    "title": "docs/docs/architecture.md > Entity to Database: Change Tracking and Flush",
+    "text": "## Entity to Database: Change Tracking and Flush\n\nMikroORM uses a **snapshot-based** change tracking approach. When an entity is hydrated or persisted, the ORM stores a copy of its state. On flush, it compares the current state against this snapshot:\n\n```mermaid\nsequenceDiagram\n    participant App\n    participant EM as EntityManager\n    participant UoW as UnitOfWork\n    participant Driver\n    participant DB as Database\n\n    Note over App,DB: 1. Load entity\n    App->>EM: em.findOne(User, 1)\n    EM-->>App: user (snapshot stored)\n\n    Note over App,DB: 2. Modify entity\n    App->>App: user.name = 'New Name'\n\n    Note over App,DB: 3. Flush changes\n    App->>EM: em.flush()\n    EM->>UoW: computeChangeSets()\n    UoW->>UoW: Compare current vs snapshot\n    UoW->>UoW: Build change sets\n    UoW->>UoW: Order by dependencies\n\n    UoW->>Driver: BEGIN transaction\n    UoW->>Driver: Execute INSERT/UPDATE/DELETE\n    Driver->>DB: SQL queries\n    UoW->>Driver: COMMIT\n\n    UoW->>UoW: Update snapshots\n    EM-->>App: Done\n```\n\nThe flush operation:\n\n1. **Computes change sets**: Compares current entity state against stored snapshots.\n2. **Orders queries**: Uses topological sort to respect foreign key constraints.\n3. **Batches operations**: Groups INSERTs, UPDATEs, and DELETEs for efficiency.\n4. **Wraps in transaction**: All changes are committed atomically.\n5. **Updates snapshots**: After successful commit, snapshots are updated to reflect the new state.\n\nSee [Unit of Work](./unit-of-work.md) for flush modes and transaction details."
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "title": "docs/docs/guide/01-first-entity.md > Working with Entity Manager > Persist and Flush",
+    "text": "### Persist and Flush\n\nThere are 2 methods we should first describe to understand how persisting works in MikroORM: [`em.persist()`](/api/core/class/EntityManager#persist) and [`em.flush()`](/api/core/class/EntityManager#flush).\n\n[`em.persist(entity)`](/api/core/class/EntityManager#persist) is used to mark new entities for future persisting. It will make the entity managed by the [`EntityManager`](/api/core/class/EntityManager) and once `flush` will be called, it will be written to the database.\n\nWe use [`em.create()`](/api/core/class/EntityManager#create) to create entity instances.\n\n```ts\n// create a new user entity instance\nconst user = em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\n\n// em.create() automatically calls persist(), so we just need to flush\nawait em.flush();\n\n// alternatively, you can persist manually:\nconst user2 = em.create(UserSchema, { ... }, { persist: false });\nem.persist(user2);\nawait em.flush();\n```\n\nTo understand `flush`, let's first define what managed entity is: An entity is managed if it's fetched from the database (via [`em.find()`](/api/core/class/EntityManager#find)) or registered as new through [`em.persist()`](/api/core/class/EntityManager#persist) and flushed later (only after the `flush` it becomes managed).\n\n[`em.flush()`](/api/core/class/EntityManager#flush) will go through all managed entities, compute appropriate change sets and perform according database queries. As an entity loaded from the database becomes managed\nautomatically, you do not have to call persist on those, and flush is enough to update them."
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#17",
+    "title": "docs/docs/guide/01-first-entity.md > Working with Entity Manager > Implicit Transactions",
+    "text": "### Implicit Transactions\n\nThe most important implication of having Unit of Work is that it allows handling transactions automatically.\n\nWhen you call [`em.flush()`](/api/core/class/EntityManager#flush), all computed changes are queried inside a database transaction. This means that you can control the boundaries of transactions by calling [`em.persist()`](/api/core/class/EntityManager#persist) and once all your changes are ready, calling `flush()` will run them inside a transaction.\n\n> You can also control the transaction boundaries manually via `em.transactional(cb)`.\n\n```ts\nconst user = await em.findOne(UserSchema, 1);\n\nuser.email = 'foo@bar.com';\n\nawait em.flush();\n```\n\nYou can find more information about transactions in [Transactions and concurrency](../transactions.md) page."
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#1",
+    "title": "docs/docs/entity-manager.md > Persist and Flush",
+    "text": "## Persist and Flush\n\nThere are 2 methods you should first understand to learn how persisting works in MikroORM: `em.persist()` and `em.flush()`.\n\n`em.persist(entity)` is used to mark new entities for future persisting. It will make the entity managed by given `EntityManager` and once `flush` will be called, it will be written to the database.\n\nTo understand `flush`, lets first define what managed entity is: An entity is managed if it’s fetched from the database (via `em.find()`, `em.findOne()` or via other managed entity) or registered as new through `em.persist()`.\n\n`em.flush()` will go through all managed entities, compute appropriate change sets and perform according database queries. As an entity loaded from database becomes managed automatically, you do not have to call persist on those, and flush is enough to update them.\n\n```ts\nconst book = await em.findOne(Book, 1);\nbook.title = 'How to persist things...';\n\n// no need to persist `book` as its already managed by the EM\nawait em.flush();\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#21",
+    "title": "docs/docs/guide/01-first-entity.md > Working with Entity Manager > Fetching Entities",
+    "text": "### Fetching Entities\n\nWe have our first entity stored in the database. To read it from there we can use `find()` and `findOne()` methods.\n\n```ts title='server.ts'\n// find user by PK, same as `em.findOne(UserSchema, { id: 1 })`\nconst userById = await em.findOne(UserSchema, 1);\n// find user by email\nconst userByEmail = await em.findOne(UserSchema, { email: 'foo@bar.com' });\n// find all users\nconst allUsers = await em.find(UserSchema, {});\n```\n\nWe mentioned the Identity Map several times already - time to test how it works. We said the entity is managed, and the Unit of Work will track its changes, and compute them when we call `flush()`. We also said a new entity that is marked with `persist()` will become managed after flushing.\n\nPut the following code into your `server.ts` file, right before the `orm.close()` call:\n\n```ts title='server.ts'\n// user entity is now managed, if we try to find it again, we get the same reference\nconst myUser = await em.findOne(UserSchema, user.id);\nconsole.log('users are the same?', user === myUser)\n\n// modifying the user and flushing yields update queries\nuser.bio = '...';\nawait em.flush();\n```\n\nRun the `npm start` again and verify the logs:\n\n```\nusers are the same? true\n[query] begin\n[query] update `user` set `bio` = '...' where `id` = 1 [took 0 ms]\n[query] commit\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/events.md#17",
+    "title": "docs/docs/events.md > Flush Events > Accessing Changes in Flush Events",
+    "text": "### Accessing Changes in Flush Events\n\nThe `UnitOfWork` provides methods to inspect pending changes:\n\n```ts\nasync onFlush(args: FlushEventArgs) {\n  const uow = args.uow;\n\n  // All pending change sets\n  const changeSets = uow.getChangeSets();\n\n  // Original data when entity was loaded\n  const original = uow.getOriginalEntityData(entity);\n\n  // Entities marked for persist/remove\n  const toInsert = uow.getPersistStack();\n  const toDelete = uow.getRemoveStack();\n\n  // Collection modifications\n  const collectionUpdates = uow.getCollectionUpdates();\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#19",
+    "title": "docs/docs/guide/01-first-entity.md > Working with Entity Manager > Fork to the win!",
+    "text": "### Fork to the win!\n\nSo we understand the problem better now, what's the solution? The error suggests it - forking. With the `fork()` method we get a clean [`EntityManager`](/api/core/class/EntityManager) instance, that has a fresh Unit of Work with its own context and Identity Map.\n\n```ts title='server.ts'\n// fork first to have a separate context\nconst em = orm.em.fork();\n\n// create and persist the user in the forked context\nconst user = em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\nawait em.flush();\n```\n\nRunning `npm start` again, you get past the global context validation error, but only to find another one:\n\n```\nTableNotFoundException: insert into `user` (`bio`, `email`, `full_name`, `password`) values ('', 'foo@bar.com', 'Foo Bar', '123456') - no such table: user\n```\n\nWe forgot to create the database schema. Fortunately, we have all the tools we need at hand. You can use the [`SchemaGenerator`](/api/sql/class/SqlSchemaGenerator) provided by MikroORM to create the schema, as well as to keep it in sync when you change your entities. For the initial testing, let's use the `refresh()` method, which is handy for testing - it will first drop the schema if it already exists and create it from scratch based on entity definition (metadata).\n\n```ts title='server.ts'\n// recreate the database schema\nawait orm.schema.refresh();\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#6",
+    "title": "docs/docs/guide/02-relationships.md > Working with relations > Creating entity graph",
+    "text": "### Creating entity graph\n\nWe've been using [`em.create()`](/api/core/class/EntityManager#create) to create entity instances. This method allows you to create a deep entity graph, mapping foreign keys of your relations to entity references of the correct type. It will also call [`em.persist()`](/api/core/class/EntityManager#persist) on the created entity (unless disabled via `persistOnCreate` option).\n\n> You can wipe most of the contents of `server.ts` file and keep only the initial part with ORM init, up to the point where the first `User` entity gets flushed, plus the `orm.close()` call at the end. We won't be using this code going forward, it is just a playground for you.\n\n```ts title='server.ts'\n// fork first to have a separate context\nconst em = orm.em.fork();\n\n// create new user entity instance\nconst user = em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\n\n// em.create auto-persists, so just flush\nawait em.flush();\n\n// clear the context to simulate fresh request\nem.clear();\n\n// create the article instance\nconst article = em.create(ArticleSchema, {\n  slug: 'foo',\n  title: 'Foo',\n  text: 'Lorem impsum dolor sit amet',\n  description: 'Foo is bar',\n  author: user.id,\n});\n\n// `em.create` calls `em.persist` automatically, so flush is enough\nawait em.flush();\nconsole.log(article);\n```\n\n:::info `em.clear()`\n\nIf you carefully checked this snippet, you probably found that new mysterious [`em.clear()`](/api/core/class/EntityManager#clear) call. What does it do? It clears the context for the [`EntityManager`](/api/core/class/EntityManager), meaning it will detach all the entities it was managing. It will bring the [`EntityManager`](/api/core/class/EntityManager) to the same state as if you would create a fresh fork via [`em.fork()`](/api/core/class/EntityManager#fork). You won't usually need this in your app, but it is very handy for unit testing, to simulate new requests coming in. You may as well use forks explicitly if you want.\n\n:::"
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#2",
+    "title": "docs/docs/entity-manager.md > Persisting and Cascading",
+    "text": "## Persisting and Cascading\n\nTo save entity state to database, you need to persist it. Persist determines whether to use `insert` or `update` and computes appropriate change-set. Entity references that are not persisted yet (does not have identifier) will be cascade persisted automatically.\n\n```ts\n// use constructors in your entities for required parameters\nconst author = new Author('Jon Snow', 'snow@wall.st');\nauthor.born = new Date();\n\nconst publisher = new Publisher('7K publisher');\n\nconst book1 = new Book('My Life on The Wall, part 1', author);\nbook1.publisher = publisher;\nconst book2 = new Book('My Life on The Wall, part 2', author);\nbook2.publisher = publisher;\nconst book3 = new Book('My Life on The Wall, part 3', author);\nbook3.publisher = publisher;\n\n// just persist books, author and publisher will be automatically cascade persisted\nawait em.persist([book1, book2, book3]).flush();\n\n// or one by one\nem.persist(book1);\nem.persist(book2);\nem.persist(book3);\nawait em.flush(); // flush everything to database at once\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "mikro-orm:docs/docs/architecture.md#6",
+    "action": "use",
+    "relevance_score": 0.9699,
+    "document_score": 0.9793,
+    "levels": {
+     "answers": 0.9699,
+     "elsewhere": 0.0094,
+     "different_case": 0.0148,
+     "unrelated": 0.0058
+    }
+   },
+   {
+    "index": 4,
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "action": "use",
+    "relevance_score": 0.9627,
+    "document_score": 0.9742,
+    "levels": {
+     "answers": 0.9627,
+     "elsewhere": 0.0115,
+     "different_case": 0.017,
+     "unrelated": 0.0088
+    }
+   },
+   {
+    "index": 6,
+    "id": "mikro-orm:docs/docs/entity-manager.md#1",
+    "action": "use",
+    "relevance_score": 0.9419,
+    "document_score": 0.9649,
+    "levels": {
+     "answers": 0.9419,
+     "elsewhere": 0.023,
+     "different_case": 0.023,
+     "unrelated": 0.0121
+    }
+   },
+   {
+    "index": 0,
+    "id": "mikro-orm:docs/docs/unit-of-work.md#1",
+    "action": "use",
+    "relevance_score": 0.8349,
+    "document_score": 0.8873,
+    "levels": {
+     "answers": 0.8349,
+     "elsewhere": 0.0523,
+     "different_case": 0.0434,
+     "unrelated": 0.0693
+    }
+   },
+   {
+    "index": 8,
+    "id": "mikro-orm:docs/docs/events.md#17",
+    "action": "expand",
+    "relevance_score": 0.1115,
+    "document_score": 0.641,
+    "levels": {
+     "answers": 0.1115,
+     "elsewhere": 0.5295,
+     "different_case": 0.0743,
+     "unrelated": 0.2847
+    }
+   },
+   {
+    "index": 1,
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0266,
+    "document_score": 0.2641,
+    "levels": {
+     "answers": 0.0266,
+     "elsewhere": 0.2374,
+     "different_case": 0.0639,
+     "unrelated": 0.672
+    }
+   },
+   {
+    "index": 7,
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0244,
+    "document_score": 0.1908,
+    "levels": {
+     "answers": 0.0244,
+     "elsewhere": 0.1665,
+     "different_case": 0.0739,
+     "unrelated": 0.7353
+    }
+   },
+   {
+    "index": 2,
+    "id": "mikro-orm:docs/docs/unit-of-work.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0207,
+    "document_score": 0.4183,
+    "levels": {
+     "answers": 0.0207,
+     "elsewhere": 0.3975,
+     "different_case": 0.0505,
+     "unrelated": 0.5312
+    }
+   },
+   {
+    "index": 11,
+    "id": "mikro-orm:docs/docs/entity-manager.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0127,
+    "document_score": 0.1495,
+    "levels": {
+     "answers": 0.0127,
+     "elsewhere": 0.1367,
+     "different_case": 0.0588,
+     "unrelated": 0.7917
+    }
+   },
+   {
+    "index": 10,
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0041,
+    "document_score": 0.0199,
+    "levels": {
+     "answers": 0.0041,
+     "elsewhere": 0.0158,
+     "different_case": 0.0245,
+     "unrelated": 0.9556
+    }
+   },
+   {
+    "index": 5,
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0037,
+    "document_score": 0.0242,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.0205,
+     "different_case": 0.0202,
+     "unrelated": 0.9556
+    }
+   },
+   {
+    "index": 9,
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#19",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0119,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.009,
+     "different_case": 0.0256,
+     "unrelated": 0.9625
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6059
+  },
+  "timing": {
+   "total_ms": 140,
+   "rerank_ms": 124,
+   "questions_ms": 0,
+   "model_ms": 111,
+   "engine": {
+    "rows": 6335,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 111,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 224
+   }
+  }
+ }
+}

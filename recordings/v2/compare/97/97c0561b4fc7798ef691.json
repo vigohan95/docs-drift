@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/97/97c0561b4fc7798ef691",
+ "request_hash": "97c0561b4fc7798ef69161da1d450279f328222a88f8217684370cc8e3e473c2",
+ "recorded_at": "2026-11-06T14:12:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 966,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "24.036863",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=287"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#29",
+    "text": "## Native histograms as classic histograms in PromQL\n\n`--enable-feature=promql-native-histograms-as-classic`\n\nWhen enabled, PromQL queries for classic histogram series (e.g. `_bucket`, `_count`, `_sum`) will\nautomatically convert native histograms into classic histogram series. Currently only Native\nHistograms with Custom Buckets (NHCB) are converted.\n\nFor example, if `request_duration_seconds` is stored as an NHCB native histogram:\n\n```promql\n# Querying with a classic histogram suffix triggers the conversion:\nhistogram_quantile(0.95, rate(request_duration_seconds_bucket[5m]))\n\n# Querying without a suffix returns the regular NHCB native histogram:\nrate(request_duration_seconds[5m])\n```\n\nThis feature only affects PromQL query evaluation (e.g. the query APIs and rule evaluation). The\nconversion is applied on top of all data the query engine reads, including series fetched from\n`remote_read` endpoints. It does not apply to remote write (NHCB series are not converted when being\nforwarded to remote endpoints), the remote read API, federation, or the series API (the\n`/api/v1/series` endpoint will not return the converted classic series). Note that remote write has its\nown `convert_nhcb_to_classic` setting, see the [`remote_write`](configuration/configuration.md#remote_write)\nconfiguration.\n\nKnown limitations:\n\n* The conversion only triggers on exact metric name matchers (e.g. `request_duration_seconds_bucket`), not on\n  regex or negative name matchers.\n* Handling of collisions and transitions between stored classic series and converted NHCB series is not\n  implemented yet, so results may contain duplicates.\n* Native histograms with exponential buckets are not converted yet; support may be added later.\n* There is no control label yet; one will be added to disable and debug the conversion.\n* There is no metric counting the converted series yet; one will be added to help track the progress of\n  a migration from classic histograms to NHCB."
+   },
+   {
+    "id": "prometheus:docs/migration.md#2",
+    "text": "## Configuration\n\n- The scrape job level configuration option `scrape_classic_histograms` has\n  been renamed to `always_scrape_classic_histograms`. If you use the\n  `scrape_native_histograms` scrape configuration option to ingest native\n  histograms and you also want to ingest classic histograms that an endpoint\n  might expose along with native histograms, be sure to add this configuration\n  or change your configuration from the old name.\n- The `http_config.enable_http2` in `remote_write` items default has been\n  changed to `false`. In Prometheus v2 the remote write http client would\n  default to use http2. In order to parallelize multiple remote write queues\n  across multiple sockets its preferable to not default to http2.\n  If you prefer to use http2 for remote write you must now set\n  `http_config.enable_http2: true` in your `remote_write` configuration section."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#29",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/migration.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/feature_flags.md#29",
+    "b": "prometheus:docs/migration.md#2",
+    "relation": "unrelated",
+    "related": 0.0102,
+    "probabilities": {
+     "same": 0.0034,
+     "overlapping": 0.0031,
+     "conflicting": 0.0038,
+     "unrelated": 0.9898
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 146
+  },
+  "timing": {
+   "read_ms": 146,
+   "total_ms": 150
+  }
+ }
+}

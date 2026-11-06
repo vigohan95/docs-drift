@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a7/a762bbd180c1ac43f3f1",
+ "request_hash": "a762bbd180c1ac43f3f101875866fc0137f182847022797468077425d553bd1b",
+ "recorded_at": "2026-11-06T14:15:25Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1132,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "187.638815",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=96,cfOrigin;dur=0,cfWorker;dur=328"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#4",
+    "text": "## Declarative Referential Integrity\n\n> This is only supported in SQL drivers.\n\nAs opposed to the application level cascading controlled by the `cascade` option, you can also define database level referential integrity actions: `on update` and `on delete`.\n\nThese rules are independent of the `cascade` option (which only controls ORM-level behavior). You can set FK rules via:\n\n1. **Property-level options:** Use `updateRule` and `deleteRule` on individual relations.\n\n```ts\n@Entity()\nexport class Book {\n\n  @ManyToOne({ updateRule: 'set null', deleteRule: 'cascade' })\n  author?: Author;\n\n}\n```\n\n2. **Global defaults:** Set `defaultUpdateRule` and `defaultDeleteRule` in your config.\n\n```ts\nMikroORM.init({\n  schemaGenerator: {\n    defaultDeleteRule: 'cascade',\n    defaultUpdateRule: 'cascade',\n  },\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "text": "## Foreign key rules no longer inferred from `cascade` option\n\nPreviously, MikroORM inferred `updateRule` and `deleteRule` from the [`cascade` option](./cascading.md):\n- `Cascade.REMOVE` or `Cascade.ALL` → `deleteRule: 'cascade'`\n- `Cascade.PERSIST` or `Cascade.ALL` → `updateRule: 'cascade'`\n- Nullable relation → `deleteRule: 'set null'`\n\nThis inference has been removed. FK rules are now independent of the `cascade` option, which only controls ORM-level cascading behavior.\n\nThe ORM still applies sensible semantic defaults for specific relation patterns:\n\n| Scenario | `deleteRule` | `updateRule` |\n|----------|--------------|--------------|\n| FK-as-PK (entity's PK is also a FK) | `cascade` | `cascade` |\n| Pivot tables (M:N join tables) | `cascade` | `cascade` |\n| Relation to composite PK target | — | `cascade` |\n| Nullable relation | `set null` | — |\n| Self-referencing FK on MSSQL | `no action` | `no action` |\n\nIf you relied on the old `cascade` option inference, you have two options:\n\n1. Set rules explicitly on individual relations:\n\n```ts\n@ManyToOne({ deleteRule: 'cascade', updateRule: 'cascade' })\nauthor?: Author;\n```\n\n2. Set global defaults in your config:\n\n```ts\nMikroORM.init({\n  schemaGenerator: {\n    defaultDeleteRule: 'cascade',\n    defaultUpdateRule: 'cascade',\n  },\n});\n```\n\nWhen neither is set, the database uses its native default (NO ACTION for PostgreSQL, SQLite, MSSQL, Oracle; RESTRICT for MySQL/MariaDB). See [Declarative Referential Integrity](./cascading.md#declarative-referential-integrity) for details on how FK rules work."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/cascading.md#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/cascading.md#4",
+    "b": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "relation": "overlapping",
+    "related": 0.9986,
+    "probabilities": {
+     "same": 0.0043,
+     "overlapping": 0.9905,
+     "conflicting": 0.0038,
+     "unrelated": 0.0014
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0105,
+       "restated": 0.7261,
+       "elaborated": 0.0702,
+       "different": 0.1931
+      },
+      "confidence": 0.8069,
+      "a": {
+       "document": "mikro-orm:docs/docs/cascading.md#4",
+       "quote": "These rules are independent of the `cascade` option (which only controls ORM-level behavior).",
+       "start": 258,
+       "end": 351,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+       "quote": "FK rules are now independent of the `cascade` option, which only controls ORM-level cascading behavior.\n\nThe ORM still applies sensible semantic defaults for specific relation patterns:\n\n| Scenario | `deleteRule` | `updateRule` |\n|----------|--------------|--------------|\n| FK-as-PK (entity's PK is also a FK) | `cascade` | `cascade` |\n| Pivot tables (M:N join tables) | `cascade` | `cascade` |\n| Relation to composite PK target | — | `cascade` |\n| Nullable relation | `set null` | — |\n| Self-referencing FK on MSSQL | `no action` | `no action` |\n\nIf you relied on the old `cascade` option inference, you have two options:\n\n1.",
+       "start": 374,
+       "end": 1001,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0116,
+       "restated": 0.9686,
+       "elaborated": 0.0097,
+       "different": 0.0101
+      },
+      "confidence": 0.887,
+      "a": {
+       "document": "mikro-orm:docs/docs/cascading.md#4",
+       "quote": "1.",
+       "start": 379,
+       "end": 381,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+       "quote": "Set rules explicitly on individual relations:\n\n```ts\n@ManyToOne({ deleteRule: 'cascade', updateRule: 'cascade' })\nauthor?: Author;\n```\n\n2.",
+       "start": 1002,
+       "end": 1140,
+       "confidence": 0.887
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 3,
+   "counterparts_ms": 87
+  },
+  "timing": {
+   "read_ms": 198,
+   "total_ms": 202
+  }
+ }
+}

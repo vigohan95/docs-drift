@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9f/9f01f4566d0f3d84c8ce",
+ "request_hash": "9f01f4566d0f3d84c8cef4b8a91bb07e4be0bfff5d77b9f02fe78b13a0045488",
+ "recorded_at": "2026-11-06T14:15:25Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 944,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "23.350496",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=236"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#33",
+    "text": "## Batch inserts, updates and deletes\n\nWhen you flush changes made to one entity type, only one query per given operation (create/update/delete) will be executed.\n\n```ts\nfor (let i = 1; i <= 5; i++) {\n  const u = new User(`Peter ${i}`, `peter+${i}@foo.bar`);\n  em.persist(u);\n}\n\nawait em.flush();\n\n// insert into `user` (`name`, `email`) values\n//   ('Peter 1', 'peter+1@foo.bar'),\n//   ('Peter 2', 'peter+2@foo.bar'),\n//   ('Peter 3', 'peter+3@foo.bar'),\n//   ('Peter 4', 'peter+4@foo.bar'),\n//   ('Peter 5', 'peter+5@foo.bar');\n```\n\n```ts\nfor (const user of users) {\n  user.name += ' changed!';\n}\n\nawait em.flush();\n\n// update `user` set\n//   `name` = case\n//     when (`id` = 1) then 'Peter 1 changed!'\n//     when (`id` = 2) then 'Peter 2 changed!'\n//     when (`id` = 3) then 'Peter 3 changed!'\n//     when (`id` = 4) then 'Peter 4 changed!'\n//     when (`id` = 5) then 'Peter 5 changed!'\n//     else `priority` end\n//   where `id` in (1, 2, 3, 4, 5)\n```\n\n```ts\nem.remove(users);\nawait em.flush();\n\n// delete from `user` where `id` in (1, 2, 3, 4, 5)\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#29",
+    "text": "### Recursive CTEs\n\nUse `withRecursive()` for recursive queries (e.g. tree traversal). On MSSQL, this emits a plain `WITH` since MSSQL CTEs are implicitly recursive.\n\nWhen using `raw()` for the CTE body (common with recursive CTEs), type inference is not available — use an explicit type parameter on `execute()` in that case:\n\n```ts\nconst qb = em.createQueryBuilder(Author)\n  .withRecursive('seq', raw('select 1 as n union all select n + 1 from seq where n < ?', [5]))\n  .select('*')\n  .from('seq', 's');\n\nconst rows = await qb.execute<{ n: number }[]>();\n// [{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }, { n: 5 }]\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#33",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#29",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-manager.md#33",
+    "b": "mikro-orm:docs/docs/query-builder.md#29",
+    "relation": "unrelated",
+    "related": 0.0036,
+    "probabilities": {
+     "same": 0.0011,
+     "overlapping": 0.0013,
+     "conflicting": 0.0011,
+     "unrelated": 0.9964
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 104
+  },
+  "timing": {
+   "read_ms": 104,
+   "total_ms": 106
+  }
+ }
+}

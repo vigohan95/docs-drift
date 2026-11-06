@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/8d/8d0e1dc0aa55eccbbc15",
+ "request_hash": "8d0e1dc0aa55eccbbc15ef88ae70d8c9b212122391e4d8e18c76bfe7764c4b65",
+ "recorded_at": "2026-11-06T14:11:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 892,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "23.270016",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=162"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "text": "### Hands-on\n\nFor this sample solution we'll be using the following:\n\n- `node.js v16.14.2`\n- `npm 8.5.0`\n- `fastify 4.0.0-rc.1`\n- `fastify-plugin 3.0.1`\n- `undici 5.0.0`\n\nSay we have the following base server set up at first:\n\n```js\nconst Fastify = require('fastify')\n\nconst provider = require('./provider')\n\nconst server = Fastify({ logger: true })\nconst USUAL_WAIT_TIME_MS = 5000\n\nserver.get('/ping', function (request, reply) {\n  reply.send({ error: false, ready: request.server.magicKey !== null })\n})\n\nserver.post('/webhook', function (request, reply) {\n  // It's good practice to validate webhook requests come from\n  // who you expect. This is skipped in this sample for the sake\n  // of simplicity\n\n  const { magicKey } = request.body\n  request.server.magicKey = magicKey\n  request.log.info('Ready for customer requests!')\n\n  reply.send({ error: false })\n})\n\nserver.get('/v1*', async function (request, reply) {\n  try {\n    const data = await provider.fetchSensitiveData(request.server.magicKey)\n    return { customer: true, error: false }\n  } catch (error) {\n    request.log.error({\n      error,\n      message: 'Failed at fetching sensitive data from provider',\n    })\n\n    reply.statusCode = 500\n    return { customer: null, error: true }\n  }\n})\n\nserver.decorate('magicKey')\n\nserver.listen({ port: '1234' }, () => {\n  provider.thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS)\n    .catch((error) => {\n      server.log.error({\n        error,\n        message: 'Got an error while trying to get the magic key!'\n      })\n\n      // Since we won't be able to serve requests, might as well wrap\n      // things up\n      server.close(() => process.exit(1))\n    })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "text": "### Why Node.js v20?\n\nFastify v5 will only support Node.js v20+ because it has significant differences\ncompared to v18, such as\nbetter support for `node:test`. This allows us to provide a better developer\nexperience and streamline maintenance.\n\nNode.js v18 will exit Long Term Support on April 30, 2025, so you should be planning\nto upgrade to v20 anyway."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "b": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "relation": "unrelated",
+    "related": 0.0072,
+    "probabilities": {
+     "same": 0.0022,
+     "overlapping": 0.0025,
+     "conflicting": 0.0024,
+     "unrelated": 0.9928
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29
+  },
+  "timing": {
+   "read_ms": 29,
+   "total_ms": 30
+  }
+ }
+}

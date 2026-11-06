@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f5/f5a233cd3895110ddc20",
+ "request_hash": "f5a233cd3895110ddc205267427e44f9c99f9c2cfbd6c47216832401e47bc50d",
+ "recorded_at": "2026-11-06T14:14:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 948,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.062847",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=29,cfOrigin;dur=0,cfWorker;dur=186"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/populate.md#10",
+    "text": "## `limit` vs. `perDocumentLimit` {#limit-vs-perDocumentLimit}\n\nPopulate does support a `limit` option, however, it currently\ndoes **not** limit on a per-document basis for backwards compatibility. For example,\nsuppose you have 2 stories:\n\n```javascript\nawait Story.create([\n  { title: 'Casino Royale', fans: [1, 2, 3, 4, 5, 6, 7, 8] },\n  { title: 'Live and Let Die', fans: [9, 10] }\n]);\n```\n\nIf you were to `populate()` using the `limit` option, you\nwould find that the 2nd story has 0 fans:\n\n```javascript\nconst stories = await Story.find().populate({\n  path: 'fans',\n  options: { limit: 2 }\n});\n\nstories[0].name; // 'Casino Royale'\nstories[0].fans.length; // 2\n\n// 2nd story has 0 fans!\nstories[1].name; // 'Live and Let Die'\nstories[1].fans.length; // 0\n```\n\nThat's because, in order to avoid executing a separate query\nfor each document, Mongoose instead queries for fans using\n`numDocuments * limit` as the limit. If you need the correct\n`limit`, you should use the `perDocumentLimit` option (new in Mongoose 5.9.0).\nJust keep in mind that `populate()` will execute a separate query\nfor each story, which may cause `populate()` to be slower.\n\n```javascript\nconst stories = await Story.find().populate({\n  path: 'fans',\n  // Special option that tells Mongoose to execute a separate query\n  // for each `story` to make sure we get 2 fans for each story.\n  perDocumentLimit: 2\n});\n\nstories[0].name; // 'Casino Royale'\nstories[0].fans.length; // 2\n\nstories[1].name; // 'Live and Let Die'\nstories[1].fans.length; // 2\n```"
+   },
+   {
+    "id": "mongoose:docs/populate.md#21",
+    "text": "## Populate Virtuals {#populate-virtuals}\n\nSo far you've only populated based on the `_id` field.\nHowever, that's sometimes not the right choice.\nFor example, suppose you have 2 models: `Author` and `BlogPost`.\n\n```javascript\nconst AuthorSchema = new Schema({\n  name: String,\n  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }]\n});\n\nconst BlogPostSchema = new Schema({\n  title: String,\n  comments: [{\n    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },\n    content: String\n  }]\n});\n\nconst Author = mongoose.model('Author', AuthorSchema, 'Author');\nconst BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');\n```\n\nThe above is an example of **bad schema design**. Why?\nSuppose you have an extremely prolific author that writes over 10k blog posts.\nThat `author` document will be huge, over 12kb, and large documents lead to performance issues on both server and client.\nThe [Principle of Least Cardinality](https://dev.to/swyx/4-things-i-learned-from-mastering-mongoose-js-25e#4-principle-of-least-cardinality) states that one-to-many relationships, like author to blog post, should be stored on the \"many\" side.\nIn other words, blog posts should store their `author`, authors should **not** store all their `posts`.\n\n```javascript\nconst AuthorSchema = new Schema({\n  name: String\n});\n\nconst BlogPostSchema = new Schema({\n  title: String,\n  author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },\n  comments: [{\n    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },\n    content: String\n  }]\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/populate.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/populate.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/populate.md#10",
+    "b": "mongoose:docs/populate.md#21",
+    "relation": "unrelated",
+    "related": 0.0041,
+    "probabilities": {
+     "same": 0.0015,
+     "overlapping": 0.0012,
+     "conflicting": 0.0015,
+     "unrelated": 0.9959
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35
+  },
+  "timing": {
+   "read_ms": 35,
+   "total_ms": 38
+  }
+ }
+}

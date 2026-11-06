@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b3/b3d4fee980f17bc3caa6",
+ "request_hash": "b3d4fee980f17bc3caa6618d6ff4dd609973def4c299fe185036a80c49629c42",
+ "recorded_at": "2026-11-06T14:13:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1046,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "173.389889",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=317"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "text": "### `configureServer`\n\n- **Type:** `(server: ViteDevServer) => (() => void) | void | Promise<(() => void) | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [ViteDevServer](./api-javascript#vitedevserver)\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Hook for configuring the dev server. The most common use case is adding custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      server.middlewares.use((req, res, next) => {\n        // custom handle request...\n      })\n    },\n  })\n  ```\n\n  **Injecting Post Middleware**\n\n  The `configureServer` hook is called before internal middlewares are installed, so the custom middlewares will run before internal middlewares by default. If you want to inject a middleware **after** internal middlewares, you can return a function from `configureServer`, which will be called after internal middlewares are installed:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      // return a post hook that is called after internal middlewares are\n      // installed\n      return () => {\n        server.middlewares.use((req, res, next) => {\n          // custom handle request...\n        })\n      }\n    },\n  })\n  ```\n\n  **Storing Server Access**\n\n  In some cases, other plugin hooks may need access to the dev server instance (e.g. accessing the WebSocket server, the file system watcher, or the module graph). This hook can also be used to store the server instance for access in other hooks:\n\n  ```js\n  const myPlugin = () => {\n    let server\n    return {\n      name: 'configure-server',\n      configureServer(_server) {\n        server = _server\n      },\n      transform(code, id) {\n        if (server) {\n          // use server...\n        }\n      },\n    }\n  }\n  ```\n\n  Note `configureServer` is not called when running the production build so your other hooks need to guard against its absence."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#12",
+    "text": "### `configurePreviewServer`\n\n- **Type:** `(server: PreviewServer) => (() => void) | void | Promise<(() => void) | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [PreviewServer](./api-javascript#previewserver)\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Same as [`configureServer`](/guide/api-plugin.html#configureserver) but for the preview server. Similarly to `configureServer`, the `configurePreviewServer` hook is called before other middlewares are installed. If you want to inject a middleware **after** other middlewares, you can return a function from `configurePreviewServer`, which will be called after internal middlewares are installed:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-preview-server',\n    configurePreviewServer(server) {\n      // return a post hook that is called after other middlewares are\n      // installed\n      return () => {\n        server.middlewares.use((req, res, next) => {\n          // custom handle request...\n        })\n      }\n    },\n  })\n  ```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-plugin.md#12"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-plugin.md#11"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-plugin.md#11",
+    "b": "vite:docs/guide/api-plugin.md#12",
+    "relation": "overlapping",
+    "related": 0.9923,
+    "probabilities": {
+     "same": 0.0135,
+     "overlapping": 0.9704,
+     "conflicting": 0.0084,
+     "unrelated": 0.0077
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0098,
+       "restated": 0.9408,
+       "elaborated": 0.0337,
+       "different": 0.0157
+      },
+      "confidence": 0.9843,
+      "a": {
+       "document": "vite:docs/guide/api-plugin.md#11",
+       "quote": "The `configureServer` hook is called before internal middlewares are installed, so the custom middlewares will run before internal middlewares by default.",
+       "start": 717,
+       "end": 871,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-plugin.md#12",
+       "quote": "Similarly to `configureServer`, the `configurePreviewServer` hook is called before other middlewares are installed.",
+       "start": 412,
+       "end": 527,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0055,
+       "restated": 0.9846,
+       "elaborated": 0.0051,
+       "different": 0.0048
+      },
+      "confidence": 0.993,
+      "a": {
+       "document": "vite:docs/guide/api-plugin.md#11",
+       "quote": "If you want to inject a middleware **after** internal middlewares, you can return a function from `configureServer`, which will be called after internal middlewares are installed:",
+       "start": 872,
+       "end": 1051,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-plugin.md#12",
+       "quote": "If you want to inject a middleware **after** other middlewares, you can return a function from `configurePreviewServer`, which will be called after internal middlewares are installed:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-preview-server',\n    configurePreviewServer(server) {\n      // return a post hook that is called after other middlewares are\n      // installed\n      return () => {\n        server.middlewares.use((req, res, next) => {\n          // custom handle request...\n        })\n      }\n    },\n  })\n  ```",
+       "start": 528,
+       "end": 1062,
+       "confidence": 0.993
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 2,
+   "counterparts_ms": 78
+  },
+  "timing": {
+   "read_ms": 184,
+   "total_ms": 189
+  }
+ }
+}

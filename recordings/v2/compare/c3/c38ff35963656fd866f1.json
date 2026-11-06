@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c3/c38ff35963656fd866f1",
+ "request_hash": "c38ff35963656fd866f1d64b88fd09fa575d44cf85c441e8cde82b530d2f618a",
+ "recorded_at": "2026-11-06T14:14:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1097,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "167.170975",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=30,cfOrigin;dur=0,cfWorker;dur=343"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#17",
+    "text": "### Removing entities\n\nThere are several approaches to removing an entity. In this case, the entity is first loaded, if it does not exist, `notFound: true` is returned in the response, if it does, it's removed via `em.remove()`, which marks the entity for removal on the following `flush()` call.\n\n```ts title='modules/article/routes.ts'\napp.delete('/:id', async request => {\n  const user = getUserFromToken(request);\n  const params = request.params as { id: string };\n  const article = await db.article.findOne(+params.id);\n\n  if (!article) {\n    return { notFound: true };\n  }\n\n  verifyArticlePermissions(user, article);\n  // mention `nativeDelete` alternative if we don't care about validations much\n  await db.em.remove(article).flush();\n\n  return { success: true };\n});\n```\n\nYou could also use `em.nativeDelete()` or `QueryBuilder` to execute a `DELETE` query.\n\n```ts\nawait db.article.nativeDelete(+params.id);\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-first-guide.md#70",
+    "text": "    // mention `nativeDelete` alternative if we don't care about validations much\n    await db.em.remove(article).flush();\n  \n    return { success: true };\n  });\n// rest of the code\n```\n\nThanks to MikroORM's identity map, you can compare the objects like shown above.\n\nLet's also add an endpoint to update our user profile:\n\n```diff title=\"src/modules/user/user.routes.ts\"\n...\n-import { UniqueConstraintViolationException } from '@mikro-orm/mysql';\n+import { UniqueConstraintViolationException, wrap } from '@mikro-orm/mysql';\n...\n+  const profileUpdatePayload = signUpPayload.partial();\n+  \n+  app.patch('/profile', async (request) => {\n+    const user = getUserFromToken(request);\n+    wrap(user).assign(profileUpdatePayload.parse(request.body));\n+    await db.em.flush();\n+    return user;\n+  });\n```\n\n:::info Exercise\n\nAdd unit tests for those new endpoints.\n\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-first-guide.md#70",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/04-advanced.md#17",
+    "b": "mikro-orm:docs/docs/schema-first-guide.md#70",
+    "relation": "overlapping",
+    "related": 0.9886,
+    "probabilities": {
+     "same": 0.0741,
+     "overlapping": 0.8991,
+     "conflicting": 0.0155,
+     "unrelated": 0.0114
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 54,
+   "passages": 1,
+   "counterparts_ms": 96
+  },
+  "timing": {
+   "read_ms": 176,
+   "total_ms": 180
+  }
+ }
+}

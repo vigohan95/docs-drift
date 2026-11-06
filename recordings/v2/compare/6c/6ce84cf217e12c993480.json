@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6c/6ce84cf217e12c993480",
+ "request_hash": "6ce84cf217e12c9934803b86bfb5375a6541160c92ddcece2af9c8e8543d5ec7",
+ "recorded_at": "2026-11-06T14:15:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1050,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "178.681536",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=389"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#9",
+    "text": "### Relation modifiers: `.ref()` and `.lazyRef()`\n\nFor `m:1` / `1:1` relations, you can opt into compile-time populate-state safety:\n\n- **`.ref()`** wraps the runtime value in a `Reference`, exposing `.$` / `.get()` / `.load()` — see [`Ref<T>`](./type-safe-relations.md#reference-wrapper).\n- **`.lazyRef()`** is a type-only marker — the runtime stays a plain entity (no wrapper), but TypeScript hides non-PK access until `Loaded<>` narrows it. See [`LazyRef<T>`](./type-safe-relations.md#lazyreft--type-only-reference).\n\n```ts\nconst BookSchema = defineEntity({\n  name: 'Book',\n  properties: {\n    id: p.integer().primary(),\n    author: () => p.manyToOne(AuthorSchema).ref(),       // `Ref<Author>`\n    publisher: () => p.manyToOne(PublisherSchema).lazyRef(), // `LazyRef<Publisher>`\n  },\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#3",
+    "text": "> For a type-only alternative that keeps the runtime value as a plain entity (no `Reference` wrapper, no `.$` indirection) while still restricting access until `Loaded<>` narrows it, declare the property as `LazyRef<T>` instead. See [Type-safe Relations → `LazyRef<T>`](./type-safe-relations.md#lazyreft--type-only-reference).\n\nHere is another example of `Author` entity, that was referenced from the `Book` one, this time defined for mongo:\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'reflect-metadata', value: 'reflect-metadata'},\n    {label: 'ts-morph', value: 'ts-morph'},\n]\n  }\n>\n  <TabItem value=\"define-entity-class\">\n\n```ts title=\"./entities/Author.ts\"\nimport { defineEntity, p } from '@mikro-orm/core';\n\nconst AuthorSchema = defineEntity({\n  name: 'Author',\n  properties: {\n    _id: p.type(ObjectId).primary(),\n    id: p.string().serializedPrimaryKey(),\n    createdAt: p.datetime().onCreate(() => new Date()),\n    updatedAt: p.datetime()\n      .onCreate(() => new Date())\n      .onUpdate(() => new Date()),\n    name: p.string(),\n    email: p.string(),\n    age: p.integer().nullable(),\n    termsAccepted: p.boolean(),\n    identities: p.array().nullable(),\n    born: p.date().nullable(),\n    books: () => p.oneToMany(Book).mappedBy(book => book.author),\n    friends: () => p.manyToMany(Author),\n    favouriteBook: () => p.manyToOne(Book).nullable(),\n    version: p.integer().version(),\n  },\n});\n\nexport class Author extends AuthorSchema.class {}\nAuthorSchema.setClass(Author);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/defining-entities.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/define-entity.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/define-entity.md#9",
+    "b": "mikro-orm:docs/docs/defining-entities.md#3",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0044,
+     "overlapping": 0.9904,
+     "conflicting": 0.0029,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0037,
+       "restated": 0.9883,
+       "elaborated": 0.0036,
+       "different": 0.0044
+      },
+      "confidence": 0.9956,
+      "a": {
+       "document": "mikro-orm:docs/docs/define-entity.md#9",
+       "quote": "- **`.lazyRef()`** is a type-only marker — the runtime stays a plain entity (no wrapper), but TypeScript hides non-PK access until `Loaded<>` narrows it.",
+       "start": 290,
+       "end": 443,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/defining-entities.md#3",
+       "quote": "> For a type-only alternative that keeps the runtime value as a plain entity (no `Reference` wrapper, no `.$` indirection) while still restricting access until `Loaded<>` narrows it, declare the property as `LazyRef<T>` instead.",
+       "start": 0,
+       "end": 228,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 109,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 1,
+   "counterparts_ms": 70
+  },
+  "timing": {
+   "read_ms": 263,
+   "total_ms": 266
+  }
+ }
+}

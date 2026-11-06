@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/71/71ec5409193f4b15f0c0",
+ "request_hash": "71ec5409193f4b15f0c0cba36ed30b037e325c82fd6e7e054a67a0133bb4d869",
+ "recorded_at": "2026-11-06T14:14:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1030,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "171.11446",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=31,cfOrigin;dur=0,cfWorker;dur=327"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#1",
+    "text": "## Operation Buffering {#buffering}\n\nMongoose lets you start using your models immediately, without waiting for\nmongoose to establish a connection to MongoDB.\n\n```javascript\nmongoose.connect('mongodb://127.0.0.1:27017/myapp');\nconst MyModel = mongoose.model('Test', new Schema({ name: String }));\n// Works\nawait MyModel.findOne();\n```\n\nThat's because mongoose buffers model function calls internally. This\nbuffering is convenient, but also a common source of confusion. Mongoose\nwill *not* throw any errors by default if you use a model without\nconnecting.\n\n```javascript\nconst MyModel = mongoose.model('Test', new Schema({ name: String }));\nconst promise = MyModel.findOne();\n\nsetTimeout(function() {\n  mongoose.connect('mongodb://127.0.0.1:27017/myapp');\n}, 60000);\n\n// Will just hang until mongoose successfully connects\nawait promise;\n```\n\nTo disable buffering, turn off the [`bufferCommands` option on your schema](guide.html#bufferCommands).\nIf you have `bufferCommands` on and your connection is hanging, try turning\n`bufferCommands` off to see if you haven't opened a connection properly.\nYou can also disable `bufferCommands` globally:\n\n```javascript\nmongoose.set('bufferCommands', false);\n```\n\nNote that buffering is also responsible for waiting until Mongoose\ncreates collections if you use the [`autoCreate` option](guide.html#autoCreate).\nIf you disable buffering, you should also disable the `autoCreate`\noption and use [`createCollection()`](api/model.html#model_Model-createCollection)\nto create [capped collections](guide.html#capped) or\n[collections with collations](guide.html#collation).\n\n```javascript\nconst schema = new Schema({\n  name: String\n}, {\n  capped: { size: 1024 },\n  bufferCommands: false,\n  autoCreate: false // disable `autoCreate` since `bufferCommands` is false\n});\n\nconst Model = mongoose.model('Test', schema);\n// Explicitly create the collection before using it\n// so the collection is capped.\nawait Model.createCollection();\n```"
+   },
+   {
+    "id": "mongoose:docs/guide.md#16",
+    "text": "## option: autoCreate {#autoCreate}\n\nBefore Mongoose builds indexes, it calls `Model.createCollection()` to create the underlying collection in MongoDB by default.\nCalling `createCollection()` sets the [collection's default collation](https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations) based on the [collation option](#collation) and establishes the collection as\na capped collection if you set the [`capped` schema option](#capped).\n\nYou can disable this behavior by setting `autoCreate` to `false` using [`mongoose.set('autoCreate', false)`](api/mongoose.html#mongoose_Mongoose-set).\nLike `autoIndex`, `autoCreate` is helpful for development and test environments, but you may want to disable it for production to avoid unnecessary database calls.\n\nUnfortunately, `createCollection()` cannot change an existing collection.\nFor example, if you add `capped: { size: 1024 }` to your schema and the existing collection is not capped, `createCollection()` will **not** overwrite the existing collection.\nThat is because the MongoDB server does not allow changing a collection's options without dropping the collection first.\n\n```javascript\nconst schema = new Schema({ name: String }, {\n  autoCreate: false,\n  capped: { size: 1024 }\n});\nconst Test = mongoose.model('Test', schema);\n\n// No-op if collection already exists, even if the collection is not capped.\n// This means that `capped` won't be applied if the 'tests' collection already exists.\nawait Test.createCollection();\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/guide.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/connections.md#1",
+    "b": "mongoose:docs/guide.md#16",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0051,
+     "overlapping": 0.9891,
+     "conflicting": 0.0035,
+     "unrelated": 0.0023
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 1,
+   "counterparts_ms": 75
+  },
+  "timing": {
+   "read_ms": 182,
+   "total_ms": 186
+  }
+ }
+}

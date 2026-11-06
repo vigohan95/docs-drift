@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0a/0ae989a164d8e17b8668",
+ "request_hash": "0ae989a164d8e17b86684712eed17218d3dea6fa84d379f46973c4641cdc03de",
+ "recorded_at": "2026-11-06T14:15:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1083,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "153.111486",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=397"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#6",
+    "text": "### Priority Order\n\nFK rules are resolved in this order:\n\n1. Explicit property-level `deleteRule`/`updateRule`\n2. ORM semantic defaults (table above)\n3. Global config `schemaGenerator.defaultDeleteRule`/`defaultUpdateRule`\n4. Database native default (NO ACTION for PostgreSQL, SQLite, MSSQL, Oracle; RESTRICT for MySQL/MariaDB)\n\n> Note: Oracle does not support `ON UPDATE CASCADE`. If you need cascading updates on Oracle, you must handle them at the application level or use triggers."
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "text": "## Foreign key rules no longer inferred from `cascade` option\n\nPreviously, MikroORM inferred `updateRule` and `deleteRule` from the [`cascade` option](./cascading.md):\n- `Cascade.REMOVE` or `Cascade.ALL` → `deleteRule: 'cascade'`\n- `Cascade.PERSIST` or `Cascade.ALL` → `updateRule: 'cascade'`\n- Nullable relation → `deleteRule: 'set null'`\n\nThis inference has been removed. FK rules are now independent of the `cascade` option, which only controls ORM-level cascading behavior.\n\nThe ORM still applies sensible semantic defaults for specific relation patterns:\n\n| Scenario | `deleteRule` | `updateRule` |\n|----------|--------------|--------------|\n| FK-as-PK (entity's PK is also a FK) | `cascade` | `cascade` |\n| Pivot tables (M:N join tables) | `cascade` | `cascade` |\n| Relation to composite PK target | — | `cascade` |\n| Nullable relation | `set null` | — |\n| Self-referencing FK on MSSQL | `no action` | `no action` |\n\nIf you relied on the old `cascade` option inference, you have two options:\n\n1. Set rules explicitly on individual relations:\n\n```ts\n@ManyToOne({ deleteRule: 'cascade', updateRule: 'cascade' })\nauthor?: Author;\n```\n\n2. Set global defaults in your config:\n\n```ts\nMikroORM.init({\n  schemaGenerator: {\n    defaultDeleteRule: 'cascade',\n    defaultUpdateRule: 'cascade',\n  },\n});\n```\n\nWhen neither is set, the database uses its native default (NO ACTION for PostgreSQL, SQLite, MSSQL, Oracle; RESTRICT for MySQL/MariaDB). See [Declarative Referential Integrity](./cascading.md#declarative-referential-integrity) for details on how FK rules work."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/cascading.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/cascading.md#6",
+    "b": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "relation": "overlapping",
+    "related": 0.9984,
+    "probabilities": {
+     "same": 0.0075,
+     "overlapping": 0.9862,
+     "conflicting": 0.0048,
+     "unrelated": 0.0016
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0069,
+       "restated": 0.9772,
+       "elaborated": 0.0101,
+       "different": 0.0059
+      },
+      "confidence": 0.9941,
+      "a": {
+       "document": "mikro-orm:docs/docs/cascading.md#6",
+       "quote": "3.",
+       "start": 150,
+       "end": 152,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+       "quote": "Set global defaults in your config:\n\n```ts\nMikroORM.init({\n  schemaGenerator: {\n    defaultDeleteRule: 'cascade',\n    defaultUpdateRule: 'cascade',\n  },\n});\n```\n\nWhen neither is set, the database uses its native default (NO ACTION for PostgreSQL, SQLite, MSSQL, Oracle; RESTRICT for MySQL/MariaDB).",
+       "start": 1141,
+       "end": 1439,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 138,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 1,
+   "counterparts_ms": 53
+  },
+  "timing": {
+   "read_ms": 273,
+   "total_ms": 276
+  }
+ }
+}

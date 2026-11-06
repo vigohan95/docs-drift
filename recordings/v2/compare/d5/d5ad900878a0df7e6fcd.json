@@ -1,0 +1,189 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d5/d5ad900878a0df7e6fcd",
+ "request_hash": "d5ad900878a0df7e6fcdb69f9ac09bb2159b7ec55bc78f56dd7c6754f6a528d7",
+ "recorded_at": "2026-11-06T14:15:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1079,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "217.046721",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=14,cfOrigin;dur=0,cfWorker;dur=370"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "text": "### Unit of Work and Identity Map\n\nMikroORM uses the Identity Map pattern to track objects. Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`. This allows MikroORM room for optimizations. If you call the EntityManager and ask for an entity with a specific ID twice, it will return the same instance:\n\n```ts\nconst jon1 = await em.findOne(Author, 1);\nconst jon2 = await em.findOne(Author, 1);\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nThe Identity Map only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before. But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key."
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#0",
+    "text": "---\ntitle: Unit of Work and Transactions\nsidebar_label: Unit of Work\n---\n\nMikroORM uses the Identity Map pattern to track objects. Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`.\n\nThis allows MikroORM room for optimizations. If you call the EntityManager and ask for an entity with a specific ID twice, it will return the same instance:\n\n```ts\nconst jon1 = await em.findOne(Author, 1);\nconst jon2 = await em.findOne(Author, 1);\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nOnly one SELECT query will be fired against the database here. In the second `findOne()` call MikroORM will check the identity map first and will skip the database round trip as it will find the entity already loaded.\n\nThe identity map being indexed by primary keys only allows shortcuts when you ask for objects by primary key. When you query by other properties, you will still get the same reference, but two separate database calls will be made:\n\n```ts\nconst jon1 = await em.findOne(Author, { name: 'Jon Snow' });\nconst jon2 = await em.findOne(Author, { name: 'Jon Snow' });\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nMikroORM only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before. But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/unit-of-work.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/01-first-entity.md#15"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "b": "mikro-orm:docs/docs/unit-of-work.md#0",
+    "relation": "overlapping",
+    "related": 0.9986,
+    "probabilities": {
+     "same": 0.0057,
+     "overlapping": 0.9901,
+     "conflicting": 0.0029,
+     "unrelated": 0.0014
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.8745,
+       "restated": 0.0793,
+       "elaborated": 0.0356,
+       "different": 0.0105
+      },
+      "confidence": 0.9895,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+       "quote": "MikroORM uses the Identity Map pattern to track objects.",
+       "start": 35,
+       "end": 91,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/unit-of-work.md#0",
+       "quote": "---\ntitle: Unit of Work and Transactions\nsidebar_label: Unit of Work\n---\n\nMikroORM uses the Identity Map pattern to track objects.",
+       "start": 0,
+       "end": 130,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9699,
+       "restated": 0.0081,
+       "elaborated": 0.016,
+       "different": 0.0061
+      },
+      "confidence": 0.9939,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+       "quote": "Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`.",
+       "start": 92,
+       "end": 210,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/unit-of-work.md#0",
+       "quote": "Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`.\n\nThis allows MikroORM room for optimizations.",
+       "start": 131,
+       "end": 295,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0122,
+       "restated": 0.5992,
+       "elaborated": 0.2688,
+       "different": 0.1198
+      },
+      "confidence": 0.8802,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+       "quote": "The Identity Map only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before.",
+       "start": 527,
+       "end": 667,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/unit-of-work.md#0",
+       "quote": "When you query by other properties, you will still get the same reference, but two separate database calls will be made:\n\n```ts\nconst jon1 = await em.findOne(Author, { name: 'Jon Snow' });\nconst jon2 = await em.findOne(Author, { name: 'Jon Snow' });\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nMikroORM only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before.",
+       "start": 896,
+       "end": 1346,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9804,
+       "restated": 0.0084,
+       "elaborated": 0.0063,
+       "different": 0.0049
+      },
+      "confidence": 0.9951,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+       "quote": "But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key.",
+       "start": 668,
+       "end": 851,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/unit-of-work.md#0",
+       "quote": "But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key.",
+       "start": 1347,
+       "end": 1530,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 5,
+   "counterparts_ms": 116
+  },
+  "timing": {
+   "read_ms": 229,
+   "total_ms": 233
+  }
+ }
+}

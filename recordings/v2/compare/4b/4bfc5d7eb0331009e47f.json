@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4b/4bfc5d7eb0331009e47f",
+ "request_hash": "4bfc5d7eb0331009e47fa8c76d47273485b14c387554c0777646cfdae11bd024",
+ "recorded_at": "2026-11-06T14:15:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 895,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "43.767712",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=187"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#33",
+    "text": "Register the subscriber in your ORM config:\n\n```ts title='mikro-orm.config.ts'\nimport { SoftDeleteSubscriber } from './modules/common/soft-delete.subscriber.js';\n\nexport default defineConfig({\n  // ...\n  subscribers: [new SoftDeleteSubscriber()],\n});\n```\n\nNow when you call `em.remove(comment)` and `em.flush()`, the comment won't be physically deleted - instead, its `deletedAt` column will be set. And thanks to the filter, queries for comments will automatically exclude soft-deleted ones.\n\nIf you need to query soft-deleted records (e.g., for an admin panel or undo feature), you can disable the filter:\n\n```ts\n// include soft-deleted comments\nconst allComments = await em.find(CommentSchema, {}, {\n  filters: { softDelete: false },\n});\n```\n\n> The subscriber already checks for the `deletedAt` property generically - you can add the same `filters` option and `deletedAt` property to any entity that should support soft delete. See the [Events](../events.md) and [Filters](../filters.md) documentation for more details."
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "text": "### Automating with an onFlush Subscriber\n\nTo avoid manually creating outbox events in every transaction, you can use an `onFlush` subscriber to inspect computed change sets and enqueue events automatically:\n\n```ts\nimport { ChangeSetType, EventSubscriber, FlushEventArgs } from '@mikro-orm/core';\nimport { OutboxEvent } from './entities/OutboxEvent.js';\n\nexport class OutboxSubscriber implements EventSubscriber {\n\n  async onFlush(args: FlushEventArgs) {\n    for (const cs of args.uow.getChangeSets()) {\n      if (cs.meta.className === 'OutboxEvent') {\n        continue; // don't create outbox events for outbox events\n      }\n\n      // skip internal early update change sets (used for self-referencing relations)\n      if (cs.type === ChangeSetType.UPDATE_EARLY) {\n        continue;\n      }\n\n      const event = args.em.create(OutboxEvent, {\n        eventType: `${cs.meta.className}_${cs.type}`,\n        payload: cs.getPrimaryKey(true),\n      });\n\n      args.uow.computeChangeSet(event);\n    }\n  }\n\n}\n```\n\nRegister it in your ORM config:\n\n```ts\nMikroORM.init({\n  subscribers: [new OutboxSubscriber()],\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#33",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/04-advanced.md#33",
+    "b": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "relation": "unrelated",
+    "related": 0.1367,
+    "probabilities": {
+     "same": 0.0194,
+     "overlapping": 0.0981,
+     "conflicting": 0.0192,
+     "unrelated": 0.8633
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 53
+  },
+  "timing": {
+   "read_ms": 53,
+   "total_ms": 55
+  }
+ }
+}

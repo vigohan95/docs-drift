@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/7d/7df00c0ad36ad0224046",
+ "request_hash": "7df00c0ad36ad0224046052a51334aa6920b20d5879e5c803a6aba0c2ee6405a",
+ "recorded_at": "2026-11-06T14:15:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1025,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "166.953154",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=37,cfOrigin;dur=0,cfWorker;dur=310"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#38",
+    "text": "### @CreateRequestContext()\n\n`@CreateRequestContext()` decorator can be used to create a new `RequestContext` for an async method. This is useful for ensuring each request has its own isolated `EntityManager` fork.\n\nSee [Identity Map](./identity-map.md) for more details about request context.\n\n| Parameter                | Type                                      | Optional | Description                                             |\n|--------------------------|-------------------------------------------|----------|---------------------------------------------------------|\n| `contextProvider`        | `() => MikroORM` &#124; `() => EntityManager` | yes      | Callback to get the ORM instance or EntityManager.      |\n\n```ts\nexport class MyService {\n\n  constructor(private readonly orm: MikroORM) {}\n\n  @CreateRequestContext()\n  async doSomething() {\n    // this method now runs in its own request context\n    const em = this.orm.em; // this is a forked EntityManager\n  }\n\n}\n\n// or with explicit context provider\nexport class MyService {\n\n  constructor(private readonly em: EntityManager) {}\n\n  @CreateRequestContext((self: MyService) => self.em)\n  async doSomething() {\n    // ...\n  }\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#35",
+    "text": "### Standalone scripts\n\nFor one-off scripts, you have two options. The simplest is to fork the `EntityManager` explicitly, just like we did in Chapter 1:\n\n```ts title='scripts/cleanup.ts'\nimport { initORM } from '../src/db.js';\n\nconst db = initORM();\nconst em = db.em.fork();\n\n// work with the forked EntityManager\nconst oldArticles = await em.find(ArticleSchema, {\n  createdAt: { $lt: new Date('2020-01-01') },\n});\nem.remove(oldArticles);\nawait em.flush();\n\nawait db.orm.close();\n```\n\nAlternatively, if you want to use the global `EntityManager` directly (acceptable for scripts where there's no concurrent access), you can enable it in the config:\n\n```ts\nconst db = initORM({ allowGlobalContext: true });\n\n// now you can use db.em directly\nconst users = await db.em.find(User, {});\n```\n\n:::warning\n\nDo not use `allowGlobalContext` as a workaround for missing request context in production. It silences the validation error but does not fix the underlying problem — you will still face growing memory footprint and unstable API responses caused by a shared Identity Map. Use it only for simple scripts and tests where there is no concurrent access. For everything else, set up a proper request context via `RequestContext` helper, `@CreateRequestContext()` decorator, or `em.fork()`. See [Identity Map — Why is Request Context needed?](../identity-map.md#why-is-request-context-needed) for details.\n\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#38",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#35",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/decorators.md#38",
+    "b": "mikro-orm:docs/docs/guide/04-advanced.md#35",
+    "relation": "overlapping",
+    "related": 0.9393,
+    "probabilities": {
+     "same": 0.012,
+     "overlapping": 0.9135,
+     "conflicting": 0.0138,
+     "unrelated": 0.0607
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 48,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 1,
+   "counterparts_ms": 54
+  },
+  "timing": {
+   "read_ms": 184,
+   "total_ms": 189
+  }
+ }
+}

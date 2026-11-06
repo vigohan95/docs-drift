@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/73/7359f07a5d26ce45aba3",
+ "request_hash": "7359f07a5d26ce45aba3003ddc24c7391b401095c63b922b6d7dcfbff4078f96",
+ "recorded_at": "2026-11-06T14:19:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1819,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.025537",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=64,cfOrigin;dur=0,cfWorker;dur=182"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/actionCreatorMiddleware.mdx#3",
+    "text": "### `createActionCreatorInvariantMiddleware`\n\nCreates an instance of the action creator check middleware, with the given options.\n\nYou will most likely not need to call this yourself, as `getDefaultMiddleware` already does so.\nExample:\n\n```ts\n// file: reducer.ts noEmit\n\nexport default function (state = {}, action: any) {\n  return state\n}\n\n// file: store.ts\n\nimport {\n  configureStore,\n  createActionCreatorInvariantMiddleware,\n  Tuple,\n} from '@reduxjs/toolkit'\nimport reducer from './reducer'\n\n// Augment middleware to consider all functions with a static type property to be action creators\nconst isActionCreator = (\n  action: unknown,\n): action is Function & { type: unknown } =>\n  typeof action === 'function' && 'type' in action\n\nconst actionCreatorMiddleware = createActionCreatorInvariantMiddleware({\n  isActionCreator,\n})\n\nconst store = configureStore({\n  reducer,\n  middleware: () => new Tuple(actionCreatorMiddleware),\n})\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/api/immutabilityMiddleware.mdx#3",
+    "text": "### `createImmutableStateInvariantMiddleware`\n\nCreates an instance of the immutability check middleware, with the given options.\n\nYou will most likely not need to call this yourself, as `getDefaultMiddleware` already does so.\n\nExample:\n\n```ts\n// file: exampleSlice.ts\n\nimport { createSlice } from '@reduxjs/toolkit'\n\nexport const exampleSlice = createSlice({\n  name: 'example',\n  initialState: {\n    user: 'will track changes',\n    ignoredPath: 'single level',\n    ignoredNested: {\n      one: 'one',\n      two: 'two',\n    },\n  },\n  reducers: {},\n})\n\nexport default exampleSlice.reducer\n\n// file: store.ts\n\nimport {\n  configureStore,\n  createImmutableStateInvariantMiddleware,\n  Tuple,\n} from '@reduxjs/toolkit'\n\nimport exampleSliceReducer from './exampleSlice'\n\nconst immutableInvariantMiddleware = createImmutableStateInvariantMiddleware({\n  ignoredPaths: ['ignoredPath', 'ignoredNested.one', 'ignoredNested.two'],\n})\n\nconst store = configureStore({\n  reducer: exampleSliceReducer,\n  // Note that this will replace all default middleware\n  middleware: () => new Tuple(immutableInvariantMiddleware),\n})\n```\n\ndoing the same without removing all other middlewares, using [getDefaultMiddleware](./getDefaultMiddleware):\n\n```ts\n// file: exampleSlice.ts noEmit\n\nimport { createSlice } from '@reduxjs/toolkit'\n\nexport const exampleSlice = createSlice({\n  name: 'example',\n  initialState: {\n    user: 'will track changes',\n    ignoredPath: 'single level',\n    ignoredNested: {\n      one: 'one',\n      two: 'two',\n    },\n  },\n  reducers: {},\n})\n\nexport default exampleSlice.reducer\n\n// file: store.ts\nimport { configureStore } from '@reduxjs/toolkit'\n\nimport exampleSliceReducer from './exampleSlice'\n\nconst store = configureStore({\n  reducer: exampleSliceReducer,\n  // This replaces the original default middleware with the customized versions\n  middleware: (getDefaultMiddleware) =>\n    getDefaultMiddleware({\n      immutableCheck: {\n        ignoredPaths: ['ignoredPath', 'ignoredNested.one', 'ignoredNested.two'],\n      },\n    }),\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/actionCreatorMiddleware.mdx#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/api/immutabilityMiddleware.mdx#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/api/actionCreatorMiddleware.mdx#3",
+    "b": "redux-toolkit:docs/api/immutabilityMiddleware.mdx#3",
+    "relation": "unrelated",
+    "related": 0.1183,
+    "probabilities": {
+     "same": 0.0178,
+     "overlapping": 0.0847,
+     "conflicting": 0.0158,
+     "unrelated": 0.8817
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 50
+  },
+  "timing": {
+   "read_ms": 50,
+   "total_ms": 53
+  }
+ }
+}

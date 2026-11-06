@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b4/b45227ea64f7244e0fe0",
+ "request_hash": "b45227ea64f7244e0fe06c0b7488bb04d67d4eba0d1d6140771f877a7f889fa3",
+ "recorded_at": "2026-11-06T14:13:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 892,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "23.373983",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=31,cfOrigin;dur=0,cfWorker;dur=168"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "text": "## Shared Plugins During Build\n\nBefore Vite 6, the plugins pipelines worked in a different way during dev and build:\n\n- **During dev:** plugins are shared\n- **During Build:** plugins are isolated for each environment (in different processes: `vite build` then `vite build --ssr`).\n\nThis forced frameworks to share state between the `client` build and the `ssr` build through manifest files written to the file system. In Vite 6, we are now building all environments in a single process so the way the plugins pipeline and inter-environment communication can be aligned with dev.\n\nIn a future major, we could have complete alignment:\n\n- **During both dev and build:** plugins are shared, with [per-environment filtering](#per-environment-plugins-using-the-applytoenvironment-hook)\n\nThere will also be a single `ResolvedConfig` instance shared during build, allowing for caching at entire app build process level in the same way as we have been doing with `WeakMap<ResolvedConfig, CachedData>` during dev.\n\nFor Vite 6, we need to do a smaller step to keep backward compatibility. Ecosystem plugins are currently using `config.build` instead of `environment.config.build` to access configuration, so we need to create a new `ResolvedConfig` per-environment by default. A project can opt-in into sharing the full config and plugins pipeline setting `builder.sharedConfigBuild` to `true`.\n\nThis option would only work of a small subset of projects at first, so plugin authors can opt-in for a particular plugin to be shared by setting the `sharedDuringBuild` flag to `true`. This allows for easily sharing state both for regular plugins:\n\n```js\nfunction myPlugin() {\n  // Share state among all environments in dev and build\n  const sharedState = ...\n  return {\n    name: 'shared-plugin',\n    transform(code, id) { ... },\n\n    // Opt-in into a single instance for all environments\n    sharedDuringBuild: true,\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#3",
+    "text": "## `ResolvedConfig`\n\nThe `ResolvedConfig` interface has all the same properties of a `UserConfig`, except most properties are resolved and non-undefined. It also contains utilities like:\n\n- `config.assetsInclude`: A function to check if an `id` is considered an asset.\n- `config.logger`: Vite's internal logger object."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-plugins.md#13",
+    "b": "vite:docs/guide/api-javascript.md#3",
+    "relation": "unrelated",
+    "related": 0.0215,
+    "probabilities": {
+     "same": 0.0046,
+     "overlapping": 0.0074,
+     "conflicting": 0.0095,
+     "unrelated": 0.9785
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30
+  },
+  "timing": {
+   "read_ms": 30,
+   "total_ms": 32
+  }
+ }
+}

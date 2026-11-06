@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b0/b0e17b167c84562eb5dd",
+ "request_hash": "b0e17b167c84562eb5dd2ce83f0d8ce0f678d94575b19cf2a3dd99c523c9a5b8",
+ "recorded_at": "2026-11-06T14:13:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 986,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "144.713757",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=281"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#1",
+    "text": "## Per-environment Hooks and Global Hooks\n\nPlugins run on a shared pipeline, but their hooks fall into two categories depending on whether they run once for the whole server or once for each environment.\n\nGlobal hooks are called a single time, independent of the configured environments. They handle app-wide concerns such as resolving the config or setting up the dev and preview servers, so `this.environment` is not relevant to them. Config resolution related hooks and server related hooks are global hooks.\n\nPer-environment hooks are called once for each environment, and expose the current environment through `this.environment` in their context. All [Rolldown hooks](/guide/api-plugin#rolldown-hooks) are per-environment, as are other Vite-specific hooks that handle modules. However, note that `buildStart` and `buildEnd` are only called for the client environment without [the `perEnvironmentStartEndDuringDev: true` flag](#per-environment-state-in-plugins)."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#7",
+    "text": "## Per-environment State in Plugins\n\nGiven that the same plugin instance is used for different environments, the plugin state needs to be keyed with `this.environment`. This is the same pattern the ecosystem has already been using to keep state about modules using the `ssr` boolean as key to avoid mixing client and ssr modules state. A `Map<Environment, State>` can be used to keep the state for each environment separately. Note that for backward compatibility, `buildStart` and `buildEnd` are only called for the client environment without the `perEnvironmentStartEndDuringDev: true` flag. Same for `watchChange` and the `perEnvironmentWatchChangeDuringDev: true` flag.\n\n```js\nfunction PerEnvironmentCountTransformedModulesPlugin() {\n  const state = new Map<Environment, { count: number }>()\n  return {\n    name: 'count-transformed-modules',\n    perEnvironmentStartEndDuringDev: true,\n    buildStart() {\n      state.set(this.environment, { count: 0 })\n    },\n    transform(id) {\n      state.get(this.environment).count++\n    },\n    buildEnd() {\n      console.log(this.environment.name, state.get(this.environment).count)\n    }\n  }\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-plugins.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-plugins.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-plugins.md#1",
+    "b": "vite:docs/guide/api-environment-plugins.md#7",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0043,
+     "overlapping": 0.9903,
+     "conflicting": 0.0038,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0097,
+       "restated": 0.9755,
+       "elaborated": 0.0084,
+       "different": 0.0063
+      },
+      "confidence": 0.9937,
+      "a": {
+       "document": "vite:docs/guide/api-environment-plugins.md#1",
+       "quote": "However, note that `buildStart` and `buildEnd` are only called for the client environment without [the `perEnvironmentStartEndDuringDev: true` flag](#per-environment-state-in-plugins).",
+       "start": 783,
+       "end": 967,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-environment-plugins.md#7",
+       "quote": "Note that for backward compatibility, `buildStart` and `buildEnd` are only called for the client environment without the `perEnvironmentStartEndDuringDev: true` flag.",
+       "start": 427,
+       "end": 593,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 1,
+   "counterparts_ms": 58
+  },
+  "timing": {
+   "read_ms": 155,
+   "total_ms": 157
+  }
+ }
+}

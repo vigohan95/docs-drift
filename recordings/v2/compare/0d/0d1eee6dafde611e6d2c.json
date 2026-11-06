@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0d/0d1eee6dafde611e6d2c",
+ "request_hash": "0d1eee6dafde611e6d2c2729e812145cd222bb24dfdeebc2583146b86e229f0f",
+ "recorded_at": "2026-11-06T14:18:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2175,
+ "response_headers": {
+  "x-clocked-credits": "13",
+  "x-clocked-model-ms": "300.64637",
+  "x-clocked-cost-usd": "0.002590",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=478"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+    "text": "## Defining Mutation Endpoints\n\nMutation endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.mutation()` method.\n\nMutation endpoints should define either a `query` callback that constructs the URL (including any URL query params), or [a `queryFn` callback](./customizing-queries.mdx#customizing-queries-with-queryfn) that may do arbitrary async logic and return a result. The `query` callback may also return an object containing the URL, the HTTP method to use and a request body.\n\nIf the `query` callback needs additional data to generate the URL, it should be written to take a single argument. If you need to pass in multiple parameters, pass them formatted as a single \"options object\".\n\nMutation endpoints may also modify the response contents before the result is cached, define \"tags\" to identify cache invalidation, and provide cache entry lifecycle callbacks to run additional logic as cache entries are added and removed.\n\nWhen used with TypeScript, you should supply generics for the return type and the expected query argument: `build.mutation<ReturnType, ArgType>`. If there is no argument, use `void` for the arg type instead.\n\n```ts title=\"Example of all mutation endpoint options\"\n// file: types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: api.ts\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\nimport type { Post } from './types'\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({\n    baseUrl: '/',\n  }),\n  tagTypes: ['Post'],\n  endpoints: (build) => ({\n    // The mutation accepts a `Partial<Post>` arg, and returns a `Post`\n    updatePost: build.mutation<Post, Partial<Post> & Pick<Post, 'id'>>({\n      // highlight-start\n      // note: an optional `queryFn` may be used in place of `query`\n      query: ({ id, ...patch }) => ({\n        url: `post/${id}`,\n        method: 'PATCH',\n        body: patch,\n      }),\n      // Pick out data and prevent nested properties in a hook or selector\n      transformResponse: (response: { data: Post }, meta, arg) => response.data,\n      // Pick out errors and prevent nested properties in a hook or selector\n      transformErrorResponse: (\n        response: { status: string | number },\n        meta,\n        arg,\n      ) => response.status,\n      invalidatesTags: ['Post'],\n      // onQueryStarted is useful for optimistic updates\n      // The 2nd parameter is the destructured `MutationLifecycleApi`\n      async onQueryStarted(\n        arg,\n        { dispatch, getState, queryFulfilled, requestId, extra, getCacheEntry },\n      ) {},\n      // The 2nd parameter is the destructured `MutationCacheLifecycleApi`\n      async onCacheEntryAdded(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          cacheEntryRemoved,\n          cacheDataLoaded,\n          getCacheEntry,\n        },\n      ) {},\n      // highlight-end\n    }),\n  }),\n})\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+    "text": "## Defining Query Endpoints\n\nQuery endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.query()` method.\n\nQuery endpoints should define either a `query` callback that constructs the URL (including any URL query params), or [a `queryFn` callback](./customizing-queries.mdx#customizing-queries-with-queryfn) that may do arbitrary async logic and return a result.\n\nIf the `query` callback needs additional data to generate the URL, it should be written to take a single argument. If you need to pass in multiple parameters, pass them formatted as a single \"options object\".\n\nQuery endpoints may also modify the response contents before the result is cached, define \"tags\" to identify cache invalidation, and provide cache entry lifecycle callbacks to run additional logic as cache entries are added and removed.\n\nWhen used with TypeScript, you should supply generics for the return type and the expected query argument: `build.query<ReturnType, ArgType>`. If there is no argument, use `void` for the arg type instead.\n\n```ts title=\"Example of all query endpoint options\"\n// file: types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: api.ts\n// Or from '@reduxjs/toolkit/query/react'\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\nimport type { Post } from './types'\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({\n    baseUrl: '/',\n  }),\n  tagTypes: ['Post'],\n  endpoints: (build) => ({\n    // highlight-start\n    // The query accepts a number and returns a Post\n    getPost: build.query<Post, number>({\n      // note: an optional `queryFn` may be used in place of `query`\n      query: (id) => ({ url: `post/${id}` }),\n      // Pick out data and prevent nested properties in a hook or selector\n      transformResponse: (response: { data: Post }, meta, arg) => response.data,\n      // Pick out errors and prevent nested properties in a hook or selector\n      transformErrorResponse: (\n        response: { status: string | number },\n        meta,\n        arg,\n      ) => response.status,\n      providesTags: (result, error, id) => [{ type: 'Post', id }],\n      // The 2nd parameter is the destructured `QueryLifecycleApi`\n      async onQueryStarted(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          queryFulfilled,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // The 2nd parameter is the destructured `QueryCacheLifecycleApi`\n      async onCacheEntryAdded(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          cacheEntryRemoved,\n          cacheDataLoaded,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // highlight-end\n    }),\n  }),\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/usage/queries.mdx#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+    "b": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+    "relation": "overlapping",
+    "related": 0.9953,
+    "probabilities": {
+     "same": 0.0131,
+     "overlapping": 0.9752,
+     "conflicting": 0.0071,
+     "unrelated": 0.0047
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0285,
+       "restated": 0.9195,
+       "elaborated": 0.0318,
+       "different": 0.0202
+      },
+      "confidence": 0.9798,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+       "quote": "If you need to pass in multiple parameters, pass them formatted as a single \"options object\".",
+       "start": 679,
+       "end": 772,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+       "quote": "If you need to pass in multiple parameters, pass them formatted as a single \"options object\".\n\nQuery endpoints may also modify the response contents before the result is cached, define \"tags\" to identify cache invalidation, and provide cache entry lifecycle callbacks to run additional logic as cache entries are added and removed.\n\nWhen used with TypeScript, you should supply generics for the return type and the expected query argument: `build.query<ReturnType, ArgType>`.",
+       "start": 557,
+       "end": 1032,
+       "confidence": 0.998
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.056,
+       "restated": 0.8735,
+       "elaborated": 0.0286,
+       "different": 0.042
+      },
+      "confidence": 0.958,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+       "quote": "If there is no argument, use `void` for the arg type instead.",
+       "start": 1161,
+       "end": 1222,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/queries.mdx#2",
+       "quote": "If there is no argument, use `void` for the arg type instead.\n\n```ts title=\"Example of all query endpoint options\"\n// file: types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: api.ts\n// Or from '@reduxjs/toolkit/query/react'\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\nimport type { Post } from './types'\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({\n    baseUrl: '/',\n  }),\n  tagTypes: ['Post'],\n  endpoints: (build) => ({\n    // highlight-start\n    // The query accepts a number and returns a Post\n    getPost: build.query<Post, number>({\n      // note: an optional `queryFn` may be used in place of `query`\n      query: (id) => ({ url: `post/${id}` }),\n      // Pick out data and prevent nested properties in a hook or selector\n      transformResponse: (response: { data: Post }, meta, arg) => response.data,\n      // Pick out errors and prevent nested properties in a hook or selector\n      transformErrorResponse: (\n        response: { status: string | number },\n        meta,\n        arg,\n      ) => response.status,\n      providesTags: (result, error, id) => [{ type: 'Post', id }],\n      // The 2nd parameter is the destructured `QueryLifecycleApi`\n      async onQueryStarted(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          queryFulfilled,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // The 2nd parameter is the destructured `QueryCacheLifecycleApi`\n      async onCacheEntryAdded(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          cacheEntryRemoved,\n          cacheDataLoaded,\n          getCacheEntry,\n          updateCachedData,\n        },\n      ) {},\n      // highlight-end\n    }),\n  }),\n})\n```",
+       "start": 1033,
+       "end": 2860,
+       "confidence": 0.997
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 43,
+   "passage_reads": 1,
+   "passages_ms": 101,
+   "passages": 2,
+   "counterparts_ms": 199
+  },
+  "timing": {
+   "read_ms": 343,
+   "total_ms": 348
+  }
+ }
+}

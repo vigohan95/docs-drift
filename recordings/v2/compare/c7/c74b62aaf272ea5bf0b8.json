@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c7/c74b62aaf272ea5bf0b8",
+ "request_hash": "c74b62aaf272ea5bf0b81c4f2cf56a695f91e6b9929bfae2c62676dc3be6cede",
+ "recorded_at": "2026-11-06T14:14:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 992,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "123.948771",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=259"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/validation.md#8",
+    "text": "## Cast Errors\n\nBefore running validators, Mongoose attempts to coerce values to the correct type. This process is called *casting* the document.\nIf casting fails for a given path, the `error.errors` object will contain a `CastError` object.\n\nCasting runs before validation, and validation does not run if casting fails.\nThat means your custom validators may assume `v` is `null`, `undefined`, or an instance of the type specified in your schema.\n\n```javascript acquit:Cast Errors\nconst vehicleSchema = new mongoose.Schema({\n  numWheels: { type: Number, max: 18 }\n});\nconst Vehicle = db.model('Vehicle', vehicleSchema);\n\nconst doc = new Vehicle({ numWheels: 'not a number' });\nconst err = doc.validateSync();\n\nerr.errors['numWheels'].name; // 'CastError'\n// 'Cast to Number failed for value \"not a number\" at path \"numWheels\"'\nerr.errors['numWheels'].message;\n```\n\nBy default, Mongoose cast error messages look like `Cast to Number failed for value \"pie\" at path \"numWheels\"`.\nYou can overwrite Mongoose's default cast error message by the `cast` option on your SchemaType to a string as follows.\n\n```javascript acquit:Cast Error Message Overwrite\nconst vehicleSchema = new mongoose.Schema({\n  numWheels: {\n    type: Number,\n    cast: '{VALUE} is not a number'\n  }\n});\nconst Vehicle = db.model('Vehicle', vehicleSchema);\n\nconst doc = new Vehicle({ numWheels: 'pie' });\nconst err = doc.validateSync();\n\nerr.errors['numWheels'].name; // 'CastError'\n// \"pie\" is not a number\nerr.errors['numWheels'].message;\n```"
+   },
+   {
+    "id": "mongoose:docs/tutorials/query_casting.md#0",
+    "text": "# Query Casting\n\nThe first parameter to [`Model.find()`](../api/model.html#model_Model-find), [`Query#find()`](../api/query.html#query_Query-find), [`Model.findOne()`](../api/model.html#model_Model-findOne), etc. is called `filter`.\nIn older content this parameter is sometimes called `query` or `conditions`. For example:\n\n```javascript acquit:Cast Tutorial.*get and set\nconst query = Character.find({ name: 'Jean-Luc Picard' });\nquery.getFilter(); // `{ name: 'Jean-Luc Picard' }`\n\n// Subsequent chained calls merge new properties into the filter\nquery.find({ age: { $gt: 50 } });\nquery.getFilter(); // `{ name: 'Jean-Luc Picard', age: { $gt: 50 } }`\n```\n\nWhen you execute the query using [`Query#exec()`](../api/query.html#query_Query-exec) or [`Query#then()`](../api/query.html#query_Query-then), Mongoose *casts* the filter to match your schema.\n\n```javascript acquit:Cast Tutorial.*cast values\n// Note that `_id` and `age` are strings. Mongoose will cast `_id` to\n// a MongoDB ObjectId and `age.$gt` to a number.\nconst query = Character.findOne({\n  _id: '5cdc267dd56b5662b7b7cc0c',\n  age: { $gt: '50' }\n});\n\n// `{ _id: '5cdc267dd56b5662b7b7cc0c', age: { $gt: '50' } }`\n// Query hasn't been executed yet, so Mongoose hasn't casted the filter.\nquery.getFilter();\n\nconst doc = await query.exec();\ndoc.name; // \"Jean-Luc Picard\"\n\n// Mongoose casted the filter, so `_id` became an ObjectId and `age.$gt`\n// became a number.\nquery.getFilter()._id instanceof mongoose.Types.ObjectId; // true\ntypeof query.getFilter().age.$gt === 'number'; // true\n```\n\nIf Mongoose fails to cast the filter to your schema, your query will throw a `CastError`.\n\n```javascript acquit:Cast Tutorial.*cast error\nconst query = Character.findOne({ age: { $lt: 'not a number' } });\n\nconst err = await query.exec().then(() => null, err => err);\nerr instanceof mongoose.CastError; // true\n// Cast to number failed for value \"not a number\" at path \"age\" for\n// model \"Character\"\nerr.message;\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/validation.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/tutorials/query_casting.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/validation.md#8",
+    "b": "mongoose:docs/tutorials/query_casting.md#0",
+    "relation": "overlapping",
+    "related": 0.9848,
+    "probabilities": {
+     "same": 0.0128,
+     "overlapping": 0.9649,
+     "conflicting": 0.0071,
+     "unrelated": 0.0152
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 97,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 133,
+   "total_ms": 137
+  }
+ }
+}

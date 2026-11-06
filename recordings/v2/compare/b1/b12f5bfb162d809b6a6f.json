@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b1/b12f5bfb162d809b6a6f",
+ "request_hash": "b12f5bfb162d809b6a6fcd36174b0bc8342727f2691a867691e848d46b609d5c",
+ "recorded_at": "2026-11-06T14:14:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1004,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "93.071199",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=284"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/tutorials/ssl.md#1",
+    "text": "## TLS/SSL Validation\n\nBy default, Mongoose validates the TLS/SSL certificate against a [certificate authority](https://en.wikipedia.org/wiki/Certificate_authority) to ensure the TLS/SSL certificate is valid. To disable this validation, set the `tlsAllowInvalidCertificates` (or `tlsInsecure`) option to `true`.\n\n```javascript\nmongoose.connect('mongodb://127.0.0.1:27017/test', {\n  tls: true,\n  tlsAllowInvalidCertificates: true,\n});\n```\n\nIn most cases, you should not disable TLS/SSL validation in production. However, `tlsAllowInvalidCertificates: true` is often helpful\nfor debugging SSL connection issues. If you can connect to MongoDB with `tlsAllowInvalidCertificates: true`, but not with\n`tlsAllowInvalidCertificates: false`, then you can confirm Mongoose can connect to the server and the server is configured to use\nTLS/SSL correctly, but there's some issue with the certificate.\n\nFor example, a common issue is the below error message:\n\n```no-highlight\nMongooseServerSelectionError: unable to verify the first certificate\n```\n\nThis error is often caused by [self-signed MongoDB certificates](https://medium.com/@rajanmaharjan/secure-your-mongodb-connections-ssl-tls-92e2addb3c89) or other situations where the certificate sent by the MongoDB\nserver is not registered with an established certificate authority. The solution is to set the `tlsCAFile` option, which essentially sets a list of allowed SSL certificates."
+   },
+   {
+    "id": "mongoose:docs/tutorials/ssl.md#2",
+    "text": "```javascript\nawait mongoose.connect('mongodb://127.0.0.1:27017/test', {\n  tls: true,\n  // For example, see https://medium.com/@rajanmaharjan/secure-your-mongodb-connections-ssl-tls-92e2addb3c89\n  // for where the `rootCA.pem` file comes from.\n  tlsCAFile: `${__dirname}/rootCA.pem`,\n});\n```\n\nAnother common issue is the below error message:\n\n```no-highlight\nMongooseServerSelectionError: Hostname/IP does not match certificate's altnames: Host: hostname1. is not cert's CN: hostname2\n```\n\nThe SSL certificate's [common name](https://knowledge.digicert.com/solution/SO7239.html) **must** line up with the host name\nin your connection string. If the SSL certificate is for `hostname2.mydomain.com`, your connection string must connect to `hostname2.mydomain.com`, not any other hostname or IP address that may be equivalent to `hostname2.mydomain.com`. For replica sets, this also means that the SSL certificate's common name must line up with the [machine's `hostname`](../connections.html#replicaset-hostnames). To disable this validation, set the `tlsAllowInvalidHostnames` option to `true`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/tutorials/ssl.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/tutorials/ssl.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/tutorials/ssl.md#1",
+    "b": "mongoose:docs/tutorials/ssl.md#2",
+    "relation": "overlapping",
+    "related": 0.9961,
+    "probabilities": {
+     "same": 0.0084,
+     "overlapping": 0.9806,
+     "conflicting": 0.0071,
+     "unrelated": 0.0039
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 100,
+   "total_ms": 104
+  }
+ }
+}

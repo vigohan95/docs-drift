@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a7/a7f0acdb3f3c9e06748c",
+ "request_hash": "a7f0acdb3f3c9e06748c66f9307acdac9863900d663b0e1b6e15759801a05cdc",
+ "recorded_at": "2026-11-06T14:14:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1004,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "135.169313",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=271"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#31",
+    "text": "```javascript\nawait MyModel.create({ field: 42 });\n\n// Matches 0 documents with `strictQuery: false`, the default: Mongoose sends\n// `{ notInSchema: 1 }` to the server as-is, and no document has that property.\nawait MyModel.find({ notInSchema: 1 });\n\n// Matches _all_ documents with `strictQuery: true`: Mongoose strips out\n// `notInSchema: 1`, leaving an empty filter `{}`.\nawait MyModel.find({ notInSchema: 1 }).setOptions({ strictQuery: true });\n```\n\nIn general, we do **not** recommend passing user-defined objects as query filters:\n\n```javascript\n// Don't do this!\nconst docs = await MyModel.find(req.query);\n\n// Do this instead:\nconst docs = await MyModel.find({ name: req.query.name, age: req.query.age }).setOptions({ sanitizeFilter: true });\n```\n\nIn Mongoose 7, `strictQuery` is `false` by default.\nHowever, you can override this behavior globally:\n\n```javascript\n// Set `strictQuery` to `true` to omit unknown fields in queries.\nmongoose.set('strictQuery', true);\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_7.md#2",
+    "text": "## `strictQuery` {#strictquery}\n\n`strictQuery` is now false by default.\n\n```javascript\nconst mySchema = new Schema({ field: Number });\nconst MyModel = mongoose.model('Test', mySchema);\n\n// Mongoose will not strip out `notInSchema: 1` because `strictQuery` is false by default\nconst docs = await MyModel.find({ notInSchema: 1 });\n// Empty array in Mongoose 7. In Mongoose 6, this would contain all documents in MyModel\ndocs;\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#31",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/migrating_to_7.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_7.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/guide.md#31"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#31",
+    "b": "mongoose:docs/migrating_to_7.md#2",
+    "relation": "overlapping",
+    "related": 0.9969,
+    "probabilities": {
+     "same": 0.0367,
+     "overlapping": 0.954,
+     "conflicting": 0.0062,
+     "unrelated": 0.0031
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0123,
+       "restated": 0.9406,
+       "elaborated": 0.0365,
+       "different": 0.0107
+      },
+      "confidence": 0.9893,
+      "a": {
+       "document": "mongoose:docs/guide.md#31",
+       "quote": "In Mongoose 7, `strictQuery` is `false` by default.",
+       "start": 756,
+       "end": 807,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mongoose:docs/migrating_to_7.md#2",
+       "quote": "## `strictQuery` {#strictquery}\n\n`strictQuery` is now false by default.\n\n```javascript\nconst mySchema = new Schema({ field: Number });\nconst MyModel = mongoose.model('Test', mySchema);\n\n// Mongoose will not strip out `notInSchema: 1` because `strictQuery` is false by default\nconst docs = await MyModel.find({ notInSchema: 1 });\n// Empty array in Mongoose 7.",
+       "start": 0,
+       "end": 358,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 1,
+   "counterparts_ms": 66
+  },
+  "timing": {
+   "read_ms": 145,
+   "total_ms": 148
+  }
+ }
+}

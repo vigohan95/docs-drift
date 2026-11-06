@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d1/d14031571f9e98c7213f",
+ "request_hash": "d14031571f9e98c7213f3f884436670a79504b1b139a3a0fe41ac150aeafaf68",
+ "recorded_at": "2026-11-06T14:14:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1057,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "163.403198",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=335"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/caching.md#0",
+    "text": "---\ntitle: Result cache\n---\n\nMikroORM has a simple result caching mechanism. It works with those methods of `EntityManager`: `find()`, `findOne()`, `findAndCount()`, `findOneOrFail()`, `count()`, as well as with `QueryBuilder` result methods (including `execute`).\n\nBy default, in memory cache is used, that is shared for the whole `MikroORM` instance. Default expiration is 1 second.\n\n```ts\nconst res = await em.find(Book, { author: { name: 'Jon Snow' } }, {\n  populate: ['author', 'tags'],\n  cache: 50, // set expiration to 50ms\n  // cache: ['cache-key', 50], // set custom cache key and expiration\n  // cache: true, // use default cache key and expiration\n});\n```\n\nOr with query builder:\n\n```ts\nconst res = await em.createQueryBuilder(Book)\n  .where({ author: { name: 'Jon Snow' } })\n  .cache()\n  .getResultList();\n```\n\nYou can change the default expiration as well as provide custom cache adapter in the ORM configuration:\n\n```ts\nconst orm = await MikroORM.init({\n  resultCache: {\n    // following options are the defaults\n    adapter: MemoryCacheAdapter,\n    expiration: 1000, // 1s\n    options: {},\n    // cache can be also enabled globally\n    // global: 50, // 50ms\n  },\n  // ...\n});\n```\n\nTo clear the cached result, you need to load it with explicit cache key, and later on you can use `em.clearCache(cacheKey)` method."
+   },
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#34",
+    "text": "## Result Cache\n\nMikroORM supports caching of query results. You can configure the result cache globally via the `resultCache` option:\n\n```ts\nMikroORM.init({\n  resultCache: {\n    expiration: 1000, // default expiration time in ms\n    adapter: MemoryCacheAdapter, // you can provide your own implementation here, e.g. with redis\n    options: {}, // options will be passed to the constructor of `adapter` class\n    global: false, // enable global result caching for all queries\n  },\n});\n```\n\nThe `global` option can be:\n- `false` (default) - result caching is opt-in per query\n- `true` - cache all queries with default expiration\n- `number` - cache all queries with the specified expiration in ms\n- `[string, number]` - cache all queries with the specified key prefix and expiration"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/caching.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/configuration.md#34"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#34",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/caching.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/caching.md#0",
+    "b": "mikro-orm:docs/docs/configuration.md#34",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0076,
+     "overlapping": 0.9824,
+     "conflicting": 0.0077,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0065,
+       "restated": 0.978,
+       "elaborated": 0.0104,
+       "different": 0.0051
+      },
+      "confidence": 0.9949,
+      "a": {
+       "document": "mikro-orm:docs/docs/caching.md#0",
+       "quote": "MikroORM has a simple result caching mechanism.",
+       "start": 29,
+       "end": 76,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/configuration.md#34",
+       "quote": "## Result Cache\n\nMikroORM supports caching of query results.",
+       "start": 0,
+       "end": 60,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0108,
+       "restated": 0.905,
+       "elaborated": 0.0384,
+       "different": 0.0457
+      },
+      "confidence": 0.522,
+      "a": {
+       "document": "mikro-orm:docs/docs/caching.md#0",
+       "quote": "You can change the default expiration as well as provide custom cache adapter in the ORM configuration:",
+       "start": 823,
+       "end": 926,
+       "confidence": 0.979
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/configuration.md#34",
+       "quote": "You can configure the result cache globally via the `resultCache` option:\n\n```ts\nMikroORM.init({\n  resultCache: {\n    expiration: 1000, // default expiration time in ms\n    adapter: MemoryCacheAdapter, // you can provide your own implementation here, e.g. with redis\n    options: {}, // options will be passed to the constructor of `adapter` class\n    global: false, // enable global result caching for all queries\n  },\n});\n```\n\nThe `global` option can be:\n- `false` (default) - result caching is opt-in per query\n- `true` - cache all queries with default expiration\n- `number` - cache all queries with the specified expiration in ms\n- `[string, number]` - cache all queries with the specified key prefix and expiration",
+       "start": 61,
+       "end": 780,
+       "confidence": 0.522
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 50,
+   "passage_reads": 1,
+   "passages_ms": 55,
+   "passages": 2,
+   "counterparts_ms": 91
+  },
+  "timing": {
+   "read_ms": 194,
+   "total_ms": 199
+  }
+ }
+}

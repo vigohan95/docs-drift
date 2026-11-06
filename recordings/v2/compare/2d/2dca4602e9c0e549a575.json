@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2d/2dca4602e9c0e549a575",
+ "request_hash": "2dca4602e9c0e549a575af3443bcc3285ed6b7ce87aaa3a1cd2765c9b7c3ce9e",
+ "recorded_at": "2026-11-06T14:13:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1206,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "226.077888",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=464"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/faq.md#11",
+    "text": "**A**. Technically, any 12 character string is a valid [ObjectId](https://www.mongodb.com/docs/manual/reference/bson-types/#objectid).\nConsider using a regex like `/^[a-f0-9]{24}$/` to test whether a string is exactly 24 hex characters.\n\n<hr id=\"map-keys-strings\" />\n\n<a class=\"anchor\" href=\"#map-keys-strings\">**Q**</a>. Why do keys in Mongoose Maps have to be strings?\n\n**A**. Because the Map eventually gets stored in MongoDB where the keys must be strings.\n\n<hr id=\"limit-vs-perDocumentLimit\" />\n\n<a class=\"anchor\" href=\"#limit-vs-perDocumentLimit\">**Q**</a>. I am using `Model.find(...).populate(...)` with the `limit` option, but getting fewer results than the limit. What gives?\n\n**A**. In order to avoid executing a separate query for each document returned from the `find` query, Mongoose\ninstead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the\n[perDocumentLimit](populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in\nmind that populate() will execute a separate query for each document.\n\n<hr id=\"duplicate-query\" />\n\n<a class=\"anchor\" href=\"#duplicate-query\">**Q**</a>. My query/update seems to execute twice. Why is this happening?\n\n**A**. The most common cause of duplicate queries is **executing the same query object twice**.\nCalling [`then()`](https://masteringjs.io/tutorials/fundamentals/then) or `await` on the same query object\nmultiple times will execute the query multiple times."
+   },
+   {
+    "id": "mongoose:docs/populate.md#10",
+    "text": "## `limit` vs. `perDocumentLimit` {#limit-vs-perDocumentLimit}\n\nPopulate does support a `limit` option, however, it currently\ndoes **not** limit on a per-document basis for backwards compatibility. For example,\nsuppose you have 2 stories:\n\n```javascript\nawait Story.create([\n  { title: 'Casino Royale', fans: [1, 2, 3, 4, 5, 6, 7, 8] },\n  { title: 'Live and Let Die', fans: [9, 10] }\n]);\n```\n\nIf you were to `populate()` using the `limit` option, you\nwould find that the 2nd story has 0 fans:\n\n```javascript\nconst stories = await Story.find().populate({\n  path: 'fans',\n  options: { limit: 2 }\n});\n\nstories[0].name; // 'Casino Royale'\nstories[0].fans.length; // 2\n\n// 2nd story has 0 fans!\nstories[1].name; // 'Live and Let Die'\nstories[1].fans.length; // 0\n```\n\nThat's because, in order to avoid executing a separate query\nfor each document, Mongoose instead queries for fans using\n`numDocuments * limit` as the limit. If you need the correct\n`limit`, you should use the `perDocumentLimit` option (new in Mongoose 5.9.0).\nJust keep in mind that `populate()` will execute a separate query\nfor each story, which may cause `populate()` to be slower.\n\n```javascript\nconst stories = await Story.find().populate({\n  path: 'fans',\n  // Special option that tells Mongoose to execute a separate query\n  // for each `story` to make sure we get 2 fans for each story.\n  perDocumentLimit: 2\n});\n\nstories[0].name; // 'Casino Royale'\nstories[0].fans.length; // 2\n\nstories[1].name; // 'Live and Let Die'\nstories[1].fans.length; // 2\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/faq.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/populate.md#10"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/populate.md#10",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/faq.md#11"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/faq.md#11",
+    "b": "mongoose:docs/populate.md#10",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0044,
+     "overlapping": 0.9903,
+     "conflicting": 0.0036,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0107,
+       "restated": 0.6594,
+       "elaborated": 0.2953,
+       "different": 0.0347
+      },
+      "confidence": 0.9653,
+      "a": {
+       "document": "mongoose:docs/faq.md#11",
+       "quote": "In order to avoid executing a separate query for each document returned from the `find` query, Mongoose",
+       "start": 694,
+       "end": 797,
+       "confidence": 0.986
+      },
+      "b": {
+       "document": "mongoose:docs/populate.md#10",
+       "quote": "## `limit` vs. `perDocumentLimit` {#limit-vs-perDocumentLimit}\n\nPopulate does support a `limit` option, however, it currently\ndoes **not** limit on a per-document basis for backwards compatibility.",
+       "start": 0,
+       "end": 197,
+       "confidence": 0.997
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0074,
+       "restated": 0.9655,
+       "elaborated": 0.0197,
+       "different": 0.0074
+      },
+      "confidence": 0.553,
+      "a": {
+       "document": "mongoose:docs/faq.md#11",
+       "quote": "In order to avoid executing a separate query for each document returned from the `find` query, Mongoose",
+       "start": 694,
+       "end": 797,
+       "confidence": 0.553
+      },
+      "b": {
+       "document": "mongoose:docs/populate.md#10",
+       "quote": "For example,\nsuppose you have 2 stories:\n\n```javascript\nawait Story.create([\n  { title: 'Casino Royale', fans: [1, 2, 3, 4, 5, 6, 7, 8] },\n  { title: 'Live and Let Die', fans: [9, 10] }\n]);\n```\n\nIf you were to `populate()` using the `limit` option, you\nwould find that the 2nd story has 0 fans:\n\n```javascript\nconst stories = await Story.find().populate({\n  path: 'fans',\n  options: { limit: 2 }\n});\n\nstories[0].name; // 'Casino Royale'\nstories[0].fans.length; // 2\n\n// 2nd story has 0 fans!\nstories[1].name; // 'Live and Let Die'\nstories[1].fans.length; // 0\n```\n\nThat's because, in order to avoid executing a separate query\nfor each document, Mongoose instead queries for fans using\n`numDocuments * limit` as the limit.",
+       "start": 198,
+       "end": 919,
+       "confidence": 0.998
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.011,
+       "restated": 0.8757,
+       "elaborated": 0.0698,
+       "different": 0.0434
+      },
+      "confidence": 0.9566,
+      "a": {
+       "document": "mongoose:docs/faq.md#11",
+       "quote": "If you need the correct limit, you should use the",
+       "start": 857,
+       "end": 906,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mongoose:docs/populate.md#10",
+       "quote": "If you need the correct\n`limit`, you should use the `perDocumentLimit` option (new in Mongoose 5.9.0).\nJust keep in mind that `populate()` will execute a separate query\nfor each story, which may cause `populate()` to be slower.\n\n```javascript\nconst stories = await Story.find().populate({\n  path: 'fans',\n  // Special option that tells Mongoose to execute a separate query\n  // for each `story` to make sure we get 2 fans for each story.\n  perDocumentLimit: 2\n});\n\nstories[0].name; // 'Casino Royale'\nstories[0].fans.length; // 2\n\nstories[1].name; // 'Live and Let Die'\nstories[1].fans.length; // 2\n```",
+       "start": 920,
+       "end": 1522,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 106,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 3,
+   "counterparts_ms": 147
+  },
+  "timing": {
+   "read_ms": 336,
+   "total_ms": 340
+  }
+ }
+}

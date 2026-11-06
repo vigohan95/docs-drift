@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/12/12fa8e61c13bbc9d0091",
+ "request_hash": "12fa8e61c13bbc9d0091475c5f3b5029213292bb19bd88a938e6fa39e1bb1123",
+ "recorded_at": "2026-11-06T14:14:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1002,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "161.72547",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=296"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/1-promise.md#4",
+    "text": "### `promise.json(schema)`\n\n**Returns: `Promise<StandardSchemaV1InferOutput<Schema>>`**\n\nA shortcut method that gives a Promise returning a JSON object validated with a [Standard Schema](https://standardschema.dev)-compatible validator, such as [Zod](https://github.com/colinhacks/zod) or [Valibot](https://valibot.dev). The promise resolves with the output of the schema, and the return type is inferred from it.\n\nA custom [`parseJson`](2-options.md#parsejson) option runs first, so the schema receives the parsed body. The `validate` method of the schema may return a Promise.\n\nAn empty response body parses to an empty string, the same as for [`promise.json<T>()`](1-promise.md#promisejsont), so the schema receives `''`.\n\nThrows a [`SchemaValidationError`](8-errors.md#schemavalidationerror) when the body does not match the schema.\n\n> [!NOTE]\n> A `TypeError` is thrown when the argument does not follow the Standard Schema specification, for example when it has no `~standard.validate` method.\n\n```js\nimport got from 'got';\nimport {z} from 'zod';\n\nconst userSchema = z.object({name: z.string()});\n\nconst user = await got('https://example.com/user').json(userSchema);\n\nconsole.log(user.name);\n```"
+   },
+   {
+    "id": "got:documentation/2-options.md#30",
+    "text": "### `responseType`\n\n**Type: `'text' | 'json' | 'buffer'`**\\\n**Default: `'text'`**\n\nThe parsing method.\n\nThe promise also has `.text()`, `.json()` and `.buffer()` methods which return another Got promise for the parsed body.\\\nIt's like setting the options to `{responseType: 'json', resolveBodyOnly: true}` but without affecting the main Got promise.\n\n`.json()` also accepts a [Standard Schema](https://standardschema.dev) validator, in which case the promise resolves with the output of the schema. See [`promise.json(schema)`](1-promise.md#promisejsonschema).\n\n```js\nimport got from 'got';\n\nconst responsePromise = got('https://httpbin.org/anything');\nconst bufferPromise = responsePromise.buffer();\nconst jsonPromise = responsePromise.json();\n\nconst [response, buffer, json] = await Promise.all([responsePromise, bufferPromise, jsonPromise]);\n// `response` is an instance of Got Response\n// `buffer` is an instance of Uint8Array\n// `json` is an object\n```\n\n> [!NOTE]\n> When using streams, this option is ignored.\n\n> [!NOTE]\n> `'buffer'` will return the raw body bytes as a `Uint8Array`. Any modifications will also alter the result of `.text()` and `.json()`. Before overwriting it, please copy it first via `new Uint8Array(buffer)`.\\\n>  See https://github.com/nodejs/node/issues/27080"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/1-promise.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/2-options.md#30",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/1-promise.md#4",
+    "b": "got:documentation/2-options.md#30",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.005,
+     "overlapping": 0.9882,
+     "conflicting": 0.0043,
+     "unrelated": 0.0026
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 1,
+   "counterparts_ms": 73
+  },
+  "timing": {
+   "read_ms": 173,
+   "total_ms": 176
+  }
+ }
+}

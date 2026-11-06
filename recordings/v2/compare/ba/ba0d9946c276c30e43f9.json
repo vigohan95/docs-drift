@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ba/ba0d9946c276c30e43f9",
+ "request_hash": "ba0d9946c276c30e43f989ff352f2812e60f4e94c596283bb02bb078d96443f9",
+ "recorded_at": "2026-11-06T14:14:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1156,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "82.98304",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=53,cfOrigin;dur=0,cfWorker;dur=370"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#33",
+    "text": "## option: toObject {#toObject}\n\nDocuments have a [toObject](api/document.html#document_Document-toObject) method\nwhich converts the mongoose document into a plain JavaScript object. This\nmethod accepts a few options. Instead of applying these options on a\nper-document basis, we may declare the options at the schema level and have\nthem applied to all of the schema's documents by default.\n\nTo have all virtuals show up in your `console.log` output, set the\n`toObject` option to `{ getters: true }`:\n\n```javascript\nconst schema = new Schema({ name: String });\nschema.path('name').get(function(v) {\n  return v + ' is my name';\n});\nschema.set('toObject', { getters: true });\nconst M = mongoose.model('Person', schema);\nconst m = new M({ name: 'Max Headroom' });\nconsole.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }\n```\n\nTo see all available `toObject` options, read [this](api/document.html#document_Document-toObject)."
+   },
+   {
+    "id": "mongoose:docs/populate.md#22",
+    "text": "Unfortunately, these two schemas, as written, don't support populating an author's list of blog posts.\nThat's where *virtual populate* comes in.\nVirtual populate means calling `populate()` on a virtual property that has a `ref` option as shown below.\n\n```javascript\n// Specifying a virtual with a `ref` property is how you enable virtual\n// population\nAuthorSchema.virtual('posts', {\n  ref: 'BlogPost',\n  localField: '_id',\n  foreignField: 'author'\n});\n\nconst Author = mongoose.model('Author', AuthorSchema, 'Author');\nconst BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');\n```\n\nYou can then `populate()` the author's `posts` as shown below.\n\n```javascript\nconst author = await Author.findOne().populate('posts');\n\nauthor.posts[0].title; // Title of the first blog post\n```\n\nKeep in mind that virtuals are *not* included in `toJSON()` and `toObject()` output by default.\nIf you want populate virtuals to show up when using functions like Express' [`res.json()` function](https://masteringjs.io/tutorials/express/json) or `console.log()`, set the `virtuals: true` option on your schema's `toJSON` and `toObject()` options.\n\n```javascript\nconst authorSchema = new Schema({ name: String }, {\n  toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals\n  toObject: { virtuals: true } // So `console.log()` and other functions that use `toObject()` include virtuals\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#33",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/populate.md#22",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#33",
+    "b": "mongoose:docs/populate.md#22",
+    "relation": "overlapping",
+    "related": 0.9969,
+    "probabilities": {
+     "same": 0.0051,
+     "overlapping": 0.9861,
+     "conflicting": 0.0057,
+     "unrelated": 0.0031
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 182,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 216,
+   "total_ms": 219
+  }
+ }
+}

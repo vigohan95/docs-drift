@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1a/1a2b28bc616cd9eb2ad8",
+ "request_hash": "1a2b28bc616cd9eb2ad8efc9e0085e120364fa670cbbfbf7ba7564d7f254a255",
+ "recorded_at": "2026-11-06T14:14:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 874,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.599585",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=158"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/2-options.md#18",
+    "text": "### `parseJson`\n\n**Type: `(text: string) => unknown`**\\\n**Default: `(text: string) => JSON.parse(text)`**\n\nThe function used to parse JSON responses.\n\n```js\nimport got from 'got';\nimport {parse} from '@hapi/bourne';\n\n// Preventing prototype pollution by using Bourne\nconst parsed = await got('https://example.com', {\n\tparseJson: text => parse(text)\n}).json();\n\nconsole.log(parsed);\n```"
+   },
+   {
+    "id": "got:documentation/4-pagination.md#15",
+    "text": "### Example\n\nIn this example we will use `searchParams` instead of `Link` header.\\\nJust to show how you can customize the `paginate` function.\n\nThe reason `filter` looks exactly the same like `shouldContinue` is that the latter will tell Got to stop once we reach our timestamp.\nThe `filter` function is needed as well, because in the same response we can get results with different timestamps.\n\n```js\nimport got from 'got';\nimport {parse as bourneParse} from '@hapi/bourne';\n\nconst max = Date.now() - 1000 * 86400 * 7;\n\nconst iterator = got.paginate('https://api.github.com/repos/sindresorhus/got/commits', {\n\tpagination: {\n\t\tpaginate: ({response, currentItems}) => {\n\t\t\t// If there are no more data, finish.\n\t\t\tif (currentItems.length === 0) {\n\t\t\t\treturn false;\n\t\t\t}\n\n\t\t\t// Get the current page number.\n\t\t\tconst {searchParams} = response.request.options;\n\t\t\tconst previousPage = Number(searchParams.get('page') ?? 1);\n\n\t\t\t// Update the page number by one.\n\t\t\treturn {\n\t\t\t\tsearchParams: {\n\t\t\t\t\tpage: previousPage + 1\n\t\t\t\t}\n\t\t\t};\n\t\t},\n\t\t// Using `Bourne` to prevent prototype pollution.\n\t\ttransform: response => bourneParse(response.body),\n\t\tfilter: ({item}) => {\n\t\t\t// Check if the commit time exceeds our range.\n\t\t\tconst date = new Date(item.commit.committer.date);\n\t\t\tconst end = date.getTime() - max >= 0;\n\n\t\t\treturn end;\n\t\t},\n\t\tshouldContinue: ({item}) => {\n\t\t\t// Check if the commit time exceeds our range.\n\t\t\tconst date = new Date(item.commit.committer.date);\n\t\t\tconst end = date.getTime() - max >= 0;\n\n\t\t\treturn end;\n\t\t},\n\t\t// We want only 50 results.\n\t\tcountLimit: 50,\n\t\t// Wait 1s before making another request to prevent API rate limiting.\n\t\tbackoff: 1000,\n\t\t// It is a good practice to set an upper limit of how many requests can be made.\n\t\t// This way we can avoid infinite loops.\n\t\trequestLimit: 10,\n\t\t// In this case, we don't need to store all the items we receive.\n\t\t// They are processed immediately.\n\t\tstackAllItems: false\n\t}\n});\n\nconsole.log('Last 50 commits from now to week ago:');\nfor await (const item of iterator) {\n\tconsole.log(item.commit.message.split('\\n')[0]);\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/2-options.md#18",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/4-pagination.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/2-options.md#18",
+    "b": "got:documentation/4-pagination.md#15",
+    "relation": "unrelated",
+    "related": 0.0207,
+    "probabilities": {
+     "same": 0.0062,
+     "overlapping": 0.0088,
+     "conflicting": 0.0058,
+     "unrelated": 0.9793
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 35
+  }
+ }
+}

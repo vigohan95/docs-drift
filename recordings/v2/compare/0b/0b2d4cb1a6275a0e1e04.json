@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0b/0b2d4cb1a6275a0e1e04",
+ "request_hash": "0b2d4cb1a6275a0e1e0420328dcd0631ac2366182d207c44448e51f71aa86470",
+ "recorded_at": "2026-11-06T14:13:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1033,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "170.818811",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=13,cfOrigin;dur=0,cfWorker;dur=318"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/CodeTransformation.md#4",
+    "text": "Asynchronous transpilation can fall back to the synchronous `process` call if `processAsync` is unimplemented, but synchronous transpilation cannot use the asynchronous `processAsync` call. If your codebase is ESM only, implementing the async variants are sufficient. Otherwise, if any code is loaded through `require` (including `createRequire` from within ESM), then you need to implement the synchronous `process` variant.\n\nBe aware that `node_modules` is not transpiled with default config, the `transformIgnorePatterns` setting must be modified in order to do so.\n\nSemi-related to this are the supports flags we pass (see `CallerTransformOptions` above), but those should be used within the transform to figure out if it should return ESM or CJS, and has no direct bearing on sync vs async\n\nThough not required, we _highly recommend_ implementing `getCacheKey` as well, so we do not waste resources transpiling when we could have read its previous result from disk. You can use [`@jest/create-cache-key-function`](https://www.npmjs.com/package/@jest/create-cache-key-function) to help implement it.\n\nInstead of having your custom transformer implement the `Transformer` interface directly, you can choose to export `createTransformer`, a factory function to dynamically create transformers. This is to allow having a transformer config in your jest config."
+   },
+   {
+    "id": "jest:docs/Configuration.md#90",
+    "text": "### `transform` \\[object&lt;string, pathToTransformer | \\[pathToTransformer, object]&gt;]\n\nDefault: `{\"\\\\.[jt]sx?$\": \"babel-jest\"}`\n\nA map from regular expressions to paths to transformers. Optionally, a tuple with configuration options can be passed as second argument: `{filePattern: ['path-to-transformer', {options}]}`. For example, here is how you can configure `babel-jest` for non-default behavior: `{'\\\\.js$': ['babel-jest', {rootMode: 'upward'}]}`.\n\nJest runs the code of your project as JavaScript, hence a transformer is needed if you use some syntax not supported by Node out of the box (such as JSX, TypeScript, Vue templates). By default, Jest will use [`babel-jest`](https://github.com/jestjs/jest/tree/main/packages/babel-jest#setup) transformer, which will load your project's Babel configuration and transform any file matching the `/\\.[jt]sx?$/` RegExp (in other words, any `.js`, `.jsx`, `.ts` or `.tsx` file). In addition, `babel-jest` will inject the Babel plugin necessary for mock hoisting talked about in [ES Module mocking](ManualMocks.md#using-with-es-module-imports).\n\nSee the [Code Transformation](CodeTransformation.md) section for more details and instructions on building your own transformer.\n\nWhen no transformer matches a `.ts`, `.mts` or `.cts` file, Jest erases its type annotations with [`module.stripTypeScriptTypes()`](https://nodejs.org/api/module.html#modulestriptypescripttypescode-options), the same way Node does. This needs Node.js `^22.13.0` or `>=23.2.0`, and it only erases types — see [Using TypeScript](GettingStarted.md#via-nodes-type-stripping) for the limits. `transformIgnorePatterns` applies, so files under `node_modules` are left alone."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/CodeTransformation.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "jest:docs/Configuration.md#90"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/Configuration.md#90",
+    "duplicates": [],
+    "overlaps": [
+     "jest:docs/CodeTransformation.md#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/CodeTransformation.md#4",
+    "b": "jest:docs/Configuration.md#90",
+    "relation": "overlapping",
+    "related": 0.9963,
+    "probabilities": {
+     "same": 0.004,
+     "overlapping": 0.9894,
+     "conflicting": 0.0029,
+     "unrelated": 0.0037
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0061,
+       "restated": 0.9754,
+       "elaborated": 0.0089,
+       "different": 0.0096
+      },
+      "confidence": 0.9904,
+      "a": {
+       "document": "jest:docs/CodeTransformation.md#4",
+       "quote": "Be aware that `node_modules` is not transpiled with default config, the `transformIgnorePatterns` setting must be modified in order to do so.",
+       "start": 427,
+       "end": 568,
+       "confidence": 1
+      },
+      "b": {
+       "document": "jest:docs/Configuration.md#90",
+       "quote": "`transformIgnorePatterns` applies, so files under `node_modules` are left alone.",
+       "start": 1614,
+       "end": 1694,
+       "confidence": 0.998
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 97,
+   "passages": 1,
+   "counterparts_ms": 50
+  },
+  "timing": {
+   "read_ms": 182,
+   "total_ms": 186
+  }
+ }
+}

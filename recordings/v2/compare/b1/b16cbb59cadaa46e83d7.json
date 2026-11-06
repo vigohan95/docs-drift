@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b1/b16cbb59cadaa46e83d7",
+ "request_hash": "b16cbb59cadaa46e83d7513b46f25c48d45ab84ac3571f85d3c9cdaba624636a",
+ "recorded_at": "2026-11-06T14:12:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 978,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.497825",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=249"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/operators.md#17",
+    "text": "### Many-to-one and one-to-many vector matches\n\n**Many-to-one** and **one-to-many** matchings refer to the case where each vector element on\nthe \"one\"-side can match with multiple elements on the \"many\"-side. This has to\nbe explicitly requested using the `group_left` or `group_right` [modifiers](#group-modifiers), where\nleft/right determines which vector has the higher cardinality.\n\n    <vector expr> <bin-op> ignoring(<label list>) group_left(<label list>) <vector expr>\n    <vector expr> <bin-op> ignoring(<label list>) group_right(<label list>) <vector expr>\n    <vector expr> <bin-op> on(<label list>) group_left(<label list>) <vector expr>\n    <vector expr> <bin-op> on(<label list>) group_right(<label list>) <vector expr>\n\nThe label list provided with the [group modifier](#group-modifiers) contains additional labels from\nthe \"one\"-side to be included in the result metrics. For `on` a label can only\nappear in one of the lists. Every time series of the result vector must be\nuniquely identifiable.\n\nExample query:\n\n    method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:rate5m\n\nIn this case the left vector contains more than one entry per `method` label\nvalue. Thus, we indicate this using `group_left`. The elements from the right\nside are now matched with multiple elements with the same `method` label on the\nleft:\n\n    {method=\"get\", code=\"500\"}  0.04            //  24 / 600\n    {method=\"get\", code=\"404\"}  0.05            //  30 / 600\n    {method=\"post\", code=\"500\"} 0.05            //   6 / 120\n    {method=\"post\", code=\"404\"} 0.175           //  21 / 120"
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "text": "* If a fill modifier is used on the \"many\" side of a match, it will only fill in a single series\n  for the \"many\" side of each match group, using the group's matching labels as the series identity.\n* If a fill modifier is used on the \"one\" side of a match and the grouping modifier specifies\n  label names to include from the \"one\" side (e.g. `left_vector * on(instance, job) group_left(info_label) fill_right(1) right_vector`), those labels will not be filled in for missing\n  series, as there is no source for their values.\n\nFill modifiers are not supported for set operators (`and`, `or`, `unless`), as the purpose of those\noperators is to filter series based on presence or absence in the other vector.\n\nExample query, filling in missing series on the either side with `0`:\n\n    method_code:http_errors:rate5m{status=\"500\"} / ignoring(code) fill(0) method:http_requests:rate5m\n\nThis returns a result vector containing the fraction of HTTP requests with status code\nof 500 for each method, as measured over the last 5 minutes. The entries with methods `put` and `del`\nare now included in the result with a filled-in default sample value of `0`, as they had no matching\nseries on the respective other side:\n\n    {method=\"get\"}  0.04            #  24 / 600\n    {method=\"put\"}  +Inf            #   3 /   0 (missing right side filled in)\n    {method=\"del\"}  0               #   0 /  34 (missing left side filled in)\n    {method=\"post\"} 0.05            #   6 / 120"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/operators.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/operators.md#17",
+    "b": "prometheus:docs/querying/operators.md#19",
+    "relation": "unrelated",
+    "related": 0.1299,
+    "probabilities": {
+     "same": 0.0136,
+     "overlapping": 0.103,
+     "conflicting": 0.0133,
+     "unrelated": 0.8701
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 53
+  },
+  "timing": {
+   "read_ms": 53,
+   "total_ms": 56
+  }
+ }
+}

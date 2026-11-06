@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4c/4cbcbab151c47d2378a3",
+ "request_hash": "4cbcbab151c47d2378a3d464188f0f2ea36022a283a5f4436134a51fecfb0561",
+ "recorded_at": "2026-11-06T14:21:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2070,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.490305",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=196"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/config/experimental.md#10",
+    "text": "### Known Limitations\n\nSome Vitest features rely on files being transformed. Vitest uses synchronous [Node.js Loaders API](https://nodejs.org/api/module.html#customization-hooks) to transform test files and setup files to support these features:\n\n- [`import.meta.vitest`](/guide/in-source)\n- [`vi.mock`](/api/vi#vi-mock)\n- [`vi.hoisted`](/api/vi#vi-hoisted)\n\n::: warning\nThis means that Vitest requires at least Node 22.15 for those features to work. At the moment, they also do not work in Deno or Bun.\n\nVitest will only detect `vi.mock` and `vi.hoisted` inside of test files, they will not be hoisted inside imported modules.\n:::\n\nThis could affect performance because Vitest needs to read the file and process it. If you do not use these features, you can disable the transforms by setting `experimental.nodeLoader` to `false`. Vitest only reads test files and setup files while looking for `vi.mock` or `vi.hoisted`. Using these in other files won't hoist them to the top of the file and can lead to unexpected behavior.\n\nSome features will not work due to the nature of `viteModuleRunner`, including:\n\n- no `import.meta.env`: `import.meta.env` is a Vite feature, use `process.env` instead\n- no `plugins`: plugins are not applied because there is no transformation phase, use [customization hooks](https://nodejs.org/api/module.html#customization-hooks) via [`execArgv`](/config/execargv) instead\n- no `alias`: aliases are not applied because there is no transformation phase\n- `istanbul` coverage provider doesn't work because there is no transformation phase, use `v8` instead\n- `vi.resetModules()`: there is no API to invalidate ES modules from the module cache"
+   },
+   {
+    "id": "vitest:docs/config/injectcjsglobals.md#2",
+    "text": "The syntax detection is always enabled: Vitest doesn't respect Node.js CLI flags that modify the module type resolution, like `--no-experimental-detect-module`, `--input-type` (it only applies to the string input in Node.js), or the `--experimental-default-type` flag removed in Node.js 23.\n\nReferencing a CommonJS variable in an ES module throws a `ReferenceError`, just like outside of Vitest:\n\n```\nReferenceError: __dirname is not defined\n\n\"__dirname\" is a CommonJS variable that is not available in ES modules, and \"injectCjsGlobals\" is disabled. If this module is meant to be an ES module, use \"import.meta.dirname\" instead of \"__dirname\". If it is meant to be a CommonJS module, use the \".cjs\" file extension, set \"type\": \"commonjs\" in the nearest package.json, or externalize it with \"server.deps.external\".\n```\n\n::: warning\nThis option doesn't affect externalized modules which are always executed by the native runtime. Node.js provides CommonJS variables to externalized CommonJS modules on its own.\n\nNote that inlined CommonJS modules are not processed by Vite plugins even when this option is enabled: `require` calls always leave the module runner, so features like mocking do not apply to them. See [CommonJS source code is not fully supported](/guide/common-errors#commonjs-source-code-is-not-fully-supported) for configuration alternatives.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/config/experimental.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/config/injectcjsglobals.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/config/experimental.md#10",
+    "b": "vitest:docs/config/injectcjsglobals.md#2",
+    "relation": "unrelated",
+    "related": 0.0085,
+    "probabilities": {
+     "same": 0.003,
+     "overlapping": 0.0028,
+     "conflicting": 0.0027,
+     "unrelated": 0.9915
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 36
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/64/64545367145c63440724",
+ "request_hash": "64545367145c6344072498fecbb13ad1329fd6f7b4dc7f9956ea58f15a22c2fb",
+ "recorded_at": "2026-11-06T14:15:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 951,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.875648",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=29,cfOrigin;dur=0,cfWorker;dur=229"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "text": "## Population where condition\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nWhen you use populate hints in `em.find()` and similar methods, by default all related entities are populated. Consider the following example - it would find all authors that have books with given IDs, and populate their books collection with **all** books, not just those matching the condition:\n\n```ts\n// finds authors with books 1, 2, 3 - but populates ALL their books\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nIf you wanted to populate only the books that match the filter condition, you can use `PopulateHint.INFER`:\n\n```ts\n// finds authors with books 1, 2, 3 - and populates ONLY those books\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```\n\nThis behaviour is configurable both globally and locally via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` (default) and `PopulateHint.INFER`. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\nMikroORM.init({\n  populateWhere: PopulateHint.INFER, // infer populate condition from the filter\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#6",
+    "text": "## Implicit Joining\n\n`QueryBuilder` supports automatic joining based on entity metadata:\n\n```ts\nconst qb = em.createQueryBuilder(BookTag, 't');\nqb.select('*').where({ books: 123 });\n\nconsole.log(qb.getQuery());\n// select `t`.*, `e1`.`book_tag_id`, `e1`.`book_uuid_pk`\n// from `book_tag` as `t`\n// left join `book_to_book_tag` as `e1` ON `t`.`id` = `e1`.`book_tag_id`\n// where `e1`.`book_uuid_pk` = ?\n```\n\nThis also works for multiple levels of nesting:\n\n```ts\nconst qb = em.createQueryBuilder(Author);\nqb.select('*')\n  .where({ books: { tags: { name: 'Cool' } } })\n  .orderBy({ books: { tags: { createdBy: QueryOrder.DESC } } });\n\nconsole.log(qb.getQuery());\n// select `e0`.*\n// from `author` as `e0`\n// left join `book2` as `e1` on `e0`.`id` = `e1`.`author_id`\n// left join `book2_to_book_tag2` as `e3` on `e1`.`uuid_pk` = `e3`.`book2_uuid_pk`\n// left join `book_tag2` as `e2` on `e3`.`book_tag2_id` = `e2`.`id`\n// where `e2`.`name` = ?\n// order by `e1`.`tags` asc\n```\n\nThis is currently available only for filtering (`where`) and sorting (`orderBy`), only the root entity will be selected. To populate its relationships, you can use [`em.populate()`](populating-relations.md)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/configuration.md#23",
+    "b": "mikro-orm:docs/docs/query-builder.md#6",
+    "relation": "unrelated",
+    "related": 0.0099,
+    "probabilities": {
+     "same": 0.004,
+     "overlapping": 0.0031,
+     "conflicting": 0.0028,
+     "unrelated": 0.9901
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

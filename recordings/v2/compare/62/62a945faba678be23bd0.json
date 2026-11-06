@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/62/62a945faba678be23bd0",
+ "request_hash": "62a945faba678be23bd057602b9867f11d2ccd450021bd2e622c7909b62228e6",
+ "recorded_at": "2026-11-06T14:13:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1152,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.529631",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=278"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#30",
+    "text": "## option: strictQuery {#strictQuery}\n\nMongoose supports a separate `strictQuery` option to avoid strict mode for query filters.\nThis is because empty query filters cause Mongoose to return all documents in the model, which can cause issues.\n\n```javascript\nconst mySchema = new Schema({ field: Number }, { strictQuery: true });\nconst MyModel = mongoose.model('Test', mySchema);\n// Mongoose will filter out `notInSchema: 1` because `strictQuery: true`, meaning this query will return\n// _all_ documents in the 'tests' collection\nMyModel.find({ notInSchema: 1 });\n```\n\nThe `strict` option does apply to updates.\nThe `strictQuery` option is **just** for query filters.\n\n```javascript\n// Mongoose will strip out `notInSchema` from the update if `strict` is\n// not `false`\nMyModel.updateMany({}, { $set: { notInSchema: 1 } });\n```\n\nMongoose has a separate `strictQuery` option to toggle strict mode for the `filter` parameter to queries.\n\n```javascript\nconst mySchema = new Schema({ field: Number }, {\n  strict: true,\n  strictQuery: false // Turn off strict mode for query filters\n});\nconst MyModel = mongoose.model('Test', mySchema);\n// Mongoose will not strip out `notInSchema: 1` because `strictQuery` is false\nMyModel.find({ notInSchema: 1 });\n```\n\nNote the difference between the two settings for filter paths that aren't in the schema.\nWith `strictQuery: false`, Mongoose leaves the path in the filter as-is and does **not** cast the value.\nThe server will only return documents where `notInSchema` is stored as `1`, so the query typically matches no documents.\nWith `strictQuery: true`, Mongoose silently removes the path from the filter, so the query may match more documents than intended.\nWith `strictQuery: 'throw'`, Mongoose throws a `StrictModeError` instead."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_7.md#2",
+    "text": "## `strictQuery` {#strictquery}\n\n`strictQuery` is now false by default.\n\n```javascript\nconst mySchema = new Schema({ field: Number });\nconst MyModel = mongoose.model('Test', mySchema);\n\n// Mongoose will not strip out `notInSchema: 1` because `strictQuery` is false by default\nconst docs = await MyModel.find({ notInSchema: 1 });\n// Empty array in Mongoose 7. In Mongoose 6, this would contain all documents in MyModel\ndocs;\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#30",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_7.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#30",
+    "b": "mongoose:docs/migrating_to_7.md#2",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0078,
+     "overlapping": 0.9854,
+     "conflicting": 0.0042,
+     "unrelated": 0.0027
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 45,
+   "passage_reads": 1,
+   "passages_ms": 53,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 98,
+   "total_ms": 100
+  }
+ }
+}

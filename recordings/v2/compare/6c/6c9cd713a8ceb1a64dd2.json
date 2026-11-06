@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6c/6c9cd713a8ceb1a64dd2",
+ "request_hash": "6c9cd713a8ceb1a64dd2f175f15225754bc352b39d88bdc04911a5aa76636124",
+ "recorded_at": "2026-11-06T14:11:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 853,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.868511",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=173"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#90",
+    "text": "#### setChildLoggerFactory\n<a id=\"set-child-logger-factory\"></a>\n\n`fastify.setChildLoggerFactory(factory(logger, bindings, opts, rawReq))`: Set a\nfunction that will be called when creating a child logger instance for each request\nwhich allows for modifying or adding child logger bindings and logger options, or\nreturning a custom child logger implementation.\n\nChild logger bindings have a performance advantage over per-log bindings because\nthey are pre-serialized by Pino when the child logger is created.\n\nThe first parameter is the parent logger instance, followed by the default bindings\nand logger options which should be passed to the child logger, and finally\nthe raw request (not a Fastify request object). The function is bound with `this`\nbeing the Fastify instance.\n\nFor example:\n```js\nconst fastify = require('fastify')({\n  childLoggerFactory: function (logger, bindings, opts, rawReq) {\n    // Calculate additional bindings from the request if needed\n    bindings.traceContext = rawReq.headers['x-cloud-trace-context']\n    return logger.child(bindings, opts)\n  }\n})\n```\n\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different logger factories."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#90",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#88",
+    "b": "fastify:docs/Reference/Server.md#90",
+    "relation": "unrelated",
+    "related": 0.0043,
+    "probabilities": {
+     "same": 0.0013,
+     "overlapping": 0.0012,
+     "conflicting": 0.0018,
+     "unrelated": 0.9957
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36
+  },
+  "timing": {
+   "read_ms": 36,
+   "total_ms": 38
+  }
+ }
+}

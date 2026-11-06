@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/24/24146671f1eae23d9a0f",
+ "request_hash": "24146671f1eae23d9a0fb9d949415a43b16054066d6394617cef5136613705b4",
+ "recorded_at": "2026-11-06T14:11:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 941,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "98.10128",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=31,cfOrigin;dur=0,cfWorker;dur=237"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) * `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. (2) ##### fastify.HTTPMethods [src](https://github.com/fastify/fastify/blob/main/types/utils.d.ts#L8) Union type of: `'DELETE' | 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'OPTIONS'`",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#73",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > addHttpMethod",
+    "text": "#### addHttpMethod\n<a id=\"addHttpMethod\"></a>\n\nFastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,\n`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.\nThe `addHttpMethod` method allows to add any non standard HTTP\nmethods to the server that are [supported by Node.js](https://nodejs.org/api/http.html#httpmethods).\n\nThe method accepts an optional configuration object:\n\n| Property | Type | Default | Description |\n| -------- | ---- | ------- | ----------- |\n| `hasBody` | `boolean` | `false` | Whether the method accepts a request body. |\n| `overrideExisting` | `boolean` | `false` | Whether to explicitly override an existing method. |\n\n```js\n// Add a new HTTP method called 'MKCOL' that supports a request body\nfastify.addHttpMethod('MKCOL', { hasBody: true,  })\n\n// Add a new HTTP method called 'COPY' that does not support a request body\nfastify.addHttpMethod('COPY')\n```\n\nAfter calling `addHttpMethod`, it is possible to use the route shorthand\nmethods to define routes for the new HTTP method:\n\n```js\nfastify.addHttpMethod('MKCOL', { hasBody: true })\nfastify.mkcol('/', (req, reply) => {\n  // Handle the 'MKCOL' request\n})\n```\n\nCalling `addHttpMethod` for an existing method requires `overrideExisting: true`\nand overrides its body behavior.\n\n```js\nfastify.addHttpMethod('GET', {\n  hasBody: true,\n  overrideExisting: true\n})\n```\n\nOmitting `overrideExisting: true` when the method already exists throws\n`FST_ERR_ROUTE_METHOD_ALREADY_SUPPORTED`."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#37",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Fastify > fastify.RawServerBase",
+    "text": "##### fastify.RawServerBase\n[src](https://github.com/fastify/fastify/blob/main/types/utils.d.ts#L13)\n\nDependent on `@types/node` modules `http`, `https`, `http2`\n\nUnion type of: `http.Server | https.Server | http2.Http2Server |\nhttp2.Http2SecureServer`"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#58",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Logger > fastify.LogLevel",
+    "text": "##### fastify.LogLevel\n\n[src](https://github.com/fastify/fastify/blob/main/types/logger.d.ts#L12)\n\nUnion type of: `'info' | 'error' | 'debug' | 'fatal' | 'warn' | 'trace'`\n\n---"
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser",
+    "text": "Note that for `GET` and `HEAD` requests, the payload is never parsed. For\n`OPTIONS` and `DELETE` requests, the payload is parsed only if a valid\n`content-type` header is provided. Unlike `POST`, `PUT`, and `PATCH`, the\n[catch-all](#catch-all) parser is not executed, and the payload is simply not\nparsed.\n\n> ⚠ Warning:\n> When using regular expressions to detect `Content-Type`, it is important to\n> ensure proper detection. For example, to match `application/*`, use\n> `/^application\\/([\\w-]+);?/` to match the\n> [essence MIME type](https://mimesniff.spec.whatwg.org/#mime-type-miscellaneous)\n> only.\n>\n> Additionally, if the route uses per-content-type body validation via\n> `schema.body.content`, the schema is selected by an **exact match** on the\n> essence MIME type, not by the parser's regex. A regex parser that accepts\n> content types with no matching key in the `content` schema map will result\n> in those requests **not being validated**. Ensure every content type matched\n> by the regex has a corresponding entry in the schema's `content` map. See\n> [Validation and Serialization](./Validation-and-Serialization.md) for details.\n\n> ℹ️ Note:\n> Fastify validates the request's `Content-Type` header before selecting a body\n> parser. String, `RegExp`, and [catch-all](#catch-all) parsers therefore will\n> never handle an invalid header. An `onRequest` hook can rewrite a malformed\n> header prior to validation:\n>\n> ```js\n> fastify.addHook('onRequest', async function rewriteContentType (request) {\n>   if (request.headers['content-type'] === 'application/json,application/json') {\n>     request.headers['content-type'] = 'application/json'\n>   }\n> })\n> ```\n>\n> Apply only unambiguous rewrites and reject other malformed values. An invalid\n> media type can select a different body parser or `schema.body.content`\n> validation schema. Rewrite the header before accessing `request.mediaType`,\n> which parses and caches the current value."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#4",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Validation",
+    "text": "### Validation\nRoute validation relies on [Ajv v8](https://www.npmjs.com/package/ajv), a\nhigh-performance JSON Schema validator. To validate input, add the required\nfields to the route schema.\n\nSupported validations include:\n- `body`: validates the request body for POST, PUT, or PATCH methods.\n- `querystring` or `query`: validates the query string.\n- `params`: validates the route parameters.\n- `headers`: validates the request headers.\n\nValidations can be a complete JSON Schema object with a `type` of `'object'` and\na `'properties'` object containing parameters, or a simpler variation listing\nparameters at the top level.\n\n> ℹ For using the latest Ajv (v8), refer to the\n> [`schemaController`](./Server.md#schema-controller) section."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#38",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Fastify > fastify.RawServerDefault",
+    "text": "##### fastify.RawServerDefault\n[src](https://github.com/fastify/fastify/blob/main/types/utils.d.ts#L18)\n\nDependent on `@types/node` modules `http`\n\nType alias for `http.Server`\n\n---"
+   },
+   {
+    "id": "fastify:docs/Guides/Ecosystem.md#10",
+    "title": "docs/Guides/Ecosystem.md > Ecosystem > [Community](#community)",
+    "text": "  that adds support for KafkaJS - a modern Apache Kafka client library.\n- [`fastify-keycloak-adapter`](https://github.com/yubinTW/fastify-keycloak-adapter)\n  A keycloak adapter for a Fastify app.\n- [`fastify-kubernetes`](https://github.com/greguz/fastify-kubernetes) Fastify\n  Kubernetes client plugin.\n- [`fastify-kysely`](https://github.com/alenap93/fastify-kysely) Fastify\n  plugin for supporting Kysely type-safe query builder.\n- [`fastify-language-parser`](https://github.com/lependu/fastify-language-parser)\n  Fastify plugin to parse request language.\n- [`fastify-lcache`](https://github.com/denbon05/fastify-lcache)\n  Lightweight cache plugin\n- [`fastify-list-routes`](https://github.com/chuongtrh/fastify-list-routes)\n  A simple plugin for Fastify to list all available routes.\n- [`fastify-lm`](https://github.com/galiprandi/fastify-lm#readme)\n  Use OpenAI, Claude, Google, Deepseek, and others LMs with one Fastify plugin.\n- [`fastify-loader`](https://github.com/TheNoim/fastify-loader) Load routes from\n  a directory and inject the Fastify instance in each file.\n- [`fastify-log-controller`](https://github.com/Eomm/fastify-log-controller/)\n  changes the log level of your Fastify server at runtime.\n- [`fastify-lured`](https://github.com/lependu/fastify-lured) Plugin to load lua\n  scripts with [fastify-redis](https://github.com/fastify/fastify-redis) and\n  [lured](https://github.com/enobufs/lured).\n- [`fastify-mailer`](https://github.com/coopflow/fastify-mailer) Plugin to\n  initialize and encapsulate [Nodemailer](https://nodemailer.com)'s transporters\n  instances in Fastify.\n- [`fastify-markdown`](https://github.com/freezestudio/fastify-markdown) Plugin\n  to markdown support.\n- [`fastify-method-override`](https://github.com/corsicanec82/fastify-method-override)\n  Plugin for Fastify, which allows the use of HTTP verbs, such as DELETE, PATCH,\n  HEAD, PUT, OPTIONS in case the client doesn't support them.\n- [`fastify-metrics`](https://gitlab.com/m03geek/fastify-metrics) Plugin for\n  exporting [Prometheus](https://prometheus.io) metrics.\n- [`fastify-minify`](https://github.com/Jelenkee/fastify-minify) Plugin for\n  minification and transformation of responses.\n- [`fastify-mongodb-sanitizer`](https://github.com/KlemenKozelj/fastify-mongodb-sanitizer)\n  Fastify plugin that sanitizes client input to prevent\n  potential MongoDB query injection attacks.\n- [`fastify-mongoose-api`](https://github.com/jeka-kiselyov/fastify-mongoose-api)\n  Fastify plugin to create REST API methods based on Mongoose MongoDB models.\n- [`fastify-mongoose-driver`](https://github.com/alex-ppg/fastify-mongoose)\n  Fastify Mongoose plugin that connects to a MongoDB via the Mongoose plugin\n  with support for Models.\n- [`fastify-mosquitto-dynsec`](https://github.com/LuizTakeda/fastify-mosquitto-dynsec)\n  Fastify plugin to manage Mosquitto Dynamic Security over MQTT.\n- [`fastify-mqtt`](https://github.com/love-lena/fastify-mqtt) Plugin to share\n  [mqtt](https://www.npmjs.com/package/mqtt) client across Fastify.\n- [`fastify-msgpack`](https://github.com/kenriortega/fastify-msgpack) Fastify\n  and MessagePack, together at last. Uses @msgpack/msgpack by default.\n- [`fastify-msgraph-webhook`](https://github.com/flower-of-the-bridges/fastify-msgraph-change-notifications-webhook)\n  to manage\n  [MS Graph Change Notifications webhooks](https://learn.microsoft.com/it-it/graph/change-notifications-delivery-webhooks?tabs=http).\n- [`fastify-multer`](https://github.com/fox1t/fastify-multer) Multer is a plugin\n  for handling multipart/form-data, which is primarily used for uploading files."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#44",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Request > fastify.RawRequestDefaultExpression\\<[RawServer][RawServerGeneric]\\>",
+    "text": "##### fastify.RawRequestDefaultExpression\\<[RawServer][RawServerGeneric]\\>\n[src](https://github.com/fastify/fastify/blob/main/types/utils.d.ts#L23)\n\nDependent on `@types/node` modules `http`, `https`, `http2`\n\nGeneric parameter `RawServer` defaults to [`RawServerDefault`][RawServerDefault]\n\nIf `RawServer` is of type `http.Server` or `https.Server`, then this expression\nreturns `http.IncomingMessage`, otherwise, it returns\n`http2.Http2ServerRequest`.\n\n```typescript\nimport http from 'node:http'\nimport http2 from 'node:http2'\nimport { RawRequestDefaultExpression } from 'fastify'\n\nRawRequestDefaultExpression<http.Server> // -> http.IncomingMessage\nRawRequestDefaultExpression<http2.Http2Server> // -> http2.Http2ServerRequest\n```\n\n---"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#47",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Reply > fastify.RawReplyDefaultExpression< [RawServer][RawServerGeneric]>",
+    "text": "##### fastify.RawReplyDefaultExpression< [RawServer][RawServerGeneric]>\n[src](https://github.com/fastify/fastify/blob/main/types/utils.d.ts#L27)\n\nDependent on `@types/node` modules `http`, `https`, `http2`\n\nGeneric parameter `RawServer` defaults to [`RawServerDefault`][RawServerDefault]\n\nIf `RawServer` is of type `http.Server` or `https.Server`, then this expression\nreturns `http.ServerResponse`, otherwise, it returns\n`http2.Http2ServerResponse`.\n\n```typescript\nimport http from 'node:http'\nimport http2 from 'node:http2'\nimport { RawReplyDefaultExpression } from 'fastify'\n\nRawReplyDefaultExpression<http.Server> // -> http.ServerResponse\nRawReplyDefaultExpression<http2.Http2Server> // -> http2.Http2ServerResponse\n```\n\n---"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#30",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Fastify > fastify< [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [Logger][LoggerGeneric]>(opts?: [FastifyServerOptions][FastifyServerOptions]): [FastifyInstance][FastifyInstance]",
+    "text": "##### fastify< [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [Logger][LoggerGeneric]>(opts?: [FastifyServerOptions][FastifyServerOptions]): [FastifyInstance][FastifyInstance]\n[src](https://github.com/fastify/fastify/blob/main/fastify.d.ts#L19)\n\nThe main Fastify API method. By default creates an HTTP server. Utilizing\ndiscriminant unions and overload methods, the type system will automatically\ninfer which type of server (http, https, or http2) is being created purely based\non the options based to the method (see the examples below for more\ninformation). It also supports an extensive generic type system to allow the\nuser to extend the underlying Node.js Server, Request, and Reply objects.\nAdditionally, the `Logger` generic exists for custom log types. See the examples\nand generic breakdown below for more information."
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#41",
+    "title": "docs/Guides/Serverless.md > Vercel",
+    "text": "## Vercel\n\n[Vercel](https://vercel.com) fully supports deploying Fastify applications.\nAdditionally, with Vercel's\n[Fluid compute](https://vercel.com/docs/fluid-compute), you can combine\nserver-like concurrency with the autoscaling properties of traditional\nserverless functions.\n\nGet started with the\n[Fastify template on Vercel](\nhttps://vercel.com/templates/backend/fastify-on-vercel).\n\n[Fluid compute](https://vercel.com/docs/fluid-compute) currently\nrequires an explicit opt-in. Learn more about enabling Fluid compute\n[here](\nhttps://vercel.com/docs/fluid-compute#enabling-fluid-compute)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#49",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Plugin > fastify.FastifyPluginCallback< [Options][FastifyPluginOptions]>",
+    "text": "##### fastify.FastifyPluginCallback< [Options][FastifyPluginOptions]>\n[src](https://github.com/fastify/fastify/blob/main/types/plugin.d.ts#L9)\n\nInterface method definition used within the\n[`fastify.register()`][FastifyRegister] method."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Server.md#73",
+    "action": "use",
+    "relevance_score": 0.9813,
+    "document_score": 0.9855,
+    "levels": {
+     "answers": 0.9813,
+     "elsewhere": 0.0042,
+     "different_case": 0.006,
+     "unrelated": 0.0085
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/TypeScript.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0055,
+    "document_score": 0.0344,
+    "levels": {
+     "answers": 0.0055,
+     "elsewhere": 0.0289,
+     "different_case": 0.0128,
+     "unrelated": 0.9528
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0051,
+    "document_score": 0.0189,
+    "levels": {
+     "answers": 0.0051,
+     "elsewhere": 0.0138,
+     "different_case": 0.0311,
+     "unrelated": 0.95
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/TypeScript.md#37",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0087,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0053,
+     "different_case": 0.0107,
+     "unrelated": 0.9806
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/TypeScript.md#38",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0032,
+    "document_score": 0.0082,
+    "levels": {
+     "answers": 0.0032,
+     "elsewhere": 0.005,
+     "different_case": 0.0061,
+     "unrelated": 0.9858
+    }
+   },
+   {
+    "index": 11,
+    "id": "fastify:docs/Reference/TypeScript.md#49",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0104,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0077,
+     "different_case": 0.0077,
+     "unrelated": 0.982
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/TypeScript.md#58",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0049,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0027,
+     "different_case": 0.0098,
+     "unrelated": 0.9852
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.007,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0049,
+     "different_case": 0.009,
+     "unrelated": 0.984
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/TypeScript.md#47",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0021,
+     "different_case": 0.0049,
+     "unrelated": 0.9911
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Guides/Ecosystem.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0039,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0022,
+     "different_case": 0.0075,
+     "unrelated": 0.9886
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/TypeScript.md#44",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0018,
+     "different_case": 0.0033,
+     "unrelated": 0.9933
+    }
+   },
+   {
+    "index": 10,
+    "id": "fastify:docs/Guides/Serverless.md#41",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0013,
+     "different_case": 0.0022,
+     "unrelated": 0.9951
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5636
+  },
+  "timing": {
+   "total_ms": 117,
+   "rerank_ms": 101,
+   "questions_ms": 0,
+   "model_ms": 88,
+   "engine": {
+    "rows": 6104,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 88,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 85,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 208
+   }
+  }
+ }
+}

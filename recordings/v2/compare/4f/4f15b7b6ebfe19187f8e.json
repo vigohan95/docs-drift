@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4f/4f15b7b6ebfe19187f8e",
+ "request_hash": "4f15b7b6ebfe19187f8e9be6ee5d926afdeb0167841bf8b2e80c50da1480256d",
+ "recorded_at": "2026-11-06T14:14:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 926,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.397697",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=235"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#1",
+    "text": "## Operation Buffering {#buffering}\n\nMongoose lets you start using your models immediately, without waiting for\nmongoose to establish a connection to MongoDB.\n\n```javascript\nmongoose.connect('mongodb://127.0.0.1:27017/myapp');\nconst MyModel = mongoose.model('Test', new Schema({ name: String }));\n// Works\nawait MyModel.findOne();\n```\n\nThat's because mongoose buffers model function calls internally. This\nbuffering is convenient, but also a common source of confusion. Mongoose\nwill *not* throw any errors by default if you use a model without\nconnecting.\n\n```javascript\nconst MyModel = mongoose.model('Test', new Schema({ name: String }));\nconst promise = MyModel.findOne();\n\nsetTimeout(function() {\n  mongoose.connect('mongodb://127.0.0.1:27017/myapp');\n}, 60000);\n\n// Will just hang until mongoose successfully connects\nawait promise;\n```\n\nTo disable buffering, turn off the [`bufferCommands` option on your schema](guide.html#bufferCommands).\nIf you have `bufferCommands` on and your connection is hanging, try turning\n`bufferCommands` off to see if you haven't opened a connection properly.\nYou can also disable `bufferCommands` globally:\n\n```javascript\nmongoose.set('bufferCommands', false);\n```\n\nNote that buffering is also responsible for waiting until Mongoose\ncreates collections if you use the [`autoCreate` option](guide.html#autoCreate).\nIf you disable buffering, you should also disable the `autoCreate`\noption and use [`createCollection()`](api/model.html#model_Model-createCollection)\nto create [capped collections](guide.html#capped) or\n[collections with collations](guide.html#collation).\n\n```javascript\nconst schema = new Schema({\n  name: String\n}, {\n  capped: { size: 1024 },\n  bufferCommands: false,\n  autoCreate: false // disable `autoCreate` since `bufferCommands` is false\n});\n\nconst Model = mongoose.model('Test', schema);\n// Explicitly create the collection before using it\n// so the collection is capped.\nawait Model.createCollection();\n```"
+   },
+   {
+    "id": "mongoose:docs/guide.md#42",
+    "text": "## option: timeseries {#timeseries}\n\nIf you set the `timeseries` option on a schema, Mongoose will create a [timeseries collection](https://www.mongodb.com/docs/manual/core/timeseries-collections/) for any model that you create from that schema.\n\n```javascript\nconst schema = Schema({ name: String, timestamp: Date, metadata: Object }, {\n  timeseries: {\n    timeField: 'timestamp',\n    metaField: 'metadata',\n    granularity: 'hours'\n  },\n  autoCreate: false,\n  expireAfterSeconds: 86400\n});\n\n// `Test` collection will be a timeseries collection\nconst Test = db.model('Test', schema);\n// Explicitly create the collection if `autoCreate` is false. You need to\n// create the collection before using it - if you insert a document before\n// creating the collection, MongoDB will create a normal collection without\n// timeseries.\nawait Test.createCollection();\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/guide.md#42",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/connections.md#1",
+    "b": "mongoose:docs/guide.md#42",
+    "relation": "overlapping",
+    "related": 0.9784,
+    "probabilities": {
+     "same": 0.0131,
+     "overlapping": 0.9584,
+     "conflicting": 0.0068,
+     "unrelated": 0.0216
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 66,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 100,
+   "total_ms": 103
+  }
+ }
+}

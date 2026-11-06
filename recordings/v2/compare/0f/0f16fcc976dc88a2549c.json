@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0f/0f16fcc976dc88a2549c",
+ "request_hash": "0f16fcc976dc88a2549c851eca890b66ed1855feb8af9ffba5234876288e1b5d",
+ "recorded_at": "2026-11-06T14:14:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 834,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.475136",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=13,cfOrigin;dur=0,cfWorker;dur=158"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/4-pagination.md#6",
+    "text": "### `pagination`\n\n**Type: `object`**\\\n**Default:**\n\n```js\n{\n\ttransform: (response: Response) => {\n\t\tif (response.request.options.responseType === 'json') {\n\t\t\treturn response.body;\n\t\t}\n\n\t\tconst body = response.request.options.responseType === 'buffer'\n\t\t\t? decodeUint8Array(response.body as Uint8Array, response.request.options.encoding)\n\t\t\t: response.body as string;\n\n\t\treturn response.request.options.parseJson(body);\n\t},\n\tpaginate: ({response}) => {\n\t\tconst rawLinkHeader = response.headers.link;\n\t\tif (typeof rawLinkHeader !== 'string' || rawLinkHeader.trim() === '') {\n\t\t\treturn false;\n\t\t}\n\n\t\tconst parsed = parseLinkHeader(rawLinkHeader);\n\t\tconst next = parsed.find(entry => !Object.hasOwn(entry.parameters, 'anchor') && entry.parameters.rel?.replaceAll('\"', '').toLowerCase().split(/\\s+/v).includes('next'));\n\n\t\tif (next) {\n\t\t\treturn {\n\t\t\t\turl: next.reference\n\t\t\t};\n\t\t}\n\n\t\treturn false;\n\t},\n\tfilter: () => true,\n\tshouldContinue: () => true,\n\tcountLimit: Number.POSITIVE_INFINITY,\n\tbackoff: 0,\n\trequestLimit: 10_000,\n\tstackAllItems: false\n}\n```\n\nThis option represents the `pagination` object.\n\nThe default `paginate` uses the exported [`parseLinkHeader(…)`](#parselinkheaderlink) helper."
+   },
+   {
+    "id": "got:documentation/7-retry.md#2",
+    "text": "### `retry`\n\n**Type: `object`**\\\n**Default:**\n\n```js\n{\n\tlimit: 2,\n\tmethods: [\n\t\t'GET',\n\t\t'PUT',\n\t\t'HEAD',\n\t\t'DELETE',\n\t\t'OPTIONS',\n\t\t'TRACE',\n\t\t'QUERY'\n\t],\n\tstatusCodes: [\n\t\t408,\n\t\t413,\n\t\t429,\n\t\t500,\n\t\t502,\n\t\t503,\n\t\t504,\n\t\t521,\n\t\t522,\n\t\t524\n\t],\n\terrorCodes: [\n\t\t'ETIMEDOUT',\n\t\t'ECONNRESET',\n\t\t'EADDRINUSE',\n\t\t'ECONNREFUSED',\n\t\t'EPIPE',\n\t\t'ENOTFOUND',\n\t\t'ENETUNREACH',\n\t\t'EAI_AGAIN'\n\t],\n\tmaxRetryAfter: undefined,\n\tcalculateDelay: ({computedValue}) => computedValue,\n\tbackoffLimit: Number.POSITIVE_INFINITY,\n\tnoise: 100,\n\tenforceRetryRules: true\n}\n```\n\nThis option represents the `retry` object.\n\n`enforceRetryRules` decides whether the limits above are applied before `calculateDelay` runs. See [`calculateDelay`](#calculatedelay).\n\nUndefined settings preserve inherited values, except `maxRetryAfter`, where `undefined` restores the request timeout fallback."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/4-pagination.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/7-retry.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/4-pagination.md#6",
+    "b": "got:documentation/7-retry.md#2",
+    "relation": "unrelated",
+    "related": 0.0042,
+    "probabilities": {
+     "same": 0.0016,
+     "overlapping": 0.0015,
+     "conflicting": 0.0012,
+     "unrelated": 0.9958
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 35
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f3/f3b75cdb8d9c11939622",
+ "request_hash": "f3b75cdb8d9c1193962239d85cdd9c7a6be04d9c230231c9f6a07546afd121e1",
+ "recorded_at": "2026-11-06T14:20:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2061,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "95.753153",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=215"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/config/resolvesnapshotpath.md#1",
+    "text": "# resolveSnapshotPath <CRoot />\n\n- **Type:** `(testPath: string, snapExtension: string, context: { config: SerializedConfig }) => string`\n- **Default:** stores snapshot files in `__snapshots__` directory\n\nOverrides default snapshot path. For example, to store snapshots next to test files:\n\n```ts\nimport { defineConfig } from 'vitest/config'\n\nexport default defineConfig({\n  test: {\n    resolveSnapshotPath: (testPath, snapExtension) => testPath + snapExtension,\n  },\n})\n```\n\nYou can also use the `context` parameter to access the project's serialized config. This is useful when you have multiple [projects](/guide/projects) and want to store snapshots in different locations based on the project name:\n\n```ts\nimport { basename, dirname, join } from 'node:path'\nimport { defineConfig } from 'vitest/config'\n\nexport default defineConfig({\n  test: {\n    resolveSnapshotPath(testPath, snapExtension, context) {\n      return join(\n        dirname(testPath),\n        '__snapshots__',\n        context.config.name ?? 'default',\n        basename(testPath) + snapExtension,\n      )\n    },\n  },\n})\n```"
+   },
+   {
+    "id": "vitest:docs/guide/learn/snapshots.md#2",
+    "text": "## Your First Snapshot\n\nTo create a snapshot test, pass a value to [`toMatchSnapshot()`](/api/expect#tomatchsnapshot):\n\n```js\nimport { expect, test } from 'vitest'\n\nfunction generateGreeting(name) {\n  return {\n    message: `Hello, ${name}!`,\n    timestamp: null,\n    version: 2,\n  }\n}\n\ntest('generates a greeting', () => {\n  expect(generateGreeting('Alice')).toMatchSnapshot()\n})\n```\n\nThe first time you run this test, there's no existing snapshot to compare against, so Vitest creates one. It stores the snapshot in a `__snapshots__` directory next to your test file:\n\n```\n__snapshots__/\n  example.test.js.snap\n```\n\nIf you open that file, you'll see a serialized representation of the value:\n\n```js\nexports['generates a greeting 1'] = `\n{\n  \"message\": \"Hello, Alice!\",\n  \"timestamp\": null,\n  \"version\": 2,\n}\n`\n```\n\nFrom now on, every time you run this test, Vitest serializes the output of `generateGreeting('Alice')` and compares it character-by-character against this stored snapshot. If the output changes (say, someone modifies the message format or bumps the version number), the test fails and shows a clear diff of what changed.\n\n::: tip\nCommit your snapshot files to version control. They serve as a record of the expected output and should be reviewed in code review just like any other test assertion.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/config/resolvesnapshotpath.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/learn/snapshots.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/config/resolvesnapshotpath.md#1",
+    "b": "vitest:docs/guide/learn/snapshots.md#2",
+    "relation": "overlapping",
+    "related": 0.9955,
+    "probabilities": {
+     "same": 0.013,
+     "overlapping": 0.9763,
+     "conflicting": 0.0063,
+     "unrelated": 0.0045
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 74,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 105,
+   "total_ms": 108
+  }
+ }
+}

@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/00/0004c4a1ab7d4eec7bc9",
+ "request_hash": "0004c4a1ab7d4eec7bc974bb4c010a74858197c87f13ced3b15a58a192715e97",
+ "recorded_at": "2026-11-06T14:14:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1263,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "136.261406",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=462"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/2-options.md#9",
+    "text": "### `allowAbsoluteUrls`\n\n**Type: `boolean`**\\\n**Default: `true`**\n\nAllow absolute URLs to bypass `prefixUrl`.\n\nWhen set to `false` with `prefixUrl`, passing an absolute URL will throw. This also rejects scheme-relative URL strings like `//example.com/path` in retry and pagination URL overrides. Use this when untrusted URL input must stay on the same origin as the configured `prefixUrl`. This is not a path sandbox: relative paths like `../other` still follow standard URL resolution on the same origin.\n\n```js\nimport got from 'got';\n\nconst client = got.extend({\n\tprefixUrl: 'https://api.example.com',\n\tallowAbsoluteUrls: false,\n\theaders: {\n\t\t'x-api-key': process.env.API_KEY\n\t}\n});\n\nawait client('users/1');\n// Requests https://api.example.com/users/1\n\nawait client('https://attacker.example');\n// Throws\n```\n\nSet `prefixUrl` to an empty string for a request that intentionally needs an absolute URL:\n\n```js\nawait client('https://trusted.example', {prefixUrl: ''});\n```\n\n> [!NOTE]\n> This guards the `url` you pass. It does not block cross-origin redirects issued by the server, though inherited sensitive headers are still stripped when a redirect changes origin.\n\n> [!NOTE]\n> The check is defeated if the same hook or `pagination.paginate(…)` return also sets `prefixUrl` or `allowAbsoluteUrls`. Do not populate those options from untrusted data."
+   },
+   {
+    "id": "got:documentation/migration-guides/axios.md#5",
+    "text": "#### Changes in behavior\n\n- `transformRequest` → [`hooks.beforeRequest`](../9-hooks.md#beforerequest)\n  - The API is different.\n- `transformResponse` → [`hooks.afterResponse`](../9-hooks.md#afterresponse)\n  - The API is different.\n- `baseUrl` → [`prefixUrl`](../2-options.md#prefixurl)\n  - The `prefixUrl` is prepended to relative string input. Absolute URLs bypass `prefixUrl` by default. Use [`allowAbsoluteUrls: false`](../2-options.md#allowabsoluteurls) to reject absolute URLs when `prefixUrl` is set.\n- [`timeout`](../6-timeout.md)\n  - This option is now an object. You can now set timeouts on particular events!\n- [`responseType`](../2-options.md#responsetype)\n  - Accepts `'text'`, `'json'` or `'buffer'`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/2-options.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "got:documentation/migration-guides/axios.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/migration-guides/axios.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "got:documentation/2-options.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/2-options.md#9",
+    "b": "got:documentation/migration-guides/axios.md#5",
+    "relation": "overlapping",
+    "related": 0.9975,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9874,
+     "conflicting": 0.0037,
+     "unrelated": 0.0025
+    },
+    "duplicates": [
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.0257,
+       "restated": 0.2317,
+       "elaborated": 0.7198,
+       "different": 0.0228
+      },
+      "confidence": 0.9772,
+      "a": {
+       "document": "got:documentation/2-options.md#9",
+       "quote": "Allow absolute URLs to bypass `prefixUrl`.",
+       "start": 67,
+       "end": 109,
+       "confidence": 1
+      },
+      "b": {
+       "document": "got:documentation/migration-guides/axios.md#5",
+       "quote": "Absolute URLs bypass `prefixUrl` by default.",
+       "start": 345,
+       "end": 389,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.0163,
+       "restated": 0.2956,
+       "elaborated": 0.5866,
+       "different": 0.1015
+      },
+      "confidence": 0.8985,
+      "a": {
+       "document": "got:documentation/2-options.md#9",
+       "quote": "When set to `false` with `prefixUrl`, passing an absolute URL will throw.",
+       "start": 111,
+       "end": 184,
+       "confidence": 1
+      },
+      "b": {
+       "document": "got:documentation/migration-guides/axios.md#5",
+       "quote": "Use [`allowAbsoluteUrls: false`](../2-options.md#allowabsoluteurls) to reject absolute URLs when `prefixUrl` is set.\n- [`timeout`](../6-timeout.md)\n  - This option is now an object.",
+       "start": 390,
+       "end": 571,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 74,
+   "passage_reads": 1,
+   "passages_ms": 129,
+   "passages": 2,
+   "counterparts_ms": 59
+  },
+  "timing": {
+   "read_ms": 261,
+   "total_ms": 265
+  }
+ }
+}

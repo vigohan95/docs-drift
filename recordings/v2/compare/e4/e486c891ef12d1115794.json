@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e4/e486c891ef12d1115794",
+ "request_hash": "e486c891ef12d11157949c80eb56a1f46c6929740e2fa3e01f4ccb5cc949847b",
+ "recorded_at": "2026-11-06T14:15:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 926,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "38.039041",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=206"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#4",
+    "text": "## Configuring TypeScript\n\nWe will use the following TypeScript config, so create the `tsconfig.json` file and copy it there. If you know what you are doing, you can adjust the configuration to fit your needs.\n\nFor ESM support to work, we need to set `module` and `moduleResolution` to `NodeNext` and target `ES2024`. We also enable `strict` mode. Lastly, we tell TypeScript to compile into `dist` folder via `outDir` and make it `include` all `*.ts` files inside `src` folder.\n\n```json title='tsconfig.json'\n{\n  \"compilerOptions\": {\n    \"module\": \"NodeNext\",\n    \"moduleResolution\": \"NodeNext\",\n    \"target\": \"ES2024\",\n    \"strict\": true,\n    \"outDir\": \"dist\"\n  },\n  \"include\": [\n    \"./src/**/*.ts\"\n  ]\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-first-guide.md#46",
+    "text": "But we did add `emitDecoratorMetadata` in our `tsconfig.json`, right? Yes, but vitest uses ESBuild to transpile the sources, and ESBuild doesn’t support this out of the box. There are several solutions to this problem. We may either\n\n1. Use `@mikro-orm/reflection` to analyze the sources in a different fashion that doesn't rely on `emitDecoratorMetadata`.\n2. Swap out ESBuild for SWC, and [configure SWC to support decorators](./usage-with-transpilers.md#swc).\n3. Install `@anatine/esbuild-decorators` and add it to the vitest config.\n4. Adjust the entity generator to always output the \"type\" property, thus bypassing the need to infer the type in the first place.\n\nOption 1 is what the \"code first\" guide does, and that is a great solution if you are writing the entity definitions manually. Options 2 and 3 are a different alternative you may go for if you need `emitDecoratorMetadata` for other purposes as well. For this guide, we'll go with option 4, because it is the easiest to do.\n\nAdd to your config\n\n```ts title='src/mikro-orm.config.ts'\n  entityGenerator: {\n    scalarTypeInDecorator: true,\n    // rest of entity generator config\n  }\n```\n\nand regenerate the entities. You can now run the test without an error. You may also remove `emitDecoratorMetadata` from `tsconfig.json` at this point, unless you need it for another library."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-first-guide.md#46",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#4",
+    "b": "mikro-orm:docs/docs/schema-first-guide.md#46",
+    "relation": "unrelated",
+    "related": 0.1961,
+    "probabilities": {
+     "same": 0.022,
+     "overlapping": 0.1613,
+     "conflicting": 0.0127,
+     "unrelated": 0.8039
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 46
+  },
+  "timing": {
+   "read_ms": 45,
+   "total_ms": 48
+  }
+ }
+}

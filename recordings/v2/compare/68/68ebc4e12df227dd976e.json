@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/68/68ebc4e12df227dd976e",
+ "request_hash": "68ebc4e12df227dd976e8c957c7cbd5e659fb104f78c48174bd8e5dd938f3767",
+ "recorded_at": "2026-11-06T14:11:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 987,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "128.221954",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=270"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "text": "### Remove support for DELETE with a `Content-Type: application/json` header and an empty body\n\nIn v4, Fastify allowed `DELETE` requests with a `Content-Type: application/json`\nheader and an empty body was accepted.\nThis is no longer allowed in v5.\n\nSee [#5419](https://github.com/fastify/fastify/pull/5419) for more information."
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "text": "Note that for `GET` and `HEAD` requests, the payload is never parsed. For\n`OPTIONS` and `DELETE` requests, the payload is parsed only if a valid\n`content-type` header is provided. Unlike `POST`, `PUT`, and `PATCH`, the\n[catch-all](#catch-all) parser is not executed, and the payload is simply not\nparsed.\n\n> ⚠ Warning:\n> When using regular expressions to detect `Content-Type`, it is important to\n> ensure proper detection. For example, to match `application/*`, use\n> `/^application\\/([\\w-]+);?/` to match the\n> [essence MIME type](https://mimesniff.spec.whatwg.org/#mime-type-miscellaneous)\n> only.\n>\n> Additionally, if the route uses per-content-type body validation via\n> `schema.body.content`, the schema is selected by an **exact match** on the\n> essence MIME type, not by the parser's regex. A regex parser that accepts\n> content types with no matching key in the `content` schema map will result\n> in those requests **not being validated**. Ensure every content type matched\n> by the regex has a corresponding entry in the schema's `content` map. See\n> [Validation and Serialization](./Validation-and-Serialization.md) for details.\n\n> ℹ️ Note:\n> Fastify validates the request's `Content-Type` header before selecting a body\n> parser. String, `RegExp`, and [catch-all](#catch-all) parsers therefore will\n> never handle an invalid header. An `onRequest` hook can rewrite a malformed\n> header prior to validation:\n>\n> ```js\n> fastify.addHook('onRequest', async function rewriteContentType (request) {\n>   if (request.headers['content-type'] === 'application/json,application/json') {\n>     request.headers['content-type'] = 'application/json'\n>   }\n> })\n> ```\n>\n> Apply only unambiguous rewrites and reject other malformed values. An invalid\n> media type can select a different body parser or `schema.body.content`\n> validation schema. Rewrite the header before accessing `request.mediaType`,\n> which parses and caches the current value."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#20",
+    "b": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "relation": "overlapping",
+    "related": 0.9799,
+    "probabilities": {
+     "same": 0.0091,
+     "overlapping": 0.9544,
+     "conflicting": 0.0164,
+     "unrelated": 0.0201
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 109,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 139,
+   "total_ms": 141
+  }
+ }
+}

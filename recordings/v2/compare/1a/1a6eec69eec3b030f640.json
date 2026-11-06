@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1a/1a6eec69eec3b030f640",
+ "request_hash": "1a6eec69eec3b030f640c9704a7adbfbb2920e8675ebcbf9e3ce1e9578442431",
+ "recorded_at": "2026-11-06T14:15:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 874,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.020128",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=13,cfOrigin;dur=0,cfWorker;dur=156"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#20",
+    "text": "## Initializing nullable properties to `null`\n\nBy default, nullable properties that are not provided in `em.create()` data remain `undefined` on the entity object. This can lead to a mismatch between the runtime value (`undefined`) and what the database returns after loading (`null`).\n\nWith `initNullableProperties` enabled, nullable properties are initialized to `null` (or `undefined` when `forceUndefined` is set) during `em.create()`. Properties with explicit `default`, `defaultRaw`, or `onCreate` are not affected.\n\n```ts\nMikroORM.init({\n  initNullableProperties: true,\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#6",
+    "text": "#### Via `extends` with property initializers {#extends-initializers}\n\nWhen using the `defineEntity + class` pattern with `extends`, the auto-generated class inherits from the parent class at the JavaScript level. This means property initializers defined on the base class (like `id = v4()` or `createdAt = new Date()`) run automatically when constructing child entities via `new`:\n\n```ts\nconst BaseSchema = defineEntity({\n  name: 'BaseEntity',\n  abstract: true,\n  properties: {\n    id: p.string().primary(),\n    createdAt: p.datetime(),\n    updatedAt: p.datetime(),\n  },\n});\n\nexport class Base extends BaseSchema.class {\n  id = v4();\n  createdAt = new Date();\n  updatedAt = new Date();\n}\n\nBaseSchema.setClass(Base);\n\nconst UserSchema = defineEntity({\n  name: 'User',\n  extends: BaseSchema,\n  properties: {\n    email: p.string().unique(),\n    name: p.string(),\n  },\n});\n\nexport class User extends UserSchema.class {\n  name = '';\n}\n\nUserSchema.setClass(User);\n\n// id, createdAt, updatedAt are initialized from Base's property initializers\nconst user = new User();\nconsole.log(user.id); // a UUID string\nconsole.log(user.createdAt); // current Date\n```\n\n> This approach is useful when you want constructor-level defaults that work without an `EntityManager` context (i.e., with plain `new`). If you only need defaults during persistence, you can use `onCreate` hooks instead — see [Mapped Superclasses](./inheritance-mapping.md#mapped-superclasses) for more details."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#20",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/configuration.md#20",
+    "b": "mikro-orm:docs/docs/define-entity.md#6",
+    "relation": "unrelated",
+    "related": 0.0077,
+    "probabilities": {
+     "same": 0.0028,
+     "overlapping": 0.0025,
+     "conflicting": 0.0024,
+     "unrelated": 0.9923
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27
+  },
+  "timing": {
+   "read_ms": 27,
+   "total_ms": 29
+  }
+ }
+}

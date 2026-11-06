@@ -1,0 +1,100 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/75/75a8b804d35068565335",
+ "request_hash": "75a8b804d350685653351ae481d49b05d92a29d0e626d6ef193fbc307536e7e0",
+ "recorded_at": "2026-11-06T14:16:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1633,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "117.37318",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=30,cfOrigin;dur=0,cfWorker;dur=253"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "text": "### Persist and Flush\n\nThere are 2 methods we should first describe to understand how persisting works in MikroORM: [`em.persist()`](/api/core/class/EntityManager#persist) and [`em.flush()`](/api/core/class/EntityManager#flush).\n\n[`em.persist(entity)`](/api/core/class/EntityManager#persist) is used to mark new entities for future persisting. It will make the entity managed by the [`EntityManager`](/api/core/class/EntityManager) and once `flush` will be called, it will be written to the database.\n\nWe use [`em.create()`](/api/core/class/EntityManager#create) to create entity instances.\n\n```ts\n// create a new user entity instance\nconst user = em.create(UserSchema, {\n  email: 'foo@bar.com',\n  fullName: 'Foo Bar',\n  password: '123456',\n});\n\n// em.create() automatically calls persist(), so we just need to flush\nawait em.flush();\n\n// alternatively, you can persist manually:\nconst user2 = em.create(UserSchema, { ... }, { persist: false });\nem.persist(user2);\nawait em.flush();\n```\n\nTo understand `flush`, let's first define what managed entity is: An entity is managed if it's fetched from the database (via [`em.find()`](/api/core/class/EntityManager#find)) or registered as new through [`em.persist()`](/api/core/class/EntityManager#persist) and flushed later (only after the `flush` it becomes managed).\n\n[`em.flush()`](/api/core/class/EntityManager#flush) will go through all managed entities, compute appropriate change sets and perform according database queries. As an entity loaded from the database becomes managed\nautomatically, you do not have to call persist on those, and flush is enough to update them."
+   }
+  ],
+  "answer": "Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity. Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`. Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`.",
+  "claims": [
+   "Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity.",
+   "Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`. Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0023,
+  "ungrounded": 0.9977,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+    "share": 0,
+    "share_of_answer": 0.0023,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4497,
+    "supported": 0.0016,
+    "contradicted": 0.0021,
+    "not_stated": 0.9934,
+    "not_a_claim": 0.0029,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/guide/01-first-entity.md#12": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`. Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5503,
+    "supported": 0.003,
+    "contradicted": 0.0119,
+    "not_stated": 0.9791,
+    "not_a_claim": 0.006,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/guide/01-first-entity.md#12": 1
+    },
+    "source": null,
+    "evidence": {
+     "document": "mikro-orm:docs/docs/guide/01-first-entity.md#12",
+     "quote": "em.flush()`](/api/core/class/EntityManager#flush) will go through all managed entities, compute appropriate change sets and perform according database queries.",
+     "start": 1316,
+     "end": 1475,
+     "confidence": 0.559
+    }
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0016
+  },
+  "timing": {
+   "read_ms": 125,
+   "total_ms": 127
+  }
+ }
+}

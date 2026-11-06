@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/99/99d4731214e0bceb287e",
+ "request_hash": "99d4731214e0bceb287eac7250013ef6fc3281393b20d0873aeaccfacf698c2f",
+ "recorded_at": "2026-11-06T14:12:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 893,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "76.923391",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=210"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#31",
+    "text": "### Creating a many-to-many relation\n\nLet's create a many-to-many relation.\nLet's say a photo can be in many albums, and each album can contain many photos.\nLet's create an `Album` class:\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\n\n@Entity()\nexport class Album {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @ManyToMany(() => Photo, (photo) => photo.albums)\n    @JoinTable()\n    photos: Photo[]\n}\n```\n\n`@JoinTable` is required to specify that this is the owner side of the relationship.\n\nNow let's add the inverse side of our relation to the `Photo` class:\n\n```typescript\nexport class Photo {\n    // ... other columns\n\n    @ManyToMany(() => Album, (album) => album.photos)\n    albums: Album[]\n}\n```\n\nAfter you run the application, the ORM will create an **album_photos_photo_albums** _junction table_:\n\n```text\n+-------------+--------------+----------------------------+\n|                album_photos_photo_albums                |\n+-------------+--------------+----------------------------+\n| album_id    | int          | PRIMARY KEY FOREIGN KEY    |\n| photo_id    | int          | PRIMARY KEY FOREIGN KEY    |\n+-------------+--------------+----------------------------+\n```\n\nRemember to register the `Album` class with your connection in the ORM:"
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#19",
+    "text": "#### `@JoinTable`\n\nUsed for `many-to-many` relations and describes join columns of the \"junction\" table.\nJunction table is a special, separate table created automatically by TypeORM with columns referenced to the related entities.\nYou can change the name of the generated \"junction\" table, the column names inside the junction table, their referenced\ncolumns with the `joinColumn`- and `inverseJoinColumn` attributes, and the created foreign keys names.\nYou can also set parameter `synchronize` to false to skip schema update(same way as in @Entity)\n\nExample:\n\n```typescript\n@Entity()\nexport class Post {\n    @ManyToMany((type) => Category)\n    @JoinTable({\n        name: \"question_categories\",\n        joinColumn: {\n            name: \"question\",\n            referencedColumnName: \"id\",\n            foreignKeyConstraintName: \"fk_question_categories_questionId\",\n        },\n        inverseJoinColumn: {\n            name: \"category\",\n            referencedColumnName: \"id\",\n            foreignKeyConstraintName: \"fk_question_categories_categoryId\",\n        },\n        synchronize: false,\n    })\n    categories: Category[]\n}\n```\n\nIf the destination table has composite primary keys,\nthen an array of properties must be sent to the `@JoinTable` decorator."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/help/3-decorator-reference.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/getting-started.md#31",
+    "b": "typeorm:docs/docs/help/3-decorator-reference.md#19",
+    "relation": "overlapping",
+    "related": 0.9982,
+    "probabilities": {
+     "same": 0.0052,
+     "overlapping": 0.9901,
+     "conflicting": 0.0029,
+     "unrelated": 0.0018
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 56,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 87,
+   "total_ms": 90
+  }
+ }
+}

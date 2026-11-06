@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ba/baa77bef9f87bebf0695",
+ "request_hash": "baa77bef9f87bebf069527e3eade54b82d6094f1fa42a8c563dc7d47c138b04a",
+ "recorded_at": "2026-11-06T14:21:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2054,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "110.435104",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=293"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "text": "#### Within Each Test File\n\nThe execution follows this order:\n\n1. **File-level code:** All code outside `describe` blocks runs immediately\n2. **Test collection:** `describe` blocks are processed, and tests are registered as side effects of importing the test file\n3. **[`aroundAll`](/api/hooks#aroundall) hooks:** Wrap around all tests in the suite (must call `runSuite()`)\n4. **[`beforeAll`](/api/hooks#beforeall) hooks:** Run once before any tests in the suite\n5. **For each test:**\n   - [`aroundEach`](/api/hooks#aroundeach) hooks wrap around the test (must call `runTest()`)\n   - `beforeEach` hooks execute (in order defined, or based on [`sequence.hooks`](/config/sequence#sequence-hooks))\n   - Test function executes\n   - `afterEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - Cleanup functions returned from `beforeEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - [`onTestFinished`](/api/hooks#ontestfinished) callbacks run (always in reverse order)\n   - If test failed: [`onTestFailed`](/api/hooks#ontestfailed) callbacks run\n   - Note: if `repeats` or `retry` are set, all of these steps are executed again\n6. **[`afterAll`](/api/hooks#afterall) hooks:** Run once after all tests in the suite complete\n7. **Cleanup functions returned from `beforeAll` hooks:** Run once after all tests in the suite complete"
+   },
+   {
+    "id": "vitest:docs/guide/test-context.md#35",
+    "text": "#### Suite-Level Hooks with Fixtures <Version>4.1.0</Version> {#suite-level-hooks}\n\nThe extended `test` object also provides [`beforeAll`](/api/hooks#beforeall), [`afterAll`](/api/hooks#afterall), and [`aroundAll`](/api/hooks#aroundall) hooks that can access file-scoped and worker-scoped fixtures:\n\n```ts\nconst test = baseTest\n  .extend('config', { scope: 'file' }, () => loadConfig())\n  .extend('database', { scope: 'file' }, async ({ config }, { onCleanup }) => {\n    const db = await createDatabase(config)\n    onCleanup(() => db.close())\n    return db\n  })\n\n// Access file-scoped fixtures in suite-level hooks\ntest.aroundAll(async (runSuite, { database }) => {\n  await database.transaction(runSuite)\n})\n\ntest.beforeAll(async ({ database }) => {\n  await database.createUsers()\n})\n\ntest.afterAll(async ({ database }) => {\n  await database.removeUsers()\n})\n```\n\n::: warning IMPORTANT\nSuite-level hooks (`beforeAll`, `afterAll`, `aroundAll`) **must be called on the `test` object returned from `test.extend()`** to have access to the extended fixtures. Using the global `beforeAll`/`afterAll`/`aroundAll` functions will not have access to your custom fixtures:\n\n```ts\nimport { test as baseTest, beforeAll } from 'vitest'\n\nconst test = baseTest\n  .extend('database', { scope: 'file' }, async ({}, { onCleanup }) => {\n    const db = await createDatabase()\n    onCleanup(() => db.close())\n    return db\n  })\n\n// ❌ WRONG: Global beforeAll doesn't have access to 'database'\nbeforeAll(({ database }) => {\n  // Error: 'database' is undefined\n})\n\n// ✅ CORRECT: Use test.beforeAll to access fixtures\ntest.beforeAll(({ database }) => {\n  // 'database' is available\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/test-context.md#35",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/lifecycle.md#9",
+    "b": "vitest:docs/guide/test-context.md#35",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.0135,
+     "overlapping": 0.9783,
+     "conflicting": 0.0041,
+     "unrelated": 0.0042
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 118,
+   "total_ms": 121
+  }
+ }
+}

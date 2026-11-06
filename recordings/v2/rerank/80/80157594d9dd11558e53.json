@@ -1,0 +1,282 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/80/80157594d9dd11558e53",
+ "request_hash": "80157594d9dd11558e53f6512caf53938c68016e6f3992d2f463500a2b5f6b77",
+ "recorded_at": "2026-11-06T14:11:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1281,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "119.238495",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=162,cfOrigin;dur=0,cfWorker;dur=343"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) In the [preParsing](#preparsing) hook, `request.body` will always be `undefined`, because the body parsing happens before the [preValidation](#prevalidation) hook. (2) The previous hook was `onRequest`, the next hook will be `preValidation`. Notice: in the `preParsing` hook, request.body will always be null, because the body parsing happens before the `preValidation` hook. Notice: you should also add `receivedEncodedLength` property to the returned stream.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#72",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.onRequestHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void",
+    "text": "##### fastify.onRequestHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L17)\n\n`onRequest` is the first hook to be executed in the request lifecycle. There was\nno previous hook, the next hook will be `preParsing`.\n\nNotice: in the `onRequest` hook, request.body will always be null, because the\nbody parsing happens before the `preHandler` hook."
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#2",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > onRequest",
+    "text": "### onRequest\n```js\nfastify.addHook('onRequest', (request, reply, done) => {\n  // Some code\n  done()\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('onRequest', async (request, reply) => {\n  // Some code\n  await asyncMethod()\n})\n```\n\n> ℹ️ Note:\n> In the [onRequest](#onrequest) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "title": "docs/Guides/Migration-Guide-V3.md > V3 Migration Guide > Breaking changes > Changed preParsing hook behavior ([#2286](https://github.com/fastify/fastify/pull/2286))",
+    "text": "### Changed preParsing hook behavior ([#2286](https://github.com/fastify/fastify/pull/2286))\n\nFrom Fastify v3, the behavior of the `preParsing` hook will change slightly\nto support request payload manipulation.\n\nThe hook now takes an additional argument, `payload`, and therefore the new hook\nsignature is `fn(request, reply, payload, done)` or `async fn(request, reply,\npayload)`.\n\nThe hook can optionally return a new stream via `done(null, stream)` or\nreturning the stream in case of async functions.\n\nIf the hook returns a new stream, it will be used instead of the original one in\nsubsequent hooks. A sample use case for this is handling compressed requests.\n\nThe new stream should add the `receivedEncodedLength` property to the stream\nthat should reflect the actual data size received from the client. For instance,\nin a compressed request it should be the size of the compressed payload. This\nproperty can (and should) be dynamically updated during `data` events.\n\nThe old syntax of Fastify v2 without payload is supported but it is deprecated."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#74",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.preValidationHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void",
+    "text": "##### fastify.preValidationHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L53)\n\n`preValidation` is the third hook to be executed in the request lifecycle. The\nprevious hook was `preParsing`, the next hook will be `preHandler`."
+   },
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#0",
+    "title": "docs/Reference/Lifecycle.md > Lifecycle",
+    "text": "## Lifecycle\n<a id=\"lifecycle\"></a>\n\nThis diagram shows the internal lifecycle of Fastify.\n\nThe right branch of each section shows the next phase of the lifecycle. The left\nbranch shows the corresponding error code generated if the parent throws an\nerror. All errors are automatically handled by Fastify.\n\n```\nIncoming Request\n  │\n  └─▶ Routing\n        │\n        └─▶ Instance Logger\n             │\n   4**/5** ◀─┴─▶ onRequest Hook\n                  │\n        4**/5** ◀─┴─▶ preParsing Hook\n                        │\n              4**/5** ◀─┴─▶ Parsing\n                             │\n                   4**/5** ◀─┴─▶ preValidation Hook\n                                  │\n                            400 ◀─┴─▶ Validation\n                                        │\n                              4**/5** ◀─┴─▶ preHandler Hook\n                                              │\n                                    4**/5** ◀─┴─▶ User Handler\n                                                    │\n                                                    └─▶ Reply\n                                                          │\n                                                4**/5** ◀─┴─▶ preSerialization Hook\n                                                                │\n                                                                └─▶ onSend Hook\n                                                                      │\n                                                            4**/5** ◀─┴─▶ Outgoing Response\n                                                                            │\n                                                                            └─▶ onResponse Hook\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#76",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.preSerializationHookHandler< PreSerializationPayload, [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], payload: PreSerializationPayload, done: (err: [FastifyError][FastifyError] | null, re",
+    "text": "##### fastify.preSerializationHookHandler< PreSerializationPayload, [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], payload: PreSerializationPayload, done: (err: [FastifyError][FastifyError] | null, res?: unknown) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L94)\n\n`preSerialization` is the fifth hook to be executed in the request lifecycle.\nThe previous hook was `preHandler`, the next hook will be `onSend`.\n\n> ℹ️ Note:\n> The hook is NOT called if the payload is a string, a Buffer,\n> a stream, or null."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#77",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.onSendHookHandler< OnSendPayload, [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], payload: OnSendPayload, done: (err: [FastifyError][FastifyError] | null, res?: unknown) => void): Promise",
+    "text": "##### fastify.onSendHookHandler< OnSendPayload, [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], payload: OnSendPayload, done: (err: [FastifyError][FastifyError] | null, res?: unknown) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L114)\n\nYou can change the payload with the `onSend` hook. It is the sixth hook to be\nexecuted in the request lifecycle. The previous hook was `preSerialization`, the\nnext hook will be `onResponse`.\n\n> ℹ️ Note:\n>  If you change the payload, you may only change it to a string,\n> a Buffer, a stream, or null."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#75",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.preHandlerHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void",
+    "text": "##### fastify.preHandlerHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L70)\n\n`preHandler` is the fourth hook to be executed in the request lifecycle. The\nprevious hook was `preValidation`, the next hook will be `preSerialization`."
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#24",
+    "title": "docs/Reference/Hooks.md > Route level hooks",
+    "text": "## Route level hooks\n<a id=\"route-hooks\"></a>\n\nYou can declare one or more custom lifecycle hooks ([onRequest](#onrequest),\n[onResponse](#onresponse), [preParsing](#preparsing),\n[preValidation](#prevalidation), [preHandler](#prehandler),\n[preSerialization](#preserialization), [onSend](#onsend),\n[onTimeout](#ontimeout), and [onError](#onerror)) hook(s) that will be\n**unique** for the route. If you do so, those hooks are always executed as the\nlast hook in their category.\n\nThis can be useful if you need to implement authentication, where the\n[preParsing](#preparsing) or [preValidation](#prevalidation) hooks are exactly\nwhat you need. Multiple route-level hooks can also be specified as an array.\n\n```js\nfastify.addHook('onRequest', (request, reply, done) => {\n  // Your code\n  done()\n})\n\nfastify.addHook('onResponse', (request, reply, done) => {\n  // your code\n  done()\n})\n\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Your code\n  done(null, payload)\n})\n\nfastify.addHook('preValidation', (request, reply, done) => {\n  // Your code\n  done()\n})\n\nfastify.addHook('preHandler', (request, reply, done) => {\n  // Your code\n  done()\n})\n\nfastify.addHook('preSerialization', (request, reply, payload, done) => {\n  // Your code\n  done(null, payload)\n})\n\nfastify.addHook('onSend', (request, reply, payload, done) => {\n  // Your code\n  done(null, payload)\n})\n\nfastify.addHook('onTimeout', (request, reply, done) => {\n  // Your code\n  done()\n})\n\nfastify.addHook('onError', (request, reply, error, done) => {\n  // Your code\n  done()\n})\n\nfastify.route({\n  method: 'GET',\n  url: '/',\n  schema: { ... },\n  onRequest: function (request, reply, done) {\n    // This hook will always be executed after the shared `onRequest` hooks\n    done()\n  },\n  // // Example with an async hook. All hooks support this syntax\n  //\n  // onRequest: async function (request, reply) {\n  //  // This hook will always be executed after the shared `onRequest` hooks\n  //  await ...\n  // }\n  onResponse: function (request, reply, done) {\n    // this hook will always be executed after the shared `onResponse` hooks\n    done()\n  },\n  preParsing: function (request, reply, payload, done) {\n    // This hook will always be executed after the shared `preParsing` hooks\n    done(null, payload)\n  },\n  preValidation: function (request, reply, done) {\n    // This hook will always be executed after the shared `preValidation` hooks\n    done()\n  },\n  preHandler: function (request, reply, done) {\n    // This hook will always be executed after the shared `preHandler` hooks\n    done()\n  },\n  // // Example with an array. All hooks support this syntax.\n  //\n  // preHandler: [function (request, reply, done) {\n  //   // This hook will always be executed after the shared `preHandler` hooks\n  //   done()\n  // }],\n  preSerialization: (request, reply, payload, done) => {\n    // This hook will always be executed after the shared `preSerialization` hooks\n    done(null, payload)\n  },\n  onSend: (request, reply, payload, done) => {\n    // This hook will always be executed after the shared `onSend` hooks\n    done(null, payload)\n  },\n  onTimeout: (request, reply, done) => {\n    // This hook will always be executed after the shared `onTimeout` hooks\n    done()\n  },\n  onError: (request, reply, error, done) => {\n    // This hook will always be executed after the shared `onError` hooks\n    done()\n  },\n  handler: function (request, reply) {\n    reply.send({ hello: 'world' })\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#4",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > preValidation",
+    "text": "### preValidation\n\nIf you are using the `preValidation` hook, you can change the payload before it\nis validated. For example:\n\n```js\nfastify.addHook('preValidation', (request, reply, done) => {\n  request.body = { ...request.body, importantKey: 'randomString' }\n  done()\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preValidation', async (request, reply) => {\n  const importantKey = await generateRandomString()\n  request.body = { ...request.body, importantKey }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#4",
+    "title": "docs/Reference/Routes.md > Routes > Routes options",
+    "text": "  Note: this option does not override `ignoreTrailingSlash` in\n  [Server](./Server.md) configuration.\n\n* `request` is defined in [Request](./Request.md).\n\n* `reply` is defined in [Reply](./Reply.md).\n\n> ℹ️ Note:\n> The documentation for `onRequest`, `preParsing`, `preValidation`,\n> `preHandler`, `preSerialization`, `onSend`, and `onResponse` is detailed in\n> [Hooks](./Hooks.md). To send a response before the request is handled by the\n> `handler`, see [Respond to a request from\n> a hook](./Hooks.md#respond-to-a-request-from-a-hook).\n\nExample:\n```js\nfastify.route({\n  method: 'GET',\n  url: '/',\n  schema: {\n    querystring: {\n      type: 'object',\n      properties: {\n        name: { type: 'string' },\n        excitement: { type: 'integer' }\n      }\n    },\n    response: {\n      200: {\n        type: 'object',\n        properties: {\n          hello: { type: 'string' }\n        }\n      }\n    }\n  },\n  handler: function (request, reply) {\n    reply.send({ hello: 'world' })\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#14",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > Respond to a request from a hook",
+    "text": "If you want to respond with a stream, you should avoid using an `async` function\nfor the hook. If you must use an `async` function, your code will need to follow\nthe pattern in\n[test/hooks-async.js](https://github.com/fastify/fastify/blob/94ea67ef2d8dce8a955d510cd9081aabd036fa85/test/hooks-async.js#L269-L275).\n\n```js\nfastify.addHook('onRequest', (request, reply, done) => {\n  const stream = fs.createReadStream('some-file', 'utf8')\n  reply.send(stream)\n})\n```\n\nIf you are sending a response without `await` on it, make sure to always `return\nreply`:\n\n```js\nfastify.addHook('preHandler', async (request, reply) => {\n  setImmediate(() => { reply.send('hello') })\n\n  // This is needed to signal the handler to wait for a response\n  // to be sent outside of the promise chain\n  return reply\n})\n\nfastify.addHook('preHandler', async (request, reply) => {\n  // the @fastify/static plugin will send a file asynchronously,\n  // so we should return reply\n  reply.sendFile('myfile')\n  return reply\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Hooks.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0412,
+    "document_score": 0.1341,
+    "levels": {
+     "answers": 0.0412,
+     "elsewhere": 0.0929,
+     "different_case": 0.1484,
+     "unrelated": 0.7174
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0291,
+    "document_score": 0.1245,
+    "levels": {
+     "answers": 0.0291,
+     "elsewhere": 0.0954,
+     "different_case": 0.1081,
+     "unrelated": 0.7673
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Lifecycle.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0198,
+    "document_score": 0.1466,
+    "levels": {
+     "answers": 0.0198,
+     "elsewhere": 0.1269,
+     "different_case": 0.0513,
+     "unrelated": 0.8021
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/TypeScript.md#72",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0159,
+    "document_score": 0.0894,
+    "levels": {
+     "answers": 0.0159,
+     "elsewhere": 0.0735,
+     "different_case": 0.1138,
+     "unrelated": 0.7968
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Reference/Hooks.md#24",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0102,
+    "document_score": 0.0881,
+    "levels": {
+     "answers": 0.0102,
+     "elsewhere": 0.0778,
+     "different_case": 0.0356,
+     "unrelated": 0.8763
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Hooks.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0092,
+    "document_score": 0.0451,
+    "levels": {
+     "answers": 0.0092,
+     "elsewhere": 0.0359,
+     "different_case": 0.0271,
+     "unrelated": 0.9278
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/TypeScript.md#74",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0075,
+    "document_score": 0.0621,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.0546,
+     "different_case": 0.0746,
+     "unrelated": 0.8633
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/TypeScript.md#75",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0048,
+    "document_score": 0.0175,
+    "levels": {
+     "answers": 0.0048,
+     "elsewhere": 0.0128,
+     "different_case": 0.0628,
+     "unrelated": 0.9196
+    }
+   },
+   {
+    "index": 11,
+    "id": "fastify:docs/Reference/Hooks.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0111,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0078,
+     "different_case": 0.0075,
+     "unrelated": 0.9813
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/TypeScript.md#77",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0083,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.005,
+     "different_case": 0.0238,
+     "unrelated": 0.9679
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/TypeScript.md#76",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.017,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0146,
+     "different_case": 0.0323,
+     "unrelated": 0.9507
+    }
+   },
+   {
+    "index": 10,
+    "id": "fastify:docs/Reference/Routes.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0204,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0179,
+     "different_case": 0.0115,
+     "unrelated": 0.9681
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6211
+  },
+  "timing": {
+   "total_ms": 138,
+   "rerank_ms": 123,
+   "questions_ms": 0,
+   "model_ms": 110,
+   "engine": {
+    "rows": 6679,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 110,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 208
+   }
+  }
+ }
+}

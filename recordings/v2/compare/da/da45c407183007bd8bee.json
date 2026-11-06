@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/da/da45c407183007bd8bee",
+ "request_hash": "da45c407183007bd8bee8ae182479a063577ead2a7cdedf377b88fe8f1bd3e29",
+ "recorded_at": "2026-11-06T14:14:10Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1039,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "112.357283",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=258"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#20",
+    "text": "## Multi Tenant Connections {#multi-tenant-connections}\n\nIn the context of Mongoose, a multi-tenant architecture typically means a case where multiple different clients talk to MongoDB through a single Mongoose application.\nThis typically means each client makes queries and executes updates through a single Mongoose application, but has a distinct MongoDB database within the same MongoDB cluster.\n\nWe recommend reading [this article about multi-tenancy with Mongoose](https://medium.com/brightlab-techblog/multitenant-node-js-application-with-mongoose-mongodb-f8841a285b4f); it has a good description of how we define multi-tenancy and a more detailed overview of our recommended patterns.\n\nThere are two patterns we recommend for multi-tenancy in Mongoose:\n\n1. Maintain one connection pool, switch between tenants using the [`Connection.prototype.useDb()` method](https://mongoosejs.com/docs/api/connection.html#Connection.prototype.useDb()).\n2. Maintain a separate connection pool per tenant, store connections in a map or [POJO](https://masteringjs.io/tutorials/fundamentals/pojo).\n\nThe following is an example of pattern (1).\nWe recommend pattern (1) for cases where you have a small number of tenants, or if each individual tenant's workload is light (approximately < 1 request per second, all requests take < 10ms of database processing time).\nPattern (1) is simpler to implement and simpler to manage in production, because there is only 1 connection pool.\nBut, under high load, you will likely run into issues where some tenants' operations slow down other tenants' operations due to [slow trains](https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs)."
+   },
+   {
+    "id": "mongoose:docs/connections.md#21",
+    "text": "```javascript\nconst express = require('express');\nconst mongoose = require('mongoose');\n\nmongoose.connect('mongodb://127.0.0.1:27017/main');\nmongoose.set('debug', true);\n\nmongoose.model('User', mongoose.Schema({ name: String }));\n\nconst app = express();\n\napp.get('/users/:tenantId', function(req, res) {\n  const db = mongoose.connection.useDb(`tenant_${req.params.tenantId}`, {\n    // `useCache` tells Mongoose to cache connections by database name, so\n    // `mongoose.connection.useDb('foo', { useCache: true })` returns the\n    // same reference each time.\n    useCache: true\n  });\n  // Need to register models every time a new connection is created\n  if (!db.models['User']) {\n    db.model('User', mongoose.Schema({ name: String }));\n  }\n  console.log('Find users from', db.name);\n  db.model('User').find().\n    then(users => res.json({ users })).\n    catch(err => res.status(500).json({ message: err.message }));\n});\n\napp.listen(3000);\n```\n\nThe following is an example of pattern (2).\nPattern (2) is more flexible and better for use cases with > 10k tenants and > 1 requests/second.\nBecause each tenant has a separate connection pool, one tenant's slow operations will have minimal impact on other tenants.\nHowever, this pattern is harder to implement and manage in production.\nIn particular, [MongoDB does have a limit on the number of open connections](https://www.mongodb.com/blog/post/tuning-mongodb--linux-to-allow-for-tens-of-thousands-connections), and [MongoDB Atlas has separate limits on the number of open connections](https://www.mongodb.com/docs/atlas/reference/atlas-limits), so you need to make sure the total number of sockets in your connection pools doesn't go over MongoDB's limits."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#20",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/connections.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/connections.md#20",
+    "b": "mongoose:docs/connections.md#21",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.0152,
+     "overlapping": 0.9727,
+     "conflicting": 0.0079,
+     "unrelated": 0.0042
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 86,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 121,
+   "total_ms": 125
+  }
+ }
+}

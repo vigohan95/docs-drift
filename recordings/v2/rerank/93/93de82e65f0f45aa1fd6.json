@@ -1,0 +1,280 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/93/93de82e65f0f45aa1fd6",
+ "request_hash": "93de82e65f0f45aa1fd6d23ce3f66a964415e2cffc7a8f93c3d4180d9044c781",
+ "recorded_at": "2026-11-06T14:12:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1154,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "119.463837",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=165,cfOrigin;dur=0,cfWorker;dur=320"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) The following describes the format of a chunks file, which is created in the `chunks/` directory of a block. (2) The following describes the format of a chunks file, which is created in the `chunks_head/` directory inside the data directory.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/tombstones.md#0",
+    "title": "tsdb/docs/format/tombstones.md > Tombstones Disk Format",
+    "text": "# Tombstones Disk Format\n\nThe following describes the format of a tombstones file, which is placed\nat the top level directory of a block.\n\nThe last 8 bytes specifies the offset to the start of Stones section.\nThe stones section is 0 padded to a multiple of 4 for fast scans.\n\n```\n┌────────────────────────────┬─────────────────────┐\n│ magic(0x0130BA30) <4b>     │ version(1) <1 byte> │\n├────────────────────────────┴─────────────────────┤\n│ ┌──────────────────────────────────────────────┐ │\n│ │                Tombstone 1                   │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      ...                     │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                Tombstone N                   │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                  CRC<4b>                     │ │\n│ └──────────────────────────────────────────────┘ │\n└──────────────────────────────────────────────────┘\n```"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/index.md#0",
+    "title": "tsdb/docs/format/index.md > Index Disk Format",
+    "text": "# Index Disk Format\n\nThe following describes the format of the `index` file found in each block directory.\nIt is terminated by a table of contents which serves as an entry point into the index.\n\n```\n┌────────────────────────────┬─────────────────────┐\n│ magic(0xBAAAD700) <4b>     │ version(1) <1 byte> │\n├────────────────────────────┴─────────────────────┤\n│ ┌──────────────────────────────────────────────┐ │\n│ │                 Symbol Table                 │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                    Series                    │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                 Label Index 1                │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      ...                     │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                 Label Index N                │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                   Postings 1                 │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      ...                     │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                   Postings N                 │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │               Label Offset Table             │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │             Postings Offset Table            │ │\n│ ├──────────────────────────────────────────────┤ │\n│ │                      TOC                     │ │\n│ └──────────────────────────────────────────────┘ │\n└──────────────────────────────────────────────────┘\n```\n\nWhen the index is written, an arbitrary number of padding bytes may be added between the lined out main sections above. When sequentially scanning through the file, any zero bytes after a section's specified length must be skipped.\n\nMost of the sections described below start with a `len` field. It always specifies the number of bytes just before the trailing CRC32 checksum. The checksum is always calculated over those `len` bytes."
+   },
+   {
+    "id": "prometheus:docs/storage.md#3",
+    "title": "docs/storage.md > Local storage > On-disk layout",
+    "text": "Note that a limitation of local storage is that it is not clustered or\nreplicated. Thus, it is not arbitrarily scalable or durable in the face of\ndrive or node outages and should be managed like any other single node\ndatabase. With proper architecture, it is possible to retain years of\ndata in local storage.\n\n[Snapshots](querying/api.md#snapshot) are recommended for backups. Backups\nmade without snapshots run the risk of losing data that was recorded since\nthe last TSDB block was created, which typically happens every two hours,\ncovering the last three hours of samples. Excluding the WAL files (the\n`chunks_head/`, `wal/`, and `wbl/` directories in `storage.tsdb.path`)\non backup or restore will ensure a coherent backup, in any case, at the\ncost of losing the time range covered by the WAL files.\n\nAlternatively, external storage may be used via the\n[remote read/write APIs](https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage).\nCareful evaluation is required for these systems as they vary greatly in durability,\nperformance, and efficiency.\n\nFor further details on file format, see [TSDB format](/tsdb/docs/format/README.md)."
+   },
+   {
+    "id": "prometheus:docs/storage.md#2",
+    "title": "docs/storage.md > Local storage > On-disk layout",
+    "text": "### On-disk layout\n\nIngested samples are grouped into two-hour blocks. Each block consists of a directory that \ncontains a chunks subdirectory with all the time series samples for that time window, \na metadata file,  and an index file (which maps metric names and labels to the time series \nin the chunks directory). The samples in the chunks directory are organized into one \nor more segment files, each up to 512 MB by default. When series are deleted via the API, \nthe deletion records are stored in separate tombstone files rather than being immediately \nremoved from the chunk segments.\n\nThe current block for incoming samples is kept in memory and is not fully\npersisted. It is secured against crashes by a write-ahead log (WAL) that can be\nreplayed when the Prometheus server restarts. Write-ahead log files are stored\nin the `wal` directory in 128MB segments. These files contain raw data that\nhas not yet been compacted; thus they are significantly larger than regular block\nfiles. Prometheus will retain a minimum of three write-ahead log files.\nHigh-traffic servers may retain more than three WAL files in order to keep at\nleast two hours of raw data.\n\nA Prometheus server's data directory looks something like this:\n\n```\n./data\n├── 01BKGV7JBM69T2G1BGBGM6KB12\n│   └── meta.json\n├── 01BKGTZQ1SYQJTR4PB43C8PD98\n│   ├── chunks\n│   │   └── 000001\n│   ├── tombstones\n│   ├── index\n│   └── meta.json\n├── 01BKGTZQ1HHWHV8FBJXW1Y3W0K\n│   └── meta.json\n├── 01BKGV7JC0RY8A6MACW02A2PJD\n│   ├── chunks\n│   │   └── 000001\n│   ├── tombstones\n│   ├── index\n│   └── meta.json\n├── chunks_head\n│   └── 000001\n└── wal\n    ├── 000000002\n    └── checkpoint.00000001\n        └── 00000000\n```"
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#66",
+    "title": "docs/command-line/promtool.md > Commands > `promtool tsdb` > `promtool tsdb dump` > Flags",
+    "text": "###### Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">--sandbox-dir-root</code> | Root directory where a sandbox directory will be created, this sandbox is used in case WAL replay generates chunks (default is the database path). The sandbox is cleaned up at the end. |  |\n| <code class=\"text-nowrap\">--min-time</code> | Minimum timestamp to dump, in milliseconds since the Unix epoch. | `-9223372036854775808` |\n| <code class=\"text-nowrap\">--max-time</code> | Maximum timestamp to dump, in milliseconds since the Unix epoch. | `9223372036854775807` |\n| <code class=\"text-nowrap\">--match</code> <code class=\"text-nowrap\">...</code> | Series selector. Can be specified multiple times. | `{__name__=~'(?s:.*)'}` |\n| <code class=\"text-nowrap\">--format</code> | Output format of the dump (prom (default) or seriesjson). | `prom` |"
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#8",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `ChunkRef` > Why does `HeadChunkRef` contain a series reference and `BlockChunkRef` does not?",
+    "text": "#### Why does `HeadChunkRef` contain a series reference and `BlockChunkRef` does not?\n\nThe `ChunkRef` types allow retrieving the chunk data as efficiently as possible.\n* In the Head block the chunks are in the series struct. So we need to reach the series before we can access the chunk from it.\n  Hence we need to pack the `HeadSeriesRef` to get to the series.\n* In persistent blocks, the chunk files are separated from the index and static. Hence you only need the co-ordinates within the `chunks` directory\n  to get to the chunk. Hence no need of `BlockSeriesRef`."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#53",
+    "title": "docs/querying/api.md > Status > TSDB Blocks",
+    "text": "### TSDB Blocks\n\n**NOTE**: This endpoint is **experimental** and might change in the future. The endpoint name and the exact format of the returned data may change between Prometheus versions. The **exact metadata returned** by this endpoint is an implementation detail and may change in future Prometheus versions.\n\nThe following endpoint returns the list of currently loaded TSDB blocks and their metadata.\n\n```\nGET /api/v1/status/tsdb/blocks\n```\n\nThis endpoint returns the following information for each block:\n\n- `ulid`: Unique ID of the block.\n- `minTime`: Minimum timestamp (in milliseconds) of the block.\n- `maxTime`: Maximum timestamp (in milliseconds) of the block.\n- `stats`:\n  - `numSeries`: Number of series in the block.\n  - `numSamples`: Number of samples in the block.\n  - `numChunks`: Number of chunks in the block.\n- `compaction`:\n  - `level`: The compaction level of the block.\n  - `sources`: List of ULIDs of source blocks used to compact this block.\n- `version`: The block version.\n\n\n```bash\ncurl http://localhost:9090/api/v1/status/tsdb/blocks\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"blocks\": [\n      {\n        \"ulid\": \"01JZ8JKZY6XSK3PTDP9ZKRWT60\",\n        \"minTime\": 1750860620060,\n        \"maxTime\": 1750867200000,\n        \"stats\": {\n          \"numSamples\": 13701,\n          \"numSeries\": 716,\n          \"numChunks\": 716\n        },\n        \"compaction\": {\n          \"level\": 1,\n          \"sources\": [\n            \"01JZ8JKZY6XSK3PTDP9ZKRWT60\"\n          ]\n        },\n        \"version\": 1\n      }\n    ]\n  }\n}\n```\n\n*New in v2.15*"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#3",
+    "title": "docs/getting_started.md > Starting Prometheus",
+    "text": "## Starting Prometheus\n\nTo start Prometheus with your newly created configuration file, change to the\ndirectory containing the Prometheus binary and run:\n\n```bash\n# Start Prometheus.\n# By default, Prometheus stores its database in ./data (flag --storage.tsdb.path).\n./prometheus --config.file=prometheus.yml\n```\n\nPrometheus should start up. You should also be able to browse to a status page\nabout itself at [localhost:9090](http://localhost:9090). Give it a couple of\nseconds to collect data about itself from its own HTTP metrics endpoint.\n\nYou can also verify that Prometheus is serving metrics about itself by\nnavigating to its metrics endpoint:\n[localhost:9090/metrics](http://localhost:9090/metrics)"
+   },
+   {
+    "id": "prometheus:tsdb/docs/refs.md#9",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used internally in TSDB",
+    "text": "## Used internally in TSDB\n\n* [`HeadChunkID`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb/chunks#HeadChunkID) references a chunk of a `memSeries` (either an `mmappedChunk` or `headChunk`).\n  If a caller has, for whatever reason, an \"old\" `HeadChunkID` that refers to a chunk that has been compacted into a block, querying the memSeries for it will not return any data.\n* [`ChunkDiskMapperRef`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb/chunks#ChunkDiskMapperRef) is an 8 Byte integer.\n  4 Bytes are used to refer to a chunks file number and 4 bytes serve as byte offset (similar to `BlockChunkRef`).  `mmappedChunk` provide this value such that callers can load the mmapped chunk from disk."
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#69",
+    "title": "docs/command-line/promtool.md > Commands > `promtool tsdb` > `promtool tsdb dump-openmetrics` > Flags",
+    "text": "###### Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">--sandbox-dir-root</code> | Root directory where a sandbox directory will be created, this sandbox is used in case WAL replay generates chunks (default is the database path). The sandbox is cleaned up at the end. |  |\n| <code class=\"text-nowrap\">--min-time</code> | Minimum timestamp to dump, in milliseconds since the Unix epoch. | `-9223372036854775808` |\n| <code class=\"text-nowrap\">--max-time</code> | Maximum timestamp to dump, in milliseconds since the Unix epoch. | `9223372036854775807` |\n| <code class=\"text-nowrap\">--match</code> <code class=\"text-nowrap\">...</code> | Series selector. Can be specified multiple times. | `{__name__=~'(?s:.*)'}` |"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#5",
+    "title": "docs/getting_started.md > Using the graphing interface",
+    "text": "## Using the graphing interface\n\nTo graph expressions, navigate to http://localhost:9090/query and use the \"Graph\"\ntab.\n\nFor example, enter the following expression to graph the per-second rate of chunks\nbeing created in the self-scraped Prometheus:\n\n```\nrate(prometheus_tsdb_head_chunks_created_total[1m])\n```\n\nExperiment with the graph range parameters and other settings."
+   },
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "title": "docs/storage.md > Local storage > Operational aspects",
+    "text": "### Operational aspects\n\nPrometheus has several flags that configure local storage. The most important are:\n\n- `--storage.tsdb.path`: Where Prometheus writes its database. Defaults to `data/`.\n- `--storage.tsdb.retention.time`: How long to retain samples in storage. If neither\n  this flag nor `storage.tsdb.retention.size` is set, the retention time defaults to\n  `15d`. Supported units: y, w, d, h, m, s, ms.\n- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.\n  The oldest data will be removed first. Defaults to `0` or disabled. Units supported:\n  B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. Only\n  the persistent blocks are deleted to honor this retention although WAL and m-mapped\n  chunks are counted in the total size. So the minimum requirement for the disk is the\n  peak space taken by the `wal` (the WAL and Checkpoint) and `chunks_head`\n  (m-mapped Head chunks) directory combined (peaks every 2 hours).\n- `--storage.tsdb.wal-compression`: Enables compression of the write-ahead log (WAL).\n  Depending on your data, you can expect the WAL size to be halved with little extra\n  CPU load. This flag was introduced in 2.11.0 and enabled by default in 2.20.0.\n  Note that once enabled, downgrading Prometheus to a version below 2.11.0 will\n  require deleting the WAL."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "prometheus:docs/storage.md#2",
+    "action": "use",
+    "relevance_score": 0.9109,
+    "document_score": 0.9342,
+    "levels": {
+     "answers": 0.9109,
+     "elsewhere": 0.0233,
+     "different_case": 0.0273,
+     "unrelated": 0.0385
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:tsdb/docs/refs.md#8",
+    "action": "use",
+    "relevance_score": 0.8677,
+    "document_score": 0.8833,
+    "levels": {
+     "answers": 0.8677,
+     "elsewhere": 0.0156,
+     "different_case": 0.0424,
+     "unrelated": 0.0744
+    }
+   },
+   {
+    "index": 11,
+    "id": "prometheus:docs/storage.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0087,
+    "document_score": 0.0514,
+    "levels": {
+     "answers": 0.0087,
+     "elsewhere": 0.0427,
+     "different_case": 0.0427,
+     "unrelated": 0.9059
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/storage.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0054,
+    "document_score": 0.075,
+    "levels": {
+     "answers": 0.0054,
+     "elsewhere": 0.0696,
+     "different_case": 0.051,
+     "unrelated": 0.874
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/format/tombstones.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0072,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0044,
+     "different_case": 0.0455,
+     "unrelated": 0.9474
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/format/index.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0075,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0048,
+     "different_case": 0.011,
+     "unrelated": 0.9816
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/command-line/promtool.md#69",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0058,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0032,
+     "different_case": 0.0111,
+     "unrelated": 0.983
+    }
+   },
+   {
+    "index": 8,
+    "id": "prometheus:tsdb/docs/refs.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.008,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0055,
+     "different_case": 0.0125,
+     "unrelated": 0.9795
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/querying/api.md#53",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0028,
+     "different_case": 0.0061,
+     "unrelated": 0.9888
+    }
+   },
+   {
+    "index": 10,
+    "id": "prometheus:docs/getting_started.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0026,
+     "different_case": 0.0053,
+     "unrelated": 0.9904
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/command-line/promtool.md#66",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0027,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0014,
+     "different_case": 0.004,
+     "unrelated": 0.9933
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/getting_started.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0012,
+    "document_score": 0.0024,
+    "levels": {
+     "answers": 0.0012,
+     "elsewhere": 0.0012,
+     "different_case": 0.0028,
+     "unrelated": 0.9949
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5165
+  },
+  "timing": {
+   "total_ms": 124,
+   "rerank_ms": 123,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6209,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

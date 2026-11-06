@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d8/d8045a7151bccf1fa5fa",
+ "request_hash": "d8045a7151bccf1fa5fa4a9c492ea343bf2904bd287690fd232ad5b9b1e0cb86",
+ "recorded_at": "2026-11-06T14:14:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 886,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.450624",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=179"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/middleware.md#3",
+    "text": "**Note:** Like `updateOne`, Mongoose registers `deleteOne` middleware on `Query.prototype.deleteOne` by default.\nThat means that `Model.deleteOne()` will trigger `deleteOne` hooks, and `this` will refer to a query.\nHowever, `doc.deleteOne()` does **not** fire `deleteOne` query middleware for legacy reasons.\nTo register `deleteOne` middleware as document middleware, use `schema.pre('deleteOne', { document: true, query: false })`.\n\n**Note:** The [`create()`](./api/model.html#model_Model-create) function fires `save()` hooks.\n\n**Note:** Query middlewares are not executed on subdocuments.\n\n```javascript\nconst childSchema = new mongoose.Schema({\n  name: String\n});\n\nconst mainSchema = new mongoose.Schema({\n  child: [childSchema]\n});\n\nmainSchema.pre('findOneAndUpdate', function() {\n  console.log('Middleware on parent document'); // Will be executed\n});\n\nchildSchema.pre('findOneAndUpdate', function() {\n  console.log('Middleware on subdocument'); // Will not be executed\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#3",
+    "text": "## MongoDB Driver 4.0 {#mongodb-driver-40}\n\nMongoose now uses v4.x of the [MongoDB Node driver](https://www.npmjs.com/package/mongodb).\nSee [the MongoDB Node drivers' migration guide](https://github.com/mongodb/node-mongodb-native/blob/4.0/docs/CHANGES_4.0.0.md) for detailed info.\nBelow are some of the most noteworthy changes:\n\n* MongoDB Driver 4.x is written in TypeScript and has its own TypeScript type definitions. These may conflict with `@types/mongodb`, so if you have TypeScript compiler errors please make sure you upgrade to the [latest version of `@types/mongodb`](https://www.npmjs.com/package/@types/mongodb), which is an empty stub.\n* The `poolSize` option for connections has been [replaced with `minPoolSize` and `maxPoolSize`](https://github.com/mongodb/node-mongodb-native/blob/4.1/docs/CHANGES_4.0.0.md#connection-pool-options). The Mongoose 5.x `poolSize` option is equivalent to the Mongoose 6 `maxPoolSize` option. The default value of `maxPoolSize` has been increased to 100.\n* The result of `updateOne()` and `updateMany()` is now different.\n* The result of `deleteOne()` and `deleteMany()` no longer has an `n` property.\n\n```javascript\nconst res = await TestModel.updateMany({}, { someProperty: 'someValue' });\n\nres.matchedCount; // Number of documents that were found that match the filter. Replaces `res.n`\nres.modifiedCount; // Number of documents modified. Replaces `res.nModified`\nres.upsertedCount; // Number of documents upserted. Replaces `res.upserted`\n```\n\n```javascript\nconst res = await TestModel.deleteMany({});\n\n// In Mongoose 6: `{ acknowledged: true, deletedCount: 2 }`\n// In Mongoose 5: `{ n: 2, ok: 1, deletedCount: 2 }`\nres;\n\nres.deletedCount; // Number of documents that were deleted. Replaces `res.n`\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/middleware.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/middleware.md#3",
+    "b": "mongoose:docs/migrating_to_6.md#3",
+    "relation": "unrelated",
+    "related": 0.0099,
+    "probabilities": {
+     "same": 0.0033,
+     "overlapping": 0.0033,
+     "conflicting": 0.0033,
+     "unrelated": 0.9901
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

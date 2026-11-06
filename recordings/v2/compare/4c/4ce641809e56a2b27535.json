@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4c/4ce641809e56a2b27535",
+ "request_hash": "4ce641809e56a2b275352bec5da7eda10d9fb96bd2c8568209ca5bc902852b43",
+ "recorded_at": "2026-11-06T14:18:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2357,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "176.787489",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=53,cfOrigin;dur=0,cfWorker;dur=329"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/overview.mdx#4",
+    "text": "## Redux Integration\n\nInternally, `createApi` will call [the Redux Toolkit `createSlice` API](https://redux-toolkit.js.org/api/createSlice) to generate a slice reducer and corresponding action creators with the appropriate logic for caching fetched data. It also automatically generates a custom Redux middleware that manages subscription counts and cache lifetimes.\n\nThe generated slice reducer and the middleware both need to be adding to your Redux store setup in `configureStore` in order to work correctly.\n\n:::info API Reference\n\n- [API Slices: Redux Integration](./redux-integration.mdx)\n\n:::"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/redux-integration.mdx#1",
+    "text": "# API Slices: Redux Integration\n\nInternally, `createApi` will call [the Redux Toolkit `createSlice` API](https://redux-toolkit.js.org/api/createSlice) to generate a slice reducer and corresponding action creators with the appropriate logic for caching fetched data. It also automatically generates a custom Redux middleware that manages subscription counts and cache lifetimes.\n\nThe generated slice reducer and the middleware both need to be added to your Redux store setup in `configureStore` in order to work correctly:\n\n```ts title=\"src/store.ts\"\n// file: src/services/pokemon.ts noEmit\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\n\nexport const pokemonApi = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: '/' }),\n  endpoints: () => ({}),\n})\n\n// file: src/store.ts\nimport { configureStore } from '@reduxjs/toolkit'\nimport { setupListeners } from '@reduxjs/toolkit/query'\nimport { pokemonApi } from './services/pokemon'\n\nexport const store = configureStore({\n  reducer: {\n    // Add the generated reducer as a specific top-level slice\n    [pokemonApi.reducerPath]: pokemonApi.reducer,\n  },\n  // Adding the api middleware enables caching, invalidation, polling,\n  // and other useful features of `rtk-query`.\n  middleware: (getDefaultMiddleware) =>\n    getDefaultMiddleware().concat(pokemonApi.middleware),\n})\n\n// configure listeners using the provided defaults\nsetupListeners(store.dispatch)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/overview.mdx#4",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/api/created-api/redux-integration.mdx#1"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/redux-integration.mdx#1",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/api/created-api/overview.mdx#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/created-api/overview.mdx#4",
+    "b": "redux-toolkit:docs/rtk-query/api/created-api/redux-integration.mdx#1",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.1594,
+     "overlapping": 0.8267,
+     "conflicting": 0.0096,
+     "unrelated": 0.0042
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9479,
+       "restated": 0.0233,
+       "elaborated": 0.0223,
+       "different": 0.0065
+      },
+      "confidence": 0.9935,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/created-api/overview.mdx#4",
+       "quote": "Internally, `createApi` will call [the Redux Toolkit `createSlice` API](https://redux-toolkit.js.org/api/createSlice) to generate a slice reducer and corresponding action creators with the appropriate logic for caching fetched data.",
+       "start": 22,
+       "end": 254,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/api/created-api/redux-integration.mdx#1",
+       "quote": "# API Slices: Redux Integration\n\nInternally, `createApi` will call [the Redux Toolkit `createSlice` API](https://redux-toolkit.js.org/api/createSlice) to generate a slice reducer and corresponding action creators with the appropriate logic for caching fetched data.",
+       "start": 0,
+       "end": 265,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "elaborated",
+      "kinds": {
+       "verbatim": 0.0112,
+       "restated": 0.0729,
+       "elaborated": 0.8834,
+       "different": 0.0325
+      },
+      "confidence": 0.897,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/created-api/overview.mdx#4",
+       "quote": "It also automatically generates a custom Redux middleware that manages subscription counts and cache lifetimes.",
+       "start": 255,
+       "end": 366,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/api/created-api/redux-integration.mdx#1",
+       "quote": "It also automatically generates a custom Redux middleware that manages subscription counts and cache lifetimes.\n\nThe generated slice reducer and the middleware both need to be added to your Redux store setup in `configureStore` in order to work correctly:\n\n```ts title=\"src/store.ts\"\n// file: src/services/pokemon.ts noEmit\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\n\nexport const pokemonApi = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: '/' }),\n  endpoints: () => ({}),\n})\n\n// file: src/store.ts\nimport { configureStore } from '@reduxjs/toolkit'\nimport { setupListeners } from '@reduxjs/toolkit/query'\nimport { pokemonApi } from './services/pokemon'\n\nexport const store = configureStore({\n  reducer: {\n    // Add the generated reducer as a specific top-level slice\n    [pokemonApi.reducerPath]: pokemonApi.reducer,\n  },\n  // Adding the api middleware enables caching, invalidation, polling,\n  // and other useful features of `rtk-query`.\n  middleware: (getDefaultMiddleware) =>\n    getDefaultMiddleware().concat(pokemonApi.middleware),\n})\n\n// configure listeners using the provided defaults\nsetupListeners(store.dispatch)\n```",
+       "start": 266,
+       "end": 1423,
+       "confidence": 0.897
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 60,
+   "passages": 2,
+   "counterparts_ms": 100
+  },
+  "timing": {
+   "read_ms": 188,
+   "total_ms": 192
+  }
+ }
+}

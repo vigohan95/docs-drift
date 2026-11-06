@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/81/81607e82c72e0ef8ae16",
+ "request_hash": "81607e82c72e0ef8ae16e2809c4f6daba5a29cd2a61ff3be56c87204b97f84ec",
+ "recorded_at": "2026-11-06T14:15:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1097,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "198.140512",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=398"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#22",
+    "text": "| `deferMode`     | `immediate` &#124; `deferred`                 | yes      | only for postgres unique constraints                                                                                                                        |\n\n```ts\n// when none of `owner/inverseBy/mappedBy` is provided, it will be considered owning side\n@OneToOne()\nbestFriend1!: User;\n\n// side with `inversedBy` is the owning one, to define inverse side use `mappedBy`\n@OneToOne({ inversedBy: 'bestFriend1', orphanRemoval: true })\nbestFriend2!: User;\n\n// when defining it like this, you need to specifically mark the owning side with `owner: true`\n@OneToOne(() => User, user => user.bestFriend2, { owner: true, orphanRemoval: true })\nbestFriend3!: User;\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/relationships.md#5",
+    "text": "### Owning Side\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'reflect-metadata', value: 'reflect-metadata'},\n    {label: 'ts-morph', value: 'ts-morph'},\n]\n  }\n>\n  <TabItem value=\"define-entity-class\">\n\n```ts\nimport { defineEntity, p } from '@mikro-orm/core';\n\nconst UserSchema = defineEntity({\n  name: 'User',\n  properties: {\n    id: p.integer().primary(),\n    // when none of `owner/inversedBy/mappedBy` is provided, it will be considered owning side\n    bestFriend1: () => p.oneToOne(User),\n    // side with `inversedBy` is the owning one, to define inverse side use `mappedBy`\n    bestFriend2: () => p.oneToOne(User).inversedBy('bestFriend1'),\n    // you need to specifically mark the owning side with `owner: true`\n    bestFriend3: () => p.oneToOne(User).owner(),\n  },\n});\n\nexport class User extends UserSchema.class {}\nUserSchema.setClass(User);\n```\n\n  </TabItem>\n\n  <TabItem value=\"define-entity\">\n\n```ts\nimport { defineEntity, InferEntity, p } from '@mikro-orm/core';\n\nexport const User = defineEntity({\n  name: 'User',\n  properties: {\n    id: p.integer().primary(),\n    // when none of `owner/inversedBy/mappedBy` is provided, it will be considered owning side\n    bestFriend1: () => p.oneToOne(User),\n    // side with `inversedBy` is the owning one, to define inverse side use `mappedBy`\n    bestFriend2: () => p.oneToOne(User).inversedBy('bestFriend1'),\n    // you need to specifically mark the owning side with `owner: true`\n    bestFriend3: () => p.oneToOne(User).owner(),\n  },\n});\n\nexport type IUser = InferEntity<typeof User>;\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#22",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/relationships.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/decorators.md#22",
+    "b": "mikro-orm:docs/docs/relationships.md#5",
+    "relation": "overlapping",
+    "related": 0.9968,
+    "probabilities": {
+     "same": 0.0205,
+     "overlapping": 0.9702,
+     "conflicting": 0.0061,
+     "unrelated": 0.0032
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 1,
+   "counterparts_ms": 112
+  },
+  "timing": {
+   "read_ms": 230,
+   "total_ms": 233
+  }
+ }
+}

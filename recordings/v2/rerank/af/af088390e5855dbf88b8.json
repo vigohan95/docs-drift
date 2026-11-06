@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/af/af088390e5855dbf88b8",
+ "request_hash": "af088390e5855dbf88b80898816a8120f39a7252742f8cfc1ee1a4d4e00cabef",
+ "recorded_at": "2026-11-06T14:13:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1159,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "121.958847",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=164,cfOrigin;dur=0,cfWorker;dur=326"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) ## The `hotUpdate` Hook (2) ### `handleHotUpdate` - **Type:** `(ctx: HmrContext) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>` - **Kind:** `async`, `sequential` - **See also:** [HMR API](./api-hmr) - **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks) Perform custom HMR update handling.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "title": "docs/changes/hotupdate-hook.md > HMR `hotUpdate` Plugin Hook > Motivation",
+    "text": "## Motivation\n\nThe [`handleHotUpdate` hook](/guide/api-plugin.md#handlehotupdate) allows to perform custom HMR update handling. A list of modules to be updated is passed in the `HmrContext`.\n\n```ts\ninterface HmrContext {\n  file: string\n  timestamp: number\n  modules: Array<ModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThis hook is called once for all environments, and the passed modules have mixed information from the Client and SSR environments only. Once frameworks move to custom environments, a new hook that is called for each of them is needed.\n\nThe new `hotUpdate` hook works in the same way as `handleHotUpdate` but it is called for each environment and receives a new `HotUpdateOptions` instance:\n\n```ts\ninterface HotUpdateOptions {\n  type: 'create' | 'update' | 'delete'\n  file: string\n  timestamp: number\n  modules: Array<EnvironmentModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThe current dev environment can be accessed like in other Plugin hooks with `this.environment`. The `modules` list will now be module nodes from the current environment only. Each environment update can define different update strategies.\n\nThis hook is also now called for additional watch events and not only for `'update'`. Use `type` to differentiate between them."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#12",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `configurePreviewServer`",
+    "text": "### `configurePreviewServer`\n\n- **Type:** `(server: PreviewServer) => (() => void) | void | Promise<(() => void) | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [PreviewServer](./api-javascript#previewserver)\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Same as [`configureServer`](/guide/api-plugin.html#configureserver) but for the preview server. Similarly to `configureServer`, the `configurePreviewServer` hook is called before other middlewares are installed. If you want to inject a middleware **after** other middlewares, you can return a function from `configurePreviewServer`, which will be called after internal middlewares are installed:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-preview-server',\n    configurePreviewServer(server) {\n      // return a post hook that is called after other middlewares are\n      // installed\n      return () => {\n        server.middlewares.use((req, res, next) => {\n          // custom handle request...\n        })\n      }\n    },\n  })\n  ```"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#18",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `handleHotUpdate`",
+    "text": "  - Return an empty array and perform complete custom HMR handling by sending custom events to the client:\n\n    ```js\n    handleHotUpdate({ server }) {\n      server.ws.send({\n        type: 'custom',\n        event: 'special-update',\n        data: {}\n      })\n      return []\n    }\n    ```\n\n    Client code should register corresponding handler using the [HMR API](./api-hmr) (this could be injected by the same plugin's `transform` hook):\n\n    ```js\n    if (import.meta.hot) {\n      import.meta.hot.on('special-update', (data) => {\n        // perform custom update\n      })\n    }\n    ```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#12",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > Environments During Build > The `buildApp` plugin hook",
+    "text": "### The `buildApp` plugin hook\n\n- **Type:** `(this: MinimalPluginContextWithoutEnvironment, builder: ViteBuilder) => Promise<void>`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\nBesides the `builder.buildApp` config option, plugins can define a `buildApp` hook to participate in the app build. The config option and the plugin hooks run in a defined order: hooks with order `'pre'` or `null` run first, then the configured `builder.buildApp`, then hooks with order `'post'`. Within a hook, `environment.isBuilt` tells you whether an environment has already been built, which lets a plugin avoid building it twice."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#6",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > The `hotUpdate` Hook",
+    "text": "The hook can choose to:\n\n- Filter and narrow down the affected module list so that the HMR is more accurate.\n\n- Return an empty array and perform a full reload:\n\n  ```js\n  hotUpdate({ modules, timestamp }) {\n    if (this.environment.name !== 'client')\n      return\n\n    // Invalidate modules manually\n    const invalidatedModules = new Set()\n    for (const mod of modules) {\n      this.environment.moduleGraph.invalidateModule(\n        mod,\n        invalidatedModules,\n        timestamp,\n        true\n      )\n    }\n    this.environment.hot.send({ type: 'full-reload' })\n    return []\n  }\n  ```\n\n- Return an empty array and perform complete custom HMR handling by sending custom events to the client:\n\n  ```js\n  hotUpdate() {\n    if (this.environment.name !== 'client')\n      return\n\n    this.environment.hot.send({\n      type: 'custom',\n      event: 'special-update',\n      data: {}\n    })\n    return []\n  }\n  ```\n\n  Client code should register the corresponding handler using the [HMR API](./api-hmr) (this could be injected by the same plugin's `transform` hook):\n\n  ```js\n  if (import.meta.hot) {\n    import.meta.hot.on('special-update', (data) => {\n      // perform custom update\n    })\n  }\n  ```"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `configureServer`",
+    "text": "### `configureServer`\n\n- **Type:** `(server: ViteDevServer) => (() => void) | void | Promise<(() => void) | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [ViteDevServer](./api-javascript#vitedevserver)\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Hook for configuring the dev server. The most common use case is adding custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      server.middlewares.use((req, res, next) => {\n        // custom handle request...\n      })\n    },\n  })\n  ```\n\n  **Injecting Post Middleware**\n\n  The `configureServer` hook is called before internal middlewares are installed, so the custom middlewares will run before internal middlewares by default. If you want to inject a middleware **after** internal middlewares, you can return a function from `configureServer`, which will be called after internal middlewares are installed:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      // return a post hook that is called after internal middlewares are\n      // installed\n      return () => {\n        server.middlewares.use((req, res, next) => {\n          // custom handle request...\n        })\n      }\n    },\n  })\n  ```\n\n  **Storing Server Access**\n\n  In some cases, other plugin hooks may need access to the dev server instance (e.g. accessing the WebSocket server, the file system watcher, or the module graph). This hook can also be used to store the server instance for access in other hooks:\n\n  ```js\n  const myPlugin = () => {\n    let server\n    return {\n      name: 'configure-server',\n      configureServer(_server) {\n        server = _server\n      },\n      transform(code, id) {\n        if (server) {\n          // use server...\n        }\n      },\n    }\n  }\n  ```\n\n  Note `configureServer` is not called when running the production build so your other hooks need to guard against its absence."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#14",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `closePreviewServer`",
+    "text": "### `closePreviewServer`\n\n- **Type:** `() => void | Promise<void>`\n- **Kind:** `async`, `parallel`\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Same as [`closeServer`](/guide/api-plugin.html#closeserver) but for the preview server. The preview server never restarts, so there is no `reason`.\n\n  ```js\n  const myPlugin = () => {\n    let resource\n    return {\n      name: 'close-preview-server',\n      configurePreviewServer(server) {\n        resource = createResource()\n      },\n      async closePreviewServer() {\n        await resource.dispose()\n      },\n    }\n  }\n  ```"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#10",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `configResolved`",
+    "text": "### `configResolved`\n\n- **Type:** `(config: ResolvedConfig) => void | Promise<void>`\n- **Kind:** `async`, `parallel`\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Called after the Vite config is resolved. Use this hook to read and store the final resolved config. It is also useful when the plugin needs to do something different based on the command being run.\n\n  **Example:**\n\n  ```js\n  const examplePlugin = () => {\n    let config\n\n    return {\n      name: 'read-config',\n\n      configResolved(resolvedConfig) {\n        // store the resolved config\n        config = resolvedConfig\n      },\n\n      // use stored config in other hooks\n      transform(code, id) {\n        if (config.command === 'serve') {\n          // dev: plugin invoked by dev server\n        } else {\n          // build: plugin invoked by Rollup\n        }\n      },\n    }\n  }\n  ```\n\n  Note that the `command` value is `serve` in dev (in the cli `vite`, `vite dev`, and `vite serve` are aliases)."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#15",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `transformIndexHtml`",
+    "text": "### `transformIndexHtml`\n\n- **Type:** `IndexHtmlTransformHook | { order?: 'pre' | 'post', handler: IndexHtmlTransformHook }`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Dedicated hook for transforming HTML entry point files such as `index.html`. The hook receives the current HTML string and a transform context. The context exposes the [`ViteDevServer`](./api-javascript#vitedevserver) instance during dev, and exposes the Rollup output bundle during build.\n\n  The hook can be async and can return one of the following:\n  - Transformed HTML string\n  - An array of tag descriptor objects (`{ tag, attrs, children }`) to inject to the existing HTML. Each tag can also specify where it should be injected to (default is prepending to `<head>`)\n  - An object containing both as `{ html, tags }`\n\n  By default `order` is `undefined`, with this hook applied after the HTML has been transformed. In order to inject a script that should go through the Vite plugins pipeline, `order: 'pre'` will apply the hook before processing the HTML. `order: 'post'` applies the hook after all hooks with `order` undefined are applied.\n\n  **Basic Example:**\n\n  ```js\n  const htmlPlugin = () => {\n    return {\n      name: 'html-transform',\n      transformIndexHtml(html) {\n        return html.replace(\n          /<title>(.*?)<\\/title>/,\n          `<title>Title replaced!</title>`,\n        )\n      },\n    }\n  }\n  ```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#4",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Configuring Environment Using the `configEnvironment` Hook",
+    "text": "## Configuring Environment Using the `configEnvironment` Hook\n\n- **Type:** `(name: string, config: EnvironmentOptions, env: { mode: string, command: 'build' | 'serve', isSsrBuild?: boolean, isPreview?: boolean, isSsrTargetWebworker?: boolean }) => EnvironmentOptions | null | void`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](#per-environment-hooks-and-global-hooks)\n\nWhile the `config` hook is running, the complete list of environments isn't yet known and the environments can be affected by both the default values from the root level environment config or explicitly through the `config.environments` record.\nPlugins should set default values using the `config` hook. To configure each environment, they can use the new `configEnvironment` hook. This hook is called for each environment with its partially resolved config including resolution of final defaults.\n\n```ts\n  configEnvironment(name: string, options: EnvironmentOptions) {\n    // add \"workerd\" condition to the rsc environment\n    if (name === 'rsc') {\n      return {\n        resolve: {\n          conditions: ['workerd'],\n        },\n      }\n    }\n  }\n```"
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#2",
+    "title": "docs/changes/hotupdate-hook.md > HMR `hotUpdate` Plugin Hook > Migration Guide",
+    "text": "## Migration Guide\n\nFilter and narrow down the affected module list so that the HMR is more accurate.\n\n```js\nhandleHotUpdate({ modules }) {\n  return modules.filter(condition)\n}\n\n// Migrate to:\n\nhotUpdate({ modules }) {\n  return modules.filter(condition)\n}\n```\n\nReturn an empty array and perform a full reload:\n\n```js\nhandleHotUpdate({ server, modules, timestamp }) {\n  // Invalidate modules manually\n  const invalidatedModules = new Set()\n  for (const mod of modules) {\n    server.moduleGraph.invalidateModule(\n      mod,\n      invalidatedModules,\n      timestamp,\n      true\n    )\n  }\n  server.ws.send({ type: 'full-reload' })\n  return []\n}\n\n// Migrate to:\n\nhotUpdate({ modules, timestamp }) {\n  // Invalidate modules manually\n  const invalidatedModules = new Set()\n  for (const mod of modules) {\n    this.environment.moduleGraph.invalidateModule(\n      mod,\n      invalidatedModules,\n      timestamp,\n      true\n    )\n  }\n  this.environment.hot.send({ type: 'full-reload' })\n  return []\n}\n```\n\nReturn an empty array and perform complete custom HMR handling by sending custom events to the client:\n\n```js\nhandleHotUpdate({ server }) {\n  server.ws.send({\n    type: 'custom',\n    event: 'special-update',\n    data: {}\n  })\n  return []\n}\n\n// Migrate to...\n\nhotUpdate() {\n  this.environment.hot.send({\n    type: 'custom',\n    event: 'special-update',\n    data: {}\n  })\n  return []\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#9",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `config`",
+    "text": "### `config`\n\n- **Type:** `(config: UserConfig, env: { mode: 'build' | 'serve', command: string, isSsrBuild?: boolean, isPreview?: boolean }) => UserConfig | null | void`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Modify Vite config before it's resolved. The hook receives the raw user config (CLI options merged with config file) and the current config env which exposes the `mode` and `command` being used. It can return a partial config object that will be deeply merged into existing config, or directly mutate the config (if the default merging cannot achieve the desired result).\n\n  **Example:**\n\n  ```js\n  // return partial config (recommended)\n  const partialConfigPlugin = () => ({\n    name: 'return-partial',\n    config: () => ({\n      resolve: {\n        alias: {\n          foo: 'bar',\n        },\n      },\n    }),\n  })\n\n  // mutate the config directly (use only when merging doesn't work)\n  const mutateConfigPlugin = () => ({\n    name: 'mutate-config',\n    config(config, { command }) {\n      if (command === 'build') {\n        config.root = 'foo'\n      }\n    },\n  })\n  ```\n\n  ::: warning Note\n  User plugins are resolved before running this hook so injecting other plugins inside the `config` hook will have no effect.\n  :::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "action": "use",
+    "relevance_score": 0.9226,
+    "document_score": 0.946,
+    "levels": {
+     "answers": 0.9226,
+     "elsewhere": 0.0233,
+     "different_case": 0.0179,
+     "unrelated": 0.0361
+    }
+   },
+   {
+    "index": 10,
+    "id": "vite:docs/changes/hotupdate-hook.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.3067,
+    "document_score": 0.3584,
+    "levels": {
+     "answers": 0.3067,
+     "elsewhere": 0.0517,
+     "different_case": 0.0643,
+     "unrelated": 0.5773
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/api-environment-plugins.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.031,
+    "document_score": 0.0651,
+    "levels": {
+     "answers": 0.031,
+     "elsewhere": 0.0341,
+     "different_case": 0.0424,
+     "unrelated": 0.8925
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/api-plugin.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0108,
+    "document_score": 0.0403,
+    "levels": {
+     "answers": 0.0108,
+     "elsewhere": 0.0295,
+     "different_case": 0.0344,
+     "unrelated": 0.9253
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0072,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0038,
+     "different_case": 0.0117,
+     "unrelated": 0.9811
+    }
+   },
+   {
+    "index": 9,
+    "id": "vite:docs/guide/api-environment-plugins.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.007,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0041,
+     "different_case": 0.0114,
+     "unrelated": 0.9816
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-plugin.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0066,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0042,
+     "different_case": 0.0223,
+     "unrelated": 0.9711
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/api-environment-frameworks.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0031,
+     "different_case": 0.0088,
+     "unrelated": 0.9861
+    }
+   },
+   {
+    "index": 8,
+    "id": "vite:docs/guide/api-plugin.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0034,
+     "different_case": 0.0106,
+     "unrelated": 0.984
+    }
+   },
+   {
+    "index": 11,
+    "id": "vite:docs/guide/api-plugin.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0059,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0039,
+     "different_case": 0.0127,
+     "unrelated": 0.9814
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/guide/api-plugin.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0031,
+     "different_case": 0.0119,
+     "unrelated": 0.9831
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/guide/api-plugin.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0018,
+     "different_case": 0.0048,
+     "unrelated": 0.9919
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6033
+  },
+  "timing": {
+   "total_ms": 127,
+   "rerank_ms": 125,
+   "questions_ms": 0,
+   "model_ms": 110,
+   "engine": {
+    "rows": 6501,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 110,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 208
+   }
+  }
+ }
+}

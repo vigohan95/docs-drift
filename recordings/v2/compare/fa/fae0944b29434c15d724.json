@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/fa/fae0944b29434c15d724",
+ "request_hash": "fae0944b29434c15d72471949760bd8b2786f7f989a8458e1c90a72ce23bc0dd",
+ "recorded_at": "2026-11-06T14:14:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 881,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.178816",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=47,cfOrigin;dur=0,cfWorker;dur=152"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_9.md#8",
+    "text": "## Hooks for custom methods and statics no longer support callbacks\n\nPreviously, you could use Mongoose middleware with custom methods and statics that took callbacks.\nIn Mongoose 9, this is no longer supported.\nIf you want to use Mongoose middleware with a custom method or static, that custom method or static must be an async function or return a Promise.\n\n```javascript\nconst mySchema = new Schema({\n  name: String\n});\n\n// This is an example of a custom method that uses callbacks. While this method by itself still works in Mongoose 9,\n// Mongoose 9 no longer supports hooks for this method.\nmySchema.methods.foo = async function(cb) {\n  return cb(null, this.name);\n};\nmySchema.statics.bar = async function(cb) {\n  return cb(null, 'bar');\n};\n\n// This is no longer supported because `foo()` and `bar()` use callbacks.\nmySchema.pre('foo', function() {\n  console.log('foo pre hook');\n});\nmySchema.pre('bar', function() {\n  console.log('bar pre hook');\n});\n\n// The following code has a custom method and a custom static that use async functions.\n// The following works correctly in Mongoose 9: `pre('bar')` is executed when you call `bar()` and\n// `pre('qux')` is executed when you call `qux()`.\nmySchema.methods.baz = async function baz(arg) {\n  return arg;\n};\nmySchema.pre('baz', async function baz() {\n  console.log('baz pre hook');\n});\nmySchema.statics.qux = async function qux(arg) {\n  return arg;\n};\nmySchema.pre('qux', async function qux() {\n  console.log('qux pre hook');\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_9.md#9",
+    "text": "## `Document.prototype.updateOne` no longer accepts a callback\n\n`Document.prototype.updateOne` still supported callbacks in Mongoose 8. In Mongoose 9, the callback parameter was removed.\n\n```javascript\nconst doc = await TestModel.findOne().orFail();\n\n// Worked in Mongoose 8, no longer supported in Mongoose 9.\ndoc.updateOne({ name: 'updated' }, null, (err, res) => {\n  if (err) throw err;\n  console.log(res);\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_9.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_9.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/migrating_to_9.md#8",
+    "b": "mongoose:docs/migrating_to_9.md#9",
+    "relation": "unrelated",
+    "related": 0.0081,
+    "probabilities": {
+     "same": 0.0024,
+     "overlapping": 0.0027,
+     "conflicting": 0.003,
+     "unrelated": 0.9919
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27
+  },
+  "timing": {
+   "read_ms": 27,
+   "total_ms": 30
+  }
+ }
+}

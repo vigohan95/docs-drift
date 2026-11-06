@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2d/2d819d374b3a69678509",
+ "request_hash": "2d819d374b3a69678509e4668baa20be1627f231588eddaaca4f89713996f17b",
+ "recorded_at": "2026-11-06T14:14:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 990,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "136.87101",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=292"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "got:documentation/10-instances.md#5",
+    "text": "### `got.extend(…options, …instances)`\n\n**Tip:**\n> - `options` can include `handlers` and `mutableDefaults`.\n\n**Note:**\n> - Properties that are not enumerable, such as `body`, `json`, and `form`, will not be merged. Pass them to each request instead of to `got.extend()`: an instance created with one keeps it in its recorded options, so `got.extend(instance, …)` can throw when another argument sets a different kind of payload.\n\nConfigure a new `got` instance with merged default options. The options are merged with the parent instance's `defaults.options` using [`options.merge(…)`](2-options.md#merge).\n\n```js\nimport got from 'got';\n\nconst client = got.extend({\n\tprefixUrl: 'https://httpbin.org',\n\theaders: {\n\t\t'x-foo': 'bar'\n\t}\n});\n\nconst {headers} = await client.get('headers').json();\nconsole.log(headers['x-foo']); //=> 'bar'\n\nconst jsonClient = client.extend({\n\tresponseType: 'json',\n\tresolveBodyOnly: true,\n\theaders: {\n\t\t'x-lorem': 'impsum'\n\t}\n});\n\nconst {headers: headers2} = await jsonClient.get('headers');\nconsole.log(headers2['x-foo']);   //=> 'bar'\nconsole.log(headers2['x-lorem']); //=> 'impsum'\n```\n\n**Note:**\n> - Handlers can be asynchronous and can return a `Promise`, but never a `Promise<Stream>` when `options.isStream` is `true` (set internally for `got.stream()` requests).\n> - Streams must always be handled synchronously.\n> - In order to perform async work using streams, the `beforeRequest` hook should be used instead."
+   },
+   {
+    "id": "got:documentation/9-hooks.md#3",
+    "text": "#### `beforeRequest`\n\n**Type: `BeforeRequestHook[]`**\\\n**Default: `[]`**\n\n```ts\n(options: NormalizedOptions, context: BeforeRequestHookContext) => Promisable<void | ClientRequest | IncomingMessage | ResponseLike>\n```\n\nCalled right before making the request with `options.createNativeRequestOptions()`.\\\nThis hook is especially useful in conjunction with `got.extend()` when you want to sign your request.\n\nThe second parameter is a context object with the following properties:\n- `retryCount` - The current retry count (0 for the initial request, 1+ for retries).\n\n**Note:**\n> - Got will make no further changes to the request before it is sent.\n\n**Note:**\n> - Changing `options.json` or `options.form` has no effect on the request. You should change `options.body` instead. If needed, update the `options.headers` accordingly.\n\n```js\nimport got from 'got';\n\nconst response = await got.post(\n\t'https://httpbin.org/anything',\n\t{\n\t\tjson: {payload: 'old'},\n\t\thooks: {\n\t\t\tbeforeRequest: [\n\t\t\t\t(options, context) => {\n\t\t\t\t\toptions.body = JSON.stringify({payload: 'new'});\n\t\t\t\t\toptions.headers['content-length'] = new TextEncoder().encode(options.body).byteLength.toString();\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t}\n);\n```\n\nYou can use `context.retryCount` to conditionally modify behavior based on whether it's the initial request or a retry:\n\n```js\nimport got from 'got';\n\nconst response = await got('https://httpbin.org/status/500', {\n\tretry: {\n\t\tlimit: 2\n\t},\n\thooks: {\n\t\tbeforeRequest: [\n\t\t\t(options, context) => {\n\t\t\t\t// Only log on initial request, not on retries\n\t\t\t\tif (context.retryCount === 0) {\n\t\t\t\t\tconsole.log('Making initial request');\n\t\t\t\t}\n\t\t\t}\n\t\t]\n\t}\n});\n```\n\n**Tip:**\n> - You can indirectly override the `request` function by early returning a [`ClientRequest`-like](https://nodejs.org/api/http.html#http_class_http_clientrequest) instance or a [`IncomingMessage`-like](https://nodejs.org/api/http.html#http_class_http_incomingmessage) instance. This is very useful when creating a custom cache mechanism.\n> - [Read more about this tip](cache.md#advanced-caching-mechanisms)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "got:documentation/10-instances.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "got:documentation/9-hooks.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "got:documentation/10-instances.md#5",
+    "b": "got:documentation/9-hooks.md#3",
+    "relation": "overlapping",
+    "related": 0.6355,
+    "probabilities": {
+     "same": 0.0151,
+     "overlapping": 0.6038,
+     "conflicting": 0.0166,
+     "unrelated": 0.3645
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 62,
+   "passage_reads": 1,
+   "passages_ms": 98,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 160,
+   "total_ms": 164
+  }
+ }
+}

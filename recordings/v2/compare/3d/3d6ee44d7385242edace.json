@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3d/3d6ee44d7385242edace",
+ "request_hash": "3d6ee44d7385242edaceb3db031e5ec91b28efd97b7183fede046bfb66f010e7",
+ "recorded_at": "2026-11-06T14:14:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 964,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "89.363167",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=266"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "text": "### Unit of Work and Identity Map\n\nMikroORM uses the Identity Map pattern to track objects. Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`. This allows MikroORM room for optimizations. If you call the EntityManager and ask for an entity with a specific ID twice, it will return the same instance:\n\n```ts\nconst jon1 = await em.findOne(Author, 1);\nconst jon2 = await em.findOne(Author, 1);\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nThe Identity Map only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before. But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key."
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#3",
+    "text": "## How MikroORM Detects Changes\n\nMikroORM is a data-mapper that tries to achieve persistence-ignorance (PI). This means you map JS objects into a relational database that do not necessarily know about the database at all. A natural question would now be, \"how does MikroORM even detect objects have changed?\".\n\nFor this MikroORM keeps a second map inside the `UnitOfWork`. Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`.\n\nNow whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`. For each object it will compare the original property and association values with the values that are currently set on the object. If changes are detected then the object is queued for a UPDATE operation. Only the fields that actually changed are updated."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#15",
+    "b": "mikro-orm:docs/docs/unit-of-work.md#3",
+    "relation": "overlapping",
+    "related": 0.9957,
+    "probabilities": {
+     "same": 0.0039,
+     "overlapping": 0.9884,
+     "conflicting": 0.0034,
+     "unrelated": 0.0043
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 96,
+   "total_ms": 99
+  }
+ }
+}

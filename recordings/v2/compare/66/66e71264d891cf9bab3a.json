@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/66/66e71264d891cf9bab3a",
+ "request_hash": "66e71264d891cf9bab3a0e630e297c3811107c99ffaa83aa26cab8e8b4674d7c",
+ "recorded_at": "2026-11-06T14:15:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1250,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "218.270937",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=485"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "text": "## Population no longer infers the where condition by default\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nPreviously when you used populate hints in `em.find()` and similar methods, the query for your entity would be analysed and parts of it extracted and used for the population. Following example would find all authors that have books with given IDs, and populate their books collection, again using this PK condition, resulting in only such books being in those collections.\n\n```ts\n// this would end up with `Author.books` collections having only books of PK 1, 2, 3\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nFollowing this example, if you wanted to load all books, you would need a separate `em.populate()` call:\n\n```ts\nconst a = await em.find(Author, { books: [1, 2, 3] });\nawait em.populate(a, ['books']);\n```\n\nThis behaviour changed and is now configurable both globally and locally, via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` and `PopulateHint.INFER`, the former being the default in v5, the latter being the default behaviour in v4. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\n// revert back to the old behaviour locally\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "text": "## Population where condition\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nWhen you use populate hints in `em.find()` and similar methods, by default all related entities are populated. Consider the following example - it would find all authors that have books with given IDs, and populate their books collection with **all** books, not just those matching the condition:\n\n```ts\n// finds authors with books 1, 2, 3 - but populates ALL their books\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nIf you wanted to populate only the books that match the filter condition, you can use `PopulateHint.INFER`:\n\n```ts\n// finds authors with books 1, 2, 3 - and populates ONLY those books\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```\n\nThis behaviour is configurable both globally and locally via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` (default) and `PopulateHint.INFER`. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\nMikroORM.init({\n  populateWhere: PopulateHint.INFER, // infer populate condition from the filter\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/configuration.md#23"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "b": "mikro-orm:docs/docs/configuration.md#23",
+    "relation": "overlapping",
+    "related": 0.9972,
+    "probabilities": {
+     "same": 0.0564,
+     "overlapping": 0.9315,
+     "conflicting": 0.0094,
+     "unrelated": 0.0028
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0095,
+       "restated": 0.975,
+       "elaborated": 0.0105,
+       "different": 0.005
+      },
+      "confidence": 0.943,
+      "a": {
+       "document": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+       "quote": "Globally you can specify one of `PopulateHint.ALL` and `PopulateHint.INFER`, the former being the default in v5, the latter being the default behaviour in v4.",
+       "start": 1006,
+       "end": 1164,
+       "confidence": 0.943
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/configuration.md#23",
+       "quote": "Globally you can specify one of `PopulateHint.ALL` (default) and `PopulateHint.INFER`.",
+       "start": 968,
+       "end": 1054,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0219,
+       "restated": 0.8791,
+       "elaborated": 0.0438,
+       "different": 0.0553
+      },
+      "confidence": 0.757,
+      "a": {
+       "document": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+       "quote": "Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.",
+       "start": 1165,
+       "end": 1281,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/configuration.md#23",
+       "quote": "Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\nMikroORM.init({\n  populateWhere: PopulateHint.INFER, // infer populate condition from the filter\n});\n```",
+       "start": 1055,
+       "end": 1283,
+       "confidence": 0.757
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 56,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 4,
+   "counterparts_ms": 179
+  },
+  "timing": {
+   "read_ms": 318,
+   "total_ms": 324
+  }
+ }
+}

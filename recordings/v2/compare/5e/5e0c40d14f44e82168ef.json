@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5e/5e0c40d14f44e82168ef",
+ "request_hash": "5e0c40d14f44e82168ef9e47789d47c4adfb4b6061e706297dfe0ff6304c2788",
+ "recorded_at": "2026-11-06T14:21:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 868,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.029312",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=161"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/config/experimental.md#10",
+    "text": "### Known Limitations\n\nSome Vitest features rely on files being transformed. Vitest uses synchronous [Node.js Loaders API](https://nodejs.org/api/module.html#customization-hooks) to transform test files and setup files to support these features:\n\n- [`import.meta.vitest`](/guide/in-source)\n- [`vi.mock`](/api/vi#vi-mock)\n- [`vi.hoisted`](/api/vi#vi-hoisted)\n\n::: warning\nThis means that Vitest requires at least Node 22.15 for those features to work. At the moment, they also do not work in Deno or Bun.\n\nVitest will only detect `vi.mock` and `vi.hoisted` inside of test files, they will not be hoisted inside imported modules.\n:::\n\nThis could affect performance because Vitest needs to read the file and process it. If you do not use these features, you can disable the transforms by setting `experimental.nodeLoader` to `false`. Vitest only reads test files and setup files while looking for `vi.mock` or `vi.hoisted`. Using these in other files won't hoist them to the top of the file and can lead to unexpected behavior.\n\nSome features will not work due to the nature of `viteModuleRunner`, including:\n\n- no `import.meta.env`: `import.meta.env` is a Vite feature, use `process.env` instead\n- no `plugins`: plugins are not applied because there is no transformation phase, use [customization hooks](https://nodejs.org/api/module.html#customization-hooks) via [`execArgv`](/config/execargv) instead\n- no `alias`: aliases are not applied because there is no transformation phase\n- `istanbul` coverage provider doesn't work because there is no transformation phase, use `v8` instead\n- `vi.resetModules()`: there is no API to invalidate ES modules from the module cache"
+   },
+   {
+    "id": "vitest:docs/config/pool.md#4",
+    "text": "## vmThreads\n\nRun tests using [VM context](https://nodejs.org/api/vm.html) (inside a sandboxed environment) in a `threads` pool.\n\nThis makes tests run faster, but the VM module is unstable when running [ESM code](https://github.com/nodejs/node/issues/37648). Your tests will [leak memory](https://github.com/nodejs/node/issues/33439) - to battle that, workers are restarted when they exceed [`vmMemoryLimit`](/config/vmmemorylimit).\n\n::: warning Worker recycling is expensive in `vmThreads`\nRestarting a worker thread is not free: Node.js runs a full garbage collection over everything the worker accumulated before the thread can exit, and that work runs on a small pool of background threads shared by every worker in the process. When a large test suite hits [`vmMemoryLimit`](/config/vmmemorylimit) repeatedly, these teardowns pile up and also slow down the workers that are still running tests.\n\nThe `vmForks` pool recycles workers by letting the child process exit, and the operating system reclaims the memory. If your test suite is large enough to recycle workers, `vmForks` is usually noticeably faster than `vmThreads`, even though its communication with the main process is slower.\n:::\n\nOn Node.js 24.9 and later, `require()` of an ES module is supported inside vm pools, mirroring [Node's own `require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require). Calling `require()` on an ES module whose graph contains top-level `await` throws `ERR_REQUIRE_ASYNC_MODULE` - use `await import()` for those files."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/config/experimental.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/config/pool.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/config/experimental.md#10",
+    "b": "vitest:docs/config/pool.md#4",
+    "relation": "unrelated",
+    "related": 0.0061,
+    "probabilities": {
+     "same": 0.0028,
+     "overlapping": 0.0019,
+     "conflicting": 0.0014,
+     "unrelated": 0.9939
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36
+  },
+  "timing": {
+   "read_ms": 36,
+   "total_ms": 38
+  }
+ }
+}

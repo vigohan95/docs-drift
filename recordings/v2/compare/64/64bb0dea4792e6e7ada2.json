@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/64/64bb0dea4792e6e7ada2",
+ "request_hash": "64bb0dea4792e6e7ada22df8de14ca5bd42480db63eb640811b1032ad6c0ef38",
+ "recorded_at": "2026-11-06T14:12:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 996,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "109.918718",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=270"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#31",
+    "text": "### Creating a many-to-many relation\n\nLet's create a many-to-many relation.\nLet's say a photo can be in many albums, and each album can contain many photos.\nLet's create an `Album` class:\n\n```typescript\nimport {\n    Entity,\n    PrimaryGeneratedColumn,\n    Column,\n    ManyToMany,\n    JoinTable,\n} from \"typeorm\"\n\n@Entity()\nexport class Album {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @ManyToMany(() => Photo, (photo) => photo.albums)\n    @JoinTable()\n    photos: Photo[]\n}\n```\n\n`@JoinTable` is required to specify that this is the owner side of the relationship.\n\nNow let's add the inverse side of our relation to the `Photo` class:\n\n```typescript\nexport class Photo {\n    // ... other columns\n\n    @ManyToMany(() => Album, (album) => album.photos)\n    albums: Album[]\n}\n```\n\nAfter you run the application, the ORM will create an **album_photos_photo_albums** _junction table_:\n\n```text\n+-------------+--------------+----------------------------+\n|                album_photos_photo_albums                |\n+-------------+--------------+----------------------------+\n| album_id    | int          | PRIMARY KEY FOREIGN KEY    |\n| photo_id    | int          | PRIMARY KEY FOREIGN KEY    |\n+-------------+--------------+----------------------------+\n```\n\nRemember to register the `Album` class with your connection in the ORM:"
+   },
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "text": "## What does \"owner side\" in a relations mean or why we need to use `@JoinColumn` and `@JoinTable`?\n\nLet's start with `one-to-one` relation.\nLet's say we have two entities: `User` and `Photo`:\n\n```typescript\n@Entity()\nexport class User {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    name: string\n\n    @OneToOne()\n    photo: Photo\n}\n```\n\n```typescript\n@Entity()\nexport class Photo {\n    @PrimaryGeneratedColumn()\n    id: number\n\n    @Column()\n    url: string\n\n    @OneToOne()\n    user: User\n}\n```\n\nThis example does not have a `@JoinColumn` which is incorrect.\nWhy? Because to make a real relation, we need to create a column in the database.\nWe need to create a column `userId` in `photo` or `photoId` in `user`.\nBut which column should be created - `userId` or `photoId`?\nTypeORM cannot decide for you.\nTo make a decision, you must use `@JoinColumn` on one of the sides.\nIf you put `@JoinColumn` in `Photo` then a column called `userId` will be created in the `photo` table.\nIf you put `@JoinColumn` in `User` then a column called `photoId` will be created in the `user` table.\nThe side with `@JoinColumn` will be called the \"owner side of the relationship\".\nThe other side of the relation, without `@JoinColumn`, is called the \"inverse (non-owner) side of relationship\".\n\nIt is the same in a `@ManyToMany` relation. You use `@JoinTable` to show the owner side of the relation.\n\nIn `@ManyToOne` or `@OneToMany` relations, `@JoinColumn` is not necessary because\nboth decorators are different, and the table where you put the `@ManyToOne` decorator will have the relational column.\n\n`@JoinColumn` and `@JoinTable` decorators can also be used to specify additional\njoin column / junction table settings, like join column name or junction table name."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/getting-started.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/help/1-faq.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/getting-started.md#31",
+    "b": "typeorm:docs/docs/help/1-faq.md#4",
+    "relation": "overlapping",
+    "related": 0.9967,
+    "probabilities": {
+     "same": 0.0041,
+     "overlapping": 0.9889,
+     "conflicting": 0.0037,
+     "unrelated": 0.0033
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 119,
+   "total_ms": 123
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/58/5854444b2ab066dbd3eb",
+ "request_hash": "5854444b2ab066dbd3eb92e35dcbfa19f6ecfa310164ed45a2801f11541db77b",
+ "recorded_at": "2026-11-06T14:12:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 911,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.196289",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=194"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#71",
+    "text": "### `<hetzner_sd_config>`\n\nHetzner SD configurations allow retrieving scrape targets from\n[Hetzner](https://www.hetzner.com/) [Cloud](https://www.hetzner.cloud/) API and\n[Robot](https://docs.hetzner.com/robot/) API.\nThis service discovery uses the public IPv4 address by default, but that can be\nchanged with relabeling, as demonstrated in [the Prometheus hetzner-sd\nconfiguration file](/documentation/examples/prometheus-hetzner.yml).\n\nThe following meta labels are available on all targets during [relabeling](#relabel_config):\n\n* `__meta_hetzner_server_id`: the ID of the server\n* `__meta_hetzner_server_name`: the name of the server\n* `__meta_hetzner_server_status`: the status of the server\n* `__meta_hetzner_public_ipv4`: the public ipv4 address of the server\n* `__meta_hetzner_public_ipv6_network`: the public ipv6 network (/64) of the server\n\nNote that the `__meta_hetzner_datacenter` label is deprecated for the `robot` role, the replacement label is `__meta_hetzner_robot_datacenter`.\n\nThe labels below are only available for targets with `role` set to `hcloud`:\n\n* `__meta_hetzner_hcloud_image_name`: the image name of the server\n* `__meta_hetzner_hcloud_image_description`: the description of the server image\n* `__meta_hetzner_hcloud_image_os_flavor`: the OS flavor of the server image\n* `__meta_hetzner_hcloud_image_os_version`: the OS version of the server image\n* `__meta_hetzner_hcloud_location`: the location of the server\n* `__meta_hetzner_hcloud_location_network_zone`: the network zone of the server\n* `__meta_hetzner_hcloud_datacenter_location`: the location of the server (deprecated in favor of `__meta_hetzner_hcloud_location`)\n* `__meta_hetzner_hcloud_datacenter_location_network_zone`: the network zone of the server (deprecated in favor of `__meta_hetzner_hcloud_location_network_zone`)\n* `__meta_hetzner_hcloud_server_type`: the type of the server\n* `__meta_hetzner_hcloud_cpu_cores`: the CPU cores count of the server\n* `__meta_hetzner_hcloud_cpu_type`: the CPU type of the server (shared or dedicated)\n* `__meta_hetzner_hcloud_memory_size_gb`: the amount of memory of the server (in GB)\n* `__meta_hetzner_hcloud_disk_size_gb`: the disk size of the server (in GB)\n* `__meta_hetzner_hcloud_private_ipv4_<networkname>`: the private ipv4 address of the server within a given network\n* `__meta_hetzner_hcloud_label_<labelname>`: each label of the server, with any unsupported characters converted to an underscore\n* `__meta_hetzner_hcloud_labelpresent_<labelname>`: `true` for each label of the server, with any unsupported characters converted to an underscore"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#80",
+    "text": "#### `endpointslice`\n\nThe `endpointslice` role discovers targets from existing endpointslices. For each endpoint\naddress referenced in the endpointslice object one target is discovered. If the endpoint is backed by a pod, all\nadditional container ports of the pod, not bound to an endpoint port, are discovered as targets as well.\n\nThe role requires the `discovery.k8s.io/v1` API version (available since Kubernetes v1.21).\n\nAvailable meta labels:\n\n* `__meta_kubernetes_namespace`: The namespace of the endpointslice object.\n* `__meta_kubernetes_namespace_label_<labelname>`: Each label from the namespace object, with any unsupported characters converted to an underscore. Requires `attach_metadata: {namespace: true}`.\n* `__meta_kubernetes_namespace_labelpresent_<labelname>`: `true` for each label from the namespace object, with any unsupported characters converted to an underscore. Requires `attach_metadata: {namespace: true}`.\n* `__meta_kubernetes_namespace_annotation_<annotationname>`: Each annotation from the namespace object. Requires `attach_metadata: {namespace: true}`.\n* `__meta_kubernetes_namespace_annotationpresent_<annotationname>`: `true` for each annotation from the namespace object. Requires `attach_metadata: {namespace: true}`.\n* `__meta_kubernetes_endpointslice_name`: The name of endpointslice object.\n* `__meta_kubernetes_endpointslice_label_<labelname>`: Each label from the endpointslice object, with any unsupported characters converted to an underscore.\n* `__meta_kubernetes_endpointslice_labelpresent_<labelname>`: `true` for each label from the endpointslice object, with any unsupported characters converted to an underscore.\n* `__meta_kubernetes_endpointslice_annotation_<annotationname>`: Each annotation from the endpointslice object.\n* `__meta_kubernetes_endpointslice_annotationpresent_<annotationname>`: `true` for each annotation from the endpointslice object.\n* For all targets discovered directly from the endpointslice list (those not additionally inferred\n  from underlying pods), the following labels are attached:\n  * `__meta_kubernetes_endpointslice_address_target_kind`: Kind of the referenced object.\n  * `__meta_kubernetes_endpointslice_address_target_name`: Name of referenced object.\n  * `__meta_kubernetes_endpointslice_address_type`: The ip protocol family of the address of the target.\n  * `__meta_kubernetes_endpointslice_endpoint_conditions_ready`: Set to `true` or `false` for the referenced endpoint's ready state.\n  * `__meta_kubernetes_endpointslice_endpoint_conditions_serving`: Set to `true` or `false` for the referenced endpoint's serving state.\n  * `__meta_kubernetes_endpointslice_endpoint_conditions_terminating`: Set to `true` or `false` for the referenced endpoint's terminating state.\n  * `__meta_kubernetes_endpointslice_endpoint_topology_kubernetes_io_hostname`: Name of the node hosting the referenced endpoint.\n  * `__meta_kubernetes_endpointslice_endpoint_topology_present_kubernetes_io_hostname`: Flag that shows if the referenced object has a kubernetes.io/hostname annotation.\n  * `__meta_kubernetes_endpointslice_endpoint_hostname`: Hostname of the referenced endpoint.\n  * `__meta_kubernetes_endpointslice_endpoint_node_name`: Name of the Node hosting the referenced endpoint.\n  * `__meta_kubernetes_endpointslice_endpoint_zone`: Zone the referenced endpoint exists in.\n  * `__meta_kubernetes_endpointslice_port`: Port of the referenced endpoint.\n  * `__meta_kubernetes_endpointslice_port_name`: Named port of the referenced endpoint."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#71",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#80",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#71",
+    "b": "prometheus:docs/configuration/configuration.md#80",
+    "relation": "unrelated",
+    "related": 0.0043,
+    "probabilities": {
+     "same": 0.0013,
+     "overlapping": 0.0012,
+     "conflicting": 0.0018,
+     "unrelated": 0.9957
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 45
+  },
+  "timing": {
+   "read_ms": 45,
+   "total_ms": 49
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/43/4315324592e6db4c020c",
+ "request_hash": "4315324592e6db4c020c375cd9ce4cb69cac645980714af2b837f62e46ea8e14",
+ "recorded_at": "2026-11-06T14:12:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1030,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "132.637375",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=56,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "text": "### `test.yml`\n\n```yaml\n# This is the main input for unit testing.\n# Only this file is passed as command line argument.\n\nrule_files:\n    - alerts.yml\n\nevaluation_interval: 1m\n\ntests:\n    # Test 1.\n    - interval: 1m\n      # Series data.\n      input_series:\n          - series: 'up{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'\n          - series: 'up{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '1+0x6 0 0 0 0 0 0 0 0' # 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0\n          - series: 'go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '10+10x2 30+20x5' # 10 20 30 30 50 70 90 110 130\n          - series: 'go_goroutines{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '10+10x7 10+30x4' # 10 20 30 40 50 60 70 80 10 40 70 100 130\n\n      # Unit test for alerting rules.\n      alert_rule_test:\n          # Unit test 1.\n          - eval_time: 10m\n            alertname: InstanceDown\n            exp_alerts:\n                # Alert 1.\n                - exp_labels:\n                      severity: page\n                      instance: localhost:9090\n                      job: prometheus\n                  exp_annotations:\n                      summary: \"Instance localhost:9090 down\"\n                      description: \"localhost:9090 of job prometheus has been down for more than 5 minutes.\"\n      # Unit tests for promql expressions.\n      promql_expr_test:\n          # Unit test 1.\n          - expr: go_goroutines > 5\n            eval_time: 4m\n            exp_samples:\n                # Sample 1.\n                - labels: 'go_goroutines{job=\"prometheus\",instance=\"localhost:9090\"}'\n                  value: 50\n                # Sample 2.\n                - labels: 'go_goroutines{job=\"node_exporter\",instance=\"localhost:9100\"}'\n                  value: 50\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#2",
+    "b": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "relation": "overlapping",
+    "related": 0.9898,
+    "probabilities": {
+     "same": 0.0183,
+     "overlapping": 0.9617,
+     "conflicting": 0.0098,
+     "unrelated": 0.0102
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 44,
+   "passage_reads": 1,
+   "passages_ms": 102,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 146,
+   "total_ms": 149
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/85/85fefa79bbabd8f18b94",
+ "request_hash": "85fefa79bbabd8f18b94fb9ae8be8f69975f42c0f80d389f59b9d18dc5207506",
+ "recorded_at": "2026-11-06T14:21:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2766,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "161.755394",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=317"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/config/maxconcurrency.md#1",
+    "text": "# maxConcurrency\n\n- **Type:** `number`\n- **Default:** `5`\n- **CLI:** `--max-concurrency=10`, `--maxConcurrency=10`\n\nThe maximum number of tests and hooks that can run at the same time when using `test.concurrent` or `describe.concurrent`.\n\nThe hook execution order within a single group is also controlled by [`sequence.hooks`](/config/sequence#sequence-hooks). With `sequence.hooks: 'parallel'`, the execution is bounded by the same limit of [`maxConcurrency`](/config/maxconcurrency)."
+   },
+   {
+    "id": "vitest:docs/guide/learn/writing-tests.md#8",
+    "text": "## Parameterized Tests\n\nWhen you have several test cases that only differ in their inputs and expected outputs, writing a separate `test` for each one gets repetitive. [`test.for`](/api/test#test-for) lets you define the cases as data and run the same test logic for all of them:\n\n```js\nimport { expect, test } from 'vitest'\n\ntest.for([\n  [1, 1, 2],\n  [1, 2, 3],\n  [2, 1, 3],\n])('add(%i, %i) -> %i', ([a, b, expected]) => {\n  expect(a + b).toBe(expected)\n})\n```\n\nIn the example above, the %i placeholders are replaced with the integer values from each data row. Vitest also supports other placeholder types, such as %s for strings and %f for floating-point numbers. As a result, the test runner generates test names such as add(1, 1) -> 2, add(1, 2) -> 3, and add(2, 1) -> 3.\n\nIf your cases have more than two or three values, passing objects is more readable. Use `$property` in the name to interpolate fields:\n\n```js\ntest.for([\n  { a: 1, b: 1, expected: 2 },\n  { a: 1, b: 2, expected: 3 },\n  { a: 2, b: 1, expected: 3 },\n])('add($a, $b) -> $expected', ({ a, b, expected }) => {\n  expect(a + b).toBe(expected)\n})\n```\n\nThe second argument to the test function is the [Test Context](/guide/test-context), which gives you access to fixtures, per-test `expect`, and other utilities. This is especially useful with [`test.concurrent`](/api/test#concurrent), where concurrent tests run in parallel and the global `expect` can't reliably associate a snapshot with the right test. The context-scoped `expect` solves this:\n\n```js\ntest.concurrent.for([\n  [1, 1],\n  [1, 2],\n  [2, 1],\n])('add(%i, %i)', ([a, b], { expect }) => {\n  expect(a + b).toMatchSnapshot()\n})\n```\n\n[`describe.for`](/api/describe#describe-for) works the same way but creates a suite for each set of parameters, which is useful when multiple tests share the same parameterized setup.\n\n::: tip\nVitest also provides [`test.each`](/api/test#each), which you may recognize from Jest. It works similarly but spreads array arguments instead of passing them as a single value, and doesn't provide access to the Test Context. It exists mainly for Jest compatibility. Prefer `test.for` in new code.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/config/maxconcurrency.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/learn/writing-tests.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/config/maxconcurrency.md#1",
+    "b": "vitest:docs/guide/learn/writing-tests.md#8",
+    "relation": "overlapping",
+    "related": 0.5355,
+    "probabilities": {
+     "same": 0.0119,
+     "overlapping": 0.5042,
+     "conflicting": 0.0195,
+     "unrelated": 0.4645
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 54,
+   "passage_reads": 1,
+   "passages_ms": 121,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 173,
+   "total_ms": 178
+  }
+ }
+}

@@ -1,0 +1,189 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/59/595759706e893e2a8883",
+ "request_hash": "595759706e893e2a88833e5e13f587ff8f09c7cce21c8a8f107d913f009375b0",
+ "recorded_at": "2026-11-06T14:20:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1315,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "187.950367",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=94,cfOrigin;dur=0,cfWorker;dur=334"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/browser/index.md#19",
+    "text": "### Spying on Module Exports\n\nBrowser Mode uses the browser's native ESM support to serve modules. The module namespace object is sealed and can't be reconfigured, unlike in Node.js tests where Vitest can patch the Module Runner. This means you can't call `vi.spyOn` on an imported object:\n\n```ts\nimport { vi } from 'vitest'\nimport * as module from './module.js'\n\nvi.spyOn(module, 'method') // ❌ throws an error\n```\n\nTo bypass this limitation, Vitest supports `{ spy: true }` option in `vi.mock('./module.js')`. This will automatically spy on every export in the module without replacing them with fake ones.\n\n```ts\nimport { vi } from 'vitest'\nimport * as module from './module.js'\n\nvi.mock('./module.js', { spy: true })\n\nvi.mocked(module.method).mockImplementation(() => {\n  // ...\n})\n```\n\nHowever, the only way to mock exported _variables_ is to export a method that will change the internal value:\n\n::: code-group\n\n```js [module.js]\nexport let MODE = 'test'\nexport function changeMode(newMode) {\n  MODE = newMode\n}\n```\n\n```js [module.test.ts]\nimport { expect } from 'vitest'\nimport { changeMode, MODE } from './module.js'\n\nchangeMode('production')\nexpect(MODE).toBe('production')\n```\n\n:::"
+   },
+   {
+    "id": "vitest:docs/guide/mocking/modules.md#3",
+    "text": "::: danger Browser Mode Support\nThis will not work in the [Browser Mode](/guide/browser/) because it uses the browser's native ESM support to serve modules. The module namespace object is sealed and can't be reconfigured. To bypass this limitation, Vitest supports `{ spy: true }` option in `vi.mock('./example.js')`. This will automatically spy on every export in the module without replacing them with fake ones.\n\n```ts\nimport { vi } from 'vitest'\nimport * as exampleObject from './example.js'\n\nvi.mock('./example.js', { spy: true })\n\nvi.mocked(exampleObject.answer).mockReturnValue(0)\n```\n\n:::\n\n::: warning\nYou only need to import the module as a namespace object in the file where you are using the `vi.spyOn` utility. If the `answer` is called in another file and is imported there as a named export, Vitest will be able to properly track it as long as the function that called it is called after `vi.spyOn`:\n\n```ts [source.js]\nimport { answer } from './example.js'\n\nexport function question() {\n  if (answer() === 42) {\n    return 'Ultimate Question of Life, the Universe, and Everything'\n  }\n\n  return 'Unknown Question'\n}\n```\n\n:::\n\nNote that `vi.spyOn` will only spy on calls that were done after it spied on the method. So, if the function is executed at the top level during an import or it was called before the spying, `vi.spyOn` will not be able to report on it."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/browser/index.md#19",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/guide/mocking/modules.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/mocking/modules.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/guide/browser/index.md#19"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/browser/index.md#19",
+    "b": "vitest:docs/guide/mocking/modules.md#3",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0061,
+     "overlapping": 0.9894,
+     "conflicting": 0.003,
+     "unrelated": 0.0015
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0095,
+       "restated": 0.9647,
+       "elaborated": 0.0199,
+       "different": 0.0059
+      },
+      "confidence": 0.9941,
+      "a": {
+       "document": "vitest:docs/guide/browser/index.md#19",
+       "quote": "Browser Mode uses the browser's native ESM support to serve modules.",
+       "start": 30,
+       "end": 98,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/guide/mocking/modules.md#3",
+       "quote": "::: danger Browser Mode Support\nThis will not work in the [Browser Mode](/guide/browser/) because it uses the browser's native ESM support to serve modules.",
+       "start": 0,
+       "end": 156,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9652,
+       "restated": 0.0212,
+       "elaborated": 0.0076,
+       "different": 0.006
+      },
+      "confidence": 0.614,
+      "a": {
+       "document": "vitest:docs/guide/browser/index.md#19",
+       "quote": "The module namespace object is sealed and can't be reconfigured, unlike in Node.js tests where Vitest can patch the Module Runner.",
+       "start": 99,
+       "end": 229,
+       "confidence": 0.614
+      },
+      "b": {
+       "document": "vitest:docs/guide/mocking/modules.md#3",
+       "quote": "The module namespace object is sealed and can't be reconfigured.",
+       "start": 157,
+       "end": 221,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0224,
+       "restated": 0.9547,
+       "elaborated": 0.0151,
+       "different": 0.0078
+      },
+      "confidence": 0.9922,
+      "a": {
+       "document": "vitest:docs/guide/browser/index.md#19",
+       "quote": "To bypass this limitation, Vitest supports `{ spy: true }` option in `vi.mock('./module.js')`.",
+       "start": 417,
+       "end": 511,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/guide/mocking/modules.md#3",
+       "quote": "To bypass this limitation, Vitest supports `{ spy: true }` option in `vi.mock('./example.js')`.",
+       "start": 222,
+       "end": 317,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0212,
+       "restated": 0.8267,
+       "elaborated": 0.0461,
+       "different": 0.106
+      },
+      "confidence": 0.894,
+      "a": {
+       "document": "vitest:docs/guide/browser/index.md#19",
+       "quote": "This will automatically spy on every export in the module without replacing them with fake ones.",
+       "start": 512,
+       "end": 608,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/guide/mocking/modules.md#3",
+       "quote": "This will automatically spy on every export in the module without replacing them with fake ones.\n\n```ts\nimport { vi } from 'vitest'\nimport * as exampleObject from './example.js'\n\nvi.mock('./example.js', { spy: true })\n\nvi.mocked(exampleObject.answer).mockReturnValue(0)\n```\n\n:::\n\n::: warning\nYou only need to import the module as a namespace object in the file where you are using the `vi.spyOn` utility.",
+       "start": 318,
+       "end": 722,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 75,
+   "passages": 4,
+   "counterparts_ms": 95
+  },
+  "timing": {
+   "read_ms": 199,
+   "total_ms": 202
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/98/987f4637e9e80b0a34e8",
+ "request_hash": "987f4637e9e80b0a34e8c8c0c85974e400df6ae94f6b80d1d8c6d64b75c16adf",
+ "recorded_at": "2026-11-06T14:14:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 854,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.978752",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=186"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#25",
+    "text": "## Disabling transactions\n\nIt is possible to disable transactions, either globally via `disableTransactions` config option, or locally when using `em.transactional()`.\n\n```ts\n// only the outer transaction will be opened\nawait orm.em.transactional(async em => {\n  // but the inner calls to both em.transactional and em.begin will be no-op\n  await em.transactional(...);\n}, { disableTransactions: true });\n```\n\nAlternatively, you can disable transactions when creating new forks:\n\n```ts\nconst em = await orm.em.fork({ disableTransactions: true });\nawait em.transactional(...); // no-op\nawait em.begin(...); // no-op\nawait em.commit(...); // commit still calls `flush`\n```\n\n> This part of documentation is highly inspired by [doctrine internals docs](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/transactions-and-concurrency.html) as the behaviour here is pretty much the same."
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#5",
+    "text": "## Flush Modes\n\nThe flushing strategy is given by the `flushMode` of the current running `EntityManager`.\n\n- `FlushMode.COMMIT` - The `EntityManager` delays the flush until the current Transaction is committed.\n- `FlushMode.AUTO` - This is the default mode, and it flushes the `EntityManager` only if necessary.\n- `FlushMode.ALWAYS` - Flushes the `EntityManager` before every query.\n\n`FlushMode.AUTO` will try to detect changes on the entity you are querying, and flush if there is an overlap:\n\n```ts\n// querying for author will trigger auto-flush if you have new author persisted\nconst a1 = new Author(...);\nem.persist(a1);\nconst r1 = await em.find(Author, {});\n\n// querying author won't trigger auto-flush if you have new book, but no changes on author\nconst b4 = new Book(...);\nem.persist(b4);\nconst r2 = await em.find(Author, {});\n\n// but querying for book will trigger auto-flush\nconst r3 = await em.find(Book, {});\n```\n\nChanges on managed entities are not detected automatically, you need to call `em.persist` if you want such changes to trigger auto flush.\n\n```ts\nconst book = await em.findOne(Book, 1);\nbook.price = 1000;\nem.persist(book);\n\n// triggers auto-flush because of the changed `price`\nconst r1 = await em.find(Book, { price: { $gt: 500 } });\n\n// triggers auto-flush too, the book entity is dirty\nconst r2 = await em.find(Book, { name: /foo.*/ });\n```\n\nYou can set the flush mode on different places:\n\n- in the ORM config via `Options.flushMode`\n- for given `EntityManager` instance (and its forks) via `em.setFlushMode()`\n- for given `EntityManager` fork via `em.fork({ flushMode })`\n- for given QueryBuilder instance via `qb.setFlushMode()`\n- for given transaction scope via `em.transactional(..., { flushMode })`\n- for given `em.find` (or similar) call via `em.find(..., { flushMode })`\n\n> This part of documentation is highly inspired by [doctrine internals docs](https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/unitofwork.html) as the behaviour here is pretty much the same."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#25",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/transactions.md#25",
+    "b": "mikro-orm:docs/docs/unit-of-work.md#5",
+    "relation": "unrelated",
+    "related": 0.0056,
+    "probabilities": {
+     "same": 0.0022,
+     "overlapping": 0.0017,
+     "conflicting": 0.0018,
+     "unrelated": 0.9944
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

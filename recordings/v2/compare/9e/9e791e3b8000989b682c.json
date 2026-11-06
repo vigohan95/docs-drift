@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9e/9e791e3b8000989b682c",
+ "request_hash": "9e791e3b8000989b682cfdb28491ba2c62e494fba7d112220bac13f09828e9dc",
+ "recorded_at": "2026-11-06T14:12:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 916,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.176704",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=189"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#23",
+    "text": "#### `msk`\n\nThe `msk` role discovers targets from AWS MSK (Managed Streaming for Apache Kafka) provisioned clusters.\n\n**Important**: This service discovery only works with **provisioned clusters**. Serverless clusters are not supported as they do not expose individual broker nodes.\n\nDiscovery includes:\n- **Broker nodes**: Kafka broker instances (supports both ZooKeeper-based and KRaft-based clusters)\n- **KRaft Controller nodes**: Controller instances (KRaft-based clusters only)\n\nNote: ZooKeeper nodes are not discoverable via the MSK API. For monitoring, MSK provides:\n- **JMX Exporter**: Available on both broker and KRaft controller nodes (when enabled)\n- **Node Exporter**: Available on broker nodes only (when enabled)\n\nThe IAM credentials used must have the following permissions to discover\nscrape targets:\n\n- `kafka:DescribeClusterV2`\n- `kafka:ListClustersV2`\n- `kafka:ListNodes`\n\nThe following meta labels are available on targets during [relabeling](#relabel_config):\n\n* `__meta_msk_cluster_name`: the name of the MSK cluster\n* `__meta_msk_cluster_arn`: the ARN of the MSK cluster\n* `__meta_msk_cluster_state`: the state of the MSK cluster (e.g., ACTIVE, CREATING, DELETING)\n* `__meta_msk_cluster_type`: the type of the MSK cluster (always PROVISIONED, as serverless clusters are skipped)\n* `__meta_msk_cluster_version`: the current version of the MSK cluster\n* `__meta_msk_cluster_kafka_version`: the Kafka version running on the cluster\n* `__meta_msk_cluster_jmx_exporter_enabled`: whether JMX exporter is enabled on the cluster; this label is absent (not `false`) when Open Monitoring is not enabled on the cluster\n* `__meta_msk_cluster_configuration_arn`: the ARN of the MSK configuration; this label is absent when the cluster is not using custom config\n* `__meta_msk_cluster_configuration_revision`: the revision of the MSK configuration; this label is absent when the cluster is not using custom config\n* `__meta_msk_cluster_tag_<tagkey>`: each cluster tag value, keyed by tag name\n* `__meta_msk_node_type`: the type of the node (BROKER or CONTROLLER)\n* `__meta_msk_node_arn`: the ARN of the node\n* `__meta_msk_node_added_time`: the time the node was added to the cluster\n* `__meta_msk_node_instance_type`: the instance type of the node\n* `__meta_msk_node_attached_eni`: the ID of the attached ENI\n* `__meta_msk_broker_id`: the broker ID (broker nodes only)\n* `__meta_msk_broker_endpoint_index`: the index of the broker endpoint (broker nodes only)\n* `__meta_msk_broker_client_subnet`: the client subnet of the broker (broker nodes only)\n* `__meta_msk_broker_client_vpc_ip`: the VPC IP address of the broker (broker nodes only)\n* `__meta_msk_broker_node_exporter_enabled`: whether node exporter is enabled on brokers (broker nodes only); this label is absent (not `false`) when Open Monitoring is not enabled on the cluster\n* `__meta_msk_controller_endpoint_index`: the index of the controller endpoint (controller nodes only)"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#26",
+    "text": "* `__meta_elasticache_cache_cluster_log_delivery_configuration_log_group_<index>`: CloudWatch log group name (cloudwatch-logs destination only)\n* `__meta_elasticache_cache_cluster_log_delivery_configuration_delivery_stream_<index>`: Kinesis Firehose delivery stream name (kinesis-firehose destination only)\n* `__meta_elasticache_cache_cluster_pending_modified_values_auth_token_status`: pending auth token status\n* `__meta_elasticache_cache_cluster_pending_modified_values_cache_node_type`: pending cache node type change\n* `__meta_elasticache_cache_cluster_pending_modified_values_engine_version`: pending engine version upgrade\n* `__meta_elasticache_cache_cluster_pending_modified_values_num_cache_nodes`: pending number of cache nodes\n* `__meta_elasticache_cache_cluster_pending_modified_values_transit_encryption_enabled`: pending transit encryption status\n* `__meta_elasticache_cache_cluster_pending_modified_values_transit_encryption_mode`: pending transit encryption mode\n* `__meta_elasticache_cache_cluster_pending_modified_values_cache_node_ids_to_remove`: comma-separated list of cache node IDs to be removed\n* `__meta_elasticache_cache_cluster_security_group_membership_id_<index>`: security group ID (indexed)\n* `__meta_elasticache_cache_cluster_security_group_membership_status_<index>`: security group status (indexed)\n* `__meta_elasticache_cache_cluster_node_id`: cache node ID\n* `__meta_elasticache_cache_cluster_node_status`: cache node status\n* `__meta_elasticache_cache_cluster_node_create_time`: cache node creation time in RFC3339 format\n* `__meta_elasticache_cache_cluster_node_availability_zone`: cache node availability zone\n* `__meta_elasticache_cache_cluster_node_customer_outpost_arn`: cache node outpost ARN\n* `__meta_elasticache_cache_cluster_node_source_cache_node_id`: source cache node ID for replication\n* `__meta_elasticache_cache_cluster_node_parameter_group_status`: parameter group status\n* `__meta_elasticache_cache_cluster_node_endpoint_address`: cache node endpoint address\n* `__meta_elasticache_cache_cluster_node_endpoint_port`: cache node endpoint port\n* `__meta_elasticache_cache_cluster_tag_<tagkey>`: each cache cluster tag value, keyed by tag name"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#26",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#23",
+    "b": "prometheus:docs/configuration/configuration.md#26",
+    "relation": "unrelated",
+    "related": 0.006,
+    "probabilities": {
+     "same": 0.0022,
+     "overlapping": 0.0022,
+     "conflicting": 0.0015,
+     "unrelated": 0.994
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 42
+  },
+  "timing": {
+   "read_ms": 42,
+   "total_ms": 46
+  }
+ }
+}

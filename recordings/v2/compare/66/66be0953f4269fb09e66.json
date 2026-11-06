@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/66/66be0953f4269fb09e66",
+ "request_hash": "66be0953f4269fb09e662922b5f7b17554e6d086f1840efbd18e0401004e1a32",
+ "recorded_at": "2026-11-06T14:15:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 961,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "122.315748",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=274"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#2",
+    "text": "## Base entity\n\nNow let's say we want to have these timestamps (and the primary key) on every entity in our app. With `defineEntity`, we can create a base entity that other entities extend. Put the following into `src/modules/common/base.entity.ts`:\n\n```ts title='base.entity.ts'\nimport { defineEntity, p } from '@mikro-orm/core';\n\nexport const BaseSchema = defineEntity({\n  name: 'BaseEntity',\n  abstract: true,\n  properties: {\n    id: p.integer().primary(),\n    createdAt: p.datetime().onCreate(() => new Date()),\n    updatedAt: p.datetime().onCreate(() => new Date()).onUpdate(() => new Date()),\n  },\n});\n```\n\nThis is an abstract entity (it won't have its own table). Other entities can extend it using the `extends` option:\n\n> You can see the import with `.js` extension - this is mandatory for ESM projects. If your project is targeting CommonJS, drop it.\n\n```ts title='user.entity.ts'\nimport { defineEntity, type InferEntity, p } from '@mikro-orm/core';\nimport { BaseSchema } from '../common/base.entity.js';\n\nexport const UserSchema = defineEntity({\n  name: 'User',\n  extends: BaseSchema,\n  properties: {\n    fullName: p.string(),\n    email: p.string(),\n    password: p.string(),\n    bio: p.text().default(''),\n  },\n});\n\nexport type IUser = InferEntity<typeof UserSchema>;\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/inheritance-mapping.md#2",
+    "text": "```ts\nconst p = defineEntity.properties;\n\n// mapped superclass (abstract entity that won't have its own table)\nconst PersonSchema = defineEntity({\n  name: 'Person',\n  abstract: true,\n  properties: {\n    mapped1: p.number(),\n    mapped2: p.string(),\n    toothbrush: () => p.oneToOne(Toothbrush),\n  },\n});\n\nexport const Employee = defineEntity({\n  name: 'Employee',\n  extends: Person,\n  properties: {\n    id: p.number().primary(),\n    name: p.string(),\n  },\n});\n\nexport const Toothbrush = defineEntity({\n  name: 'Toothbrush',\n  properties: {\n    id: p.number().primary(),\n    // ... more fields\n  },\n});\n\nexport class Person extends PersonSchema.class {}\nPersonSchema.setClass(Person);\n```\n\n> When using `extends` with the `defineEntity + class` pattern, property initializers from the base class run automatically via `super()`. See [Reusing base properties via `extends`](./define-entity.md#extends-initializers) for details.\n\n  </TabItem>\n\n  <TabItem value=\"define-entity\">\n\n```ts\nconst p = defineEntity.properties;\n\n// mapped superclass (abstract entity that won't have its own table)\nexport const Person = defineEntity({\n  name: 'Person',\n  abstract: true,\n  properties: {\n    mapped1: p.number(),\n    mapped2: p.string(),\n    toothbrush: () => p.oneToOne(Toothbrush),\n  },\n});\n\nexport const Employee = defineEntity({\n  name: 'Employee',\n  extends: Person,\n  properties: {\n    id: p.number().primary(),\n    name: p.string(),\n  },\n});\n\nexport const Toothbrush = defineEntity({\n  name: 'Toothbrush',\n  properties: {\n    id: p.number().primary(),\n    // ... more fields\n  },\n});\n\nexport type IPerson = InferEntity<typeof Person>;\nexport type IEmployee = InferEntity<typeof Employee>;\nexport type IToothbrush = InferEntity<typeof Toothbrush>;\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/inheritance-mapping.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/02-relationships.md#2",
+    "b": "mikro-orm:docs/docs/inheritance-mapping.md#2",
+    "relation": "overlapping",
+    "related": 0.9812,
+    "probabilities": {
+     "same": 0.0142,
+     "overlapping": 0.9592,
+     "conflicting": 0.0078,
+     "unrelated": 0.0188
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 96,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 131,
+   "total_ms": 135
+  }
+ }
+}

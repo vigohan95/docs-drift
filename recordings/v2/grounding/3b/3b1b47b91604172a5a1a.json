@@ -1,0 +1,83 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/3b/3b1b47b91604172a5a1a",
+ "request_hash": "3b1b47b91604172a5a1a47303e5176316966b3179bcf29ec57280375ab506f68",
+ "recorded_at": "2026-11-06T14:15:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1048,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "72.046432",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=37,cfOrigin;dur=0,cfWorker;dur=254"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "text": "## Population no longer infers the where condition by default\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nPreviously when you used populate hints in `em.find()` and similar methods, the query for your entity would be analysed and parts of it extracted and used for the population. Following example would find all authors that have books with given IDs, and populate their books collection, again using this PK condition, resulting in only such books being in those collections.\n\n```ts\n// this would end up with `Author.books` collections having only books of PK 1, 2, 3\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nFollowing this example, if you wanted to load all books, you would need a separate `em.populate()` call:\n\n```ts\nconst a = await em.find(Author, { books: [1, 2, 3] });\nawait em.populate(a, ['books']);\n```\n\nThis behaviour changed and is now configurable both globally and locally, via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` and `PopulateHint.INFER`, the former being the default in v5, the latter being the default behaviour in v4. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\n// revert back to the old behaviour locally\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```"
+   }
+  ],
+  "answer": "When you use populate hints in `em.find()` and similar methods, by default all related entities are populated.",
+  "claims": [
+   "When you use populate hints in `em.find()` and similar methods, by default all related entities are populated."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.7111,
+  "ungrounded": 0.2889,
+  "verdict": "grounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "share": 1,
+    "share_of_answer": 0.7111,
+    "claims": [
+     0
+    ]
+   }
+  ],
+  "claims": [
+   {
+    "claim": "When you use populate hints in `em.find()` and similar methods, by default all related entities are populated.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.7111,
+    "contradicted": 0.1409,
+    "not_stated": 0.139,
+    "not_a_claim": 0.009,
+    "verdict": "supported",
+    "sources": {
+     "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18": 1
+    },
+    "source": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "evidence": {
+     "document": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+     "quote": "Globally you can specify one of `PopulateHint.ALL` and `PopulateHint.INFER`, the former being the default in v5, the latter being the default behaviour in v4.",
+     "start": 1006,
+     "end": 1164,
+     "confidence": 0.979
+    }
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.7111
+  },
+  "timing": {
+   "read_ms": 103,
+   "total_ms": 106
+  }
+ }
+}

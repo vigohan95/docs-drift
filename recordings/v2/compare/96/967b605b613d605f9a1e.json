@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/96/967b605b613d605f9a1e",
+ "request_hash": "967b605b613d605f9a1e8aebe192c7d6f3faa513a354e372cb7a8e9c3629056f",
+ "recorded_at": "2026-11-06T14:14:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 960,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "23.528095",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=156"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#33",
+    "text": "## option: toObject {#toObject}\n\nDocuments have a [toObject](api/document.html#document_Document-toObject) method\nwhich converts the mongoose document into a plain JavaScript object. This\nmethod accepts a few options. Instead of applying these options on a\nper-document basis, we may declare the options at the schema level and have\nthem applied to all of the schema's documents by default.\n\nTo have all virtuals show up in your `console.log` output, set the\n`toObject` option to `{ getters: true }`:\n\n```javascript\nconst schema = new Schema({ name: String });\nschema.path('name').get(function(v) {\n  return v + ' is my name';\n});\nschema.set('toObject', { getters: true });\nconst M = mongoose.model('Person', schema);\nconst m = new M({ name: 'Max Headroom' });\nconsole.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }\n```\n\nTo see all available `toObject` options, read [this](api/document.html#document_Document-toObject)."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#17",
+    "text": "## Post Save Hooks Get Flow Control {#post-save-flow-control}\n\nPost hooks now get flow control, which means async post save hooks and child document post save hooks execute **before** your `save()` callback.\n\n```javascript\nconst ChildModelSchema = new mongoose.Schema({\n  text: {\n    type: String\n  }\n});\nChildModelSchema.post('save', function(doc) {\n  // In mongoose 5.x this will print **before** the `console.log()`\n  // in the `save()` callback. In mongoose 4.x this was reversed.\n  console.log('Child post save');\n});\nconst ParentModelSchema = new mongoose.Schema({\n  children: [ChildModelSchema]\n});\n\nconst Model = mongoose.model('Parent', ParentModelSchema);\nconst m = new Model({ children: [{ text: 'test' }] });\nm.save(function() {\n  // In mongoose 5.xm this prints **after** the \"Child post save\" message.\n  console.log('Save callback');\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#33",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#33",
+    "b": "mongoose:docs/migrating_to_5.md#17",
+    "relation": "unrelated",
+    "related": 0.003,
+    "probabilities": {
+     "same": 0.0011,
+     "overlapping": 0.0011,
+     "conflicting": 0.0008,
+     "unrelated": 0.997
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30
+  },
+  "timing": {
+   "read_ms": 30,
+   "total_ms": 32
+  }
+ }
+}

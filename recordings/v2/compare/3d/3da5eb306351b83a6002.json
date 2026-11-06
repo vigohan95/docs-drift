@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3d/3da5eb306351b83a6002",
+ "request_hash": "3da5eb306351b83a600278129d388f0ad60bb3142bdcb857549700355c02ff8b",
+ "recorded_at": "2026-11-06T14:14:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1223,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "195.143717",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=343"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#19",
+    "text": "### Migration class\n\nLet's take a look at the generated migration. You can see there is a class that extends the `Migration` abstract class from the `@mikro-orm/migrations` package:\n\n```ts title='Migration20220913202829.ts'\nimport { Migration } from '@mikro-orm/migrations';\n\nexport class Migration20220913202829 extends Migration {\n\n  async up(): Promise<void> {\n    this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` text not null);');\n    // ...\n  }\n\n}\n```\n\nTo support undoing those changed, you can implement the `down` method, which throws an error by default.\n\n:::info Down migrations and SQLite\n\nMikroORM will generate the down migrations automatically (although not for the initial migration, for security concerns), with one exception - the SQLite driver, due to its limited capabilities. If you use any other driver, a down migration will be generated (unless it's an initial migration).\n\n:::\n\n> You can also execute queries inside the `up()`/`down()` method via `this.execute('...')`, which will run queries in the same transaction as the rest of the migration. The `this.addSql('...)` method also accepts instances of the native query builder or `raw()` SQL fragments.\n\nRead more about migrations in the [documentation](../migrations)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/migrations.md#1",
+    "text": "## Migration class\n\nMigrations are classes that extend Migration abstract class:\n\n```ts\nimport { Migration } from '@mikro-orm/migrations';\n\nexport class Migration20191019195930 extends Migration {\n\n  async up(): Promise<void> {\n    this.addSql('select 1 + 1');\n  }\n\n}\n```\n\nTo support undoing those changed, you can implement the `down` method, which throws an error by default.\n\nMigrations are by default wrapped in a transaction. You can override this behaviour on per migration basis by implementing the `isTransactional(): boolean` method.\n\nSome statements, like `create index concurrently` in PostgreSQL, cannot run inside a transaction at all. With the default `migrations.allOrNothing: true`, returning `false` from `isTransactional()` is not enough for them: such a migration runs on a different connection, outside of the master transaction, so it can't see tables created by earlier migrations in the same run, and it hangs on tables they altered, as their locks are only released once the whole run commits. Set `migrations.allOrNothing: false` too, so every migration is committed on its own. Keep in mind that a failed run will then leave the earlier migrations applied.\n\n```ts\nexport class Migration20260101000000 extends Migration {\n\n  isTransactional(): boolean {\n    return false;\n  }\n\n  async up(): Promise<void> {\n    this.addSql('drop index concurrently if exists \"user_email_index\"');\n    this.addSql('create index concurrently \"user_email_index\" on \"user\" (\"email\")');\n  }\n\n}\n```\n\nA failed concurrent build leaves an invalid index behind, and `create index concurrently if not exists` would silently skip it on the next run, so drop it first as shown above.\n\n`Configuration` object and driver instance are available in the `Migration` class context.\n\nYou can execute queries in the migration via `Migration.execute()` method, which will run queries in the same transaction as the rest of the migration. The `Migration.addSql()` method also accepts instances of the native query builder or `raw()` SQL fragments."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#19",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/migrations.md#1"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/migrations.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/03-project-setup.md#19"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/03-project-setup.md#19",
+    "b": "mikro-orm:docs/docs/migrations.md#1",
+    "relation": "overlapping",
+    "related": 0.9984,
+    "probabilities": {
+     "same": 0.0047,
+     "overlapping": 0.99,
+     "conflicting": 0.0037,
+     "unrelated": 0.0016
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0128,
+       "restated": 0.9401,
+       "elaborated": 0.0305,
+       "different": 0.0166
+      },
+      "confidence": 0.9834,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/03-project-setup.md#19",
+       "quote": "### Migration class",
+       "start": 0,
+       "end": 19,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/migrations.md#1",
+       "quote": "## Migration class\n\nMigrations are classes that extend Migration abstract class:\n\n```ts\nimport { Migration } from '@mikro-orm/migrations';\n\nexport class Migration20191019195930 extends Migration {\n\n  async up(): Promise<void> {\n    this.addSql('select 1 + 1');\n  }\n\n}\n```\n\nTo support undoing those changed, you can implement the `down` method, which throws an error by default.\n\nMigrations are by default wrapped in a transaction.",
+       "start": 0,
+       "end": 430,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0853,
+       "restated": 0.8609,
+       "elaborated": 0.038,
+       "different": 0.0158
+      },
+      "confidence": 0.9842,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/03-project-setup.md#19",
+       "quote": "The `this.addSql('...",
+       "start": 1175,
+       "end": 1196,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/migrations.md#1",
+       "quote": "The `Migration.addSql()` method also accepts instances of the native query builder or `raw()` SQL fragments.",
+       "start": 1924,
+       "end": 2032,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 96,
+   "passages": 2,
+   "counterparts_ms": 76
+  },
+  "timing": {
+   "read_ms": 205,
+   "total_ms": 209
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b2/b26050e6a66b7c923b8a",
+ "request_hash": "b26050e6a66b7c923b8ae561097c755d456e303c13176c58efdc2fec80ad8ca4",
+ "recorded_at": "2026-11-06T14:21:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2197,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.826717",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=224"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/recipes/conditional-mocking.md#5",
+    "text": "## Handling unmatched calls\n\nBy default, when the spy is called with arguments that match no registered behavior, it falls back to the spy's original implementation. If the spy has no original implementation, it returns `undefined`.\n\nThere are three ways to handle this differently:\n\n1. [throwing an error](#onunmatched-throw);\n2. [running a custom function](#onunmatched-fn);\n3. [using asymmetric matchers as catch-all behaviors](#asymmetric-matcher-as-catch-all)."
+   },
+   {
+    "id": "vitest:docs/api/vi.md#31",
+    "text": "The optional `times` option limits how many times a behavior applies before being exhausted. Behaviors registered for the same arguments are consumed last-in-first-out: the most recently registered behavior is tried first, and once exhausted, earlier ones act as fallbacks.\n\n```ts\nconst spy = vi.fn<(key: string) => string>()\n\nvi.when(spy)\n  .calledWith('theme')\n  .thenReturn('light') // fallback, applies indefinitely\n  .thenReturn('dark', { times: 2 }) // applied first for the next 2 calls\n\nexpect(spy('theme')).toBe('dark')\nexpect(spy('theme')).toBe('dark')\nexpect(spy('theme')).toBe('light') // falls back\n```\n\nWhen called with arguments that match no registered behavior, the spy falls through to its original implementation by default. Use the `onUnmatched` option to change this:\n\n- `'passthrough'` (**default**): delegates to the spy's original implementation\n- `'throw'`: throws an error listing the unmatched arguments\n- a function: called with the unmatched arguments; its return value is used\n\n```ts\nconst spy = vi.fn<(id: number) => string>()\n\nvi.when(spy, { onUnmatched: 'throw' })\n  .calledWith(1)\n  .thenReturn('Alice')\n\nexpect(spy(1)).toBe('Alice')\nexpect(() => spy(99)).toThrow() // no behavior defined for 99\n```\n\nThe `When` object returned by `vi.when` supports the [`toHaveBeenExhausted` assertion](/api/expect#tohavebeenexhausted), which passes once every registered behavior has been consumed."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/recipes/conditional-mocking.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/api/vi.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/recipes/conditional-mocking.md#5",
+    "b": "vitest:docs/api/vi.md#31",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0065,
+     "overlapping": 0.9879,
+     "conflicting": 0.0035,
+     "unrelated": 0.0022
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 71,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 101,
+   "total_ms": 105
+  }
+ }
+}

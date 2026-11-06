@@ -135,9 +135,14 @@ def load_project(project: str, root: Path, includes: list[str], excludes: list[s
         for p in sorted(root.glob(pattern)):
             if not p.is_file() or p.suffix.lower() not in (".md", ".mdx"):
                 continue
-            rel = p.relative_to(root).as_posix()
-            if rel in seen or any(re.search(x, rel) for x in excludes):
+            try:  # resolve() gives the on-disk spelling, which the GitHub links need
+                rel = p.resolve().relative_to(root.resolve()).as_posix()
+            except ValueError:
+                rel = p.relative_to(root).as_posix()
+            # case-insensitive filesystems return README.md for a "readme.md" pattern too
+            key = rel.lower()
+            if key in seen or any(re.search(x, rel) for x in excludes):
                 continue
-            seen.add(rel)
+            seen.add(key)
             out.extend(split_file(project, root, rel))
     return out

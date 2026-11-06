@@ -1,0 +1,120 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/fa/fafead7034a99e2b5f6d",
+ "request_hash": "fafead7034a99e2b5f6d6a44dfca04be17f4f10699003529b523939180f569dc",
+ "recorded_at": "2026-11-06T14:12:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1024,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "182.872031",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=340"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/operators.md#5",
+    "text": "If two float samples are matched, the arithmetic operator is applied to the two\ninput values.\n\nIf a float sample is matched with a histogram sample, the behavior follows the\nsame logic as between a scalar and a histogram sample (see above), i.e. `*` and\n`/` (the latter with the histogram sample on the LHS) are valid operations,\nwhile all others lead to the removal of the corresponding element from the\nresulting vector.\n\nIf two histogram samples are matched, only `+` and `-` are valid operations,\neach adding or subtracting all matching bucket populations and the count and\nthe sum of observations. All other operations result in the removal of the\ncorresponding element from the output vector, flagged by an info-level\nannotation. The `+` and `-` operations should generally only be applied to gauge\nhistograms, but PromQL allows them for counter histograms, too, to cover\nspecific use cases, for which special attention is required to avoid problems\nwith unaligned counter resets. (Certain incompatibilities of counter resets can\nbe detected by PromQL and are flagged with a warn-level annotations.) Adding\ntwo counter histograms results in a counter histogram. All other combination of\noperands and all subtractions result in a gauge histogram.\n\n**In any arithmetic binary operation involving vectors**, the metric name (as well as `__type__` and `__unit__`, when the `type-and-unit-labels` feature flag is enabled) is\ndropped. This occurs even if `__name__`, `__type__`, or `__unit__` are explicitly mentioned in `on`\n(see https://github.com/prometheus/prometheus/issues/16631 for further discussion)."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#11",
+    "text": "Matches between two float samples work as usual.\n\nMatches between a float sample and a histogram sample are invalid, and the\ncorresponding element is removed from the result vector, flagged by an info-level\nannotation.\n\nBetween two histogram samples, `==` and `!=` work as expected, but all other\ncomparison binary operations are again invalid.\n\n**In any comparison binary operation involving vectors**, providing the `bool`\nmodifier changes the behavior in the following ways:\n\n* Vector elements which find a match on the other side of the expression but for\n  which the expression is false instead have the value `0`, and vector elements\n  that do find a match and for which the expression is true have the value `1`.\n  (Note that elements with no match or invalid operations involving histogram\n  samples still return no result rather than the value `0`.)\n* The metric name (as well as `__type__` and `__unit__`, when the `type-and-unit-labels` feature flag is enabled) is dropped.\n\nIf the `bool` modifier is not provided, then the metric name from the left side\nis retained, with some exceptions:\n\n* If `on` is used, then the metric name is dropped.\n* If `group_right` is used, then the metric name from the right side is retained,\n  to avoid collisions."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/operators.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "prometheus:docs/querying/operators.md#11"
+    ]
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "prometheus:docs/querying/operators.md#5"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/operators.md#5",
+    "b": "prometheus:docs/querying/operators.md#11",
+    "relation": "conflicting",
+    "related": 0.7765,
+    "probabilities": {
+     "same": 0.0128,
+     "overlapping": 0.2641,
+     "conflicting": 0.4996,
+     "unrelated": 0.2235
+    },
+    "duplicates": [],
+    "conflicts": [
+     {
+      "kind": "rule_or_condition",
+      "kinds": {
+       "value": 0.0063,
+       "date_or_version": 0.0057,
+       "rule_or_condition": 0.9549,
+       "scope": 0.0182,
+       "name": 0.0045,
+       "no_conflict": 0.0104
+      },
+      "confidence": 0.9896,
+      "a": {
+       "document": "prometheus:docs/querying/operators.md#5",
+       "quote": "If a float sample is matched with a histogram sample, the behavior follows the",
+       "start": 95,
+       "end": 173,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/querying/operators.md#11",
+       "quote": "Matches between two float samples work as usual.\n\nMatches between a float sample and a histogram sample are invalid, and the\ncorresponding element is removed from the result vector, flagged by an info-level\nannotation.\n\nBetween two histogram samples, `==` and `!=` work as expected, but all other\ncomparison binary operations are again invalid.\n\n**In any comparison binary operation involving vectors**, providing the `bool`\nmodifier changes the behavior in the following ways:\n\n* Vector elements which find a match on the other side of the expression but for\n  which the expression is false instead have the value `0`, and vector elements\n  that do find a match and for which the expression is true have the value `1`.\n  (Note that elements with no match or invalid operations involving histogram\n  samples still return no result rather than the value `0`.)",
+       "start": 0,
+       "end": 858,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 47,
+   "passage_reads": 1,
+   "passages_ms": 62,
+   "passages": 1,
+   "counterparts_ms": 66,
+   "kinds_ms": 25
+  },
+  "timing": {
+   "read_ms": 200,
+   "total_ms": 206
+  }
+ }
+}

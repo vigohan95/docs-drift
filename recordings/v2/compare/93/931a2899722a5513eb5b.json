@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/93/931a2899722a5513eb5b",
+ "request_hash": "931a2899722a5513eb5bc4f614fea55ba0d2cee052fc6f4a0c26dff3f58a1258",
+ "recorded_at": "2026-11-06T14:15:12Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1129,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "158.813726",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=312"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#1",
+    "text": "## Fastify\n\nLet's create new file `app.ts` inside `src` directory, and export a `bootstrap` function from it, where you create the fastify app instance. Remember how you were forking the [`EntityManager`](/api/core/class/EntityManager) to get around the global context validation? For web servers, you can leverage middlewares, or in fastify hooks, to achieve unique request contexts automatically. MikroORM provides a handy helper called `RequestContext` which can be used to create the fork for each request. The [`EntityManager`](/api/core/class/EntityManager) is aware of this class and tries to get the right context from it automatically.\n\n:::info How does `RequestContext` helper work?\n\nInternally all [`EntityManager`](/api/core/class/EntityManager) methods that work with the Identity Map (e.g. [`em.find()`](/api/core/class/EntityManager#find) or [`em.getReference()`](/api/core/class/EntityManager#getReference)) first call `em.getContext()` to access the contextual fork. This method will first check if the code is running inside `RequestContext` handler and prefer the [`EntityManager`](/api/core/class/EntityManager) fork from it.\n\n```ts\n// we call em.find() on the global EM instance\nconst res = await orm.em.find(Book, {});\n\n// but under the hood this resolves to\nconst res = await orm.em.getContext().find(Book, {});\n\n// which then resolves to\nconst res = await RequestContext.getEntityManager().find(Book, {});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#5",
+    "text": "### How does `RequestContext` helper work?\n\nInternally all `EntityManager` methods that work with the Identity Map (e.g. `em.find()` or `em.getReference()`) first call `em.getContext()` to access the contextual fork. This method will first check if you are running inside `RequestContext` handler and prefer the `EntityManager` fork from it.\n\n```ts\n// we call em.find() on the global EM instance\nconst res = await orm.em.find(Book, {});\n\n// but under the hood this resolves to\nconst res = await orm.em.getContext().find(Book, {});\n\n// which then resolves to\nconst res = await RequestContext.getEntityManager().find(Book, {});\n```\n\nThe `RequestContext.getEntityManager()` method then checks `AsyncLocalStorage` static instance we use for creating new EM forks in the `RequestContext.create()` method.\n\n> The context resolution works only on the global `EntityManager` instance, so if you use `em.fork()` directly, you will not get the request scoped `EntityManager` automatically unless you pass the `useContext: true` option to it.\n>\n> ```ts\n> // `em` will respect the async context\n> const em = orm.em.fork({ useContext: true });\n> ```\n\nThe [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage) class from Node.js core is the magician here. It allows you to track the context throughout the async calls. It allows you to decouple the `EntityManager` fork creation (usually in a middleware as shown in previous section) from its usage through the global `EntityManager` instance."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/identity-map.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/03-project-setup.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/03-project-setup.md#1",
+    "b": "mikro-orm:docs/docs/identity-map.md#5",
+    "relation": "overlapping",
+    "related": 0.999,
+    "probabilities": {
+     "same": 0.0037,
+     "overlapping": 0.9925,
+     "conflicting": 0.0028,
+     "unrelated": 0.001
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.5025,
+       "restated": 0.4208,
+       "elaborated": 0.0669,
+       "different": 0.0098
+      },
+      "confidence": 0.9902,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/03-project-setup.md#1",
+       "quote": "Internally all [`EntityManager`](/api/core/class/EntityManager) methods that work with the Identity Map (e.g.",
+       "start": 694,
+       "end": 803,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/identity-map.md#5",
+       "quote": "### How does `RequestContext` helper work?\n\nInternally all `EntityManager` methods that work with the Identity Map (e.g. `em.find()` or `em.getReference()`) first call `em.getContext()` to access the contextual fork.",
+       "start": 0,
+       "end": 216,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 47,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 1,
+   "counterparts_ms": 52
+  },
+  "timing": {
+   "read_ms": 183,
+   "total_ms": 187
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2e/2ef0ea8f6d89106e49b7",
+ "request_hash": "2ef0ea8f6d89106e49b790a16e1e88cbeaae3debb0d20e3dd5e9daa69a582da4",
+ "recorded_at": "2026-11-06T14:15:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1082,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.550495",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=247"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#34",
+    "text": "### `ScalarReference` wrapper\n\nSimilarly to the `Reference` wrapper, you can also wrap lazy scalars with `Ref` into a `ScalarReference` object. The `Ref` type automatically resolves to `ScalarReference` for non-object types, so the below is correct:\n\n```ts\n@Property({ lazy: true, ref: true })\npasswordHash!: Ref<string>;\n```\n\n```ts\nconst user = await em.findOne(User, 1);\nconst passwordHash = await user.passwordHash.load();\n```\n\nFor object-like types, if you choose to use the reference wrappers, you should use the `ScalarRef<T>` type explicitly. For example, you might want to lazily load a large JSON value:\n\n```ts\n@Property({ type: 'json', nullable: true, lazy: true, ref: true })\n// ReportParameters is an object type, imagine it defined elsewhere.\nreportParameters!: ScalarRef<ReportParameters | null>; \n```\n\nKeep in mind that once a scalar value is managed through a `ScalarReference`, accessing it through MikroORM managed objects will always return the `ScalarReference` wrapper. That can be confusing in case the property is also `nullable`, since the `ScalarReference` will always be truthy. In such cases, you should inform the type system of the nullability of the property through `ScalarReference<T>`'s type parameter as demonstrated above. Below is an example of how it all works:\n\n```ts\n// Say Report of id \"1\" has no reportParameters in the Database.\nconst report = await em.findOne(Report, 1);\nif (report.reportParameters) {\n  // Logs Ref<?>, not the actual value. **Would always run***.\n  console.log(report.reportParameters);\n  //@ts-expect-error $/.get() is not available until the reference has been loaded.\n  // const mistake = report.reportParameters.$\n}\nconst populatedReport = await em.populate(report, ['reportParameters']);\n// Logs `null`\nconsole.log(populatedReport.reportParameters.$); \n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/stored-routines.md#9",
+    "text": "Driver support:\n\n- **MySQL / MariaDB**: full support. Proc body contains N `SELECT`s; mysql2's response array carries each set, terminated by an OkPacket the connection filters out.\n- **PostgreSQL**: full support via `refcursor` OUT params. **Must** be called inside `em.transactional`. Refcursor params are detected by `type: 'refcursor'` — non-refcursor OUT params still behave as scalar `ScalarReference` outputs.\n- **Oracle**: full support via `sys_refcursor` OUT params. **Must not** be called inside `em.transactional`.\n- **MSSQL**: result sets emitted by a procedure are not surfaced through `em.callRoutine` — tedious flattens them through the kysely wrapper without per-set boundaries. Use `em.getConnection().execute()` for raw multi-recordset access.\n- **SQLite** (and **sql.js**): no stored procedure concept, so multi-result-set calls throw. Functions are bridged via `bodyJs` UDFs — see [Cross-DB testing with SQLite](#cross-db-testing-with-sqlite).\n- **libSQL**: throws unconditionally; the libsql client does not implement runtime UDF registration.\n- **Mongo**: no stored routines at all; throws.\n\n:::note Likely to evolve\n\n`em.callRoutine` currently returns plain `Dictionary[][]` for result-set-emitting procedures. Static tuple typing (`returns: [Author, Book]` → `[Author[], Book[]]`) and dynamic hydration via a `(fields, index) => EntityClass` callback — for procedures whose emitted set shape depends on a runtime branch — are tracked as follow-ups."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#34",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/stored-routines.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/defining-entities.md#34",
+    "b": "mikro-orm:docs/docs/stored-routines.md#9",
+    "relation": "unrelated",
+    "related": 0.0066,
+    "probabilities": {
+     "same": 0.0024,
+     "overlapping": 0.0022,
+     "conflicting": 0.002,
+     "unrelated": 0.9934
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 74
+  },
+  "timing": {
+   "read_ms": 74,
+   "total_ms": 76
+  }
+ }
+}

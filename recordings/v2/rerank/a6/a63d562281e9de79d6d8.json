@@ -1,0 +1,280 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/a6/a63d562281e9de79d6d8",
+ "request_hash": "a63d562281e9de79d6d85c2c019bb1fcd87ba69266a0919256f9ba7368efc843",
+ "recorded_at": "2026-11-06T14:12:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1242,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "130.94809",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=173,cfOrigin;dur=0,cfWorker;dur=339"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) await manager.update(User, [ { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } }, { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } }, { criteria: { age: 18 }, data: { category: \"ADULT\" } }, ]) // executes three separate UPDATE queries: // UPDATE user SET firstName = Rizzrak WHERE id = 1 // UPDATE user SET firstName = Karzzir WHERE id = 2 // UPDATE user SET category = ADULT WHERE age = 18 ``` (2) You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause).",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "title": "docs/docs/working-with-entity-manager/5-entity-manager-api.md > `EntityManager` API",
+    "text": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together):\n\n```typescript\nawait manager.update(User, [{ status: \"expired\" }, { flagged: true }], {\n    active: false,\n})\n// executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true\n```\n\n- `updateAll` - Updates _all_ entities of target type (without WHERE clause). Sets fields from supplied partial entity.\n\n```typescript\nawait manager.updateAll(User, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT\n```\n\n- `upsert` - Inserts a new entity or array of entities unless they already exist in which case they are updated instead. Supported by AuroraDataApi, Cockroach, Mysql, Postgres, and Sqlite database drivers.\n\nWhen an upsert operation results in an update (due to a conflict), special columns like `@UpdateDateColumn` and `@VersionColumn` are automatically updated to their current values.\n\nColumns marked with `update: false` or defined as computed generated columns (via `asExpression`/`generatedType`) are **never** included in the update set on conflict. If all non-conflict columns are excluded by these rules (i.e. there are no updatable columns), the upsert degrades to an insert-or-ignore operation and the existing row is left completely unchanged. On databases that support conflict targets (e.g. PostgreSQL, CockroachDB), this is scoped to the specified conflict columns; on MySQL-family databases, `INSERT IGNORE` is used which applies to all unique constraints."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5",
+    "title": "docs/docs/working-with-entity-manager/5-entity-manager-api.md > `EntityManager` API",
+    "text": "```typescript\nawait manager.upsert(\n    User,\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\" },\n    ],\n    [\"externalId\"],\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak),\n *      (externalId = cba321, firstName = Karzzir),\n *  ON CONFLICT (externalId) DO UPDATE firstName = EXCLUDED.firstName\n **/\n```\n\n- `delete` - Deletes entities by entity id, ids, given conditions, or an array of condition objects.\n\n```typescript\nawait manager.delete(User, 1)\nawait manager.delete(User, [1, 2, 3])\nawait manager.delete(User, { firstName: \"Timber\" })\n\n// Bulk deletes with different conditions for each operation\nawait manager.delete(User, [{ firstName: \"Timber\" }, { age: 18 }, { id: 42 }])\n// executes three separate DELETE queries:\n// DELETE FROM user WHERE firstName = Timber\n// DELETE FROM user WHERE age = 18\n// DELETE FROM user WHERE id = 42\n```\n\nYou can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together). This is different from passing a primitive array, which is treated as a list of IDs:\n\n```typescript\n// Primitive array — interpreted as WHERE id IN (1, 2, 3)\nawait manager.delete(User, [1, 2, 3])\n\n// Object array — each element is a separate condition (OR'd together)\nawait manager.delete(User, [{ id: 1 }, { email: \"old@example.com\" }])\n// executes DELETE FROM user WHERE id = 1 OR email = 'old@example.com'\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "title": "docs/docs/working-with-entity-manager/6-repository-api.md > Repository APIs > `Repository` API",
+    "text": "- `save` - Saves a given entity or array of entities.\n  If the entity already exist in the database, it is updated.\n  If the entity does not exist in the database, it is inserted.\n  It saves all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped.\n  Returns the saved entity/entities.\n\n```typescript\nawait repository.save(user)\nawait repository.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Returns the removed entity/entities.\n\n```typescript\nawait repository.remove(user)\nawait repository.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait repository.insert({\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait repository.insert([\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids or given conditions. Sets fields from supplied partial entity.\n\n```typescript\nawait repository.update({ age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait repository.update(1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// optionally request RETURNING / OUTPUT values (supported drivers only)\nconst result = await repository.update(\n    1,\n    { firstName: \"Rizzrak\" },\n    { returning: [\"id\", \"firstName\"] },\n)\nconsole.log(result.raw) // [{ id: 1, firstName: \"Rizzrak\" }]\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "title": "docs/docs/working-with-entity-manager/6-repository-api.md > Repository APIs > `Repository` API",
+    "text": "```typescript\nawait repository.upsert(\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\", dateAdded: \"2020-01-01\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\", dateAdded: \"2022-01-01\" },\n    ],\n    {\n        conflictPaths: [\"externalId\"],\n        skipUpdateIfNoValuesChanged: true, // supported by postgres, skips update if it would not change row values\n        indexPredicate: \"dateAdded > 2020-01-01\", // supported by postgres, allows for partial indexes\n    },\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak, dateAdded = 2020-01-01),\n *      (externalId = cba321, firstName = Karzzir, dateAdded = 2022-01-01),\n *  ON CONFLICT (externalId) WHERE ( dateAdded > 2021-01-01 ) DO UPDATE\n *  SET firstName = EXCLUDED.firstName,\n *  SET dateAdded = EXCLUDED.dateAdded,\n *  WHERE user.firstName IS DISTINCT FROM EXCLUDED.firstName OR user.dateAdded IS DISTINCT FROM EXCLUDED.dateAdded\n **/\n```\n\n- `delete` - Deletes entities by entity id, ids or given conditions:\n\n```typescript\nawait repository.delete(1)\nawait repository.delete([1, 2, 3])\nawait repository.delete({ firstName: \"Timber\" })\n```\n\n- `deleteAll` - Deletes _all_ entities of target type (without WHERE clause).\n\n```typescript\nawait repository.deleteAll()\n// executes DELETE FROM user\n```\n\nRefer also to the `clear` method, which performs database `TRUNCATE TABLE` operation instead."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#6",
+    "title": "docs/docs/working-with-entity-manager/6-repository-api.md > Repository APIs > `Repository` API",
+    "text": "- `softDelete` and `restore` - Soft deleting and restoring a row by id, ids, given conditions, or an array of condition objects:\n\n```typescript\nconst repository = dataSource.getRepository(Entity)\n// Soft delete an entity\nawait repository.softDelete(1)\n// And you can restore it using restore;\nawait repository.restore(1)\n// Soft delete multiple entities\nawait repository.softDelete([1, 2, 3])\n// Or soft delete by other attribute\nawait repository.softDelete({ firstName: \"Jake\" })\n\n// Bulk soft deletes with different conditions for each operation\nawait repository.softDelete([{ firstName: \"Jake\" }, { age: 25 }, { id: 42 }])\n// executes three separate UPDATE queries (setting deletedAt timestamp):\n// UPDATE entity SET deletedAt = NOW() WHERE firstName = Jake\n// UPDATE entity SET deletedAt = NOW() WHERE age = 25\n// UPDATE entity SET deletedAt = NOW() WHERE id = 42\n```\n\n- `softRemove` and `recover` - This is alternative to `softDelete` and `restore`.\n\n```typescript\n// You can soft-delete them using softRemove\nconst entities = await repository.find()\nconst entitiesAfterSoftRemove = await repository.softRemove(entities)\n\n// And You can recover them using recover;\nawait repository.recover(entitiesAfterSoftRemove)\n```\n\n- `increment` - Increments some column by provided value of entities that match given options."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#6",
+    "title": "docs/docs/working-with-entity-manager/5-entity-manager-api.md > `EntityManager` API",
+    "text": "Note: passing an empty object `{}` or `[{}]` throws a `TypeORMError` to prevent accidental full-table deletes.\n\n- `deleteAll` - Deletes _all_ entities of target type (without WHERE clause).\n\n```typescript\nawait manager.deleteAll(User)\n// executes DELETE FROM user\n```\n\nRefer also to the `clear` method, which performs database `TRUNCATE TABLE` operation instead.\n\n- `increment` - Increments some column by provided value of entities that match given options.\n\n```typescript\nawait manager.increment(User, { firstName: \"Timber\" }, \"age\", 3)\n```\n\n- `decrement` - Decrements some column by provided value that match given options.\n\n```typescript\nawait manager.decrement(User, { firstName: \"Timber\" }, \"age\", 3)\n```\n\n- `exists` - Check whether any entity exists that matches `FindOptions`.\n\n```typescript\nconst exists = await manager.exists(User, {\n    where: {\n        firstName: \"Timber\",\n    },\n})\n```\n\n- `existsBy` - Checks whether any entity exists that matches `FindOptionsWhere`.\n\n```typescript\nconst exists = await manager.existsBy(User, { firstName: \"Timber\" })\n```\n\n- `count` - Counts entities that match `FindOptions`. Useful for pagination.\n\n```typescript\nconst count = await manager.count(User, {\n    where: {\n        firstName: \"Timber\",\n    },\n})\n\nconst distinctCount = await manager.count(User, {\n    select: {\n        firstName: true,\n    },\n})\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#4",
+    "title": "docs/docs/working-with-entity-manager/6-repository-api.md > Repository APIs > `Repository` API",
+    "text": "```typescript\nawait repository.upsert(\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\" },\n    ],\n    [\"externalId\"],\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak),\n *      (externalId = cba321, firstName = Karzzir),\n *  ON CONFLICT (externalId) DO UPDATE\n *  SET firstName = EXCLUDED.firstName,\n *      updatedDate = CURRENT_TIMESTAMP,\n *      version = version + 1\n **/\n```\n\nYou can also request values to be returned from an upsert (supported on drivers with RETURNING / OUTPUT support):\n\n```typescript\nconst { raw } = await repository.upsert(\n    { externalId: \"abc123\", firstName: \"Rizzrak\" },\n    {\n        conflictPaths: [\"externalId\"],\n        returning: [\"externalId\", \"firstName\"],\n    },\n)\nconsole.log(raw) // [{ externalId: \"abc123\", firstName: \"Rizzrak\" }]\n```\n\n```typescript\nawait repository.upsert(\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\" },\n    ],\n    {\n        conflictPaths: [\"externalId\"],\n        skipUpdateIfNoValuesChanged: true, // supported by postgres, skips update if it would not change row values\n        upsertType: \"upsert\", //  \"on-conflict-do-update\" | \"on-duplicate-key-update\" | \"upsert\" - optionally provide an UpsertType - 'upsert' is currently only supported by CockroachDB\n    },\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak),\n *      (externalId = cba321, firstName = Karzzir),\n *  ON CONFLICT (externalId) DO UPDATE\n *  SET firstName = EXCLUDED.firstName\n *  WHERE user.firstName IS DISTINCT FROM EXCLUDED.firstName\n **/\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#13",
+    "title": "docs/docs/data-source/5-null-and-undefined-handling.md > Handling null and undefined values in where conditions > Supported operations > Repository and EntityManager Methods",
+    "text": "### Repository and EntityManager Methods\n\n```typescript\n// Repository.update()\nawait repository.update({ text: null }, { title: \"Updated\" }) // Respects invalidWhereValuesBehavior\n\n// Repository.delete()\nawait repository.delete({ text: null }) // Respects invalidWhereValuesBehavior\n\n// EntityManager.update()\nawait manager.update(Post, { text: null }, { title: \"Updated\" }) // Respects invalidWhereValuesBehavior\n\n// EntityManager.delete()\nawait manager.delete(Post, { text: null }) // Respects invalidWhereValuesBehavior\n\n// EntityManager.softDelete()\nawait manager.softDelete(Post, { text: null }) // Respects invalidWhereValuesBehavior\n```\n\n:::warning\n**Empty criteria are rejected.** `update`, `delete`, `softDelete`, and `restore` require non-empty criteria — an empty condition would render as `WHERE 1=1` and affect **every** row. Because `\"ignore\"` strips `null`/`undefined` properties, a criteria whose keys are **all** stripped becomes empty. In that case the operation is rejected instead of running as an unfiltered write:\n\n```typescript\nconst dataSource = new DataSource({\n    // ... other options\n    invalidWhereValuesBehavior: { null: \"ignore\", undefined: \"ignore\" },\n})\n\n// { text: null } becomes {} after stripping -> rejected; the table is NOT emptied\nawait manager.delete(Post, { text: null })\n// Error: Empty criteria(s) are not allowed for the delete method.\n```\n\nUse the dedicated `updateAll()` / `deleteAll()` methods when you intentionally want to affect every row.\n:::"
+   },
+   {
+    "id": "typeorm:docs/docs/entity/6-separating-entity-definition.md#0",
+    "title": "docs/docs/entity/6-separating-entity-definition.md > Separating Entity Definition > Defining Schemas",
+    "text": "## Defining Schemas\n\nYou can define an entity and its columns right in the model, using decorators.\nBut some people prefer to define an entity and its columns inside separate files\nwhich are called \"entity schemas\" in TypeORM.\n\nSimple definition example:\n\n```ts\nimport { EntitySchema } from \"typeorm\"\n\nexport const CategoryEntity = new EntitySchema({\n    name: \"category\",\n    columns: {\n        id: {\n            type: Number,\n            primary: true,\n            generated: true,\n        },\n        name: {\n            type: String,\n        },\n    },\n})\n```\n\nExample with relations:\n\n```ts\nimport { EntitySchema } from \"typeorm\"\n\nexport const PostEntity = new EntitySchema({\n    name: \"post\",\n    columns: {\n        id: {\n            type: Number,\n            primary: true,\n            generated: true,\n        },\n        title: {\n            type: String,\n        },\n        text: {\n            type: String,\n        },\n    },\n    relations: {\n        categories: {\n            type: \"many-to-many\",\n            target: \"category\", // CategoryEntity\n        },\n    },\n})\n```\n\nComplex example:\n\n```ts\nimport { EntitySchema } from \"typeorm\"\n\nexport const PersonSchema = new EntitySchema({\n    name: \"person\",\n    columns: {\n        id: {\n            primary: true,\n            type: \"int\",\n            generated: \"increment\",\n        },\n        firstName: {\n            type: String,\n            length: 30,\n        },\n        lastName: {\n            type: String,\n            length: 50,\n            nullable: false,\n        },\n        age: {\n            type: Number,\n            nullable: false,\n        },\n        countryCode: {\n            type: String,\n            length: 2,\n            foreignKey: {\n                target: \"countries\", // CountryEntity\n                inverseSide: \"code\",\n            },\n        },\n        cityId: {\n            type: Number,\n            foreignKey: {\n                target: \"cities\", // CityEntity\n            },\n        },\n    },\n    checks: [\n        { expression: `\"firstName\" <> 'John' AND \"lastName\" <> 'Doe'` },\n        { expression: `\"age\" > 18` },\n    ],\n    indices: [\n        {\n            name: \"IDX_TEST\",\n            unique: true,\n            columns: [\"firstName\", \"lastName\"],\n        },\n    ],\n    uniques: [\n        {\n            name: \"UNIQUE_TEST\",\n            columns: [\"firstName\", \"lastName\"],\n        },\n    ],\n    foreignKeys: [\n        {\n            target: \"cities\", // CityEntity\n            columnNames: [\"cityId\", \"countryCode\"],\n            referencedColumnNames: [\"id\", \"countryCode\"],\n        },\n    ],\n})\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/query-builder/3-update-query-builder.md#1",
+    "title": "docs/docs/query-builder/3-update-query-builder.md > Update using Query Builder > Raw SQL support",
+    "text": "## Raw SQL support\n\nIn some cases when you need to execute SQL queries you need to use function style value:\n\n```typescript\nawait dataSource\n    .createQueryBuilder()\n    .update(User)\n    .set({\n        firstName: \"Timber\",\n        lastName: \"Saw\",\n        age: () => \"age + 1\",\n    })\n    .where(\"id = :id\", { id: 1 })\n    .execute()\n```\n\n> Warning: When using raw SQL, ensure that values are properly sanitized to prevent SQL injection."
+   },
+   {
+    "id": "typeorm:docs/docs/query-builder/3-update-query-builder.md#0",
+    "title": "docs/docs/query-builder/3-update-query-builder.md > Update using Query Builder",
+    "text": "# Update using Query Builder\n\nYou can create `UPDATE` queries using `QueryBuilder`.\nExamples:\n\n```typescript\nawait dataSource\n    .createQueryBuilder()\n    .update(User)\n    .set({ firstName: \"Timber\", lastName: \"Saw\" })\n    .where(\"id = :id\", { id: 1 })\n    .execute()\n```\n\nThis is the most efficient way in terms of performance to update entities in your database."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "title": "docs/docs/working-with-entity-manager/5-entity-manager-api.md > `EntityManager` API",
+    "text": "- `merge` - Merges multiple entities into a single entity.\n\n```typescript\nconst user = new User()\nmanager.merge(User, user, { firstName: \"Timber\" }, { lastName: \"Saw\" }) // same as user.firstName = \"Timber\"; user.lastName = \"Saw\";\n```\n\n- `preload` - Creates a new entity from the given plain javascript object. If the entity already exist in the database, then\n  it loads it (and everything related to it), replaces all values with the new ones from the given object,\n  and returns the new entity. The new entity is actually loaded from the database entity with all properties\n  replaced from the new object.\n\n```typescript\nconst partialUser = {\n    id: 1,\n    firstName: \"Rizzrak\",\n    profile: {\n        id: 1,\n    },\n}\nconst user = await manager.preload(User, partialUser)\n// user will contain all missing data from partialUser with partialUser property values:\n// { id: 1, firstName: \"Rizzrak\", lastName: \"Saw\", profile: { id: 1, ... } }\n```\n\n- `save` - Saves a given entity or array of entities.\n  If the entity already exists in the database, then it's updated.\n  If the entity does not exist in the database yet, it's inserted.\n  It saves all given entities in a single transaction (in the case of entity manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped. In order to make a value `NULL`, you must manually set the property to equal `null`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "action": "use",
+    "relevance_score": 0.8813,
+    "document_score": 0.9317,
+    "levels": {
+     "answers": 0.8813,
+     "elsewhere": 0.0504,
+     "different_case": 0.0357,
+     "unrelated": 0.0325
+    }
+   },
+   {
+    "index": 0,
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#4",
+    "action": "use",
+    "relevance_score": 0.602,
+    "document_score": 0.7464,
+    "levels": {
+     "answers": 0.602,
+     "elsewhere": 0.1444,
+     "different_case": 0.0849,
+     "unrelated": 0.1688
+    }
+   },
+   {
+    "index": 4,
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0931,
+    "document_score": 0.1385,
+    "levels": {
+     "answers": 0.0931,
+     "elsewhere": 0.0454,
+     "different_case": 0.1795,
+     "unrelated": 0.682
+    }
+   },
+   {
+    "index": 1,
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0721,
+    "document_score": 0.211,
+    "levels": {
+     "answers": 0.0721,
+     "elsewhere": 0.1389,
+     "different_case": 0.1899,
+     "unrelated": 0.5991
+    }
+   },
+   {
+    "index": 5,
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0178,
+    "document_score": 0.1515,
+    "levels": {
+     "answers": 0.0178,
+     "elsewhere": 0.1337,
+     "different_case": 0.0408,
+     "unrelated": 0.8077
+    }
+   },
+   {
+    "index": 10,
+    "id": "typeorm:docs/docs/query-builder/3-update-query-builder.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0171,
+    "document_score": 0.1497,
+    "levels": {
+     "answers": 0.0171,
+     "elsewhere": 0.1325,
+     "different_case": 0.0588,
+     "unrelated": 0.7915
+    }
+   },
+   {
+    "index": 11,
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0081,
+    "document_score": 0.0338,
+    "levels": {
+     "answers": 0.0081,
+     "elsewhere": 0.0257,
+     "different_case": 0.0217,
+     "unrelated": 0.9445
+    }
+   },
+   {
+    "index": 7,
+    "id": "typeorm:docs/docs/data-source/5-null-and-undefined-handling.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0073,
+    "document_score": 0.0519,
+    "levels": {
+     "answers": 0.0073,
+     "elsewhere": 0.0446,
+     "different_case": 0.061,
+     "unrelated": 0.8872
+    }
+   },
+   {
+    "index": 6,
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0064,
+    "document_score": 0.0192,
+    "levels": {
+     "answers": 0.0064,
+     "elsewhere": 0.0128,
+     "different_case": 0.0446,
+     "unrelated": 0.9362
+    }
+   },
+   {
+    "index": 9,
+    "id": "typeorm:docs/docs/query-builder/3-update-query-builder.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.005,
+    "document_score": 0.0327,
+    "levels": {
+     "answers": 0.005,
+     "elsewhere": 0.0277,
+     "different_case": 0.0345,
+     "unrelated": 0.9329
+    }
+   },
+   {
+    "index": 3,
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0044,
+    "document_score": 0.0175,
+    "levels": {
+     "answers": 0.0044,
+     "elsewhere": 0.013,
+     "different_case": 0.0248,
+     "unrelated": 0.9578
+    }
+   },
+   {
+    "index": 8,
+    "id": "typeorm:docs/docs/entity/6-separating-entity-definition.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0055,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.003,
+     "different_case": 0.0077,
+     "unrelated": 0.9869
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 8245
+  },
+  "timing": {
+   "total_ms": 135,
+   "rerank_ms": 134,
+   "questions_ms": 0,
+   "model_ms": 117,
+   "engine": {
+    "rows": 7369,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 117,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 114,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 320
+   }
+  }
+ }
+}

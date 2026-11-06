@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/56/569651d3de0bf52d2747",
+ "request_hash": "569651d3de0bf52d2747ff589a186f34c50161a22e4640229d6cf8b321bb7ef7",
+ "recorded_at": "2026-11-06T14:13:18Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1003,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "125.000158",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=29,cfOrigin;dur=0,cfWorker;dur=282"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#8",
+    "text": "For example, to call `transformIndexHtml` on the user module, the following plugin can be used:\n\n```ts {13-21}\nfunction vitePluginVirtualIndexHtml(): Plugin {\n  let server: ViteDevServer | undefined\n  return {\n    name: vitePluginVirtualIndexHtml.name,\n    configureServer(server_) {\n      server = server_\n    },\n    resolveId(source) {\n      return source === 'virtual:index-html' ? '\\0' + source : undefined\n    },\n    async load(id) {\n      if (id === '\\0' + 'virtual:index-html') {\n        let html: string\n        if (server) {\n          this.addWatchFile('index.html')\n          html = fs.readFileSync('index.html', 'utf-8')\n          html = await server.transformIndexHtml('/', html)\n        } else {\n          html = fs.readFileSync('dist/client/index.html', 'utf-8')\n        }\n        return `export default ${JSON.stringify(html)}`\n      }\n      return\n    },\n  }\n}\n```\n\nIf your code requires Node.js APIs, you can use `hot.send` to communicate with the code that uses Vite's APIs from the user modules. However, be aware that this approach may not work the same way after the build process.\n\n```ts\n// code using the Vite's APIs\nimport { createServer } from 'vite'\n\nconst server = await createServer({\n  plugins: [\n    // a plugin that handles `virtual:entrypoint`\n    {\n      name: 'virtual-module',\n      /* plugin implementation */\n    },\n  ],\n})\nconst ssrEnvironment = server.environments.ssr\nconst input = {}\n\n// use exposed functions by each environment factories that runs the code\n// check for each environment factories what they provide\nif (ssrEnvironment instanceof RunnableDevEnvironment) {\n  await ssrEnvironment.runner.import('virtual:entrypoint')\n} else if (ssrEnvironment instanceof CustomDevEnvironment) {\n  ssrEnvironment.runEntrypoint('virtual:entrypoint')\n} else {\n  throw new Error(`Unsupported runtime for ${ssrEnvironment.name}`)\n}\n\nconst req = new Request('http://example.com/')\n\nconst uniqueId = 'a-unique-id'\nssrEnvironment.hot.send('request', serialize({ req, uniqueId }))\nconst response = await new Promise((resolve) => {\n  ssrEnvironment.hot.on('response', (data) => {\n    data = deserialize(data)\n    if (data.uniqueId === uniqueId) {\n      resolve(data.res)\n    }\n  })\n})"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#15",
+    "text": "### `transformIndexHtml`\n\n- **Type:** `IndexHtmlTransformHook | { order?: 'pre' | 'post', handler: IndexHtmlTransformHook }`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Dedicated hook for transforming HTML entry point files such as `index.html`. The hook receives the current HTML string and a transform context. The context exposes the [`ViteDevServer`](./api-javascript#vitedevserver) instance during dev, and exposes the Rollup output bundle during build.\n\n  The hook can be async and can return one of the following:\n  - Transformed HTML string\n  - An array of tag descriptor objects (`{ tag, attrs, children }`) to inject to the existing HTML. Each tag can also specify where it should be injected to (default is prepending to `<head>`)\n  - An object containing both as `{ html, tags }`\n\n  By default `order` is `undefined`, with this hook applied after the HTML has been transformed. In order to inject a script that should go through the Vite plugins pipeline, `order: 'pre'` will apply the hook before processing the HTML. `order: 'post'` applies the hook after all hooks with `order` undefined are applied.\n\n  **Basic Example:**\n\n  ```js\n  const htmlPlugin = () => {\n    return {\n      name: 'html-transform',\n      transformIndexHtml(html) {\n        return html.replace(\n          /<title>(.*?)<\\/title>/,\n          `<title>Title replaced!</title>`,\n        )\n      },\n    }\n  }\n  ```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-frameworks.md#8",
+    "b": "vite:docs/guide/api-plugin.md#15",
+    "relation": "overlapping",
+    "related": 0.9912,
+    "probabilities": {
+     "same": 0.0176,
+     "overlapping": 0.9667,
+     "conflicting": 0.0069,
+     "unrelated": 0.0088
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 101,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 137,
+   "total_ms": 140
+  }
+ }
+}

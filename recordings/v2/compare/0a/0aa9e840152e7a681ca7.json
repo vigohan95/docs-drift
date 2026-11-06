@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0a/0aa9e840152e7a681ca7",
+ "request_hash": "0aa9e840152e7a681ca7db159f114d80f292ea4a1471aa46fa69475ae6c9c883",
+ "recorded_at": "2026-11-06T14:11:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 973,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "126.035934",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=274"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#4",
+    "text": "### preValidation\n\nIf you are using the `preValidation` hook, you can change the payload before it\nis validated. For example:\n\n```js\nfastify.addHook('preValidation', (request, reply, done) => {\n  request.body = { ...request.body, importantKey: 'randomString' }\n  done()\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preValidation', async (request, reply) => {\n  const importantKey = await generateRandomString()\n  request.body = { ...request.body, importantKey }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#5",
+    "text": "4. Build and run the server code with `npm run build` and `npm run start`\n5. Query the API\n   ```bash\n   curl localhost:8080/auth?username=admin&password=Password123!\n   ```\n   And it should return back `logged in!`\n6. But wait there's more! The generic interfaces are also available inside route\n   level hook methods. Modify the previous route by adding a `preValidation`\n   hook:\n   ```typescript\n   server.get<{\n     Querystring: IQuerystring,\n     Headers: IHeaders,\n     Reply: IReply\n   }>('/auth', {\n     preValidation: (request, reply, done) => {\n       const { username, password } = request.query\n       done(username !== 'admin' ? new Error('Must be admin') : undefined) // only validate `admin` account\n     }\n   }, async (request, reply) => {\n     const customerHeader = request.headers['h-Custom']\n     // do something with request data\n     return { success: true }\n   })\n   ```\n7. Build and run and query with the `username` query string option set to\n   anything other than `admin`. The API should now return a HTTP 500 error\n   `{\"statusCode\":500,\"error\":\"Internal Server Error\",\"message\":\"Must be\n   admin\"}`\n\n🎉 Good work, now you can define interfaces for each route and have strictly\ntyped request and reply instances. Other parts of the Fastify type system rely\non generic properties. Make sure to reference the detailed type system\ndocumentation below to learn more about what is available."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Hooks.md#4",
+    "b": "fastify:docs/Reference/TypeScript.md#5",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.0077,
+     "overlapping": 0.9843,
+     "conflicting": 0.0038,
+     "unrelated": 0.0042
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 107,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 133,
+   "total_ms": 137
+  }
+ }
+}

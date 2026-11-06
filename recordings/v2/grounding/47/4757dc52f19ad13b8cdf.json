@@ -1,0 +1,100 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/47/4757dc52f19ad13b8cdf",
+ "request_hash": "4757dc52f19ad13b8cdf8410c7f08672687fd5c9b7df7c7df7ddcc56398500d0",
+ "recorded_at": "2026-11-06T14:15:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 967,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "84.76067",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#6",
+    "text": "## Entity to Database: Change Tracking and Flush\n\nMikroORM uses a **snapshot-based** change tracking approach. When an entity is hydrated or persisted, the ORM stores a copy of its state. On flush, it compares the current state against this snapshot:\n\n```mermaid\nsequenceDiagram\n    participant App\n    participant EM as EntityManager\n    participant UoW as UnitOfWork\n    participant Driver\n    participant DB as Database\n\n    Note over App,DB: 1. Load entity\n    App->>EM: em.findOne(User, 1)\n    EM-->>App: user (snapshot stored)\n\n    Note over App,DB: 2. Modify entity\n    App->>App: user.name = 'New Name'\n\n    Note over App,DB: 3. Flush changes\n    App->>EM: em.flush()\n    EM->>UoW: computeChangeSets()\n    UoW->>UoW: Compare current vs snapshot\n    UoW->>UoW: Build change sets\n    UoW->>UoW: Order by dependencies\n\n    UoW->>Driver: BEGIN transaction\n    UoW->>Driver: Execute INSERT/UPDATE/DELETE\n    Driver->>DB: SQL queries\n    UoW->>Driver: COMMIT\n\n    UoW->>UoW: Update snapshots\n    EM-->>App: Done\n```\n\nThe flush operation:\n\n1. **Computes change sets**: Compares current entity state against stored snapshots.\n2. **Orders queries**: Uses topological sort to respect foreign key constraints.\n3. **Batches operations**: Groups INSERTs, UPDATEs, and DELETEs for efficiency.\n4. **Wraps in transaction**: All changes are committed atomically.\n5. **Updates snapshots**: After successful commit, snapshots are updated to reflect the new state.\n\nSee [Unit of Work](./unit-of-work.md) for flush modes and transaction details."
+   }
+  ],
+  "answer": "Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity. Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`. Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`.",
+  "claims": [
+   "Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity.",
+   "Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`. Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.2048,
+  "ungrounded": 0.7952,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#6",
+    "share": 1,
+    "share_of_answer": 0.2048,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "Whenever you call [`em.flush()`](/api/core/class/EntityManager#flush), the ORM will iterate over the Identity Map, and for each entity it compares the original state with the values that are currently set on the entity.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4497,
+    "supported": 0.4251,
+    "contradicted": 0.0163,
+    "not_stated": 0.5491,
+    "not_a_claim": 0.0095,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/architecture.md#6": 1
+    },
+    "source": null,
+    "evidence": {
+     "document": "mikro-orm:docs/docs/architecture.md#6",
+     "quote": "On flush, it compares the current state against this snapshot:",
+     "start": 188,
+     "end": 250,
+     "confidence": 0.993
+    }
+   },
+   {
+    "claim": "Whenever you fetch an object from the database MikroORM will keep a copy of all the properties and associations inside the `UnitOfWork`. Now whenever you call `em.flush()` MikroORM will iterate over all entities you previously marked for persisting via `em.persist()`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5503,
+    "supported": 0.0247,
+    "contradicted": 0.0913,
+    "not_stated": 0.8657,
+    "not_a_claim": 0.0183,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/architecture.md#6": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 1,
+   "supported": 0.0247
+  },
+  "timing": {
+   "read_ms": 97,
+   "total_ms": 101
+  }
+ }
+}

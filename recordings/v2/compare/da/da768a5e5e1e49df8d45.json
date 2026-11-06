@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/da/da768a5e5e1e49df8d45",
+ "request_hash": "da768a5e5e1e49df8d456a48406910aa382b76e08e1b653a408082ba250cb647",
+ "recorded_at": "2026-11-06T14:12:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 900,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "82.104704",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=226"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "text": "### Explicitly selecting query destinations\n\nBy default, TypeORM will send all read queries to a random read slave, and all writes to the master. This means when you first add the `replication` settings to your configuration, any existing read query runners that don't explicitly specify a replication mode will start going to a slave. This is good for scalability, but if some of those queries _must_ return up to date data, then you need to explicitly pass a replication mode when you create a query runner.\n\nIf you want to explicitly use the `master` for read queries, pass an explicit `ReplicationMode` when creating your `QueryRunner`;\n\n```typescript\nconst masterQueryRunner = dataSource.createQueryRunner(\"master\")\ntry {\n    const postsFromMaster = await dataSource\n        .createQueryBuilder(Post, \"post\", masterQueryRunner) // you can either pass QueryRunner as an optional argument with query builder\n        .setQueryRunner(masterQueryRunner) // or use setQueryRunner which sets or overrides query builder's QueryRunner\n        .getMany()\n} finally {\n    await masterQueryRunner.release()\n}\n```\n\nIf you want to use a slave in raw queries, pass `slave` as the replication mode when creating a query runner:\n\n```typescript\nconst slaveQueryRunner = dataSource.createQueryRunner(\"slave\")\ntry {\n    const userFromSlave = await slaveQueryRunner.query(\n        \"SELECT * FROM users WHERE id = $1\",\n        [userId],\n        slaveQueryRunner,\n    )\n} finally {\n    return slaveQueryRunner.release()\n}\n```\n\n**Note**: Manually created `QueryRunner` instances must be explicitly released on their own. If you don't release your query runners, they will keep a connection checked out of the pool, and prevent other queries from using it."
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#0",
+    "text": "## What is a QueryRunner?\n\nEach new `QueryRunner` instance takes a single connection from the connection pool, if the RDBMS supports connection pooling.\nFor databases that do not support connection pools, it uses the same connection across the entire data source.\n\nThe full QueryRunner API is documented in the [migrations section](./migrations/09-api.md)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/query-runner.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/data-source/3-multiple-data-sources.md#5",
+    "b": "typeorm:docs/docs/query-runner.md#0",
+    "relation": "overlapping",
+    "related": 0.7753,
+    "probabilities": {
+     "same": 0.0182,
+     "overlapping": 0.7456,
+     "conflicting": 0.0115,
+     "unrelated": 0.2247
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 46,
+   "passage_reads": 1,
+   "passages_ms": 47,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 92,
+   "total_ms": 96
+  }
+ }
+}

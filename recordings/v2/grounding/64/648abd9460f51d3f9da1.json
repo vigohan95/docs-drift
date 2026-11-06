@@ -1,0 +1,100 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/64/648abd9460f51d3f9da1",
+ "request_hash": "648abd9460f51d3f9da18e034d17691838379515cecdb04a3e71a25bd2cd0a10",
+ "recorded_at": "2026-11-06T14:16:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2096,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "69.011871",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=188"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#1",
+    "text": "## Persist and Flush\n\nThere are 2 methods you should first understand to learn how persisting works in MikroORM: `em.persist()` and `em.flush()`.\n\n`em.persist(entity)` is used to mark new entities for future persisting. It will make the entity managed by given `EntityManager` and once `flush` will be called, it will be written to the database.\n\nTo understand `flush`, lets first define what managed entity is: An entity is managed if it’s fetched from the database (via `em.find()`, `em.findOne()` or via other managed entity) or registered as new through `em.persist()`.\n\n`em.flush()` will go through all managed entities, compute appropriate change sets and perform according database queries. As an entity loaded from database becomes managed automatically, you do not have to call persist on those, and flush is enough to update them.\n\n```ts\nconst book = await em.findOne(Book, 1);\nbook.title = 'How to persist things...';\n\n// no need to persist `book` as its already managed by the EM\nawait em.flush();\n```"
+   }
+  ],
+  "answer": "The following code will update your database with the changes made to the `Author` object, even if you did not call [`em.persist()`](/api/core/class/EntityManager#persist): A natural question would now be, \"how does MikroORM even detect objects have changed?\". For this MikroORM keeps a second map inside the `UnitOfWork`.",
+  "claims": [
+   "The following code will update your database with the changes made to the `Author` object, even if you did not call [`em.persist()`](/api/core/class/EntityManager#persist):",
+   "A natural question would now be, \"how does MikroORM even detect objects have changed?\". For this MikroORM keeps a second map inside the `UnitOfWork`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.2214,
+  "ungrounded": 0.7786,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#1",
+    "share": 1,
+    "share_of_answer": 0.2214,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "The following code will update your database with the changes made to the `Author` object, even if you did not call [`em.persist()`](/api/core/class/EntityManager#persist):",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5358,
+    "supported": 0.4114,
+    "contradicted": 0.0316,
+    "not_stated": 0.5441,
+    "not_a_claim": 0.0128,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/entity-manager.md#1": 1
+    },
+    "source": null,
+    "evidence": {
+     "document": "mikro-orm:docs/docs/entity-manager.md#1",
+     "quote": "As an entity loaded from database becomes managed automatically, you do not have to call persist on those, and flush is enough to update them.",
+     "start": 698,
+     "end": 840,
+     "confidence": 1
+    }
+   },
+   {
+    "claim": "A natural question would now be, \"how does MikroORM even detect objects have changed?\". For this MikroORM keeps a second map inside the `UnitOfWork`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4642,
+    "supported": 0.002,
+    "contradicted": 0.0024,
+    "not_stated": 0.9888,
+    "not_a_claim": 0.0068,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/entity-manager.md#1": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 1,
+   "supported": 0.002
+  },
+  "timing": {
+   "read_ms": 78,
+   "total_ms": 79
+  }
+ }
+}

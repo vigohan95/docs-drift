@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/10/109401d09726a46bada6",
+ "request_hash": "109401d09726a46bada62d240904cccb16834766d3aeebc6c19ff94962586245",
+ "recorded_at": "2026-11-06T14:15:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 962,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.496416",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=261"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/05-type-safety.md#2",
+    "text": "```ts\n// user is of type `Loaded<User, 'articles'>`\nconst user = await em.findOneOrFail(User, 1, { populate: ['articles'] });\n\n// type-safe sync access to loaded collection items:\nfor (const article of user.articles.$) {\n  console.log(article.title);\n}\n```\n\n> If you don't like symbols with magic names like `$`, you can use the `get()` method instead, which is an alias for it.\n\nYou can also use the `Loaded` type in your own functions to require that certain relations are populated:\n\n```ts\nfunction publishArticle(article: Loaded<Article, 'author'>) {\n  // we can safely access the author without any async loading\n  console.log(`Publishing \"${article.title}\" by ${article.author.$.fullName}`);\n}\n```\n\n```ts\n// works - author is populated\nconst a1 = await em.findOneOrFail(ArticleSchema, 1, { populate: ['author'] });\npublishArticle(a1);\n\n// compile error - author is not populated\nconst a2 = await em.findOneOrFail(ArticleSchema, 1);\npublishArticle(a2);\n```\n\n> Keep in mind this is all just type-level information, you can easily trick it via type assertions."
+   },
+   {
+    "id": "mikro-orm:docs/docs/type-safe-relations.md#12",
+    "text": "### Type-Safe Access with `$`\n\nWhen a relation is in the `Loaded` hints, you can access it synchronously via the `$` symbol:\n\n```ts\n// Type: Loaded<User, 'identity'>\nconst user = await em.findOneOrFail(User, 1, { populate: ['identity'] });\n\n// Type-safe synchronous access\nconsole.log(user.identity.$.email);\n```\n\nWithout the populate hint, accessing `$` is a compile error:\n\n```ts\n// Type: Loaded<User, never>\nconst user = await em.findOneOrFail(User, 1);\n\n// TS Error: Property '$' does not exist on type 'Ref<Identity>'\nconsole.log(user.identity.$.email);\n```\n\n> If you don't like symbols with magic names like `$`, you can use the `get()` method, which is an alias for it."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/05-type-safety.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/type-safe-relations.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/05-type-safety.md#2",
+    "b": "mikro-orm:docs/docs/type-safe-relations.md#12",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0079,
+     "overlapping": 0.9871,
+     "conflicting": 0.0034,
+     "unrelated": 0.0017
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 54,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 81,
+   "total_ms": 84
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/25/259e7a00846bc94e6f41",
+ "request_hash": "259e7a00846bc94e6f41e4fc865006c5c4e5cc71756564bd9fc2e4206a660157",
+ "recorded_at": "2026-11-06T14:21:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2695,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "98.963392",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=348"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "text": "#### Within Each Test File\n\nThe execution follows this order:\n\n1. **File-level code:** All code outside `describe` blocks runs immediately\n2. **Test collection:** `describe` blocks are processed, and tests are registered as side effects of importing the test file\n3. **[`aroundAll`](/api/hooks#aroundall) hooks:** Wrap around all tests in the suite (must call `runSuite()`)\n4. **[`beforeAll`](/api/hooks#beforeall) hooks:** Run once before any tests in the suite\n5. **For each test:**\n   - [`aroundEach`](/api/hooks#aroundeach) hooks wrap around the test (must call `runTest()`)\n   - `beforeEach` hooks execute (in order defined, or based on [`sequence.hooks`](/config/sequence#sequence-hooks))\n   - Test function executes\n   - `afterEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - Cleanup functions returned from `beforeEach` hooks execute (reverse order by default with `sequence.hooks: 'stack'`)\n   - [`onTestFinished`](/api/hooks#ontestfinished) callbacks run (always in reverse order)\n   - If test failed: [`onTestFailed`](/api/hooks#ontestfailed) callbacks run\n   - Note: if `repeats` or `retry` are set, all of these steps are executed again\n6. **[`afterAll`](/api/hooks#afterall) hooks:** Run once after all tests in the suite complete\n7. **Cleanup functions returned from `beforeAll` hooks:** Run once after all tests in the suite complete"
+   },
+   {
+    "id": "vitest:docs/guide/recipes/db-transaction.md#3",
+    "text": "## How it works\n\nThe `db` fixture is created once per file via `scope: 'file'`, so connection setup happens once instead of on every test, and `onCleanup` closes the connection when the file is done. `aroundEach` wraps every test in `db.transaction(runTest)`, and anything the test writes gets rolled back when `runTest` resolves. The test receives the same `db` instance through its context, with no awareness that it's running inside a transaction.\n\nThis works as long as your database driver supports nested transactions or savepoints, which covers most modern databases. The same `aroundEach` hook can also wrap an [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage) context if you want to propagate things like tenant or trace IDs through the test alongside the transaction."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/lifecycle.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/recipes/db-transaction.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/lifecycle.md#9",
+    "b": "vitest:docs/guide/recipes/db-transaction.md#3",
+    "relation": "overlapping",
+    "related": 0.6141,
+    "probabilities": {
+     "same": 0.0152,
+     "overlapping": 0.5856,
+     "conflicting": 0.0132,
+     "unrelated": 0.3859
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 48,
+   "passage_reads": 1,
+   "passages_ms": 63,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 110,
+   "total_ms": 114
+  }
+ }
+}

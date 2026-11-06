@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f5/f52de43efe4e97584b97",
+ "request_hash": "f52de43efe4e97584b975193df553e5273674bddeb57560de5240353bd332233",
+ "recorded_at": "2026-11-06T14:15:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1101,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "189.476479",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=387"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#17",
+    "text": "</TabItem>\n</Tabs>\n\nFor bidirectional M:N relations, it is enough to specify the `pivotEntity` option only on the owning side. You still need to link the sides via `inversedBy` or `mappedBy` option.\n\nIf you want to add new items to such M:N collection, you need to have all non-FK properties to define a database level default value.\n\nAlternatively, you can work with the pivot entity directly:\n\n```ts\n// create new item\nconst item = em.create(OrderItem, {\n  order: 123,\n  product: 321,\n  amount: 999,\n});\nawait em.persist(item).flush();\n\n// or remove an item via delete query\nawait em.nativeDelete(OrderItem, { order: 123, product: 321 });\n```\n\nYou can as well define the 1:m properties targeting the pivot entity as in the previous example, and use that for modifying the collection, while using the M:N property for easier reading and filtering purposes."
+   },
+   {
+    "id": "mikro-orm:docs/docs/composite-keys.md#12",
+    "text": "```ts\n@Entity()\nexport class Order {\n\n  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem })\n  products = new Collection<Product>(this);\n\n}\n```\n\nFor bidirectional M:N relations, it is enough to specify the `pivotEntity` option only on the owning side. You still need to link the sides via `inversedBy` or `mappedBy` option.\n\n```ts\n@Entity()\nexport class Product {\n\n  @ManyToMany({ entity: () => Order, mappedBy: o => o.products })\n  orders = new Collection<Order>(this);\n\n}\n```\n\nIf you want to add new items to such M:N collection, you need to have all non-FK properties define a database level default value.\n\n```ts\n@Entity()\nexport class OrderItem {\n\n  @ManyToOne({ primary: true })\n  order: Order;\n\n  @ManyToOne({ primary: true })\n  product: Product;\n\n  @Property({ default: 1 })\n  amount!: number;\n\n}\n```\n\nAlternatively, you can work with the pivot entity directly:\n\n```ts\n// create new item\nconst item = em.create(OrderItem, {\n  order: 123,\n  product: 321,\n  amount: 999,\n});\nawait em.persist(item).flush();\n\n// or remove an item via delete query\nconst em.nativeDelete(OrderItem, { order: 123, product: 321 });\n```\n\nYou can also define the 1:m properties targeting the pivot entity as in the previous example, and use that for modifying the collection, while using the M:N property for easier reading and filtering purposes."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#17",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/composite-keys.md#12"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/composite-keys.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/collections.md#17"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/collections.md#17",
+    "b": "mikro-orm:docs/docs/composite-keys.md#12",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0275,
+     "overlapping": 0.9654,
+     "conflicting": 0.0052,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.5001,
+       "restated": 0.3979,
+       "elaborated": 0.0446,
+       "different": 0.0573
+      },
+      "confidence": 0.9427,
+      "a": {
+       "document": "mikro-orm:docs/docs/collections.md#17",
+       "quote": "For bidirectional M:N relations, it is enough to specify the `pivotEntity` option only on the owning side.",
+       "start": 20,
+       "end": 126,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/composite-keys.md#12",
+       "quote": "```ts\n@Entity()\nexport class Order {\n\n  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem })\n  products = new Collection<Product>(this);\n\n}\n```\n\nFor bidirectional M:N relations, it is enough to specify the `pivotEntity` option only on the owning side.",
+       "start": 0,
+       "end": 267,
+       "confidence": 0.996
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0336,
+       "restated": 0.5104,
+       "elaborated": 0.3745,
+       "different": 0.0815
+      },
+      "confidence": 0.9185,
+      "a": {
+       "document": "mikro-orm:docs/docs/collections.md#17",
+       "quote": "You still need to link the sides via `inversedBy` or `mappedBy` option.",
+       "start": 127,
+       "end": 198,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/composite-keys.md#12",
+       "quote": "You still need to link the sides via `inversedBy` or `mappedBy` option.\n\n```ts\n@Entity()\nexport class Product {\n\n  @ManyToMany({ entity: () => Order, mappedBy: o => o.products })\n  orders = new Collection<Order>(this);\n\n}\n```\n\nIf you want to add new items to such M:N collection, you need to have all non-FK properties define a database level default value.\n\n```ts\n@Entity()\nexport class OrderItem {\n\n  @ManyToOne({ primary: true })\n  order: Order;\n\n  @ManyToOne({ primary: true })\n  product: Product;\n\n  @Property({ default: 1 })\n  amount!: number;\n\n}\n```\n\nAlternatively, you can work with the pivot entity directly:\n\n```ts\n// create new item\nconst item = em.create(OrderItem, {\n  order: 123,\n  product: 321,\n  amount: 999,\n});\nawait em.persist(item).flush();\n\n// or remove an item via delete query\nconst em.nativeDelete(OrderItem, { order: 123, product: 321 });\n```\n\nYou can also define the 1:m properties targeting the pivot entity as in the previous example, and use that for modifying the collection, while using the M:N property for easier reading and filtering purposes.",
+       "start": 268,
+       "end": 1345,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 71,
+   "passages": 2,
+   "counterparts_ms": 101
+  },
+  "timing": {
+   "read_ms": 200,
+   "total_ms": 202
+  }
+ }
+}

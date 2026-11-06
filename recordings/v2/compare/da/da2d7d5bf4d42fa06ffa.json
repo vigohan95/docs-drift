@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/da/da2d7d5bf4d42fa06ffa",
+ "request_hash": "da2d7d5bf4d42fa06ffa3bece8866badcfc364e6923c45d1565e6cd84ebeb654",
+ "recorded_at": "2026-11-06T14:14:10Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1027,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "97.809057",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=285"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/middleware.md#1",
+    "text": "## Types of Middleware\n\nMongoose has 4 types\nof middleware: document middleware, model middleware, aggregate middleware, and query middleware.\n\nDocument middleware is supported for the following document functions.\nIn Mongoose, a document is an instance of a `Model` class.\nIn document middleware functions, `this` refers to the document. To access the model, use `this.constructor`.\n\n* [validate](api/document.html#document_Document-validate)\n* [save](api/model.html#model_Model-save)\n* [updateOne](api/document.html#document_Document-updateOne)\n* [deleteOne](api/model.html#model_Model-deleteOne)\n* [init](api/document.html#document_Document-init) (note: init hooks are [synchronous](#synchronous))\n\nQuery middleware is supported for the following Query functions.\nQuery middleware executes when you call `exec()` or `then()` on a Query object, or `await` on a Query object.\nIn query middleware functions, `this` refers to the query.\n\n* [countDocuments](api/query.html#query_Query-countDocuments)\n* [deleteMany](api/query.html#query_Query-deleteMany)\n* [deleteOne](api/query.html#query_Query-deleteOne)\n* [distinct](api/query.html#query_Query-distinct)\n* [estimatedDocumentCount](api/query.html#query_Query-estimatedDocumentCount)\n* [find](api/query.html#query_Query-find)\n* [findOne](api/query.html#query_Query-findOne)\n* [findOneAndDelete](api/query.html#query_Query-findOneAndDelete)\n* [findOneAndReplace](api/query.html#query_Query-findOneAndReplace)\n* [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)\n* [replaceOne](api/query.html#query_Query-replaceOne)\n* [updateOne](api/query.html#query_Query-updateOne)\n* [updateMany](api/query.html#query_Query-updateMany)\n* [validate](validation.html#update-validators)"
+   },
+   {
+    "id": "mongoose:docs/middleware.md#17",
+    "text": "## Synchronous Hooks {#synchronous}\n\nCertain Mongoose hooks are synchronous, which means they do **not** support functions that return promises.\nCurrently, only `init` hooks are synchronous, because the [`init()` function](api/document.html#document_Document-init) is synchronous.\nBelow is an example of using pre and post init hooks.\n\n```javascript acquit:post init hooks.*success\nconst schema = new Schema({ title: String, loadedAt: Date });\n\nschema.pre('init', pojo => {\n  assert.equal(pojo.constructor.name, 'Object'); // Plain object before init\n});\n\nconst now = new Date();\nschema.post('init', doc => {\n  assert.ok(doc instanceof mongoose.Document); // Mongoose doc after init\n  doc.loadedAt = now;\n});\n\nconst Test = db.model('Test', schema);\n\nreturn Test.create({ title: 'Casino Royale' }).\n  then(doc => Test.findById(doc)).\n  then(doc => assert.equal(doc.loadedAt.valueOf(), now.valueOf()));\n```\n\nTo report an error in an init hook, you must throw a **synchronous** error.\nUnlike all other middleware, init middleware does **not** handle promise\nrejections.\n\n```javascript acquit:post init hooks.*with errors\nconst schema = new Schema({ title: String });\n\nconst swallowedError = new Error('will not show');\n// init hooks do **not** handle async errors or any sort of async behavior\nschema.pre('init', () => Promise.reject(swallowedError));\nschema.post('init', () => { throw Error('will show'); });\n\nconst Test = db.model('Test', schema);\n\nreturn Test.create({ title: 'Casino Royale' }).\n  then(doc => Test.findById(doc)).\n  catch(error => assert.equal(error.message, 'will show'));\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/middleware.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/middleware.md#17",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/middleware.md#1",
+    "b": "mongoose:docs/middleware.md#17",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9867,
+     "conflicting": 0.0047,
+     "unrelated": 0.0022
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 44,
+   "passage_reads": 1,
+   "passages_ms": 89,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 133,
+   "total_ms": 136
+  }
+ }
+}

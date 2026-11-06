@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/32/32637d837b67aa5314c0",
+ "request_hash": "32637d837b67aa5314c09fb4ec5b58541a261c774c7789cca01013fb77e73ab1",
+ "recorded_at": "2026-11-06T14:19:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 6022,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.52413",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#41",
+    "text": "### `onCacheEntryAdded`\n\n_(optional)_\n\nAvailable to both [queries](../usage/queries.mdx) and [mutations](../usage/mutations.mdx).\n\nA function that is called when a new cache entry is added, i.e. when a new subscription for the endpoint + query parameters combination is created. The function is called with a lifecycle api object containing properties such as `cacheDataLoaded` & `cacheDataRemoved`, allowing code to be run when a cache entry is added, when cache data is loaded, and when the cache entry is removed (i.e. throughout the lifecycle of a cache entry).\n\nCan be used for [streaming updates](../usage/streaming-updates.mdx)."
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/customizing-queries.mdx#29",
+    "text": "### Streaming data with no initial request\n\nRTK Query provides the ability for an endpoint to send an initial request for data, followed up with recurring [streaming updates](./streaming-updates.mdx) that perform further updates to the cached data as the updates occur. However, the initial request is optional, and you may wish to use streaming updates without any initial request fired off.\n\nIn the example below, a `queryFn` is used to populate the cache data with an empty array, with no initial request sent. The array is later populated using streaming updates via the [`onCacheEntryAdded`](../api/createApi.mdx#oncacheentryadded) endpoint option, updating the cached data as it is received.\n\n```ts title=\"Streaming data with no initial request\"\n// file: types.ts noEmit\nexport interface Message {\n  id: number\n  channel: 'general' | 'redux'\n  userName: string\n  text: string\n}\n\n// file: api.ts\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\nimport type { Message } from './types'\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: '/' }),\n  tagTypes: ['Message'],\n  endpoints: (build) => ({\n    // highlight-start\n    streamMessages: build.query<Message[], void>({\n      // The query is not relevant here as the data will be provided via streaming updates.\n      // A queryFn returning an empty array is used, with contents being populated via\n      // streaming updates below as they are received.\n      queryFn: () => ({ data: [] }),\n      async onCacheEntryAdded(arg, { updateCachedData, cacheEntryRemoved }) {\n        const ws = new WebSocket('ws://localhost:8080')\n        // populate the array with messages as they are received from the websocket\n        ws.addEventListener('message', (event) => {\n          updateCachedData((draft) => {\n            draft.push(JSON.parse(event.data))\n          })\n        })\n        await cacheEntryRemoved\n        ws.close()\n      },\n    }),\n    // highlight-end\n  }),\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#41",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/customizing-queries.mdx#29",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/createApi.mdx#41",
+    "b": "redux-toolkit:docs/rtk-query/usage/customizing-queries.mdx#29",
+    "relation": "overlapping",
+    "related": 0.9981,
+    "probabilities": {
+     "same": 0.0041,
+     "overlapping": 0.9916,
+     "conflicting": 0.0025,
+     "unrelated": 0.0019
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 100,
+   "total_ms": 102
+  }
+ }
+}

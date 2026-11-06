@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/94/948d15e1e8c1edb8ac7c",
+ "request_hash": "948d15e1e8c1edb8ac7ca3a93c5e06510ec73ffcde5826109a063c1e0b6b4830",
+ "recorded_at": "2026-11-06T14:13:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1305,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "116.727646",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=161,cfOrigin;dur=0,cfWorker;dur=415"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) ### `runner` \\[string | \\[string, object\\]] (2) ### `testRunner` \\[string] Default: `jest-circus/runner` This option allows the use of a custom test runner.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "jest:docs/CLI.md#65",
+    "title": "docs/CLI.md > Reference > `--testRunner=<path>`",
+    "text": "### `--testRunner=<path>`\n\nLets you specify a custom test runner."
+   },
+   {
+    "id": "jest:packages/jest-circus/README.md#3",
+    "title": "packages/jest-circus/README.md > Configure",
+    "text": "## Configure\n\nConfigure Jest to use `jest-circus` via the [`testRunner`](https://jestjs.io/docs/configuration#testrunner-string) option:\n\n```json\n{\n  \"testRunner\": \"jest-circus/runner\"\n}\n```\n\nOr via CLI:\n\n```bash\njest --testRunner='jest-circus/runner'\n```"
+   },
+   {
+    "id": "jest:docs/Configuration.md#31",
+    "title": "docs/Configuration.md > Reference > `globalTeardown` \\[string]",
+    "text": "### `globalTeardown` \\[string]\n\nDefault: `undefined`\n\nThis option allows the use of a custom global teardown module which must export a function (it can be sync or async). The function will be triggered once after all test files and it will receive two arguments: Jest's [`globalConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L358-L422) and [`projectConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L424-L481).\n\n:::info\n\nA global teardown module configured in a project (using multi-project runner) will be triggered only when you run at least one test from this project.\n\nThe same caveat concerning transformation of `node_modules` as for `globalSetup` applies to `globalTeardown`.\n\n:::"
+   },
+   {
+    "id": "jest:docs/Configuration.md#99",
+    "title": "docs/Configuration.md > Reference > `watchPlugins` \\[array&lt;string | \\[string, Object]&gt;]",
+    "text": "### `watchPlugins` \\[array&lt;string | \\[string, Object]&gt;]\n\nDefault: `[]`\n\nThis option allows you to use custom watch plugins. Read more about watch plugins [here](watch-plugins).\n\nExamples of watch plugins include:\n\n- [`jest-watch-master`](https://github.com/rickhanlonii/jest-watch-master)\n- [`jest-watch-select-projects`](https://github.com/jest-community/jest-watch-select-projects)\n- [`jest-watch-suspend`](https://github.com/unional/jest-watch-suspend)\n- [`jest-watch-typeahead`](https://github.com/jest-community/jest-watch-typeahead)\n- [`jest-watch-yarn-workspaces`](https://github.com/cameronhunter/jest-watch-directories/tree/master/packages/jest-watch-yarn-workspaces)\n\n:::info\n\nThe values in the `watchPlugins` property value can omit the `jest-watch-` prefix of the package name.\n\n:::"
+   },
+   {
+    "id": "jest:docs/Configuration.md#30",
+    "title": "docs/Configuration.md > Reference > `globalSetup` \\[string]",
+    "text": "### `globalSetup` \\[string]\n\nDefault: `undefined`\n\nThis option allows the use of a custom global setup module, which must export a function (it can be sync or async). The function will be triggered once before all test files and it will receive two arguments: Jest's [`globalConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L358-L422) and [`projectConfig`](https://github.com/jestjs/jest/blob/v29.2.1/packages/jest-types/src/Config.ts#L424-L481).\n\n:::info\n\nA global setup module configured in a project (using multi-project runner) will be triggered only when you run at least one test from this project.\n\nAny global variables that are defined through `globalSetup` can only be read in `globalTeardown`. You cannot retrieve globals defined here in your test suites.\n\nWhile code transformation is applied to the linked setup-file, Jest will **not** transform any code in `node_modules`. This is due to the need to load the actual transformers (e.g. `babel` or `typescript`) to perform transformation.\n\n:::\n\n```js title=\"setup.js\"\nmodule.exports = async function (globalConfig, projectConfig) {\n  console.log(globalConfig.testPathPatterns);\n  console.log(projectConfig.cache);\n\n  // Set reference to mongod in order to close the server during teardown.\n  globalThis.__MONGOD__ = mongod;\n};\n```\n\n```js title=\"teardown.js\"\nmodule.exports = async function (globalConfig, projectConfig) {\n  console.log(globalConfig.testPathPatterns);\n  console.log(projectConfig.cache);\n\n  await globalThis.__MONGOD__.stop();\n};\n```"
+   },
+   {
+    "id": "jest:docs/Configuration.md#21",
+    "title": "docs/Configuration.md > Reference > `dependencyExtractor` \\[string]",
+    "text": "### `dependencyExtractor` \\[string]\n\nDefault: `undefined`\n\nThis option allows the use of a custom dependency extractor. It must be a node module that exports an object with an `extract` function. E.g.:\n\n```javascript\nconst crypto = require('crypto');\nconst fs = require('fs');\n\nmodule.exports = {\n  extract(code, filePath, defaultExtract) {\n    const deps = defaultExtract(code, filePath);\n    // Scan the file and add dependencies in `deps` (which is a `Set`)\n    return deps;\n  },\n  getCacheKey() {\n    return crypto\n      .createHash('md5')\n      .update(fs.readFileSync(__filename))\n      .digest('hex');\n  },\n};\n```\n\nThe `extract` function should return an iterable (`Array`, `Set`, etc.) with the dependencies found in the code.\n\nThat module can also contain a `getCacheKey` function to generate a cache key to determine if the logic has changed and any cached artifacts relying on it should be discarded."
+   },
+   {
+    "id": "jest:docs/Configuration.md#22",
+    "title": "docs/Configuration.md > Reference > `displayName` \\[string, object]",
+    "text": "### `displayName` \\[string, object]\n\ndefault: `undefined`\n\nAllows for a label to be printed alongside a test while it is running. This becomes more useful in multi-project repositories where there can be many jest configuration files. This visually tells which project a test belongs to.\n\n```js tab title=\"jest.config.js\"\nconst {defineConfig} = require('jest');\n\nmodule.exports = defineConfig({\n  displayName: 'CLIENT',\n});\n```\n\n```ts tab title=\"jest.config.ts\"\nimport {defineConfig} from 'jest';\n\nexport default defineConfig({\n  displayName: 'CLIENT',\n});\n```\n\nAlternatively, an object with the properties `name` and `color` can be passed. This allows for a custom configuration of the background color of the displayName. `displayName` defaults to white when its value is a string. Jest uses [`chalk`](https://github.com/chalk/chalk) to provide the color. As such, all of the valid options for colors supported by `chalk` are also supported by Jest.\n\n```js tab title=\"jest.config.js\"\nconst {defineConfig} = require('jest');\n\nmodule.exports = defineConfig({\n  displayName: {\n    name: 'CLIENT',\n    color: 'blue',\n  },\n});\n```\n\n```ts tab title=\"jest.config.ts\"\nimport {defineConfig} from 'jest';\n\nexport default defineConfig({\n  displayName: {\n    name: 'CLIENT',\n    color: 'blue',\n  },\n});\n```"
+   },
+   {
+    "id": "jest:docs/Configuration.md#64",
+    "title": "docs/Configuration.md > Reference > `runtime` \\[string]",
+    "text": "### `runtime` \\[string]\n\nDefault: `\"jest-runtime\"`\n\nThis option allows the use of a custom runtime to execute test files. A custom runtime can be provided by specifying a path to a runtime implementation.\n\nThe runtime module must export a class that extends Jest's default `Runtime` class or implements a compatible interface with the same constructor signature and methods.\n\n:::warning\n\nCreating a custom runtime is an advanced use case. Most users should not need to customize the runtime. Consider whether your use case might be better addressed with custom [transformers](Configuration.md#transform-objectstring-pathtotransformer--pathtotransformer-object), [test environments](Configuration.md#testenvironment-string), or [module mocks](ManualMocks.md).\n\n:::\n\nExample:\n\n```js title=\"custom-runtime.js\"\nconst {default: Runtime} = require('jest-runtime');\n\nclass CustomRuntime extends Runtime {\n  //...custom logic\n}\n\nmodule.exports = CustomRuntime;\n```\n\n```ts title=\"custom-runtime.ts\"\nimport Runtime from 'jest-runtime';\n\nexport default class CustomRuntime extends Runtime {\n  //...custom logic\n}\n```\n\nAdd the custom runtime to your Jest configuration:\n\n```js tab title=\"jest.config.js\"\nconst {defineConfig} = require('jest');\n\nmodule.exports = defineConfig({\n  runtime: './custom-runtime.js',\n});\n```\n\n```ts tab title=\"jest.config.ts\"\nimport {defineConfig} from 'jest';\n\nexport default defineConfig({\n  runtime: './custom-runtime.ts',\n});\n```"
+   },
+   {
+    "id": "jest:docs/Configuration.md#86",
+    "title": "docs/Configuration.md > Reference > `testResultsProcessor` \\[string]",
+    "text": "### `testResultsProcessor` \\[string]\n\nDefault: `undefined`\n\nThis option allows the use of a custom results processor. This processor must be a node module that exports a function expecting an object with the following structure as the first argument and return it:\n\n```json\n{\n  \"success\": boolean,\n  \"startTime\": epoch,\n  \"numTotalTestSuites\": number,\n  \"numPassedTestSuites\": number,\n  \"numFailedTestSuites\": number,\n  \"numRuntimeErrorTestSuites\": number,\n  \"numTotalTests\": number,\n  \"numPassedTests\": number,\n  \"numFailedTests\": number,\n  \"numPendingTests\": number,\n  \"numTodoTests\": number,\n  \"openHandles\": Array<Error>,\n  \"testResults\": [{\n    \"numFailingTests\": number,\n    \"numPassingTests\": number,\n    \"numPendingTests\": number,\n    \"testResults\": [{\n      \"title\": string (message in it block),\n      \"status\": \"failed\" | \"pending\" | \"passed\",\n      \"ancestorTitles\": [string (message in describe blocks)],\n      \"failureMessages\": [string],\n      \"numPassingAsserts\": number,\n      \"location\": {\n        \"column\": number,\n        \"line\": number\n      },\n      \"duration\": number | null,\n      \"startAt\": epoch | null\n    },\n    ...\n    ],\n    \"perfStats\": {\n      \"end\": epoch,\n      \"loadTestEnvironmentEnd\": epoch,\n      \"loadTestEnvironmentStart\": epoch,\n      \"runtime\": number,\n      \"setupAfterEnvEnd\": epoch,\n      \"setupAfterEnvStart\": epoch,\n      \"setupFilesEnd\": epoch,\n      \"setupFilesStart\": epoch,\n      \"slow\": boolean,\n      \"start\": epoch\n    },\n    \"testFilePath\": absolute path to test file,\n    \"coverage\": {}\n  },\n  \"testExecError:\" (exists if there was a top-level failure) {\n    \"message\": string\n    \"stack\": string\n  }\n  ...\n  ]\n}\n```\n\n`testResultsProcessor` and `reporters` are very similar to each other. One difference is that a test result processor only gets called after all tests finished. Whereas a reporter has the ability to receive test results after individual tests and/or test suites are finished."
+   },
+   {
+    "id": "jest:docs/Configuration.md#58",
+    "title": "docs/Configuration.md > Reference > `resolver` \\[string]",
+    "text": "### `resolver` \\[string]\n\nDefault: `undefined`\n\nThis option allows the use of a custom resolver. This resolver must be a module that exports _either_:\n\n1. a function expecting a string as the first argument for the path to resolve and an options object as the second argument. The function should either return a path to the module that should be resolved or throw an error if the module can't be found. _or_\n2. an object containing `async` and/or `sync` properties. The `sync` property should be a function with the shape explained above, and the `async` property should also be a function that accepts the same arguments, but returns a promise which resolves with the path to the module or rejects with an error.\n\nThe resolver may be written as either CommonJS or an ES module, including one that uses a top-level await. An ES module can export the function or the `sync`/`async` object as its `default` export, or expose `sync` and `async` as named exports.\n\nThe options object provided to resolvers has the shape:\n\n```ts\ntype ResolverOptions = {\n  /** Directory to begin resolving from. */\n  basedir: string;\n  /** List of export conditions. */\n  conditions?: Array<string>;\n  /** Instance of default resolver. */\n  defaultResolver: (path: string, options: ResolverOptions) => string;\n  /** List of file extensions to search in order. */\n  extensions?: Array<string>;\n  /** List of directory names to be looked up for modules recursively. */\n  moduleDirectory?: Array<string>;\n  /** List of `require.paths` to use if nothing is found in `node_modules`. */\n  paths?: Array<string>;\n  /** Current root directory. */\n  rootDir?: string;\n};\n```"
+   },
+   {
+    "id": "jest:docs/Configuration.md#88",
+    "title": "docs/Configuration.md > Reference > `testSequencer` \\[string]",
+    "text": "### `testSequencer` \\[string]\n\nDefault: `@jest/test-sequencer`\n\nThis option allows you to use a custom sequencer instead of Jest's default.\n\n:::tip\n\nBoth `sort` and `shard` may optionally return a `Promise`.\n\n:::\n\nFor example, you may sort test paths alphabetically:\n\n```js title=\"custom-sequencer.js\"\nconst Sequencer = require('@jest/test-sequencer').default;\n\nclass CustomSequencer extends Sequencer {\n  /**\n   * Select tests for shard requested via --shard=shardIndex/shardCount\n   * Sharding is applied before sorting\n   */\n  shard(tests, {shardIndex, shardCount}) {\n    const shardSize = Math.ceil(tests.length / shardCount);\n    const shardStart = shardSize * (shardIndex - 1);\n    const shardEnd = shardSize * shardIndex;\n\n    return [...tests]\n      .sort((a, b) => (a.path > b.path ? 1 : -1))\n      .slice(shardStart, shardEnd);\n  }\n\n  /**\n   * Sort test to determine order of execution\n   * Sorting is applied after sharding\n   */\n  sort(tests) {\n    // Test structure information\n    // https://github.com/jestjs/jest/blob/6b8b1404a1d9254e7d5d90a8934087a9c9899dab/packages/jest-runner/src/types.ts#L17-L21\n    const copyTests = [...tests];\n    return copyTests.sort((testA, testB) => (testA.path > testB.path ? 1 : -1));\n  }\n}\n\nmodule.exports = CustomSequencer;\n```\n\nAdd `custom-sequencer` to your Jest configuration:\n\n```js tab title=\"jest.config.js\"\nconst {defineConfig} = require('jest');\n\nmodule.exports = defineConfig({\n  testSequencer: 'path/to/custom-sequencer.js',\n});\n```\n\n```ts tab title=\"jest.config.ts\"\nimport {defineConfig} from 'jest';\n\nexport default defineConfig({\n  testSequencer: 'path/to/custom-sequencer.js',\n});\n```"
+   },
+   {
+    "id": "jest:docs/CLI.md#30",
+    "title": "docs/CLI.md > Reference > `--injectGlobals`",
+    "text": "### `--injectGlobals`\n\nInsert Jest's globals (`expect`, `test`, `describe`, `beforeEach` etc.) into the global environment. If you set this to `false`, you should import from `@jest/globals`, e.g.\n\n```ts\nimport {expect, jest, test} from '@jest/globals';\n\njest.useFakeTimers();\n\ntest('some test', () => {\n  expect(Date.now()).toBe(0);\n});\n```\n\n:::note\n\nThis option is only supported using the default `jest-circus` test runner.\n\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "jest:packages/jest-circus/README.md#3",
+    "action": "use",
+    "relevance_score": 0.9792,
+    "document_score": 0.9845,
+    "levels": {
+     "answers": 0.9792,
+     "elsewhere": 0.0054,
+     "different_case": 0.0081,
+     "unrelated": 0.0074
+    }
+   },
+   {
+    "index": 0,
+    "id": "jest:docs/CLI.md#65",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.1125,
+    "document_score": 0.2761,
+    "levels": {
+     "answers": 0.1125,
+     "elsewhere": 0.1637,
+     "different_case": 0.0354,
+     "unrelated": 0.6885
+    }
+   },
+   {
+    "index": 11,
+    "id": "jest:docs/CLI.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0156,
+    "document_score": 0.0503,
+    "levels": {
+     "answers": 0.0156,
+     "elsewhere": 0.0347,
+     "different_case": 0.1103,
+     "unrelated": 0.8394
+    }
+   },
+   {
+    "index": 7,
+    "id": "jest:docs/Configuration.md#64",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0061,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0034,
+     "different_case": 0.013,
+     "unrelated": 0.9808
+    }
+   },
+   {
+    "index": 8,
+    "id": "jest:docs/Configuration.md#86",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0034,
+     "different_case": 0.0067,
+     "unrelated": 0.9879
+    }
+   },
+   {
+    "index": 10,
+    "id": "jest:docs/Configuration.md#88",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0061,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.004,
+     "different_case": 0.008,
+     "unrelated": 0.9859
+    }
+   },
+   {
+    "index": 3,
+    "id": "jest:docs/Configuration.md#99",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0024,
+     "different_case": 0.0077,
+     "unrelated": 0.9879
+    }
+   },
+   {
+    "index": 5,
+    "id": "jest:docs/Configuration.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0022,
+     "different_case": 0.008,
+     "unrelated": 0.9879
+    }
+   },
+   {
+    "index": 9,
+    "id": "jest:docs/Configuration.md#58",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0036,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0018,
+     "different_case": 0.005,
+     "unrelated": 0.9914
+    }
+   },
+   {
+    "index": 6,
+    "id": "jest:docs/Configuration.md#22",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0017,
+    "document_score": 0.0029,
+    "levels": {
+     "answers": 0.0017,
+     "elsewhere": 0.0012,
+     "different_case": 0.0035,
+     "unrelated": 0.9936
+    }
+   },
+   {
+    "index": 4,
+    "id": "jest:docs/Configuration.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0037,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0022,
+     "different_case": 0.0033,
+     "unrelated": 0.993
+    }
+   },
+   {
+    "index": 2,
+    "id": "jest:docs/Configuration.md#31",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0049,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0035,
+     "different_case": 0.0059,
+     "unrelated": 0.9892
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5053
+  },
+  "timing": {
+   "total_ms": 225,
+   "rerank_ms": 224,
+   "questions_ms": 0,
+   "model_ms": 110,
+   "engine": {
+    "rows": 6289,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 110,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 107,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 144
+   }
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5d/5d365cd8a9b384142a3c",
+ "request_hash": "5d365cd8a9b384142a3c944a775fe7aea4cc97c073231f2284c23f483d786ef4",
+ "recorded_at": "2026-11-06T14:14:18Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1127,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "72.812992",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=383"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#11",
+    "text": "Now, mongoose will call your getter function every time you access the\n`fullName` property:\n\n```javascript\nconsole.log(axl.fullName); // Axl Rose\n```\n\nIf you use `toJSON()` or `toObject()` Mongoose will *not* include virtuals by default.\nPass `{ virtuals: true }` to [`toJSON()`](api/document.html#document_Document-toJSON) or `toObject()` to include virtuals.\n\n```javascript\n// Convert `doc` to a POJO, with virtuals attached\ndoc.toObject({ virtuals: true });\n\n// Equivalent:\ndoc.toJSON({ virtuals: true });\n```\n\nThe above caveat for `toJSON()` also includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).\nTo include virtuals in `JSON.stringify()` output, you can either call `toObject({ virtuals: true })` on the document before calling `JSON.stringify()`, or set the `toJSON: { virtuals: true }` option on your schema.\n\n```javascript\n// Explicitly add virtuals to `JSON.stringify()` output\nJSON.stringify(doc.toObject({ virtuals: true }));\n\n// Or, to automatically attach virtuals to `JSON.stringify()` output:\nconst personSchema = new Schema({\n  name: {\n    first: String,\n    last: String\n  }\n}, {\n  toJSON: { virtuals: true } // <-- include virtuals in `JSON.stringify()`\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#13",
+    "text": "## `toObject()` Options {#toobject-options}\n\nThe `options` parameter to `toObject()` and `toJSON()` merge defaults rather than overwriting them.\n\n```javascript\n// Note the `toObject` option below\nconst schema = new Schema({ name: String }, { toObject: { virtuals: true } });\nschema.virtual('answer').get(() => 42);\nconst MyModel = db.model('MyModel', schema);\n\nconst doc = new MyModel({ name: 'test' });\n// In mongoose 4.x this prints \"undefined\", because `{ minimize: false }`\n// overwrites the entire schema-defined options object.\n// In mongoose 5.x this prints \"42\", because `{ minimize: false }` gets\n// merged with the schema-defined options.\nconsole.log(doc.toJSON({ minimize: false }).answer);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_5.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#11",
+    "b": "mongoose:docs/migrating_to_5.md#13",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.0085,
+     "overlapping": 0.985,
+     "conflicting": 0.004,
+     "unrelated": 0.0026
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 52,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 79,
+   "total_ms": 81
+  }
+ }
+}

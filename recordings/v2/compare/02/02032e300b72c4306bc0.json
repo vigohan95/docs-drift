@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/02/02032e300b72c4306bc0",
+ "request_hash": "02032e300b72c4306bc0a5de78747930b68d15c70270bdcf27d721f3b33285eb",
+ "recorded_at": "2026-11-06T14:15:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 962,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.673312",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=258"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#10",
+    "text": "And now the test case, finally. Currently, there is no data as you are using an empty in-memory database, fresh for each test run, so the article listing endpoint will return just an empty array - you will handle that in a moment.\n\n> Notice that you are using `beforeAll` hook to initialize the app and `afterAll` to tear it down - the `app.close()` will result in the `onClose` hook that calls `orm.close()`. Without that, the process would hang.\n\n```ts title='article.test.ts'\nimport { afterAll, beforeAll, expect, test } from 'vitest';\nimport { FastifyInstance } from 'fastify';\nimport { initTestApp } from './utils.js';\n\nlet app: FastifyInstance;\n\nbeforeAll(async () => {\n  // use different ports to allow parallel testing\n  app = await initTestApp(30001);\n});\n\nafterAll(async () => {\n  // we close only the fastify app - it will close the database connection via onClose hook automatically\n  await app.close();\n});\n\ntest('list all articles', async () => {\n  // mimic the http request via `app.inject()`\n  const res = await app.inject({\n    method: 'get',\n    url: '/article',\n  });\n\n  // assert it was successful response\n  expect(res.statusCode).toBe(200);\n\n  // with expected shape\n  expect(res.json()).toMatchObject({\n    items: [],\n    total: 0,\n  });\n});\n```\n\nNow run `npm test`, you should be good to go:\n\n```\n ✓ test/article.test.ts (1)\n\nTest Files  1 passed (1)\n    Tests  1 passed (1)\n  Start at  15:56:41\n  Duration  876ms (transform 264ms, setup 0ms, collect 300ms, tests 147ms)\n\n\n PASS  Waiting for file changes...\n     press h to show help, press q to quit\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#5",
+    "text": "### Testing the `User` endpoints\n\nYou now have two new endpoints, so test that they work as expected. Add a new test case for the `User` endpoints:\n\n```ts title='tests/user.test.ts'\nimport { FastifyInstance } from 'fastify';\nimport { afterAll, beforeAll, expect, test } from 'vitest';\nimport { initTestApp } from './utils.js';\n\nlet app: FastifyInstance;\n\nbeforeAll(async () => {\n  // using different ports to allow parallel testing\n  app = await initTestApp(30002);\n});\n\nafterAll(async () => {\n  // closing only the fastify app - it will close the database connection via onClose hook automatically\n  await app.close();\n});\n\ntest('login', async () => {\n  const res1 = await app.inject({\n    method: 'post',\n    url: '/user/sign-in',\n    payload: {\n      email: 'foo@bar.com',\n      password: 'password123',\n    },\n  });\n\n  expect(res1.statusCode).toBe(200);\n  expect(res1.json()).toMatchObject({\n    fullName: 'Foo Bar',\n  });\n\n  const res2 = await app.inject({\n    method: 'post',\n    url: '/user/sign-in',\n    payload: {\n      email: 'foo@bar.com',\n      password: 'password456',\n    },\n  });\n\n  expect(res2.statusCode).toBe(401);\n  expect(res2.json()).toMatchObject({ error: 'Invalid combination of email and password' });\n});\n```\n\nWhen you run it with `npm test`, you should see a failed assertion:\n\n```text\n FAIL  test/user.test.ts > login\nAssertionError: expected 500 to be 401 // Object.is equality\n\n- Expected\n+ Received\n\n- 401\n+ 500\n```\n\nThat's because this isn't handled anywhere, the code just throws an error - let's deal with that now by integrating authentication into the application."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/03-project-setup.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/03-project-setup.md#10",
+    "b": "mikro-orm:docs/docs/guide/04-advanced.md#5",
+    "relation": "unrelated",
+    "related": 0.4218,
+    "probabilities": {
+     "same": 0.0274,
+     "overlapping": 0.3755,
+     "conflicting": 0.0189,
+     "unrelated": 0.5782
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 110
+  },
+  "timing": {
+   "read_ms": 110,
+   "total_ms": 113
+  }
+ }
+}

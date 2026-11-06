@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a3/a3b0fe1d6fbba06f6da9",
+ "request_hash": "a3b0fe1d6fbba06f6da9b749c959664ba934160883a8e04f622248db2c859f8e",
+ "recorded_at": "2026-11-06T14:14:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1026,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "133.800863",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=350"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_6.md#33",
+    "text": "## Removed Validator `isAsync` {#removed-validator-isasync}\n\n`isAsync` is no longer an option for `validate`. Use an `async function` instead."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_9.md#11",
+    "text": "## `isAsync` middleware no longer supported\n\nMongoose 9 no longer supports `isAsync` middleware. Middleware functions that use the legacy signature with both `next` and `done` callbacks (i.e., `function(next, done)`) are not supported. We recommend middleware now use promises or async/await.\n\nIf you have code that uses `isAsync` middleware, you must refactor it to use async functions or return a promise instead.\n\n```javascript\n// ❌ Not supported in Mongoose 9\nconst schema = new Schema({});\n\nschema.pre('save', true, function(next, done) {\n  execed.first = true;\n  setTimeout(\n    function() {\n      done(new Error('first done() error'));\n    },\n    5);\n\n  next();\n});\n\nschema.pre('save', true, function(next, done) {\n  execed.second = true;\n  setTimeout(\n    function() {\n      next(new Error('second next() error'));\n      done(new Error('second done() error'));\n    },\n    25);\n});\n\n// ✅ Supported in Mongoose 9: use async functions or return a promise\nschema.pre('save', async function() {\n  execed.first = true;\n  await new Promise(resolve => setTimeout(resolve, 5));\n});\n\nschema.pre('save', async function() {\n  execed.second = true;\n  await new Promise(resolve => setTimeout(resolve, 25));\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_6.md#33",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_9.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/migrating_to_6.md#33",
+    "b": "mongoose:docs/migrating_to_9.md#11",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0395,
+     "overlapping": 0.954,
+     "conflicting": 0.0046,
+     "unrelated": 0.002
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 1,
+   "counterparts_ms": 48
+  },
+  "timing": {
+   "read_ms": 145,
+   "total_ms": 147
+  }
+ }
+}

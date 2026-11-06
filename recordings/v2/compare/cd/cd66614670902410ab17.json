@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/cd/cd66614670902410ab17",
+ "request_hash": "cd66614670902410ab17b3a6fb68f898c35542c298ba0f8c25a9d65edfa49234",
+ "recorded_at": "2026-11-06T14:14:18Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 968,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "121.7416",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=269"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#30",
+    "text": "## option: strictQuery {#strictQuery}\n\nMongoose supports a separate `strictQuery` option to avoid strict mode for query filters.\nThis is because empty query filters cause Mongoose to return all documents in the model, which can cause issues.\n\n```javascript\nconst mySchema = new Schema({ field: Number }, { strictQuery: true });\nconst MyModel = mongoose.model('Test', mySchema);\n// Mongoose will filter out `notInSchema: 1` because `strictQuery: true`, meaning this query will return\n// _all_ documents in the 'tests' collection\nMyModel.find({ notInSchema: 1 });\n```\n\nThe `strict` option does apply to updates.\nThe `strictQuery` option is **just** for query filters.\n\n```javascript\n// Mongoose will strip out `notInSchema` from the update if `strict` is\n// not `false`\nMyModel.updateMany({}, { $set: { notInSchema: 1 } });\n```\n\nMongoose has a separate `strictQuery` option to toggle strict mode for the `filter` parameter to queries.\n\n```javascript\nconst mySchema = new Schema({ field: Number }, {\n  strict: true,\n  strictQuery: false // Turn off strict mode for query filters\n});\nconst MyModel = mongoose.model('Test', mySchema);\n// Mongoose will not strip out `notInSchema: 1` because `strictQuery` is false\nMyModel.find({ notInSchema: 1 });\n```\n\nNote the difference between the two settings for filter paths that aren't in the schema.\nWith `strictQuery: false`, Mongoose leaves the path in the filter as-is and does **not** cast the value.\nThe server will only return documents where `notInSchema` is stored as `1`, so the query typically matches no documents.\nWith `strictQuery: true`, Mongoose silently removes the path from the filter, so the query may match more documents than intended.\nWith `strictQuery: 'throw'`, Mongoose throws a `StrictModeError` instead."
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#9",
+    "text": "## `strictQuery` is now equal to `strict` by default {#strictquery-is-removed-and-replaced-by-strict}\n\n~Mongoose no longer supports a `strictQuery` option. You must now use `strict`.~\nAs of Mongoose 6.0.10, we brought back the `strictQuery` option. In Mongoose 6, `strictQuery` is set to `strict` by default. This means that, by default, Mongoose will filter out query filter properties that are not in the schema.\n\nHowever, this behavior was a source of confusion in some cases, so in Mongoose 7, this default changes back to `false`. So if you want to retain the default behavior of Mongoose 5 as well as Mongoose 7 and later, you can also disable `strictQuery` globally to override:\n\n```javascript\nmongoose.set('strictQuery', false);\n```\n\nIn a test suite, it may be useful to set `strictQuery` to `throw`, which will throw exceptions any time a query references schema that doesn't exist, which could help identify a bug in your tests or code.\n\nHere's an example of the effect of `strictQuery`:\n\n```javascript\nconst userSchema = new Schema({ name: String });\nconst User = mongoose.model('User', userSchema);\n\n// By default, this is equivalent to `User.find()` because Mongoose filters out `notInSchema`\nawait User.find({ notInSchema: 1 });\n\n// Set `strictQuery: false` to opt in to filtering by properties that aren't in the schema\nawait User.find({ notInSchema: 1 }, null, { strictQuery: false });\n// equivalent:\nawait User.find({ notInSchema: 1 }).setOptions({ strictQuery: false });\n```\n\nYou can also disable `strictQuery` globally to override:\n\n```javascript\nmongoose.set('strictQuery', false);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#30",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#30",
+    "b": "mongoose:docs/migrating_to_6.md#9",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9817,
+     "conflicting": 0.0094,
+     "unrelated": 0.0026
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 96,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 131,
+   "total_ms": 134
+  }
+ }
+}

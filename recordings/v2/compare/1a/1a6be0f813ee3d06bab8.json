@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1a/1a6be0f813ee3d06bab8",
+ "request_hash": "1a6be0f813ee3d06bab8f5744fcdacd65960bcc31f9be03efef8b6afbbda6dd8",
+ "recorded_at": "2026-11-06T14:15:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1038,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "216.63117",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=363"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#11",
+    "text": "## Hooks example\n\nHooks can be registered in two ways:\n\n- **`hooks` property** — pass an object with arrays of hook handlers directly in the `defineEntity` call.\n- **`addHook` method** — register hook handlers after the entity is defined.\n\nBoth approaches accept functions (arrow functions, named functions, async functions). The entity instance is available via `args.entity`. See [Events and Lifecycle Hooks](./events.md) for the full list of available hooks and `EventArgs` details.\n\n<Tabs\n  groupId=\"entity-schema-hooks\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n  ]}\n>\n  <TabItem value=\"define-entity-class\">\n\nUse `addHook` after the class is defined for full type safety:\n\n```ts\nconst BookTagSchema = defineEntity({\n  name: 'BookTag',\n  properties: {\n    _id: p.type(ObjectId).primary(),\n    id: p.string().serializedPrimaryKey(),\n    name: p.string(),\n    version: p.integer(),\n    books: () => p.manyToMany(Book).mappedBy('tags'),\n  },\n});\n\nexport class BookTag extends BookTagSchema.class {}\nBookTagSchema.setClass(BookTag);\n\n// highlight-start\nBookTagSchema.addHook('beforeCreate', (args: EventArgs<BookTag>) => {\n  args.entity.version = 1;\n});\n\nBookTagSchema.addHook('beforeUpdate', (args: EventArgs<BookTag>) => {\n  args.entity.version++;\n});\n// highlight-end\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/events.md#3",
+    "text": "</TabItem>\n<TabItem value=\"define-entity\">\n\nWith `defineEntity` (no class), use the `addHook` method to register hooks after the entity is defined:\n\n```ts title=\"./entities/Article.ts\"\nimport { defineEntity, type InferEntity, type EventArgs, p } from '@mikro-orm/core';\n\nexport const Article = defineEntity({\n  name: 'Article',\n  properties: {\n    id: p.integer().primary(),\n    title: p.string(),\n    slug: p.string().unique(),\n    updatedAt: p.datetime(),\n  },\n});\n\nexport type IArticle = InferEntity<typeof Article>;\n\n// highlight-start\nArticle.addHook('beforeCreate', async (args: EventArgs<IArticle>) => {\n  const article = args.entity;\n  if (!article.slug) {\n    article.slug = article.title.toLowerCase().replace(/\\s+/g, '-');\n  }\n});\n\nArticle.addHook('beforeUpdate', async (args: EventArgs<IArticle>) => {\n  args.entity.updatedAt = new Date();\n});\n// highlight-end\n```\n\n> You can also pass hooks inline via the `hooks` property in the `defineEntity` call, but `args.entity` will be typed as `any` there because the entity type is not yet known. Explicitly typing the parameter (e.g. `EventArgs<IArticle>`) won't work either, as it would create a circular reference. Use `addHook` after the entity and its type alias are defined to get full type safety.\n\n</TabItem>\n<TabItem value=\"reflect-metadata\">\n\nWith decorators, mark entity methods with hook decorators like `@BeforeCreate()`, `@BeforeUpdate()`, etc.:"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/events.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/events.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/define-entity.md#11"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/define-entity.md#11",
+    "b": "mikro-orm:docs/docs/events.md#3",
+    "relation": "overlapping",
+    "related": 0.9943,
+    "probabilities": {
+     "same": 0.0319,
+     "overlapping": 0.9546,
+     "conflicting": 0.0078,
+     "unrelated": 0.0057
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0149,
+       "restated": 0.9338,
+       "elaborated": 0.0214,
+       "different": 0.0299
+      },
+      "confidence": 0.9701,
+      "a": {
+       "document": "mikro-orm:docs/docs/define-entity.md#11",
+       "quote": "Hooks can be registered in two ways:",
+       "start": 18,
+       "end": 54,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/events.md#3",
+       "quote": "</TabItem>\n<TabItem value=\"define-entity\">\n\nWith `defineEntity` (no class), use the `addHook` method to register hooks after the entity is defined:\n\n```ts title=\"./entities/Article.ts\"\nimport { defineEntity, type InferEntity, type EventArgs, p } from '@mikro-orm/core';\n\nexport const Article = defineEntity({\n  name: 'Article',\n  properties: {\n    id: p.integer().primary(),\n    title: p.string(),\n    slug: p.string().unique(),\n    updatedAt: p.datetime(),\n  },\n});\n\nexport type IArticle = InferEntity<typeof Article>;\n\n// highlight-start\nArticle.addHook('beforeCreate', async (args: EventArgs<IArticle>) => {\n  const article = args.entity;\n  if (!article.slug) {\n    article.slug = article.title.toLowerCase().replace(/\\s+/g, '-');\n  }\n});\n\nArticle.addHook('beforeUpdate', async (args: EventArgs<IArticle>) => {\n  args.entity.updatedAt = new Date();\n});\n// highlight-end\n```\n\n> You can also pass hooks inline via the `hooks` property in the `defineEntity` call, but `args.entity` will be typed as `any` there because the entity type is not yet known.",
+       "start": 0,
+       "end": 1052,
+       "confidence": 0.992
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 1,
+   "counterparts_ms": 111
+  },
+  "timing": {
+   "read_ms": 227,
+   "total_ms": 230
+  }
+ }
+}

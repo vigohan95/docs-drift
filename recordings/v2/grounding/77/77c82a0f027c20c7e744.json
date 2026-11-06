@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/77/77c82a0f027c20c7e744",
+ "request_hash": "77c82a0f027c20c7e74431608fc141d72b0ebc5b0307ce522922136f5daf4b17",
+ "recorded_at": "2026-11-06T14:12:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 937,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "100.5336",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=232"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/storage.md#2",
+    "text": "### On-disk layout\n\nIngested samples are grouped into two-hour blocks. Each block consists of a directory that \ncontains a chunks subdirectory with all the time series samples for that time window, \na metadata file,  and an index file (which maps metric names and labels to the time series \nin the chunks directory). The samples in the chunks directory are organized into one \nor more segment files, each up to 512 MB by default. When series are deleted via the API, \nthe deletion records are stored in separate tombstone files rather than being immediately \nremoved from the chunk segments.\n\nThe current block for incoming samples is kept in memory and is not fully\npersisted. It is secured against crashes by a write-ahead log (WAL) that can be\nreplayed when the Prometheus server restarts. Write-ahead log files are stored\nin the `wal` directory in 128MB segments. These files contain raw data that\nhas not yet been compacted; thus they are significantly larger than regular block\nfiles. Prometheus will retain a minimum of three write-ahead log files.\nHigh-traffic servers may retain more than three WAL files in order to keep at\nleast two hours of raw data.\n\nA Prometheus server's data directory looks something like this:\n\n```\n./data\n├── 01BKGV7JBM69T2G1BGBGM6KB12\n│   └── meta.json\n├── 01BKGTZQ1SYQJTR4PB43C8PD98\n│   ├── chunks\n│   │   └── 000001\n│   ├── tombstones\n│   ├── index\n│   └── meta.json\n├── 01BKGTZQ1HHWHV8FBJXW1Y3W0K\n│   └── meta.json\n├── 01BKGV7JC0RY8A6MACW02A2PJD\n│   ├── chunks\n│   │   └── 000001\n│   ├── tombstones\n│   ├── index\n│   └── meta.json\n├── chunks_head\n│   └── 000001\n└── wal\n    ├── 000000002\n    └── checkpoint.00000001\n        └── 00000000\n```"
+   }
+  ],
+  "answer": "The following describes the format of a chunks file, which is created in the `chunks/` directory of a block. The following describes the format of a chunks file, which is created in the `chunks_head/` directory inside the data directory.",
+  "claims": [
+   "The following describes the format of a chunks file, which is created in the `chunks/` directory of a block.",
+   "The following describes the format of a chunks file, which is created in the `chunks_head/` directory inside the data directory."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0487,
+  "ungrounded": 0.9513,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "prometheus:docs/storage.md#2",
+    "share": 1,
+    "share_of_answer": 0.0487,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "The following describes the format of a chunks file, which is created in the `chunks/` directory of a block.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4576,
+    "supported": 0.0735,
+    "contradicted": 0.0397,
+    "not_stated": 0.8688,
+    "not_a_claim": 0.018,
+    "verdict": "not_stated",
+    "sources": {
+     "prometheus:docs/storage.md#2": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "The following describes the format of a chunks file, which is created in the `chunks_head/` directory inside the data directory.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5424,
+    "supported": 0.0278,
+    "contradicted": 0.0522,
+    "not_stated": 0.9016,
+    "not_a_claim": 0.0184,
+    "verdict": "not_stated",
+    "sources": {
+     "prometheus:docs/storage.md#2": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 1,
+   "supported": 0.0278
+  },
+  "timing": {
+   "read_ms": 110,
+   "total_ms": 113
+  }
+ }
+}

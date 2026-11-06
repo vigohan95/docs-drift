@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1d/1d732df522ea6f3aa68d",
+ "request_hash": "1d732df522ea6f3aa68d4cb49fbcbda7ef8a641f264509b6f5a6ad8220f3c3cc",
+ "recorded_at": "2026-11-06T14:18:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2266,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "162.151196",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=288"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/code-splitting.mdx#3",
+    "text": "#### Description\n\nAccepts an options object containing the same `endpoints` builder callback you would pass to [`createApi.endpoints`](../createApi.mdx#endpoints). Any endpoint definitions defined using that builder will be merged into the existing endpoint definitions for this API slice using a shallow merge, so any new endpoint definitions will override existing endpoints with the same name.\n\nReturns an updated and enhanced version of the API slice object, containing the combined endpoint definitions.\n\nEndpoints will not be overridden unless `overrideExisting` is set to `true`. If not, a development mode warning will be shown to notify you if there is a name clash between endpoint definitions.\n\nThis method is primarily useful for code splitting and hot reloading."
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/code-splitting.mdx#3",
+    "text": "## Enhancing Endpoints\n\nSometimes you may also need to modify an existing API definition, such as adding additional tag types, or providing additional configuration options to a given endpoint.\n\n`api.enhanceEndpoints` returns an updated and enhanced version of the API slice object, containing the combined endpoint definitions.\n\nThis is primarily useful for taking an API slice object that was code-generated from an API schema file like OpenAPI, and adding additional specific hand-written configuration for cache invalidation management on top of the generated endpoint definitions.\n\nFor example, `enhanceEndpoints` can be used to modify caching behavior by changing the values of `providesTags`, `invalidatesTags`, and `keepUnusedDataFor`:\n\n```ts\n// file: api.ts noEmit\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'\n\nexport const api = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: '/' }),\n  endpoints: (build) => ({\n    getUserByUserId: build.query({\n      query() {\n        return ''\n      },\n    }),\n    patchUserByUserId: build.mutation({\n      query() {\n        return ''\n      },\n    }),\n    getUsers: build.query({\n      query() {\n        return ''\n      },\n    }),\n  }),\n})\n\n// file: enhanceEndpoints.ts\nimport { api } from './api'\n\nconst enhancedApi = api.enhanceEndpoints({\n  addTagTypes: ['User'],\n  endpoints: {\n    getUserByUserId: {\n      providesTags: ['User'],\n    },\n    patchUserByUserId: {\n      invalidatesTags: ['User'],\n    },\n    // alternatively, define a function which is called with the endpoint definition as an argument\n    getUsers(endpoint) {\n      endpoint.providesTags = ['User']\n      endpoint.keepUnusedDataFor = 120\n    },\n  },\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/code-splitting.mdx#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/code-splitting.mdx#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/created-api/code-splitting.mdx#3",
+    "b": "redux-toolkit:docs/rtk-query/usage/code-splitting.mdx#3",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0078,
+     "overlapping": 0.9862,
+     "conflicting": 0.0036,
+     "unrelated": 0.0024
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 62,
+   "passages": 1,
+   "counterparts_ms": 81
+  },
+  "timing": {
+   "read_ms": 174,
+   "total_ms": 177
+  }
+ }
+}

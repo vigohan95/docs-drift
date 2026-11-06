@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6f/6feb85bfc67e23a3a0de",
+ "request_hash": "6feb85bfc67e23a3a0de084ef00932b62619dc89086c02d1f51c75634759bcef",
+ "recorded_at": "2026-11-06T14:18:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1060,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.357344",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=163"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/usage/immer-reducers.md#3",
+    "text": "### Reducers and Immutable Updates\n\nOne of the primary rules of Redux is that **our reducers are _never_ allowed to mutate the original / current state values!**\n\n:::warning\n\n```js\n// ❌ Illegal - by default, this will mutate the state!\nstate.value = 123\n```\n\n:::\n\nThere are several reasons why you must not mutate state in Redux:\n\n- It causes bugs, such as the UI not updating properly to show the latest values\n- It makes it harder to understand why and how the state has been updated\n- It makes it harder to write tests\n- It breaks the ability to use \"time-travel debugging\" correctly\n- It goes against the intended spirit and usage patterns for Redux\n\nSo if we can't change the originals, how do we return an updated state?\n\n:::tip\n\n**Reducers can only make _copies_ of the original values, and then they can mutate the copies.**\n\n```js\n// ✅ This is safe, because we made a copy\nreturn {\n  ...state,\n  value: 123,\n}\n```\n\n:::\n\nWe already saw that we can write immutable updates by hand, by using JavaScript's array / object spread operators and other functions that return copies of the original values.\n\nThis becomes harder when the data is nested. **A critical rule of immutable updates is that you must make a copy of _every_ level of nesting that needs to be updated.**\n\nA typical example of this might look like:\n\n```js\nfunction handwrittenReducer(state, action) {\n  return {\n    ...state,\n    first: {\n      ...state.first,\n      second: {\n        ...state.first.second,\n        [action.someId]: {\n          ...state.first.second[action.someId],\n          fourth: action.someValue,\n        },\n      },\n    },\n  }\n}\n```\n\nHowever, if you're thinking that \"writing immutable updates by hand this way looks hard to remember and do correctly\"... yeah, you're right! :)\n\nWriting immutable update logic by hand _is_ hard, and **accidentally mutating state in reducers is the single most common mistake Redux users make**. If you do need to write updates by hand, [Immutable Update Patterns](/usage/structuring-reducers/immutable-update-patterns) covers the correct patterns for nested objects and arrays and the mistakes that most often cause accidental mutations."
+   },
+   {
+    "id": "redux-toolkit:docs/api/createListenerMiddleware.mdx#32",
+    "text": "### Cancellation and Task Management\n\nThe listener middleware supports cancellation of running listener instances, `take/condition/pause/delay` functions, and \"child tasks\", with an implementation based on [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).\n\nThe `listenerApi.pause/delay()` functions provide a cancellation-aware way to have the current listener sleep. `pause()` accepts a promise, while `delay` accepts a timeout value. If the listener is cancelled while waiting, a `TaskAbortError` will be thrown. In addition, both `take` and `condition` support cancellation interruption as well.\n\n`listenerApi.cancelActiveListeners()` will cancel _other_ existing instances that are running, while `listenerApi.cancel()` can be used to cancel the _current_ instance (which may be useful from a fork, which could be deeply nested and not able to directly throw a promise to break out of the effect execution). `listenerAPi.throwIfCancelled()` can also be useful to bail out of workflows in case cancellation happened while the effect was doing other work.\n\n`listenerApi.fork()` can used to launch \"child tasks\" that can do additional work. These can be waited on to collect their results. An example of this might look like:\n\n```ts no-transpile\nlistenerMiddleware.startListening({\n  actionCreator: increment,\n  effect: async (action, listenerApi) => {\n    // Spawn a child task and start it immediately\n    const task = listenerApi.fork(async (forkApi) => {\n      // Artificially wait a bit inside the child\n      await forkApi.delay(5)\n      // Complete the child by returning a value\n      return 42\n    })\n\n    const result = await task.result\n    // Unwrap the child result in the listener\n    if (result.status === 'ok') {\n      // Logs the `42` result value that was returned\n      console.log('Child succeeded: ', result.value)\n    }\n  },\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/usage/immer-reducers.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/api/createListenerMiddleware.mdx#32",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/usage/immer-reducers.md#3",
+    "b": "redux-toolkit:docs/api/createListenerMiddleware.mdx#32",
+    "relation": "unrelated",
+    "related": 0.0037,
+    "probabilities": {
+     "same": 0.0013,
+     "overlapping": 0.0012,
+     "conflicting": 0.0012,
+     "unrelated": 0.9963
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 37
+  },
+  "timing": {
+   "read_ms": 37,
+   "total_ms": 40
+  }
+ }
+}

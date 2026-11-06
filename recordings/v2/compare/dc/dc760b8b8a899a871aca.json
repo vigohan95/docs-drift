@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/dc/dc760b8b8a899a871aca",
+ "request_hash": "dc760b8b8a899a871acae576b0dcf276a71749b21621c5c832c0de31cec85515",
+ "recorded_at": "2026-11-06T14:14:18Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 916,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "34.907169",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=36,cfOrigin;dur=0,cfWorker;dur=181"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#11",
+    "text": "Now, mongoose will call your getter function every time you access the\n`fullName` property:\n\n```javascript\nconsole.log(axl.fullName); // Axl Rose\n```\n\nIf you use `toJSON()` or `toObject()` Mongoose will *not* include virtuals by default.\nPass `{ virtuals: true }` to [`toJSON()`](api/document.html#document_Document-toJSON) or `toObject()` to include virtuals.\n\n```javascript\n// Convert `doc` to a POJO, with virtuals attached\ndoc.toObject({ virtuals: true });\n\n// Equivalent:\ndoc.toJSON({ virtuals: true });\n```\n\nThe above caveat for `toJSON()` also includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).\nTo include virtuals in `JSON.stringify()` output, you can either call `toObject({ virtuals: true })` on the document before calling `JSON.stringify()`, or set the `toJSON: { virtuals: true }` option on your schema.\n\n```javascript\n// Explicitly add virtuals to `JSON.stringify()` output\nJSON.stringify(doc.toObject({ virtuals: true }));\n\n// Or, to automatically attach virtuals to `JSON.stringify()` output:\nconst personSchema = new Schema({\n  name: {\n    first: String,\n    last: String\n  }\n}, {\n  toJSON: { virtuals: true } // <-- include virtuals in `JSON.stringify()`\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#0",
+    "text": "# Migrating from 5.x to 6.x\n\n<style>\n  ul > li {\n    padding: 4px 0px;\n  }\n</style>\n\nPlease note: we plan to discontinue Mongoose 5 support on March 1, 2024.\nPlease see our [version support guide](./version-support.html).\n\nThere are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)\nyou should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.\n\nIf you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration guide](migrating_to_5.html) and upgrade to Mongoose 5.x first.\n\n* [Version Requirements](#version-requirements)\n* [MongoDB Driver 4.0](#mongodb-driver-40)\n* [No More Deprecation Warning Options](#no-more-deprecation-warning-options)\n* [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)\n* [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)\n* [Duplicate Query Execution](#duplicate-query-execution)\n* [`Model.exists()` Returns a lean document instead of Boolean](#model-exists-returns-a-lean-document-instead-of-boolean)\n* [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)\n* [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)\n* [Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()`](#simplified-isvalidobjectid-and-separate-isobjectidorhexstring)\n* [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)\n* [Schema Defined Document Key Order](#schema-defined-document-key-order)\n* [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)\n* [Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`](#removed-omitundefined)\n* [Document Parameter to Default Functions](#document-parameter-to-default-functions)\n* [Arrays are Proxies](#arrays-are-proxies)\n* [`typePojoToMixed`](#typepojotomixed)\n* [`strictPopulate()`](#strictpopulate)\n* [Subdocument `ref` Function Context](#subdocument-ref-function-context)\n* [Schema Reserved Names Warning](#schema-reserved-names-warning)\n* [Subdocument Paths](#subdocument-paths)\n* [Creating Aggregation Cursors](#creating-aggregation-cursors)\n* [`autoCreate` Defaults to `true`](#autocreate-defaults-to-true)\n* [No More `context: 'query'`](#no-more-context-query)\n* [Custom Validators with Populated Paths](#custom-validators-with-populated-paths)\n* [Disconnected Event with Replica Sets](#disconnected-event-with-replica-sets)\n* [Removed `execPopulate()`](#removed-execpopulate)\n* [`create()` with Empty Array](#create-with-empty-array)\n* [Removed Nested Path Merging](#removed-nested-path-merging)\n* [ObjectId `valueOf()`](#objectid-valueof)\n* [Immutable `createdAt`](#immutable-createdat)\n* [Removed Validator `isAsync`](#removed-validator-isasync)\n* [Removed `safe`](#removed-safe)\n* [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)\n* [No default model for `Query.prototype.populate()`](#no-default-model-for-query-prototype-populate)\n* [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)\n* [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)\n* [MongoDB Driver's New URL Parser Incompatible with Some npm Packages](#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages)\n* [Lodash `.isEmpty()` returns false for ObjectIds](#lodash-object-id)\n* [mongoose.modelSchemas removed](#model-schemas)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/guide.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/guide.md#11",
+    "b": "mongoose:docs/migrating_to_6.md#0",
+    "relation": "unrelated",
+    "related": 0.024,
+    "probabilities": {
+     "same": 0.0073,
+     "overlapping": 0.0077,
+     "conflicting": 0.009,
+     "unrelated": 0.976
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 41
+  },
+  "timing": {
+   "read_ms": 41,
+   "total_ms": 45
+  }
+ }
+}

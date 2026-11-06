@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ab/ab88c092a31b28e3977b",
+ "request_hash": "ab88c092a31b28e3977b530f07a795bfbfd16a70f96234289e086c332f180a31",
+ "recorded_at": "2026-11-06T14:11:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 996,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "116.62454",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=257"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "text": "#### What The Default Error Handler Sends\nThe default error handler serializes the error into a JSON body with the\n`statusCode`, `error`, and `message` properties, plus `code` when the error\ncarries one:\n\n```js\napp.get('/', async () => { throw new Error('kaboom') })\n```\n\n```json\n{\n  \"statusCode\": 500,\n  \"error\": \"Internal Server Error\",\n  \"message\": \"kaboom\"\n}\n```\n\nThe `error` property is the generic HTTP status text, but **`message` is\n`error.message` verbatim**. This applies to every status code, including `500`.\nFastify's built-in error serializer emits only these four properties, so the\nstack trace is not part of the default payload — but a route-level response\nschema replaces that serializer, and one that declares a `stack` property will\nserialize it.\n\n> Security:\n> Because `message` and `code` are forwarded as-is, errors thrown by libraries\n> deeper in your application are exposed to the client. A database driver\n> error, for example, can leak schema details and query text:\n>\n> ```json\n> {\n>   \"statusCode\": 500,\n>   \"code\": \"ER_BAD_FIELD_ERROR\",\n>   \"error\": \"Internal Server Error\",\n>   \"message\": \"Unknown column 'username' in 'field list'\"\n> }\n> ```\n>\n> Fastify does not distinguish between development and production here. If\n> unexpected errors must not reach the client, handle this explicitly."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#22",
+    "text": "###### Async-Await and Promises\n<a id=\"async-await-promise\"></a>\n\nFastify natively handles promises and supports async-await.\n\n*Note that in the following examples we are not using reply.send.*\n```js\nconst { promisify } = require('node:util')\nconst delay = promisify(setTimeout)\n\nfastify.get('/promises', options, function (request, reply) {\n return delay(200).then(() => { return { hello: 'world' }})\n})\n\nfastify.get('/async-await', options, async function (request, reply) {\n  await delay(200)\n  return { hello: 'world' }\n})\n```\n\nRejected promises default to a `500` HTTP status code. Reject the promise, or\n`throw` in an `async function`, with an object that has `statusCode` (or\n`status`) and `message` properties to modify the reply.\n\n```js\nfastify.get('/teapot', async function (request, reply) {\n  const err = new Error()\n  err.statusCode = 418\n  err.message = 'short and stout'\n  throw err\n})\n\nfastify.get('/botnet', async function (request, reply) {\n  throw { statusCode: 418, message: 'short and stout' }\n  // will return to the client the same json\n})\n```\n\nIf you want to know more please review\n[Routes#async-await](./Routes.md#async-await)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#22",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Errors.md#9",
+    "b": "fastify:docs/Reference/Reply.md#22",
+    "relation": "overlapping",
+    "related": 0.9083,
+    "probabilities": {
+     "same": 0.0202,
+     "overlapping": 0.8757,
+     "conflicting": 0.0124,
+     "unrelated": 0.0917
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 51,
+   "passage_reads": 1,
+   "passages_ms": 77,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 128,
+   "total_ms": 131
+  }
+ }
+}

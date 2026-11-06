@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/55/554fb83300d4833eeb3a",
+ "request_hash": "554fb83300d4833eeb3a44936a01f29dc2ecab12d10fdbd5fbe03a5b27fc1aae",
+ "recorded_at": "2026-11-06T14:12:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 988,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.06966",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=38,cfOrigin;dur=0,cfWorker;dur=236"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#6",
+    "text": "### String literals\n\nString literals are designated by single quotes, double quotes or backticks.\n\nPromQL follows the same [escaping rules as\nGo](https://golang.org/ref/spec#String_literals). For string literals in single or double quotes, a\nbackslash begins an escape sequence, which may be followed by `a`, `b`, `f`,\n`n`, `r`, `t`, `v` or `\\`.  Specific characters can be provided using octal\n(`\\nnn`) or hexadecimal (`\\xnn`, `\\unnnn` and `\\Unnnnnnnn`) notations.\n\nConversely, escape characters are not parsed in string literals designated by backticks. It is important to note that, unlike Go, Prometheus does not discard newlines inside backticks.\n\nExample:\n\n    \"this is a string\"\n    'these are unescaped: \\n \\\\ \\t'\n    `these are not unescaped: \\n ' \" \\t`\n\nThis can be useful for [`regular expressions`](#regular-expressions) in [`label_replace()`](functions.md#label_replace), for example:\n\n    label_replace(up, \"host\", \"$1\", \"instance\", \"(.*)\\\\.example\\\\.com\")\n    label_replace(up, \"host\", \"$1\", \"instance\", `(.*)\\.example\\.com`)"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#39",
+    "text": "## `label_replace()`\n\nFor each timeseries in `v`, `label_replace(v instant-vector, dst_label string, replacement string, src_label string, regex string)`\nmatches the [regular expression](./basics.md#regular-expressions) `regex` against the value of the label `src_label`. If it\nmatches, the value of the label `dst_label` in the returned timeseries will be the expansion\nof `replacement`, together with the original labels in the input. Capturing groups in the\nregular expression can be referenced with `$1`, `$2`, etc. Named capturing groups in the regular expression can be referenced with `$name` (where `name` is the  capturing group name). If the regular expression doesn't match then the timeseries is returned unchanged.\n\n`label_replace` acts on float and histogram samples in the same way.\n\nThis example will return timeseries with the values `a:c` at label `service` and `a` at label `foo`:\n\n```\nlabel_replace(up{job=\"api-server\",service=\"a:c\"}, \"foo\", \"$1\", \"service\", \"(.*):.*\")\n```\n\nThis second example has the same effect than the first example, and illustrates use of named capturing groups:\n```\nlabel_replace(up{job=\"api-server\",service=\"a:c\"}, \"foo\", \"$name\", \"service\", \"(?P<name>.*):(?P<version>.*)\")\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#39",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/basics.md#6",
+    "b": "prometheus:docs/querying/functions.md#39",
+    "relation": "overlapping",
+    "related": 0.9971,
+    "probabilities": {
+     "same": 0.0037,
+     "overlapping": 0.9906,
+     "conflicting": 0.0028,
+     "unrelated": 0.0029
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 71,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 98,
+   "total_ms": 101
+  }
+ }
+}

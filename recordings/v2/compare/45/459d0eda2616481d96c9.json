@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/45/459d0eda2616481d96c9",
+ "request_hash": "459d0eda2616481d96c946b4196c80f10605274048fea39fbe558914a6cfe66f",
+ "recorded_at": "2026-11-06T14:11:56Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 888,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.212769",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=173"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "text": "- `save` - Saves a given entity or array of entities.\n  If the entity already exist in the database, it is updated.\n  If the entity does not exist in the database, it is inserted.\n  It saves all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Also supports partial updating since all undefined properties are skipped.\n  Returns the saved entity/entities.\n\n```typescript\nawait repository.save(user)\nawait repository.save([category1, category2, category3])\n```\n\n- `remove` - Removes a given entity or array of entities.\n  It removes all given entities in a single transaction (in the case of entity, manager is not transactional).\n  Returns the removed entity/entities.\n\n```typescript\nawait repository.remove(user)\nawait repository.remove([category1, category2, category3])\n```\n\n- `insert` - Inserts a new entity, or array of entities.\n\n```typescript\nawait repository.insert({\n    firstName: \"Timber\",\n    lastName: \"Timber\",\n})\n\nawait repository.insert([\n    {\n        firstName: \"Foo\",\n        lastName: \"Bar\",\n    },\n    {\n        firstName: \"Rizz\",\n        lastName: \"Rak\",\n    },\n])\n```\n\n- `update` - Updates entities by entity id, ids or given conditions. Sets fields from supplied partial entity.\n\n```typescript\nawait repository.update({ age: 18 }, { category: \"ADULT\" })\n// executes UPDATE user SET category = ADULT WHERE age = 18\n\nawait repository.update(1, { firstName: \"Rizzrak\" })\n// executes UPDATE user SET firstName = Rizzrak WHERE id = 1\n\n// optionally request RETURNING / OUTPUT values (supported drivers only)\nconst result = await repository.update(\n    1,\n    { firstName: \"Rizzrak\" },\n    { returning: [\"id\", \"firstName\"] },\n)\nconsole.log(result.raw) // [{ id: 1, firstName: \"Rizzrak\" }]\n```"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#4",
+    "text": "```typescript\nawait repository.upsert(\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\" },\n    ],\n    [\"externalId\"],\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak),\n *      (externalId = cba321, firstName = Karzzir),\n *  ON CONFLICT (externalId) DO UPDATE\n *  SET firstName = EXCLUDED.firstName,\n *      updatedDate = CURRENT_TIMESTAMP,\n *      version = version + 1\n **/\n```\n\nYou can also request values to be returned from an upsert (supported on drivers with RETURNING / OUTPUT support):\n\n```typescript\nconst { raw } = await repository.upsert(\n    { externalId: \"abc123\", firstName: \"Rizzrak\" },\n    {\n        conflictPaths: [\"externalId\"],\n        returning: [\"externalId\", \"firstName\"],\n    },\n)\nconsole.log(raw) // [{ externalId: \"abc123\", firstName: \"Rizzrak\" }]\n```\n\n```typescript\nawait repository.upsert(\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\" },\n    ],\n    {\n        conflictPaths: [\"externalId\"],\n        skipUpdateIfNoValuesChanged: true, // supported by postgres, skips update if it would not change row values\n        upsertType: \"upsert\", //  \"on-conflict-do-update\" | \"on-duplicate-key-update\" | \"upsert\" - optionally provide an UpsertType - 'upsert' is currently only supported by CockroachDB\n    },\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak),\n *      (externalId = cba321, firstName = Karzzir),\n *  ON CONFLICT (externalId) DO UPDATE\n *  SET firstName = EXCLUDED.firstName\n *  WHERE user.firstName IS DISTINCT FROM EXCLUDED.firstName\n **/\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#2",
+    "b": "typeorm:docs/docs/working-with-entity-manager/6-repository-api.md#4",
+    "relation": "unrelated",
+    "related": 0.009,
+    "probabilities": {
+     "same": 0.0036,
+     "overlapping": 0.0026,
+     "conflicting": 0.0029,
+     "unrelated": 0.991
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

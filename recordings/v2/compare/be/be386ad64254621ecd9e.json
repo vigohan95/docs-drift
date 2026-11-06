@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/be/be386ad64254621ecd9e",
+ "request_hash": "be386ad64254621ecd9e0e9f4f8dc659555560223fa4ee149f9b9de09b272b23",
+ "recorded_at": "2026-11-06T14:11:08Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1111,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "177.365721",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=37,cfOrigin;dur=0,cfWorker;dur=304"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "text": "### Changed preParsing hook behavior ([#2286](https://github.com/fastify/fastify/pull/2286))\n\nFrom Fastify v3, the behavior of the `preParsing` hook will change slightly\nto support request payload manipulation.\n\nThe hook now takes an additional argument, `payload`, and therefore the new hook\nsignature is `fn(request, reply, payload, done)` or `async fn(request, reply,\npayload)`.\n\nThe hook can optionally return a new stream via `done(null, stream)` or\nreturning the stream in case of async functions.\n\nIf the hook returns a new stream, it will be used instead of the original one in\nsubsequent hooks. A sample use case for this is handling compressed requests.\n\nThe new stream should add the `receivedEncodedLength` property to the stream\nthat should reflect the actual data size received from the client. For instance,\nin a compressed request it should be the size of the compressed payload. This\nproperty can (and should) be dynamically updated during `data` events.\n\nThe old syntax of Fastify v2 without payload is supported but it is deprecated."
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "text": "### preParsing\n\nIf you are using the `preParsing` hook, you can transform the request payload\nstream before it is parsed. It receives the request and reply objects as other\nhooks, and a stream with the current request payload.\n\nIf it returns a value (via `return` or via the callback function), it must\nreturn a stream.\n\nFor instance, you can decompress the request body:\n\n```js\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Some code\n  done(null, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preParsing', async (request, reply, payload) => {\n  // Some code\n  await asyncMethod()\n  return newPayload\n})\n```\n\n> ℹ️ Note:\n> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.\n\n> ℹ️ Note:\n> You should also add a `receivedEncodedLength` property to the\n> returned stream. This property is used to correctly match the request payload\n> with the `Content-Length` header value. Ideally, this property should be updated\n> on each received chunk.\n\n> ℹ️ Note:\n> The size of the returned stream is checked to not exceed the limit\n> set in [`bodyLimit`](./Server.md#bodylimit) option."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Hooks.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Guides/Migration-Guide-V3.md#5"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "b": "fastify:docs/Reference/Hooks.md#3",
+    "relation": "overlapping",
+    "related": 0.9984,
+    "probabilities": {
+     "same": 0.0054,
+     "overlapping": 0.9897,
+     "conflicting": 0.0033,
+     "unrelated": 0.0016
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.009,
+       "restated": 0.9491,
+       "elaborated": 0.032,
+       "different": 0.0098
+      },
+      "confidence": 0.9902,
+      "a": {
+       "document": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+       "quote": "The hook now takes an additional argument, `payload`, and therefore the new hook",
+       "start": 212,
+       "end": 292,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Hooks.md#3",
+       "quote": "It receives the request and reply objects as other\nhooks, and a stream with the current request payload.\n\nIf it returns a value (via `return` or via the callback function), it must\nreturn a stream.\n\nFor instance, you can decompress the request body:\n\n```js\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Some code\n  done(null, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preParsing', async (request, reply, payload) => {\n  // Some code\n  await asyncMethod()\n  return newPayload\n})\n```\n\n> ℹ️ Note:\n> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.\n\n> ℹ️ Note:\n> You should also add a `receivedEncodedLength` property to the\n> returned stream.",
+       "start": 122,
+       "end": 924,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 2,
+   "counterparts_ms": 90
+  },
+  "timing": {
+   "read_ms": 185,
+   "total_ms": 189
+  }
+ }
+}

@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/31/31f0e7b2dc52ed565bfb",
+ "request_hash": "31f0e7b2dc52ed565bfbfe7a1e942fef4cac08c761b4aa803376502d9c164255",
+ "recorded_at": "2026-11-06T14:15:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1050,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "167.434242",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=45,cfOrigin;dur=0,cfWorker;dur=323"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+    "text": "### Why is Request Context needed?\n\nNow back to the validation error about global context. With the freshly gained knowledge, we know [`EntityManager`](/api/core/class/EntityManager) maintains a reference to all the managed entities in the Identity Map. Imagine we would use a single Identity Map throughout our application (so a single global context, global [`EntityManager`](/api/core/class/EntityManager)). It will be shared across all request handlers, that can run in parallel.\n\n1. growing memory footprint\n\n   As there would be only one shared Identity Map, we can't just clear it after our request ends. There can be another request working with it so clearing the Identity Map from one request could break other requests running in parallel. This will result in a growing memory footprint, as every entity that became managed at some point in time would be kept in the Identity Map.\n\n2. unstable response of API endpoints\n\n   Every entity has `toJSON()` method, that automatically converts it to serialized form If we have only one shared Identity Map, the following situation may occur:\n\n   Let's say there are 2 endpoints\n\n    1. `GET /article/:id` that returns just the article, without populating anything\n    2. `GET /article-with-author/:id` that returns the article and its author populated\n\n   Now when someone requests the same article via both of those endpoints, we could end up with both returning the same output:\n\n    1. `GET /article/1` returns `Article` without populating its property `author` property\n    2. `GET /article-with-author/1` returns `Article`, this time with `author` populated\n    3. `GET /article/1` returns `Article`, but this time also with `author` populated\n\n   This happens because the information about entity association being populated is stored in the Identity Map."
+   },
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#14",
+    "text": "### Problem 2 - unstable response of API endpoints\n\nEvery entity has `toJSON()` method, that automatically converts it to serialized form. If you have only one shared Identity Map, the following situation may occur:\n\nLet's say there are 2 endpoints\n\n1. `GET /book/:id` that returns just the book, without populating anything\n2. `GET /book-with-author/:id` that returns the book and its author populated\n\nNow when someone requests same book via both of those endpoints, we could end up with both returning the same output:\n\n1. `GET /book/1` returns `Book` without populating its property `author` property\n2. `GET /book-with-author/1` returns `Book`, this time with `author` populated\n3. `GET /book/1` returns `Book`, but this time also with `author` populated\n\nThis happens because the information about entity association being populated is stored in the Identity Map."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/identity-map.md#14"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#14",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/01-first-entity.md#18"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+    "b": "mikro-orm:docs/docs/identity-map.md#14",
+    "relation": "overlapping",
+    "related": 0.9951,
+    "probabilities": {
+     "same": 0.0266,
+     "overlapping": 0.9561,
+     "conflicting": 0.0124,
+     "unrelated": 0.0049
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.5052,
+       "restated": 0.4606,
+       "elaborated": 0.0216,
+       "different": 0.0126
+      },
+      "confidence": 0.9874,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+       "quote": "2.",
+       "start": 893,
+       "end": 895,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/identity-map.md#14",
+       "quote": "### Problem 2 - unstable response of API endpoints\n\nEvery entity has `toJSON()` method, that automatically converts it to serialized form.",
+       "start": 0,
+       "end": 138,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.036,
+       "restated": 0.9082,
+       "elaborated": 0.0414,
+       "different": 0.0144
+      },
+      "confidence": 0.9856,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+       "quote": "Every entity has `toJSON()` method, that automatically converts it to serialized form If we have only one shared Identity Map, the following situation may occur:",
+       "start": 935,
+       "end": 1096,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/identity-map.md#14",
+       "quote": "If you have only one shared Identity Map, the following situation may occur:\n\nLet's say there are 2 endpoints\n\n1.",
+       "start": 139,
+       "end": 252,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0163,
+       "restated": 0.9348,
+       "elaborated": 0.034,
+       "different": 0.0149
+      },
+      "confidence": 0.963,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+       "quote": "3.",
+       "start": 1622,
+       "end": 1624,
+       "confidence": 0.997
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/identity-map.md#14",
+       "quote": "`GET /book/1` returns `Book`, but this time also with `author` populated\n\nThis happens because the information about entity association being populated is stored in the Identity Map.",
+       "start": 687,
+       "end": 869,
+       "confidence": 0.963
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 3,
+   "counterparts_ms": 77
+  },
+  "timing": {
+   "read_ms": 179,
+   "total_ms": 183
+  }
+ }
+}

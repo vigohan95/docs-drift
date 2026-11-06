@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f2/f2e4b3119c9a3434ec8b",
+ "request_hash": "f2e4b3119c9a3434ec8bd42084290679fc9c62594f7cb94602327dd969bb2a11",
+ "recorded_at": "2026-11-06T14:15:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1232,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "123.381632",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=49,cfOrigin;dur=0,cfWorker;dur=506"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#34",
+    "text": "### `ScalarReference` wrapper\n\nSimilarly to the `Reference` wrapper, you can also wrap lazy scalars with `Ref` into a `ScalarReference` object. The `Ref` type automatically resolves to `ScalarReference` for non-object types, so the below is correct:\n\n```ts\n@Property({ lazy: true, ref: true })\npasswordHash!: Ref<string>;\n```\n\n```ts\nconst user = await em.findOne(User, 1);\nconst passwordHash = await user.passwordHash.load();\n```\n\nFor object-like types, if you choose to use the reference wrappers, you should use the `ScalarRef<T>` type explicitly. For example, you might want to lazily load a large JSON value:\n\n```ts\n@Property({ type: 'json', nullable: true, lazy: true, ref: true })\n// ReportParameters is an object type, imagine it defined elsewhere.\nreportParameters!: ScalarRef<ReportParameters | null>; \n```\n\nKeep in mind that once a scalar value is managed through a `ScalarReference`, accessing it through MikroORM managed objects will always return the `ScalarReference` wrapper. That can be confusing in case the property is also `nullable`, since the `ScalarReference` will always be truthy. In such cases, you should inform the type system of the nullability of the property through `ScalarReference<T>`'s type parameter as demonstrated above. Below is an example of how it all works:\n\n```ts\n// Say Report of id \"1\" has no reportParameters in the Database.\nconst report = await em.findOne(Report, 1);\nif (report.reportParameters) {\n  // Logs Ref<?>, not the actual value. **Would always run***.\n  console.log(report.reportParameters);\n  //@ts-expect-error $/.get() is not available until the reference has been loaded.\n  // const mistake = report.reportParameters.$\n}\nconst populatedReport = await em.populate(report, ['reportParameters']);\n// Logs `null`\nconsole.log(populatedReport.reportParameters.$); \n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/05-type-safety.md#6",
+    "text": "### `ScalarReference` wrapper\n\nSimilarly to the `Reference` wrapper, you can also wrap scalars with `Ref` into a `ScalarReference` object. This is handy for lazy scalar properties.\n\nThe `Ref` type automatically resolves to `ScalarReference` for non-object types, so the following is correct:\n\n```ts\n// In our Article entity, the `text` property is lazy.\n// If we wrap it with .ref(), it becomes a ScalarReference:\ntext: p.text().lazy().ref(),\n```\n\n```ts\nconst article = await em.findOne(ArticleSchema, 1);\nconst text = await article.text.load(); // loads the lazy text property\n```\n\n:::info Using decorators\n\nIf you use decorators with `reflect-metadata`, you'll need to explicitly set the `ref` option:\n\n```ts\n@ManyToOne(() => User, { ref: true })\nauthor!: Ref<User>;\n```\n\nWith `defineEntity`, the `.ref()` method handles this automatically.\n\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#34",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/05-type-safety.md#6"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/05-type-safety.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/defining-entities.md#34"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/defining-entities.md#34",
+    "b": "mikro-orm:docs/docs/guide/05-type-safety.md#6",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0067,
+     "overlapping": 0.9874,
+     "conflicting": 0.0036,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0821,
+       "restated": 0.8624,
+       "elaborated": 0.0419,
+       "different": 0.0135
+      },
+      "confidence": 0.9865,
+      "a": {
+       "document": "mikro-orm:docs/docs/defining-entities.md#34",
+       "quote": "### `ScalarReference` wrapper",
+       "start": 0,
+       "end": 29,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/guide/05-type-safety.md#6",
+       "quote": "### `ScalarReference` wrapper\n\nSimilarly to the `Reference` wrapper, you can also wrap scalars with `Ref` into a `ScalarReference` object.",
+       "start": 0,
+       "end": 138,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 151,
+   "passage_reads": 1,
+   "passages_ms": 77,
+   "passages": 1,
+   "counterparts_ms": 50
+  },
+  "timing": {
+   "read_ms": 278,
+   "total_ms": 282
+  }
+ }
+}

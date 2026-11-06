@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/15/150edf72777b68df2581",
+ "request_hash": "150edf72777b68df2581f552c8026c724cd7660310acac2b706b800d2c73159d",
+ "recorded_at": "2026-11-06T14:15:24Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1042,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "105.69363",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=42,cfOrigin;dur=0,cfWorker;dur=324"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#7",
+    "text": "### Using a custom class\n\nIf you need to add custom methods to your entity, you can extend the schema's auto-generated class via `setClass()`:\n\n```ts title='user.entity.ts'\nexport const UserSchema = defineEntity({\n  name: 'User',\n  properties: {\n    // ...\n  },\n});\n\nexport class User extends UserSchema.class {\n  // custom methods go here\n}\n\nUserSchema.setClass(User);\n```\n\nThis avoids redeclaring all properties in the class - they are inferred from the schema automatically. We will use this pattern in Chapter 2 when adding methods to the `User` entity."
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#21",
+    "text": "# Events and life cycle hooks\n\nTime to improve the password hashing. Let's use the `argon2` package, which provides `hash` and `verify` functions. They are both async, so you cannot use `.onCreate()` directly. Instead, you need to use the lifecycle hooks via the `addHook()` method on the schema.\n\n> Don't forget to install the `argon2` package via `npm install argon2`.\n\nThe plan is following:\n\n- the password will remain in plaintext when assigned via `em.create()`\n- `hashPassword` function will become an event handler via `addHook()`\n- you register it for both `beforeCreate` and `beforeUpdate` events\n- the handler receives `EventArgs` which includes `changeSet` with the computed difference\n- you check `changeSet.payload.password` to only hash when the password changed\n\n```ts title='user.entity.ts'\nimport { defineEntity, type EventArgs, p } from '@mikro-orm/core';\nimport { BaseSchema } from '../common/base.entity.js';\nimport { ArticleSchema } from '../article/article.entity.js';\nimport { hash, verify } from 'argon2';\n\nasync function hashPassword(args: EventArgs<User>) {\n  // hash only if the password was changed\n  const password = args.changeSet?.payload.password;\n\n  if (typeof password === 'string') {\n    args.entity.password = await hash(password);\n  }\n}\n\nexport const UserSchema = defineEntity({\n  name: 'User',\n  extends: BaseSchema,\n  properties: {\n    fullName: p.string(),\n    email: p.string(),\n    password: p.string().hidden().lazy(),\n    bio: p.text().default(''),\n    articles: () => p.oneToMany(ArticleSchema).mappedBy('author'),\n  },\n});\n\n// Extend the schema's auto-generated class to add custom methods\nexport class User extends UserSchema.class {\n  async verifyPassword(password: string) {\n    return verify(this.password, password);\n  }\n}\n\nUserSchema.setClass(User);\nUserSchema.addHook('beforeCreate', hashPassword);\nUserSchema.addHook('beforeUpdate', hashPassword);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#7",
+    "b": "mikro-orm:docs/docs/guide/02-relationships.md#21",
+    "relation": "overlapping",
+    "related": 0.9951,
+    "probabilities": {
+     "same": 0.0174,
+     "overlapping": 0.9727,
+     "conflicting": 0.0049,
+     "unrelated": 0.0049
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 116,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 201,
+   "total_ms": 204
+  }
+ }
+}

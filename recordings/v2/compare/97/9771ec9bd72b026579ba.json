@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/97/9771ec9bd72b026579ba",
+ "request_hash": "9771ec9bd72b026579baea1e26f45ac17fb9e794ae37cb3a8a615e3ad9293761",
+ "recorded_at": "2026-11-06T14:10:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1129,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "189.730465",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=452"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "text": "### Hands-on\n\nFor this sample solution we'll be using the following:\n\n- `node.js v16.14.2`\n- `npm 8.5.0`\n- `fastify 4.0.0-rc.1`\n- `fastify-plugin 3.0.1`\n- `undici 5.0.0`\n\nSay we have the following base server set up at first:\n\n```js\nconst Fastify = require('fastify')\n\nconst provider = require('./provider')\n\nconst server = Fastify({ logger: true })\nconst USUAL_WAIT_TIME_MS = 5000\n\nserver.get('/ping', function (request, reply) {\n  reply.send({ error: false, ready: request.server.magicKey !== null })\n})\n\nserver.post('/webhook', function (request, reply) {\n  // It's good practice to validate webhook requests come from\n  // who you expect. This is skipped in this sample for the sake\n  // of simplicity\n\n  const { magicKey } = request.body\n  request.server.magicKey = magicKey\n  request.log.info('Ready for customer requests!')\n\n  reply.send({ error: false })\n})\n\nserver.get('/v1*', async function (request, reply) {\n  try {\n    const data = await provider.fetchSensitiveData(request.server.magicKey)\n    return { customer: true, error: false }\n  } catch (error) {\n    request.log.error({\n      error,\n      message: 'Failed at fetching sensitive data from provider',\n    })\n\n    reply.statusCode = 500\n    return { customer: null, error: true }\n  }\n})\n\nserver.decorate('magicKey')\n\nserver.listen({ port: '1234' }, () => {\n  provider.thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS)\n    .catch((error) => {\n      server.log.error({\n        error,\n        message: 'Got an error while trying to get the magic key!'\n      })\n\n      // Since we won't be able to serve requests, might as well wrap\n      // things up\n      server.close(() => process.exit(1))\n    })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#6",
+    "text": "##### index.js\n\n```js\nconst Fastify = require('fastify')\n\nconst customerRoutes = require('./customer-routes')\nconst { setup, delay } = require('./delay-incoming-requests')\n\nconst server = new Fastify({ logger: true })\n\nserver.register(setup)\n\n// Non-blocked URL\nserver.get('/ping', function (request, reply) {\n  reply.send({ error: false, ready: request.server.magicKey !== null })\n})\n\n// Webhook to handle the provider's response - also non-blocked\nserver.post('/webhook', function (request, reply) {\n  // It's good practice to validate webhook requests really come from\n  // whoever you expect. This is skipped in this sample for the sake\n  // of simplicity\n\n  const { magicKey } = request.body\n  request.server.magicKey = magicKey\n  request.log.info('Ready for customer requests!')\n\n  reply.send({ error: false })\n})\n\n// Blocked URLs\n// Mind we're building a new plugin by calling the `delay` factory with our\n// customerRoutes plugin\nserver.register(delay(customerRoutes), { prefix: '/v1' })\n\nserver.listen({ port: '1234' })\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "b": "fastify:docs/Guides/Delay-Accepting-Requests.md#6",
+    "relation": "overlapping",
+    "related": 0.9957,
+    "probabilities": {
+     "same": 0.0129,
+     "overlapping": 0.9752,
+     "conflicting": 0.0075,
+     "unrelated": 0.0043
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 90,
+   "passage_reads": 1,
+   "passages_ms": 106,
+   "passages": 2,
+   "counterparts_ms": 93
+  },
+  "timing": {
+   "read_ms": 289,
+   "total_ms": 292
+  }
+ }
+}

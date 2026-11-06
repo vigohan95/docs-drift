@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0e/0e4a68be9c150661f6a7",
+ "request_hash": "0e4a68be9c150661f6a72a0393e825192a5c1964061a678f73ca7f49b2777336",
+ "recorded_at": "2026-11-06T14:14:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1121,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "206.44602",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=342"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/advanced_schemas.md#0",
+    "text": "## Creating from ES6 Classes Using `loadClass()`\n\nMongoose allows creating schemas from [ES6 classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).\nThe `loadClass()` function lets you pull in methods,\nstatics, and virtuals from an ES6 class. A class method maps to a schema\nmethod, a static method maps to a schema static, and getters/setters map\nto virtuals.\n\n```javascript acquit:Creating from ES6 Classes Using.*loadClass\nconst schema = new Schema({ firstName: String, lastName: String });\n\nclass HumanClass {\n  get fullName() {\n    return 'My name';\n  }\n}\n\nclass PersonClass extends HumanClass {\n  // `fullName` becomes a virtual\n  get fullName() {\n    return `${super.fullName} is ${this.firstName} ${this.lastName}`;\n  }\n\n  set fullName(v) {\n    const firstSpace = v.indexOf(' ');\n    this.firstName = v.split(' ')[0];\n    this.lastName = firstSpace === -1 ? '' : v.substring(firstSpace + 1);\n  }\n\n  // `getFullName()` becomes a document method\n  getFullName() {\n    return `${this.firstName} ${this.lastName}`;\n  }\n\n  // `findByFullName()` becomes a static\n  static findByFullName(name) {\n    const firstSpace = name.indexOf(' ');\n    const firstName = name.split(' ')[0];\n    const lastName = firstSpace === -1 ? '' : name.substring(firstSpace + 1);\n    return this.findOne({ firstName, lastName });\n  }\n}\n\nschema.loadClass(PersonClass);\nconst Person = db.model('Person', schema);\n\nconst doc = await Person.create({\n  firstName: 'Jon',\n  lastName: 'Snow'\n});\n\nassert.equal(doc.fullName, 'My name is Jon Snow');\ndoc.fullName = 'Jon Stark';\nassert.equal(doc.firstName, 'Jon');\nassert.equal(doc.lastName, 'Stark');\nconst foundPerson = await Person.findByFullName('Jon Snow');\n\nassert.equal(foundPerson.fullName, 'My name is Jon Snow');\n```"
+   },
+   {
+    "id": "mongoose:docs/guide.md#52",
+    "text": "## With ES6 Classes {#es6-classes}\n\nSchemas have a [`loadClass()` method](api/schema.html#schema_Schema-loadClass)\nthat you can use to create a Mongoose schema from an [ES6 class](https://thecodebarbarian.com/an-overview-of-es6-classes):\n\n* [ES6 class methods](https://masteringjs.io/tutorials/fundamentals/class#methods) become [Mongoose methods](guide.html#methods)\n* [ES6 class statics](https://masteringjs.io/tutorials/fundamentals/class#statics) become [Mongoose statics](guide.html#statics)\n* [ES6 getters and setters](https://masteringjs.io/tutorials/fundamentals/class#getterssetters) become [Mongoose virtuals](tutorials/virtuals.html)\n\nHere's an example of using `loadClass()` to create a schema from an ES6 class:\n\n```javascript\nclass MyClass {\n  myMethod() { return 42; }\n  static myStatic() { return 42; }\n  get myVirtual() { return 42; }\n}\n\nconst schema = new mongoose.Schema();\nschema.loadClass(MyClass);\n\nconsole.log(schema.methods); // { myMethod: [Function: myMethod] }\nconsole.log(schema.statics); // { myStatic: [Function: myStatic] }\nconsole.log(schema.virtuals); // { myVirtual: VirtualType { ... } }\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/advanced_schemas.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/guide.md#52"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/guide.md#52",
+    "duplicates": [],
+    "overlaps": [
+     "mongoose:docs/advanced_schemas.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/advanced_schemas.md#0",
+    "b": "mongoose:docs/guide.md#52",
+    "relation": "overlapping",
+    "related": 0.9986,
+    "probabilities": {
+     "same": 0.0089,
+     "overlapping": 0.9871,
+     "conflicting": 0.0026,
+     "unrelated": 0.0014
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0099,
+       "restated": 0.9634,
+       "elaborated": 0.0187,
+       "different": 0.008
+      },
+      "confidence": 0.992,
+      "a": {
+       "document": "mongoose:docs/advanced_schemas.md#0",
+       "quote": "Mongoose allows creating schemas from [ES6 classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).",
+       "start": 50,
+       "end": 177,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mongoose:docs/guide.md#52",
+       "quote": "## With ES6 Classes {#es6-classes}\n\nSchemas have a [`loadClass()` method](api/schema.html#schema_Schema-loadClass)\nthat you can use to create a Mongoose schema from an [ES6 class](https://thecodebarbarian.com/an-overview-of-es6-classes):\n\n* [ES6 class methods](https://masteringjs.io/tutorials/fundamentals/class#methods) become [Mongoose methods](guide.html#methods)\n* [ES6 class statics](https://masteringjs.io/tutorials/fundamentals/class#statics) become [Mongoose statics](guide.html#statics)\n* [ES6 getters and setters](https://masteringjs.io/tutorials/fundamentals/class#getterssetters) become [Mongoose virtuals](tutorials/virtuals.html)\n\nHere's an example of using `loadClass()` to create a schema from an ES6 class:\n\n```javascript\nclass MyClass {\n  myMethod() { return 42; }\n  static myStatic() { return 42; }\n  get myVirtual() { return 42; }\n}\n\nconst schema = new mongoose.Schema();\nschema.loadClass(MyClass);\n\nconsole.log(schema.methods); // { myMethod: [Function: myMethod] }\nconsole.log(schema.statics); // { myStatic: [Function: myStatic] }\nconsole.log(schema.virtuals); // { myVirtual: VirtualType { ...",
+       "start": 0,
+       "end": 1118,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 73,
+   "passages": 1,
+   "counterparts_ms": 111
+  },
+  "timing": {
+   "read_ms": 218,
+   "total_ms": 221
+  }
+ }
+}

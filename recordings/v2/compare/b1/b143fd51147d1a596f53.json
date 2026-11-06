@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b1/b143fd51147d1a596f53",
+ "request_hash": "b143fd51147d1a596f533f87ed9c97d79dd5f8964d4ebbe53192da2ca7b3ae39",
+ "recorded_at": "2026-11-06T14:11:02Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 836,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.029921",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=158"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Type-Providers.md#2",
+    "text": "### Json Schema to Ts\n\nThe following sets up a `json-schema-to-ts` Type Provider:\n\n```bash\n$ npm i @fastify/type-provider-json-schema-to-ts\n```\n\n```typescript\nimport Fastify from 'fastify'\nimport { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts'\n\nconst server = Fastify().withTypeProvider<JsonSchemaToTsProvider>()\n\nserver.get('/route', {\n  schema: {\n    querystring: {\n      type: 'object',\n      properties: {\n        foo: { type: 'number' },\n        bar: { type: 'string' },\n      },\n      required: ['foo', 'bar']\n    }\n  }\n}, (request, reply) => {\n\n  // type Query = { foo: number, bar: string }\n  const { foo, bar } = request.query // type safe!\n})\n```\n\nWhen using raw JSON Schema objects with `JsonSchemaToTsProvider`, TypeScript\nmust be able to see the exact literal values in the schema. Inline schemas, like\nthe example above, are inferred from the route call. If the schema is moved into\na separate variable, use `as const`:\n\n```typescript\nconst querystringSchema = {\n  type: 'object',\n  properties: {\n    foo: { type: 'number' },\n    bar: { type: 'string' },\n  },\n  required: ['foo', 'bar']\n} as const\n```\n\nWithout `as const`, TypeScript may widen schema values such as `type: 'object'`\nto `type: string`, which prevents `json-schema-to-ts` from inferring the route\ntypes. This assertion has no effect on the schema used by Fastify at runtime."
+   },
+   {
+    "id": "fastify:docs/Reference/Type-Providers.md#3",
+    "text": "### TypeBox\n\nThe following sets up a TypeBox Type Provider:\n\n```bash\n$ npm i typebox @fastify/type-provider-typebox\n```\n\n```typescript\nimport Fastify from 'fastify'\nimport { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'\nimport { Type } from 'typebox'\n\nconst server = Fastify().withTypeProvider<TypeBoxTypeProvider>()\n\nserver.get('/route', {\n  schema: {\n    querystring: Type.Object({\n      foo: Type.Number(),\n      bar: Type.String()\n    })\n  }\n}, (request, reply) => {\n\n  // type Query = { foo: number, bar: string }\n  const { foo, bar } = request.query // type safe!\n})\n```\n\nSee the [TypeBox\ndocumentation](https://sinclairzx81.github.io/typebox/)\nfor setting-up AJV to work with TypeBox."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Type-Providers.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Type-Providers.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Type-Providers.md#2",
+    "b": "fastify:docs/Reference/Type-Providers.md#3",
+    "relation": "unrelated",
+    "related": 0.0142,
+    "probabilities": {
+     "same": 0.0045,
+     "overlapping": 0.0046,
+     "conflicting": 0.0051,
+     "unrelated": 0.9858
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27
+  },
+  "timing": {
+   "read_ms": 27,
+   "total_ms": 29
+  }
+ }
+}

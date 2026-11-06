@@ -1,0 +1,91 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/33/33360723f75767276ee1",
+ "request_hash": "33360723f75767276ee1a1a57c7ca2b29c6022ec8cc7aaf91e0e9ad844e133f9",
+ "recorded_at": "2026-11-06T14:14:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1157,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "81.340704",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=396"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_9.md#6",
+    "text": "## `mongoose.isValidObjectId()` returns false for numbers\n\nIn Mongoose 8, you could create a new ObjectId from a number, and `isValidObjectId()` would return `true` for numbers. In Mongoose 9, `isValidObjectId()` will return `false` for numbers and you can no longer create a new ObjectId from a number.\n\n```javascript\n// true in mongoose 8, false in mongoose 9\nmongoose.isValidObjectId(6);\n\n// Works in Mongoose 8, throws in Mongoose 9\nnew mongoose.Types.ObjectId(6);\n```"
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#12",
+    "text": "## Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()` {#simplified-isvalidobjectid-and-separate-isobjectidorhexstring}\n\nIn Mongoose 5, `mongoose.isValidObjectId()` returned `false` for values like numbers, which was inconsistent with the MongoDB driver's `ObjectId.isValid()` function.\nTechnically, any JavaScript number can be converted to a MongoDB ObjectId.\n\nIn Mongoose 6, `mongoose.isValidObjectId()` is just a wrapper for `mongoose.Types.ObjectId.isValid()` for consistency.\n\nMongoose 6.2.5 now includes a `mongoose.isObjectIdOrHexString()` function, which does a better job of capturing the more common use case for `isValidObjectId()`: is the given value an `ObjectId` instance or a 24 character hex string representing an `ObjectId`?\n\n```javascript\n// `isValidObjectId()` returns `true` for some surprising values, because these\n// values are _technically_ ObjectId representations\nmongoose.isValidObjectId(new mongoose.Types.ObjectId()); // true\nmongoose.isValidObjectId('0123456789ab'); // true\nmongoose.isValidObjectId(6); // true\nmongoose.isValidObjectId(new User({ name: 'test' })); // true\n\n// `isObjectIdOrHexString()` instead only returns `true` for ObjectIds and 24\n// character hex strings.\nmongoose.isObjectIdOrHexString(new mongoose.Types.ObjectId()); // true\nmongoose.isObjectIdOrHexString('62261a65d66c6be0a63c051f'); // true\nmongoose.isObjectIdOrHexString('0123456789ab'); // false\nmongoose.isObjectIdOrHexString(6); // false\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_9.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "mongoose:docs/migrating_to_6.md#12"
+    ]
+   },
+   {
+    "id": "mongoose:docs/migrating_to_6.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "mongoose:docs/migrating_to_9.md#6"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/migrating_to_9.md#6",
+    "b": "mongoose:docs/migrating_to_6.md#12",
+    "relation": "conflicting",
+    "related": 0.9867,
+    "probabilities": {
+     "same": 0.0146,
+     "overlapping": 0.0773,
+     "conflicting": 0.8947,
+     "unrelated": 0.0133
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 141,
+   "passage_reads": 1,
+   "passages_ms": 121,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 262,
+   "total_ms": 265
+  }
+ }
+}

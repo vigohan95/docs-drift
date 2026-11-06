@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/12/12e128b5b060c490427b",
+ "request_hash": "12e128b5b060c490427bbb886854b81bc5f23e25494a3ef3f79981a6a9b1df02",
+ "recorded_at": "2026-11-06T14:14:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1080,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "170.122786",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=376"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#1",
+    "text": "## Hidden Properties\n\nIf you want to omit some properties from serialized result, you can mark them with `hidden` flag on `@Property()` decorator. To have this information available on the type level, you also need to use the `HiddenProps` symbol:\n\n```ts\n@Entity()\nclass Book {\n\n  // we use the `HiddenProps` symbol to define hidden properties on type level\n  [HiddenProps]?: 'hiddenField' | 'otherHiddenField';\n\n  @Property({ hidden: true })\n  hiddenField = Date.now();\n\n  @Property({ hidden: true, nullable: true })\n  otherHiddenField?: string;\n\n}\n\nconst book = new Book(...);\nconsole.log(wrap(book).toObject().hiddenField); // undefined\n\n// @ts-expect-error accessing `hiddenField` will fail to compile thanks to the `HiddenProps` symbol\nconsole.log(wrap(book).toJSON().hiddenField); // undefined\n```\n\nAlternatively, you can use the `Hidden` type for **primitive property types** (`string`, `number`, `boolean`, `bigint`, `symbol`). It works the same as the `Opt` type (an alternative for `OptionalProps` symbol), and can be used in two ways:\n\n- with generics: `hiddenField?: Hidden<string>;`\n- with intersections: `hiddenField?: string & Hidden;`\n\nBoth will work the same, and can be combined with the `HiddenProps` symbol approach.\n\n> With `ReflectMetadataProvider`, intersection types are emitted as `Object`, so the property type needs to be provided explicitly (e.g. `@PrimaryKey({ type: 'number' })`), unless it can be inferred from a default value. See [Metadata Providers](./metadata-providers.md#intersection-types-opt-hidden).\n\n```ts\n@Entity()\nclass Book {\n\n  @Property({ hidden: true })\n  hiddenField: Hidden<number> = Date.now();\n\n  @Property({ hidden: true, nullable: true })\n  otherHiddenField?: string & Hidden;\n\n}\n```\n\n> **Note:** The `Hidden` type brand only works for primitive types. For object-type properties like `Date`, `Record<string, unknown>`, or JSON properties, you must use the `HiddenProps` symbol approach instead:\n>\n> ```ts\n> @Entity()\n> class User {\n>\n>   [HiddenProps]?: 'secretData' | 'hiddenDate';\n>\n>   @Property({ type: JsonType, hidden: true })\n>   secretData!: Record<string, unknown>;\n>\n>   @Property({ hidden: true })\n>   hiddenDate!: Date;\n>\n> }\n> ```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#59",
+    "text": "## `Hidden` type brand only works for primitive types\n\nThe `Hidden` type brand now only works for primitive property types (`string`, `number`, `boolean`, `bigint`, `symbol`). For object-type properties like `Date`, `Record<string, unknown>`, or JSON properties, you need to use the `HiddenProps` symbol instead. See the [hidden properties guide](./serializing.md#hidden-properties) for more information.\n\nThis change fixes an issue where object-type properties (including JSON and Date) were incorrectly detected as hidden in the `EntityDTO` type.\n\n```diff\n@Entity()\nclass User {\n\n+  // For object-type hidden properties, use HiddenProps symbol\n+  [HiddenProps]?: 'secretData' | 'hiddenDate';\n\n   @Property({ hidden: true })\n   password!: Hidden<string>; // still works for primitives\n\n   @Property({ type: JsonType, hidden: true })\n-  secretData!: Hidden<Record<string, unknown>>; // no longer works\n+  secretData!: Record<string, unknown>; // use HiddenProps instead\n\n   @Property({ hidden: true })\n-  hiddenDate!: Hidden<Date>; // no longer works\n+  hiddenDate!: Date; // use HiddenProps instead\n\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v6-to-v7.md#59"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#59",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/serializing.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/serializing.md#1",
+    "b": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#59",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.0131,
+     "overlapping": 0.9792,
+     "conflicting": 0.0051,
+     "unrelated": 0.0026
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.017,
+       "restated": 0.9641,
+       "elaborated": 0.0124,
+       "different": 0.0066
+      },
+      "confidence": 0.9934,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#1",
+       "quote": "Alternatively, you can use the `Hidden` type for **primitive property types** (`string`, `number`, `boolean`, `bigint`, `symbol`).",
+       "start": 805,
+       "end": 935,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#59",
+       "quote": "## `Hidden` type brand only works for primitive types\n\nThe `Hidden` type brand now only works for primitive property types (`string`, `number`, `boolean`, `bigint`, `symbol`).",
+       "start": 0,
+       "end": 175,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0104,
+       "restated": 0.9651,
+       "elaborated": 0.018,
+       "different": 0.0065
+      },
+      "confidence": 0.9935,
+      "a": {
+       "document": "mikro-orm:docs/docs/serializing.md#1",
+       "quote": "For object-type properties like `Date`, `Record<string, unknown>`, or JSON properties, you must use the `HiddenProps` symbol approach instead:",
+       "start": 1806,
+       "end": 1948,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#59",
+       "quote": "For object-type properties like `Date`, `Record<string, unknown>`, or JSON properties, you need to use the `HiddenProps` symbol instead.",
+       "start": 176,
+       "end": 312,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 83,
+   "passage_reads": 1,
+   "passages_ms": 75,
+   "passages": 2,
+   "counterparts_ms": 93
+  },
+  "timing": {
+   "read_ms": 250,
+   "total_ms": 253
+  }
+ }
+}

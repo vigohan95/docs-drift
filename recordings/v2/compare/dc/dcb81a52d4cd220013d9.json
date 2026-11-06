@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/dc/dcb81a52d4cd220013d9",
+ "request_hash": "dcb81a52d4cd220013d909af851218e780aa515a82bdcb66129a156aeaec05e8",
+ "recorded_at": "2026-11-06T14:15:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 883,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "23.766624",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=171"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#6",
+    "text": "### Removing items from collection\n\nRemoving items from a collection does not necessarily imply deleting the target entity, it means you are disconnecting the relation — removing items from collection, not removing entities from database — `Collection.remove()` is not the same as `em.remove()`. When you use `em.assign()` to update entities you can also remove/disconnect entities from a collection, they do not get automatically removed from the database. If you want to delete the entity by removing it from collection, you need to enable `orphanRemoval: true`, which tells the ORM you don't want orphaned entities to exist, so those should be removed. Also check the documentation on [Orphan Removal](./cascading.md#orphan-removal)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#26",
+    "text": "## Atomic updates via `raw()` helper\n\nWhen you want to issue an atomic update query via flush, you can use the static `raw()` helper:\n\n```ts\nconst ref = em.getReference(Author, 123);\nref.age = raw<number>(`age * 2`);\n\nawait em.flush();\nconsole.log(ref.age); // real value is available after flush\n```\n\nThe `raw()` helper accepts a generic type parameter that specifies the return type. When assigning directly to entity properties, use `raw<T>()` where `T` matches the property type:\n\n```ts\n// Direct property assignment requires explicit type\nauthor.age = raw<number>(`age + 1`);\nauthor.name = raw<string>(`upper(name)`);\nbook.price = raw<number>(`price * 1.1`);\n```\n\nWhen using `em.create()`, `em.assign()`, or similar methods, the type parameter is not required as `RawQueryFragment` is accepted in entity data types:\n\n```ts\n// No explicit type needed with em.create/em.assign\nem.assign(author, { age: raw(`age + 1`) });\nconst book = em.create(Book, { price: raw(`price * 1.1`) });\n```\n\nThe `raw()` helper returns special raw query fragment object. It disallows serialization (via `toJSON`) as well as working with the value (via [`valueOf()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/valueOf)). Only single use of this value is allowed, if you try to reassign it to another entity, an error will be thrown to protect you from mistakes like this:\n\n```ts\norder.number = raw<number>(`(select max(num) + 1 from orders)`);\nuser.lastOrderNumber = order.number; // throws, it could resolve to a different value\nJSON.stringify(order); // throws, raw value cannot be serialized\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#26",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/collections.md#6",
+    "b": "mikro-orm:docs/docs/entity-manager.md#26",
+    "relation": "unrelated",
+    "related": 0.004,
+    "probabilities": {
+     "same": 0.0015,
+     "overlapping": 0.0013,
+     "conflicting": 0.0012,
+     "unrelated": 0.996
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31
+  },
+  "timing": {
+   "read_ms": 31,
+   "total_ms": 33
+  }
+ }
+}

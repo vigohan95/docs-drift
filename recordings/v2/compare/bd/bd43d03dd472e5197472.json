@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bd/bd43d03dd472e5197472",
+ "request_hash": "bd43d03dd472e5197472b1981a5e023cb04d3552da6cc1128a13ed48d578a78e",
+ "recorded_at": "2026-11-06T14:21:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3207,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.872511",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=438"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/learn/setup-teardown.md#6",
+    "text": "## Cleanup with `onTestFinished`\n\nSometimes you create a resource inside a test that needs to be cleaned up afterwards. You could use `afterEach`, but that means the cleanup is separated from the setup, which can make the test harder to follow. [`onTestFinished`](/api/hooks#ontestfinished) lets you register a cleanup function right where you create the resource:\n\n```js\nimport { expect, onTestFinished, test } from 'vitest'\n\ntest('creates a temporary file', () => {\n  const file = createTempFile()\n  onTestFinished(() => {\n    deleteTempFile(file)\n  })\n\n  expect(file.exists()).toBe(true)\n})\n```\n\nA similar pattern works with `beforeEach`. You can return a cleanup function and Vitest will call it after each test. This is especially nice when the setup and teardown are closely related:\n\n```js\nimport { beforeEach } from 'vitest'\n\nbeforeEach(() => {\n  const server = startServer()\n  return () => {\n    server.close()\n  }\n})\n```"
+   },
+   {
+    "id": "vitest:docs/guide/recipes/explicit-resources.md#3",
+    "text": "## Scoped to any block\n\n`using` is block-scoped, so you can install a spy for just part of a test. This is the case neither `afterEach` nor `onTestFinished` covers, since both run after the test ends:\n\n```ts\nimport { expect, it, vi } from 'vitest'\n\nit('only mocks fetch for the auth call', async () => {\n  // real fetch here\n  await preloadConfig()\n\n  {\n    using fetchSpy = vi.spyOn(globalThis, 'fetch')\n      .mockResolvedValue(new Response('{\"ok\":true}'))\n\n    await login('alice', 'secret')\n    expect(fetchSpy).toHaveBeenCalledOnce()\n  }\n\n  // real fetch is back\n  await reportSuccess()\n})\n```\n\nThis is also a way to avoid turning on the global [`restoreMocks: true`](/config/restoremocks) config when only a handful of calls actually need restoration."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/learn/setup-teardown.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/recipes/explicit-resources.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/learn/setup-teardown.md#6",
+    "b": "vitest:docs/guide/recipes/explicit-resources.md#3",
+    "relation": "overlapping",
+    "related": 0.9873,
+    "probabilities": {
+     "same": 0.0097,
+     "overlapping": 0.9708,
+     "conflicting": 0.0067,
+     "unrelated": 0.0127
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 54,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 81,
+   "total_ms": 84
+  }
+ }
+}

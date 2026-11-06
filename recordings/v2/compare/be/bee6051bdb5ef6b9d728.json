@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/be/bee6051bdb5ef6b9d728",
+ "request_hash": "bee6051bdb5ef6b9d728ffbbb15dad7170094eca270bdd671eb40b442b279491",
+ "recorded_at": "2026-11-06T14:14:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1424,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "149.693602",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=46,cfOrigin;dur=0,cfWorker;dur=616"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#20",
+    "text": "#### Collation\n\nControls string comparison rules. The `collation` option accepts different types depending on the driver:\n\n- **SQL drivers**: Pass a collation name **string**. It will be applied as `COLLATE` to **every** column in the `ORDER BY` clause. Passing a `CollationOptions` object to a SQL driver will throw an error.\n- **MongoDB**: Pass a `CollationOptions` **object**. Passing a string to MongoDB will throw an error.\n\n```ts\n// SQL: applies COLLATE to ORDER BY\nconst users = await em.find(User, {}, {\n  collation: 'utf8mb4_general_ci',\n  orderBy: { name: 'asc' },\n});\n// produces: ... ORDER BY `name` COLLATE `utf8mb4_general_ci` ASC\n\n// MongoDB: structured collation object\nconst users = await em.find(User, {}, {\n  collation: { locale: 'en', strength: 2 },\n  orderBy: { name: QueryOrder.ASC },\n});\n```\n\nTo use collation in `WHERE` conditions (SQL only), use raw SQL fragments:\n\n```ts\nconst users = await em.find(User, {\n  [sql`name collate utf8mb4_general_ci`]: 'john',\n});\n// produces: ... WHERE name collate `utf8mb4_general_ci` = 'john'\n```\n\nFor MongoDB, the `collation` option applies to the entire query (both filtering and sorting), which is the native MongoDB behavior."
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#36",
+    "text": "## Collation\n\nYou can set a collation for `ORDER BY` expressions using the `collation()` method. This appends `COLLATE <collation>` to **every** column in the `ORDER BY` clause:\n\n```ts\nconst qb = em.createQueryBuilder(User);\nqb.select('*')\n  .collation('utf8mb4_general_ci')\n  .orderBy({ name: 'asc' });\n\nconsole.log(qb.getQuery());\n// select `e0`.* from `user` as `e0`\n//   order by `e0`.`name` collate `utf8mb4_general_ci` asc\n```\n\nTo use collation in `WHERE` conditions, use raw SQL fragments:\n\n```ts\nconst qb = em.createQueryBuilder(User);\nqb.select('*')\n  .where({ [sql`name collate utf8mb4_general_ci`]: 'john' });\n\nconsole.log(qb.getQuery());\n// select `e0`.* from `user` as `e0`\n//   where name collate `utf8mb4_general_ci` = ?\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#20",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/query-builder.md#36"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#36",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/entity-manager.md#20"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-manager.md#20",
+    "b": "mikro-orm:docs/docs/query-builder.md#36",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0057,
+     "overlapping": 0.9879,
+     "conflicting": 0.0044,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0088,
+       "restated": 0.9386,
+       "elaborated": 0.0296,
+       "different": 0.023
+      },
+      "confidence": 0.977,
+      "a": {
+       "document": "mikro-orm:docs/docs/entity-manager.md#20",
+       "quote": "It will be applied as `COLLATE` to **every** column in the `ORDER BY` clause.",
+       "start": 176,
+       "end": 253,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/query-builder.md#36",
+       "quote": "This appends `COLLATE <collation>` to **every** column in the `ORDER BY` clause:\n\n```ts\nconst qb = em.createQueryBuilder(User);\nqb.select('*')\n  .collation('utf8mb4_general_ci')\n  .orderBy({ name: 'asc' });\n\nconsole.log(qb.getQuery());\n// select `e0`.* from `user` as `e0`\n//   order by `e0`.`name` collate `utf8mb4_general_ci` asc\n```\n\nTo use collation in `WHERE` conditions, use raw SQL fragments:\n\n```ts\nconst qb = em.createQueryBuilder(User);\nqb.select('*')\n  .where({ [sql`name collate utf8mb4_general_ci`]: 'john' });\n\nconsole.log(qb.getQuery());\n// select `e0`.* from `user` as `e0`\n//   where name collate `utf8mb4_general_ci` = ?\n```",
+       "start": 97,
+       "end": 739,
+       "confidence": 0.994
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 219,
+   "passage_reads": 1,
+   "passages_ms": 162,
+   "passages": 2,
+   "counterparts_ms": 72
+  },
+  "timing": {
+   "read_ms": 453,
+   "total_ms": 456
+  }
+ }
+}

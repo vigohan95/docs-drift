@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0b/0b3e4ff13bace1955eb4",
+ "request_hash": "0b3e4ff13bace1955eb441d731b0ae8ec20c01b3d641a76e597217e7920ffc86",
+ "recorded_at": "2026-11-06T14:15:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 876,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.064192",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=166"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "text": "## Population where condition\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nWhen you use populate hints in `em.find()` and similar methods, by default all related entities are populated. Consider the following example - it would find all authors that have books with given IDs, and populate their books collection with **all** books, not just those matching the condition:\n\n```ts\n// finds authors with books 1, 2, 3 - but populates ALL their books\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nIf you wanted to populate only the books that match the filter condition, you can use `PopulateHint.INFER`:\n\n```ts\n// finds authors with books 1, 2, 3 - and populates ONLY those books\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```\n\nThis behaviour is configurable both globally and locally via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` (default) and `PopulateHint.INFER`. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\nMikroORM.init({\n  populateWhere: PopulateHint.INFER, // infer populate condition from the filter\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/loading-strategies.md#4",
+    "text": "### Per-parent limiting\n\nYou can limit the number of items loaded per parent entity using the `limit` option in `populateHints`. This is useful when a relation can have many items (e.g., thousands of posts per user) but you only need a few per parent.\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts'],\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n// each user.posts collection will have at most 5 items (the most recent ones)\n```\n\nYou can also use `offset` for pagination:\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts'],\n  populateHints: {\n    posts: { limit: 5, offset: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n```\n\nDifferent limits can be applied at each level of nested population:\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts.comments'],\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n    'posts.comments': { limit: 3 },\n  },\n});\n```\n\nThe `orderBy` in `populateHints` takes precedence over nested `FindOptions.orderBy`. If neither is provided, the relation's default ordering is used.\n\nCollections loaded with a limit are marked as **partial and readonly** — you cannot add or remove items from them, which prevents the Unit of Work from treating unloaded items as removals.\n\nUnder the hood, SQL drivers use `ROW_NUMBER() OVER (PARTITION BY ...)` window functions to efficiently limit per parent in a single query. MongoDB uses an aggregation pipeline with `$group` and `$slice`.\n\n> When `limit` is set, the loading strategy is automatically forced to `select-in`, since the `joined` strategy cannot apply per-parent limiting within a join.\n\nThis also works with `em.populate()`:\n\n```ts\nawait em.populate(users, ['posts'], {\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/loading-strategies.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/configuration.md#23",
+    "b": "mikro-orm:docs/docs/loading-strategies.md#4",
+    "relation": "unrelated",
+    "related": 0.0246,
+    "probabilities": {
+     "same": 0.007,
+     "overlapping": 0.0087,
+     "conflicting": 0.0089,
+     "unrelated": 0.9754
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36
+  },
+  "timing": {
+   "read_ms": 36,
+   "total_ms": 39
+  }
+ }
+}

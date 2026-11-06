@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3d/3d155fb99abcff25a0d8",
+ "request_hash": "3d155fb99abcff25a0d82fe7eb740c375b3b1d0d743b2123e12b2e8ac330ead9",
+ "recorded_at": "2026-11-06T14:11:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1104,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "157.459042",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=381"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "text": "Again, `@JoinColumn` must be set only on one side of the relation - the side that must have the foreign key in the database table.\n\nExample how to save such a relation:\n\n```typescript\nconst profile = new Profile()\nprofile.gender = \"male\"\nprofile.photo = \"me.jpg\"\nawait dataSource.manager.save(profile)\n\nconst user = new User()\nuser.name = \"Joe Smith\"\nuser.profile = profile\nawait dataSource.manager.save(user)\n```\n\nWith [cascades](./1-relations.md#cascades) enabled you can save this relation with only one `save` call.\n\nTo load user with profile inside you must specify relation in `FindOptions`:\n\n```typescript\nconst users = await dataSource.getRepository(User).find({\n    relations: {\n        profile: true,\n    },\n})\n```\n\nOr using `QueryBuilder` you can join them:\n\n```typescript\nconst users = await dataSource\n    .getRepository(User)\n    .createQueryBuilder(\"user\")\n    .leftJoinAndSelect(\"user.profile\", \"profile\")\n    .getMany()\n```\n\nWith eager loading enabled on a relation, you don't have to specify relations in the find command as it will ALWAYS be loaded automatically. If you use QueryBuilder eager relations are disabled, you have to use `leftJoinAndSelect` to load the relation.\n\nRelations can be uni-directional and bi-directional.\nUni-directional are relations with a relation decorator only on one side.\nBi-directional are relations with decorators on both sides of a relation."
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#5",
+    "text": "## Loading many-to-many relations\n\nTo load questions with categories inside you must specify the relation in `FindOptions`:\n\n```typescript\nconst questionRepository = dataSource.getRepository(Question)\nconst questions = await questionRepository.find({\n    relations: {\n        categories: true,\n    },\n})\n```\n\nOr using `QueryBuilder` you can join them:\n\n```typescript\nconst questions = await dataSource\n    .getRepository(Question)\n    .createQueryBuilder(\"question\")\n    .leftJoinAndSelect(\"question.categories\", \"category\")\n    .getMany()\n```\n\nWith eager loading enabled on a relation, you don't have to specify relations in the find command as it will ALWAYS be loaded automatically. If you use QueryBuilder eager relations are disabled, you have to use `leftJoinAndSelect` to load the relation."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/relations/4-many-to-many-relations.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/relations/4-many-to-many-relations.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "typeorm:docs/docs/relations/2-one-to-one-relations.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+    "b": "typeorm:docs/docs/relations/4-many-to-many-relations.md#5",
+    "relation": "overlapping",
+    "related": 0.9939,
+    "probabilities": {
+     "same": 0.0125,
+     "overlapping": 0.9725,
+     "conflicting": 0.0089,
+     "unrelated": 0.0061
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0274,
+       "restated": 0.7944,
+       "elaborated": 0.0492,
+       "different": 0.129
+      },
+      "confidence": 0.871,
+      "a": {
+       "document": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+       "quote": "With eager loading enabled on a relation, you don't have to specify relations in the find command as it will ALWAYS be loaded automatically.",
+       "start": 942,
+       "end": 1082,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/relations/4-many-to-many-relations.md#5",
+       "quote": "## Loading many-to-many relations\n\nTo load questions with categories inside you must specify the relation in `FindOptions`:\n\n```typescript\nconst questionRepository = dataSource.getRepository(Question)\nconst questions = await questionRepository.find({\n    relations: {\n        categories: true,\n    },\n})\n```\n\nOr using `QueryBuilder` you can join them:\n\n```typescript\nconst questions = await dataSource\n    .getRepository(Question)\n    .createQueryBuilder(\"question\")\n    .leftJoinAndSelect(\"question.categories\", \"category\")\n    .getMany()\n```\n\nWith eager loading enabled on a relation, you don't have to specify relations in the find command as it will ALWAYS be loaded automatically.",
+       "start": 0,
+       "end": 685,
+       "confidence": 0.997
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9902,
+       "restated": 0.0043,
+       "elaborated": 0.0028,
+       "different": 0.0026
+      },
+      "confidence": 0.9974,
+      "a": {
+       "document": "typeorm:docs/docs/relations/2-one-to-one-relations.md#1",
+       "quote": "If you use QueryBuilder eager relations are disabled, you have to use `leftJoinAndSelect` to load the relation.",
+       "start": 1083,
+       "end": 1194,
+       "confidence": 1
+      },
+      "b": {
+       "document": "typeorm:docs/docs/relations/4-many-to-many-relations.md#5",
+       "quote": "If you use QueryBuilder eager relations are disabled, you have to use `leftJoinAndSelect` to load the relation.",
+       "start": 686,
+       "end": 797,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 105,
+   "passage_reads": 1,
+   "passages_ms": 54,
+   "passages": 2,
+   "counterparts_ms": 86
+  },
+  "timing": {
+   "read_ms": 243,
+   "total_ms": 247
+  }
+ }
+}

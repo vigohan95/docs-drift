@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/61/61974ca504f2efea3aa9",
+ "request_hash": "61974ca504f2efea3aa95a62262540421872ed3ddefdfb0a4f14e1e947421d9d",
+ "recorded_at": "2026-11-06T14:20:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1154,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "174.514627",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=93,cfOrigin;dur=0,cfWorker;dur=322"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/recipes/conditional-mocking.md#9",
+    "text": "## Asserting that all behaviors were called\n\nTo check that all registered behaviors were actually matched and their actions consumed, the object returned by `vi.when` supports the [`toHaveBeenExhausted`](/api/expect#tohavebeenexhausted) assertion:\n\n```ts\ntest('loads both users', async () => {\n  const db = { findById: vi.fn<FindById>() }\n\n  const w = vi.when(db.findById)\n    .calledWith(1)\n    .thenResolveOnce({ id: 1, name: 'Ella' })\n    .calledWith(2)\n    .thenResolveOnce({ id: 2, name: 'Gracie' })\n\n  await loadDashboard(db)\n\n  expect(w).toHaveBeenExhausted()\n})\n```\n\nIn this example, if `loadDashboard` only calls `findById(1)`, the test fails with a message listing the behaviors that were never matched:\n\n```\nAssertionError: expected all behaviors to have been exhausted, but some remain:\n\n  calledWith(2)\n    ✗ thenReturn({ id: 2, name: 'Gracie' })  never called\n```\n\n::: warning Caveat\nA `vi.when` chain with no behaviors is never considered exhausted. The same applies to a bare `.calledWith()` with no `then*` action attached. Both will always cause `toHaveBeenExhausted` to fail.\n\nIndefinite actions (no `times` limit) satisfy exhaustion checks after being used at least once. The actions keep responding after that, but the assertion is satisfied.\n:::"
+   },
+   {
+    "id": "vitest:docs/api/expect.md#58",
+    "text": "## toHaveBeenExhausted <Version>5.0.0</Version> {#tohavebeenexhausted}\n\n- **Type:** `() => void`\n\nThis assertion checks that every behavior registered on a [`vi.when`](/api/vi#vi-when) chain has been consumed. A behavior is considered exhausted when it has been called the number of times specified by its `times` option, or at least once for behaviors that apply indefinitely.\n\nRequires a `When` chain returned by `vi.when` to be passed to `expect`.\n\n```ts\nimport { expect, test, vi } from 'vitest'\n\ntest('all behaviors were consumed', () => {\n  const spy = vi.fn()\n  const w = vi.when(spy)\n    .calledWith(1)\n    .thenReturnOnce('once')\n    .calledWith(2)\n    .thenReturn('always')\n\n  expect(w).not.toHaveBeenExhausted()\n\n  spy(1) // consumes the `thenReturnOnce` behavior\n  spy(2) // satisfies the `thenReturn` behavior (called at least once)\n\n  expect(w).toHaveBeenExhausted()\n})\n```\n\n::: warning\nA `When` chain with no registered behaviors is never considered exhausted. `toHaveBeenExhausted` only passes when at least one `calledWith` with an associated action (`then*`) has been registered and every registered behavior has been fully consumed.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/recipes/conditional-mocking.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/api/expect.md#58"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/api/expect.md#58",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/guide/recipes/conditional-mocking.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/recipes/conditional-mocking.md#9",
+    "b": "vitest:docs/api/expect.md#58",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0082,
+     "overlapping": 0.9859,
+     "conflicting": 0.0041,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0059,
+       "restated": 0.9773,
+       "elaborated": 0.0098,
+       "different": 0.0071
+      },
+      "confidence": 0.9929,
+      "a": {
+       "document": "vitest:docs/guide/recipes/conditional-mocking.md#9",
+       "quote": "To check that all registered behaviors were actually matched and their actions consumed, the object returned by `vi.when` supports the [`toHaveBeenExhausted`](/api/expect#tohavebeenexhausted) assertion:",
+       "start": 45,
+       "end": 247,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/api/expect.md#58",
+       "quote": "## toHaveBeenExhausted <Version>5.0.0</Version> {#tohavebeenexhausted}\n\n- **Type:** `() => void`\n\nThis assertion checks that every behavior registered on a [`vi.when`](/api/vi#vi-when) chain has been consumed.",
+       "start": 0,
+       "end": 209,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0113,
+       "restated": 0.9477,
+       "elaborated": 0.0299,
+       "different": 0.0111
+      },
+      "confidence": 0.9889,
+      "a": {
+       "document": "vitest:docs/guide/recipes/conditional-mocking.md#9",
+       "quote": "A `vi.when` chain with no behaviors is never considered exhausted.",
+       "start": 898,
+       "end": 964,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/api/expect.md#58",
+       "quote": "`toHaveBeenExhausted` only passes when at least one `calledWith` with an associated action (`then*`) has been registered and every registered behavior has been fully consumed.\n:::",
+       "start": 976,
+       "end": 1155,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 73,
+   "passages": 2,
+   "counterparts_ms": 84
+  },
+  "timing": {
+   "read_ms": 185,
+   "total_ms": 188
+  }
+ }
+}

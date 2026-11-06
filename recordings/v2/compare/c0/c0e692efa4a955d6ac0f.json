@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c0/c0e692efa4a955d6ac0f",
+ "request_hash": "c0e692efa4a955d6ac0f314965fc46c40f1b07120878c28232583fc79f83828d",
+ "recorded_at": "2026-11-06T14:14:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 967,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "98.663555",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=250"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#3",
+    "text": "## Options {#options}\n\nThe `connect` method also accepts an `options` object which will be passed\non to the underlying MongoDB driver.\n\n```javascript\nmongoose.connect(uri, options);\n```\n\nA full list of options can be found on the [MongoDB Node.js driver docs for `MongoClientOptions`](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/MongoClientOptions.html).\nMongoose passes options to the driver without modification, modulo a few\nexceptions that are explained below.\n\n* `bufferCommands`    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables [Mongoose's buffering mechanism](faq.html#callback_never_executes)\n* `user`/`pass`       - The username and password for authentication. These options are Mongoose-specific, they are equivalent to the MongoDB driver's `auth.username` and `auth.password` options.\n* `autoIndex`         - By default, mongoose will automatically build indexes defined in your schema when it connects. This is great for development, but not ideal for large production deployments, because index builds can cause performance degradation. If you set `autoIndex` to false, mongoose will not automatically build indexes for **any** model associated with this connection.\n* `dbName`            - Specifies which database to connect to and overrides any database specified in the connection string. This is useful if you are unable to specify a default database in the connection string like with [some `mongodb+srv` syntax connections](https://stackoverflow.com/questions/48917591/fail-to-connect-mongoose-to-atlas/48917626#48917626)."
+   },
+   {
+    "id": "mongoose:docs/guide.md#8",
+    "text": "## Indexes {#indexes}\n\nMongoDB supports [secondary indexes](http://www.mongodb.com/docs/manual/indexes/).\nWith mongoose, we define these indexes within our `Schema` [at](api/schematype.html#schematype_SchemaType-index) [the](api/schematype.html#schematype_SchemaType-unique) [path](api/schematype.html#schematype_SchemaType-sparse) [level](api/schemadateoptions.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.\nDefining indexes at the schema level is necessary when creating\n[compound indexes](https://www.mongodb.com/docs/manual/core/index-compound/).\n\n```javascript\nconst animalSchema = new Schema({\n  name: String,\n  type: String,\n  tags: { type: [String], index: true } // path level\n});\n\nanimalSchema.index({ name: 1, type: -1 }); // schema level\n```\n\nSee [SchemaType#index()](api/schematype.html#schematype_SchemaType-index) for other index options.\n\nWhen your application starts up, Mongoose automatically calls [`createIndex`](https://www.mongodb.com/docs/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.\nMongoose will call `createIndex` for each index sequentially, and emit an 'index' event on the model when all the `createIndex` calls succeeded or when there was an error.\nWhile nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](https://www.mongodb.com/docs/manual/core/index-creation/#index-build-impact-on-database-performance).\nDisable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `autoIndex` to `false`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/connections.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/guide.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/connections.md#3",
+    "b": "mongoose:docs/guide.md#8",
+    "relation": "overlapping",
+    "related": 0.997,
+    "probabilities": {
+     "same": 0.0055,
+     "overlapping": 0.9869,
+     "conflicting": 0.0046,
+     "unrelated": 0.003
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 108,
+   "total_ms": 112
+  }
+ }
+}

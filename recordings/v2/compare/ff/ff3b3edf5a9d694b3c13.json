@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ff/ff3b3edf5a9d694b3c13",
+ "request_hash": "ff3b3edf5a9d694b3c13f62d1d8f8f863e493da28a17b44928d907f96d4b4c06",
+ "recorded_at": "2026-11-06T14:14:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1350,
+ "response_headers": {
+  "x-clocked-credits": "18",
+  "x-clocked-model-ms": "448.713209",
+  "x-clocked-cost-usd": "0.003586",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=641"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/validation.md#8",
+    "text": "## Cast Errors\n\nBefore running validators, Mongoose attempts to coerce values to the correct type. This process is called *casting* the document.\nIf casting fails for a given path, the `error.errors` object will contain a `CastError` object.\n\nCasting runs before validation, and validation does not run if casting fails.\nThat means your custom validators may assume `v` is `null`, `undefined`, or an instance of the type specified in your schema.\n\n```javascript acquit:Cast Errors\nconst vehicleSchema = new mongoose.Schema({\n  numWheels: { type: Number, max: 18 }\n});\nconst Vehicle = db.model('Vehicle', vehicleSchema);\n\nconst doc = new Vehicle({ numWheels: 'not a number' });\nconst err = doc.validateSync();\n\nerr.errors['numWheels'].name; // 'CastError'\n// 'Cast to Number failed for value \"not a number\" at path \"numWheels\"'\nerr.errors['numWheels'].message;\n```\n\nBy default, Mongoose cast error messages look like `Cast to Number failed for value \"pie\" at path \"numWheels\"`.\nYou can overwrite Mongoose's default cast error message by the `cast` option on your SchemaType to a string as follows.\n\n```javascript acquit:Cast Error Message Overwrite\nconst vehicleSchema = new mongoose.Schema({\n  numWheels: {\n    type: Number,\n    cast: '{VALUE} is not a number'\n  }\n});\nconst Vehicle = db.model('Vehicle', vehicleSchema);\n\nconst doc = new Vehicle({ numWheels: 'pie' });\nconst err = doc.validateSync();\n\nerr.errors['numWheels'].name; // 'CastError'\n// \"pie\" is not a number\nerr.errors['numWheels'].message;\n```"
+   },
+   {
+    "id": "mongoose:docs/tutorials/custom-casting.md#0",
+    "text": "# Custom Casting\n\n[Mongoose 5.4.0](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md#540--2018-12-14) introduced [several ways to configure SchemaTypes globally](http://thecodebarbarian.com/whats-new-in-mongoose-54-global-schematype-configuration).\nOne of these new features is the [`SchemaType.cast()` function](../api/schematype.html#schematype_SchemaType-cast), which enables you to override Mongoose's built-in casting.\n\nFor example, by default Mongoose will throw an error if you attempt to cast\na string that contains a Japanese numeral to a number.\n\n```javascript acquit:custom casting.*casting error\nconst schema = new mongoose.Schema({\n  age: Number\n});\nconst Model = mongoose.model('Test', schema);\n\nconst doc = new Model({ age: '二' });\nconst err = doc.validateSync();\n// \"Cast to Number failed for value \"二\" at path \"age\"\"\nerr.message;\n```\n\nYou can overwrite the default casting function for numbers to allow converting\nthe string that contains the Japanese numeral \"2\" to a number as shown below.\n\n```javascript acquit:custom casting.*casting override\n// Calling `cast()` on a class that inherits from `SchemaType` returns the\n// current casting function.\nconst originalCast = mongoose.Number.cast();\n\n// Calling `cast()` with a function sets the current function used to\n// cast a given schema type, in this cast Numbers.\nmongoose.Number.cast(v => {\n  if (v === '二') {\n    return 2;\n  }\n  return originalCast(v);\n});\n\nconst schema = new mongoose.Schema({\n  age: Number\n});\n\nconst Model = mongoose.model('Test', schema);\n\nconst doc = new Model({ age: '二' });\nconst err = doc.validateSync();\nerr; // null\ndoc.age; // 2\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/validation.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/tutorials/custom-casting.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/validation.md#8",
+    "b": "mongoose:docs/tutorials/custom-casting.md#0",
+    "relation": "overlapping",
+    "related": 0.9765,
+    "probabilities": {
+     "same": 0.0192,
+     "overlapping": 0.9417,
+     "conflicting": 0.0156,
+     "unrelated": 0.0235
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 423,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 458,
+   "total_ms": 461
+  }
+ }
+}

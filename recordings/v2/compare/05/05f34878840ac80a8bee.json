@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/05/05f34878840ac80a8bee",
+ "request_hash": "05f34878840ac80a8beeb3f73eb5580a4a72fc910f647f8edea6d8087f7e2322",
+ "recorded_at": "2026-11-06T14:15:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1084,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "199.043005",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=378"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#23",
+    "text": "## Virtual entities\n\nLet's now improve the first article endpoint - `em.findAndCount()` was used to get paginated results easily, but what if you want to customize the response? One way is with [Virtual entities](../virtual-entities.md). They don't represent any database table, instead, they dynamically resolve to an SQL query, allowing you to map any kind of results onto an entity.\n\n:::info\n\nVirtual entities are meant for read purposes, they don't have a primary key and therefore cannot be tracked for changes. If you want an actual database view instead, see the [View entities](#view-entities) section later in this chapter.\n\n:::\n\nTo define a virtual entity with `defineEntity`, provide an `expression` option. It can be a string (SQL query) or a callback returning an SQL query or a `QueryBuilder` instance. Only scalar properties are supported.\n\n```ts title='modules/article/article-listing.entity.ts'\nimport { defineEntity, InferEntity, EntityManager, p } from '@mikro-orm/core';\nimport { ArticleSchema } from './article.entity.js';\n\nexport const ArticleListingSchema = defineEntity({\n  name: 'ArticleListing',\n  expression: (em: EntityManager) => {\n    return em.getRepository(ArticleSchema).listArticlesQuery();\n  },\n  properties: {\n    slug: p.string(),\n    title: p.string(),\n    description: p.string(),\n    tags: p.array(),\n    author: p.integer(),\n    authorName: p.string(),\n    totalComments: p.integer(),\n  },\n});\n\nexport type IArticleListing = InferEntity<typeof ArticleListingSchema>;\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/virtual-entities.md#0",
+    "text": "---\ntitle: Virtual Entities\n---\n\nimport Tabs from '@theme/Tabs';\nimport TabItem from '@theme/TabItem';\n\nVirtual entities don't represent any database table. Instead, they dynamically resolve to an SQL query (or an aggregation in MongoDB), allowing to map any kind of results onto an entity. Such entities are meant for read purposes, they don't have a primary key and therefore cannot be tracked for changes.\n\n> If you need actual database views that are created and managed by the schema generator, see [View Entities](./view-entities.md) instead. View entities create `CREATE VIEW` statements and are tracked in migrations, while virtual entities evaluate their expression at query time.\n\n> Virtual entities can contain scalar properties as well as to-one relations (M:1 and 1:1 owners). Such relations are always populated via `select-in` strategy.\n\nTo define a virtual entity, provide an `expression`, either as a string (SQL query):\n\n> You need to use the virtual column names based on current naming strategy. Note the `authorName` property being represented as `author_name` column.\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'reflect-metadata', value: 'reflect-metadata'},\n    {label: 'ts-morph', value: 'ts-morph'},\n]\n  }\n>\n  <TabItem value=\"define-entity-class\">"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#23",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/virtual-entities.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/virtual-entities.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/04-advanced.md#23"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/04-advanced.md#23",
+    "b": "mikro-orm:docs/docs/virtual-entities.md#0",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0075,
+     "overlapping": 0.9854,
+     "conflicting": 0.0048,
+     "unrelated": 0.0024
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0123,
+       "restated": 0.9703,
+       "elaborated": 0.0096,
+       "different": 0.0078
+      },
+      "confidence": 0.9922,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/04-advanced.md#23",
+       "quote": "Virtual entities are meant for read purposes, they don't have a primary key and therefore cannot be tracked for changes.",
+       "start": 396,
+       "end": 516,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/virtual-entities.md#0",
+       "quote": "---\ntitle: Virtual Entities\n---\n\nimport Tabs from '@theme/Tabs';\nimport TabItem from '@theme/TabItem';\n\nVirtual entities don't represent any database table.",
+       "start": 0,
+       "end": 156,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0177,
+       "restated": 0.8648,
+       "elaborated": 0.09,
+       "different": 0.0275
+      },
+      "confidence": 0.9725,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/04-advanced.md#23",
+       "quote": "They don't represent any database table, instead, they dynamically resolve to an SQL query, allowing you to map any kind of results onto an entity.",
+       "start": 238,
+       "end": 385,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/virtual-entities.md#0",
+       "quote": "Instead, they dynamically resolve to an SQL query (or an aggregation in MongoDB), allowing to map any kind of results onto an entity.",
+       "start": 157,
+       "end": 290,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0135,
+       "restated": 0.9674,
+       "elaborated": 0.0131,
+       "different": 0.0059
+      },
+      "confidence": 0.9941,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/04-advanced.md#23",
+       "quote": "Virtual entities are meant for read purposes, they don't have a primary key and therefore cannot be tracked for changes.",
+       "start": 396,
+       "end": 516,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/virtual-entities.md#0",
+       "quote": "Such entities are meant for read purposes, they don't have a primary key and therefore cannot be tracked for changes.\n\n> If you need actual database views that are created and managed by the schema generator, see [View Entities](./view-entities.md) instead.",
+       "start": 291,
+       "end": 548,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 84,
+   "passages": 3,
+   "counterparts_ms": 92
+  },
+  "timing": {
+   "read_ms": 211,
+   "total_ms": 215
+  }
+ }
+}

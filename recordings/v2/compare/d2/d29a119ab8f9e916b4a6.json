@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d2/d29a119ab8f9e916b4a6",
+ "request_hash": "d29a119ab8f9e916b4a680d70178b6f1873f1d3a1b93cd0b7f1c561905489b1d",
+ "recorded_at": "2026-11-06T14:13:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 995,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "139.938845",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=287"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "jest:docs/ExpectAPI.md#18",
+    "text": "### `.toHaveProperty(keyPath, value?)`\n\nUse `.toHaveProperty` to check if property at provided reference `keyPath` exists for an object. For checking deeply nested properties in an object you may use [dot notation](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Operators/Property_accessors) or an array containing the keyPath for deep references.\n\nYou can provide an optional `value` argument to compare the received property value (recursively for all properties of object instances, also known as deep equality, like the `toEqual` matcher).\n\nThe following example contains a `houseForSale` object with nested properties. We are using `toHaveProperty` to check for the existence and values of various properties in the object.\n\n```js\n// Object containing house features to be tested\nconst houseForSale = {\n  bath: true,\n  bedrooms: 4,\n  kitchen: {\n    amenities: ['oven', 'stove', 'washer'],\n    area: 20,\n    wallColor: 'white',\n    'nice.oven': true,\n  },\n  livingroom: {\n    amenities: [\n      {\n        couch: [\n          ['large', {dimensions: [20, 20]}],\n          ['small', {dimensions: [10, 10]}],\n        ],\n      },\n    ],\n  },\n  'ceiling.height': 2,\n};\n\ntest('this house has my desired features', () => {\n  // Example Referencing\n  expect(houseForSale).toHaveProperty('bath');\n  expect(houseForSale).toHaveProperty('bedrooms', 4);\n\n  expect(houseForSale).not.toHaveProperty('pool');\n\n  // Deep referencing using dot notation\n  expect(houseForSale).toHaveProperty('kitchen.area', 20);\n  expect(houseForSale).toHaveProperty('kitchen.amenities', [\n    'oven',\n    'stove',\n    'washer',\n  ]);\n\n  expect(houseForSale).not.toHaveProperty('kitchen.open');\n\n  // Deep referencing using an array containing the keyPath\n  expect(houseForSale).toHaveProperty(['kitchen', 'area'], 20);\n  expect(houseForSale).toHaveProperty(\n    ['kitchen', 'amenities'],\n    ['oven', 'stove', 'washer'],\n  );\n  expect(houseForSale).toHaveProperty(['kitchen', 'amenities', 0], 'oven');\n  expect(houseForSale).toHaveProperty(\n    'livingroom.amenities[0].couch[0][1].dimensions[0]',\n    20,\n  );\n  expect(houseForSale).toHaveProperty(['kitchen', 'nice.oven']);\n  expect(houseForSale).not.toHaveProperty(['kitchen', 'open']);"
+   },
+   {
+    "id": "jest:docs/ExpectAPI.md#34",
+    "text": "### `.toEqual(value)`\n\nUse `.toEqual` to compare recursively all properties of object instances (also known as \"deep\" equality). It calls `Object.is` to compare primitive values, which is even better for testing than `===` strict equality operator.\n\nFor example, `.toEqual` and `.toBe` behave differently in this test suite, so all the tests pass:\n\n```js\nconst can1 = {\n  flavor: 'grapefruit',\n  ounces: 12,\n};\nconst can2 = {\n  flavor: 'grapefruit',\n  ounces: 12,\n};\n\ndescribe('the La Croix cans on my desk', () => {\n  test('have all the same properties', () => {\n    expect(can1).toEqual(can2);\n  });\n  test('are not the exact same can', () => {\n    expect(can1).not.toBe(can2);\n  });\n});\n```\n\n:::tip\n\n`toEqual` ignores object keys with `undefined` properties, `undefined` array items, array sparseness, or object type mismatch. To take these into account use [`.toStrictEqual`](#tostrictequalvalue) instead.\n\n:::\n\n:::info\n\n`.toEqual` won't perform a _deep equality_ check for two errors. Only the `message` property of an Error is considered for equality. It is recommended to use the `.toThrow` matcher for testing against errors.\n\n:::\n\nIf differences between properties do not help you to understand why a test fails, especially if the report is large, then you might move the comparison into the `expect` function. For example, use `equals` method of `Buffer` class to assert whether or not buffers contain the same content:\n\n- rewrite `expect(received).toEqual(expected)` as `expect(received.equals(expected)).toBe(true)`\n- rewrite `expect(received).not.toEqual(expected)` as `expect(received.equals(expected)).toBe(false)`"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "jest:docs/ExpectAPI.md#18",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "jest:docs/ExpectAPI.md#34",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jest:docs/ExpectAPI.md#18",
+    "b": "jest:docs/ExpectAPI.md#34",
+    "relation": "overlapping",
+    "related": 0.7591,
+    "probabilities": {
+     "same": 0.0168,
+     "overlapping": 0.7279,
+     "conflicting": 0.0145,
+     "unrelated": 0.2409
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 55,
+   "passage_reads": 1,
+   "passages_ms": 97,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 151,
+   "total_ms": 155
+  }
+ }
+}

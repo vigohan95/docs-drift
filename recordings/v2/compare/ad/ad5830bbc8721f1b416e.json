@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ad/ad5830bbc8721f1b416e",
+ "request_hash": "ad5830bbc8721f1b416e2d3a9943ef5bfbccb1f59029d06117d7bd6a586c8b74",
+ "recorded_at": "2026-11-06T14:13:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 976,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.870848",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=288"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/migration.md#12",
+    "text": "### Consistent CommonJS Interop\n\nThe `default` import from a CommonJS (CJS) module is now handled in a consistent way.\n\nIf it matches one of the following conditions, the `default` import is the `module.exports` value of the importee CJS module. Otherwise, the `default` import is the `module.exports.default` value of the importee CJS module:\n\n- The importer is `.mjs` or `.mts`.\n- The closest `package.json` for the importer has a `type` field set to `module`.\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n\n::: details The previous behavior\n\nIn development, if it matches one of the following conditions, the `default` import is the `module.exports` value of the importee CJS module. Otherwise, the `default` import is the `module.exports.default` value of the importee CJS module:\n\n- _The importer is included in the dependency optimization_ and `.mjs` or `.mts`.\n- _The importer is included in the dependency optimization_ and the closest `package.json` for the importer has a `type` field set to `module`.\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n\nIn build, the conditions were:\n\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n- _`default` property of `module.exports` does not exist_.\n\n(assuming [`build.commonjsOptions.defaultIsModuleExports`](https://github.com/rollup/plugins/tree/master/packages/commonjs#defaultismoduleexports) is not changed from the default `'auto'`)\n\n:::\n\nSee Rolldown's docs about this problem for more details: [Ambiguous `default` import from CJS modules - Bundling CJS | Rolldown](https://rolldown.rs/in-depth/bundling-cjs#ambiguous-default-import-from-cjs-modules).\n\nThis change may break some existing code importing CJS modules. You can use the deprecated `legacy.inconsistentCjsInterop: true` option to temporarily restore the previous behavior. If you find a package that is affected by this change, please report it to the package author or send them a pull request. Make sure to link to the Rolldown documentation above so that the author can understand the context."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#14",
+    "text": "### Require Calls For Externalized Modules\n\n`require` calls for externalized modules are now preserved as `require` calls and not converted to `import` statements. This is to preserve the semantics of `require` calls. If you want to convert them to `import` statements, you can use [Rolldown's built-in `esmExternalRequirePlugin`](https://rolldown.rs/builtin-plugins/esm-external-require), which is re-exported from `vite`.\n\n```js\nimport { defineConfig, esmExternalRequirePlugin } from 'vite'\n\nexport default defineConfig({\n  // ...\n  plugins: [\n    esmExternalRequirePlugin({\n      external: ['react', 'vue', /^node:/],\n    }),\n  ],\n})\n```\n\nSee Rolldown's docs for more details: [`require` external modules - Bundling CJS | Rolldown](https://rolldown.rs/in-depth/bundling-cjs#require-external-modules)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/migration.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/migration.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/migration.md#12",
+    "b": "vite:docs/guide/migration.md#14",
+    "relation": "unrelated",
+    "related": 0.0042,
+    "probabilities": {
+     "same": 0.0015,
+     "overlapping": 0.0013,
+     "conflicting": 0.0013,
+     "unrelated": 0.9958
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/78/78b2888f9d3f4d53c26d",
+ "request_hash": "78b2888f9d3f4d53c26d47778676c5fa3d6e4233908e8bdbb90c3085c1896a6e",
+ "recorded_at": "2026-11-06T14:15:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 976,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.086848",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=282"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-generator.md#0",
+    "text": "---\ntitle: Entity Generator\n---\n\nTo generate entities from existing database schema, you can use the `EntityGenerator` helper. It lives in its own package called `@mikro-orm/entity-generator`:\n\n```bash npm2yarn\nnpm install @mikro-orm/entity-generator\n```\n\n> The version needs to be aligned with the `@mikro-orm/core` package and the database driver package.\n\nTo use it, you need to register the `EntityGenerator` extension in your ORM config:\n\n```ts\nimport { defineConfig } from '@mikro-orm/postgresql';\nimport { EntityGenerator } from '@mikro-orm/entity-generator';\n\nexport default defineConfig({\n  dbName: 'test',\n  extensions: [EntityGenerator],\n});\n```\n\nThen you can use it either via CLI:\n\n> To work with the CLI, first install `@mikro-orm/cli` package locally. The version needs to be aligned with the `@mikro-orm/core` package.\n\n```sh\nnpx mikro-orm generate-entities --dump  # Dumps all generated entities\nnpx mikro-orm generate-entities --save --path=./my-entities  # Saves entities into given directory\n```\n\nOr you can create simple script where you initialize MikroORM like this:\n\n```ts title=\"./generate-entities.ts\"\nimport { MikroORM } from '@mikro-orm/core';\nimport { EntityGenerator } from '@mikro-orm/entity-generator';\n\n(async () => {\n  const orm = await MikroORM.init({\n    discovery: {\n      // we need to disable validation for no entities\n      warnWhenNoEntities: false,\n    },\n    extensions: [EntityGenerator],\n    dbName: 'your-db-name',\n    // ...\n  });\n  const dump = await orm.entityGenerator.generate({\n    save: true,\n    path: process.cwd() + '/my-entities',\n  });\n  console.log(dump);\n  await orm.close(true);\n})();\n```\n\nThen run this script via `tsx` (or compile it to plain JS and use `node`):\n\n```sh\n$ tsx generate-entities\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-generator.md#0",
+    "text": "---\ntitle: Schema Generator\n---\n\n> SchemaGenerator can do harm to your database. It will drop or alter tables, indexes, sequences and such. Please use this tool with caution in development and not on a production server. It is meant for helping you develop your Database Schema, but NOT with migrating schema from A to B in production. A safe approach would be generating the SQL on development server and saving it into SQL Migration files that are executed manually on the production server.\n\n> SchemaGenerator assumes your project uses the given database on its own. Update and Drop commands will mess with other tables if they are not related to the current project that is using MikroORM. Please be careful!\n\nTo generate schema from your entity metadata, you can use `SchemaGenerator` helper.\n\nYou can use it via CLI:\n\n> To work with the CLI, first install `@mikro-orm/cli` package locally. The version needs to be aligned with the `@mikro-orm/core` package.\n\n```sh\nnpx mikro-orm schema:create --dump   # Dumps create schema SQL\nnpx mikro-orm schema:update --dump   # Dumps update schema SQL\nnpx mikro-orm schema:drop --dump     # Dumps drop schema SQL\n```\n\n> You can also use `--run` flag to fire all queries, but be careful as it might break your database. Be sure to always check the generated SQL first before executing. Do not use `--run` flag in production!"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-generator.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-generator.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-generator.md#0",
+    "b": "mikro-orm:docs/docs/schema-generator.md#0",
+    "relation": "unrelated",
+    "related": 0.1421,
+    "probabilities": {
+     "same": 0.0201,
+     "overlapping": 0.1013,
+     "conflicting": 0.0207,
+     "unrelated": 0.8579
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 77
+  },
+  "timing": {
+   "read_ms": 76,
+   "total_ms": 79
+  }
+ }
+}

@@ -1,0 +1,280 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/e1/e14181e82db2eb7af589",
+ "request_hash": "e14181e82db2eb7af58953486ab905d540ef421d980e6728a0ccf1903c0fda79",
+ "recorded_at": "2026-11-06T14:22:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1826,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.614433",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=163,cfOrigin;dur=0,cfWorker;dur=286"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) Returns a new [test specification](/api/advanced/test-specification) that can be used to filter or run this specific test case. (2) Returns a new [test specification](/api/advanced/test-specification) that can be used to filter or run this specific test suite.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "vitest:docs/api/advanced/test-module.md#9",
+    "title": "docs/api/advanced/test-module.md > TestModule > toTestSpecification <Version>4.1.0</Version> {#totestspecification}",
+    "text": "## toTestSpecification <Version>4.1.0</Version> {#totestspecification}\n\n```ts\nfunction toTestSpecification(testCases?: TestCase[]): TestSpecification\n```\n\nReturns a new [test specification](/api/advanced/test-specification) that can be used to filter or run this specific test module.\n\nIt accepts an optional array of test cases that should be filtered."
+   },
+   {
+    "id": "vitest:docs/guide/test-tags.md#8",
+    "title": "docs/guide/test-tags.md > Test Tags <Version>4.1.0</Version> {#test-tags} > Filtering Tests by Tag",
+    "text": "## Filtering Tests by Tag\n\nTo run only tests with specific tags, use the [`--tags-filter`](/guide/cli#tagsfilter) CLI option:\n\n```shell\nvitest --tags-filter=frontend\nvitest --tags-filter=\"frontend and backend\"\n```\n\nIf you are running Vitest UI, you can start a filter with a `tag:` prefix to filter out tests by tags using the same tags expression syntax:\n\n<img alt=\"The tags filter in Vitest UI\" img-light src=\"/ui/light-ui-tags.png\">\n<img alt=\"The tags filter in Vitest UI\" img-dark src=\"/ui/dark-ui-tags.png\">\n\nIf you are using a programmatic API, you can pass down a `tagsFilter` option to [`startVitest`](/guide/advanced/#startvitest) or [`createVitest`](/guide/advanced/#createvitest):\n\n```ts\nimport { startVitest } from 'vitest/node'\n\nawait startVitest([], {\n  tagsFilter: ['frontend and backend'],\n})\n```\n\nOr you can create a [test specification](/api/advanced/test-specification) with your custom filters:\n\n```ts\nconst specification = vitest.getRootProject().createSpecification(\n  '/path-to-file.js',\n  {\n    testTagsFilter: ['frontend and backend'],\n  },\n)\n```"
+   },
+   {
+    "id": "vitest:docs/api/advanced/test-project.md#12",
+    "title": "docs/api/advanced/test-project.md > TestProject <Version>3.0.0</Version> {#testproject} > createSpecification",
+    "text": "## createSpecification\n\n```ts\nfunction createSpecification(\n  moduleId: string,\n  locations?: number[],\n): TestSpecification\n```\n\nCreate a [test specification](/api/advanced/test-specification) that can be used in [`vitest.runTestSpecifications`](/api/advanced/vitest#runtestspecifications). Specification scopes the test file to a specific `project` and test `locations` (optional). Test [locations](/api/advanced/test-case#location) are code lines where the test is defined in the source code. If locations are provided, Vitest will only run tests defined on those lines. Note that if [`testNamePattern`](/config/testnamepattern) is defined, then it will also be applied.\n\n```ts\nimport { createVitest } from 'vitest/node'\nimport { resolve } from 'node:path/posix'\n\nconst vitest = await createVitest('test')\nconst project = vitest.projects[0]\nconst specification = project.createSpecification(\n  resolve('./example.test.ts'),\n  [20, 40], // optional test lines\n)\nawait vitest.runTestSpecifications([specification])\n```\n\n::: warning\n`createSpecification` expects resolved [module ID](/api/advanced/test-specification#moduleid). It doesn't auto-resolve the file or check that it exists on the file system.\n\nAlso note that `project.createSpecification` always returns a new instance.\n:::"
+   },
+   {
+    "id": "vitest:docs/guide/learn/testing-in-practice.md#17",
+    "title": "docs/guide/learn/testing-in-practice.md > Testing in Practice > Organizing Test Files > Naming Tests",
+    "text": "### Naming Tests\n\nTest names matter more than you might expect. When a test fails in CI, the name is often the first thing someone reads. Names like \"works correctly\" or \"handles edge case\" don't tell you what broke.\n\nPrefer names that describe the specific behavior: \"returns 0 for an empty cart\", \"throws if the email format is invalid\", \"preserves existing items when adding a new one\". The test output should read like a specification of what the module does."
+   },
+   {
+    "id": "vitest:docs/api/advanced/test-collection.md#2",
+    "title": "docs/api/advanced/test-collection.md > TestCollection > at",
+    "text": "## at\n\n```ts\nfunction at(index: number): TestCase | TestSuite | undefined\n```\n\nReturns the test or suite at a specific index. This method accepts negative indexes."
+   },
+   {
+    "id": "vitest:docs/api/advanced/test-specification.md#4",
+    "title": "docs/api/advanced/test-specification.md > TestSpecification > testModule",
+    "text": "## testModule\n\nInstance of [`TestModule`](/api/advanced/test-module) associated with the specification. This is `undefined` until Vitest queues the module or parses it, for example, with [`experimental.preParse`](/config/experimental#experimental-preparse) or [`parseSpecifications`](/api/advanced/vitest#parsespecifications).\n\nVitest keeps the module after the test run finishes. If the specification runs again, this returns the module of the previous run until the module is queued again."
+   },
+   {
+    "id": "vitest:docs/api/advanced/vitest.md#6",
+    "title": "docs/api/advanced/vitest.md > Vitest > cache > cache.getTestSpecificationResult <Version type=\"experimental\">5.0.4</Version> {#cache-gettestspecificationresult}",
+    "text": "### cache.getTestSpecificationResult <Version type=\"experimental\">5.0.4</Version> {#cache-gettestspecificationresult}\n\nReturns the result of the test file from the previous test runs, or `undefined` if Vitest has no result for it.\n\n```ts\nfunction getTestSpecificationResult(\n  specification: TestSpecification\n): CachedTestFileResult | undefined\n\ninterface CachedTestFileResult {\n  /**\n   * The file has a known failure.\n   * A complete run of the file clears it, or a run in which every known failed test passes.\n   */\n  failed: boolean\n  /**\n   * Duration of the last complete run in milliseconds.\n   */\n  duration: number\n  /**\n   * Unix timestamp in milliseconds of the start of the last complete run.\n   * It is not set if the file never ran completely.\n   */\n  lastRun?: number\n  /**\n   * Full names of the tests that failed in the last run of the file.\n   * `--last-failed` runs only these tests.\n   * It is not set if the failure happened outside of tests, for example in a hook or during collection.\n   */\n  failedTests?: string[]\n}\n```\n\nA run is not complete if it was cancelled or if it executed only a part of the file, for example, because of a test name pattern, a line filter or `.only`.\n\n::: warning\n`vitest.cache.getFileTestResults` and `vitest.cache.getFileStats` are deprecated and will be removed in the next major version. Use `getTestSpecificationResult` instead of `getFileTestResults`. Vitest does not cache file sizes anymore; read the size from the file system if your sequencer needs it.\n:::"
+   },
+   {
+    "id": "vitest:docs/api/advanced/vitest.md#14",
+    "title": "docs/api/advanced/vitest.md > Vitest > getRelevantTestSpecifications",
+    "text": "## getRelevantTestSpecifications\n\n```ts\nfunction getRelevantTestSpecifications(\n  filters?: string[]\n): Promise<TestSpecification[]>\n```\n\nThis method resolves every test specification by calling [`project.globTestFiles`](/api/advanced/test-project#globtestfiles). It accepts string filters to match the test files - these are the same filters that [CLI supports](/guide/filtering#cli). If `--changed` flag was specified, the list will be filtered to include only files that changed. `getRelevantTestSpecifications` doesn't run any test files.\n\n::: warning\nThis method can be slow because it needs to filter `--changed` flags. Do not use it if you just need a list of test files.\n\n- If you need to get the list of specifications for known test files, use [`getModuleSpecifications`](#getmodulespecifications) instead.\n- If you need to get the list of all possible test files, use [`globTestSpecifications`](#globtestspecifications).\n\n:::"
+   },
+   {
+    "id": "vitest:docs/guide/learn/async.md#7",
+    "title": "docs/guide/learn/async.md > Testing Asynchronous Code > Unhandled Rejections",
+    "text": "## Unhandled Rejections\n\nBy default, Vitest reports unhandled promise rejections as errors in the test run. If a promise rejects somewhere in your code and nothing catches it, the test run will fail, even if all your assertions passed. This is intentional: unhandled rejections usually indicate real bugs, like a forgotten `await` or a fire-and-forget promise that silently fails.\n\n```js\ntest('this causes an unhandled rejection error', () => {\n  // This promise rejects but is never awaited or caught\n  Promise.reject(new Error('oops'))\n})\n```\n\nTo fix this, make sure you `await` all promises or catch expected rejections:\n\n```js\ntest('handle the rejection', async () => {\n  // Either await the promise\n  await expect(Promise.reject(new Error('oops'))).rejects.toThrow('oops')\n\n  // Or catch it explicitly if you don't need to assert on it\n  Promise.reject(new Error('expected')).catch(() => {})\n})\n```\n\nIf your code intentionally produces unhandled rejections, you can filter specific errors with [`onUnhandledError`](/config/onunhandlederror) or disable the check entirely with [`dangerouslyIgnoreUnhandledErrors`](/config/dangerouslyignoreunhandlederrors)."
+   },
+   {
+    "id": "vitest:docs/api/advanced/vitest.md#48",
+    "title": "docs/api/advanced/vitest.md > Vitest > experimental_parseSpecification <Version type=\"experimental\">4.0.0</Version> <Experimental /> {#parsespecification}",
+    "text": "## experimental_parseSpecification <Version type=\"experimental\">4.0.0</Version> <Experimental /> {#parsespecification}\n\n```ts\nfunction experimental_parseSpecification(\n  specification: TestSpecification\n): Promise<TestModule>\n```\n\nThis function will collect all tests inside the file without running it. It uses rollup's `parseAst` function on top of Vite's `ssrTransform` to statically analyse the file and collect all tests that it can. A call is collected only if its first argument is a string, a template string, a number, a variable, a property like `MyClass.name`, or a condition (`a ? b : c`, `a ?? b`, `a || b`) of those, so `test(getName(), fn)` is not collected. A name that is not a literal, such as `test(isWindows ? 'a' : 'b', fn)`, is collected with its source code as the name. The test keeps its location, but a test name pattern cannot match it.\n\n::: warning\nIf Vitest could not analyse the name of the test, it will inject a `dynamic: true` property to the test or a suite. The `id` will also have a postfix with `-dynamic` to not break tests that were collected properly.\n\nVitest always injects this property in tests with `for` or `each` modifier or tests with a dynamic name (like, `hello ${property}` or `'hello' + ${property}`). Vitest will still assign a name to the test, but it cannot be used to filter tests.\n\nThere is nothing Vitest can do to make it possible to filter dynamic tests, but you can turn a test with `for` or `each` modifier into a name pattern with `escapeTestName` function:\n\n```ts\nimport { escapeTestName } from 'vitest/node'\n\n// turns into /hello, .+?/\nconst escapedPattern = new RegExp(escapeTestName('hello, %s', true))\n```\n\n:::\n\n::: warning\nVitest will only collect tests defined in the file. It will never follow imports to other files.\n\nVitest collects all `it`, `test`, `suite` and `describe` definitions even if they were not imported from the `vitest` entry point.\n:::"
+   },
+   {
+    "id": "vitest:docs/api/advanced/reporters.md#3",
+    "title": "docs/api/advanced/reporters.md > Reporters > onTestRunStart",
+    "text": "## onTestRunStart\n\n```ts\nfunction onTestRunStart(\n  specifications: TestSpecification[]\n): Awaitable<void>\n```\n\nThis method is called when a new test run has started. It receives an array of [test specifications](/api/advanced/test-specification) scheduled to run. This array is readonly and available only for information purposes.\n\nIf Vitest didn't find any test files to run, this event will be invoked with an empty array, and then [`onTestRunEnd`](#ontestrunend) will be called immediately after.\n\n::: details Example\n\n```ts\nimport type { Reporter, TestSpecification } from 'vitest/node'\n\nclass MyReporter implements Reporter {\n  onTestRunStart(specifications: TestSpecification[]) {\n    console.log(specifications.length, 'test files will run')\n  }\n}\n\nexport default new MyReporter()\n```\n\n:::"
+   },
+   {
+    "id": "vitest:docs/guide/learn/writing-tests.md#7",
+    "title": "docs/guide/learn/writing-tests.md > Writing Tests > Skipping and Focusing Tests",
+    "text": "## Skipping and Focusing Tests\n\nWhile developing, you'll often want to run only a subset of tests. Vitest provides modifiers for this:\n\n[`.only`](/api/test#only) tells Vitest to run only this test (or suite) and skip everything else in the file. This is useful when you're working on a specific test and don't want to wait for the entire suite to finish:\n\n```js\ntest.only('focus on this test', () => {\n  // only this test runs in the file\n})\n```\n\n[`.skip`](/api/test#skip) does the opposite. It skips a test without removing it, which is handy when a test is temporarily broken or you want to ignore it while you work on something else:\n\n```js\ntest.skip('not ready yet', () => {\n  // this test is skipped\n})\n```\n\n[`.todo`](/api/test#todo) lets you mark a placeholder for a test you haven't written yet. Vitest will list it in the output so you won't forget about it:\n\n```js\ntest.todo('implement validation later')\n```\n\nThese modifiers are great for quick, local changes while developing. For more permanent ways to filter tests (by filename, line number, or tags), see the [Test Filtering](/guide/filtering) guide."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vitest:docs/api/advanced/test-module.md#9",
+    "action": "use",
+    "relevance_score": 0.9586,
+    "document_score": 0.9744,
+    "levels": {
+     "answers": 0.9586,
+     "elsewhere": 0.0158,
+     "different_case": 0.0174,
+     "unrelated": 0.0082
+    }
+   },
+   {
+    "index": 2,
+    "id": "vitest:docs/api/advanced/test-project.md#12",
+    "action": "use",
+    "relevance_score": 0.7977,
+    "document_score": 0.8475,
+    "levels": {
+     "answers": 0.7977,
+     "elsewhere": 0.0499,
+     "different_case": 0.0703,
+     "unrelated": 0.0822
+    }
+   },
+   {
+    "index": 7,
+    "id": "vitest:docs/api/advanced/vitest.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0251,
+    "document_score": 0.1088,
+    "levels": {
+     "answers": 0.0251,
+     "elsewhere": 0.0836,
+     "different_case": 0.0523,
+     "unrelated": 0.8389
+    }
+   },
+   {
+    "index": 9,
+    "id": "vitest:docs/api/advanced/vitest.md#48",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0213,
+    "document_score": 0.0732,
+    "levels": {
+     "answers": 0.0213,
+     "elsewhere": 0.0519,
+     "different_case": 0.0458,
+     "unrelated": 0.881
+    }
+   },
+   {
+    "index": 6,
+    "id": "vitest:docs/api/advanced/vitest.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0112,
+    "document_score": 0.0328,
+    "levels": {
+     "answers": 0.0112,
+     "elsewhere": 0.0216,
+     "different_case": 0.0367,
+     "unrelated": 0.9305
+    }
+   },
+   {
+    "index": 1,
+    "id": "vitest:docs/guide/test-tags.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0088,
+    "document_score": 0.1023,
+    "levels": {
+     "answers": 0.0088,
+     "elsewhere": 0.0935,
+     "different_case": 0.0585,
+     "unrelated": 0.8391
+    }
+   },
+   {
+    "index": 4,
+    "id": "vitest:docs/api/advanced/test-collection.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0066,
+    "document_score": 0.02,
+    "levels": {
+     "answers": 0.0066,
+     "elsewhere": 0.0134,
+     "different_case": 0.0217,
+     "unrelated": 0.9584
+    }
+   },
+   {
+    "index": 10,
+    "id": "vitest:docs/api/advanced/reporters.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.0203,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.0154,
+     "different_case": 0.0257,
+     "unrelated": 0.954
+    }
+   },
+   {
+    "index": 11,
+    "id": "vitest:docs/guide/learn/writing-tests.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0039,
+    "document_score": 0.0354,
+    "levels": {
+     "answers": 0.0039,
+     "elsewhere": 0.0314,
+     "different_case": 0.0345,
+     "unrelated": 0.9301
+    }
+   },
+   {
+    "index": 5,
+    "id": "vitest:docs/api/advanced/test-specification.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0037,
+    "document_score": 0.0149,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.0112,
+     "different_case": 0.0171,
+     "unrelated": 0.968
+    }
+   },
+   {
+    "index": 3,
+    "id": "vitest:docs/guide/learn/testing-in-practice.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.0052,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0028,
+     "different_case": 0.0038,
+     "unrelated": 0.9911
+    }
+   },
+   {
+    "index": 8,
+    "id": "vitest:docs/guide/learn/async.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0034,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0015,
+     "different_case": 0.004,
+     "unrelated": 0.9926
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4668
+  },
+  "timing": {
+   "total_ms": 110,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5712,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 83,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

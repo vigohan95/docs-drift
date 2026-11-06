@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/2c/2c582287f3bd8fbe9344",
+ "request_hash": "2c582287f3bd8fbe934474e540604756358ca200db6b62f6cc242fb66d9c84b7",
+ "recorded_at": "2026-11-06T14:18:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1073,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "30.052832",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=169"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "text": "## Defining Infinite Query Endpoints\n\nInfinite query endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.infiniteQuery()` method. They are an extension of standard query endpoints - you can specify [the same options as standard queries](./queries.mdx#defining-query-endpoints) (providing either `query` or `queryFn`, customizing with `transformResponse`, lifecycles with `onCacheEntryAdded` and `onQueryStarted`, defining tags, etc). However, they also require an additional `infiniteQueryOptions` field to specify the infinite query behavior.\n\nWith TypeScript, you must supply 3 generic arguments: `build.infiniteQuery<ResultType, QueryArg, PageParam>`, where `ResultType` is the contents of a single page, `QueryArg` is the type passed in as the cache key, and `PageParam` is the value used to request a specific page. If there is no argument, use `void` for the arg type instead."
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+    "text": "## Defining Mutation Endpoints\n\nMutation endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.mutation()` method.\n\nMutation endpoints should define either a `query` callback that constructs the URL (including any URL query params), or [a `queryFn` callback](./customizing-queries.mdx#customizing-queries-with-queryfn) that may do arbitrary async logic and return a result. The `query` callback may also return an object containing the URL, the HTTP method to use and a request body.\n\nIf the `query` callback needs additional data to generate the URL, it should be written to take a single argument. If you need to pass in multiple parameters, pass them formatted as a single \"options object\".\n\nMutation endpoints may also modify the response contents before the result is cached, define \"tags\" to identify cache invalidation, and provide cache entry lifecycle callbacks to run additional logic as cache entries are added and removed.\n\nWhen used with TypeScript, you should supply generics for the return type and the expected query argument: `build.mutation<ReturnType, ArgType>`. If there is no argument, use `void` for the arg type instead.\n\n```ts title=\"Example of all mutation endpoint options\"\n// file: types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: api.ts\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'\nimport type { Post } from './types'\n\nconst api = createApi({\n  baseQuery: fetchBaseQuery({\n    baseUrl: '/',\n  }),\n  tagTypes: ['Post'],\n  endpoints: (build) => ({\n    // The mutation accepts a `Partial<Post>` arg, and returns a `Post`\n    updatePost: build.mutation<Post, Partial<Post> & Pick<Post, 'id'>>({\n      // highlight-start\n      // note: an optional `queryFn` may be used in place of `query`\n      query: ({ id, ...patch }) => ({\n        url: `post/${id}`,\n        method: 'PATCH',\n        body: patch,\n      }),\n      // Pick out data and prevent nested properties in a hook or selector\n      transformResponse: (response: { data: Post }, meta, arg) => response.data,\n      // Pick out errors and prevent nested properties in a hook or selector\n      transformErrorResponse: (\n        response: { status: string | number },\n        meta,\n        arg,\n      ) => response.status,\n      invalidatesTags: ['Post'],\n      // onQueryStarted is useful for optimistic updates\n      // The 2nd parameter is the destructured `MutationLifecycleApi`\n      async onQueryStarted(\n        arg,\n        { dispatch, getState, queryFulfilled, requestId, extra, getCacheEntry },\n      ) {},\n      // The 2nd parameter is the destructured `MutationCacheLifecycleApi`\n      async onCacheEntryAdded(\n        arg,\n        {\n          dispatch,\n          getState,\n          extra,\n          requestId,\n          cacheEntryRemoved,\n          cacheDataLoaded,\n          getCacheEntry,\n        },\n      ) {},\n      // highlight-end\n    }),\n  }),\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "b": "redux-toolkit:docs/rtk-query/usage/mutations.mdx#2",
+    "relation": "unrelated",
+    "related": 0.0208,
+    "probabilities": {
+     "same": 0.0072,
+     "overlapping": 0.0073,
+     "conflicting": 0.0063,
+     "unrelated": 0.9792
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 38
+  },
+  "timing": {
+   "read_ms": 37,
+   "total_ms": 41
+  }
+ }
+}

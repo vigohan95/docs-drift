@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4a/4a602cfffd1d689a1f6a",
+ "request_hash": "4a602cfffd1d689a1f6a29a78b62f306d6c813b0c3a48b8765439d3cc74bd500",
+ "recorded_at": "2026-11-06T14:14:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 985,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.240417",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=281"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/tutorials/getters-setters.md#1",
+    "text": "## Getters\n\nSuppose you have a `User` collection and you want to obfuscate user emails to protect your users' privacy. Below is a basic `userSchema` that obfuscates the user's email address.\n\n```javascript acquit:getters/setters.*getters.*basic example\nconst userSchema = new Schema({\n  email: {\n    type: String,\n    get: obfuscate\n  }\n});\n\n// Mongoose passes the raw value in MongoDB `email` to the getter\nfunction obfuscate(email) {\n  const separatorIndex = email.indexOf('@');\n  if (separatorIndex < 3) {\n    // 'ab@gmail.com' -> '**@gmail.com'\n    return email.slice(0, separatorIndex).replace(/./g, '*') +\n      email.slice(separatorIndex);\n  }\n  // 'test42@gmail.com' -> 'te****@gmail.com'\n  return email.slice(0, 2) +\n    email.slice(2, separatorIndex).replace(/./g, '*') +\n    email.slice(separatorIndex);\n}\n\nconst User = mongoose.model('User', userSchema);\nconst user = new User({ email: 'ab@gmail.com' });\nuser.email; // **@gmail.com\n```\n\nKeep in mind that getters do **not** impact the underlying data stored in\nMongoDB. If you save `user`, the `email` property will be 'ab@gmail.com' in\nthe database.\n\nBy default, Mongoose does **not** execute getters when converting a document to JSON, including [Express' `res.json()` function](http://expressjs.com/en/4x/api.html#res.json).\n\n```javascript\napp.get(function(req, res) {\n  return User.findOne().\n    // The `email` getter will NOT run here\n    then(doc => res.json(doc)).\n    catch(err => res.status(500).json({ message: err.message }));\n});\n```"
+   },
+   {
+    "id": "mongoose:docs/tutorials/getters-setters.md#2",
+    "text": "To run getters when converting a document to JSON, set the [`toJSON.getters` option to `true` in your schema](../guide.html#toJSON) as shown below.\n\n```javascript\nconst userSchema = new Schema({\n  email: {\n    type: String,\n    get: obfuscate\n  }\n}, { toJSON: { getters: true } });\n\n// Or, globally\nmongoose.set('toJSON', { getters: true });\n\n// Or, on a one-off basis\napp.get(function(req, res) {\n  return User.findOne().\n    // The `email` getter will run here\n    then(doc => res.json(doc.toJSON({ getters: true }))).\n    catch(err => res.status(500).json({ message: err.message }));\n});\n```\n\nTo skip getters on a one-off basis, use [`user.get()` with the `getters` option set to `false`](../api/document.html#document_Document-get) as shown below.\n\n```javascript acquit:getters/setters.*getters.*skip\nuser.get('email', null, { getters: false }); // 'ab@gmail.com'\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mongoose:docs/tutorials/getters-setters.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mongoose:docs/tutorials/getters-setters.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mongoose:docs/tutorials/getters-setters.md#1",
+    "b": "mongoose:docs/tutorials/getters-setters.md#2",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0091,
+     "overlapping": 0.9841,
+     "conflicting": 0.0043,
+     "unrelated": 0.0024
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 65,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 97,
+   "total_ms": 101
+  }
+ }
+}

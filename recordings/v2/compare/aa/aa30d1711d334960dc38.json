@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/aa/aa30d1711d334960dc38",
+ "request_hash": "aa30d1711d334960dc38cbfc725766ff61a16be8fd401296ac6369214cf6f5ca",
+ "recorded_at": "2026-11-06T14:21:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1091,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "206.962814",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=347"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vitest:docs/guide/browser/playwright-traces.md#1",
+    "text": "## Trace markers\n\nYou can add explicit named markers to make the trace timeline easier to read:\n\n```ts\nimport { page } from 'vitest/browser'\n\ndocument.body.innerHTML = `\n  <button type=\"button\">Sign in</button>\n`\n\nawait page.getByRole('button', { name: 'Sign in' }).mark('sign in button rendered')\n```\n\nBoth `page.mark(name)` and `locator.mark(name)` are available.\n\nYou can also group multiple operations under one marker with `page.mark(name, callback)`:\n\n```ts\nawait page.mark('sign in flow', async () => {\n  await page.getByRole('textbox', { name: 'Email' }).fill('john@example.com')\n  await page.getByRole('textbox', { name: 'Password' }).fill('secret')\n  await page.getByRole('button', { name: 'Sign in' }).click()\n})\n```\n\nYou can also wrap reusable helpers with [`vi.defineHelper()`](/api/vi#vi-defineHelper) so trace entries point to where the helper is called, not its internals:\n\n```ts\nimport { vi } from 'vitest'\nimport { page } from 'vitest/browser'\n\nconst myRender = vi.defineHelper(async (content: string) => {\n  document.body.innerHTML = content\n  await page.elementLocator(document.body).mark('render helper')\n})\n\ntest('renders content', async () => {\n  await myRender('<button>Hello</button>') // trace points to this line\n})\n```"
+   },
+   {
+    "id": "vitest:docs/guide/browser/trace-view.md#6",
+    "text": "## Custom Trace Entries\n\nYou can insert your own named entries with `page.mark()` and `locator.mark()`:\n\n```ts\nimport { page } from 'vitest/browser'\n\nawait page.mark('content rendered')\n\nawait page.getByRole('button', { name: 'Sign in' }).mark('sign in button')\n```\n\nYou can also pass a callback to `page.mark()` to group steps. The mark entry spans the callback, and the actions inside it are nested under the mark in the step list:\n\n```ts\nawait page.mark('sign in flow', async () => {\n  await page.getByRole('textbox', { name: 'Email' }).fill('john@example.com')\n  await page.getByRole('textbox', { name: 'Password' }).fill('secret')\n  await page.getByRole('button', { name: 'Sign in' }).click()\n})\n```\n\nUse [`vi.defineHelper()`](/api/vi#vi-defineHelper) to make entries from reusable helpers point to the call site rather than the helper's internals:\n\n```ts\nimport { vi } from 'vitest'\nimport { page } from 'vitest/browser'\n\nconst renderContent = vi.defineHelper(async (html: string) => {\n  document.body.innerHTML = html\n  await page.elementLocator(document.body).mark('render')\n})\n\ntest('shows button', async () => {\n  await renderContent('<button>Hello</button>') // trace entry points here\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vitest:docs/guide/browser/playwright-traces.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/guide/browser/trace-view.md#6"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vitest:docs/guide/browser/trace-view.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "vitest:docs/guide/browser/playwright-traces.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vitest:docs/guide/browser/playwright-traces.md#1",
+    "b": "vitest:docs/guide/browser/trace-view.md#6",
+    "relation": "overlapping",
+    "related": 0.9987,
+    "probabilities": {
+     "same": 0.0069,
+     "overlapping": 0.9889,
+     "conflicting": 0.0029,
+     "unrelated": 0.0013
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0041,
+       "restated": 0.9887,
+       "elaborated": 0.0039,
+       "different": 0.0032
+      },
+      "confidence": 0.87,
+      "a": {
+       "document": "vitest:docs/guide/browser/playwright-traces.md#1",
+       "quote": "## Trace markers",
+       "start": 0,
+       "end": 16,
+       "confidence": 0.87
+      },
+      "b": {
+       "document": "vitest:docs/guide/browser/trace-view.md#6",
+       "quote": "## Custom Trace Entries\n\nYou can insert your own named entries with `page.mark()` and `locator.mark()`:\n\n```ts\nimport { page } from 'vitest/browser'\n\nawait page.mark('content rendered')\n\nawait page.getByRole('button', { name: 'Sign in' }).mark('sign in button')\n```\n\nYou can also pass a callback to `page.mark()` to group steps.",
+       "start": 0,
+       "end": 328,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.008,
+       "restated": 0.9691,
+       "elaborated": 0.0145,
+       "different": 0.0084
+      },
+      "confidence": 0.989,
+      "a": {
+       "document": "vitest:docs/guide/browser/playwright-traces.md#1",
+       "quote": "You can also group multiple operations under one marker with `page.mark(name, callback)`:",
+       "start": 367,
+       "end": 456,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vitest:docs/guide/browser/trace-view.md#6",
+       "quote": "The mark entry spans the callback, and the actions inside it are nested under the mark in the step list:\n\n```ts\nawait page.mark('sign in flow', async () => {\n  await page.getByRole('textbox', { name: 'Email' }).fill('john@example.com')\n  await page.getByRole('textbox', { name: 'Password' }).fill('secret')\n  await page.getByRole('button', { name: 'Sign in' }).click()\n})\n```\n\nUse [`vi.defineHelper()`](/api/vi#vi-defineHelper) to make entries from reusable helpers point to the call site rather than the helper's internals:\n\n```ts\nimport { vi } from 'vitest'\nimport { page } from 'vitest/browser'\n\nconst renderContent = vi.defineHelper(async (html: string) => {\n  document.body.innerHTML = html\n  await page.elementLocator(document.body).mark('render')\n})\n\ntest('shows button', async () => {\n  await renderContent('<button>Hello</button>') // trace entry points here\n})\n```",
+       "start": 329,
+       "end": 1203,
+       "confidence": 0.989
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 2,
+   "counterparts_ms": 133
+  },
+  "timing": {
+   "read_ms": 238,
+   "total_ms": 242
+  }
+ }
+}
