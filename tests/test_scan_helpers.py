@@ -69,11 +69,32 @@ def test_side_info_multi_line_quote_range():
 
 
 def test_tiers():
-    assert tier_of({}) == "ungated"
-    assert tier_of({"gate": {"any_contradicted": False}, "swap": {"confirmed": True}}) == "filtered"
-    assert tier_of({"gate": {"any_contradicted": True}, "swap": {"confirmed": False}}) == "likely"
-    assert tier_of({"gate": {"any_contradicted": True}}) == "likely"
-    assert tier_of({"gate": {"any_contradicted": True}, "swap": {"confirmed": True}}) == "confirmed"
+    yes, no = {"any_contradicted": True}, {"any_contradicted": False}
+    assert tier_of({"kind": "value"}) == "unchecked"
+    assert tier_of({"kind": "value", "gate": yes, "swap": {"confirmed": True}}) == "confirmed"
+    assert tier_of({"kind": "rule_or_condition", "gate": yes, "swap": {"confirmed": False}}) == "likely"
+    assert tier_of({"kind": "date_or_version", "gate": no, "swap": {"confirmed": True}}) == "likely"
+    assert tier_of({"kind": "value", "gate": no, "swap": {"confirmed": False}}) == "weak"
+
+
+def test_scope_and_name_differences_are_never_reported():
+    yes = {"any_contradicted": True}
+    for kind in ("scope", "name", "no_conflict", None):
+        assert tier_of({"kind": kind, "gate": yes, "swap": {"confirmed": True}}) == "out_of_scope"
+
+
+def test_two_guides_for_different_versions_are_not_compared():
+    from docsdrift.filters import version_scoped_pair, guide_version
+    assert guide_version("docs/migrating_to_7.md") == "7"
+    assert guide_version("docs/src/use/migrate-to-8.0.0.md") == "8.0.0"
+    assert guide_version("docs/docs/upgrading-v4-to-v5.md") == "4-5"
+    assert guide_version("docs/Reference/Server.md") is None
+    assert guide_version("docs/guide/migration.md") is None          # no version in the name
+    assert version_scoped_pair("docs/migrating_to_6.md", "docs/migrating_to_7.md")
+    assert version_scoped_pair("docs/src/use/migrate-to-8.0.0.md", "docs/src/use/migrating-to-7.0.0.md")
+    assert not version_scoped_pair("docs/migrating_to_7.md", "docs/migrating_to_7.md")
+    assert not version_scoped_pair("docs/Guides/Migration-Guide-V5.md", "docs/Reference/Server.md")
+    assert not version_scoped_pair("docs/Reference/Hooks.md", "docs/Reference/TypeScript.md")
 
 
 def test_compare_payload_is_two_documents_and_keeps_order():

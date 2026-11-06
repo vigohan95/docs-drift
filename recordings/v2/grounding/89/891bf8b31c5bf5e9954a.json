@@ -1,0 +1,76 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/89/891bf8b31c5bf5e9954a",
+ "request_hash": "891bf8b31c5bf5e9954ab2ed108db1ff649244feeea953fef1ca51e7457bb80c",
+ "recorded_at": "2026-11-06T14:29:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 901,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "86.009825",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=204"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_6.md#12",
+    "text": "[File: docs/migrating_to_6.md | Section: Migrating from 5.x to 6.x > Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()` {#simplified-isvalidobjectid-and-separate-isobjectidorhexstring}]\n## Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()` {#simplified-isvalidobjectid-and-separate-isobjectidorhexstring}\n\nIn Mongoose 5, `mongoose.isValidObjectId()` returned `false` for values like numbers, which was inconsistent with the MongoDB driver's `ObjectId.isValid()` function.\nTechnically, any JavaScript number can be converted to a MongoDB ObjectId.\n\nIn Mongoose 6, `mongoose.isValidObjectId()` is just a wrapper for `mongoose.Types.ObjectId.isValid()` for consistency.\n\nMongoose 6.2.5 now includes a `mongoose.isObjectIdOrHexString()` function, which does a better job of capturing the more common use case for `isValidObjectId()`: is the given value an `ObjectId` instance or a 24 character hex string representing an `ObjectId`?\n\n```javascript\n// `isValidObjectId()` returns `true` for some surprising values, because these\n// values are _technically_ ObjectId representations\nmongoose.isValidObjectId(new mongoose.Types.ObjectId()); // true\nmongoose.isValidObjectId('0123456789ab'); // true\nmongoose.isValidObjectId(6); // true\nmongoose.isValidObjectId(new User({ name: 'test' })); // true\n\n// `isObjectIdOrHexString()` instead only returns `true` for ObjectIds and 24\n// character hex strings.\nmongoose.isObjectIdOrHexString(new mongoose.Types.ObjectId()); // true\nmongoose.isObjectIdOrHexString('62261a65d66c6be0a63c051f'); // true\nmongoose.isObjectIdOrHexString('0123456789ab'); // false\nmongoose.isObjectIdOrHexString(6); // false\n```"
+   }
+  ],
+  "answer": "## `mongoose.isValidObjectId()` returns false for numbers In Mongoose 8, you could create a new ObjectId from a number, and `isValidObjectId()` would return `true` for numbers.",
+  "claims": [
+   "## `mongoose.isValidObjectId()` returns false for numbers In Mongoose 8, you could create a new ObjectId from a number, and `isValidObjectId()` would return `true` for numbers."
+  ],
+  "evidence": "all",
+  "instructions": "The statement is taken from file docs/migrating_to_9.md, section \"Migrating from 8.x to 9.x > `mongoose.isValidObjectId()` returns false for numbers\". Statement and source are sections of the documentation of one project at one commit. First decide whether they describe the SAME thing. If they are about different packages, frameworks, classes, hooks, options, functions, file formats, or about different released versions (for example two migration guides for different versions), the statement is NOT STATED, never contradicted. Mark it contradicted only when the source gives an incompatible value, version, limit, name, list or rule for that same thing in the same scope. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0162,
+  "ungrounded": 0.9838,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "mongoose:docs/migrating_to_6.md#12",
+    "share": 1,
+    "share_of_answer": 0.0162,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "## `mongoose.isValidObjectId()` returns false for numbers In Mongoose 8, you could create a new ObjectId from a number, and `isValidObjectId()` would return `true` for numbers.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0162,
+    "contradicted": 0.036,
+    "not_stated": 0.9378,
+    "not_a_claim": 0.01,
+    "verdict": "not_stated",
+    "sources": {
+     "mongoose:docs/migrating_to_6.md#12": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0162
+  },
+  "timing": {
+   "read_ms": 94,
+   "total_ms": 98
+  }
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/e7/e72c332d39825458c08f",
+ "request_hash": "e72c332d39825458c08f6b49af6d38fcc122ee7ad37c797fa34766f9c6f03d26",
+ "recorded_at": "2026-11-06T14:30:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 903,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.754527",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=174"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "text": "[File: docs/guide/api-plugin.md | Section: Plugin API > Vite Specific Hooks > `handleHotUpdate`]\n### `handleHotUpdate`\n\n- **Type:** `(ctx: HmrContext) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [HMR API](./api-hmr)\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Perform custom HMR update handling. The hook receives a context object with the following signature:\n\n  ```ts\n  interface HmrContext {\n    file: string\n    timestamp: number\n    modules: Array<ModuleNode>\n    read: () => string | Promise<string>\n    server: ViteDevServer\n  }\n  ```\n\n  - `modules` is an array of modules that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n  - `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior.\n\n  The hook can choose to:\n  - Filter and narrow down the affected module list so that the HMR is more accurate.\n\n  - Return an empty array and perform a full reload:\n\n    ```js\n    handleHotUpdate({ server, modules, timestamp }) {\n      // Invalidate modules manually\n      const invalidatedModules = new Set()\n      for (const mod of modules) {\n        server.moduleGraph.invalidateModule(\n          mod,\n          invalidatedModules,\n          timestamp,\n          true\n        )\n      }\n      server.ws.send({ type: 'full-reload' })\n      return []\n    }\n    ```"
+   }
+  ],
+  "answer": "## The `hotUpdate` Hook",
+  "claims": [
+   "## The `hotUpdate` Hook"
+  ],
+  "evidence": "all",
+  "instructions": "The statement is taken from file docs/guide/api-environment-plugins.md, section \"Environment API for Plugins > The `hotUpdate` Hook\". Statement and source are sections of the documentation of one project at one commit. First decide whether they describe the SAME thing. If they are about different packages, frameworks, classes, hooks, options, functions, file formats, or about different released versions (for example two migration guides for different versions), the statement is NOT STATED, never contradicted. Mark it contradicted only when the source gives an incompatible value, version, limit, name, list or rule for that same thing in the same scope. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": null,
+  "ungrounded": null,
+  "verdict": "no_claims",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "share": 0,
+    "share_of_answer": 0,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "## The `hotUpdate` Hook",
+    "kind": "acknowledgement",
+    "kinds": {
+     "acknowledgement": 0.5785240382474087,
+     "offer_or_question": 0.05153408536074353,
+     "pointer": 0.043218451895193515,
+     "meta": 0.3267234244966542
+    },
+    "counted": false,
+    "weight": 0,
+    "supported": 0.0872,
+    "contradicted": 0.0228,
+    "not_stated": 0.3777,
+    "not_a_claim": 0.5123,
+    "verdict": "not_a_claim",
+    "sources": {
+     "vite:docs/guide/api-plugin.md#17": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [],
+  "not_claims": [
+   0
+  ],
+  "weakest_claim": null,
+  "timing": {
+   "read_ms": 52,
+   "total_ms": 56
+  }
+ }
+}

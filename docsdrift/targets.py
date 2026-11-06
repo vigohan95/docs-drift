@@ -93,7 +93,39 @@ TARGETS = {
         "excludes": [r"CHANGELOG"],
         "readme": "readme.md",
     },
+    # Validation set: scanned after the v2.1 reporting rule was fixed.
+    "rollup": {
+        "repo": "rollup/rollup",
+        "commit": "82bef03ce41b38810d375f2b302379b97d8e9468",
+        "includes": ["README.md", "docs/**/*.md"],
+        "excludes": [r"CHANGELOG"],
+        "readme": "README.md",
+    },
+    "fiber": {
+        "repo": "gofiber/fiber",
+        "commit": "16cdbd2be862b6fb178fb37318e0141b8134e9d3",
+        "includes": ["README.md", "docs/**/*.md", "docs/**/*.mdx"],
+        "excludes": [r"CHANGELOG"],
+        "readme": "README.md",
+    },
+    "pydantic": {
+        "repo": "pydantic/pydantic",
+        "commit": "9895381aa55eb2a1e74079f0b4fb745d1ea12d12",
+        "includes": ["README.md", "docs/*.md", "docs/concepts/*.md", "docs/api/*.md", "docs/integrations/*.md",
+                     "docs/examples/*.md", "docs/errors/*.md", "docs/internals/*.md"],
+        "excludes": [r"CHANGELOG"],
+        "readme": "README.md",
+    },
+    "svelte": {
+        "repo": "sveltejs/svelte",
+        "commit": "7775f73b7cbe32de3bb566f3515113208887e961",
+        "includes": ["README.md", "documentation/docs/**/*.md", "packages/svelte/README.md"],
+        "excludes": [r"CHANGELOG"],
+        "readme": "README.md",
+    },
 }
+
+VALIDATION = ("rollup", "fiber", "pydantic", "svelte")
 
 
 def load(project: str):

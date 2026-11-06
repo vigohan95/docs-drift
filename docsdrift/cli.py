@@ -48,12 +48,12 @@ def print_report(rep: dict, show_all: bool = False, out=sys.stdout):
       f"{st['findings']} raw conflict findings\n")
     tiers = Counter(f["tier"] for f in rep["findings"])
     w(f"  reported: {tiers.get('confirmed', 0)} confirmed, {tiers.get('likely', 0)} likely; "
-      f"filtered out by the /grounding gate: {tiers.get('filtered', 0)}\n")
+      f"not reported: {tiers.get('weak', 0)} weak, {tiers.get('out_of_scope', 0)} scope/name differences\n")
     w(f"  credits: {st['credits_total']:.0f} at list price ({st['live_credits']:.0f} spent now, "
       f"{st['cache_hits']} answers replayed from recordings)\n")
-    order = {"confirmed": 0, "likely": 1, "ungated": 2, "filtered": 3}
+    order = {"confirmed": 0, "likely": 1, "unchecked": 2, "weak": 3, "out_of_scope": 4}
     for f in sorted(rep["findings"], key=lambda f: (order.get(f["tier"], 9), -(f.get("confidence") or 0))):
-        if f["tier"] == "filtered" and not show_all:
+        if f["tier"] in ("weak", "out_of_scope") and not show_all:
             continue
         w(f"\n  [{f['tier'].upper()}] {f['kind']}  (id {f['id']})\n")
         for side in ("a", "b"):
@@ -103,7 +103,7 @@ def main(argv=None) -> int:
         p.add_argument("--offline", action="store_true", help="replay recordings only; no network, no key")
         p.add_argument("--budget", type=float, default=DEFAULT_BUDGET, help="stop when the ledger reaches this many credits")
         p.add_argument("--out", help="where to write the JSON report")
-        p.add_argument("--all", action="store_true", help="also print findings the gate filtered out")
+        p.add_argument("--all", action="store_true", help="also print findings that are not reported by default")
         p.add_argument("--quiet", action="store_true")
 
     s = sub.add_parser("scan", help="scan a documentation tree")

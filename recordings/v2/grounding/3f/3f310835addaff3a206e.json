@@ -1,0 +1,83 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/3f/3f310835addaff3a206e",
+ "request_hash": "3f310835addaff3a206e8ef78be12737dbcf4fc3f4a1bffa5438eaf87734c054",
+ "recorded_at": "2026-11-06T14:29:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 947,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "67.986977",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=233"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "text": "[File: docs/docs/upgrading-v4-to-v5.md | Section: Population no longer infers the where condition by default]\n## Population no longer infers the where condition by default\n\n> This applies only to SELECT_IN strategy, as JOINED strategy implies the inference.\n\nPreviously when you used populate hints in `em.find()` and similar methods, the query for your entity would be analysed and parts of it extracted and used for the population. Following example would find all authors that have books with given IDs, and populate their books collection, again using this PK condition, resulting in only such books being in those collections.\n\n```ts\n// this would end up with `Author.books` collections having only books of PK 1, 2, 3\nconst a = await em.find(Author, { books: [1, 2, 3] }, { populate: ['books'] });\n```\n\nFollowing this example, if you wanted to load all books, you would need a separate `em.populate()` call:\n\n```ts\nconst a = await em.find(Author, { books: [1, 2, 3] });\nawait em.populate(a, ['books']);\n```\n\nThis behaviour changed and is now configurable both globally and locally, via `populateWhere` option. Globally you can specify one of `PopulateHint.ALL` and `PopulateHint.INFER`, the former being the default in v5, the latter being the default behaviour in v4. Locally (via `FindOptions`) you can also specify custom where condition that will be passed to `em.populate()` call.\n\n```ts\n// revert back to the old behaviour locally\nconst a = await em.find(Author, { books: [1, 2, 3] }, {\n  populate: ['books'],\n  populateWhere: PopulateHint.INFER,\n});\n```"
+   }
+  ],
+  "answer": "When you use populate hints in `em.find()` and similar methods, by default all related entities are populated.",
+  "claims": [
+   "When you use populate hints in `em.find()` and similar methods, by default all related entities are populated."
+  ],
+  "evidence": "all",
+  "instructions": "The statement is taken from file docs/docs/configuration.md, section \"Population where condition\". Statement and source are sections of the documentation of one project at one commit. First decide whether they describe the SAME thing. If they are about different packages, frameworks, classes, hooks, options, functions, file formats, or about different released versions (for example two migration guides for different versions), the statement is NOT STATED, never contradicted. Mark it contradicted only when the source gives an incompatible value, version, limit, name, list or rule for that same thing in the same scope. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.1658,
+  "ungrounded": 0.8342,
+  "verdict": "contradicted",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+    "share": 1,
+    "share_of_answer": 0.1658,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "When you use populate hints in `em.find()` and similar methods, by default all related entities are populated.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.1658,
+    "contradicted": 0.5162,
+    "not_stated": 0.3063,
+    "not_a_claim": 0.0118,
+    "verdict": "contradicted",
+    "sources": {
+     "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18": 1
+    },
+    "source": null,
+    "evidence": {
+     "document": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#18",
+     "quote": "Globally you can specify one of `PopulateHint.ALL` and `PopulateHint.INFER`, the former being the default in v5, the latter being the default behaviour in v4.",
+     "start": 1116,
+     "end": 1274,
+     "confidence": 0.99
+    }
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.1658
+  },
+  "timing": {
+   "read_ms": 75,
+   "total_ms": 79
+  }
+ }
+}

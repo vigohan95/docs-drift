@@ -20,6 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .client import Clocked, ClockedError, BudgetExceeded
+from .filters import REPORTABLE_KINDS, version_scoped_pair
 from .local import rank_keys
 from .neardup import chunk_pairs, TOKEN, STOP
 from .sections import Chunk, load_project
@@ -57,11 +58,15 @@ MAX_STATEMENT = 420
 def build_candidates(chunks: list[Chunk], max_neardup: int = 120, max_key: int = 30):
     """Ordered list of passage pairs to compare. Purely local, no API."""
     texts, cross, same = set(), [], []
+    skipped_versioned = 0
     for p in chunk_pairs(chunks):
         tkey = tuple(sorted((p["a"].text.lower(), p["b"].text.lower())))
         if tkey in texts:
             continue
         texts.add(tkey)
+        if version_scoped_pair(p["a"].chunk.path, p["b"].chunk.path):
+            skipped_versioned += 1
+            continue
         (cross if p["a"].chunk.path != p["b"].chunk.path else same).append(p)
     picked = (cross + same)[:max_neardup]
     out, seen = [], set()
@@ -79,12 +84,15 @@ def build_candidates(chunks: list[Chunk], max_neardup: int = 120, max_key: int =
             for b in bearing[i + 1:]:
                 if a.path == b.path or frozenset((a.cid, b.cid)) in seen or per_key >= 2 or n_key >= max_key:
                     continue
+                if version_scoped_pair(a.path, b.path):
+                    continue
                 seen.add(frozenset((a.cid, b.cid)))
                 out.append({"a": a, "b": b, "source": "shared-key", "key": key})
                 per_key += 1
                 n_key += 1
     stats = {"near_dup_cross_file": len(cross), "near_dup_same_file": len(same),
-             "near_dup_sent": len(picked), "shared_key_sent": n_key}
+             "near_dup_sent": len(picked), "shared_key_sent": n_key,
+             "skipped_version_scoped": skipped_versioned}
     return out, stats
 
 
@@ -130,25 +138,6 @@ def side_info(repo: str, commit: str, chunk: Chunk, f: dict) -> dict:
     }
 
 
-def pair_level_finding(project: str, repo: str, commit: str, cand: dict, pr: dict) -> dict:
-    sides = {}
-    for side, chunk, (line, text) in (("a", cand["a"], cand["sent_a"]), ("b", cand["b"], cand["sent_b"])):
-        sides[side] = {
-            "cid": chunk.cid, "path": chunk.path, "heading": chunk.heading,
-            "line_start": line, "line_end": line, "chunk_lines": [chunk.start_line, chunk.end_line],
-            "quote": text, "statement": text[:MAX_STATEMENT],
-            "url": f"https://github.com/{repo}/blob/{commit}/{chunk.path}#L{line}",
-        }
-    sig = f"{project}|{cand['a'].cid}|{cand['b'].cid}|pair|{cand['sent_a'][0]}|{cand['sent_b'][0]}"
-    return {
-        "id": hashlib.sha1(sig.encode("utf-8")).hexdigest()[:10],
-        "project": project, "source": cand["source"], "key": None,
-        "kind": "pair_level", "confidence": pr["probabilities"]["conflicting"],
-        "pair_relation": pr["relation"], "pair_conflicting": pr["probabilities"]["conflicting"],
-        "a": sides["a"], "b": sides["b"],
-    }
-
-
 class Shortlist:
     """IDF-weighted token overlap between a query and every chunk (free)."""
 
@@ -175,19 +164,28 @@ class Shortlist:
 
 
 def tier_of(f: dict) -> str:
-    """Reporting rule, fixed on 2026-11-07 before the day-2 targets were scanned.
+    """Reporting rule v2.1 (2026-11-07, chosen on the 57 labeled v2.0 findings and then
+    checked on four projects scanned afterwards).
 
-    confirmed : /grounding says at least one side's statement is contradicted by the
-                other passage AND /compare reports the conflict in both document orders
-    likely    : the /grounding gate passes but the swapped /compare does not repeat it
-    filtered  : /compare alone; not reported by default
+    out_of_scope : /compare calls the conflict a "scope" or "name" difference; that is
+                   what sibling pages about different things look like. Not reported.
+    confirmed    : /grounding says one side's statement is contradicted by the other
+                   passage AND /compare repeats the conflict with the passages swapped
+    likely       : one of those two checks agrees
+    weak         : neither check agrees. Not reported by default.
     """
-    gate = f.get("gate")
-    if gate is None:
-        return "ungated"
-    if not gate.get("any_contradicted"):
-        return "filtered"
-    return "confirmed" if (f.get("swap") or {}).get("confirmed") else "likely"
+    if f.get("kind") not in REPORTABLE_KINDS:
+        return "out_of_scope"
+    if "gate" not in f and "swap" not in f:
+        return "unchecked"
+    gate = bool((f.get("gate") or {}).get("any_contradicted"))
+    swap = bool((f.get("swap") or {}).get("confirmed"))
+    if gate and swap:
+        return "confirmed"
+    return "likely" if (gate or swap) else "weak"
+
+
+REPORTED_TIERS = ("confirmed", "likely")
 
 
 # -------------------------------------------------------------------- stages
@@ -202,6 +200,28 @@ def compare_payload(a: Chunk, b: Chunk, instructions: str | None = COMPARE_INSTR
 def gate_payload(claim: str, source: Chunk) -> dict:
     return {"documents": [{"id": source.cid, "text": source.text}], "answer": claim, "claims": [claim],
             "evidence": "all", "instructions": GATE_INSTRUCTIONS}
+
+
+GATE2_RULES = (
+    "Statement and source are sections of the documentation of one project at one commit. "
+    "First decide whether they describe the SAME thing. If they are about different packages, frameworks, "
+    "classes, hooks, options, functions, file formats, or about different released versions (for example two "
+    "migration guides for different versions), the statement is NOT STATED, never contradicted. "
+    "Mark it contradicted only when the source gives an incompatible value, version, limit, name, list or rule "
+    "for that same thing in the same scope. An example value in a code sample that overrides a default does "
+    "not contradict the default."
+)
+
+
+def with_provenance(chunk: Chunk) -> str:
+    return f"[File: {chunk.path} | Section: {chunk.heading}]\n{chunk.text}"
+
+
+def gate2_payload(claim: str, claim_chunk: Chunk, source: Chunk) -> dict:
+    """Gate request that tells /grounding where the statement and the source come from."""
+    where = f"The statement is taken from file {claim_chunk.path}, section \"{claim_chunk.heading}\". "
+    return {"documents": [{"id": source.cid, "text": with_provenance(source)}], "answer": claim, "claims": [claim],
+            "evidence": "all", "instructions": where + GATE2_RULES}
 
 
 def run_gate(client: Clocked, finding: dict, by_cid: dict) -> dict:
@@ -311,10 +331,6 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
                 pr = r["pairs"][0]
                 pair_rows.append({"a": c["a"].cid, "b": c["b"].cid, "source": c["source"], "relation": pr["relation"],
                                   "conflicting": pr["probabilities"]["conflicting"], "conflicts": len(pr.get("conflicts", []))})
-                if not pr.get("conflicts") and pr["relation"] == "conflicting" and c.get("sent_a"):
-                    # /compare calls the pair conflicting but returns no passage. Fall back to the
-                    # two near-duplicate sentences found locally; the gate decides whether to report.
-                    findings.append(pair_level_finding(project, repo, commit, c, pr))
                 for f in pr.get("conflicts", []):
                     fa, fb = f.get("a") or {}, f.get("b") or {}
                     findings.append({
@@ -334,7 +350,8 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
     if swap and not stopped:
         flagged = {}
         for f in findings:
-            flagged.setdefault((f["a"]["cid"], f["b"]["cid"]), []).append(f)
+            if f["kind"] in REPORTABLE_KINDS:
+                flagged.setdefault((f["a"]["cid"], f["b"]["cid"]), []).append(f)
 
         def do_swap(key):
             a, b = by_cid[key[0]], by_cid[key[1]]
@@ -366,13 +383,13 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
                 return f, {"error": str(e)[:200], "tested": 0, "any_contradicted": False,
                            "all_contradicted": False, "credits": 0.0}
         with ThreadPoolExecutor(max_workers=workers) as ex:
-            for f, g in ex.map(do_gate, findings):
+            for f, g in ex.map(do_gate, [f for f in findings if f["kind"] in REPORTABLE_KINDS]):
                 f["gate"] = g
                 credits["grounding"] += g.get("credits", 0.0)
 
     if elsewhere and not stopped:
         shortlist = Shortlist(chunks)
-        todo = [f for f in findings if not gate or f.get("gate", {}).get("any_contradicted")]
+        todo = [f for f in findings if tier_of(f) in REPORTED_TIERS]
 
         def do_else(f):
             try:
@@ -389,7 +406,7 @@ def analyze(project: str, chunks: list[Chunk], cands: list[dict], cstats: dict |
         f["tier"] = tier_of(f)
     client.save_index()
     return {
-        "project": project, "repo": repo, "commit": commit,
+        "project": project, "repo": repo, "commit": commit, "pipeline": "v2.1",
         "stats": {
             "files": len({c.path for c in chunks}), "passages": len(chunks), "candidates": cstats,
             "pairs_compared": len(pair_rows), "pair_relations": dict(Counter(p["relation"] for p in pair_rows)),
