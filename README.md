@@ -8,7 +8,7 @@ both passages with file and line. It is a list to review, not a verdict: about h
 
 Built for the Clocked Build Challenge (October 21 to November 10, 2026) on `/compare`, `/grounding` and `/rerank`.
 
-Demo page: [`docs/index.html`](docs/index.html) (static; also served by GitHub Pages).
+Demo page: [`docs/index.html`](docs/index.html) (static; also served by GitHub Pages). Judges: a three-minute path is in [`JUDGES.md`](JUDGES.md).
 
 ## Results
 
