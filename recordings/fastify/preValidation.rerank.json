@@ -1,0 +1,146 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/preValidation.rerank",
+ "recorded_at": "2026-11-06T13:28:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 984,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "56.046463",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=36,cfOrigin;dur=0,cfWorker;dur=264"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `preValidation`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `preValidation`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#4",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > preValidation",
+    "text": "### preValidation\n\nIf you are using the `preValidation` hook, you can change the payload before it\nis validated. For example:\n\n```js\nfastify.addHook('preValidation', (request, reply, done) => {\n  request.body = { ...request.body, importantKey: 'randomString' }\n  done()\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preValidation', async (request, reply) => {\n  const importantKey = await generateRandomString()\n  request.body = { ...request.body, importantKey }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#86",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > setNotFoundHandler",
+    "text": "#### setNotFoundHandler\n<a id=\"set-not-found-handler\"></a>\n\n`fastify.setNotFoundHandler(handler(request, reply))`: set the 404 handler. This\ncall is encapsulated by prefix, so different plugins can set different not found\nhandlers if a different [`prefix` option](./Plugins.md#route-prefixing-option)\nis passed to `fastify.register()`. The handler is treated as a regular route\nhandler so requests will go through the full [Fastify\nlifecycle](./Lifecycle.md#lifecycle) for unexisting URLs.\n*async-await* is supported as well.\nBadly formatted URLs are sent to the [`onBadUrl`](#onbadurl)\nhandler instead.\n\nYou can also register [`preValidation`](./Hooks.md#route-hooks) and\n[`preHandler`](./Hooks.md#route-hooks) hooks for the 404 handler.\n\n> ℹ️ Note:\n> The `preValidation` hook registered using this method will run for a\n> route that Fastify does not recognize and **not** when a route handler manually\n> calls [`reply.callNotFound`](./Reply.md#call-not-found). In which case, only\n> preHandler will be run.\n\n\n```js\nfastify.setNotFoundHandler({\n  preValidation: (req, reply, done) => {\n    // your code\n    done()\n  },\n  preHandler: (req, reply, done) => {\n    // your code\n    done()\n  }\n}, function (request, reply) {\n    // Default not found handler with preValidation and preHandler hooks\n})\n\nfastify.register(function (instance, options, done) {\n  instance.setNotFoundHandler(function (request, reply) {\n    // Handle not found request without preValidation and preHandler hooks\n    // to URLs that begin with '/v1'\n  })\n  done()\n}, { prefix: '/v1' })\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#5",
+    "title": "docs/Reference/TypeScript.md > Learn By Example > Using Generics",
+    "text": "4. Build and run the server code with `npm run build` and `npm run start`\n5. Query the API\n   ```bash\n   curl localhost:8080/auth?username=admin&password=Password123!\n   ```\n   And it should return back `logged in!`\n6. But wait there's more! The generic interfaces are also available inside route\n   level hook methods. Modify the previous route by adding a `preValidation`\n   hook:\n   ```typescript\n   server.get<{\n     Querystring: IQuerystring,\n     Headers: IHeaders,\n     Reply: IReply\n   }>('/auth', {\n     preValidation: (request, reply, done) => {\n       const { username, password } = request.query\n       done(username !== 'admin' ? new Error('Must be admin') : undefined) // only validate `admin` account\n     }\n   }, async (request, reply) => {\n     const customerHeader = request.headers['h-Custom']\n     // do something with request data\n     return { success: true }\n   })\n   ```\n7. Build and run and query with the `username` query string option set to\n   anything other than `admin`. The API should now return a HTTP 500 error\n   `{\"statusCode\":500,\"error\":\"Internal Server Error\",\"message\":\"Must be\n   admin\"}`\n\n🎉 Good work, now you can define interfaces for each route and have strictly\ntyped request and reply instances. Other parts of the Fastify type system rely\non generic properties. Make sure to reference the detailed type system\ndocumentation below to learn more about what is available."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#74",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.preValidationHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void",
+    "text": "##### fastify.preValidationHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L53)\n\n`preValidation` is the third hook to be executed in the request lifecycle. The\nprevious hook was `preParsing`, the next hook will be `preHandler`."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization",
+    "text": "## Validation and Serialization\nFastify uses a schema-based approach. We recommend using\n[JSON Schema](https://json-schema.org/) to validate routes and serialize outputs.\nFastify compiles the schema into a highly performant function.\n\nValidation is only attempted if the content type is `application/json`,\nunless the body schema uses the [`content`](#body-content-type-validation)\nproperty to specify validation per content type. When the body schema defines\na `content` field, it must enumerate all possible content types the\napplication expects to handle with the associated handler.\n\nAll examples use the\n[JSON Schema Draft 7](https://json-schema.org/draft-07)\nspecification.\n\n> ⚠ Warning:\n> Treat schema definitions as application code. Validation and serialization\n> features use `new Function()`, which is unsafe with user-provided schemas. See\n> [Ajv](https://www.npmjs.com/package/ajv) and\n> [fast-json-stringify](https://www.npmjs.com/package/fast-json-stringify) for details.\n>\n> Whilst Fastify supports the\n> [`$async` Ajv feature](https://ajv.js.org/guide/async-validation.html),\n> it should not be used for initial validation. Accessing databases during\n> validation may lead to Denial of Service attacks. Use\n> [Fastify's hooks](./Hooks.md) like `preHandler` for `async` tasks after validation.\n>\n> When using custom validators with async `preValidation` hooks,\n> validators **must return** `{error}` objects instead of throwing errors.\n> Throwing errors from custom validators will cause unhandled promise rejections\n> that crash the application when combined with async hooks. See the\n> [custom validator examples](#using-other-validation-libraries) below for the\n> correct pattern."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "action": "use",
+    "relevance_score": 0.9923,
+    "document_score": 0.9951,
+    "levels": {
+     "answers": 0.9923,
+     "elsewhere": 0.0028,
+     "different_case": 0.0026,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#86",
+    "action": "use",
+    "relevance_score": 0.6297,
+    "document_score": 0.913,
+    "levels": {
+     "answers": 0.6297,
+     "elsewhere": 0.2832,
+     "different_case": 0.0408,
+     "unrelated": 0.0462
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/TypeScript.md#74",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0166,
+    "document_score": 0.1166,
+    "levels": {
+     "answers": 0.0166,
+     "elsewhere": 0.1,
+     "different_case": 0.0404,
+     "unrelated": 0.843
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/TypeScript.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0052,
+    "document_score": 0.014,
+    "levels": {
+     "answers": 0.0052,
+     "elsewhere": 0.0088,
+     "different_case": 0.0168,
+     "unrelated": 0.9692
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Hooks.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0047,
+    "document_score": 0.0226,
+    "levels": {
+     "answers": 0.0047,
+     "elsewhere": 0.018,
+     "different_case": 0.012,
+     "unrelated": 0.9654
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2065
+  },
+  "timing": {
+   "total_ms": 74,
+   "rerank_ms": 58,
+   "questions_ms": 0,
+   "model_ms": 53,
+   "engine": {
+    "rows": 2740,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 53,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

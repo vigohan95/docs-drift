@@ -1,0 +1,144 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/exposeHeadRoutes.rerank",
+ "recorded_at": "2026-11-06T13:28:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1015,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "69.41552",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=331"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `exposeHeadRoutes`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `exposeHeadRoutes`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "title": "docs/Guides/Migration-Guide-V4.md > V4 Migration Guide > Breaking Changes > `exposeHeadRoutes` true by default",
+    "text": "### `exposeHeadRoutes` true by default\n\nStarting with v4, every `GET` route will create a sibling `HEAD` route.\nYou can revert this behavior by setting `exposeHeadRoutes: false` in the server\noptions."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > `HEAD` routes requires to register before `GET` when `exposeHeadRoutes: true`",
+    "text": "### `HEAD` routes requires to register before `GET` when `exposeHeadRoutes: true`\n\nWe have a more strict requirement for custom `HEAD` route when\n`exposeHeadRoutes: true`.\n\nWhen you provides a custom `HEAD` route, you must either explicitly\nset `exposeHeadRoutes` to `false`\n\n```js\n// v4\nfastify.get('/route', {\n\n}, (req, reply) => {\n  reply.send({ hello: 'world' });\n});\n\nfastify.head('/route', (req, reply) => {\n  // ...\n});\n```\n\n```js\n// v5\nfastify.get('/route', {\n  exposeHeadRoutes: false\n}, (req, reply) => {\n  reply.send({ hello: 'world' });\n});\n\nfastify.head('/route', (req, reply) => {\n  // ...\n});\n```\n\nor place the `HEAD` route before `GET`.\n\n```js\n// v5\nfastify.head('/route', (req, reply) => {\n  // ...\n});\n\nfastify.get('/route', {\n\n}, (req, reply) => {\n  reply.send({ hello: 'world' });\n});\n```\n\nThis was changed in [#2700](https://github.com/fastify/fastify/pull/2700),\nand the old behavior was deprecated in v4 as `FSTDEP007`."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "title": "docs/Reference/Routes.md > Routes > Routes options",
+    "text": "### Routes options\n<a id=\"options\"></a>\n\n* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,\n  `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. To accept more methods,\n  the [`addHttpMethod`](./Server.md#addHttpMethod) must be used.\n  It could also be an array of methods.\n* `url`: the path of the URL to match this route (alias: `path`).\n* `schema`: an object containing the schemas for the request and response. They\n  need to be in [JSON Schema](https://json-schema.org/) format, check\n  [here](./Validation-and-Serialization.md) for more info.\n\n  * `body`: validates the body of the request if it is a POST, PUT, PATCH,\n    TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.\n  * `querystring` or `query`: validates the querystring. This can be a complete\n    JSON Schema object, with the property `type` of `object` and `properties`\n    object of parameters, or simply the values of what would be contained in the\n    `properties` object as shown below.\n  * `params`: validates the params.\n  * `response`: filter and generate a schema for the response, setting a schema\n    allows us to have 10-20% more throughput.\n* `exposeHeadRoute`: creates a sibling `HEAD` route for any `GET` routes.\n  Defaults to the value of [`exposeHeadRoutes`](./Server.md#exposeHeadRoutes)\n  instance option. If you want a custom `HEAD` handler without disabling this\n  option, make sure to define it before the `GET` route.\n* `attachValidation`: attach `validationError` to request, if there is a schema\n  validation error, instead of sending the error to the error handler. The\n  default [error format](https://ajv.js.org/api.html#error-objects) is the Ajv\n  one.\n* `onRequest(request, reply, done)`: a [function](./Hooks.md#onrequest) called\n  as soon as a request is received, it could also be an array of functions.\n* `preParsing(request, reply, payload, done)`: a\n  [function](./Hooks.md#preparsing) called before parsing the request, it could\n  also be an array of functions.\n* `preValidation(request, reply, done)`: a [function](./Hooks.md#prevalidation)\n  called after the shared `preValidation` hooks, useful if you need to perform\n  authentication at route level for example, it could also be an array of\n  functions.\n* `preHandler(request, reply, done)`: a [function](./Hooks.md#prehandler) called\n  just before the request handler, it could also be an array of functions.\n* `preSerialization(request, reply, payload, done)`: a\n  [function](./Hooks.md#preserialization) called just before the serialization,\n  it could also be an array of functions.\n* `onSend(request, reply, payload, done)`: a [function](./Hooks.md#route-hooks)\n  called right before a response is sent, it could also be an array of\n  functions.\n* `onResponse(request, reply, done)`: a [function](./Hooks.md#onresponse) called\n  when a response has been sent, so you will not be able to send more data to\n  the client. It could also be an array of functions.\n* `onTimeout(request, reply, done)`: a [function](./Hooks.md#ontimeout) called\n  when a request is timed out and the HTTP socket has been hung up.\n* `onError(request, reply, error, done)`: a [function](./Hooks.md#onerror)\n  called when an Error is thrown or sent to the client by the route handler.\n* `handler(request, reply)`: the function that will handle this request. The\n  [Fastify server](./Server.md) will be bound to `this` when the handler is\n  called. Note: using an arrow function will break the binding of `this`.\n* `errorHandler(error, request, reply)`: a custom error handler for the scope of"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "title": "docs/Reference/Server.md > Factory",
+    "text": "## Factory\n<a id=\"factory\"></a>\n\nThe Fastify module exports a factory function that is used to create new\n<code><b>Fastify server</b></code> instances. This factory function accepts an\noptions object which is used to customize the resulting instance. This document\ndescribes the properties available in that options object.\n\n- [Factory](#factory)\n  - [`http`](#http)\n  - [`http2`](#http2)\n  - [`https`](#https)\n  - [`connectionTimeout`](#connectiontimeout)\n  - [`keepAliveTimeout`](#keepalivetimeout)\n  - [`forceCloseConnections`](#forcecloseconnections)\n  - [`maxRequestsPerSocket`](#maxrequestspersocket)\n  - [`requestTimeout`](#requesttimeout)\n  - [`bodyLimit`](#bodylimit)\n  - [`onProtoPoisoning`](#onprotopoisoning)\n  - [`onConstructorPoisoning`](#onconstructorpoisoning)\n  - [`logger`](#logger)\n  - [`loggerInstance`](#loggerinstance)\n  - [`logController`](#logcontroller)\n  - [`serverFactory`](#serverfactory)\n  - [`requestIdHeader`](#requestidheader)\n  - [`genReqId`](#genreqid)\n  - [`trustProxy`](#trustproxy)\n  - [`pluginTimeout`](#plugintimeout)\n  - [`exposeHeadRoutes`](#exposeheadroutes)\n  - [`return503OnClosing`](#return503onclosing)\n  - [`ajv`](#ajv)\n  - [`serializerOpts`](#serializeropts)\n  - [`http2SessionTimeout`](#http2sessiontimeout)\n  - [`frameworkErrors`](#frameworkerrors)\n  - [`clientErrorHandler`](#clienterrorhandler)\n  - [`rewriteUrl`](#rewriteurl)\n  - [`allowErrorHandlerOverride`](#allowerrorhandleroverride)\n  - [RouterOptions](#routeroptions)\n    - [`allowUnsafeRegex`](#allowunsaferegex)\n    - [`buildPrettyMeta`](#buildprettymeta)\n    - [`caseSensitive`](#casesensitive)\n    - [`compile`](#compile)\n    - [`constraints`](#constraints)\n    - [`defaultRoute`](#defaultroute)\n    - [`ignoreDuplicateSlashes`](#ignoreduplicateslashes)\n    - [`ignoreTrailingSlash`](#ignoretrailingslash)\n    - [`maxParamLength`](#maxparamlength)\n    - [`onBadUrl`](#onbadurl)\n    - [`onMaxParamLength`](#onmaxparamlength)\n    - [`querystringParser`](#querystringparser)\n    - [`useSemicolonDelimiter`](#usesemicolondelimiter)\n- [Instance](#instance)\n  - [Server Methods](#server-methods)\n    - [server](#server)\n    - [after](#after)\n    - [ready](#ready)\n    - [listen](#listen)\n    - [addresses](#addresses)\n    - [routing](#routing)\n    - [route](#route)\n    - [hasRoute](#hasroute)\n    - [findRoute](#findroute)\n    - [close](#close)\n    - [decorate\\*](#decorate)\n    - [register](#register)\n    - [addHook](#addhook)\n    - [prefix](#prefix)\n    - [pluginName](#pluginname)\n    - [hasPlugin](#hasplugin)\n    - [listeningOrigin](#listeningorigin)\n    - [log](#log)\n    - [version](#version)\n    - [inject](#inject)\n    - [addHttpMethod](#addHttpMethod)\n    - [addSchema](#addschema)\n    - [getSchemas](#getschemas)\n    - [getSchema](#getschema)\n    - [setReplySerializer](#setreplyserializer)\n    - [setValidatorCompiler](#setvalidatorcompiler)\n    - [setSchemaErrorFormatter](#setschemaerrorformatter)\n    - [setSerializerCompiler](#setserializercompiler)\n    - [validatorCompiler](#validatorcompiler)\n    - [serializerCompiler](#serializercompiler)\n    - [schemaErrorFormatter](#schemaerrorformatter)\n    - [schemaController](#schemacontroller)\n    - [setNotFoundHandler](#setnotfoundhandler)\n    - [setErrorHandler](#seterrorhandler)\n    - [setChildLoggerFactory](#setchildloggerfactory)\n    - [setGenReqId](#setgenreqid)\n    - [addConstraintStrategy](#addconstraintstrategy)\n    - [hasConstraintStrategy](#hasconstraintstrategy)\n    - [printRoutes](#printroutes)\n    - [printPlugins](#printplugins)"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#26",
+    "title": "docs/Reference/Server.md > Factory > `exposeHeadRoutes`",
+    "text": "### `exposeHeadRoutes`\n<a id=\"exposeHeadRoutes\"></a>\n\n+ Default: `true`\n\nAutomatically creates a sibling `HEAD` route for each `GET` route defined. If\nyou want a custom `HEAD` handler without disabling this option, make sure to\ndefine it before the `GET` route."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Server.md#26",
+    "action": "use",
+    "relevance_score": 0.996,
+    "document_score": 0.997,
+    "levels": {
+     "answers": 0.996,
+     "elsewhere": 0.0011,
+     "different_case": 0.0013,
+     "unrelated": 0.0017
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "action": "use",
+    "relevance_score": 0.9955,
+    "document_score": 0.9967,
+    "levels": {
+     "answers": 0.9955,
+     "elsewhere": 0.0012,
+     "different_case": 0.0013,
+     "unrelated": 0.002
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "action": "use",
+    "relevance_score": 0.7186,
+    "document_score": 0.9385,
+    "levels": {
+     "answers": 0.7186,
+     "elsewhere": 0.2199,
+     "different_case": 0.0327,
+     "unrelated": 0.0288
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#14",
+    "action": "expand",
+    "relevance_score": 0.1334,
+    "document_score": 0.7756,
+    "levels": {
+     "answers": 0.1334,
+     "elsewhere": 0.6422,
+     "different_case": 0.0476,
+     "unrelated": 0.1768
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.3102,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.3064,
+     "different_case": 0.0244,
+     "unrelated": 0.6654
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2918
+  },
+  "timing": {
+   "total_ms": 87,
+   "rerank_ms": 72,
+   "questions_ms": 0,
+   "model_ms": 65,
+   "engine": {
+    "rows": 3593,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 65,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 63,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

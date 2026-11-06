@@ -1,0 +1,262 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify/setErrorHandler.compare",
+ "recorded_at": "2026-11-06T13:28:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1548,
+ "response_headers": {
+  "x-clocked-credits": "26",
+  "x-clocked-model-ms": "625.933577",
+  "x-clocked-cost-usd": "0.005179",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=841"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#18",
+    "text": "| <a id=\"fst_err_handler_timeout\">FST_ERR_HANDLER_TIMEOUT</a> | Request timed out. | Increase the `handlerTimeout` option or optimize the handler. | - |\n| <a id=\"fst_err_route_handler_timeout_option_not_int\">FST_ERR_ROUTE_HANDLER_TIMEOUT_OPTION_NOT_INT</a> | `handlerTimeout` option must be a positive integer. | Use a positive integer for the `handlerTimeout` option. | - |\n| <a id=\"fst_err_route_rewrite_not_str\">FST_ERR_ROUTE_REWRITE_NOT_STR</a> | `rewriteUrl` needs to be of type `string`. | Use a string for the `rewriteUrl`. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_missing_content_type\">FST_ERR_ROUTE_MISSING_CONTENT_TYPE</a> | `Content-Type` header is required for the request. | Send request with `Content-Type` header. | [#6832](https://github.com/fastify/fastify/pull/6832) |\n| <a id=\"fst_err_reopened_close_server\">FST_ERR_REOPENED_CLOSE_SERVER</a> | Fastify has already been closed and cannot be reopened. | - | [#2415](https://github.com/fastify/fastify/pull/2415) |\n| <a id=\"fst_err_reopened_server\">FST_ERR_REOPENED_SERVER</a> | Fastify is already started. | - | [#2415](https://github.com/fastify/fastify/pull/2415) |\n| <a id=\"fst_err_plugin_version_mismatch\">FST_ERR_PLUGIN_VERSION_MISMATCH</a> | Installed Fastify plugin mismatched expected version. | Use a compatible version of the plugin. | [#2549](https://github.com/fastify/fastify/pull/2549) |\n| <a id=\"fst_err_plugin_callback_not_fn\">FST_ERR_PLUGIN_CALLBACK_NOT_FN</a> | Callback for a hook is not a function. | Use a function for the callback. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_not_valid\">FST_ERR_PLUGIN_NOT_VALID</a> | Plugin must be a function or a promise. | Use a function or a promise for the plugin. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_root_plg_booted\">FST_ERR_ROOT_PLG_BOOTED</a> | Root plugin has already booted. | - | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_parent_plugin_booted\">FST_ERR_PARENT_PLUGIN_BOOTED</a> | Impossible to load plugin because the parent (mapped directly from `avvio`) | - | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_timeout\">FST_ERR_PLUGIN_TIMEOUT</a> | Plugin did not start in time. | Increase the timeout for the plugin. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_not_present_in_instance\">FST_ERR_PLUGIN_NOT_PRESENT_IN_INSTANCE</a> | The decorator is not present in the instance. | - | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_plugin_invalid_async_handler\">FST_ERR_PLUGIN_INVALID_ASYNC_HANDLER</a> | The plugin being registered mixes async and callback styles. | - | [#5141](https://github.com/fastify/fastify/pull/5141) |\n| <a id=\"fst_err_plugin_dependency_not_registered\">FST_ERR_PLUGIN_DEPENDENCY_NOT_REGISTERED</a> | The dependency of a plugin is not registered. | Register the missing dependency before registering this plugin. | [#6774](https://github.com/fastify/fastify/pull/6774) |\n| <a id=\"fst_err_validation\">FST_ERR_VALIDATION</a> | The Request failed the payload validation. | Check the request payload. | [#4824](https://github.com/fastify/fastify/pull/4824) |\n| <a id=\"fst_err_listen_options_invalid\">FST_ERR_LISTEN_OPTIONS_INVALID</a> | Invalid listen options. | Check the listen options. | [#4886](https://github.com/fastify/fastify/pull/4886) |\n| <a id=\"fst_err_error_handler_not_fn\">FST_ERR_ERROR_HANDLER_NOT_FN</a> | Error Handler must be a function | Provide a function to `setErrorHandler`. | [#5317](https://github.com/fastify/fastify/pull/5317) | <a id=\"fst_err_error_handler_already_set\">FST_ERR_ERROR_HANDLER_ALREADY_SET</a> | Error Handler already set in this scope. Set `allowErrorHandlerOverride: true` to allow overriding. | By default, `setErrorHandler` can only be called once per encapsulation context. | [#6097](https://github.com/fastify/fastify/pull/6098) |"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "text": "- Throwing a new error in a custom error handler will call the parent\n  `errorHandler`.\n  - The `onError` hook will be triggered once for the first error thrown\n  - An error will not be triggered twice from a lifecycle hook. Fastify\n    internally monitors error invocation to avoid infinite loops for errors\n    thrown in the reply phases of the lifecycle (those after the route handler)\n\nWhen using Fastify's custom error handling through\n[`setErrorHandler`](./Server.md#seterrorhandler), be aware of how errors are\npropagated between custom and default error handlers.\n\nIf a plugin's error handler re-throws an error that is not an instance of\n[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error),\nit will not propagate to the parent context error handler. Instead, it will be\ncaught by the default error handler. This can be seen in the `/bad` route of the\nexample below.\n\nTo ensure consistent error handling, throw instances of `Error`. For example,\nreplace `throw 'foo'` with `throw new Error('foo')` in the `/bad` route to\nensure errors propagate through the custom error handling chain as intended.\nThis practice helps avoid potential pitfalls when working with custom error\nhandling in Fastify.\n\nFor example:\n```js\nconst Fastify = require('fastify')\n\n// Instantiate the framework\nconst fastify = Fastify({\n  logger: true\n})\n\n// Register parent error handler\nfastify.setErrorHandler((error, request, reply) => {\n  reply.status(500).send({ ok: false })\n})\n\nfastify.register((app, options, next) => {\n  // Register child error handler\n  app.setErrorHandler((error, request, reply) => {\n    throw error\n  })\n\n  app.get('/bad', async () => {\n    // Throws a non-Error type, 'foo'\n    throw 'foo'\n  })\n\n  app.get('/good', async () => {\n    // Throws an Error instance, 'bar'\n    throw new Error('bar')\n  })\n\n  next()\n})\n\n// Run the server\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is listening at ${address}\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#11",
+    "text": "### Errors In Fastify Lifecycle Hooks And A Custom Error Handler\n\nFrom the [Hooks documentation](./Hooks.md#manage-errors-from-a-hook):\n> If you get an error during the execution of your hook, just pass it to\n> `done()` and Fastify will automatically close the request and send the\n> appropriate error code to the user.\n\nWhen a custom error handler is defined through\n[`setErrorHandler`](./Server.md#seterrorhandler), it will receive the error\npassed to the `done()` callback or through other supported automatic error\nhandling mechanisms. If `setErrorHandler` is used multiple times, the error will\nbe routed to the most precedent handler within the error\n[encapsulation context](./Encapsulation.md). Error handlers are fully\nencapsulated, so a `setErrorHandler` call within a plugin will limit the error\nhandler to that plugin's context.\n\nThe root error handler is Fastify's generic error handler. This error handler\nwill use the headers and status code in the `Error` object, if they exist. The\nheaders and status code will not be automatically set if a custom error handler\nis provided.\n\nThe following should be considered when using a custom error handler:\n\n- `reply.send(data)` behaves as in [regular route handlers](./Reply.md#senddata)\n  - objects are serialized, triggering the `preSerialization` lifecycle hook if\n    defined\n  - strings, buffers, and streams are sent to the client with appropriate headers\n    (no serialization)"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Errors.md#11",
+     "fastify:docs/Reference/Errors.md#18"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#18",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#88"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#11",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#88"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#88",
+    "b": "fastify:docs/Reference/Errors.md#18",
+    "relation": "overlapping",
+    "related": 0.9693,
+    "probabilities": {
+     "same": 0.0199,
+     "overlapping": 0.9064,
+     "conflicting": 0.043,
+     "unrelated": 0.0307
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0518,
+       "restated": 0.8872,
+       "elaborated": 0.0386,
+       "different": 0.0224
+      },
+      "confidence": 0.87,
+      "a": {
+       "document": "fastify:docs/Reference/Server.md#88",
+       "quote": "> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride).",
+       "start": 1546,
+       "end": 1610,
+       "confidence": 0.995
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Errors.md#18",
+       "quote": "Set `allowErrorHandlerOverride: true` to allow overriding.",
+       "start": 3774,
+       "end": 3832,
+       "confidence": 0.87
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0279,
+       "restated": 0.8367,
+       "elaborated": 0.1068,
+       "different": 0.0286
+      },
+      "confidence": 0.545,
+      "a": {
+       "document": "fastify:docs/Reference/Server.md#88",
+       "quote": "> Avoid calling setErrorHandler multiple times in the same scope.",
+       "start": 1480,
+       "end": 1545,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Errors.md#18",
+       "quote": "| By default, `setErrorHandler` can only be called once per encapsulation context.",
+       "start": 3833,
+       "end": 3915,
+       "confidence": 0.545
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#88",
+    "b": "fastify:docs/Reference/Errors.md#12",
+    "relation": "overlapping",
+    "related": 0.9911,
+    "probabilities": {
+     "same": 0.0354,
+     "overlapping": 0.9465,
+     "conflicting": 0.0092,
+     "unrelated": 0.0089
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#88",
+    "b": "fastify:docs/Reference/Errors.md#11",
+    "relation": "overlapping",
+    "related": 0.9941,
+    "probabilities": {
+     "same": 0.0248,
+     "overlapping": 0.9632,
+     "conflicting": 0.0061,
+     "unrelated": 0.0059
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0122,
+       "restated": 0.918,
+       "elaborated": 0.0598,
+       "different": 0.01
+      },
+      "confidence": 0.685,
+      "a": {
+       "document": "fastify:docs/Reference/Server.md#88",
+       "quote": "The handler is bound to the Fastify instance and is fully encapsulated, so",
+       "start": 210,
+       "end": 284,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Errors.md#11",
+       "quote": "Error handlers are fully\nencapsulated, so a `setErrorHandler` call within a plugin will limit the error\nhandler to that plugin's context.\n\nThe root error handler is Fastify's generic error handler.",
+       "start": 702,
+       "end": 899,
+       "confidence": 0.685
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#18",
+    "b": "fastify:docs/Reference/Errors.md#12",
+    "relation": "unrelated",
+    "related": 0.1918,
+    "probabilities": {
+     "same": 0.0234,
+     "overlapping": 0.1502,
+     "conflicting": 0.0182,
+     "unrelated": 0.8082
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#18",
+    "b": "fastify:docs/Reference/Errors.md#11",
+    "relation": "unrelated",
+    "related": 0.0259,
+    "probabilities": {
+     "same": 0.0077,
+     "overlapping": 0.0087,
+     "conflicting": 0.0095,
+     "unrelated": 0.9741
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#12",
+    "b": "fastify:docs/Reference/Errors.md#11",
+    "relation": "overlapping",
+    "related": 0.9916,
+    "probabilities": {
+     "same": 0.0347,
+     "overlapping": 0.9481,
+     "conflicting": 0.0089,
+     "unrelated": 0.0084
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0,
+   2
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   5
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 105,
+   "passage_reads": 1,
+   "passages_ms": 468,
+   "passages": 3,
+   "counterparts_ms": 81
+  },
+  "timing": {
+   "read_ms": 652,
+   "total_ms": 662
+  }
+ }
+}

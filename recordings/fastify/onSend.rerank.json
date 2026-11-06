@@ -1,0 +1,127 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/onSend.rerank",
+ "recorded_at": "2026-11-06T13:28:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 919,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "55.692257",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=226"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `onSend`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `onSend`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#8",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > onSend",
+    "text": "### onSend\nIf you are using the `onSend` hook, you can change the payload. For example:\n\n```js\nfastify.addHook('onSend', (request, reply, payload, done) => {\n  const err = null;\n  const newPayload = payload.replace('some-text', 'some-new-text')\n  done(err, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('onSend', async (request, reply, payload) => {\n  const newPayload = payload.replace('some-text', 'some-new-text')\n  return newPayload\n})\n```\n\nYou can also clear the payload to send a response with an empty body by\nreplacing the payload with `null`:\n\n```js\nfastify.addHook('onSend', (request, reply, payload, done) => {\n  reply.code(304)\n  const newPayload = null\n  done(null, newPayload)\n})\n```\n\n> You can also send an empty body by replacing the payload with the empty string\n> `''`, but be aware that this will cause the `Content-Length` header to be set\n> to `0`, whereas the `Content-Length` header will not be set if the payload is\n> `null`.\n\n> ℹ️ Note:\n> If you change the payload, you may only change it to a `string`, a\n> `Buffer`, a `stream`, a `ReadableStream`, a `Response`, or `null`."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#23",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .send(data) > Type of the final payload",
+    "text": "###### Type of the final payload\n<a id=\"payload-type\"></a>\n\nThe type of the sent payload (after serialization and going through any\n[`onSend` hooks](./Hooks.md#onsend)) must be one of the following types,\notherwise, an error will be thrown:\n\n- `string`\n- `Buffer`\n- `stream`\n- `undefined`\n- `null`"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > setErrorHandler",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#77",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.onSendHookHandler< OnSendPayload, [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], payload: OnSendPayload, done: (err: [FastifyError][FastifyError] | null, res?: unknown) => void): Promise",
+    "text": "##### fastify.onSendHookHandler< OnSendPayload, [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], payload: OnSendPayload, done: (err: [FastifyError][FastifyError] | null, res?: unknown) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L114)\n\nYou can change the payload with the `onSend` hook. It is the sixth hook to be\nexecuted in the request lifecycle. The previous hook was `preSerialization`, the\nnext hook will be `onResponse`.\n\n> ℹ️ Note:\n>  If you change the payload, you may only change it to a string,\n> a Buffer, a stream, or null."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Hooks.md#8",
+    "action": "use",
+    "relevance_score": 0.9918,
+    "document_score": 0.9946,
+    "levels": {
+     "answers": 0.9918,
+     "elsewhere": 0.0028,
+     "different_case": 0.003,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/TypeScript.md#77",
+    "action": "use",
+    "relevance_score": 0.9898,
+    "document_score": 0.993,
+    "levels": {
+     "answers": 0.9898,
+     "elsewhere": 0.0032,
+     "different_case": 0.0039,
+     "unrelated": 0.0031
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Reply.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0158,
+    "document_score": 0.2835,
+    "levels": {
+     "answers": 0.0158,
+     "elsewhere": 0.2677,
+     "different_case": 0.0305,
+     "unrelated": 0.6859
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#88",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.0229,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.0189,
+     "different_case": 0.0255,
+     "unrelated": 0.9517
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1571
+  },
+  "timing": {
+   "total_ms": 73,
+   "rerank_ms": 58,
+   "questions_ms": 0,
+   "model_ms": 53,
+   "engine": {
+    "rows": 2111,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 53,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

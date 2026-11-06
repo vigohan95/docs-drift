@@ -45,7 +45,8 @@ def rerank_query(key: str) -> tuple[str, str]:
             "A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.")
 
 
-def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_rerank: bool = True):
+def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_rerank: bool = True,
+        offset: int = 0, instructions: str | None = COMPARE_INSTRUCTIONS, label: str = ""):
     chunks = load(project)
     by_cid = {c.cid: c for c in chunks}
     ranked = rank_keys(chunks)
@@ -56,12 +57,12 @@ def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_
     seen_pairs: set[tuple[str, str]] = set()
     findings, pair_rows, key_rows = [], [], []
 
-    for score, key, bearing in ranked[:max_keys]:
+    for score, key, bearing in ranked[offset:offset + max_keys]:
         spent = credits_used() - start_credits
         if spent >= credit_cap:
             print(f"[{project}] credit cap reached ({spent:.0f}/{credit_cap})")
             break
-        tag_base = f"{project}/{slug(key)}"
+        tag_base = f"{project}{label}/{slug(key)}"
         row = {"key": key, "score": round(score, 2), "local_candidates": [c.cid for c in bearing]}
         kept = bearing
         try:
@@ -82,11 +83,10 @@ def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_
                 row["compare"] = "skipped (fewer than 2 passages state a rule, or pairs already compared)"
                 key_rows.append(row)
                 continue
-            cmp = client.call("compare", {
-                "documents": [{"id": c.cid, "text": c.text} for c in kept],
-                "instructions": COMPARE_INSTRUCTIONS,
-                "evidence": "flagged",
-            }, f"{tag_base}.compare")
+            payload = {"documents": [{"id": c.cid, "text": c.text} for c in kept], "evidence": "flagged"}
+            if instructions:
+                payload["instructions"] = instructions
+            cmp = client.call("compare", payload, f"{tag_base}.compare")
         except BudgetExceeded as e:
             print("budget:", e)
             break
@@ -131,7 +131,7 @@ def run(project: str, credit_cap: float, max_keys: int, max_group: int = 5, use_
         if sig not in seen:
             seen.add(sig)
             uniq.append(f)
-    suffix = "" if use_rerank else "-norerank"
+    suffix = f"{label}-k{offset}"
     (out_dir / f"findings{suffix}.json").write_text(json.dumps(uniq, ensure_ascii=False, indent=1), encoding="utf-8")
     (out_dir / f"pairs{suffix}.json").write_text(json.dumps(pair_rows, ensure_ascii=False, indent=1), encoding="utf-8")
     (out_dir / f"keys{suffix}.json").write_text(json.dumps(key_rows, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -146,5 +146,9 @@ if __name__ == "__main__":
     ap.add_argument("--max-keys", type=int, default=40)
     ap.add_argument("--max-group", type=int, default=5)
     ap.add_argument("--no-rerank", action="store_true")
+    ap.add_argument("--offset", type=int, default=0)
+    ap.add_argument("--default-instructions", action="store_true")
+    ap.add_argument("--label", default="")
     a = ap.parse_args()
-    run(a.project, a.credits, a.max_keys, a.max_group, use_rerank=not a.no_rerank)
+    run(a.project, a.credits, a.max_keys, a.max_group, use_rerank=not a.no_rerank, offset=a.offset,
+        instructions=None if a.default_instructions else COMPARE_INSTRUCTIONS, label=a.label)

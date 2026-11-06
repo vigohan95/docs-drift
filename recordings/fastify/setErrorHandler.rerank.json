@@ -1,0 +1,198 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/setErrorHandler.rerank",
+ "recorded_at": "2026-11-06T13:28:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1178,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "94.808029",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=165,cfOrigin;dur=0,cfWorker;dur=314"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `setErrorHandler`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `setErrorHandler`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#10",
+    "title": "docs/Reference/Errors.md > Errors > Errors In Fastify > What The Default Error Handler Sends",
+    "text": "Register a [`setErrorHandler`](./Server.md#seterrorhandler) to replace the\nmessage for errors you did not raise deliberately, while letting the ones you\ndid pass through:\n\n```js\napp.setErrorHandler(function (error, request, reply) {\n  // Errors with a statusCode below 500 were raised deliberately by this\n  // application, as were validation errors. A status code below 500 is not on\n  // its own a guarantee that the message is safe to expose — narrow this\n  // condition if any of yours are not.\n  if (error.validation || (error.statusCode && error.statusCode < 500)) {\n    return reply.send(error)\n  }\n\n  // Anything else is unexpected: log it, but do not describe it to the client.\n  this.log.error({ err: error }, 'unhandled error')\n  reply.status(500).send({\n    statusCode: 500,\n    error: 'Internal Server Error',\n    message: 'Internal Server Error'\n  })\n})\n```\n\nThe handler above is registered on the root instance, so it applies to every\nroute. Error handlers are encapsulated; for how they resolve across plugin\ncontexts, see\n[the next section](#errors-in-fastify-lifecycle-hooks-and-a-custom-error-handler).\n\nNote that a route-level response schema is still applied to whatever the error\nhandler sends, and will reshape the payload accordingly — including properties\nthe built-in error serializer would have omitted, such as `stack`. See\n[Serialization](./Validation-and-Serialization.md#serialization)."
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#11",
+    "title": "docs/Reference/Errors.md > Errors > Errors In Fastify Lifecycle Hooks And A Custom Error Handler",
+    "text": "### Errors In Fastify Lifecycle Hooks And A Custom Error Handler\n\nFrom the [Hooks documentation](./Hooks.md#manage-errors-from-a-hook):\n> If you get an error during the execution of your hook, just pass it to\n> `done()` and Fastify will automatically close the request and send the\n> appropriate error code to the user.\n\nWhen a custom error handler is defined through\n[`setErrorHandler`](./Server.md#seterrorhandler), it will receive the error\npassed to the `done()` callback or through other supported automatic error\nhandling mechanisms. If `setErrorHandler` is used multiple times, the error will\nbe routed to the most precedent handler within the error\n[encapsulation context](./Encapsulation.md). Error handlers are fully\nencapsulated, so a `setErrorHandler` call within a plugin will limit the error\nhandler to that plugin's context.\n\nThe root error handler is Fastify's generic error handler. This error handler\nwill use the headers and status code in the `Error` object, if they exist. The\nheaders and status code will not be automatically set if a custom error handler\nis provided.\n\nThe following should be considered when using a custom error handler:\n\n- `reply.send(data)` behaves as in [regular route handlers](./Reply.md#senddata)\n  - objects are serialized, triggering the `preSerialization` lifecycle hook if\n    defined\n  - strings, buffers, and streams are sent to the client with appropriate headers\n    (no serialization)"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "title": "docs/Reference/Errors.md > Errors > Errors In Fastify Lifecycle Hooks And A Custom Error Handler",
+    "text": "- Throwing a new error in a custom error handler will call the parent\n  `errorHandler`.\n  - The `onError` hook will be triggered once for the first error thrown\n  - An error will not be triggered twice from a lifecycle hook. Fastify\n    internally monitors error invocation to avoid infinite loops for errors\n    thrown in the reply phases of the lifecycle (those after the route handler)\n\nWhen using Fastify's custom error handling through\n[`setErrorHandler`](./Server.md#seterrorhandler), be aware of how errors are\npropagated between custom and default error handlers.\n\nIf a plugin's error handler re-throws an error that is not an instance of\n[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error),\nit will not propagate to the parent context error handler. Instead, it will be\ncaught by the default error handler. This can be seen in the `/bad` route of the\nexample below.\n\nTo ensure consistent error handling, throw instances of `Error`. For example,\nreplace `throw 'foo'` with `throw new Error('foo')` in the `/bad` route to\nensure errors propagate through the custom error handling chain as intended.\nThis practice helps avoid potential pitfalls when working with custom error\nhandling in Fastify.\n\nFor example:\n```js\nconst Fastify = require('fastify')\n\n// Instantiate the framework\nconst fastify = Fastify({\n  logger: true\n})\n\n// Register parent error handler\nfastify.setErrorHandler((error, request, reply) => {\n  reply.status(500).send({ ok: false })\n})\n\nfastify.register((app, options, next) => {\n  // Register child error handler\n  app.setErrorHandler((error, request, reply) => {\n    throw error\n  })\n\n  app.get('/bad', async () => {\n    // Throws a non-Error type, 'foo'\n    throw 'foo'\n  })\n\n  app.get('/good', async () => {\n    // Throws an Error instance, 'bar'\n    throw new Error('bar')\n  })\n\n  next()\n})\n\n// Run the server\nfastify.listen({ port: 3000 }, function (err, address) {\n  if (err) {\n    fastify.log.error(err)\n    process.exit(1)\n  }\n  // Server is listening at ${address}\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#18",
+    "title": "docs/Reference/Errors.md > Errors > Fastify Error Codes",
+    "text": "| <a id=\"fst_err_handler_timeout\">FST_ERR_HANDLER_TIMEOUT</a> | Request timed out. | Increase the `handlerTimeout` option or optimize the handler. | - |\n| <a id=\"fst_err_route_handler_timeout_option_not_int\">FST_ERR_ROUTE_HANDLER_TIMEOUT_OPTION_NOT_INT</a> | `handlerTimeout` option must be a positive integer. | Use a positive integer for the `handlerTimeout` option. | - |\n| <a id=\"fst_err_route_rewrite_not_str\">FST_ERR_ROUTE_REWRITE_NOT_STR</a> | `rewriteUrl` needs to be of type `string`. | Use a string for the `rewriteUrl`. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_missing_content_type\">FST_ERR_ROUTE_MISSING_CONTENT_TYPE</a> | `Content-Type` header is required for the request. | Send request with `Content-Type` header. | [#6832](https://github.com/fastify/fastify/pull/6832) |\n| <a id=\"fst_err_reopened_close_server\">FST_ERR_REOPENED_CLOSE_SERVER</a> | Fastify has already been closed and cannot be reopened. | - | [#2415](https://github.com/fastify/fastify/pull/2415) |\n| <a id=\"fst_err_reopened_server\">FST_ERR_REOPENED_SERVER</a> | Fastify is already started. | - | [#2415](https://github.com/fastify/fastify/pull/2415) |\n| <a id=\"fst_err_plugin_version_mismatch\">FST_ERR_PLUGIN_VERSION_MISMATCH</a> | Installed Fastify plugin mismatched expected version. | Use a compatible version of the plugin. | [#2549](https://github.com/fastify/fastify/pull/2549) |\n| <a id=\"fst_err_plugin_callback_not_fn\">FST_ERR_PLUGIN_CALLBACK_NOT_FN</a> | Callback for a hook is not a function. | Use a function for the callback. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_not_valid\">FST_ERR_PLUGIN_NOT_VALID</a> | Plugin must be a function or a promise. | Use a function or a promise for the plugin. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_root_plg_booted\">FST_ERR_ROOT_PLG_BOOTED</a> | Root plugin has already booted. | - | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_parent_plugin_booted\">FST_ERR_PARENT_PLUGIN_BOOTED</a> | Impossible to load plugin because the parent (mapped directly from `avvio`) | - | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_timeout\">FST_ERR_PLUGIN_TIMEOUT</a> | Plugin did not start in time. | Increase the timeout for the plugin. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_plugin_not_present_in_instance\">FST_ERR_PLUGIN_NOT_PRESENT_IN_INSTANCE</a> | The decorator is not present in the instance. | - | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_plugin_invalid_async_handler\">FST_ERR_PLUGIN_INVALID_ASYNC_HANDLER</a> | The plugin being registered mixes async and callback styles. | - | [#5141](https://github.com/fastify/fastify/pull/5141) |\n| <a id=\"fst_err_plugin_dependency_not_registered\">FST_ERR_PLUGIN_DEPENDENCY_NOT_REGISTERED</a> | The dependency of a plugin is not registered. | Register the missing dependency before registering this plugin. | [#6774](https://github.com/fastify/fastify/pull/6774) |\n| <a id=\"fst_err_validation\">FST_ERR_VALIDATION</a> | The Request failed the payload validation. | Check the request payload. | [#4824](https://github.com/fastify/fastify/pull/4824) |\n| <a id=\"fst_err_listen_options_invalid\">FST_ERR_LISTEN_OPTIONS_INVALID</a> | Invalid listen options. | Check the listen options. | [#4886](https://github.com/fastify/fastify/pull/4886) |\n| <a id=\"fst_err_error_handler_not_fn\">FST_ERR_ERROR_HANDLER_NOT_FN</a> | Error Handler must be a function | Provide a function to `setErrorHandler`. | [#5317](https://github.com/fastify/fastify/pull/5317) | <a id=\"fst_err_error_handler_already_set\">FST_ERR_ERROR_HANDLER_ALREADY_SET</a> | Error Handler already set in this scope. Set `allowErrorHandlerOverride: true` to allow overriding. | By default, `setErrorHandler` can only be called once per encapsulation context. | [#6097](https://github.com/fastify/fastify/pull/6098) |"
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#21",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .send(data) > Errors",
+    "text": "If you want to customize error handling, check out\n[`setErrorHandler`](./Server.md#seterrorhandler) API.\n\n> ℹ️ Note:\n> You are responsible for logging when customizing the error handler.\n\nAPI:\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  request.log.warn(error)\n  const statusCode = error.statusCode >= 400 ? error.statusCode : 500\n  reply\n    .code(statusCode)\n    .type('text/plain')\n    .send(statusCode >= 500 ? 'Internal server error' : error.message)\n})\n```\n\nBeware that calling `reply.send(error)` in your custom error handler will send\nthe error to the default error handler.\nCheck out the [Reply Lifecycle](./Lifecycle.md#reply-lifecycle)\nfor more information.\n\nThe not found errors generated by the router will use the\n[`setNotFoundHandler`](./Server.md#setnotfoundhandler)\n\nAPI:\n\n```js\nfastify.setNotFoundHandler(function (request, reply) {\n  reply\n    .code(404)\n    .type('text/plain')\n    .send('a custom not found')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#3",
+    "title": "docs/Reference/Routes.md > Routes > Routes options",
+    "text": "  the request. Overrides the default error global handler, and anything set by\n  [`setErrorHandler`](./Server.md#seterrorhandler), for requests to the route.\n  To access the default handler, you can access `instance.errorHandler`. Note\n  that this will point to fastify's default `errorHandler` only if a plugin\n  hasn't overridden it already.\n* `childLoggerFactory(logger, binding, opts, rawReq)`: a custom factory function\n  that will be called to produce a child logger instance for every request.\n  See [`childLoggerFactory`](./Server.md#childloggerfactory) for more info.\n  Overrides the default logger factory, and anything set by\n  [`setChildLoggerFactory`](./Server.md#setchildloggerfactory), for requests to\n  the route. To access the default factory, you can access\n  `instance.childLoggerFactory`. Note that this will point to Fastify's default\n  `childLoggerFactory` only if a plugin hasn't overridden it already.\n* `validatorCompiler({ schema, method, url, httpPart })`: function that builds\n  schemas for request validations. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#schema-validator)\n  documentation.\n* `serializerCompiler({ schema, method, url, httpStatus, contentType })`:\n  function that builds schemas for response serialization. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#schema-serializer)\n  documentation.\n* `schemaErrorFormatter(errors, dataVar)`: function that formats the errors from\n  the validation compiler. See the [Validation and\n  Serialization](./Validation-and-Serialization.md#error-handling)\n  documentation. Overrides the global schema error formatter handler, and\n  anything set by `setSchemaErrorFormatter`, for requests to the route.\n* `bodyLimit`: prevents the default JSON body parser from parsing request bodies\n  larger than this number of bytes. Must be an integer. You may also set this\n  option globally when first creating the Fastify instance with\n  `fastify(options)`. Defaults to `1048576` (1 MiB).\n* `handlerTimeout`: maximum number of milliseconds for the route's full\n  lifecycle. Overrides the server-level\n  [`handlerTimeout`](./Server.md#factory-handler-timeout). Must be a positive\n  integer. When the timeout fires, `request.signal` is aborted and a 503 error\n  is sent through the error handler (which can be customized per-route).\n* `logLevel`: set log level for this route. See below.\n* `logSerializers`: set serializers to log for this route.\n* `config`: object used to store custom configuration.\n* `version`: a [semver](https://semver.org/) compatible string that defined the\n  version of the endpoint. [Example](#version-constraints).\n* `constraints`: defines route restrictions based on request properties or\n  values, enabling customized matching using\n  [find-my-way](https://github.com/delvedor/find-my-way) constraints. Includes\n  built-in `version` and `host` constraints, with support for custom constraint\n  strategies.\n* `prefixTrailingSlash`: string used to determine how to handle passing `/` as a\n  route with a prefix.\n  * `both` (default): Will register both `/prefix` and `/prefix/`.\n  * `slash`: Will register only `/prefix/`.\n  * `no-slash`: Will register only `/prefix`."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#77",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > setReplySerializer",
+    "text": "#### setReplySerializer\n<a id=\"set-reply-serializer\"></a>\n\nSet the reply serializer for all the routes. This will be used as default if a\n[Reply.serializer(func)](./Reply.md#serializerfunc) has not been set. The\nhandler is fully encapsulated, so different plugins can set different error\nhandlers. Note: the function parameter is called only for status `2xx`. Check\nout the [`setErrorHandler`](#seterrorhandler) for errors.\n\n```js\nfastify.setReplySerializer(function (payload, statusCode){\n  // serialize the payload with a sync function\n  return `my serialized ${statusCode} content: ${payload}`\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > setErrorHandler",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/Server.md#88",
+    "action": "use",
+    "relevance_score": 0.9953,
+    "document_score": 0.9965,
+    "levels": {
+     "answers": 0.9953,
+     "elsewhere": 0.0012,
+     "different_case": 0.0017,
+     "unrelated": 0.0017
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Errors.md#18",
+    "action": "use",
+    "relevance_score": 0.9866,
+    "document_score": 0.9905,
+    "levels": {
+     "answers": 0.9866,
+     "elsewhere": 0.0039,
+     "different_case": 0.006,
+     "unrelated": 0.0035
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Errors.md#12",
+    "action": "use",
+    "relevance_score": 0.9757,
+    "document_score": 0.9884,
+    "levels": {
+     "answers": 0.9757,
+     "elsewhere": 0.0126,
+     "different_case": 0.0081,
+     "unrelated": 0.0035
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Errors.md#11",
+    "action": "use",
+    "relevance_score": 0.9385,
+    "document_score": 0.9773,
+    "levels": {
+     "answers": 0.9385,
+     "elsewhere": 0.0387,
+     "different_case": 0.0167,
+     "unrelated": 0.0061
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Errors.md#10",
+    "action": "expand",
+    "relevance_score": 0.0502,
+    "document_score": 0.6578,
+    "levels": {
+     "answers": 0.0502,
+     "elsewhere": 0.6076,
+     "different_case": 0.0443,
+     "unrelated": 0.2979
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Reply.md#21",
+    "action": "expand",
+    "relevance_score": 0.0142,
+    "document_score": 0.7327,
+    "levels": {
+     "answers": 0.0142,
+     "elsewhere": 0.7186,
+     "different_case": 0.0385,
+     "unrelated": 0.2287
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Routes.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0115,
+    "document_score": 0.154,
+    "levels": {
+     "answers": 0.0115,
+     "elsewhere": 0.1424,
+     "different_case": 0.0652,
+     "unrelated": 0.7808
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Server.md#77",
+    "action": "expand",
+    "relevance_score": 0.009,
+    "document_score": 0.8647,
+    "levels": {
+     "answers": 0.009,
+     "elsewhere": 0.8556,
+     "different_case": 0.0301,
+     "unrelated": 0.1052
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5014
+  },
+  "timing": {
+   "total_ms": 115,
+   "rerank_ms": 99,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 6094,
+    "branches": 8,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,126 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/preParsing.rerank",
+ "recorded_at": "2026-11-06T13:28:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1002,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "45.011585",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=283"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `preParsing`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `preParsing`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "title": "docs/Guides/Migration-Guide-V3.md > V3 Migration Guide > Breaking changes > Changed preParsing hook behavior ([#2286](https://github.com/fastify/fastify/pull/2286))",
+    "text": "### Changed preParsing hook behavior ([#2286](https://github.com/fastify/fastify/pull/2286))\n\nFrom Fastify v3, the behavior of the `preParsing` hook will change slightly\nto support request payload manipulation.\n\nThe hook now takes an additional argument, `payload`, and therefore the new hook\nsignature is `fn(request, reply, payload, done)` or `async fn(request, reply,\npayload)`.\n\nThe hook can optionally return a new stream via `done(null, stream)` or\nreturning the stream in case of async functions.\n\nIf the hook returns a new stream, it will be used instead of the original one in\nsubsequent hooks. A sample use case for this is handling compressed requests.\n\nThe new stream should add the `receivedEncodedLength` property to the stream\nthat should reflect the actual data size received from the client. For instance,\nin a compressed request it should be the size of the compressed payload. This\nproperty can (and should) be dynamically updated during `data` events.\n\nThe old syntax of Fastify v2 without payload is supported but it is deprecated."
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > preParsing",
+    "text": "### preParsing\n\nIf you are using the `preParsing` hook, you can transform the request payload\nstream before it is parsed. It receives the request and reply objects as other\nhooks, and a stream with the current request payload.\n\nIf it returns a value (via `return` or via the callback function), it must\nreturn a stream.\n\nFor instance, you can decompress the request body:\n\n```js\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Some code\n  done(null, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preParsing', async (request, reply, payload) => {\n  // Some code\n  await asyncMethod()\n  return newPayload\n})\n```\n\n> ℹ️ Note:\n> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.\n\n> ℹ️ Note:\n> You should also add a `receivedEncodedLength` property to the\n> returned stream. This property is used to correctly match the request payload\n> with the `Content-Length` header value. Ideally, this property should be updated\n> on each received chunk.\n\n> ℹ️ Note:\n> The size of the returned stream is checked to not exceed the limit\n> set in [`bodyLimit`](./Server.md#bodylimit) option."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#12",
+    "title": "docs/Reference/Server.md > Factory > `bodyLimit`",
+    "text": "### `bodyLimit`\n<a id=\"factory-body-limit\"></a>\n\n+ Default: `1048576` (1MiB)\n\nDefines the maximum payload, in bytes, the server is allowed to accept.\nThe default body reader sends [`FST_ERR_CTP_BODY_TOO_LARGE`](./Errors.md#fst_err_ctp_body_too_large)\nreply, if the size of the body exceeds this limit.\nIf [`preParsing` hook](./Hooks.md#preparsing) is provided, this limit is applied\nto the size of the stream the hook returns (i.e. the size of \"decoded\" body)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#73",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.preParsingHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void",
+    "text": "##### fastify.preParsingHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L35)\n\n`preParsing` is the second hook to be executed in the request lifecycle. The\nprevious hook was `onRequest`, the next hook will be `preValidation`.\n\nNotice: in the `preParsing` hook, request.body will always be null, because the\nbody parsing happens before the `preValidation` hook.\n\nNotice: you should also add `receivedEncodedLength` property to the returned\nstream. This property is used to correctly match the request payload with the\n`Content-Length` header value. Ideally, this property should be updated on each\nreceived chunk."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/TypeScript.md#73",
+    "action": "use",
+    "relevance_score": 0.977,
+    "document_score": 0.9859,
+    "levels": {
+     "answers": 0.977,
+     "elsewhere": 0.0089,
+     "different_case": 0.0085,
+     "unrelated": 0.0057
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "action": "use",
+    "relevance_score": 0.9736,
+    "document_score": 0.9847,
+    "levels": {
+     "answers": 0.9736,
+     "elsewhere": 0.0111,
+     "different_case": 0.0098,
+     "unrelated": 0.0055
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "action": "use",
+    "relevance_score": 0.97,
+    "document_score": 0.9859,
+    "levels": {
+     "answers": 0.97,
+     "elsewhere": 0.0159,
+     "different_case": 0.0088,
+     "unrelated": 0.0054
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0129,
+    "document_score": 0.1649,
+    "levels": {
+     "answers": 0.0129,
+     "elsewhere": 0.152,
+     "different_case": 0.0422,
+     "unrelated": 0.7929
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1471
+  },
+  "timing": {
+   "total_ms": 80,
+   "rerank_ms": 64,
+   "questions_ms": 0,
+   "model_ms": 43,
+   "engine": {
+    "rows": 2011,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 43,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 41,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,144 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/node-version.rerank",
+ "recorded_at": "2026-11-06T13:28:15Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1017,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.455585",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=334"
+ },
+ "request": {
+  "query": "What is the Node.js version that is required or supported?",
+  "instructions": "A passage answers only if it itself states a concrete version number as a requirement or support statement.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on",
+    "text": "### Hands-on\n\nFor this sample solution we'll be using the following:\n\n- `node.js v16.14.2`\n- `npm 8.5.0`\n- `fastify 4.0.0-rc.1`\n- `fastify-plugin 3.0.1`\n- `undici 5.0.0`\n\nSay we have the following base server set up at first:\n\n```js\nconst Fastify = require('fastify')\n\nconst provider = require('./provider')\n\nconst server = Fastify({ logger: true })\nconst USUAL_WAIT_TIME_MS = 5000\n\nserver.get('/ping', function (request, reply) {\n  reply.send({ error: false, ready: request.server.magicKey !== null })\n})\n\nserver.post('/webhook', function (request, reply) {\n  // It's good practice to validate webhook requests come from\n  // who you expect. This is skipped in this sample for the sake\n  // of simplicity\n\n  const { magicKey } = request.body\n  request.server.magicKey = magicKey\n  request.log.info('Ready for customer requests!')\n\n  reply.send({ error: false })\n})\n\nserver.get('/v1*', async function (request, reply) {\n  try {\n    const data = await provider.fetchSensitiveData(request.server.magicKey)\n    return { customer: true, error: false }\n  } catch (error) {\n    request.log.error({\n      error,\n      message: 'Failed at fetching sensitive data from provider',\n    })\n\n    reply.statusCode = 500\n    return { customer: null, error: true }\n  }\n})\n\nserver.decorate('magicKey')\n\nserver.listen({ port: '1234' }, () => {\n  provider.thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS)\n    .catch((error) => {\n      server.log.error({\n        error,\n        message: 'Got an error while trying to get the magic key!'\n      })\n\n      // Since we won't be able to serve requests, might as well wrap\n      // things up\n      server.close(() => process.exit(1))\n    })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Long Term Support Cycle",
+    "text": "## Long Term Support Cycle\n\nFastify v5 will only support Node.js v20+. If you are using an older version of\nNode.js, you will need to upgrade to a newer version to use Fastify v5.\n\nFastify v4 is still supported until June 30, 2025. If you are unable to upgrade,\nyou should consider buying an end-of-life support plan from HeroDevs."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Long Term Support Cycle > Why Node.js v20?",
+    "text": "### Why Node.js v20?\n\nFastify v5 will only support Node.js v20+ because it has significant differences\ncompared to v18, such as\nbetter support for `node:test`. This allows us to provide a better developer\nexperience and streamline maintenance.\n\nNode.js v18 will exit Long Term Support on April 30, 2025, so you should be planning\nto upgrade to v20 anyway."
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#8",
+    "title": "docs/Guides/Testing.md > Testing > Application > Testing with a running server > Example:",
+    "text": "#### Example:\n\nUses **app.js** from the previous example.\n\n**test-listen.js** (testing with [`undici`](https://www.npmjs.com/package/undici))\n```js\nconst { test } = require('node:test')\nconst { Client } = require('undici')\nconst buildFastify = require('./app')\n\ntest('should work with undici', async t => {\n  t.plan(2)\n\n  const fastify = buildFastify()\n\n  await fastify.listen()\n\n   const client = new Client(\n    'http://localhost:' + fastify.server.address().port, {\n      keepAliveTimeout: 10,\n      keepAliveMaxTimeout: 10\n    }\n  )\n\n  t.after(() => {\n    fastify.close()\n    client.close()\n  })\n\n  const response = await client.request({ method: 'GET', path: '/' })\n\n  t.assert.strictEqual(await response.body.text(), '{\"hello\":\"world\"}')\n  t.assert.strictEqual(response.statusCode, 200)\n})\n```\n\nAlternatively, starting with Node.js 18,\n[`fetch`](https://nodejs.org/docs/latest-v18.x/api/globals.html#fetch)\nmay be used without requiring any extra dependencies:\n\n**test-listen.js**\n```js\nconst { test } = require('node:test')\nconst buildFastify = require('./app')\n\ntest('should work with fetch', async t => {\n  t.plan(3)\n\n  const fastify = buildFastify()\n\n  t.after(() => fastify.close())\n\n  await fastify.listen()\n\n  const response = await fetch(\n    'http://localhost:' + fastify.server.address().port\n  )\n\n  t.assert.strictEqual(response.status, 200)\n  t.assert.strictEqual(\n    response.headers.get('content-type'),\n    'application/json; charset=utf-8'\n  )\n  const jsonResult = await response.json()\n  t.assert.strictEqual(jsonResult.hello, 'world')\n})\n```\n\n**test-ready.js** (testing with\n[`SuperTest`](https://www.npmjs.com/package/supertest))\n```js\nconst { test } = require('node:test')\nconst supertest = require('supertest')\nconst buildFastify = require('./app')\n\ntest('GET `/` route', async (t) => {\n  const fastify = buildFastify()\n\n  t.after(() => fastify.close())\n\n  await fastify.ready()\n\n  const response = await supertest(fastify.server)\n    .get('/')\n    .expect(200)\n    .expect('Content-Type', 'application/json; charset=utf-8')\n  t.assert.deepStrictEqual(response.body, { hello: 'world' })\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#7",
+    "title": "docs/Reference/Server.md > Factory > `forceCloseConnections`",
+    "text": "### `forceCloseConnections`\n<a id=\"forcecloseconnections\"></a>\n\n+ Default: `\"idle\"` if the HTTP server allows it, `false` otherwise\n\nWhen set to `true`, upon [`close`](#close) the server will iterate the current\npersistent connections and [destroy their\nsockets](https://nodejs.org/dist/latest-v16.x/docs/api/net.html#socketdestroyerror).\n\nWhen used with HTTP/2 server, it will also close all active HTTP/2 sessions.\n\n> ℹ️ Note:\n> Since Node.js v24 active sessions are closed by default\n\n\n> ⚠ Warning:\n> Connections are not inspected to determine if requests have\n> been completed.\n\nFastify will prefer the HTTP server's\n[`closeAllConnections`](https://nodejs.org/dist/latest-v18.x/docs/api/http.html#servercloseallconnections)\nmethod if supported, otherwise, it will use internal connection tracking.\n\nWhen set to `\"idle\"`, upon [`close`](#close) the server will iterate the current\npersistent connections which are not sending a request or waiting for a response\nand destroy their sockets. The value is only supported if the HTTP server\nsupports the\n[`closeIdleConnections`](https://nodejs.org/dist/latest-v18.x/docs/api/http.html#servercloseidleconnections)\nmethod, otherwise attempting to set it will throw an exception."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#1",
+    "action": "use",
+    "relevance_score": 0.9949,
+    "document_score": 0.9962,
+    "levels": {
+     "answers": 0.9949,
+     "elsewhere": 0.0013,
+     "different_case": 0.0014,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#2",
+    "action": "use",
+    "relevance_score": 0.993,
+    "document_score": 0.9947,
+    "levels": {
+     "answers": 0.993,
+     "elsewhere": 0.0017,
+     "different_case": 0.002,
+     "unrelated": 0.0033
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#2",
+    "action": "use",
+    "relevance_score": 0.9805,
+    "document_score": 0.986,
+    "levels": {
+     "answers": 0.9805,
+     "elsewhere": 0.0055,
+     "different_case": 0.0061,
+     "unrelated": 0.0079
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Guides/Testing.md#8",
+    "action": "expand",
+    "relevance_score": 0.2268,
+    "document_score": 0.8843,
+    "levels": {
+     "answers": 0.2268,
+     "elsewhere": 0.6575,
+     "different_case": 0.0348,
+     "unrelated": 0.0809
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Server.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.1152,
+    "document_score": 0.2304,
+    "levels": {
+     "answers": 0.1152,
+     "elsewhere": 0.1152,
+     "different_case": 0.0424,
+     "unrelated": 0.7272
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2035
+  },
+  "timing": {
+   "total_ms": 77,
+   "rerank_ms": 60,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2870,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 80
+   }
+  }
+ }
+}

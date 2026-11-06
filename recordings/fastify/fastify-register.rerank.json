@@ -1,0 +1,145 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/fastify-register.rerank",
+ "recorded_at": "2026-11-06T13:28:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1004,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.260193",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=177"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `fastify.register`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `fastify.register`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser > Using addContentTypeParser with fastify.register",
+    "text": "### Using addContentTypeParser with fastify.register\nWhen using `addContentTypeParser` with `fastify.register`, avoid `await`\nwhen registering routes. Using `await` makes route registration asynchronous,\npotentially registering routes before `addContentTypeParser` is set."
+   },
+   {
+    "id": "fastify:docs/Reference/Plugins.md#1",
+    "title": "docs/Reference/Plugins.md > Plugins > Plugin Options",
+    "text": "### Plugin Options\n<a id=\"plugin-options\"></a>\n\nThe optional `options` parameter for `fastify.register` supports a predefined\nset of options that Fastify itself will use, except when the plugin has been\nwrapped with [fastify-plugin](https://github.com/fastify/fastify-plugin). This\noptions object will also be passed to the plugin upon invocation, regardless of\nwhether or not the plugin has been wrapped. The currently supported list of\nFastify specific options is:\n\n+ [`logLevel`](./Routes.md#custom-log-level)\n+ [`logSerializers`](./Routes.md#custom-log-serializer)\n+ [`prefix`](#route-prefixing-option)\n\nThese options will be ignored when used with fastify-plugin.\n\nTo avoid collisions, a plugin should consider namespacing its options. For\nexample, a plugin `foo` might be registered like so:\n\n```js\nfastify.register(require('fastify-foo'), {\n  prefix: '/foo',\n  foo: {\n    fooOption1: 'value',\n    fooOption2: 'value'\n  }\n})\n```\n\nIf collisions are not a concern, the plugin may accept the options object as-is:\n\n```js\nfastify.register(require('fastify-foo'), {\n  prefix: '/foo',\n  fooOption1: 'value',\n  fooOption2: 'value'\n})\n```\n\nThe `options` parameter can also be a `Function` evaluated at plugin registration,\nproviding access to the Fastify instance via the first argument:\n\n```js\nconst fp = require('fastify-plugin')\n\nfastify.register(fp((fastify, opts, done) => {\n  fastify.decorate('foo_bar', { hello: 'world' })\n\n  done()\n}))\n\n// The opts argument of fastify-foo will be { hello: 'world' }\nfastify.register(require('fastify-foo'), parent => parent.foo_bar)\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#84",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > schemaController",
+    "text": "#### schemaController\n<a id=\"schema-controller\"></a>\n\nThis property can be used to fully manage:\n- `bucket`: where the schemas of your application will be stored\n- `compilersFactory`: what module must compile the JSON schemas\n\nIt can be useful when your schemas are stored in another data structure that is\nunknown to Fastify.\n\nAnother use case is to tweak all the schemas processing. Doing so it is possible\nto use Ajv v8 JTD or Standalone feature. To use such as JTD or the Standalone\nmode, refers to the [`@fastify/ajv-compiler`\ndocumentation](https://github.com/fastify/ajv-compiler#usage).\n\n```js\nconst fastify = Fastify({\n  schemaController: {\n    /**\n     * This factory is called whenever `fastify.register()` is called.\n     * It may receive as input the schemas of the parent context if some schemas have been added.\n     * @param {object} parentSchemas these schemas will be returned by the\n     * `getSchemas()` method function of the returned `bucket`.\n     */\n    bucket: function factory (parentSchemas) {\n      return {\n        add (inputSchema) {\n          // This function must store the schema added by the user.\n          // This function is invoked when `fastify.addSchema()` is called.\n        },\n        getSchema (schema$id) {\n          // This function must return the raw schema requested by the `schema$id`.\n          // This function is invoked when `fastify.getSchema(id)` is called.\n          return aSchema\n        },\n        getSchemas () {\n          // This function must return all the schemas referenced by the routes schemas' $ref\n          // It must return a JSON where the property is the schema `$id` and the value is the raw JSON Schema.\n          const allTheSchemaStored = {\n            'schema$id1': schema1,\n            'schema$id2': schema2\n          }\n          return allTheSchemaStored\n        }\n      }\n    },\n\n    /**\n     * The compilers factory lets you fully control the validator and serializer\n     * in the Fastify's lifecycle, providing the encapsulation to your compilers.\n     */\n    compilersFactory: {\n      /**\n       * This factory is called whenever a new validator instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`. Needed to resolve the external references $ref.\n       * @param {object} ajvServerOption the server `ajv` options to build your compilers accordingly\n       */\n      buildValidator: function factory (externalSchemas, ajvServerOption) {\n        // This factory function must return a schema validator compiler.\n        // See [#schema-validator](./Validation-and-Serialization.md#schema-validator) for details.\n        const yourAjvInstance = new Ajv(ajvServerOption.customOptions)\n        return function validatorCompiler ({ schema, method, url, httpPart }) {\n          return yourAjvInstance.compile(schema)\n        }\n      },"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#85",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > schemaController",
+    "text": "      /**\n       * This factory is called whenever a new serializer instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`. Needed to resolve the external references $ref.\n       * @param {object} serializerOptsServerOption the server `serializerOpts`\n       * options to build your compilers accordingly\n       */\n      buildSerializer: function factory (externalSchemas, serializerOptsServerOption) {\n        // This factory function must return a schema serializer compiler.\n        // See [#schema-serializer](./Validation-and-Serialization.md#schema-serializer) for details.\n        return function serializerCompiler ({ schema, method, url, httpStatus, contentType }) {\n          return data => JSON.stringify(data)\n        }\n      }\n    }\n  }\n});\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#53",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Register > fastify.FastifyRegister(plugin: [FastifyPluginAsync][FastifyPluginAsync], opts: [FastifyRegisterOptions][FastifyRegisterOptions])",
+    "text": "##### fastify.FastifyRegister(plugin: [FastifyPluginAsync][FastifyPluginAsync], opts: [FastifyRegisterOptions][FastifyRegisterOptions])\n[src](https://github.com/fastify/fastify/blob/main/types/register.d.ts#L9)\n\nThis type interface specifies the type for the\n[`fastify.register()`](./Server.md#register) method. The type interface returns\na function signature with an underlying generic `Options` which is defaulted to\n[FastifyPluginOptions][FastifyPluginOptions]. It infers this generic from the\nFastifyPlugin parameter when calling this function so there is no need to\nspecify the underlying generic. The options parameter is the intersection of the\nplugin's options and two additional optional properties: `prefix: string` and\n`logLevel`: [LogLevel][LogLevel].\n\nBelow is an example of the options inference in action:\n\n```typescript\nconst server = fastify()\n\nconst plugin: FastifyPluginCallback<{\n  option1: string;\n  option2: boolean;\n}> = function (instance, opts, done) { }\n\nserver().register(plugin, {}) // Error - options object is missing required properties\nserver().register(plugin, { option1: '', option2: true }) // OK - options object contains required properties\n```\n\nSee the Learn By Example, [Plugins](#plugins) section for more detailed examples\nof creating TypeScript plugins in Fastify."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/TypeScript.md#53",
+    "action": "use",
+    "relevance_score": 0.9865,
+    "document_score": 0.9917,
+    "levels": {
+     "answers": 0.9865,
+     "elsewhere": 0.0052,
+     "different_case": 0.0049,
+     "unrelated": 0.0034
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Plugins.md#1",
+    "action": "use",
+    "relevance_score": 0.9591,
+    "document_score": 0.9821,
+    "levels": {
+     "answers": 0.9591,
+     "elsewhere": 0.0229,
+     "different_case": 0.0114,
+     "unrelated": 0.0066
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "action": "use",
+    "relevance_score": 0.8755,
+    "document_score": 0.914,
+    "levels": {
+     "answers": 0.8755,
+     "elsewhere": 0.0384,
+     "different_case": 0.0397,
+     "unrelated": 0.0464
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#84",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0471,
+    "document_score": 0.364,
+    "levels": {
+     "answers": 0.0471,
+     "elsewhere": 0.3169,
+     "different_case": 0.0586,
+     "unrelated": 0.5774
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#85",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.0145,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.0107,
+     "different_case": 0.0222,
+     "unrelated": 0.9633
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2305
+  },
+  "timing": {
+   "total_ms": 60,
+   "rerank_ms": 59,
+   "questions_ms": 0,
+   "model_ms": 53,
+   "engine": {
+    "rows": 2980,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 53,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}
