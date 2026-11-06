@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/007",
+ "recorded_at": "2026-11-06T13:33:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1048,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "94.363073",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=14,cfOrigin;dur=0,cfWorker;dur=372"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "text": "### `<series>`\n\n```yaml\n# This follows the usual series notation '<metric name>{<label name>=<label value>, ...}'\n# Examples:\n#      series_name{label1=\"value1\", label2=\"value2\"}\n#      go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}\nseries: <string>\n\n# This uses expanding notation.\n# Expanding notation:\n#     'a+bxn' becomes 'a a+b a+(2*b) a+(3*b) … a+(n*b)'\n#     Read this as series starts at a, then n further samples incrementing by b.\n#     'a-bxn' becomes 'a a-b a-(2*b) a-(3*b) … a-(n*b)'\n#     Read this as series starts at a, then n further samples decrementing by b (or incrementing by negative b).\n#     'axn' becomes 'a a a … a' (a n+1 times) - it's a shorthand for 'a+0xn'\n# There are special values to indicate missing and stale samples:\n#     '_' represents a missing sample from scrape\n#     'stale' indicates a stale sample\n# Examples:\n#     1. '-2+4x3' becomes '-2 2 6 10' - series starts at -2, then 3 further samples incrementing by 4.\n#     2. ' 1-2x4' becomes '1 -1 -3 -5 -7' - series starts at 1, then 4 further samples decrementing by 2.\n#     3. ' 1x4' becomes '1 1 1 1 1' - shorthand for '1+0x4', series starts at 1, then 4 further samples incrementing by 0.\n#     4. ' 1 _x3 stale' becomes '1 _ _ _ stale' - the missing sample cannot increment, so 3 missing samples are produced by the '_x3' expression.\n#\n# Native histogram notation:\n#     Native histograms can be used instead of floating point numbers using the following notation:\n#     {{schema:1 sum:-0.3 count:3.1 z_bucket:7.1 z_bucket_w:0.05 buckets:[5.1 10 7] offset:-3 n_buckets:[4.1 5] n_offset:-5 counter_reset_hint:gauge}}\n#     Native histograms support the same expanding notation as floating point numbers, i.e. 'axn', 'a+bxn' and 'a-bxn'.\n#     All properties are optional and default to 0. The order is not important. The following properties are supported:\n#     - schema (int):\n#         Currently valid schema numbers are -53 and -4 <= n <= 8.\n#         Schema -53 is the custom buckets schema, upper bucket boundaries are defined in custom_values\n#         like for classic histograms, and you shouldn't use z_bucket, z_bucket_w, n_buckets, n_offset.\n#         The rest are base-2 standard schemas, where 1.0 is a bucket boundary in each case, and\n#         then each power of two is divided into 2^n logarithmic buckets.  Or\n#         in other words, each bucket boundary is the previous boundary times\n#         2^(2^-n).\n#     - sum (float):\n#         The sum of all observations, including the zero bucket.\n#     - count (non-negative float):\n#         The number of observations, including those that are NaN and including the zero bucket.\n#     - z_bucket (non-negative float):\n#         The sum of all observations in the zero bucket.\n#     - z_bucket_w (non-negative float):\n#         The width of the zero bucket.\n#         If z_bucket_w > 0, the zero bucket contains all observations -z_bucket_w <= x <= z_bucket_w.\n#         Otherwise, the zero bucket only contains observations that are exactly 0.\n#     - buckets (list of non-negative floats):\n#         Observation counts in positive buckets. Each represents an absolute count.\n#     - offset (int):\n#         The starting index of the first entry in the positive buckets.\n#     - n_buckets (list of non-negative floats):\n#         Observation counts in negative buckets. Each represents an absolute count.\n#     - n_offset (int):\n#         The starting index of the first entry in the negative buckets.\n#     - counter_reset_hint (one of 'unknown', 'reset', 'not_reset' or 'gauge')"
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#11",
+    "text": "### Custom values data:\n\nThe `custom_values` data is currently only used for schema -53 (custom bucket boundaries). For other schemas, it is empty (length of zero).\n\n```\n┌──────────────────────────┬──────────────────┬──────────────────┬─────┬──────────────────┐\n│ num_values <varbit_uint> │ value_0 <custom> │ value_1 <custom> │ ... │ value_n <custom> │\n└──────────────────────────┴─────────────────────────────────────┴─────┴──────────────────┘\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/unit_testing_rules.md#3",
+    "b": "prometheus:tsdb/docs/format/chunks.md#11",
+    "relation": "overlapping",
+    "related": 0.9921,
+    "probabilities": {
+     "same": 0.0116,
+     "overlapping": 0.9686,
+     "conflicting": 0.012,
+     "unrelated": 0.0079
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 178,
+   "passage_reads": 1,
+   "passages_ms": 67,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 245,
+   "total_ms": 248
+  }
+ }
+}

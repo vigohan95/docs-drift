@@ -1,0 +1,164 @@
+{
+ "endpoint": "compare",
+ "tag": "vite-nd/036",
+ "recorded_at": "2026-11-06T13:33:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1225,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "231.588671",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=412"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/config/preview-options.md#7",
+    "text": "## preview.proxy\n\n- **Type:** `Record<string, string | ProxyOptions>`\n- **Default:** [`server.proxy`](./server-options#server-proxy)\n\nConfigure custom proxy rules for the preview server. Expects an object of `{ key: options }` pairs. If the key starts with `^`, it will be interpreted as a `RegExp`. The `configure` option can be used to access the proxy instance.\n\nUses [`http-proxy-3`](https://github.com/sagemathinc/http-proxy-3). Full options [here](https://github.com/sagemathinc/http-proxy-3#options)."
+   },
+   {
+    "id": "vite:docs/config/server-options.md#7",
+    "text": "## server.proxy\n\n- **Type:** `Record<string, string | ProxyOptions>`\n\nConfigure custom proxy rules for the dev server. Expects an object of `{ key: options }` pairs. Any requests whose request path starts with that key will be proxied to the specified target. If the key starts with `^`, it will be interpreted as a `RegExp`. The `configure` option can be used to access the proxy instance. If a request matches any of the configured proxy rules, the request won't be transformed by Vite.\n\nNote that if you are using non-relative [`base`](/config/shared-options.md#base), you must prefix each key with that `base`.\n\nExtends [`http-proxy-3`](https://github.com/sagemathinc/http-proxy-3#options). Additional options are [here](https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/middlewares/proxy.ts#L13).\n\nIn some cases, you might also want to configure the underlying dev server (e.g. to add custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app). In order to do that, you need to write your own [plugin](/guide/using-plugins.html) and use [configureServer](/guide/api-plugin.html#configureserver) function.\n\n**Example:**\n\n```js\nexport default defineConfig({\n  server: {\n    proxy: {\n      // string shorthand:\n      // http://localhost:5173/foo\n      //   -> http://localhost:4567/foo\n      '/foo': 'http://localhost:4567',\n      // with options:\n      // http://localhost:5173/api/bar\n      //   -> http://jsonplaceholder.typicode.com/bar\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/api/, ''),\n      },\n      // with RegExp:\n      // http://localhost:5173/fallback/\n      //   -> http://jsonplaceholder.typicode.com/\n      '^/fallback/.*': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/fallback/, ''),\n      },\n      // Using the proxy instance\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        configure: (proxy, options) => {\n          // proxy will be an instance of 'http-proxy-3'\n        },\n      },\n      // Proxying websockets or socket.io:\n      // ws://localhost:5173/socket.io\n      //   -> ws://localhost:5174/socket.io\n      // Exercise caution using `rewriteWsOrigin` as it can leave the\n      // proxying open to CSRF attacks.\n      '/socket.io': {\n        target: 'ws://localhost:5174',\n        ws: true,\n        rewriteWsOrigin: true,\n      },\n    },\n  },\n})\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/config/preview-options.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/config/server-options.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/server-options.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/config/preview-options.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/config/preview-options.md#7",
+    "b": "vite:docs/config/server-options.md#7",
+    "relation": "overlapping",
+    "related": 0.9972,
+    "probabilities": {
+     "same": 0.0065,
+     "overlapping": 0.9864,
+     "conflicting": 0.0043,
+     "unrelated": 0.0028
+    },
+    "duplicates": [
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9167,
+       "restated": 0.0575,
+       "elaborated": 0.0142,
+       "different": 0.0116
+      },
+      "confidence": 0.9884,
+      "a": {
+       "document": "vite:docs/config/preview-options.md#7",
+       "quote": "Expects an object of `{ key: options }` pairs.",
+       "start": 187,
+       "end": 233,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/config/server-options.md#7",
+       "quote": "Expects an object of `{ key: options }` pairs.",
+       "start": 119,
+       "end": 165,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.7798,
+       "restated": 0.1911,
+       "elaborated": 0.0151,
+       "different": 0.0141
+      },
+      "confidence": 0.9859,
+      "a": {
+       "document": "vite:docs/config/preview-options.md#7",
+       "quote": "If the key starts with `^`, it will be interpreted as a `RegExp`.",
+       "start": 234,
+       "end": 299,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/config/server-options.md#7",
+       "quote": "If the key starts with `^`, it will be interpreted as a `RegExp`.",
+       "start": 260,
+       "end": 325,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9603,
+       "restated": 0.0249,
+       "elaborated": 0.0086,
+       "different": 0.0061
+      },
+      "confidence": 0.9939,
+      "a": {
+       "document": "vite:docs/config/preview-options.md#7",
+       "quote": "The `configure` option can be used to access the proxy instance.",
+       "start": 300,
+       "end": 364,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/config/server-options.md#7",
+       "quote": "The `configure` option can be used to access the proxy instance.",
+       "start": 326,
+       "end": 390,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 119,
+   "passages": 4,
+   "counterparts_ms": 110
+  },
+  "timing": {
+   "read_ms": 262,
+   "total_ms": 266
+  }
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/014",
+ "recorded_at": "2026-11-06T13:33:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 870,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.895361",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=172"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/https.md#0",
+    "text": "---\ntitle: HTTPS and authentication\nsort_rank: 7\n---\n\nPrometheus supports basic authentication and TLS.\nThis is **experimental** and might change in the future.\n\nTo specify which web configuration file to load, use the `--web.config.file` flag.\n\nThe file is written in [YAML format](https://en.wikipedia.org/wiki/YAML),\ndefined by the scheme described below.\nBrackets indicate that a parameter is optional. For non-list parameters the\nvalue is set to the specified default.\n\nThe file is read upon every http request, such as any change in the\nconfiguration and the certificates is picked up immediately.\n\nGeneric placeholders are defined as follows:\n\n* `<boolean>`: a boolean that can take the values `true` or `false`\n* `<filename>`: a valid path in the current working directory\n* `<secret>`: a regular string that is a secret, such as a password\n* `<string>`: a regular string\n* `<int>`: a regular integer\n* `<duration>`: a duration as accepted by Go's [time.ParseDuration](https://pkg.go.dev/time#ParseDuration), such as `1s`, `500ms` or `1m30s`; unlike durations in the main configuration file, the units `d`, `w` and `y` are not supported\n\nA valid example file can be found [here](/documentation/examples/web-config.yml).\n\n```yaml\ntls_server_config:\n  # Certificate for server to use to authenticate to client.\n  # Expected to be passed as a PEM encoded sequence of bytes as a string.\n  #\n  # NOTE: If passing the cert inline, cert_file should not be specified below.\n  [ cert: <string> ]\n\n  # Key for server to use to authenticate to client.\n  # Expected to be passed as a PEM encoded sequence of bytes as a string.\n  #\n  # NOTE: If passing the key inline, key_file should not be specified below.\n  [ key: <secret> ]\n\n  # CA certificate for client certificate authentication to the server.\n  # Expected to be passed as a PEM encoded sequence of bytes as a string.\n  #\n  # NOTE: If passing the client_ca inline, client_ca_file should not be specified below.\n  [ client_ca: <string> ]\n\n  # Certificate and key files for server to use to authenticate to client.\n  cert_file: <filename>\n  key_file: <filename>\n\n  # Server policy for client authentication. Maps to ClientAuth Policies.\n  # For more detail on clientAuth options:\n  # https://golang.org/pkg/crypto/tls/#ClientAuthType\n  #\n  # NOTE: If you want to enable client authentication, you need to use\n  # RequireAndVerifyClientCert. Other values are insecure.\n  [ client_auth_type: <string> | default = \"NoClientCert\" ]"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#44",
+    "text": "## Querying metric metadata\n\nIt returns metadata about metrics currently scraped from targets. However, it does not provide any target information.\nThis is considered **experimental** and might change in the future.\n\n```\nGET /api/v1/metadata\n```\n\nURL query parameters:\n\n- `limit=<number>`: Maximum number of metrics to return.\n- `limit_per_metric=<number>`: Maximum number of metadata to return per metric.\n- `metric=<string>`: A metric name to filter metadata for. All metric metadata is retrieved if left empty.\n\nThe `data` section of the query result consists of an object where each key is a metric name and each value is a list of unique metadata objects, as exposed for that metric name across all targets.\n\nThe following example returns two metrics. Note that the metric `http_requests_total` has more than one object in the list. At least one target has a value for `HELP` that do not match with the rest.\n\n```bash\ncurl -G http://localhost:9090/api/v1/metadata?limit=2\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"cortex_ring_tokens\": [\n      {\n        \"type\": \"gauge\",\n        \"help\": \"Number of tokens in the ring\",\n        \"unit\": \"\"\n      }\n    ],\n    \"http_requests_total\": [\n      {\n        \"type\": \"counter\",\n        \"help\": \"Number of HTTP requests\",\n        \"unit\": \"\"\n      },\n      {\n        \"type\": \"counter\",\n        \"help\": \"Amount of HTTP requests\",\n        \"unit\": \"\"\n      }\n    ]\n  }\n}\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/https.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#44",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/https.md#0",
+    "b": "prometheus:docs/querying/api.md#44",
+    "relation": "unrelated",
+    "related": 0.0038,
+    "probabilities": {
+     "same": 0.0013,
+     "overlapping": 0.0013,
+     "conflicting": 0.0013,
+     "unrelated": 0.9962
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36
+  },
+  "timing": {
+   "read_ms": 36,
+   "total_ms": 39
+  }
+ }
+}

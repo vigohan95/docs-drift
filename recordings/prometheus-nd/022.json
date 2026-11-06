@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/022",
+ "recorded_at": "2026-11-06T13:33:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 927,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "80.800287",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=237"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/alerting_rules.md#1",
+    "text": "## Defining alerting rules\n\nAlerting rules are configured in Prometheus in the same way as [recording\nrules](recording_rules.md).\n\nAn example rules file with an alert would be:\n\n```yaml\ngroups:\n- name: example\n  labels:\n    team: myteam\n  rules:\n  - alert: HighRequestLatency\n    expr: job:request_latency_seconds:mean5m{job=\"myjob\"} > 0.5\n    for: 10m\n    keep_firing_for: 5m\n    labels:\n      severity: page\n    annotations:\n      summary: High request latency\n```\n\nThe optional `for` clause causes Prometheus to wait for a certain duration\nbetween first encountering a new expression output vector element and counting\nan alert as firing for this element. In this case, Prometheus will check that\nthe alert continues to be active during each evaluation for 10 minutes before\nfiring the alert. Elements that are active, but not firing yet, are in the pending state.\nAlerting rules without the `for` clause will become active on the first evaluation.\n\nThere is also an optional `keep_firing_for` clause that tells Prometheus to keep\nthis alert firing for the specified duration after the firing condition was last met.\nThis can be used to prevent situations such as flapping alerts, false resolutions\ndue to lack of data loss, etc. Alerting rules without the `keep_firing_for` clause\nwill deactivate on the first evaluation where the condition is not met (assuming\nany optional `for` duration described above has been satisfied).\n\nThe `labels` clause allows specifying a set of additional labels to be attached\nto the alert. Any existing conflicting labels will be overwritten. The label\nvalues can be templated.\n\nThe `annotations` clause specifies a set of informational labels that can be used to store longer additional information such as alert descriptions or runbook links. The annotation values can be templated."
+   },
+   {
+    "id": "prometheus:docs/configuration/recording_rules.md#3",
+    "text": "## Recording rules\n\nRecording rules allow you to precompute frequently needed or computationally\nexpensive expressions and save their result as a new set of time series.\nQuerying the precomputed result will then often be much faster than executing\nthe original expression every time it is needed. This is especially useful for\ndashboards, which need to query the same expression repeatedly every time they\nrefresh.\n\nRecording and alerting rules exist in a rule group. Rules within a group are\nrun sequentially at a regular interval, with the same evaluation time.\nThe names of recording rules must be\n[valid metric names](https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels).\nThe names of alerting rules must be\n[valid label values](https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels).\n\nThe syntax of a rule file is:\n\n```yaml\ngroups:\n  [ - <rule_group> ]\n```\n\nA simple example rules file would be:\n\n```yaml\ngroups:\n  - name: example\n    rules:\n    - record: code:prometheus_http_requests_total:sum\n      expr: sum by (code) (prometheus_http_requests_total)\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/alerting_rules.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/recording_rules.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/alerting_rules.md#1",
+    "b": "prometheus:docs/configuration/recording_rules.md#3",
+    "relation": "overlapping",
+    "related": 0.9965,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9855,
+     "conflicting": 0.0046,
+     "unrelated": 0.0035
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 60,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 89,
+   "total_ms": 93
+  }
+ }
+}

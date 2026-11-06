@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/025",
+ "recorded_at": "2026-11-06T13:33:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 920,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "43.909345",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=238"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/https.md#0",
+    "text": "---\ntitle: HTTPS and authentication\nsort_rank: 7\n---\n\nPrometheus supports basic authentication and TLS.\nThis is **experimental** and might change in the future.\n\nTo specify which web configuration file to load, use the `--web.config.file` flag.\n\nThe file is written in [YAML format](https://en.wikipedia.org/wiki/YAML),\ndefined by the scheme described below.\nBrackets indicate that a parameter is optional. For non-list parameters the\nvalue is set to the specified default.\n\nThe file is read upon every http request, such as any change in the\nconfiguration and the certificates is picked up immediately.\n\nGeneric placeholders are defined as follows:\n\n* `<boolean>`: a boolean that can take the values `true` or `false`\n* `<filename>`: a valid path in the current working directory\n* `<secret>`: a regular string that is a secret, such as a password\n* `<string>`: a regular string\n* `<int>`: a regular integer\n* `<duration>`: a duration as accepted by Go's [time.ParseDuration](https://pkg.go.dev/time#ParseDuration), such as `1s`, `500ms` or `1m30s`; unlike durations in the main configuration file, the units `d`, `w` and `y` are not supported\n\nA valid example file can be found [here](/documentation/examples/web-config.yml).\n\n```yaml\ntls_server_config:\n  # Certificate for server to use to authenticate to client.\n  # Expected to be passed as a PEM encoded sequence of bytes as a string.\n  #\n  # NOTE: If passing the cert inline, cert_file should not be specified below.\n  [ cert: <string> ]\n\n  # Key for server to use to authenticate to client.\n  # Expected to be passed as a PEM encoded sequence of bytes as a string.\n  #\n  # NOTE: If passing the key inline, key_file should not be specified below.\n  [ key: <secret> ]\n\n  # CA certificate for client certificate authentication to the server.\n  # Expected to be passed as a PEM encoded sequence of bytes as a string.\n  #\n  # NOTE: If passing the client_ca inline, client_ca_file should not be specified below.\n  [ client_ca: <string> ]\n\n  # Certificate and key files for server to use to authenticate to client.\n  cert_file: <filename>\n  key_file: <filename>\n\n  # Server policy for client authentication. Maps to ClientAuth Policies.\n  # For more detail on clientAuth options:\n  # https://golang.org/pkg/crypto/tls/#ClientAuthType\n  #\n  # NOTE: If you want to enable client authentication, you need to use\n  # RequireAndVerifyClientCert. Other values are insecure.\n  [ client_auth_type: <string> | default = \"NoClientCert\" ]"
+   },
+   {
+    "id": "prometheus:docs/http_sd.md#2",
+    "text": "## Requirements of HTTP SD endpoints\n\nIf you implement an HTTP SD endpoint, here are a few requirements you should be\naware of.\n\nThe response is consumed as is, unmodified. On each refresh interval (default: 1\nminute), Prometheus will perform a GET request to the HTTP SD endpoint. The GET\nrequest contains a `X-Prometheus-Refresh-Interval-Seconds` HTTP header with the\nrefresh interval.\n\nThe SD endpoint must answer with an HTTP 200 response, with the HTTP Header\n`Content-Type: application/json`. The answer must be UTF-8 formatted.\nIf no targets should be transmitted, HTTP 200 must also be emitted, with\nan empty list `[]`. Target lists are unordered.\n\nPrometheus caches target lists. If an error occurs while fetching an updated\ntargets list, Prometheus keeps using the current targets list. The targets list\nis not saved across restart. The `prometheus_sd_refresh_failures_total` counter\nmetric tracks the number of refresh failures and the `prometheus_sd_refresh_duration_seconds`\nsummary can be used to track HTTP SD refresh attempts or performance. These metrics are\nremoved on Prometheus configuration reload once no HTTP SD configuration updates them,\nfor example when the scrape job is removed.\n\nThe whole list of targets must be returned on every scrape. There is no support\nfor incremental updates. A Prometheus instance does not send its hostname and it\nis not possible for a SD endpoint to know if the SD requests is the first one\nafter a restart or not.\n\nThe URL to the HTTP SD is not considered secret. The authentication and any API\nkeys should be passed with the appropriate authentication mechanisms. Prometheus\nsupports TLS authentication, basic authentication, OAuth2, and authorization\nheaders."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/https.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/http_sd.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/https.md#0",
+    "b": "prometheus:docs/http_sd.md#2",
+    "relation": "unrelated",
+    "related": 0.2033,
+    "probabilities": {
+     "same": 0.0205,
+     "overlapping": 0.16,
+     "conflicting": 0.0227,
+     "unrelated": 0.7967
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 52
+  },
+  "timing": {
+   "read_ms": 51,
+   "total_ms": 55
+  }
+ }
+}

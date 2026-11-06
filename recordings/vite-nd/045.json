@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "vite-nd/045",
+ "recorded_at": "2026-11-06T13:33:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 915,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.377728",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=211"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/env-and-mode.md#2",
+    "text": "## Env Variables\n\nVite exposes env variables under the `import.meta.env` object as strings automatically.\n\nVariables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling. To prevent accidentally leaking env variables to the client, avoid using this prefix. As an example, consider the following:\n\n```[.env]\nVITE_SOME_KEY=123\nDB_PASSWORD=foobar\n```\n\nThe parsed value of `VITE_SOME_KEY` – `\"123\"` – will be exposed on the client, but the value of `DB_PASSWORD` will not. You can test this by adding the following to your code:\n\n```js\nconsole.log(import.meta.env.VITE_SOME_KEY) // \"123\"\nconsole.log(import.meta.env.DB_PASSWORD) // undefined\n```\n\nIf you want to customize the env variables prefix, see the [envPrefix](/config/shared-options.html#envprefix) option.\n\n:::tip Env parsing\nAs shown above, `VITE_SOME_KEY` is a number but returns a string when parsed. The same would also happen for boolean env variables. Make sure to convert to the desired type when using it in your code.\n:::\n\n:::warning Protecting secrets\n\n`VITE_*` variables should _not_ contain sensitive information such as API keys. The values of these variables are bundled into your source code at build time. For production deployments, consider a backend server or serverless/edge functions to properly secure secrets.\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/features.md#48",
+    "text": "### Chunk Import Map Optimization\n\nTo improve the cache hit rate of chunks, Vite can create an import map for chunks. This prevents the cascading cache invalidation issue, which is a problem with ES Modules.\n\nFor example, consider the following scenario:\n\n```\nEntry --> A ---> C\n```\n\nIf `C` is updated, the only chunk that inherently needs to be invalidated is `C`. However, if `A` references `C` via a normal URL in a static import (i.e. the hash of `C` is included in the URL), the content of `A` is changed, thus `A` would also need to be invalidated. The same applies to `Entry`.\n\nBy utilizing the import maps feature, this issue can be avoided. When this optimization is enabled, Vite will create an import map that maps each chunk's ID to its URL and uses the chunk ID in the import statements instead of the URL. This way, when a chunk is updated, only the updated chunk needs to be invalidated, while the chunks that reference it will not be invalidated.\n\nNote that this optimization currently does not apply to CSS and assets. If you update an asset, the chunks that reference it will be invalidated. That said, the invalidation would not cascade and the chunk importing the invalidated chunk would not be invalidated.\n\nTo enable this feature, set [`build.chunkImportMap`](/config/build-options.md#build-chunkimportmap) to `true`."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/env-and-mode.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/features.md#48",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/env-and-mode.md#2",
+    "b": "vite:docs/guide/features.md#48",
+    "relation": "unrelated",
+    "related": 0.0039,
+    "probabilities": {
+     "same": 0.0011,
+     "overlapping": 0.0016,
+     "conflicting": 0.0012,
+     "unrelated": 0.9961
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 42
+  },
+  "timing": {
+   "read_ms": 42,
+   "total_ms": 44
+  }
+ }
+}

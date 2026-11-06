@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "vite-nd/040",
+ "recorded_at": "2026-11-06T13:33:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 930,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "105.163326",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=248"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#4",
+    "text": "## Configuring Environment Using the `configEnvironment` Hook\n\n- **Type:** `(name: string, config: EnvironmentOptions, env: { mode: string, command: 'build' | 'serve', isSsrBuild?: boolean, isPreview?: boolean, isSsrTargetWebworker?: boolean }) => EnvironmentOptions | null | void`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](#per-environment-hooks-and-global-hooks)\n\nWhile the `config` hook is running, the complete list of environments isn't yet known and the environments can be affected by both the default values from the root level environment config or explicitly through the `config.environments` record.\nPlugins should set default values using the `config` hook. To configure each environment, they can use the new `configEnvironment` hook. This hook is called for each environment with its partially resolved config including resolution of final defaults.\n\n```ts\n  configEnvironment(name: string, options: EnvironmentOptions) {\n    // add \"workerd\" condition to the rsc environment\n    if (name === 'rsc') {\n      return {\n        resolve: {\n          conditions: ['workerd'],\n        },\n      }\n    }\n  }\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#9",
+    "text": "### `config`\n\n- **Type:** `(config: UserConfig, env: { mode: 'build' | 'serve', command: string, isSsrBuild?: boolean, isPreview?: boolean }) => UserConfig | null | void`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Modify Vite config before it's resolved. The hook receives the raw user config (CLI options merged with config file) and the current config env which exposes the `mode` and `command` being used. It can return a partial config object that will be deeply merged into existing config, or directly mutate the config (if the default merging cannot achieve the desired result).\n\n  **Example:**\n\n  ```js\n  // return partial config (recommended)\n  const partialConfigPlugin = () => ({\n    name: 'return-partial',\n    config: () => ({\n      resolve: {\n        alias: {\n          foo: 'bar',\n        },\n      },\n    }),\n  })\n\n  // mutate the config directly (use only when merging doesn't work)\n  const mutateConfigPlugin = () => ({\n    name: 'mutate-config',\n    config(config, { command }) {\n      if (command === 'build') {\n        config.root = 'foo'\n      }\n    },\n  })\n  ```\n\n  ::: warning Note\n  User plugins are resolved before running this hook so injecting other plugins inside the `config` hook will have no effect.\n  :::"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-plugins.md#4",
+    "b": "vite:docs/guide/api-plugin.md#9",
+    "relation": "overlapping",
+    "related": 0.8383,
+    "probabilities": {
+     "same": 0.013,
+     "overlapping": 0.8112,
+     "conflicting": 0.0141,
+     "unrelated": 0.1617
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 46,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 114,
+   "total_ms": 118
+  }
+ }
+}

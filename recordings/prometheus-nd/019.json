@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/019",
+ "recorded_at": "2026-11-06T13:33:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 935,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.95664",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=237"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/functions.md#67",
+    "text": "If the [feature flag](../feature_flags.md#experimental-promql-functions)\n`--enable-feature=promql-experimental-functions` is set, the following\nadditional functions are available:\n\n* `mad_over_time(range-vector)`: the median absolute deviation of all float\n  samples in the specified interval.\n* `ts_of_min_over_time(range-vector)`: the timestamp of the last float sample\n  that has the minimum value of all float samples in the specified interval.\n* `ts_of_max_over_time(range-vector)`: the timestamp of the last float sample\n  that has the maximum value of all float samples in the specified interval.\n* `ts_of_last_over_time(range-vector)`: the timestamp of last sample in the\n  specified interval.\n* `ts_of_first_over_time(range-vector)`: the timestamp of earliest sample in the\n  specified interval.\n\nNote that all values in the specified interval have the same weight in the\naggregation even if the values are not equally spaced throughout the interval.\n\nThese functions act on histograms in the following way:\n\n- `count_over_time`, `first_over_time`, `last_over_time`, and\n  `present_over_time()` act on float and histogram samples in the same way.\n- `avg_over_time()` and `sum_over_time()` act on histogram samples in a way\n  that corresponds to the respective aggregation operators. If a series\n  contains a mix of float samples and histogram samples within the range, the\n  corresponding result is removed entirely from the output vector. Such a\n  removal is flagged by a warn-level annotation.\n- All other functions ignore histogram samples in the following way: Input\n  ranges containing only histogram samples are silently removed from the\n  output. For ranges with a mix of histogram and float samples, only the float\n  samples are processed and the omission of the histogram samples is flagged by\n  an info-level annotation."
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#4",
+    "text": "* For `/`, the histogram sample has to be on the left hand side (LHS), followed\n  by the scalar on the right hand side (RHS). All bucket populations and the\n  count and the sum of observations are then divided by the scalar. A division\n  by zero results in a histogram with no regular buckets and the zero bucket\n  population and the count and sum of observations all set to `+Inf`, `-Inf`,\n  or `NaN`, depending on their values in the input histogram (positive,\n  negative, or zero/`NaN`, respectively). If the scalar is negative, the\n  resulting histogram is considered a gauge histogram. Otherwise, the counter\n  vs. gauge flavor of the input histogram sample is retained.\n\n* For `/` with a scalar on the LHS and a histogram sample on the RHS, and\n  similarly for all other arithmetic binary operators in any combination of a\n  scalar and a histogram sample, there is no result and the corresponding\n  element is removed from the resulting vector. Such a removal is flagged by an\n  info-level annotation.\n\n**Between two instant vectors**, a binary arithmetic operator is applied to\neach entry in the LHS vector and its [matching element](#vector-matching) in\nthe RHS vector. The result is propagated into the result vector with the\ngrouping labels becoming the output label set. By default, series for which\nno matching entry in the opposite vector can be found are not part of the\nresult. This behavior can be adjusted using [fill modifiers](#filling-in-missing-matches)."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/functions.md#67",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/operators.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/functions.md#67",
+    "b": "prometheus:docs/querying/operators.md#4",
+    "relation": "unrelated",
+    "related": 0.0076,
+    "probabilities": {
+     "same": 0.0024,
+     "overlapping": 0.0024,
+     "conflicting": 0.0028,
+     "unrelated": 0.9924
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

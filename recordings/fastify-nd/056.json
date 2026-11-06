@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-nd/056",
+ "recorded_at": "2026-11-06T13:34:10Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 984,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.995741",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=280"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Testing.md#4",
+    "text": "### Benefits of using fastify.inject()\n\nFastify comes with built-in support for fake HTTP injection thanks to\n[`light-my-request`](https://github.com/fastify/light-my-request).\n\nBefore introducing any tests, we will use the `.inject` method to make a fake\nrequest to our route:\n\n**app.test.js**:\n\n```js\n'use strict'\n\nconst build = require('./app')\n\nconst test = async () => {\n  const app = build()\n\n  const response = await app.inject({\n    method: 'GET',\n    url: '/'\n  })\n\n  console.log('status code: ', response.statusCode)\n  console.log('body: ', response.body)\n}\ntest()\n```\n\nFirst, our code will run inside an asynchronous function, giving us access to\nasync/await.\n\n`.inject` ensures all registered plugins have booted up and our application is\nready to test. Finally, we pass the request method we want to use and a route.\nUsing await we can store the response without a callback.\n\n\n\nRun the test file in your terminal `node app.test.js`\n\n```sh\nstatus code:  200\nbody:  {\"hello\":\"world\"}\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#10",
+    "text": "## Plugins\nLet's `cd` into a fresh directory called 'testing-plugin-example' and type\n`npm init -y` in our terminal.\n\nRun `npm i fastify fastify-plugin`\n\n**plugin/myFirstPlugin.js**:\n\n```js\nconst fP = require(\"fastify-plugin\")\n\nasync function myPlugin(fastify, options) {\n    fastify.decorateRequest(\"helloRequest\", \"Hello World\")\n    fastify.decorate(\"helloInstance\", \"Hello Fastify Instance\")\n}\n\nmodule.exports = fP(myPlugin)\n```\n\nA basic example of a Plugin. See [Plugin Guide](./Plugins-Guide.md)\n\n**test/myFirstPlugin.test.js**:\n\n```js\nconst Fastify = require(\"fastify\");\nconst { test } = require(\"node:test\");\nconst myPlugin = require(\"../plugin/myFirstPlugin\");\n\ntest(\"Test the Plugin Route\", async t => {\n    // Create a mock fastify application to test the plugin\n    const fastify = Fastify()\n\n    fastify.register(myPlugin)\n\n    // Add an endpoint of your choice\n    fastify.get(\"/\", async (request, reply) => {\n        return ({ message: request.helloRequest })\n    })\n\n    // Use fastify.inject to fake a HTTP Request\n    const fastifyResponse = await fastify.inject({\n        method: \"GET\",\n        url: \"/\"\n    })\n\n  console.log('status code: ', fastifyResponse.statusCode)\n  console.log('body: ', fastifyResponse.body)\n})\n```\nLearn more about [```fastify.inject()```](#benefits-of-using-fastifyinject).\nRun the test file in your terminal `node test/myFirstPlugin.test.js`"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Testing.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Testing.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Testing.md#4",
+    "b": "fastify:docs/Guides/Testing.md#10",
+    "relation": "overlapping",
+    "related": 0.9945,
+    "probabilities": {
+     "same": 0.0085,
+     "overlapping": 0.9803,
+     "conflicting": 0.0057,
+     "unrelated": 0.0055
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 98,
+   "total_ms": 101
+  }
+ }
+}

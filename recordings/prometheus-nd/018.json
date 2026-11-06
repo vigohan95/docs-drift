@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/018",
+ "recorded_at": "2026-11-06T13:33:29Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1019,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "124.206656",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=276"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/migration.md#1",
+    "text": "## Flags\n\n- The following feature flags have been removed and they have been added to the\n  default behavior of Prometheus v3:\n  - `promql-at-modifier`\n  - `promql-negative-offset`\n  - `new-service-discovery-manager`\n  - `expand-external-labels`\n      - Environment variable references `${var}` or `$var` in external label values\n    are replaced according to the values of the current environment variables.\n      - References to undefined variables are replaced by the empty string.\n    The `$` character can be escaped by using `$$`.\n  - `no-default-scrape-port`\n      - Prometheus v3 will no longer add ports to scrape targets according to the\n    specified scheme. Target will now appear in labels as configured.\n      - If you rely on scrape targets like\n      `https://example.com/metrics` or `http://example.com/metrics` to be\n      represented as `https://example.com/metrics:443` and\n      `http://example.com/metrics:80` respectively, add them to your target URLs\n  - `agent`\n      - Instead use the dedicated `--agent` CLI flag.\n  - `remote-write-receiver`\n      - Instead use the dedicated `--web.enable-remote-write-receiver` CLI flag to enable the remote write receiver.\n  - `auto-gomemlimit`\n      - Prometheus v3 will automatically set `GOMEMLIMIT` to match the Linux\n      container memory limit. If there is no container limit, or the process is\n      running outside of containers, the system memory total is used. To disable\n      this, `--no-auto-gomemlimit` is available.\n  - `auto-gomaxprocs`\n      - Prometheus v3 will automatically set `GOMAXPROCS` to match the Linux\n      container CPU quota. To disable this, `--no-auto-gomaxprocs` is available.\n\n  Prometheus v3 will log a warning if you continue to pass these to\n  `--enable-feature`.\n\n- Starting from v3.9, the feature flag `native-histograms` is a no-op. Native\n  histograms are a stable feature now, but scraping them has to be enabled via\n  the `scrape_native_histograms` global or per-scrape configuration option\n  (added in v3.8)."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/migration.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#2",
+    "b": "prometheus:docs/migration.md#1",
+    "relation": "overlapping",
+    "related": 0.9955,
+    "probabilities": {
+     "same": 0.0133,
+     "overlapping": 0.976,
+     "conflicting": 0.0062,
+     "unrelated": 0.0045
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 99,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 134,
+   "total_ms": 138
+  }
+ }
+}

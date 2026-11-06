@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-nd/048",
+ "recorded_at": "2026-11-06T13:34:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1075,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "193.074942",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=28,cfOrigin;dur=0,cfWorker;dur=362"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Recommendations.md#7",
+    "text": "## Common Causes Of Performance Degradation\n\nThese patterns can increase latency or reduce throughput in production:\n\n- Prefer static or simple parametric routes on hot paths. RegExp routes are\n  expensive, and routes with many parameters can also hurt router performance.\n  See [Routes - Url building](../Reference/Routes.md#url-building).\n- Use route constraints carefully. Version constraints can degrade router\n  performance, and asynchronous custom constraints should be treated as a last\n  resort. See [Routes - Constraints](../Reference/Routes.md#constraints).\n- Prefer Fastify plugins/hooks over generic middleware when possible. Fastify's\n  middleware adapters work, but native integrations are typically better for\n  performance-sensitive paths. See [Middleware](../Reference/Middleware.md).\n- Define response schemas to speed up JSON serialization. See\n  [Getting Started - Serialize your data](./Getting-Started.md#serialize-data).\n- Keep Ajv `allErrors` disabled by default. Enable it only when detailed\n  validation feedback is needed (for example, form-heavy APIs), and avoid it\n  on latency-sensitive endpoints. When `allErrors: true` is enabled, validation\n  can do more work per request and make denial-of-service attacks easier on\n  untrusted inputs.\n  See also:\n  - [Validation and Serialization - Validator Compiler](../Reference/Validation-and-Serialization.md#schema-validator)\n  - [Ajv Security Risks of Trusted Schemas](https://ajv.js.org/security.html#security-risks-of-trusted-schemas)."
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#21",
+    "text": "#### Asynchronous Custom Constraints\n\nCustom constraints can be provided, and the `constraint` criteria can be\nfetched from another source such as a database. Use asynchronous custom\nconstraints as a last resort, as they impact router performance.\n\n```js\nfunction databaseOperation(field, done) {\n  done(null, field)\n}\n\nconst secret = {\n  // strategy name for referencing in the route handler `constraints` options\n  name: 'secret',\n  // storage factory for storing routes in the find-my-way route tree\n  storage: function () {\n    let handlers = {}\n    return {\n      get: (type) => { return handlers[type] || null },\n      set: (type, store) => { handlers[type] = store }\n    }\n  },\n  // function to get the value of the constraint from each incoming request\n  deriveConstraint: (req, ctx, done) => {\n    databaseOperation(req.headers['secret'], done)\n  },\n  // optional flag marking if handlers without constraints can match requests that have a value for this constraint\n  mustMatchWhenDerived: true\n}\n```\n\n> ⚠ Warning:\n> When using asynchronous constraints, avoid returning errors inside the\n> callback. If errors are unavoidable, provide a custom `frameworkErrors`\n> handler to manage them. Otherwise, route selection may break or expose\n> sensitive information.\n>\n> ```js\n> const Fastify = require('fastify')\n>\n> const fastify = Fastify({\n>   frameworkErrors: function (err, req, res) {\n>     if (err instanceof Fastify.errorCodes.FST_ERR_ASYNC_CONSTRAINT) {\n>       res.code(400)\n>       return res.send(\"Invalid header provided\")\n>     } else {\n>       res.send(err)\n>     }\n>   }\n> })\n> ```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Recommendations.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Routes.md#21"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Routes.md#21",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Guides/Recommendations.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Recommendations.md#7",
+    "b": "fastify:docs/Reference/Routes.md#21",
+    "relation": "overlapping",
+    "related": 0.9981,
+    "probabilities": {
+     "same": 0.0043,
+     "overlapping": 0.9906,
+     "conflicting": 0.0032,
+     "unrelated": 0.0019
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0103,
+       "restated": 0.9416,
+       "elaborated": 0.0246,
+       "different": 0.0234
+      },
+      "confidence": 0.9766,
+      "a": {
+       "document": "fastify:docs/Guides/Recommendations.md#7",
+       "quote": "performance, and asynchronous custom constraints should be treated as a last",
+       "start": 417,
+       "end": 493,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Routes.md#21",
+       "quote": "Use asynchronous custom\nconstraints as a last resort, as they impact router performance.\n\n```js\nfunction databaseOperation(field, done) {\n  done(null, field)\n}\n\nconst secret = {\n  // strategy name for referencing in the route handler `constraints` options\n  name: 'secret',\n  // storage factory for storing routes in the find-my-way route tree\n  storage: function () {\n    let handlers = {}\n    return {\n      get: (type) => { return handlers[type] || null },\n      set: (type, store) => { handlers[type] = store }\n    }\n  },\n  // function to get the value of the constraint from each incoming request\n  deriveConstraint: (req, ctx, done) => {\n    databaseOperation(req.headers['secret'], done)\n  },\n  // optional flag marking if handlers without constraints can match requests that have a value for this constraint\n  mustMatchWhenDerived: true\n}\n```\n\n> ⚠ Warning:\n> When using asynchronous constraints, avoid returning errors inside the\n> callback.",
+       "start": 159,
+       "end": 1108,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 1,
+   "counterparts_ms": 88
+  },
+  "timing": {
+   "read_ms": 201,
+   "total_ms": 205
+  }
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-nd/038",
+ "recorded_at": "2026-11-06T13:33:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 847,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.1112",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=157"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#44",
+    "text": "##### .compileSerializationSchema(schema, [httpStatus], [contentType])\n<a id=\"compileserializationschema\"></a>\n\nThis function will compile a serialization schema and\nreturn a function that can be used to serialize data.\nThe function returned (a.k.a. _serialization function_) returned is compiled\nby using the provided `SerializerCompiler`. Also this is cached by using\na `WeakMap` for reducing compilation calls.\n\nThe optional parameters `httpStatus` and `contentType`, if provided,\nare forwarded directly to the `SerializerCompiler`, so it can be used\nto compile the serialization function if a custom `SerializerCompiler` is used.\n\nThis heavily depends of the `schema#responses` attached to the route, or\nthe serialization functions compiled by using `compileSerializationSchema`.\n\n```js\nconst serialize = reply\n                  .compileSerializationSchema({\n                    type: 'object',\n                    properties: {\n                      foo: {\n                        type: 'string'\n                      }\n                    }\n                  })\nserialize({ foo: 'bar' }) // '{\"foo\":\"bar\"}'\n\n// or\n\nconst serialize = reply\n                  .compileSerializationSchema({\n                    type: 'object',\n                    properties: {\n                      foo: {\n                        type: 'string'\n                      }\n                    }\n                  }, 200)\nserialize({ foo: 'bar' }) // '{\"foo\":\"bar\"}'\n\n// or\n\nconst serialize = reply\n                  .compileSerializationSchema({\n                        '3xx': {\n                          content: {\n                            'application/json': {\n                              schema: {\n                                name: { type: 'string' },\n                                phone: { type: 'number' }\n                              }\n                            }\n                          }\n                        }\n                  }, '3xx', 'application/json')\nserialize({ name: 'Jone', phone: 201090909090 }) // '{\"name\":\"Jone\", \"phone\":201090909090}'\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#29",
+    "text": "##### .compileValidationSchema(schema, [httpPart])\n<a id=\"compilevalidationschema\"></a>\n\nThis function compiles a validation schema and returns a function to validate data.\nThe returned function (a.k.a. _validation function_) is compiled using the provided\n[`SchemaController#ValidationCompiler`](./Server.md#schema-controller). A `WeakMap`\nis used to cache this, reducing compilation calls.\n\nThe optional parameter `httpPart`, if provided, is forwarded to the\n`ValidationCompiler`, allowing it to compile the validation function if a custom\n`ValidationCompiler` is provided for the route.\n\nThis function has an `errors` property. Errors encountered during the last\nvalidation are assigned to `errors`.\n\n```js\nconst validate = request\n                  .compileValidationSchema({\n                    type: 'object',\n                    properties: {\n                      foo: {\n                        type: 'string'\n                      }\n                    }\n                  })\nconsole.log(validate({ foo: 'bar' })) // true\nconsole.log(validate.errors) // null\n\n// or\n\nconst validate = request\n                  .compileValidationSchema({\n                    type: 'object',\n                    properties: {\n                      foo: {\n                        type: 'string'\n                      }\n                    }\n                  }, 'body')\nconsole.log(validate({ foo: {} })) // false\nconsole.log(validate.errors) // validation errors\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#44",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#29",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Reply.md#44",
+    "b": "fastify:docs/Reference/Request.md#29",
+    "relation": "unrelated",
+    "related": 0.0096,
+    "probabilities": {
+     "same": 0.0032,
+     "overlapping": 0.0034,
+     "conflicting": 0.003,
+     "unrelated": 0.9904
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

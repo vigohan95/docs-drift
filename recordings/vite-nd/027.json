@@ -1,0 +1,188 @@
+{
+ "endpoint": "compare",
+ "tag": "vite-nd/027",
+ "recorded_at": "2026-11-06T13:33:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1118,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "238.612099",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=403"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#4",
+    "text": "  // 4. render the app HTML. This assumes entry-server.js's exported\n  //     `render` function calls appropriate framework SSR APIs,\n  //    e.g. ReactDOMServer.renderToString()\n  const appHtml = await render(url)\n\n  // 5. Inject the app-rendered HTML into the template.\n  const html = template.replace(`<!--ssr-outlet-->`, appHtml)\n\n  // 6. Send the rendered HTML back.\n  res.status(200).set({ 'Content-Type': 'text/html' }).end(html)\n})\n```\n\nWhen using environments that support HMR (such as `RunnableDevEnvironment`), you should add `import.meta.hot.accept()` in your server entry file for optimal behavior. Without this, server file changes will invalidate the entire server module graph:\n\n```js\n// src/entry-server.js\nexport function render(...) { ... }\n\nif (import.meta.hot) {\n  import.meta.hot.accept()\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#6",
+    "text": "Add `ssrReload()` to the `plugins` array passed to `createViteServer` in the example above. See the [`hotUpdate` hook](./api-environment-plugins#the-hotupdate-hook) for details.\n:::\n\nThe next step is implementing the `*` handler to serve server-rendered HTML:\n\n```js twoslash [server.js]\n// @noErrors\nimport fs from 'node:fs'\nimport path from 'node:path'\n\n/** @type {import('express').Express} */\nvar app\n/** @type {import('vite').ViteDevServer}  */\nvar vite\n\n// ---cut---\napp.use('*all', async (req, res, next) => {\n  const url = req.originalUrl\n\n  try {\n    // 1. Read index.html\n    let template = fs.readFileSync(\n      path.resolve(import.meta.dirname, 'index.html'),\n      'utf-8',\n    )\n\n    // 2. Apply Vite HTML transforms. This injects the Vite HMR client,\n    //    and also applies HTML transforms from Vite plugins, e.g. global\n    //    preambles from @vitejs/plugin-react\n    template = await vite.transformIndexHtml(url, template)\n\n    // 3. Load the server entry. ssrLoadModule automatically transforms\n    //    ESM source code to be usable in Node.js! There is no bundling\n    //    required, and provides efficient invalidation similar to HMR.\n    const { render } = await vite.ssrLoadModule('/src/entry-server.js')\n\n    // 4. render the app HTML. This assumes entry-server.js's exported\n    //     `render` function calls appropriate framework SSR APIs,\n    //    e.g. ReactDOMServer.renderToString()\n    const appHtml = await render(url)\n\n    // 5. Inject the app-rendered HTML into the template.\n    const html = template.replace(`<!--ssr-outlet-->`, () => appHtml)\n\n    // 6. Send the rendered HTML back.\n    res.status(200).set({ 'Content-Type': 'text/html' }).end(html)\n  } catch (e) {\n    // If an error is caught, let Vite fix the stack trace so it maps back\n    // to your actual source code.\n    vite.ssrFixStacktrace(e)\n    next(e)\n  }\n})\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/ssr.md#6"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-frameworks.md#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-frameworks.md#4",
+    "b": "vite:docs/guide/ssr.md#6",
+    "relation": "overlapping",
+    "related": 0.9968,
+    "probabilities": {
+     "same": 0.0145,
+     "overlapping": 0.9765,
+     "conflicting": 0.0058,
+     "unrelated": 0.0032
+    },
+    "duplicates": [
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9831,
+       "restated": 0.007,
+       "elaborated": 0.0055,
+       "different": 0.0044
+      },
+      "confidence": 0.9956,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#4",
+       "quote": "render the app HTML.",
+       "start": 6,
+       "end": 26,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/ssr.md#6",
+       "quote": "render the app HTML.",
+       "start": 1247,
+       "end": 1267,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9884,
+       "restated": 0.0045,
+       "elaborated": 0.004,
+       "different": 0.0031
+      },
+      "confidence": 0.9969,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#4",
+       "quote": "// 4.",
+       "start": 0,
+       "end": 5,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/ssr.md#6",
+       "quote": "This assumes entry-server.js's exported\n    //     `render` function calls appropriate framework SSR APIs,\n    //    e.g. ReactDOMServer.renderToString()\n    const appHtml = await render(url)\n\n    // 5.",
+       "start": 1268,
+       "end": 1470,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0358,
+       "restated": 0.929,
+       "elaborated": 0.0166,
+       "different": 0.0185
+      },
+      "confidence": 0.971,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#4",
+       "quote": "// 5.",
+       "start": 216,
+       "end": 221,
+       "confidence": 0.971
+      },
+      "b": {
+       "document": "vite:docs/guide/ssr.md#6",
+       "quote": "Inject the app-rendered HTML into the template.\n    const html = template.replace(`<!--ssr-outlet-->`, () => appHtml)\n\n    // 6.",
+       "start": 1471,
+       "end": 1599,
+       "confidence": 0.992
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.125,
+       "restated": 0.7307,
+       "elaborated": 0.0505,
+       "different": 0.0938
+      },
+      "confidence": 0.9062,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#4",
+       "quote": "// 6.",
+       "start": 335,
+       "end": 340,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/ssr.md#6",
+       "quote": "Send the rendered HTML back.\n    res.status(200).set({ 'Content-Type': 'text/html' }).end(html)\n  } catch (e) {\n    // If an error is caught, let Vite fix the stack trace so it maps back\n    // to your actual source code.\n    vite.ssrFixStacktrace(e)\n    next(e)\n  }\n})\n```",
+       "start": 1600,
+       "end": 1873,
+       "confidence": 0.981
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 118,
+   "passages": 4,
+   "counterparts_ms": 98
+  },
+  "timing": {
+   "read_ms": 248,
+   "total_ms": 252
+  }
+ }
+}

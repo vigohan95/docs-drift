@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/026",
+ "recorded_at": "2026-11-06T13:33:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1042,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "141.244484",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=359"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#4",
+    "text": "## Reconciliation of histogram bucket layouts\n\nNative histograms can have different bucket layouts, but they are generally\nconvertible to compatible versions to apply binary and aggregation operations\nto them. Functions acting on range vectors that are applicable to native\nhistograms also perform such reconciliation. In binary operations this\nreconciliation is performed pairwise, in aggregation operations and functions\nall histogram samples are reconciled to one compatible bucket layout.\n\nNot all bucket layouts can be reconciled, if incompatible histograms are\nencountered in an operation, the corresponding output vector element is removed\nfrom the result, flagged with a warn-level annotation.\nMore details can be found in the\n[native histogram specification](https://prometheus.io/docs/specs/native_histograms/#compatibility-between-histograms)."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#24",
+    "text": "    histogram_quantile(0.9, rate(http_request_duration_seconds_bucket[10m]))\n\nFor a native histogram, use the following expression instead:\n\n    histogram_quantile(0.9, rate(http_request_duration_seconds[10m]))\n\nThe quantile is calculated for each label combination in\n`http_request_duration_seconds`. To aggregate, use the `sum()` aggregator\naround the `rate()` function. Since the `le` label is required by\n`histogram_quantile()` to deal with classic histograms, it has to be\nincluded in the `by` clause. The following expression aggregates the 90th\npercentile by `job` for classic histograms:\n\n    histogram_quantile(0.9, sum by (job, le) (rate(http_request_duration_seconds_bucket[10m])))\n\nWhen aggregating native histograms, the expression simplifies to:\n\n    histogram_quantile(0.9, sum by (job) (rate(http_request_duration_seconds[10m])))\n\nTo aggregate all classic histograms, specify only the `le` label:\n\n    histogram_quantile(0.9, sum by (le) (rate(http_request_duration_seconds_bucket[10m])))\n\nWith native histograms, aggregating everything works as usual without any `by` clause:\n\n    histogram_quantile(0.9, sum(rate(http_request_duration_seconds[10m])))\n\nIn the (common) case that a quantile value does not coincide with a bucket\nboundary, the `histogram_quantile()` function interpolates the quantile value\nwithin the bucket the quantile value falls into. For classic histograms, for\nnative histograms with custom bucket boundaries, and for the zero bucket of\nother native histograms, it assumes a uniform distribution of observations\nwithin the bucket (also called _linear interpolation_). For the\nnon-zero-buckets of native histograms with a standard exponential bucketing\nschema, the interpolation is done under the assumption that the samples within\nthe bucket are distributed in a way that they would uniformly populate the\nbuckets in a hypothetical histogram with higher resolution. (This is also\ncalled _exponential interpolation_. See the [native histogram\nspecification](https://prometheus.io/docs/specs/native_histograms/#interpolation-within-a-bucket)\nfor more details.)"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#24",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/basics.md#4",
+    "b": "prometheus:docs/querying/functions.md#24",
+    "relation": "overlapping",
+    "related": 0.5652,
+    "probabilities": {
+     "same": 0.0194,
+     "overlapping": 0.5316,
+     "conflicting": 0.0142,
+     "unrelated": 0.4348
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 42,
+   "passage_reads": 1,
+   "passages_ms": 110,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 151,
+   "total_ms": 155
+  }
+ }
+}

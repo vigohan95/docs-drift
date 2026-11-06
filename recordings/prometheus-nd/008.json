@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/008",
+ "recorded_at": "2026-11-06T13:33:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 877,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.336256",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=182"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#21",
+    "text": "### Offset modifier\n\nThe `offset` modifier allows changing the time offset for individual\ninstant and range vectors in a query.\n\nFor example, the following expression returns the value of\n`http_requests_total` 5 minutes in the past relative to the current\nquery evaluation time:\n\n    http_requests_total offset 5m\n\nNote that the `offset` modifier always needs to follow the selector\nimmediately, i.e. the following would be correct:\n\n    sum(http_requests_total{method=\"GET\"} offset 5m) // GOOD.\n\nWhile the following would be *incorrect*:\n\n    sum(http_requests_total{method=\"GET\"}) offset 5m // INVALID.\n\nThe same works for range vectors. This returns the 5-minute [rate](./functions.md#rate)\nthat `http_requests_total` had a week ago:\n\n    rate(http_requests_total[5m] offset 1w)\n\nWhen querying for samples in the past, a negative offset will enable temporal comparisons forward in time:\n\n    rate(http_requests_total[5m] offset -1w)\n\nNote that this allows a query to look ahead of its evaluation time."
+   },
+   {
+    "id": "prometheus:docs/querying/examples.md#2",
+    "text": "## Subquery\n\nReturn the 5-minute [rate](./functions.md#rate) of the `http_requests_total` metric for the past 30 minutes, with a resolution of 1 minute.\n\n    rate(http_requests_total[5m])[30m:1m]\n\nThis is an example of a nested subquery. The subquery for the `deriv` function uses the default resolution. Note that using subqueries unnecessarily is unwise.\n\n    max_over_time(deriv(rate(distance_covered_total[5s])[30s:5s])[10m:])"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/examples.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/basics.md#21",
+    "b": "prometheus:docs/querying/examples.md#2",
+    "relation": "unrelated",
+    "related": 0.0204,
+    "probabilities": {
+     "same": 0.0051,
+     "overlapping": 0.0074,
+     "conflicting": 0.0079,
+     "unrelated": 0.9796
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27
+  },
+  "timing": {
+   "read_ms": 27,
+   "total_ms": 28
+  }
+ }
+}

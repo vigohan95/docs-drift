@@ -1,0 +1,164 @@
+{
+ "endpoint": "compare",
+ "tag": "vite-nd/047",
+ "recorded_at": "2026-11-06T13:33:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1122,
+ "response_headers": {
+  "x-clocked-credits": "11",
+  "x-clocked-model-ms": "263.893663",
+  "x-clocked-cost-usd": "0.002191",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=421"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "text": "```ts\nexport class RunnableDevEnvironment extends DevEnvironment {\n  public readonly runner: ModuleRunner\n}\n\nclass ModuleRunner {\n  /**\n   * URL to execute.\n   * Accepts file path, server path, or id relative to the root.\n   * Returns an instantiated module (same as in ssrLoadModule)\n   */\n  public async import(url: string): Promise<Record<string, any>>\n  /**\n   * Other ModuleRunner methods...\n   */\n}\n\nif (isRunnableDevEnvironment(server.environments.ssr)) {\n  await server.environments.ssr.runner.import('/entry-point.js')\n}\n```\n\n:::warning\nThe `runner` is evaluated lazily only when it's accessed for the first time. Beware that Vite enables source map support when the `runner` is created by calling `process.setSourceMapsEnabled` or by overriding `Error.prepareStackTrace` if it's not available.\n:::\n\nGiven a Vite server configured in middleware mode as described by the [SSR setup guide](/guide/ssr#setting-up-the-dev-server), let's implement the SSR middleware using the environment API. Remember that it doesn't have to be called `ssr`, so we'll name it `server` in this example. Error handling is omitted.\n\n```js\nimport fs from 'node:fs'\nimport path from 'node:path'\nimport { createServer } from 'vite'\n\nconst viteServer = await createServer({\n  server: { middlewareMode: true },\n  appType: 'custom',\n  environments: {\n    server: {\n      // by default, modules are run in the same process as the vite server\n    },\n  },\n})\n\n// You might need to cast this to RunnableDevEnvironment in TypeScript or\n// use isRunnableDevEnvironment to guard the access to the runner\nconst serverEnvironment = viteServer.environments.server\n\napp.use('*', async (req, res, next) => {\n  const url = req.originalUrl\n\n  // 1. Read index.html\n  const indexHtmlPath = path.resolve(import.meta.dirname, 'index.html')\n  let template = fs.readFileSync(indexHtmlPath, 'utf-8')\n\n  // 2. Apply Vite HTML transforms. This injects the Vite HMR client,\n  //    and also applies HTML transforms from Vite plugins, e.g. global\n  //    preambles from @vitejs/plugin-react\n  template = await viteServer.transformIndexHtml(url, template)\n\n  // 3. Load the server entry. import(url) automatically transforms\n  //    ESM source code to be usable in Node.js! There is no bundling\n  //    required, and provides full HMR support.\n  const { render } = await serverEnvironment.runner.import(\n    '/src/entry-server.js',\n  )"
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#6",
+    "text": "Add `ssrReload()` to the `plugins` array passed to `createViteServer` in the example above. See the [`hotUpdate` hook](./api-environment-plugins#the-hotupdate-hook) for details.\n:::\n\nThe next step is implementing the `*` handler to serve server-rendered HTML:\n\n```js twoslash [server.js]\n// @noErrors\nimport fs from 'node:fs'\nimport path from 'node:path'\n\n/** @type {import('express').Express} */\nvar app\n/** @type {import('vite').ViteDevServer}  */\nvar vite\n\n// ---cut---\napp.use('*all', async (req, res, next) => {\n  const url = req.originalUrl\n\n  try {\n    // 1. Read index.html\n    let template = fs.readFileSync(\n      path.resolve(import.meta.dirname, 'index.html'),\n      'utf-8',\n    )\n\n    // 2. Apply Vite HTML transforms. This injects the Vite HMR client,\n    //    and also applies HTML transforms from Vite plugins, e.g. global\n    //    preambles from @vitejs/plugin-react\n    template = await vite.transformIndexHtml(url, template)\n\n    // 3. Load the server entry. ssrLoadModule automatically transforms\n    //    ESM source code to be usable in Node.js! There is no bundling\n    //    required, and provides efficient invalidation similar to HMR.\n    const { render } = await vite.ssrLoadModule('/src/entry-server.js')\n\n    // 4. render the app HTML. This assumes entry-server.js's exported\n    //     `render` function calls appropriate framework SSR APIs,\n    //    e.g. ReactDOMServer.renderToString()\n    const appHtml = await render(url)\n\n    // 5. Inject the app-rendered HTML into the template.\n    const html = template.replace(`<!--ssr-outlet-->`, () => appHtml)\n\n    // 6. Send the rendered HTML back.\n    res.status(200).set({ 'Content-Type': 'text/html' }).end(html)\n  } catch (e) {\n    // If an error is caught, let Vite fix the stack trace so it maps back\n    // to your actual source code.\n    vite.ssrFixStacktrace(e)\n    next(e)\n  }\n})\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/ssr.md#6"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-frameworks.md#3"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-frameworks.md#3",
+    "b": "vite:docs/guide/ssr.md#6",
+    "relation": "overlapping",
+    "related": 0.8961,
+    "probabilities": {
+     "same": 0.0317,
+     "overlapping": 0.5606,
+     "conflicting": 0.3038,
+     "unrelated": 0.1039
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0301,
+       "restated": 0.9293,
+       "elaborated": 0.0205,
+       "different": 0.0202
+      },
+      "confidence": 0.95,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#3",
+       "quote": "// 1.",
+       "start": 1709,
+       "end": 1714,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/ssr.md#6",
+       "quote": "Read index.html\n    let template = fs.readFileSync(\n      path.resolve(import.meta.dirname, 'index.html'),\n      'utf-8',\n    )\n\n    // 2.",
+       "start": 566,
+       "end": 704,
+       "confidence": 0.95
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9676,
+       "restated": 0.0139,
+       "elaborated": 0.0104,
+       "different": 0.0081
+      },
+      "confidence": 0.9919,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#3",
+       "quote": "Apply Vite HTML transforms.",
+       "start": 1869,
+       "end": 1896,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/ssr.md#6",
+       "quote": "Apply Vite HTML transforms.",
+       "start": 705,
+       "end": 732,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.775,
+       "restated": 0.185,
+       "elaborated": 0.0199,
+       "different": 0.0201
+      },
+      "confidence": 0.9799,
+      "a": {
+       "document": "vite:docs/guide/api-environment-frameworks.md#3",
+       "quote": "// 2.",
+       "start": 1863,
+       "end": 1868,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/ssr.md#6",
+       "quote": "This injects the Vite HMR client,\n    //    and also applies HTML transforms from Vite plugins, e.g. global\n    //    preambles from @vitejs/plugin-react\n    template = await vite.transformIndexHtml(url, template)\n\n    // 3.",
+       "start": 733,
+       "end": 957,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 53,
+   "passage_reads": 1,
+   "passages_ms": 123,
+   "passages": 5,
+   "counterparts_ms": 101
+  },
+  "timing": {
+   "read_ms": 276,
+   "total_ms": 282
+  }
+ }
+}

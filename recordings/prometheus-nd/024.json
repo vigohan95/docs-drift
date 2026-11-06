@@ -1,0 +1,140 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/024",
+ "recorded_at": "2026-11-06T13:33:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1172,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "198.917477",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=40,cfOrigin;dur=0,cfWorker;dur=369"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#30",
+    "text": "## Query cost\n\n`--enable-feature=query-cost`\n\nEnables query cost estimation and enforcement. When set, Prometheus exposes the\n[`/api/v1/query_cost` and `/api/v1/query_range_cost`](querying/api.md#query-cost)\nendpoints, which provide a pre-execution *estimate* of the resource cost of a\nquery (series touched and samples read) without executing it, and the instant\nand range query endpoints accept a `cost=true` boolean parameter that adds an\nestimated-versus-actual cost comparison to the response. Estimation enumerates matching index entries and samples a bounded amount of\nchunk data. Both values can overestimate or underestimate actual cost; the\nestimate is informational only and is never used to reject a query. Queries\nusing `info()` return a warning because its runtime-dependent additional reads\nare omitted from the estimate.\n\nThis flag also activates enforcement of the reloadable cost limits configured\nunder the `global:` section of the\n[configuration file](configuration/configuration.md#configuration-file):\n`query_max_series`, `query_max_samples_read`, and `query_max_duration`. These\nlimits are enforced *during* query execution against the query's actual running\ncost: a query is rejected as soon as the number of series it loads or the number\nof samples it reads exceeds the configured limit, and `query_max_duration`\nsurfaces as a query timeout. The limits are reloaded together with the rest of\nthe configuration and have no effect when the feature flag is not set."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#15",
+    "text": "When the `query-cost` feature flag is enabled, the engine also enforces the\nreloadable cost limits configured under the `global:` section of the\n[configuration file](../configuration/configuration.md#configuration-file)\n(`query_max_series`, `query_max_samples_read`, and `query_max_duration`).\nThese limits are enforced *during* query execution against the query's actual\nrunning cost, not against the estimate above. A query is rejected as soon as the\nnumber of series it loads or the number of samples it reads exceeds the\nconfigured limit, and `query_max_duration` surfaces as a query timeout. The\nestimate returned by these endpoints is informational only and is never used to\nreject a query.\n\nThese limits apply to every query the engine evaluates, not only to API\nrequests. Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nWith query-cost enabled, sample accounting includes all storage input consumed\nby child evaluators, even when their output falls between outer query windows.\nReusing a materialized child result does not charge its storage reads again.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` parameters. These can\nonly tighten the operator-set value, never loosen it: a request asking for a\nvalue above the ceiling is rejected with HTTP 400 (`bad_data`) so that the\ncaller sees that the limit it asked for was not applied, instead of being\nsilently clamped down. The `timeout` parameter can also shorten the deadline,\nbut a larger value is capped at the effective duration ceiling rather than\nrejected."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#30",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/querying/api.md#15"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#15",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/feature_flags.md#30"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/feature_flags.md#30",
+    "b": "prometheus:docs/querying/api.md#15",
+    "relation": "overlapping",
+    "related": 0.9984,
+    "probabilities": {
+     "same": 0.0042,
+     "overlapping": 0.9912,
+     "conflicting": 0.003,
+     "unrelated": 0.0016
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0077,
+       "restated": 0.9728,
+       "elaborated": 0.0131,
+       "different": 0.0064
+      },
+      "confidence": 0.9936,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#30",
+       "quote": "This flag also activates enforcement of the reloadable cost limits configured",
+       "start": 838,
+       "end": 915,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#15",
+       "quote": "When the `query-cost` feature flag is enabled, the engine also enforces the\nreloadable cost limits configured under the `global:` section of the\n[configuration file](../configuration/configuration.md#configuration-file)\n(`query_max_series`, `query_max_samples_read`, and `query_max_duration`).\nThese limits are enforced *during* query execution against the query's actual\nrunning cost, not against the estimate above.",
+       "start": 0,
+       "end": 417,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.1492,
+       "restated": 0.8266,
+       "elaborated": 0.0139,
+       "different": 0.0104
+      },
+      "confidence": 0.9896,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#30",
+       "quote": "of samples it reads exceeds the configured limit, and `query_max_duration`",
+       "start": 1263,
+       "end": 1337,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#15",
+       "quote": "A query is rejected as soon as the\nnumber of series it loads or the number of samples it reads exceeds the\nconfigured limit, and `query_max_duration` surfaces as a query timeout.",
+       "start": 418,
+       "end": 596,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 93,
+   "passages": 2,
+   "counterparts_ms": 83
+  },
+  "timing": {
+   "read_ms": 208,
+   "total_ms": 212
+  }
+ }
+}

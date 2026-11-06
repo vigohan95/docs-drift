@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/049",
+ "recorded_at": "2026-11-06T13:34:02Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 912,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.277504",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=182"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#3",
+    "text": "## Extra scrape metrics\n\n`--enable-feature=extra-scrape-metrics`\n\n> **Note:** This feature flag is deprecated. Please use the `extra_scrape_metrics` configuration option instead (available at both global and scrape-config level). The feature flag will be removed in a future major version. See the [configuration documentation](configuration/configuration.md) for more details.\n\nWhen enabled, for each instance scrape, Prometheus stores a sample in the following additional time series:\n\n- `scrape_timeout_seconds`. The configured `scrape_timeout` for a target. This allows you to measure each target to find out how close they are to timing out with `scrape_duration_seconds / scrape_timeout_seconds`.\n- `scrape_sample_limit`. The configured `sample_limit` for a target. This allows you to measure each target\n  to find out how close they are to reaching the limit with `scrape_samples_post_metric_relabeling / scrape_sample_limit`. Note that `scrape_sample_limit` can be zero if there is no limit configured, which means that the query above can return `+Inf` for targets with no limit (as we divide by zero). If you want to query only for targets that do have a sample limit use this query: `scrape_samples_post_metric_relabeling / (scrape_sample_limit > 0)`.\n- `scrape_body_size_bytes`. The uncompressed size of the most recent scrape response, if successful. Scrapes failing because `body_size_limit` is exceeded report `-1`, other scrape failures report `0`."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#15",
+    "text": "## OTLP Delta Conversion\n\n`--enable-feature=otlp-deltatocumulative`\n\n> **Note:** This feature flag is deprecated and will be removed in a future major version. Use `--enable-feature=otlp-native-delta-ingestion` for native delta ingestion instead.\n\nWhen enabled, Prometheus will convert OTLP metrics from delta temporality to their\ncumulative equivalent, instead of dropping them. This cannot be enabled in conjunction with `otlp-native-delta-ingestion`.\n\nThis uses\n[deltatocumulative][d2c]\nfrom the OTel collector, using its default settings.\n\nDelta conversion keeps in-memory state to aggregate delta changes per-series over time.\nWhen Prometheus restarts, this state is lost, starting the aggregation from zero\nagain. This results in a counter reset in the cumulative series.\n\nThis state is periodically ([`max_stale`][d2c]) cleared of inactive series.\n\nEnabling this _can_ have negative impact on performance, because the in-memory\nstate is mutex guarded. Cumulative-only OTLP requests are not affected.\n\n[d2c]: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/deltatocumulativeprocessor"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/feature_flags.md#3",
+    "b": "prometheus:docs/feature_flags.md#15",
+    "relation": "unrelated",
+    "related": 0.0037,
+    "probabilities": {
+     "same": 0.001,
+     "overlapping": 0.0015,
+     "conflicting": 0.0012,
+     "unrelated": 0.9963
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27
+  },
+  "timing": {
+   "read_ms": 27,
+   "total_ms": 29
+  }
+ }
+}

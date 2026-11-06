@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/020",
+ "recorded_at": "2026-11-06T13:33:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1015,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "127.780125",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=317"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#15",
+    "text": "## OTLP Delta Conversion\n\n`--enable-feature=otlp-deltatocumulative`\n\n> **Note:** This feature flag is deprecated and will be removed in a future major version. Use `--enable-feature=otlp-native-delta-ingestion` for native delta ingestion instead.\n\nWhen enabled, Prometheus will convert OTLP metrics from delta temporality to their\ncumulative equivalent, instead of dropping them. This cannot be enabled in conjunction with `otlp-native-delta-ingestion`.\n\nThis uses\n[deltatocumulative][d2c]\nfrom the OTel collector, using its default settings.\n\nDelta conversion keeps in-memory state to aggregate delta changes per-series over time.\nWhen Prometheus restarts, this state is lost, starting the aggregation from zero\nagain. This results in a counter reset in the cumulative series.\n\nThis state is periodically ([`max_stale`][d2c]) cleared of inactive series.\n\nEnabling this _can_ have negative impact on performance, because the in-memory\nstate is mutex guarded. Cumulative-only OTLP requests are not affected.\n\n[d2c]: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/deltatocumulativeprocessor"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#64",
+    "text": "### OTLP Delta\n\nPrometheus can natively ingest incoming OTLP metrics with delta temporality, storing their raw sample values without conversion.\n\nTo enable native delta ingestion, pass `--enable-feature=otlp-native-delta-ingestion`. To retain OTLP start timestamps and use them in PromQL rate calculations, also enable `st-storage` and `use-start-timestamps`. See [OTLP Native Delta Support](../feature_flags.md#otlp-native-delta-support) for details.\n\n*New in v3.4; start-timestamp-aware querying was added in v3.12.*\n\nThe previous `--enable-feature=otlp-deltatocumulative` flag, which converts delta metrics to cumulative metrics using the OpenTelemetry Collector's [deltatocumulative processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/deltatocumulativeprocessor), is deprecated and will be removed in a future major version."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#64",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/feature_flags.md#15",
+    "b": "prometheus:docs/querying/api.md#64",
+    "relation": "overlapping",
+    "related": 0.9979,
+    "probabilities": {
+     "same": 0.0097,
+     "overlapping": 0.9842,
+     "conflicting": 0.004,
+     "unrelated": 0.0021
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 46,
+   "passage_reads": 1,
+   "passages_ms": 57,
+   "passages": 1,
+   "counterparts_ms": 53
+  },
+  "timing": {
+   "read_ms": 156,
+   "total_ms": 160
+  }
+ }
+}

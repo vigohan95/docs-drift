@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "vite-nd/033",
+ "recorded_at": "2026-11-06T13:33:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1067,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "173.223072",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=29,cfOrigin;dur=0,cfWorker;dur=323"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/ssr.md#4",
+    "text": "## Setting Up the Dev Server\n\nWhen building an SSR app, you likely want to have full control over your main server and decouple Vite from the production environment. It is therefore recommended to use Vite in middleware mode. Here is an example with [express](https://expressjs.com/):\n\n```js{12-15} twoslash [server.js]\nimport fs from 'node:fs'\nimport path from 'node:path'\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode and configure the app type as\n  // 'custom', disabling Vite's own HTML serving logic so parent server\n  // can take control\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    appType: 'custom'\n  })\n\n  // Use vite's connect instance as middleware. If you use your own\n  // express router (express.Router()), you should use router.use\n  // When the server restarts (for example after the user modifies\n  // vite.config.js), `vite.middlewares` is still going to be the same\n  // reference (with a new internal stack of Vite and plugin-injected\n  // middlewares). The following is valid even after restarts.\n  app.use(vite.middlewares)\n\n  app.use('*all', async (req, res) => {\n    // serve index.html - we will tackle this next\n  })\n\n  app.listen(5173)\n}\n\ncreateServer()\n```"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#16",
+    "text": "## server.middlewareMode\n\n- **Type:** `boolean | { server: http.Server }`\n- **Default:** `false`\n\nCreate Vite server in middleware mode.\n\nIf [proxy](./server-options#server-proxy) is setup for WebSocket, the `server` should be provided to bind the proxy correctly.\n\n- **Related:** [appType](./shared-options#apptype), [SSR - Setting Up the Dev Server](/guide/ssr#setting-up-the-dev-server)\n\n- **Example:**\n\n```js twoslash\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    // don't include Vite's default HTML handling middlewares\n    appType: 'custom',\n  })\n  // Use vite's connect instance as middleware\n  app.use(vite.middlewares)\n\n  app.use('*', async (req, res) => {\n    // Since `appType` is `'custom'`, should serve response here.\n    // Note: if `appType` is `'spa'` or `'mpa'`, Vite includes middlewares\n    // to handle HTML requests and 404s so user middlewares should be added\n    // before Vite's middlewares to take effect instead\n  })\n}\n\ncreateServer()\n```"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/ssr.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/server-options.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/ssr.md#4",
+    "b": "vite:docs/config/server-options.md#16",
+    "relation": "overlapping",
+    "related": 0.9981,
+    "probabilities": {
+     "same": 0.0089,
+     "overlapping": 0.9848,
+     "conflicting": 0.0044,
+     "unrelated": 0.0019
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 59,
+   "passages": 1,
+   "counterparts_ms": 96
+  },
+  "timing": {
+   "read_ms": 182,
+   "total_ms": 184
+  }
+ }
+}

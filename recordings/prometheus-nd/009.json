@@ -1,0 +1,140 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/009",
+ "recorded_at": "2026-11-06T13:33:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1042,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "195.17367",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=334"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#31",
+    "text": "These limits apply to every query the engine evaluates, not only to API\nrequests. Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` query parameters. A\nrequest asking for a value above the operator-set ceiling is rejected with HTTP\n400 (`bad_data`) rather than silently clamped. For `max_query_duration`, the\nceiling is `--query.timeout` while `query_max_duration` is unset. A `timeout`\nparameter above the effective duration ceiling is capped at that ceiling.\n\n`query_max_duration` overrides `--query.timeout` only while this feature flag is\nenabled. The command-line flag remains supported and controls the timeout when\nthe feature is disabled or `query_max_duration` is unset.\n\nClients can detect the feature through [`/api/v1/features`](querying/api.md#features),\nwhere it is reported as `query_cost` in the `api` category."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#15",
+    "text": "When the `query-cost` feature flag is enabled, the engine also enforces the\nreloadable cost limits configured under the `global:` section of the\n[configuration file](../configuration/configuration.md#configuration-file)\n(`query_max_series`, `query_max_samples_read`, and `query_max_duration`).\nThese limits are enforced *during* query execution against the query's actual\nrunning cost, not against the estimate above. A query is rejected as soon as the\nnumber of series it loads or the number of samples it reads exceeds the\nconfigured limit, and `query_max_duration` surfaces as a query timeout. The\nestimate returned by these endpoints is informational only and is never used to\nreject a query.\n\nThese limits apply to every query the engine evaluates, not only to API\nrequests. Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nWith query-cost enabled, sample accounting includes all storage input consumed\nby child evaluators, even when their output falls between outer query windows.\nReusing a materialized child result does not charge its storage reads again.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` parameters. These can\nonly tighten the operator-set value, never loosen it: a request asking for a\nvalue above the ceiling is rejected with HTTP 400 (`bad_data`) so that the\ncaller sees that the limit it asked for was not applied, instead of being\nsilently clamped down. The `timeout` parameter can also shorten the deadline,\nbut a larger value is capped at the effective duration ceiling rather than\nrejected."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#31",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/querying/api.md#15"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#15",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/feature_flags.md#31"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/feature_flags.md#31",
+    "b": "prometheus:docs/querying/api.md#15",
+    "relation": "overlapping",
+    "related": 0.9981,
+    "probabilities": {
+     "same": 0.0048,
+     "overlapping": 0.9898,
+     "conflicting": 0.0036,
+     "unrelated": 0.0019
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.027,
+       "restated": 0.9034,
+       "elaborated": 0.034,
+       "different": 0.0357
+      },
+      "confidence": 0.9643,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "Recording and alerting rules are subject to them too: a rule whose",
+       "start": 82,
+       "end": 148,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#15",
+       "quote": "Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nWith query-cost enabled, sample accounting includes all storage input consumed\nby child evaluators, even when their output falls between outer query windows.\nReusing a materialized child result does not charge its storage reads again.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` parameters.",
+       "start": 780,
+       "end": 1376,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0055,
+       "restated": 0.9862,
+       "elaborated": 0.0042,
+       "different": 0.004
+      },
+      "confidence": 0.996,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "A `timeout`",
+       "start": 674,
+       "end": 685,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#15",
+       "quote": "The `timeout` parameter can also shorten the deadline,\nbut a larger value is capped at the effective duration ceiling rather than\nrejected.",
+       "start": 1636,
+       "end": 1775,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 3,
+   "counterparts_ms": 95
+  },
+  "timing": {
+   "read_ms": 204,
+   "total_ms": 207
+  }
+ }
+}

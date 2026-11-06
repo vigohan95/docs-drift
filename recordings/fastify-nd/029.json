@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-nd/029",
+ "recorded_at": "2026-11-06T13:33:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 966,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "98.550978",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=250"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#1",
+    "text": "When [`handlerTimeout`](./Server.md#factory-handler-timeout) is configured, a\ntimer starts after routing. If the response is not sent within the allowed time,\n`request.signal` is aborted and a `503 Service Unavailable` error is sent.\nThe timer is cancelled when the response completes\nor when `reply.hijack()` is called.\n\nBefore or during the `User Handler`, `reply.hijack()` can be called to:\n- Prevent Fastify from running subsequent hooks and the user handler\n- Prevent Fastify from sending the response automatically\n\nIf `reply.raw` is used to send a response, `onResponse` hooks will still\nbe executed."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#10",
+    "text": "### `handlerTimeout`\n<a id=\"factory-handler-timeout\"></a>\n\n+ Default: `0` (no timeout)\n\nDefines the maximum number of milliseconds allowed for processing a request\nthrough the entire route lifecycle (from routing through onRequest, parsing,\nvalidation, handler execution, and serialization). If the response is not sent\nwithin this time, a `503 Service Unavailable` error is returned and\n`request.signal` is aborted.\n\nUnlike `connectionTimeout` and `requestTimeout` (which operate at the socket\nlevel), `handlerTimeout` is an application-level timeout that works correctly\nwith HTTP keep-alive connections. It can be overridden per-route via\n[route options](./Routes.md#routes-options). When set at both levels, the\nroute-level value takes precedence. Routes without an explicit `handlerTimeout`\ninherit the server default. Once a server-level timeout is set, individual\nroutes cannot opt out of it — they can only override it with a different\npositive integer.\n\nThe timeout is **cooperative**: when it fires, Fastify sends the 503 error\nresponse, but the handler's async work continues to run. Use\n[`request.signal`](./Request.md) to detect cancellation and stop ongoing work\n(database queries, HTTP requests, etc.). APIs that accept a `signal` option\n(`fetch()`, database drivers, `stream.pipeline()`) will cancel automatically."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Lifecycle.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Lifecycle.md#1",
+    "b": "fastify:docs/Reference/Server.md#10",
+    "relation": "overlapping",
+    "related": 0.999,
+    "probabilities": {
+     "same": 0.0025,
+     "overlapping": 0.9943,
+     "conflicting": 0.0022,
+     "unrelated": 0.001
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 79,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 106,
+   "total_ms": 108
+  }
+ }
+}

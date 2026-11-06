@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus-nd/021",
+ "recorded_at": "2026-11-06T13:33:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1030,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "184.177505",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=14,cfOrigin;dur=0,cfWorker;dur=337"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#4",
+    "text": "## Per-step stats\n\n`--enable-feature=promql-per-step-stats`\n\nWhen enabled, passing `stats=all` in a query request returns per-step\nstatistics. The following sample statistics are included:\n\n- **totalQueryableSamples** / **totalQueryableSamplesPerStep**: Total number of samples *loaded* during the query. For range-vector functions (e.g. `rate`, `sum_over_time`) evaluated over multiple steps, each step counts the full window (the same point may be counted in multiple steps).\n- **samplesRead** / **samplesReadPerStep**: Total number of samples *read* by the evaluator (its input, not physical storage I/O). For range-vector functions in range queries, only *new* points per step are counted (step 0: full window; later steps: points not seen in the previous step). See [Query statistics](querying/api.md#query-statistics) for the exact semantics.\n- **peakSamples**: Peak number of samples in memory during evaluation (used for the `query.max-samples` limit).\n\nThe Prometheus server exposes two counters for observability: `prometheus_engine_query_samples_total` (logical underlying sample consumption, full window per step) and `prometheus_engine_query_samples_read_total` (samples read, delta per step for range-vector).\n\nWhen disabled in either the engine or the query, per-step statistics are not\ncomputed at all."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#10",
+    "text": "Floats count as one sample; native histograms are weighted by their in-memory size. Fixed `@` subqueries read their window once, charging reads to the first parent step, while each parent step counts its logical underlying consumption.\n\nThe server also exposes two Prometheus metrics: `prometheus_engine_query_samples_total` (logical underlying sample consumption) and `prometheus_engine_query_samples_read_total` (samples read). See [Per-step stats](../feature_flags.md#per-step-stats) for the `promql-per-step-stats` feature flag.\n\nWhen the [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled, the\ninstant and range query endpoints accept a `cost=<bool>` parameter. It is a plain\non/off switch, not a set of levels: `cost=true` enables the comparison, and any\nvalue that does not parse as a boolean is rejected with HTTP 400 (`bad_data`).\nWhen `cost` is `true`, the response `data` includes an additional `cost` object\ncomparing estimated storage input with the actual cost measured\nduring execution:\n\n```json\n\"cost\": {\n  \"estimated\": {\n    \"seriesTouched\": 42,\n    \"samplesRead\": 5040\n  },\n  \"actual\": {\n    \"seriesTouched\": 40,\n    \"samplesRead\": 4980,\n    \"peakSamples\": 320\n  }\n}\n```\n\nThe estimated `seriesTouched` and `samplesRead` values are approximations that\ncan be higher or lower than actual cost: see\n[Query cost](#query-cost) for how they are computed and their accuracy\nlimitations. `peakSamples` is reported only for the actual cost; there is no\nestimated `peakSamples`. The comparison is informational: the estimate is never\nused to reject a query."
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/querying/api.md#10"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#10",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/feature_flags.md#4"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/feature_flags.md#4",
+    "b": "prometheus:docs/querying/api.md#10",
+    "relation": "overlapping",
+    "related": 0.9984,
+    "probabilities": {
+     "same": 0.0028,
+     "overlapping": 0.993,
+     "conflicting": 0.0026,
+     "unrelated": 0.0016
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0121,
+       "restated": 0.9313,
+       "elaborated": 0.0442,
+       "different": 0.0124
+      },
+      "confidence": 0.9876,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#4",
+       "quote": "The Prometheus server exposes two counters for observability: `prometheus_engine_query_samples_total` (logical underlying sample consumption, full window per step) and `prometheus_engine_query_samples_read_total` (samples read, delta per step for range-vector).",
+       "start": 962,
+       "end": 1223,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#10",
+       "quote": "Fixed `@` subqueries read their window once, charging reads to the first parent step, while each parent step counts its logical underlying consumption.\n\nThe server also exposes two Prometheus metrics: `prometheus_engine_query_samples_total` (logical underlying sample consumption) and `prometheus_engine_query_samples_read_total` (samples read).",
+       "start": 84,
+       "end": 429,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 1,
+   "counterparts_ms": 67
+  },
+  "timing": {
+   "read_ms": 194,
+   "total_ms": 199
+  }
+ }
+}

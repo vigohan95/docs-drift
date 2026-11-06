@@ -1,0 +1,140 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify-nd/003",
+ "recorded_at": "2026-11-06T13:33:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1044,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "158.14138",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=335"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#21",
+    "text": "### onRoute\n<a id=\"on-route\"></a>\n\nTriggered when a new route is registered. Listeners are passed a [`routeOptions`](./Routes.md#routes-options)\nobject as the sole parameter. The interface is synchronous, and, as such, the\nlisteners are not passed a callback. This hook is encapsulated.\n\n```js\nfastify.addHook('onRoute', (routeOptions) => {\n  //Some code\n  routeOptions.method\n  routeOptions.schema\n  routeOptions.url // the complete URL of the route, it will include the prefix if any\n  routeOptions.path // `url` alias\n  routeOptions.routePath // the URL of the route without the prefix\n  routeOptions.bodyLimit\n  routeOptions.logLevel\n  routeOptions.logSerializers\n  routeOptions.prefix\n  routeOptions.isGeneratedHeadRoute // `true` only for a HEAD route generated from a GET route\n})\n```\n\nIf you are authoring a plugin and you need to customize application routes, like\nmodifying the options or adding new route hooks, this is the right place.\n\n```js\nfastify.addHook('onRoute', (routeOptions) => {\n  function onPreSerialization(request, reply, payload, done) {\n    // Your code\n    done(null, payload)\n  }\n  // preSerialization can be an array or undefined\n  routeOptions.preSerialization = [...(routeOptions.preSerialization || []), onPreSerialization]\n})\n```\n\nTo add more routes within an onRoute hook, the routes must\nbe tagged correctly. The hook will run into an infinite loop if\nnot tagged. The recommended approach is shown below.\n\n```js\nconst kRouteAlreadyProcessed = Symbol('route-already-processed')\n\nfastify.addHook('onRoute', function (routeOptions) {\n  const { url, method } = routeOptions\n\n  const isAlreadyProcessed = (routeOptions.custom && routeOptions.custom[kRouteAlreadyProcessed]) || false\n\n  if (!isAlreadyProcessed) {\n    this.route({\n      url,\n      method,\n      custom: {\n        [kRouteAlreadyProcessed]: true\n      },\n      handler: () => {}\n    })\n  }\n})\n```\n\nFor more details, see this [issue](https://github.com/fastify/fastify/issues/4319)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#80",
+    "text": "##### fastify.onRouteHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(opts: [RouteOptions][RouteOptions] & \\{ path: string; prefix: string }): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L174)\n\nTriggered when a new route is registered. Listeners are passed a routeOptions\nobject as the sole parameter. The interface is synchronous, and, as such, the\nlistener does not get passed a callback"
+   }
+  ],
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode).",
+  "evidence": "flagged"
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#21",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/TypeScript.md#80"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#80",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Hooks.md#21"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Hooks.md#21",
+    "b": "fastify:docs/Reference/TypeScript.md#80",
+    "relation": "overlapping",
+    "related": 0.9964,
+    "probabilities": {
+     "same": 0.0345,
+     "overlapping": 0.9573,
+     "conflicting": 0.0046,
+     "unrelated": 0.0036
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.4171,
+       "restated": 0.5378,
+       "elaborated": 0.0255,
+       "different": 0.0196
+      },
+      "confidence": 0.9804,
+      "a": {
+       "document": "fastify:docs/Reference/Hooks.md#21",
+       "quote": "Listeners are passed a [`routeOptions`](./Routes.md#routes-options)",
+       "start": 77,
+       "end": 144,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/TypeScript.md#80",
+       "quote": "Listeners are passed a routeOptions\nobject as the sole parameter.",
+       "start": 433,
+       "end": 498,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0301,
+       "restated": 0.9415,
+       "elaborated": 0.019,
+       "different": 0.0094
+      },
+      "confidence": 0.9906,
+      "a": {
+       "document": "fastify:docs/Reference/Hooks.md#21",
+       "quote": "The interface is synchronous, and, as such, the",
+       "start": 175,
+       "end": 222,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/TypeScript.md#80",
+       "quote": "The interface is synchronous, and, as such, the\nlistener does not get passed a callback",
+       "start": 499,
+       "end": 586,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 44,
+   "passage_reads": 1,
+   "passages_ms": 54,
+   "passages": 3,
+   "counterparts_ms": 98
+  },
+  "timing": {
+   "read_ms": 196,
+   "total_ms": 199
+  }
+ }
+}
