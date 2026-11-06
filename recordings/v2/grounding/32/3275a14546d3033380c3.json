@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/32/3275a14546d3033380c3",
+ "request_hash": "3275a14546d3033380c3bb76b77b4b7c178de600385fc4349188283bf7bc2018",
+ "recorded_at": "2026-11-06T14:47:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 960,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "87.307358",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=208"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#0",
+    "text": "---\ntitle: Unit of Work and Transactions\nsidebar_label: Unit of Work\n---\n\nMikroORM uses the Identity Map pattern to track objects. Whenever you fetch an object from the database, MikroORM will keep a reference to this object inside its `UnitOfWork`.\n\nThis allows MikroORM room for optimizations. If you call the EntityManager and ask for an entity with a specific ID twice, it will return the same instance:\n\n```ts\nconst jon1 = await em.findOne(Author, 1);\nconst jon2 = await em.findOne(Author, 1);\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nOnly one SELECT query will be fired against the database here. In the second `findOne()` call MikroORM will check the identity map first and will skip the database round trip as it will find the entity already loaded.\n\nThe identity map being indexed by primary keys only allows shortcuts when you ask for objects by primary key. When you query by other properties, you will still get the same reference, but two separate database calls will be made:\n\n```ts\nconst jon1 = await em.findOne(Author, { name: 'Jon Snow' });\nconst jon2 = await em.findOne(Author, { name: 'Jon Snow' });\n\n// identity map in action\nconsole.log(jon1 === jon2); // true\n```\n\nMikroORM only knows objects by id, so a query for different criteria has to go to the database, even if it was executed just before. But instead of creating a second `Author` object MikroORM first gets the primary key from the row and checks if it already has an object inside the `UnitOfWork` with that primary key."
+   }
+  ],
+  "answer": "The following code will update your database with the changes made to the `Author` object, even if you did not call [`em.persist()`](/api/core/class/EntityManager#persist): A natural question would now be, \"how does MikroORM even detect objects have changed?\". For this MikroORM keeps a second map inside the `UnitOfWork`.",
+  "claims": [
+   "The following code will update your database with the changes made to the `Author` object, even if you did not call [`em.persist()`](/api/core/class/EntityManager#persist):",
+   "A natural question would now be, \"how does MikroORM even detect objects have changed?\". For this MikroORM keeps a second map inside the `UnitOfWork`."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0022,
+  "ungrounded": 0.9978,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/unit-of-work.md#0",
+    "share": 0,
+    "share_of_answer": 0.0022,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "The following code will update your database with the changes made to the `Author` object, even if you did not call [`em.persist()`](/api/core/class/EntityManager#persist):",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5358,
+    "supported": 0.0017,
+    "contradicted": 0.0035,
+    "not_stated": 0.9912,
+    "not_a_claim": 0.0035,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/unit-of-work.md#0": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "A natural question would now be, \"how does MikroORM even detect objects have changed?\". For this MikroORM keeps a second map inside the `UnitOfWork`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4642,
+    "supported": 0.0028,
+    "contradicted": 0.0047,
+    "not_stated": 0.9863,
+    "not_a_claim": 0.0063,
+    "verdict": "not_stated",
+    "sources": {
+     "mikro-orm:docs/docs/unit-of-work.md#0": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0017
+  },
+  "timing": {
+   "read_ms": 93,
+   "total_ms": 96
+  }
+ }
+}

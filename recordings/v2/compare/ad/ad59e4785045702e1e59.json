@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ad/ad59e4785045702e1e59",
+ "request_hash": "ad59e4785045702e1e59b0719cbff0ae925fb7cf2788276a05d78fe544bfb202",
+ "recorded_at": "2026-11-06T14:50:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1578,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.4984",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=47,cfOrigin;dur=0,cfWorker;dur=390"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/events.md#19",
+    "text": "### Modifying Change Sets in onFlush\n\nIn `onFlush`, you can add or modify change sets:\n\n```ts\nasync onFlush(args: FlushEventArgs) {\n  const changeSets = args.uow.getChangeSets();\n  const cs = changeSets.find(cs =>\n    cs.type === ChangeSetType.CREATE && cs.name === 'FooBar'\n  );\n\n  if (cs) {\n    // Create a related entity\n    const related = new FooBaz();\n    related.name = 'auto-created';\n    cs.entity.baz = related;\n\n    // Compute change set for the new entity\n    args.uow.computeChangeSet(related);\n    // Recompute the original entity's change set\n    args.uow.recomputeSingleChangeSet(cs.entity);\n  }\n}\n```\n\nTo convert a delete to an update (e.g. for soft deletes):\n\n```ts\nasync onFlush(args: FlushEventArgs) {\n  for (const cs of args.uow.getChangeSets()) {\n    if (cs.type !== ChangeSetType.DELETE) {\n      continue;\n    }\n\n    if (!cs.meta.properties.deletedAt) {\n      continue;\n    }\n\n    cs.entity.deletedAt = new Date();\n    args.uow.computeChangeSet(cs.entity, ChangeSetType.UPDATE);\n  }\n}\n```\n\nTo convert an update to a delete:\n\n```ts\nasync onFlush(args: FlushEventArgs) {\n  const cs = args.uow.getChangeSets().find(cs =>\n    cs.type === ChangeSetType.UPDATE && cs.entity.shouldDelete\n  );\n\n  if (cs) {\n    args.uow.computeChangeSet(cs.entity, ChangeSetType.DELETE);\n  }\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "text": "### Automating with an onFlush Subscriber\n\nTo avoid manually creating outbox events in every transaction, you can use an `onFlush` subscriber to inspect computed change sets and enqueue events automatically:\n\n```ts\nimport { ChangeSetType, EventSubscriber, FlushEventArgs } from '@mikro-orm/core';\nimport { OutboxEvent } from './entities/OutboxEvent.js';\n\nexport class OutboxSubscriber implements EventSubscriber {\n\n  async onFlush(args: FlushEventArgs) {\n    for (const cs of args.uow.getChangeSets()) {\n      if (cs.meta.className === 'OutboxEvent') {\n        continue; // don't create outbox events for outbox events\n      }\n\n      // skip internal early update change sets (used for self-referencing relations)\n      if (cs.type === ChangeSetType.UPDATE_EARLY) {\n        continue;\n      }\n\n      const event = args.em.create(OutboxEvent, {\n        eventType: `${cs.meta.className}_${cs.type}`,\n        payload: cs.getPrimaryKey(true),\n      });\n\n      args.uow.computeChangeSet(event);\n    }\n  }\n\n}\n```\n\nRegister it in your ORM config:\n\n```ts\nMikroORM.init({\n  subscribers: [new OutboxSubscriber()],\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/events.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/events.md#19",
+    "b": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "relation": "overlapping",
+    "related": 0.9944,
+    "probabilities": {
+     "same": 0.0143,
+     "overlapping": 0.9754,
+     "conflicting": 0.0047,
+     "unrelated": 0.0056
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 194,
+   "passage_reads": 1,
+   "passages_ms": 64,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 258,
+   "total_ms": 260
+  }
+ }
+}

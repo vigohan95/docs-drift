@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4e/4ecaa2e088d395287e75",
+ "request_hash": "4ecaa2e088d395287e75c15a26504000ee6e669c63258a2ea71bacd25788ac41",
+ "recorded_at": "2026-11-06T14:49:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1067,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.605537",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=175"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#21",
+    "text": "### The onRequest() handler\n\nWe use the `onRequest` function to wrap our Fastify application instance.\n\nAs such, we'll begin with importing it to the code:\n\n```js\nconst { onRequest } = require(\"firebase-functions/v2/https\")\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "text": "##### delay\n\n`delay` is not a plugin itself. It's actually a plugin *factory*. It expects a\nFastify plugin with `routes` and exports the actual plugin that'll handle\nenveloping those routes with an `onRequest` hook that will make sure no requests\nare handled until we're ready for them.\n\n```js\nconst delay = (routes) =>\n  function (fastify, opts, done) {\n    // Make sure customer requests won't be accepted if the magicKey is not\n    // available\n    fastify.addHook('onRequest', function (request, reply, next) {\n      if (!request.server.magicKey) {\n        reply.statusCode = 503\n        reply.header('Retry-After', USUAL_WAIT_TIME_MS)\n        reply.send({ error: true, retryInMs: USUAL_WAIT_TIME_MS })\n      }\n\n      next()\n    })\n\n    // Register to-be-delayed routes\n    fastify.register(routes, opts)\n\n    done()\n  }\n```\n\nInstead of updating every single controller that might use the `magicKey`, we\nsimply make sure that no route that's related to customer requests will be\nserved until we have everything ready. And there's more: we fail **FAST** and\nhave the possibility of giving the customer meaningful information, like how\nlong they should wait before retrying the request. Going even further, by\nissuing a [`503` status\ncode](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/503) we're\nsignaling to our infrastructure components (namely load balancers) that we're\nstill not ready to take incoming requests and they should redirect traffic to\nother instances, if available. Additionally, we are providing a `Retry-After`\nheader with the time in milliseconds the client should wait before retrying."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Serverless.md#21",
+    "b": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "relation": "unrelated",
+    "related": 0.4413,
+    "probabilities": {
+     "same": 0.015,
+     "overlapping": 0.4108,
+     "conflicting": 0.0155,
+     "unrelated": 0.5587
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 43
+  },
+  "timing": {
+   "read_ms": 42,
+   "total_ms": 45
+  }
+ }
+}

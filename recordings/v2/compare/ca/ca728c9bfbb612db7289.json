@@ -1,0 +1,120 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/ca/ca728c9bfbb612db7289",
+ "request_hash": "ca728c9bfbb612db7289bf2e9ae996a7cfb2fe0ac4a4d9db48a06fce8bce9801",
+ "recorded_at": "2026-11-06T14:50:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1398,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "146.158754",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#5",
+    "text": "| Propagation        | Description                                                                      |\n|--------------------|----------------------------------------------------------------------------------|\n| `NESTED` (default) | Creates savepoint if transaction exists, otherwise new transaction               |\n| `REQUIRED`         | Uses existing transaction if available (no savepoint), otherwise creates new one |\n| `REQUIRES_NEW`     | Always creates independent transaction, suspending existing one                  |\n| `SUPPORTS`         | Uses existing transaction if available, otherwise executes non-transactionally   |\n| `MANDATORY`        | Requires existing transaction, throws error if none exists                       |\n| `NOT_SUPPORTED`    | Suspends existing transaction and executes without transaction                   |\n| `NEVER`            | Must execute without transaction, throws error if one exists                     |"
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#40",
+    "text": "### @Transactional()\n\n`@Transactional()` decorator wraps the method in a transaction. It supports all options from `em.transactional()`.\n\nSee [Transactions](./transactions.md) for more details.\n\n| Parameter     | Type                                          | Optional | Description                                                  |\n|---------------|-----------------------------------------------|----------|--------------------------------------------------------------|\n| `context`     | `() => MikroORM` &#124; `() => EntityManager` | yes      | Callback to get the ORM instance or EntityManager.           |\n| `contextName` | `string`                                      | yes      | Name of the context to use.                                  |\n| `isolationLevel` | `IsolationLevel`                           | yes      | Transaction isolation level.                                 |\n| `readOnly`    | `boolean`                                     | yes      | Whether the transaction is read-only.                        |\n| `propagation` | `TransactionPropagation`                      | yes      | Transaction propagation mode. Defaults to `REQUIRED`.        |\n\n```ts\nexport class MyService {\n\n  constructor(private readonly orm: MikroORM) {}\n\n  @Transactional()\n  async createUser(data: CreateUserDto) {\n    // this method runs in a transaction\n    const user = this.orm.em.create(User, data);\n    await this.orm.em.persist(user).flush();\n    return user;\n  }\n\n  @Transactional({ isolationLevel: IsolationLevel.SERIALIZABLE })\n  async transferMoney(from: number, to: number, amount: number) {\n    // runs with SERIALIZABLE isolation level\n  }\n\n}\n```\n\nUnlike `em.transactional()`, the `@Transactional()` decorator uses `REQUIRED` propagation by default, which means it will join an existing transaction if one is active."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "mikro-orm:docs/docs/decorators.md#40"
+    ]
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#40",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "mikro-orm:docs/docs/transactions.md#5"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/transactions.md#5",
+    "b": "mikro-orm:docs/docs/decorators.md#40",
+    "relation": "conflicting",
+    "related": 0.9927,
+    "probabilities": {
+     "same": 0.0094,
+     "overlapping": 0.0244,
+     "conflicting": 0.9589,
+     "unrelated": 0.0073
+    },
+    "duplicates": [],
+    "conflicts": [
+     {
+      "kind": "scope",
+      "kinds": {
+       "value": 0.0035,
+       "date_or_version": 0.0048,
+       "rule_or_condition": 0.0079,
+       "scope": 0.9736,
+       "name": 0.0048,
+       "no_conflict": 0.0054
+      },
+      "confidence": 0.9946,
+      "a": {
+       "document": "mikro-orm:docs/docs/transactions.md#5",
+       "quote": "| `NESTED` (default) | Creates savepoint if transaction exists, otherwise new transaction               |",
+       "start": 212,
+       "end": 317,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/decorators.md#40",
+       "quote": "Defaults to `REQUIRED`.",
+       "start": 1142,
+       "end": 1165,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 1,
+   "counterparts_ms": 29,
+   "kinds_ms": 18
+  },
+  "timing": {
+   "read_ms": 157,
+   "total_ms": 161
+  }
+ }
+}

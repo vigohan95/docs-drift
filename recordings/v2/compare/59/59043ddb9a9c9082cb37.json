@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/59/59043ddb9a9c9082cb37",
+ "request_hash": "59043ddb9a9c9082cb370001a6997b4fb6292b4ea3faa6ae1a8054380f40555f",
+ "recorded_at": "2026-11-06T14:51:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1013,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "123.225981",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=266"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/api-slice-utils.mdx#33",
+    "text": "### `invalidateTags`\n\nA Redux action creator that can be used to manually invalidate cache tags for [automated re-fetching](../../usage/automated-refetching.mdx)."
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/internal/buildMiddleware/invalidationByTags.mdx#2",
+    "text": "## Core Sequence\n\n1. `invalidateTags()` initiates:\n   1. invalidateTags function is called with a list of tags generated from the action metadata\n   2. in the case of a [queryThunk] resolution an empty set of tags is always provided\n2. The tags calculated are added to the list of pending tags to invalidate (see [delayed](#delayed))\n3. (optional: 'Delayed') the invalidateTags function is ended if the `apiSlice.invalidationBehavior` is set to \"delayed\" and there are any pending thunks/queries running in that `apiSlice`\n4. Pending tags are reset to an empty list, if there are no tags the function ends here\n5. Selects all `{ endpointName, originalArgs, queryCacheKey }` combinations that would be invalidated by a specific set of tags.\n6. Iterates through queryCacheKeys selected and performs one of two actions if the query exists\\*\n   1. removes cached query result - via the `removeQueryResult` action - if no subscription is active\n   2. if the query is \"uninitialized\" it initiates a `refetchQuery` action\n\n```js no-transpile\nconst toInvalidate = api.util.selectInvalidatedBy(rootState, tags)\ncontext.batch(() => {\n  const valuesArray = Array.from(toInvalidate.values())\n  for (const { queryCacheKey } of valuesArray) {\n    const querySubState = state.queries[queryCacheKey]\n    const subscriptionSubState =\n      internalState.currentSubscriptions[queryCacheKey] ?? {}\n    if (querySubState) {\n      if (countObjectKeys(subscriptionSubState) === 0) {\n        mwApi.dispatch(\n          removeQueryResult({\n            queryCacheKey,\n          }),\n        )\n      } else if (querySubState.status !== 'uninitialized' /* uninitialized */) {\n        mwApi.dispatch(refetchQuery(querySubState, queryCacheKey))\n      }\n    }\n  }\n})\n```\n\n:::note\nStep 6 is performed within a `context.batch()` call.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/api-slice-utils.mdx#33",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/internal/buildMiddleware/invalidationByTags.mdx#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/created-api/api-slice-utils.mdx#33",
+    "b": "redux-toolkit:docs/rtk-query/internal/buildMiddleware/invalidationByTags.mdx#2",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.0093,
+     "overlapping": 0.9847,
+     "conflicting": 0.0033,
+     "unrelated": 0.0026
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 104,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 129,
+   "total_ms": 132
+  }
+ }
+}

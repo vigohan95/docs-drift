@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/19/191770d5a67cf6b49c78",
+ "request_hash": "191770d5a67cf6b49c785b4a3139ca2cce1a00b481c00ea0fb0443c4ec52c80a",
+ "recorded_at": "2026-11-06T14:50:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 988,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "108.324766",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=238"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#9",
+    "text": "## `@CreateRequestContext()` decorator\n\n> Before v6, `@CreateRequestContext()` was called `@UseRequestContext()`.\n\nMiddlewares are executed only for regular HTTP request handlers, what if you need a request scoped method outside of that? One example of that is queue handlers or scheduled tasks (e.g. CRON jobs).\n\nIn those cases, you can use the `@CreateRequestContext()` decorator. It requires you to first inject the `MikroORM` instance (or an `EntityManager` or some `EntityRepository`) to current context, it will then be used to create a new context for you. Under the hood, the decorator will register the new request context for your method and execute it inside the context (via `RequestContext.create()`).\n\n> `@CreateRequestContext()` should be used only on the top level methods. It should not be nested - a method decorated with it should not call another method that is also decorated with it.\n\n```ts\nexport class MyService {\n\n  // or `private readonly em: EntityManager`\n  constructor(private readonly orm: MikroORM) { }\n\n  @CreateRequestContext()\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```\n\nAlternatively you can provide a callback that will return one of `MikroORM`, `EntityManager` or `EntityRepository` instance.\n\n```ts\nimport { DI } from '..';\n\nexport class MyService {\n\n  @CreateRequestContext(() => DI.em)\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```\n\nThe callback will receive current `this` in the first parameter. You can use it to link the `EntityManager` or `EntityRepository` too:\n\n```ts\nexport class MyService {\n\n  constructor(private readonly userRepository: EntityRepository<User>) { }\n\n  @CreateRequestContext<MyService>(t => t.userRepository)\n  async doSomething() {\n    // this will be executed in a separate context\n  }\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#24",
+    "text": "## Renamed `@UseRequestContext()`\n\nThe decorator was renamed to `@CreateRequestContext()` to make it clear it always creates new context, and a new `@EnsureRequestContext()` decorator was added that will reuse existing contexts if available."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/identity-map.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v5-to-v6.md#24"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#24",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/identity-map.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/identity-map.md#9",
+    "b": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#24",
+    "relation": "overlapping",
+    "related": 0.9961,
+    "probabilities": {
+     "same": 0.0171,
+     "overlapping": 0.9736,
+     "conflicting": 0.0055,
+     "unrelated": 0.0039
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.008,
+       "restated": 0.9653,
+       "elaborated": 0.0149,
+       "different": 0.0119
+      },
+      "confidence": 0.9881,
+      "a": {
+       "document": "mikro-orm:docs/docs/identity-map.md#9",
+       "quote": "> Before v6, `@CreateRequestContext()` was called `@UseRequestContext()`.",
+       "start": 40,
+       "end": 113,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#24",
+       "quote": "## Renamed `@UseRequestContext()`\n\nThe decorator was renamed to `@CreateRequestContext()` to make it clear it always creates new context, and a new `@EnsureRequestContext()` decorator was added that will reuse existing contexts if available.",
+       "start": 0,
+       "end": 241,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 41,
+   "passages": 1,
+   "counterparts_ms": 49
+  },
+  "timing": {
+   "read_ms": 116,
+   "total_ms": 120
+  }
+ }
+}

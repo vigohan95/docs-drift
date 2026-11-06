@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6a/6a59d571a1a50a458cf9",
+ "request_hash": "6a59d571a1a50a458cf9fae6d01d8653f5c4c70598204b670fd7186bf85bac55",
+ "recorded_at": "2026-11-06T14:50:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3440,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "121.396769",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=42,cfOrigin;dur=0,cfWorker;dur=275"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/custom-types.md#15",
+    "text": "### ArrayType\n\nIn PostgreSQL and MongoDB, it uses native arrays, otherwise it concatenates the values into string separated by commas. This means that you can't use values that contain comma with the `ArrayType` ( but you can create custom array type that will handle this case, e.g. by using different separator).\n\nBy default, array of strings is returned from the type. You can also have arrays of numbers or other data types - to do so, you will need to implement custom `hydrate` method that is used for converting the array values to the right type.\n\n> `ArrayType` will be used automatically if `type` is set to `array` (default behaviour of reflect-metadata) or `string[]` or `number[]` (either manually or via ts-morph). In case of `number[]` it will automatically handle the conversion to numbers. This means that the following examples would both have the `ArrayType` used automatically (but with reflect-metadata you would have a string array for both unless you specify the type manually as `type: 'number[]')\n\n```ts\n@Property({ type: ArrayType, nullable: true })\nstringArray?: string[];\n\n@Property({ type: new ArrayType(i => +i), nullable: true })\nnumericArray?: number[];\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-conditions.md#0",
+    "text": "---\ntitle: Query Conditions\n---\n\nimport Tabs from '@theme/Tabs';\nimport TabItem from '@theme/TabItem';\n\nWhen you want to make complex queries, you can easily end up with a lot of boilerplate code full of curly brackets:\n\n```ts\nconst res = await orm.em.find(Author, {\n  $and: [\n    { id: { $in: [1, 2, 7] } },\n    { id: { $nin: [3, 4] } },\n    { id: { $gt: 5 } },\n    { id: { $lt: 10 } },\n    { id: { $gte: 7 } },\n    { id: { $lte: 8 } },\n    { id: { $ne: 9 } },\n  ],\n});\n```\n\nFor AND condition with single field, you can also do this:\n\n```ts\nconst res = await orm.em.find(Author, {\n  id: {\n    $in: [1, 2, 7],\n    $nin: [3, 4],\n    $gt: 5,\n    $lt: 10,\n    $gte: 7,\n    $lte: 8,\n    $ne: 9,\n  },\n});\n```\n\nThere is also shortcut for `$in` - simply provide array as value, and it will be converted automatically:\n\n```ts\nconst res = await orm.em.find(Author, { favouriteBook: [1, 2, 7] });\n```\n\nOn array properties (`type: 'string[]'` and other `ArrayType` columns), `$in` and `$nin` work like in MongoDB. A list of arrays matches whole arrays, so `{ tags: { $in: [['a', 'b'], ['c']] } }` finds rows whose `tags` equal `['a', 'b']` or `['c']`. A flat list matches any of the elements, so `{ tags: ['a', 'b'] }` finds rows whose `tags` contain `'a'` or `'b'`. SQL drivers support the flat list only on PostgreSQL (it maps to the `&&` operator) and throw elsewhere. Use `$eq` to match an exact array.\n\nFor primary key lookup, you can provide the array directly to `em.find()`:\n\n```ts\nconst res = await orm.em.find(Author, [1, 2, 7]);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/custom-types.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-conditions.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/custom-types.md#15",
+    "b": "mikro-orm:docs/docs/query-conditions.md#0",
+    "relation": "overlapping",
+    "related": 0.9884,
+    "probabilities": {
+     "same": 0.0081,
+     "overlapping": 0.9748,
+     "conflicting": 0.0055,
+     "unrelated": 0.0116
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 129,
+   "total_ms": 132
+  }
+ }
+}

@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a4/a4687a77a1eea55fe830",
+ "request_hash": "a4687a77a1eea55fe83066d1799959d23b248480b78ff679b4ade2c53f7d4dfb",
+ "recorded_at": "2026-11-06T14:48:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1797,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "173.782686",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=386"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#80",
+    "text": "##### fastify.onRouteHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(opts: [RouteOptions][RouteOptions] & \\{ path: string; prefix: string }): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L174)\n\nTriggered when a new route is registered. Listeners are passed a routeOptions\nobject as the sole parameter. The interface is synchronous, and, as such, the\nlistener does not get passed a callback"
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#21",
+    "text": "### onRoute\n<a id=\"on-route\"></a>\n\nTriggered when a new route is registered. Listeners are passed a [`routeOptions`](./Routes.md#routes-options)\nobject as the sole parameter. The interface is synchronous, and, as such, the\nlisteners are not passed a callback. This hook is encapsulated.\n\n```js\nfastify.addHook('onRoute', (routeOptions) => {\n  //Some code\n  routeOptions.method\n  routeOptions.schema\n  routeOptions.url // the complete URL of the route, it will include the prefix if any\n  routeOptions.path // `url` alias\n  routeOptions.routePath // the URL of the route without the prefix\n  routeOptions.bodyLimit\n  routeOptions.logLevel\n  routeOptions.logSerializers\n  routeOptions.prefix\n  routeOptions.isGeneratedHeadRoute // `true` only for a HEAD route generated from a GET route\n})\n```\n\nIf you are authoring a plugin and you need to customize application routes, like\nmodifying the options or adding new route hooks, this is the right place.\n\n```js\nfastify.addHook('onRoute', (routeOptions) => {\n  function onPreSerialization(request, reply, payload, done) {\n    // Your code\n    done(null, payload)\n  }\n  // preSerialization can be an array or undefined\n  routeOptions.preSerialization = [...(routeOptions.preSerialization || []), onPreSerialization]\n})\n```\n\nTo add more routes within an onRoute hook, the routes must\nbe tagged correctly. The hook will run into an infinite loop if\nnot tagged. The recommended approach is shown below.\n\n```js\nconst kRouteAlreadyProcessed = Symbol('route-already-processed')\n\nfastify.addHook('onRoute', function (routeOptions) {\n  const { url, method } = routeOptions\n\n  const isAlreadyProcessed = (routeOptions.custom && routeOptions.custom[kRouteAlreadyProcessed]) || false\n\n  if (!isAlreadyProcessed) {\n    this.route({\n      url,\n      method,\n      custom: {\n        [kRouteAlreadyProcessed]: true\n      },\n      handler: () => {}\n    })\n  }\n})\n```\n\nFor more details, see this [issue](https://github.com/fastify/fastify/issues/4319)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#80",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Hooks.md#21"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#21",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/TypeScript.md#80"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/TypeScript.md#80",
+    "b": "fastify:docs/Reference/Hooks.md#21",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0363,
+     "overlapping": 0.9573,
+     "conflicting": 0.0044,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0322,
+       "restated": 0.945,
+       "elaborated": 0.0119,
+       "different": 0.0109
+      },
+      "confidence": 0.9891,
+      "a": {
+       "document": "fastify:docs/Reference/TypeScript.md#80",
+       "quote": "Triggered when a new route is registered.",
+       "start": 391,
+       "end": 432,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Hooks.md#21",
+       "quote": "### onRoute\n<a id=\"on-route\"></a>\n\nTriggered when a new route is registered.",
+       "start": 0,
+       "end": 76,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0274,
+       "restated": 0.9546,
+       "elaborated": 0.0101,
+       "different": 0.008
+      },
+      "confidence": 0.992,
+      "a": {
+       "document": "fastify:docs/Reference/TypeScript.md#80",
+       "quote": "Listeners are passed a routeOptions",
+       "start": 433,
+       "end": 468,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Hooks.md#21",
+       "quote": "Listeners are passed a [`routeOptions`](./Routes.md#routes-options)\nobject as the sole parameter.",
+       "start": 77,
+       "end": 174,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0448,
+       "restated": 0.9241,
+       "elaborated": 0.0191,
+       "different": 0.0121
+      },
+      "confidence": 0.9879,
+      "a": {
+       "document": "fastify:docs/Reference/TypeScript.md#80",
+       "quote": "The interface is synchronous, and, as such, the",
+       "start": 499,
+       "end": 546,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Hooks.md#21",
+       "quote": "The interface is synchronous, and, as such, the\nlisteners are not passed a callback.",
+       "start": 175,
+       "end": 259,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 3,
+   "counterparts_ms": 72
+  },
+  "timing": {
+   "read_ms": 182,
+   "total_ms": 185
+  }
+ }
+}

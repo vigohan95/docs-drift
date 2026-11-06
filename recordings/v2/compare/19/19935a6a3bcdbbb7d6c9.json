@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/19/19935a6a3bcdbbb7d6c9",
+ "request_hash": "19935a6a3bcdbbb7d6c99bb1aa6681a656b1b6f8abfafe801ab3ab42f1c42b3f",
+ "recorded_at": "2026-11-06T14:50:24Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1977,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "155.414907",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=305"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#6",
+    "text": "### Removing items from collection\n\nRemoving items from a collection does not necessarily imply deleting the target entity, it means you are disconnecting the relation — removing items from collection, not removing entities from database — `Collection.remove()` is not the same as `em.remove()`. When you use `em.assign()` to update entities you can also remove/disconnect entities from a collection, they do not get automatically removed from the database. If you want to delete the entity by removing it from collection, you need to enable `orphanRemoval: true`, which tells the ORM you don't want orphaned entities to exist, so those should be removed. Also check the documentation on [Orphan Removal](./cascading.md#orphan-removal)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/relationships.md#7",
+    "text": "### Inverse Side\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'reflect-metadata', value: 'reflect-metadata'},\n    {label: 'ts-morph', value: 'ts-morph'},\n]\n  }\n>\n  <TabItem value=\"define-entity-class\">\n\n```ts\nimport { defineEntity, p } from '@mikro-orm/core';\n\nconst UserSchema = defineEntity({\n  name: 'User',\n  properties: {\n    id: p.integer().primary(),\n    // inverse side has to point to the owning side via `mappedBy`\n    bestFriend1: () => p.oneToOne(User).mappedBy('bestFriend1').orphanRemoval(),\n  },\n});\n\nexport class User extends UserSchema.class {}\nUserSchema.setClass(User);\n```\n\n  </TabItem>\n\n  <TabItem value=\"define-entity\">\n\n```ts\nimport { defineEntity, InferEntity, p } from '@mikro-orm/core';\n\nexport const User = defineEntity({\n  name: 'User',\n  properties: {\n    id: p.integer().primary(),\n    // inverse side has to point to the owning side via `mappedBy`\n    bestFriend1: () => p.oneToOne(User).mappedBy('bestFriend1').orphanRemoval(),\n  },\n});\n\nexport type IUser = InferEntity<typeof User>;\n```\n\n  </TabItem>\n  <TabItem value=\"reflect-metadata\">\n\n```ts\n@Entity()\nexport class User {\n\n  @OneToOne({ mappedBy: 'bestFriend1', orphanRemoval: true })\n  bestFriend1!: User;\n\n  @OneToOne(() => User, user => user.bestFriend2, { orphanRemoval: true })\n  bestFriend2!: User;\n\n}\n```\n\n  </TabItem>\n  <TabItem value=\"ts-morph\">\n\n```ts\n@Entity()\nexport class User {\n\n  @OneToOne({ mappedBy: 'bestFriend1', orphanRemoval: true })\n  bestFriend1!: User;\n\n  @OneToOne(() => User, user => user.bestFriend2, { orphanRemoval: true })\n  bestFriend2!: User;\n\n}\n```\n\n  </TabItem>\n</Tabs>\n\nAs you can see, relationships can be also self-referencing (all of them. OneToOne also supports [Orphan Removal](./cascading.md#orphan-removal))."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#6",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/relationships.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/relationships.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/collections.md#6"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/collections.md#6",
+    "b": "mikro-orm:docs/docs/relationships.md#7",
+    "relation": "overlapping",
+    "related": 0.9979,
+    "probabilities": {
+     "same": 0.0085,
+     "overlapping": 0.9859,
+     "conflicting": 0.0034,
+     "unrelated": 0.0021
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0128,
+       "restated": 0.7422,
+       "elaborated": 0.1123,
+       "different": 0.1327
+      },
+      "confidence": 0.796,
+      "a": {
+       "document": "mikro-orm:docs/docs/collections.md#6",
+       "quote": "If you want to delete the entity by removing it from collection, you need to enable `orphanRemoval: true`, which tells the ORM you don't want orphaned entities to exist, so those should be removed.",
+       "start": 458,
+       "end": 655,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/relationships.md#7",
+       "quote": "OneToOne also supports [Orphan Removal](./cascading.md#orphan-removal)).",
+       "start": 1830,
+       "end": 1902,
+       "confidence": 0.796
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 1,
+   "counterparts_ms": 49
+  },
+  "timing": {
+   "read_ms": 163,
+   "total_ms": 167
+  }
+ }
+}

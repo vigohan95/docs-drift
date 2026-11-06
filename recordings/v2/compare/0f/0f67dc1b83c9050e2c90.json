@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0f/0f67dc1b83c9050e2c90",
+ "request_hash": "0f67dc1b83c9050e2c9095e2c701b319c4090e5adbe47062098c65ad27db234d",
+ "recorded_at": "2026-11-06T14:50:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2190,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.841217",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=31,cfOrigin;dur=0,cfWorker;dur=236"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#32",
+    "text": "## Soft delete via `onFlush` event\n\nLet's add soft delete support for comments. Instead of physically deleting a comment from the database, we'll set a `deletedAt` timestamp and use a [filter](../filters.md) to automatically exclude soft-deleted records from queries.\n\nFirst, add a `deletedAt` property and a filter to the `Comment` entity:\n\n```ts title='comment.entity.ts'\nexport const CommentSchema = defineEntity({\n  name: 'Comment',\n  extends: BaseSchema,\n  properties: {\n    text: p.string(),\n    article: () => p.manyToOne(ArticleSchema).ref(),\n    author: () => p.manyToOne(UserSchema).ref(),\n    // highlight-next-line\n    deletedAt: p.datetime().nullable(),\n  },\n  // highlight-start\n  filters: {\n    softDelete: { cond: { deletedAt: null }, default: true },\n  },\n  // highlight-end\n});\n```\n\nThe `filters` option with `default: true` means all queries for `Comment` will automatically add `WHERE deleted_at IS NULL` - soft-deleted comments are invisible by default.\n\nNow implement an event subscriber that intercepts delete operations and converts them to soft deletes. The `onFlush` event fires after change sets are computed but before the actual database queries run - this is the perfect place to transform a `DELETE` into an `UPDATE`:\n\n```ts title='modules/common/soft-delete.subscriber.ts'\nimport type { EventSubscriber, FlushEventArgs } from '@mikro-orm/core';\nimport { ChangeSetType } from '@mikro-orm/core';\n\nexport class SoftDeleteSubscriber implements EventSubscriber {\n\n  async onFlush(args: FlushEventArgs): Promise<void> {\n    const changeSets = args.uow.getChangeSets();\n\n    for (const cs of changeSets) {\n      if (cs.type !== ChangeSetType.DELETE) {\n        continue;\n      }\n\n      // only soft-delete entities that have a `deletedAt` property\n      if (!cs.meta.properties.deletedAt) {\n        continue;\n      }\n\n      // convert the DELETE to an UPDATE that sets `deletedAt`\n      cs.entity.deletedAt = new Date();\n      args.uow.computeChangeSet(cs.entity, ChangeSetType.UPDATE);\n    }\n  }\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "text": "### Automating with an onFlush Subscriber\n\nTo avoid manually creating outbox events in every transaction, you can use an `onFlush` subscriber to inspect computed change sets and enqueue events automatically:\n\n```ts\nimport { ChangeSetType, EventSubscriber, FlushEventArgs } from '@mikro-orm/core';\nimport { OutboxEvent } from './entities/OutboxEvent.js';\n\nexport class OutboxSubscriber implements EventSubscriber {\n\n  async onFlush(args: FlushEventArgs) {\n    for (const cs of args.uow.getChangeSets()) {\n      if (cs.meta.className === 'OutboxEvent') {\n        continue; // don't create outbox events for outbox events\n      }\n\n      // skip internal early update change sets (used for self-referencing relations)\n      if (cs.type === ChangeSetType.UPDATE_EARLY) {\n        continue;\n      }\n\n      const event = args.em.create(OutboxEvent, {\n        eventType: `${cs.meta.className}_${cs.type}`,\n        payload: cs.getPrimaryKey(true),\n      });\n\n      args.uow.computeChangeSet(event);\n    }\n  }\n\n}\n```\n\nRegister it in your ORM config:\n\n```ts\nMikroORM.init({\n  subscribers: [new OutboxSubscriber()],\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#32",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/04-advanced.md#32",
+    "b": "mikro-orm:docs/docs/transactional-outbox.md#4",
+    "relation": "unrelated",
+    "related": 0.3862,
+    "probabilities": {
+     "same": 0.0197,
+     "overlapping": 0.3518,
+     "conflicting": 0.0147,
+     "unrelated": 0.6138
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 50
+  },
+  "timing": {
+   "read_ms": 49,
+   "total_ms": 52
+  }
+ }
+}

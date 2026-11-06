@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/2a/2a036a44a6375445c04c",
+ "request_hash": "2a036a44a6375445c04c4dce7dd7ea6df4e26c57f8412938080e0779a66bc24e",
+ "recorded_at": "2026-11-06T14:47:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1995,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "77.55747",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=218"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "pydantic:docs/errors/validation_errors.md#65",
+    "text": "## `mapping_type`\n\nThis error is raised when a problem occurs during validation due to a failure in a call to the methods from the\n`Mapping` protocol, such as `.items()`:\n\n```python\nfrom collections.abc import Mapping\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass BadMapping(Mapping):\n    def items(self):\n        raise ValueError()\n\n    def __iter__(self):\n        raise ValueError()\n\n    def __getitem__(self, key):\n        raise ValueError()\n\n    def __len__(self):\n        return 1\n\n\nclass Model(BaseModel):\n    x: dict[str, str]\n\n\ntry:\n    Model(x=BadMapping())\nexcept ValidationError as exc:\n    print(repr(exc.errors()[0]['type']))\n    #> 'mapping_type'\n```"
+   }
+  ],
+  "answer": "with pytest.raises(TypeError): Model(x=1) ``` ### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details).",
+  "claims": [
+   "with pytest.raises(TypeError): Model(x=1) ```",
+   "### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details)."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0211,
+  "ungrounded": 0.9789,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "pydantic:docs/errors/validation_errors.md#65",
+    "share": 1,
+    "share_of_answer": 0.0211,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "with pytest.raises(TypeError): Model(x=1) ```",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.1779,
+    "supported": 0.0036,
+    "contradicted": 0.0095,
+    "not_stated": 0.9797,
+    "not_a_claim": 0.0072,
+    "verdict": "not_stated",
+    "sources": {
+     "pydantic:docs/errors/validation_errors.md#65": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "### Validation exception Currently upon validation failure, a standard Pydantic [`ValidationError`][pydantic_core.ValidationError] is raised (see [model error handling](models.md#error-handling) for details).",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.8221,
+    "supported": 0.0248,
+    "contradicted": 0.0129,
+    "not_stated": 0.9433,
+    "not_a_claim": 0.0189,
+    "verdict": "not_stated",
+    "sources": {
+     "pydantic:docs/errors/validation_errors.md#65": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0036
+  },
+  "timing": {
+   "read_ms": 84,
+   "total_ms": 86
+  }
+ }
+}

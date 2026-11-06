@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b9/b9c173bf01206b27a6d7",
+ "request_hash": "b9c173bf01206b27a6d78de3da140fa4756650171e2a677313cb5da937435c6a",
+ "recorded_at": "2026-11-06T14:49:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1007,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.106976",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=36,cfOrigin;dur=0,cfWorker;dur=250"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#91",
+    "text": "#### setgenreqid\n<a id=\"set-gen-req-id\"></a>\n\n`fastify.setGenReqId(function (rawReq))` Synchronous function for setting the request-id\nfor additional Fastify instances. It will receive the _raw_ incoming request as\na parameter. The provided function should not throw an Error in any case.\n\nEspecially in distributed systems, you may want to override the default ID\ngeneration behavior to handle custom ways of generating different IDs in\norder to handle different use cases. Such as observability or webhooks plugins.\n\nFor example:\n```js\nconst fastify = require('fastify')({\n  genReqId: (req) => {\n    return 'base'\n  }\n})\n\nfastify.register((instance, opts, done) => {\n  instance.setGenReqId((req) => {\n    // custom request ID for `/webhooks`\n    return 'webhooks-id'\n  })\n  done()\n}, { prefix: '/webhooks' })\n\nfastify.register((instance, opts, done) => {\n  instance.setGenReqId((req) => {\n    // custom request ID for `/observability`\n    return 'observability-id'\n  })\n  done()\n}, { prefix: '/observability' })\n```\n\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set a different request ID."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#90",
+    "text": "#### setChildLoggerFactory\n<a id=\"set-child-logger-factory\"></a>\n\n`fastify.setChildLoggerFactory(factory(logger, bindings, opts, rawReq))`: Set a\nfunction that will be called when creating a child logger instance for each request\nwhich allows for modifying or adding child logger bindings and logger options, or\nreturning a custom child logger implementation.\n\nChild logger bindings have a performance advantage over per-log bindings because\nthey are pre-serialized by Pino when the child logger is created.\n\nThe first parameter is the parent logger instance, followed by the default bindings\nand logger options which should be passed to the child logger, and finally\nthe raw request (not a Fastify request object). The function is bound with `this`\nbeing the Fastify instance.\n\nFor example:\n```js\nconst fastify = require('fastify')({\n  childLoggerFactory: function (logger, bindings, opts, rawReq) {\n    // Calculate additional bindings from the request if needed\n    bindings.traceContext = rawReq.headers['x-cloud-trace-context']\n    return logger.child(bindings, opts)\n  }\n})\n```\n\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different logger factories."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#91",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#90",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#91",
+    "b": "fastify:docs/Reference/Server.md#90",
+    "relation": "unrelated",
+    "related": 0.0045,
+    "probabilities": {
+     "same": 0.0015,
+     "overlapping": 0.0014,
+     "conflicting": 0.0016,
+     "unrelated": 0.9955
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 138
+  },
+  "timing": {
+   "read_ms": 138,
+   "total_ms": 140
+  }
+ }
+}

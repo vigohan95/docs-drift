@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/bb/bb362fc50a81961ef3e4",
+ "request_hash": "bb362fc50a81961ef3e4b04f32a1ef81dfe58dcc070f361ed40eeeec9573134d",
+ "recorded_at": "2026-11-06T14:50:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1055,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "120.653536",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=30,cfOrigin;dur=0,cfWorker;dur=279"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+    "text": "### Why is Request Context needed?\n\nNow back to the validation error about global context. With the freshly gained knowledge, we know [`EntityManager`](/api/core/class/EntityManager) maintains a reference to all the managed entities in the Identity Map. Imagine we would use a single Identity Map throughout our application (so a single global context, global [`EntityManager`](/api/core/class/EntityManager)). It will be shared across all request handlers, that can run in parallel.\n\n1. growing memory footprint\n\n   As there would be only one shared Identity Map, we can't just clear it after our request ends. There can be another request working with it so clearing the Identity Map from one request could break other requests running in parallel. This will result in a growing memory footprint, as every entity that became managed at some point in time would be kept in the Identity Map.\n\n2. unstable response of API endpoints\n\n   Every entity has `toJSON()` method, that automatically converts it to serialized form If we have only one shared Identity Map, the following situation may occur:\n\n   Let's say there are 2 endpoints\n\n    1. `GET /article/:id` that returns just the article, without populating anything\n    2. `GET /article-with-author/:id` that returns the article and its author populated\n\n   Now when someone requests the same article via both of those endpoints, we could end up with both returning the same output:\n\n    1. `GET /article/1` returns `Article` without populating its property `author` property\n    2. `GET /article-with-author/1` returns `Article`, this time with `author` populated\n    3. `GET /article/1` returns `Article`, but this time also with `author` populated\n\n   This happens because the information about entity association being populated is stored in the Identity Map."
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#8",
+    "text": "## Disallowed global identity map\n\nIn v5, it is no longer possible to use the global identity map. This was a common issue that led to weird bugs, as using the global EM without request context is wrong, you always need to have a dedicated context for each request, so they do not interfere.\n\nNow you get a validation error if you try to use the global context. You can still disable this check via `allowGlobalContext` configuration, or a connected environment variable `MIKRO_ORM_ALLOW_GLOBAL_CONTEXT` - this can be handy especially in unit tests."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#18",
+    "b": "mikro-orm:docs/docs/upgrading-v4-to-v5.md#8",
+    "relation": "overlapping",
+    "related": 0.9968,
+    "probabilities": {
+     "same": 0.0065,
+     "overlapping": 0.9857,
+     "conflicting": 0.0047,
+     "unrelated": 0.0032
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 52,
+   "passages": 1,
+   "counterparts_ms": 50
+  },
+  "timing": {
+   "read_ms": 130,
+   "total_ms": 132
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/88/88ff8399e67f915ade18",
+ "request_hash": "88ff8399e67f915ade1883e3698d1cb4a6cbd00b9dcee41ea2d0b5822e3cbbd3",
+ "recorded_at": "2026-11-06T14:50:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1727,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.43408",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=165"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#0",
+    "text": "---\ntitle: Cascading persist, merge and remove\nsidebar_label: Cascading\n---\n\n> Cascade merging is no longer configurable (and is kept enabled for all relations).\n\n> This section is about application level cascading. For that to work, you need to have relations populated.\n\nWhen persisting or removing entity, all your references are by default cascade persisted. This means that by persisting any entity, ORM will automatically persist all of its associations.\n\nYou can control this behaviour via `cascade` attribute of `@ManyToOne`, `@ManyToMany`, `@OneToMany` and `@OneToOne` fields.\n\n> New entities without a primary key will always be persisted, regardless of `cascade` value.\n\n```ts\n// cascade persist is default value\n@OneToMany({ entity: () => Book, mappedBy: 'author' })\nbooks = new Collection<Book>(this);\n\n// same as previous definition\n@OneToMany({ entity: () => Book, mappedBy: 'author', cascade: [Cascade.PERSIST] })\nbooks = new Collection<Book>(this);\n\n// only cascade remove\n@OneToMany({ entity: () => Book, mappedBy: 'author', cascade: [Cascade.REMOVE] })\nbooks = new Collection<Book>(this);\n\n// no cascade\n@OneToMany({ entity: () => Book, mappedBy: 'author', cascade: [] })\nbooks = new Collection<Book>(this);\n\n// cascade all (persist and remove)\n@OneToMany({ entity: () => Book, mappedBy: 'author', cascade: [Cascade.ALL] })\nbooks = new Collection<Book>(this);\n\n// same as previous definition\n@OneToMany({ entity: () => Book, mappedBy: 'author', cascade: [Cascade.PERSIST, Cascade.REMOVE] })\nbooks = new Collection<Book>(this);\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#44",
+    "text": "  </TabItem>\n<TabItem value=\"reflect-metadata\">\n\n```ts title=\"./entities/Comment.ts\"\n@Entity({ orderBy: { createdAt: QueryOrder.DESC, id: QueryOrder.DESC } })\nexport class Comment {\n\n  @PrimaryKey()\n  id!: number;\n\n  @Property()\n  createdAt!: Date;\n\n  @Property()\n  text!: string;\n\n  @ManyToOne(() => Post)\n  post!: Post;\n\n}\n```\n\n  </TabItem>\n  <TabItem value=\"ts-morph\">\n\n```ts title=\"./entities/Comment.ts\"\n@Entity({ orderBy: { createdAt: QueryOrder.DESC, id: QueryOrder.DESC } })\nexport class Comment {\n\n  @PrimaryKey()\n  id!: number;\n\n  @Property()\n  createdAt!: Date;\n\n  @Property()\n  text!: string;\n\n  @ManyToOne()\n  post!: Post;\n\n}\n```\n\n  </TabItem>\n</Tabs>\n\nThe ordering precedence (from highest to lowest) is:\n\n1. **Runtime `orderBy`** - Passed to `em.find()`, `collection.init()`, or `collection.matching()`\n2. **Relation-level `orderBy`** - Defined on `@OneToMany()` or `@ManyToMany()` decorators\n3. **Entity-level `orderBy`** - Defined on the `@Entity()` decorator\n\nAll levels are combined together - if you specify `{ name: 'asc' }` at runtime and the entity has `{ createdAt: 'desc' }`, the result will order by `name` first, then by `createdAt`.\n\n<Tabs\ngroupId=\"entity-def\"\ndefaultValue=\"define-entity-class\"\nvalues={[\n{label: 'defineEntity + class', value: 'define-entity-class'},\n{label: 'defineEntity', value: 'define-entity'},\n{label: 'reflect-metadata', value: 'reflect-metadata'},\n{label: 'ts-morph', value: 'ts-morph'},\n]\n}\n>\n  <TabItem value=\"define-entity-class\">"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#44",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/cascading.md#0",
+    "b": "mikro-orm:docs/docs/defining-entities.md#44",
+    "relation": "unrelated",
+    "related": 0.0059,
+    "probabilities": {
+     "same": 0.0025,
+     "overlapping": 0.0019,
+     "conflicting": 0.0016,
+     "unrelated": 0.9941
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 35
+  }
+ }
+}

@@ -126,8 +126,27 @@ def statement_of(chunk: Chunk, start: int | None, end: int | None) -> str | None
     return s if len(s) >= 12 else None
 
 
+def exact_span(text: str, f: dict) -> tuple[int | None, int | None]:
+    """Offsets of the quoted span in `text`.
+
+    In about 2% of the spans /compare returned, text[start:end] is the quote shifted by a
+    few characters. When that happens, use the occurrence of the quote nearest to `start`.
+    """
+    start, end, quote = f.get("start"), f.get("end"), f.get("quote")
+    if start is None or end is None or not quote or text[start:end] == quote:
+        return start, end
+    best, pos = None, text.find(quote)
+    while pos != -1:
+        if best is None or abs(pos - start) < abs(best - start):
+            best = pos
+        pos = text.find(quote, pos + 1)
+    if best is None:
+        return start, end
+    return best, best + len(quote)
+
+
 def side_info(repo: str, commit: str, chunk: Chunk, f: dict) -> dict:
-    start, end = f.get("start"), f.get("end")
+    start, end = exact_span(chunk.text, f)
     l0 = chunk.line_of(start) if start is not None else chunk.start_line
     l1 = chunk.line_of(max(end - 1, start)) if end is not None else l0
     return {
@@ -293,10 +312,15 @@ def run_elsewhere(client: Clocked, finding: dict, by_cid: dict, shortlist: Short
 
 
 def scan(project: str, root: Path, includes: list[str], excludes: list[str] = (), repo: str = "", commit: str = "",
-         client: Clocked | None = None, max_neardup: int = 120, max_key: int = 30, **kw) -> dict:
+         client: Clocked | None = None, max_neardup: int = 120, max_key: int = 30,
+         both_orders: bool = False, **kw) -> dict:
     """Scan a documentation tree: build candidates locally, then analyze them."""
     chunks = load_project(project, Path(root), includes, list(excludes))
     cands, cstats = build_candidates(chunks, max_neardup, max_key)
+    if both_orders:
+        # /compare is order-sensitive: also ask every pair the other way round (doubles the cost)
+        cands = cands + [{**c, "a": c["b"], "b": c["a"], "source": c["source"] + "-reversed"} for c in cands]
+        cstats["both_orders"] = True
     return analyze(project, chunks, cands, cstats, repo=repo, commit=commit, client=client, **kw)
 
 

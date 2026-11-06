@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/8c/8caea7043048ccbda483",
+ "request_hash": "8caea7043048ccbda48340d283b29d0ad01d59fc99ee248cf161eb4520e0a2e9",
+ "recorded_at": "2026-11-06T14:52:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2679,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "38.064799",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=263"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#39",
+    "text": "### `findOneById`\n\nThe deprecated `findOneById` method has been removed from `EntityManager`, `Repository`, `BaseEntity`, `MongoEntityManager`, and `MongoRepository`. Use `findOneBy` instead:\n\n```typescript\n// Before\nconst user = await manager.findOneById(User, 1)\nconst user = await repository.findOneById(1)\nconst user = await User.findOneById(1)\n\n// After\nconst user = await manager.findOneBy(User, { id: 1 })\nconst user = await repository.findOneBy({ id: 1 })\nconst user = await User.findOneBy({ id: 1 })\n```\n\nFor MongoDB entities with `@ObjectIdColumn()`, `findOneBy` works the same way — TypeORM automatically translates the property name to `_id`."
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#3",
+    "text": "\\*\\* `skip` and `take` should be used together\n\n\\*\\* If you are using typeorm with MSSQL, and want to use `take` or `limit`, you need to use order as well or you will receive the following error: `'Invalid usage of the option NEXT in the FETCH statement.'`\n\n```typescript\nuserRepository.find({\n    order: {\n        columnName: \"ASC\",\n    },\n    skip: 0,\n    take: 10,\n})\n```\n\nwill execute following query:\n\n```sql\nSELECT * FROM \"user\"\nORDER BY \"columnName\" ASC\nLIMIT 10 OFFSET 0\n```\n\n- `cache` - Enables or disables query result caching. See [caching](../query-builder/6-caching.md) for more information and options.\n\n```typescript\nuserRepository.find({\n    cache: true,\n})\n```\n\n- `lock` - Enables locking mechanism for query. Can be used only in `findOne` and `findOneBy` methods.\n  `lock` is an object which can be defined as:\n\n```ts\n{ mode: \"optimistic\", version: number | Date }\n```\n\nor\n\n```ts\n{\n    mode: \"pessimistic_read\" |\n        \"pessimistic_write\" |\n        \"dirty_read\" |\n        \"for_no_key_update\" |\n        \"for_key_share\",\n\n    tables: string[],\n    onLocked: \"nowait\" | \"skip_locked\"\n}\n```\n\nfor example:\n\n```typescript\nuserRepository.findOne({\n    where: {\n        id: 1,\n    },\n    lock: { mode: \"optimistic\", version: 1 },\n})\n```\n\nSee [lock modes](../query-builder/1-select-query-builder.md#lock-modes) for more information."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#39",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/releases/1.0/02-upgrading-from-0.3.md#39",
+    "b": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#3",
+    "relation": "unrelated",
+    "related": 0.3577,
+    "probabilities": {
+     "same": 0.0221,
+     "overlapping": 0.3194,
+     "conflicting": 0.0162,
+     "unrelated": 0.6423
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 47
+  },
+  "timing": {
+   "read_ms": 47,
+   "total_ms": 49
+  }
+ }
+}

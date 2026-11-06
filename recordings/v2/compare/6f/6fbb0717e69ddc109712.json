@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/6f/6fbb0717e69ddc109712",
+ "request_hash": "6fbb0717e69ddc1097120e88a33aa2c7b4cb7ccbfbb332435a153f25a9d10a84",
+ "recorded_at": "2026-11-06T14:52:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 4641,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "219.350819",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=368"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "text": "#### Infinite Query endpoint definition\n\nInfinite query endpoints (defined with `build.infiniteQuery()`) are used to cache multi-page data sets from the server. They have all the same callbacks and options as standard query endpoints, but also require an additional [`infiniteQueryOptions`](#infinitequeryoptions) field to specify how to calculate the unique parameters to fetch each page.\n\nFor infinite query endpoints, there is a separation between the \"query arg\" used for the cache key, and the \"page param\" used to fetch a specific page. For example, a Pokemon API endpoint might have a string query arg like `\"fire\"` , but use a page number as the param to determine which page to fetch out of the results. The `query` and `queryFn` methods will receive a combined `{queryArg, pageParam}` object as the argument, rather than just the `queryArg` by itself.\n\n```ts title=\"Infinite Query endpoint definition\" no-transpile\nexport type PageParamFunction<DataType, PageParam, QueryArg> = (\n  firstPage: DataType,\n  allPages: Array<DataType>,\n  firstPageParam: PageParam,\n  allPageParams: Array<PageParam>,\n  queryArg: QueryArg,\n) => PageParam | undefined | null\n\ntype InfiniteQueryCombinedArg<QueryArg, PageParam> = {\n  queryArg: QueryArg\n  pageParam: PageParam\n}\n\nexport type InfiniteQueryDefinition<\n  QueryArg,\n  PageParam,\n  BaseQuery extends BaseQueryFn,\n  TagTypes extends string,\n  ResultType,\n  ReducerPath extends string = string,\n> =\n  // Infinite queries have all the same options as query endpoints,\n  // but store the `{pages, pageParams}` structure, and receive an object\n  // with both `{queryArg, pageParam}` as the arg for `query` and `queryFn`.\n  QueryDefinition<\n    InfiniteQueryCombinedArg<QueryArg, PageParam>,\n    BaseQuery,\n    TagTypes,\n    InfiniteData<ResultType>\n  > & {\n    /**\n     * Required options to configure the infinite query behavior.\n     * `initialPageParam` and `getNextPageParam` are required, to\n     * ensure the infinite query can properly fetch the next page of data.\n     * `initialPageParam` may be specified when using the\n     * endpoint, to override the default value.\n     */\n    infiniteQueryOptions: {\n      /**\n       * The initial page parameter to use for the first page fetch.\n       */\n      initialPageParam: PageParam\n      /**\n       * This function is required to automatically get the next cursor for infinite queries.\n       * The result will also be used to determine the value of `hasNextPage`.\n       */\n      getNextPageParam: PageParamFunction<DataType, PageParam, QueryArg>\n      /**\n       * This function can be set to automatically get the previous cursor for infinite queries.\n       * The result will also be used to determine the value of `hasPreviousPage`.\n       */\n      getPreviousPageParam?: PageParamFunction<DataType, PageParam, QueryArg>\n      /**\n       * If specified, only keep this many pages in cache at once.\n       * If additional pages are fetched, older pages in the other\n       * direction will be dropped from the cache.\n       */\n      maxPages?: number\n      /**\n       * Defaults to `true`. When this is `true` and an infinite query endpoint is refetched\n       * (due to tag invalidation, polling, arg change configuration, or manual refetching),\n       * RTK Query will try to sequentially refetch all pages currently in the cache.\n       * When `false` only the first page will be refetched.\n       */\n      refetchCachedPages?: boolean\n    }\n  }\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#5",
+    "text": "### `infiniteQueryOptions`\n\nThe `infiniteQueryOptions` field includes:\n\n- `initialPageParam`: the default page param value used for the first request, if this was not specified at the usage site\n- `maxPages`: an optional limit to how many fetched pages will be kept in the cache entry at a time\n- `getNextPageParam`: a required callback you must provide to calculate the next page param, given the existing cached pages and page params\n- `getPreviousPageParam`: an optional callback that will be used to calculate the previous page param, if you try to fetch backwards.\n\nBoth `initialPageParam` and `getNextPageParam` are required, to\nensure the infinite query can properly fetch the next page of data. Also, `initialPageParam` may be specified when using the endpoint, to override the default value for a first fetch. `maxPages` and `getPreviousPageParam` are both optional."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#5",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/api/createApi.mdx#10"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "b": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#5",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0084,
+     "overlapping": 0.9867,
+     "conflicting": 0.0033,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0096,
+       "restated": 0.8741,
+       "elaborated": 0.1092,
+       "different": 0.007
+      },
+      "confidence": 0.615,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "infiniteQueryOptions: {",
+       "start": 2132,
+       "end": 2155,
+       "confidence": 0.615
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#5",
+       "quote": "### `infiniteQueryOptions`\n\nThe `infiniteQueryOptions` field includes:\n\n- `initialPageParam`: the default page param value used for the first request, if this was not specified at the usage site\n- `maxPages`: an optional limit to how many fetched pages will be kept in the cache entry at a time\n- `getNextPageParam`: a required callback you must provide to calculate the next page param, given the existing cached pages and page params\n- `getPreviousPageParam`: an optional callback that will be used to calculate the previous page param, if you try to fetch backwards.\n\nBoth `initialPageParam` and `getNextPageParam` are required, to\nensure the infinite query can properly fetch the next page of data.",
+       "start": 0,
+       "end": 702,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.015,
+       "restated": 0.9455,
+       "elaborated": 0.0313,
+       "different": 0.0082
+      },
+      "confidence": 0.9918,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "* `initialPageParam` may be specified when using the",
+       "start": 2019,
+       "end": 2071,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#5",
+       "quote": "Also, `initialPageParam` may be specified when using the endpoint, to override the default value for a first fetch.",
+       "start": 703,
+       "end": 818,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0257,
+       "restated": 0.5646,
+       "elaborated": 0.3848,
+       "different": 0.0249
+      },
+      "confidence": 0.9751,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "maxPages?: number",
+       "start": 3034,
+       "end": 3051,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#5",
+       "quote": "`maxPages` and `getPreviousPageParam` are both optional.",
+       "start": 819,
+       "end": 875,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 72,
+   "passages": 3,
+   "counterparts_ms": 123
+  },
+  "timing": {
+   "read_ms": 230,
+   "total_ms": 234
+  }
+ }
+}

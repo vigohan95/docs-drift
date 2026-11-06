@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/fd/fd35337f616e3e9a4438",
+ "request_hash": "fd35337f616e3e9a44389de6c8d17795663af27069763e9e6c9a6efc7673c0e6",
+ "recorded_at": "2026-11-06T14:50:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2296,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "153.394528",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=447"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/populating-relations.md#0",
+    "text": "---\ntitle: Populating relations\n---\n\n`MikroORM` is capable of loading large nested structures while maintaining good performance, querying each database table only once. Imagine you have this nested structure:\n\n- `Book` has one `Publisher` (M:1), one `Author` (M:1) and many `BookTag`s (M:N)\n- `Publisher` has many `Test`s (M:N)\n\nWhen you use nested populate while querying all `BookTag`s, this is what happens in the background:\n\n```ts\nconst tags = await em.find(BookTag, {}, {\n  populate: ['books.publisher.tests', 'books.author'],\n});\nconsole.log(tags[0].books[0].publisher.tests[0].name); // prints name of nested test\nconsole.log(tags[0].books[0].author.name); // prints name of nested author\n```\n\n1. Load all `BookTag`s\n2. Load all `Book`s associated with previously loaded `BookTag`s\n3. Load all `Publisher`s associated with previously loaded `Book`s\n4. Load all `Test`s associated with previously loaded `Publisher`s\n5. Load all `Author`s associated with previously loaded `Book`s\n\nFor SQL drivers with pivot tables this means:\n\n```sql\nSELECT `e0`.* FROM `book_tag` AS `e0`;\n\nSELECT `e0`.*, `e1`.`book_id`, `e1`.`book_tag_id`\n  FROM `book` AS `e0` LEFT JOIN `book_to_book_tag` AS `e1` ON `e0`.`id` = `e1`.`book_id`\n  WHERE `e1`.`book_tag_id` IN (?, ?, ?, ?, ?)\n  ORDER BY `e1`.`id` ASC;\n\nSELECT `e0`.* FROM `publisher` AS `e0` WHERE `e0`.`id` IN (?, ?, ?);\n\nSELECT `e0`.*, `e1`.`test_id`, `e1`.`publisher_id`\n  FROM `test` AS `e0` LEFT JOIN `publisher_to_test` AS `e1` ON `e0`.`id` = `e1`.`test_id`\n  WHERE `e1`.`publisher_id` IN (?, ?, ?)\n  ORDER BY `e1`.`id` ASC;\n\nSELECT `e0`.* FROM `author` AS `e0` WHERE `e0`.`id` IN (?);\n```\n\nFor mongo driver it's even simpler as no pivot tables are involved:\n\n```ts\ndb.getCollection(\"book-tag\").find({}).toArray();\ndb.getCollection(\"book\").find({\"tags\":{\"$in\":[...]}}).toArray();\ndb.getCollection(\"publisher\").find({\"_id\":{\"$in\":[...]}}).toArray();\ndb.getCollection(\"test\").find({\"_id\":{\"$in\":[...]}}).toArray();\ndb.getCollection(\"author\").find({\"_id\":{\"$in\":[...]}}).toArray();\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-sql.md#5",
+    "text": "## ManyToMany relations with pivot tables\n\nSQL drivers use pivot tables for `ManyToMany` relations. MikroORM manages these automatically — you only need to define the relation on your entities:\n\n```ts\n@ManyToMany(() => BookTag)\ntags = new Collection<BookTag>(this);\n```\n\nTo customize the pivot table name, use the `pivotTable` option:\n\n```ts\n@ManyToMany({ entity: () => BookTag, pivotTable: 'book2tag' })\ntags = new Collection<BookTag>(this);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/populating-relations.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-sql.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/populating-relations.md#0",
+    "b": "mikro-orm:docs/docs/usage-with-sql.md#5",
+    "relation": "overlapping",
+    "related": 0.5912,
+    "probabilities": {
+     "same": 0.0155,
+     "overlapping": 0.5666,
+     "conflicting": 0.0091,
+     "unrelated": 0.4088
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 193,
+   "passage_reads": 1,
+   "passages_ms": 58,
+   "passages": 1,
+   "counterparts_ms": 56
+  },
+  "timing": {
+   "read_ms": 307,
+   "total_ms": 310
+  }
+ }
+}

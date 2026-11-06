@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/cc/cc976a22fb64fc953382",
+ "request_hash": "cc976a22fb64fc95338269c2460cacfb72d382baae4a23cce89b57ec6e2ca79b",
+ "recorded_at": "2026-11-06T14:47:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2155,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "119.221504",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=257"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#15",
+    "text": "The fields a client sends in the trailer section of a chunked request are dropped together with `Trailer`, as [RFC 9112 §7.1.2](https://www.rfc-editor.org/rfc/rfc9112#section-7.1.2) lets a recipient that removes the chunked coding do, instead of reaching the upstream as header lines: whatever screened the header section in front of this hop never saw them. Fiber drops them as the request arrives or, for a body streamed with `StreamRequestBody`, once that body has been read, including while the proxy forwards it. A header line sharing a name with a trailer field is kept. A streamed body whose trailer section names more than 16 fields also fails to read, which answers a request whose body the proxy reads with `431 Request Header Fields Too Large`. The trailer section of an upstream's chunked response is dropped the same way, whether its fields were announced in `Trailer` or not: the proxy answers with a sized body, which carries no trailer section, and a recipient must not merge trailer fields into the header section ([RFC 9110 §6.5.1](https://www.rfc-editor.org/rfc/rfc9110#section-6.5.1)); a response whose trailer section names more than 16 fields is answered with `502 Bad Gateway`. The section is gone before `ModifyResponse` runs and before `Do` or `Forward` return, so neither a hook nor a handler reads a trailer field of the upstream's response. A client that streams response bodies (`StreamResponseBody`, or a response whose `StreamBody` is set) receives the section only once the body has been read, after that point; the proxy reads such a body from a response of its own, which keeps the section, so it reaches neither the hook nor the client. It is discarded whatever its size: the limit of 16 fields applies to the names announced in the header section, which the proxy sees before it answers, not to fields that only arrive with the body. All of this holds with `KeepHopByHopHeaders` set."
+   }
+  ],
+  "answer": "When the method changes, the body is dropped, including a form your handler already read, together with the fields that frame or describe it or expect it: `Content-Type`, `Content-Length`, `Content-Encoding`, `Content-Language`, `Content-Location`, `Transfer-Encoding`, `Trailer`, `Expect`, `Digest` and `Content-MD5`. When the method changes, the body goes with it, and the fields that framed, described or expected it, for that hop: the request your handler holds keeps its method, body and credentials.",
+  "claims": [
+   "When the method changes, the body is dropped, including a form your handler already read, together with the fields that frame or describe it or expect it: `Content-Type`, `Content-Length`, `Content-Encoding`, `Content-Language`, `Content-Location`, `Transfer-Encoding`, `Trailer`, `Expect`, `Digest` and `Content-MD5`.",
+   "When the method changes, the body goes with it, and the fields that framed, described or expected it, for that hop: the request your handler holds keeps its method, body and credentials."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0041,
+  "ungrounded": 0.9959,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fiber:docs/middleware/proxy.md#15",
+    "share": 0,
+    "share_of_answer": 0.0041,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "When the method changes, the body is dropped, including a form your handler already read, together with the fields that frame or describe it or expect it: `Content-Type`, `Content-Length`, `Content-Encoding`, `Content-Language`, `Content-Location`, `Transfer-Encoding`, `Trailer`, `Expect`, `Digest` and `Content-MD5`.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.631,
+    "supported": 0.0034,
+    "contradicted": 0.0039,
+    "not_stated": 0.9876,
+    "not_a_claim": 0.0051,
+    "verdict": "not_stated",
+    "sources": {
+     "fiber:docs/middleware/proxy.md#15": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "When the method changes, the body goes with it, and the fields that framed, described or expected it, for that hop: the request your handler holds keeps its method, body and credentials.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.369,
+    "supported": 0.0051,
+    "contradicted": 0.0119,
+    "not_stated": 0.9726,
+    "not_a_claim": 0.0104,
+    "verdict": "not_stated",
+    "sources": {
+     "fiber:docs/middleware/proxy.md#15": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0034
+  },
+  "timing": {
+   "read_ms": 127,
+   "total_ms": 129
+  }
+ }
+}

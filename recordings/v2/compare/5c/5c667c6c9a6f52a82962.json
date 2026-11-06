@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5c/5c667c6c9a6f52a82962",
+ "request_hash": "5c667c6c9a6f52a829628aeb274fed9a4736cf0f00588604f7d0bef4f8667ba7",
+ "recorded_at": "2026-11-06T14:50:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2484,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "67.403233",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=43,cfOrigin;dur=0,cfWorker;dur=202"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#11",
+    "text": "## Hooks example\n\nHooks can be registered in two ways:\n\n- **`hooks` property** — pass an object with arrays of hook handlers directly in the `defineEntity` call.\n- **`addHook` method** — register hook handlers after the entity is defined.\n\nBoth approaches accept functions (arrow functions, named functions, async functions). The entity instance is available via `args.entity`. See [Events and Lifecycle Hooks](./events.md) for the full list of available hooks and `EventArgs` details.\n\n<Tabs\n  groupId=\"entity-schema-hooks\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n  ]}\n>\n  <TabItem value=\"define-entity-class\">\n\nUse `addHook` after the class is defined for full type safety:\n\n```ts\nconst BookTagSchema = defineEntity({\n  name: 'BookTag',\n  properties: {\n    _id: p.type(ObjectId).primary(),\n    id: p.string().serializedPrimaryKey(),\n    name: p.string(),\n    version: p.integer(),\n    books: () => p.manyToMany(Book).mappedBy('tags'),\n  },\n});\n\nexport class BookTag extends BookTagSchema.class {}\nBookTagSchema.setClass(BookTag);\n\n// highlight-start\nBookTagSchema.addHook('beforeCreate', (args: EventArgs<BookTag>) => {\n  args.entity.version = 1;\n});\n\nBookTagSchema.addHook('beforeUpdate', (args: EventArgs<BookTag>) => {\n  args.entity.version++;\n});\n// highlight-end\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/events.md#15",
+    "text": "## EventArgs\n\nEvent handlers receive an `EventArgs` object:\n\n```ts\ninterface EventArgs<T> {\n  entity: T;\n  em: EntityManager;\n  changeSet?: ChangeSet<T>;  // Available during flush operations\n}\n\ninterface ChangeSet<T> {\n  name: string;                   // Entity name\n  collection: string;             // Database table name\n  type: ChangeSetType;            // 'create' | 'update' | 'delete' | 'delete_early'\n  entity: T;                      // The entity instance\n  payload: EntityData<T>;         // Changes for the UPDATE query\n  persisted: boolean;             // Whether already executed\n  originalEntity?: EntityData<T>; // Snapshot when loaded from database\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/define-entity.md#11",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/events.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/define-entity.md#11",
+    "b": "mikro-orm:docs/docs/events.md#15",
+    "relation": "overlapping",
+    "related": 0.9967,
+    "probabilities": {
+     "same": 0.0079,
+     "overlapping": 0.9845,
+     "conflicting": 0.0044,
+     "unrelated": 0.0033
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 46,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 74,
+   "total_ms": 77
+  }
+ }
+}

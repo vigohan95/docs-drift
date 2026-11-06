@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/62/627ee19979ff7366232f",
+ "request_hash": "627ee19979ff7366232fd4654b4f128a70f06b8886d895a92d04c842ba981e3d",
+ "recorded_at": "2026-11-06T14:50:18Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1953,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "136.934687",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=263"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/row-level-security.md#9",
+    "text": "## Schema generator and migrations\n\nPolicies are picked up by `schema:create`, `schema:update`, and `migration:create` automatically, and PostgreSQL policies are introspected back so the diff stays clean. The comparator diffs each policy by name:\n\n- **Added / removed policies** → `create policy` / `drop policy`. Policies are matched by name, so a **rename** shows up as a drop of the old name plus a create of the new one (policies carry no data, so nothing is lost).\n- **Enabling / disabling RLS** → `enable`/`disable row level security`, and `force`/`no force`.\n- **Any other change** (`using`, `check`, `roles`, `command`, `type`) → `drop policy` + `create policy`. The old policy is dropped **before** any column drops in the same diff and recreated **after** any column adds — a policy expression holds a dependency on the columns it references, so altering in place would block dropping a column the old expression referenced (and PostgreSQL cannot alter a policy's `for <command>` or `as permissive|restrictive` in place anyway).\n\nBecause the target schema is compared against what PostgreSQL reports, expressions are canonicalized by the database (e.g. `in (1, 2, 3)` comes back as `= any (...)`), and the comparator accounts for that — a round-trip of `schema:create` followed by `schema:update` produces no drift. Migration snapshots serialize the full policy set and RLS state, so re-running `migration:create` against an unchanged schema yields an empty migration.\n\n:::note\n\nTables without any RLS emit no policy or RLS keys into the migration snapshot at all, so adopting this feature does not churn existing non-RLS snapshots.\n\n:::"
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-generator.md#10",
+    "text": "## PostgreSQL row level security\n\nTable-level row level security policies declared via `@Entity({ policies, rowLevelSecurity })` (and the equivalent `EntitySchema` / `defineEntity` options) are managed by the schema generator just like check constraints and indexes: `schema:create`, `schema:update`, and `migration:create` create, recreate, and drop policies, and existing policies are introspected back so the diff stays clean. See the [Row Level Security](./row-level-security.md) guide for details."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/row-level-security.md#9",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/schema-generator.md#10"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-generator.md#10",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/row-level-security.md#9"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/row-level-security.md#9",
+    "b": "mikro-orm:docs/docs/schema-generator.md#10",
+    "relation": "overlapping",
+    "related": 0.9983,
+    "probabilities": {
+     "same": 0.0063,
+     "overlapping": 0.9894,
+     "conflicting": 0.0025,
+     "unrelated": 0.0017
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0102,
+       "restated": 0.8671,
+       "elaborated": 0.1116,
+       "different": 0.0111
+      },
+      "confidence": 0.9889,
+      "a": {
+       "document": "mikro-orm:docs/docs/row-level-security.md#9",
+       "quote": "Policies are picked up by `schema:create`, `schema:update`, and `migration:create` automatically, and PostgreSQL policies are introspected back so the diff stays clean.",
+       "start": 36,
+       "end": 204,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/schema-generator.md#10",
+       "quote": "## PostgreSQL row level security\n\nTable-level row level security policies declared via `@Entity({ policies, rowLevelSecurity })` (and the equivalent `EntitySchema` / `defineEntity` options) are managed by the schema generator just like check constraints and indexes: `schema:create`, `schema:update`, and `migration:create` create, recreate, and drop policies, and existing policies are introspected back so the diff stays clean.",
+       "start": 0,
+       "end": 429,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 1,
+   "counterparts_ms": 67
+  },
+  "timing": {
+   "read_ms": 146,
+   "total_ms": 149
+  }
+ }
+}

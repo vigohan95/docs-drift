@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/d6/d67993ac2eeb6164e950",
+ "request_hash": "d67993ac2eeb6164e95049004d0be7ebab34c39c90505880b7b11e1e3afb382c",
+ "recorded_at": "2026-11-06T14:46:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 957,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "68.207361",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=232"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "text": "### preParsing\n\nIf you are using the `preParsing` hook, you can transform the request payload\nstream before it is parsed. It receives the request and reply objects as other\nhooks, and a stream with the current request payload.\n\nIf it returns a value (via `return` or via the callback function), it must\nreturn a stream.\n\nFor instance, you can decompress the request body:\n\n```js\nfastify.addHook('preParsing', (request, reply, payload, done) => {\n  // Some code\n  done(null, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('preParsing', async (request, reply, payload) => {\n  // Some code\n  await asyncMethod()\n  return newPayload\n})\n```\n\n> ℹ️ Note:\n> In the [preParsing](#preparsing) hook, `request.body` will always be\n> `undefined`, because the body parsing happens before the\n> [preValidation](#prevalidation) hook.\n\n> ℹ️ Note:\n> You should also add a `receivedEncodedLength` property to the\n> returned stream. This property is used to correctly match the request payload\n> with the `Content-Length` header value. Ideally, this property should be updated\n> on each received chunk.\n\n> ℹ️ Note:\n> The size of the returned stream is checked to not exceed the limit\n> set in [`bodyLimit`](./Server.md#bodylimit) option."
+   }
+  ],
+  "answer": "In the [onRequest](#onrequest) hook, `request.body` will always be `undefined`, because the body parsing happens before the [preValidation](#prevalidation) hook. There was no previous hook, the next hook will be `preParsing`. Notice: in the `onRequest` hook, request.body will always be null, because the body parsing happens before the `preHandler` hook.",
+  "claims": [
+   "In the [onRequest](#onrequest) hook, `request.body` will always be `undefined`, because the body parsing happens before the [preValidation](#prevalidation) hook.",
+   "There was no previous hook, the next hook will be `preParsing`. Notice: in the `onRequest` hook, request.body will always be null, because the body parsing happens before the `preHandler` hook."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0243,
+  "ungrounded": 0.9757,
+  "verdict": "contradicted",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#3",
+    "share": 1,
+    "share_of_answer": 0.0243,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "In the [onRequest](#onrequest) hook, `request.body` will always be `undefined`, because the body parsing happens before the [preValidation](#prevalidation) hook.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4548,
+    "supported": 0.0268,
+    "contradicted": 0.8239,
+    "not_stated": 0.1345,
+    "not_a_claim": 0.0147,
+    "verdict": "contradicted",
+    "sources": {
+     "fastify:docs/Reference/Hooks.md#3": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "There was no previous hook, the next hook will be `preParsing`. Notice: in the `onRequest` hook, request.body will always be null, because the body parsing happens before the `preHandler` hook.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5452,
+    "supported": 0.0221,
+    "contradicted": 0.8692,
+    "not_stated": 0.0959,
+    "not_a_claim": 0.0127,
+    "verdict": "contradicted",
+    "sources": {
+     "fastify:docs/Reference/Hooks.md#3": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 1,
+   "supported": 0.0221
+  },
+  "timing": {
+   "read_ms": 73,
+   "total_ms": 76
+  }
+ }
+}

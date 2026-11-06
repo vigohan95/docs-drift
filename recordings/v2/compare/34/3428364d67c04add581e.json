@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/34/3428364d67c04add581e",
+ "request_hash": "3428364d67c04add581e70d3bd7be930540e20e15e20e9b39bc9ccaf80fcd639",
+ "recorded_at": "2026-11-06T14:51:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1428,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "106.242561",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=323"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/autoBatchEnhancer.mdx#3",
+    "text": "### `autoBatchEnhancer`\n\n```ts title=\"autoBatchEnhancer signature\" no-transpile\nexport type SHOULD_AUTOBATCH = string\ntype AutoBatchOptions =\n  | { type: 'tick' }\n  | { type: 'timer'; timeout: number }\n  | { type: 'raf' }\n  | { type: 'callback'; queueNotification: (notify: () => void) => void }\n\nexport type autoBatchEnhancer = (options?: AutoBatchOptions) => StoreEnhancer\n```\n\n:::tip\nAs of RTK 2.0, the `autoBatchEnhancer` is included by default when calling `configureStore`.\n\nThis means to configure it, you should instead pass an callback that receives `getDefaultEnhancers` and calls it with your desired settings.\n\n```ts title=\"Configuring autoBatchEnhancer with getDefaultEnhancers\"\nimport { configureStore } from '@reduxjs/toolkit'\n\nconst store = configureStore({\n  reducer: () => 0,\n  enhancers: (getDefaultEnhancers) =>\n    getDefaultEnhancers({\n      autoBatch: { type: 'tick' },\n    }),\n})\n```\n\n:::\n\nCreates a new instance of the autobatch store enhancer.\n\nAny action that is tagged with `action.meta[SHOULD_AUTOBATCH] = true` will be treated as \"low-priority\", and a notification callback will be queued. The enhancer will delay notifying subscribers until either:\n\n- The queued callback runs and triggers the notifications\n- A \"normal-priority\" action (any action _without_ `action.meta[SHOULD_AUTOBATCH] = true`) is dispatched in the same tick\n\n`autoBatchEnhancer` accepts options to configure how the notification callback is queued:\n\n- `{type: 'raf'}`: queues using `requestAnimationFrame` (default)\n- `{type: 'tick'}`: queues using `queueMicrotask`\n- `{type: 'timer', timeout: number}`: queues using `setTimeout`\n- `{type: 'callback', queueNotification: (notify: () => void) => void}`: lets you provide your own callback, such as a debounced or throttled function\n\nThe default behavior is to queue the notifications using `requestAnimationFrame`.\n\nThe `SHOULD_AUTOBATCH` value is meant to be opaque - it's currently a string for simplicity, but could be a `Symbol` in the future."
+   },
+   {
+    "id": "redux-toolkit:docs/api/configureStore.mdx#10",
+    "text": "### `enhancers`\n\nA callback function to customize the array of enhancers.\n\nEnhancers returned by this callback will be passed to [the Redux `compose` function](/api/compose), and the combined enhancer will be passed to `createStore`.\n\n:::tip Dev Tools\nThis should _not_ include the Redux DevTools Extension `composeWithDevTools`, as this is already handled by `configureStore`.\n\nExample: `enhancers: () => new Tuple(offline)` will result in a final setup of `[offline, devToolsExtension]`.\n:::\n\nIf not provided, `configureStore` will call `getDefaultEnhancers` and use the array of enhancers it returns (including `applyMiddleware` with specified middleware).\n\nWhere you wish to add onto or customize the default enhancers, you may pass a callback function that will receive `getDefaultEnhancers` as its argument, and should return an enhancer array.\n\nExample: `enhancers: (defaultEnhancers) => defaultEnhancers.prepend(offline)` will result in a final setup\nof `[offline, applyMiddleware, devToolsExtension]`.\n\nFor more details on how the `enhancers` parameter works and the list of enhancers that are added by default, see the [`getDefaultEnhancers` docs page](./getDefaultEnhancers).\n\n:::caution Middleware\n\nIf you don't use `getDefaultEnhancers` and instead return an array, the `applyMiddleware` enhancer will _not_ be used."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/autoBatchEnhancer.mdx#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/api/configureStore.mdx#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/api/autoBatchEnhancer.mdx#3",
+    "b": "redux-toolkit:docs/api/configureStore.mdx#10",
+    "relation": "overlapping",
+    "related": 0.9427,
+    "probabilities": {
+     "same": 0.0143,
+     "overlapping": 0.9113,
+     "conflicting": 0.0171,
+     "unrelated": 0.0573
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 52,
+   "passage_reads": 1,
+   "passages_ms": 64,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 115,
+   "total_ms": 119
+  }
+ }
+}

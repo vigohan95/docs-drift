@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b5/b59974f8d563cdb9a138",
+ "request_hash": "b59974f8d563cdb9a13806feb53ecd520f4edb54128058a1e944a5989d2bedf4",
+ "recorded_at": "2026-11-06T14:48:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1816,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "34.579166",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=162"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "text": "### Routes options\n<a id=\"options\"></a>\n\n* `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`,\n  `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`. To accept more methods,\n  the [`addHttpMethod`](./Server.md#addHttpMethod) must be used.\n  It could also be an array of methods.\n* `url`: the path of the URL to match this route (alias: `path`).\n* `schema`: an object containing the schemas for the request and response. They\n  need to be in [JSON Schema](https://json-schema.org/) format, check\n  [here](./Validation-and-Serialization.md) for more info.\n\n  * `body`: validates the body of the request if it is a POST, PUT, PATCH,\n    TRACE, SEARCH, PROPFIND, PROPPATCH, LOCK or QUERY method.\n  * `querystring` or `query`: validates the querystring. This can be a complete\n    JSON Schema object, with the property `type` of `object` and `properties`\n    object of parameters, or simply the values of what would be contained in the\n    `properties` object as shown below.\n  * `params`: validates the params.\n  * `response`: filter and generate a schema for the response, setting a schema\n    allows us to have 10-20% more throughput.\n* `exposeHeadRoute`: creates a sibling `HEAD` route for any `GET` routes.\n  Defaults to the value of [`exposeHeadRoutes`](./Server.md#exposeHeadRoutes)\n  instance option. If you want a custom `HEAD` handler without disabling this\n  option, make sure to define it before the `GET` route.\n* `attachValidation`: attach `validationError` to request, if there is a schema\n  validation error, instead of sending the error to the error handler. The\n  default [error format](https://ajv.js.org/api.html#error-objects) is the Ajv\n  one.\n* `onRequest(request, reply, done)`: a [function](./Hooks.md#onrequest) called\n  as soon as a request is received, it could also be an array of functions.\n* `preParsing(request, reply, payload, done)`: a\n  [function](./Hooks.md#preparsing) called before parsing the request, it could\n  also be an array of functions.\n* `preValidation(request, reply, done)`: a [function](./Hooks.md#prevalidation)\n  called after the shared `preValidation` hooks, useful if you need to perform\n  authentication at route level for example, it could also be an array of\n  functions.\n* `preHandler(request, reply, done)`: a [function](./Hooks.md#prehandler) called\n  just before the request handler, it could also be an array of functions.\n* `preSerialization(request, reply, payload, done)`: a\n  [function](./Hooks.md#preserialization) called just before the serialization,\n  it could also be an array of functions.\n* `onSend(request, reply, payload, done)`: a [function](./Hooks.md#route-hooks)\n  called right before a response is sent, it could also be an array of\n  functions.\n* `onResponse(request, reply, done)`: a [function](./Hooks.md#onresponse) called\n  when a response has been sent, so you will not be able to send more data to\n  the client. It could also be an array of functions.\n* `onTimeout(request, reply, done)`: a [function](./Hooks.md#ontimeout) called\n  when a request is timed out and the HTTP socket has been hung up.\n* `onError(request, reply, error, done)`: a [function](./Hooks.md#onerror)\n  called when an Error is thrown or sent to the client by the route handler.\n* `handler(request, reply)`: the function that will handle this request. The\n  [Fastify server](./Server.md) will be bound to `this` when the handler is\n  called. Note: using an arrow function will break the binding of `this`.\n* `errorHandler(error, request, reply)`: a custom error handler for the scope of"
+   },
+   {
+    "id": "fastify:docs/Reference/Decorators.md#4",
+    "text": "#### `decorateReply(name, value, [dependencies])`\n<a id=\"decorate-reply\"></a>\n\nThis API adds new methods/properties to the core `Reply` object:\n\n```js\nfastify.decorateReply('utility', function () {\n  // Something very useful\n})\n```\n\nUsing an arrow function will break the binding of `this` to the Fastify\n`Reply` instance.\n\nUsing `decorateReply` will throw and error if used with a reference type:\n\n```js\n// Don't do this\nfastify.decorateReply('foo', { bar: 'fizz'})\n```\nIn this example, the object reference would be shared with all requests, and\n**any mutation will impact all requests, potentially creating security\nvulnerabilities or memory leaks**. Fastify blocks this.\n\nTo achieve proper encapsulation across requests configure a new value for each\nincoming request in the [`'onRequest'` hook](./Hooks.md#onrequest).\n\n```js\nconst fp = require('fastify-plugin')\n\nasync function myPlugin (app) {\n  app.decorateReply('foo')\n  app.addHook('onRequest', async (req, reply) => {\n    reply.foo = { bar: 42 }\n  })\n}\n\nmodule.exports = fp(myPlugin)\n```\n\nSee [`decorate`](#decorate) for information about the `dependencies` parameter."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Routes.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Decorators.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Routes.md#2",
+    "b": "fastify:docs/Reference/Decorators.md#4",
+    "relation": "unrelated",
+    "related": 0.0059,
+    "probabilities": {
+     "same": 0.0019,
+     "overlapping": 0.0018,
+     "conflicting": 0.0021,
+     "unrelated": 0.9941
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 40
+  },
+  "timing": {
+   "read_ms": 40,
+   "total_ms": 42
+  }
+ }
+}

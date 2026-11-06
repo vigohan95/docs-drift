@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/cc/cca9a15dd3f2e79a0586",
+ "request_hash": "cca9a15dd3f2e79a058650686c00e2911bb102a850312910dfd9c5983c18d205",
+ "recorded_at": "2026-11-06T14:50:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 4095,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "111.318207",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=309"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-generator.md#0",
+    "text": "---\ntitle: Entity Generator\n---\n\nTo generate entities from existing database schema, you can use the `EntityGenerator` helper. It lives in its own package called `@mikro-orm/entity-generator`:\n\n```bash npm2yarn\nnpm install @mikro-orm/entity-generator\n```\n\n> The version needs to be aligned with the `@mikro-orm/core` package and the database driver package.\n\nTo use it, you need to register the `EntityGenerator` extension in your ORM config:\n\n```ts\nimport { defineConfig } from '@mikro-orm/postgresql';\nimport { EntityGenerator } from '@mikro-orm/entity-generator';\n\nexport default defineConfig({\n  dbName: 'test',\n  extensions: [EntityGenerator],\n});\n```\n\nThen you can use it either via CLI:\n\n> To work with the CLI, first install `@mikro-orm/cli` package locally. The version needs to be aligned with the `@mikro-orm/core` package.\n\n```sh\nnpx mikro-orm generate-entities --dump  # Dumps all generated entities\nnpx mikro-orm generate-entities --save --path=./my-entities  # Saves entities into given directory\n```\n\nOr you can create simple script where you initialize MikroORM like this:\n\n```ts title=\"./generate-entities.ts\"\nimport { MikroORM } from '@mikro-orm/core';\nimport { EntityGenerator } from '@mikro-orm/entity-generator';\n\n(async () => {\n  const orm = await MikroORM.init({\n    discovery: {\n      // we need to disable validation for no entities\n      warnWhenNoEntities: false,\n    },\n    extensions: [EntityGenerator],\n    dbName: 'your-db-name',\n    // ...\n  });\n  const dump = await orm.entityGenerator.generate({\n    save: true,\n    path: process.cwd() + '/my-entities',\n  });\n  console.log(dump);\n  await orm.close(true);\n})();\n```\n\nThen run this script via `tsx` (or compile it to plain JS and use `node`):\n\n```sh\n$ tsx generate-entities\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-first-guide.md#9",
+    "text": "### Configuring the CLI\n\nConfiguring the MikroORM CLI tools is essential for the \"schema first\" approach.  We need the migrator to run our migrations, as well as the entity generator to create our entities out of the schema state.\n\nHere's a basic config we'll start with (and later extend to take full advantage of the entity generator's features):\n\n```ts title='src/mikro-orm.config.ts'\nimport { defineConfig } from '@mikro-orm/mysql';\nimport { EntityGenerator } from '@mikro-orm/entity-generator';\nimport { Migrator } from '@mikro-orm/migrations';\n\nexport default defineConfig({\n    multipleStatements: true,\n    extensions: [EntityGenerator, Migrator],\n    discovery: {\n        // we need to disable validation for no entities, due to the entity generation\n        warnWhenNoEntities: false,\n    },\n    entities: ['dist/**/*.entity.js'],\n    entitiesTs: ['src/**/*.entity.ts'],\n    host: 'localhost',\n    user: 'root',\n    password: '',\n    dbName: 'blog',\n    // enable debug mode to log SQL queries and discovery information\n    debug: true,\n    migrations: {\n        path: 'dist/migrations',\n        pathTs: 'src/migrations',\n    },\n    entityGenerator: {\n        save: true,\n        path: 'src/modules',\n        esmImport: true,\n        readOnlyPivotTables: true,\n        outputPurePivotTables: true,\n        bidirectionalRelations: true,\n        customBaseEntityName: 'Base',\n        useCoreBaseEntity: true,\n    },\n});\n```\n\nTo keep the example simple, we're having all of our configuration in a single config file, but you may split your config into a shared config and a tool specific config. In that case, you will want to also supply the correct config file for the correct tool upon running it. You will want to wrap those calls in package.json scripts that do that for you."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-generator.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-first-guide.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-generator.md#0",
+    "b": "mikro-orm:docs/docs/schema-first-guide.md#9",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.005,
+     "overlapping": 0.9896,
+     "conflicting": 0.0034,
+     "unrelated": 0.002
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 120,
+   "total_ms": 123
+  }
+ }
+}

@@ -1,0 +1,93 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/49/493780c5907fdc21f3c7",
+ "request_hash": "493780c5907fdc21f3c728350173f3a7454efe4c2e1335ac75508ee55c43889d",
+ "recorded_at": "2026-11-06T14:46:57Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1066,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "81.659744",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=333"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5",
+    "text": "```typescript\nawait manager.upsert(\n    User,\n    [\n        { externalId: \"abc123\", firstName: \"Rizzrak\" },\n        { externalId: \"bca321\", firstName: \"Karzzir\" },\n    ],\n    [\"externalId\"],\n)\n/** executes\n *  INSERT INTO user\n *  VALUES\n *      (externalId = abc123, firstName = Rizzrak),\n *      (externalId = cba321, firstName = Karzzir),\n *  ON CONFLICT (externalId) DO UPDATE firstName = EXCLUDED.firstName\n **/\n```\n\n- `delete` - Deletes entities by entity id, ids, given conditions, or an array of condition objects.\n\n```typescript\nawait manager.delete(User, 1)\nawait manager.delete(User, [1, 2, 3])\nawait manager.delete(User, { firstName: \"Timber\" })\n\n// Bulk deletes with different conditions for each operation\nawait manager.delete(User, [{ firstName: \"Timber\" }, { age: 18 }, { id: 42 }])\n// executes three separate DELETE queries:\n// DELETE FROM user WHERE firstName = Timber\n// DELETE FROM user WHERE age = 18\n// DELETE FROM user WHERE id = 42\n```\n\nYou can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together). This is different from passing a primitive array, which is treated as a list of IDs:\n\n```typescript\n// Primitive array — interpreted as WHERE id IN (1, 2, 3)\nawait manager.delete(User, [1, 2, 3])\n\n// Object array — each element is a separate condition (OR'd together)\nawait manager.delete(User, [{ id: 1 }, { email: \"old@example.com\" }])\n// executes DELETE FROM user WHERE id = 1 OR email = 'old@example.com'\n```"
+   }
+  ],
+  "answer": "await manager.update(User, [ { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } }, { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } }, { criteria: { age: 18 }, data: { category: \"ADULT\" } }, ]) // executes three separate UPDATE queries: // UPDATE user SET firstName = Rizzrak WHERE id = 1 // UPDATE user SET firstName = Karzzir WHERE id = 2 // UPDATE user SET category = ADULT WHERE age = 18 ``` You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause).",
+  "claims": [
+   "await manager.update(User, [ { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } }, { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } }, { criteria: { age: 18 }, data: { category: \"ADULT\" } }, ]) // executes three separate UPDATE queries: // UPDATE user SET firstName = Rizzrak WHERE id = 1 // UPDATE user SET firstName = Karzzir WHERE id = 2 // UPDATE user SET category = ADULT WHERE age = 18 ```",
+   "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause)."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0075,
+  "ungrounded": 0.9925,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5",
+    "share": 0,
+    "share_of_answer": 0.0075,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "await manager.update(User, [ { criteria: { id: 1 }, data: { firstName: \"Rizzrak\" } }, { criteria: { id: 2 }, data: { firstName: \"Karzzir\" } }, { criteria: { age: 18 }, data: { category: \"ADULT\" } }, ]) // executes three separate UPDATE queries: // UPDATE user SET firstName = Rizzrak WHERE id = 1 // UPDATE user SET firstName = Karzzir WHERE id = 2 // UPDATE user SET category = ADULT WHERE age = 18 ```",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.4988,
+    "supported": 0.0039,
+    "contradicted": 0.005,
+    "not_stated": 0.9845,
+    "not_a_claim": 0.0066,
+    "verdict": "not_stated",
+    "sources": {
+     "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "You can pass an **array of condition objects** to match multiple distinct sets of rows in a single call (conditions are OR'd together): ```typescript await repository.update([{ status: \"expired\" }, { flagged: true }], { active: false, }) // executes UPDATE user SET active = false WHERE status = 'expired' OR flagged = true ``` - `updateAll` - Updates _all_ entities of target type (without WHERE clause).",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.5012,
+    "supported": 0.0111,
+    "contradicted": 0.0192,
+    "not_stated": 0.9565,
+    "not_a_claim": 0.0132,
+    "verdict": "not_stated",
+    "sources": {
+     "typeorm:docs/docs/working-with-entity-manager/5-entity-manager-api.md#5": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0039
+  },
+  "timing": {
+   "read_ms": 89,
+   "total_ms": 90
+  }
+ }
+}

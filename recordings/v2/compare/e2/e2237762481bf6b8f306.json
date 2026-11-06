@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e2/e2237762481bf6b8f306",
+ "request_hash": "e2237762481bf6b8f30691064ad08219c26950e42b1d820df812a8880f887c79",
+ "recorded_at": "2026-11-06T14:52:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2374,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.064735",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=218,cfOrigin;dur=0,cfWorker;dur=236"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "text": "### Removed APIs\n\n- **`Connection` and `ConnectionOptions` removed** — use `DataSource` and `DataSourceOptions` instead ([#12022](https://github.com/typeorm/typeorm/pull/12022) by [@alumni](https://github.com/alumni))\n- **`.connection` property renamed to `.dataSource`** — the `connection` property on `Driver`, `QueryRunner`, `EntityManager`, `QueryBuilder`, `EntityMetadata`, and all `*Event` subscriber interfaces has been renamed to `dataSource`; a deprecated getter is provided as a bridge ([#12244](https://github.com/typeorm/typeorm/pull/12244), [#12245](https://github.com/typeorm/typeorm/pull/12245), [#12246](https://github.com/typeorm/typeorm/pull/12246), [#12249](https://github.com/typeorm/typeorm/pull/12249) by [@pkuczynski](https://github.com/pkuczynski))\n- **`ConnectionManager` and global convenience functions removed** — `createConnection`, `getConnection`, `getManager`, `getRepository`, `createQueryBuilder`, and other globals have been removed ([#12098](https://github.com/typeorm/typeorm/pull/12098) by [@michaelbromley](https://github.com/michaelbromley))\n- **`getMongoRepository` and `getMongoManager` globals removed** — use `dataSource.getMongoRepository()` and `dataSource.mongoManager` instead ([#12099](https://github.com/typeorm/typeorm/pull/12099) by [@pkuczynski](https://github.com/pkuczynski))\n- **`DataSource.name` removed** — named connections were deprecated in v0.3; `ConnectionOptionsReader.all()` renamed to `get()` ([#12136](https://github.com/typeorm/typeorm/pull/12136) by [@pkuczynski](https://github.com/pkuczynski))\n- **`TYPEORM_*` environment variable support removed** — `ConnectionOptionsEnvReader`, `ormconfig.env`, and `dotenv` auto-loading have been removed ([#12134](https://github.com/typeorm/typeorm/pull/12134) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findByIds` removed** — use `findBy` with `In` operator instead ([#12114](https://github.com/typeorm/typeorm/pull/12114) by [@pkuczynski](https://github.com/pkuczynski))\n- **`findOneById` removed** — use `findOneBy` instead ([#12198](https://github.com/typeorm/typeorm/pull/12198) by [@pkuczynski](https://github.com/pkuczynski))\n- **`Repository.exist()` removed** — use `Repository.exists()` instead ([#12131](https://github.com/typeorm/typeorm/pull/12131) by [@pkuczynski](https://github.com/pkuczynski))\n- **`AbstractRepository`, `@EntityRepository`, and `getCustomRepository` removed** — use `Repository.extend()` instead ([#12096](https://github.com/typeorm/typeorm/pull/12096) by [@pkuczynski](https://github.com/pkuczynski))\n- **`@RelationCount` decorator removed** — use `@VirtualColumn` with a sub-query instead ([#12181](https://github.com/typeorm/typeorm/pull/12181) by [@pkuczynski](https://github.com/pkuczynski))\n- **IoC container system removed** — `useContainer()`, `getFromContainer()`, and related types have been removed ([#12180](https://github.com/typeorm/typeorm/pull/12180) by [@pkuczynski](https://github.com/pkuczynski))\n- **`readonly` column option removed** — use `update: false` instead ([#12132](https://github.com/typeorm/typeorm/pull/12132) by [@pkuczynski](https://github.com/pkuczynski))\n- **`unsigned` on `ColumnNumericOptions` removed** — only affected decimal/float types; integer `unsigned` is unchanged ([#12133](https://github.com/typeorm/typeorm/pull/12133) by [@pkuczynski](https://github.com/pkuczynski))\n- **QueryBuilder: `onConflict()`, deprecated `orUpdate()` overload, and `setNativeParameters()` removed** — use `orIgnore()`/`orUpdate()` array signature and `setParameters()` instead ([#12090](https://github.com/typeorm/typeorm/pull/12090) by [@pkuczynski](https://github.com/pkuczynski))"
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#3",
+    "text": "\\*\\* `skip` and `take` should be used together\n\n\\*\\* If you are using typeorm with MSSQL, and want to use `take` or `limit`, you need to use order as well or you will receive the following error: `'Invalid usage of the option NEXT in the FETCH statement.'`\n\n```typescript\nuserRepository.find({\n    order: {\n        columnName: \"ASC\",\n    },\n    skip: 0,\n    take: 10,\n})\n```\n\nwill execute following query:\n\n```sql\nSELECT * FROM \"user\"\nORDER BY \"columnName\" ASC\nLIMIT 10 OFFSET 0\n```\n\n- `cache` - Enables or disables query result caching. See [caching](../query-builder/6-caching.md) for more information and options.\n\n```typescript\nuserRepository.find({\n    cache: true,\n})\n```\n\n- `lock` - Enables locking mechanism for query. Can be used only in `findOne` and `findOneBy` methods.\n  `lock` is an object which can be defined as:\n\n```ts\n{ mode: \"optimistic\", version: number | Date }\n```\n\nor\n\n```ts\n{\n    mode: \"pessimistic_read\" |\n        \"pessimistic_write\" |\n        \"dirty_read\" |\n        \"for_no_key_update\" |\n        \"for_key_share\",\n\n    tables: string[],\n    onLocked: \"nowait\" | \"skip_locked\"\n}\n```\n\nfor example:\n\n```typescript\nuserRepository.findOne({\n    where: {\n        id: 1,\n    },\n    lock: { mode: \"optimistic\", version: 1 },\n})\n```\n\nSee [lock modes](../query-builder/1-select-query-builder.md#lock-modes) for more information."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "typeorm:docs/docs/releases/1.0/01-release-notes.md#4",
+    "b": "typeorm:docs/docs/working-with-entity-manager/3-find-options.md#3",
+    "relation": "unrelated",
+    "related": 0.007,
+    "probabilities": {
+     "same": 0.0023,
+     "overlapping": 0.002,
+     "conflicting": 0.0027,
+     "unrelated": 0.993
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 42
+  },
+  "timing": {
+   "read_ms": 42,
+   "total_ms": 45
+  }
+ }
+}

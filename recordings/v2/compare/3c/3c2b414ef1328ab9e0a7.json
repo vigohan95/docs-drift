@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/3c/3c2b414ef1328ab9e0a7",
+ "request_hash": "3c2b414ef1328ab9e0a7f93697ccf17737bbe5a35b27c5b1afcbce100c8fb8ae",
+ "recorded_at": "2026-11-06T14:49:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2057,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.930912",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=176"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#84",
+    "text": "#### schemaController\n<a id=\"schema-controller\"></a>\n\nThis property can be used to fully manage:\n- `bucket`: where the schemas of your application will be stored\n- `compilersFactory`: what module must compile the JSON schemas\n\nIt can be useful when your schemas are stored in another data structure that is\nunknown to Fastify.\n\nAnother use case is to tweak all the schemas processing. Doing so it is possible\nto use Ajv v8 JTD or Standalone feature. To use such as JTD or the Standalone\nmode, refers to the [`@fastify/ajv-compiler`\ndocumentation](https://github.com/fastify/ajv-compiler#usage).\n\n```js\nconst fastify = Fastify({\n  schemaController: {\n    /**\n     * This factory is called whenever `fastify.register()` is called.\n     * It may receive as input the schemas of the parent context if some schemas have been added.\n     * @param {object} parentSchemas these schemas will be returned by the\n     * `getSchemas()` method function of the returned `bucket`.\n     */\n    bucket: function factory (parentSchemas) {\n      return {\n        add (inputSchema) {\n          // This function must store the schema added by the user.\n          // This function is invoked when `fastify.addSchema()` is called.\n        },\n        getSchema (schema$id) {\n          // This function must return the raw schema requested by the `schema$id`.\n          // This function is invoked when `fastify.getSchema(id)` is called.\n          return aSchema\n        },\n        getSchemas () {\n          // This function must return all the schemas referenced by the routes schemas' $ref\n          // It must return a JSON where the property is the schema `$id` and the value is the raw JSON Schema.\n          const allTheSchemaStored = {\n            'schema$id1': schema1,\n            'schema$id2': schema2\n          }\n          return allTheSchemaStored\n        }\n      }\n    },\n\n    /**\n     * The compilers factory lets you fully control the validator and serializer\n     * in the Fastify's lifecycle, providing the encapsulation to your compilers.\n     */\n    compilersFactory: {\n      /**\n       * This factory is called whenever a new validator instance is needed.\n       * It may be called whenever `fastify.register()` is called only if new schemas have been added to the\n       * encapsulation context.\n       * It may receive as input the schemas of the parent context if some schemas have been added.\n       * @param {object} externalSchemas these schemas will be returned by the\n       * `bucket.getSchemas()`. Needed to resolve the external references $ref.\n       * @param {object} ajvServerOption the server `ajv` options to build your compilers accordingly\n       */\n      buildValidator: function factory (externalSchemas, ajvServerOption) {\n        // This factory function must return a schema validator compiler.\n        // See [#schema-validator](./Validation-and-Serialization.md#schema-validator) for details.\n        const yourAjvInstance = new Ajv(ajvServerOption.customOptions)\n        return function validatorCompiler ({ schema, method, url, httpPart }) {\n          return yourAjvInstance.compile(schema)\n        }\n      },"
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "text": "### Using addContentTypeParser with fastify.register\nWhen using `addContentTypeParser` with `fastify.register`, avoid `await`\nwhen registering routes. Using `await` makes route registration asynchronous,\npotentially registering routes before `addContentTypeParser` is set."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#84",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#84",
+    "b": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "relation": "unrelated",
+    "related": 0.0043,
+    "probabilities": {
+     "same": 0.0014,
+     "overlapping": 0.0013,
+     "conflicting": 0.0016,
+     "unrelated": 0.9957
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 35
+  }
+ }
+}

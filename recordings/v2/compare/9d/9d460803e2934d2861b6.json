@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9d/9d460803e2934d2861b6",
+ "request_hash": "9d460803e2934d2861b6ec069e0a3cc911d011f675b196653bb23ba650b28eca",
+ "recorded_at": "2026-11-06T14:50:22Z",
+ "status": 200,
+ "attempts": 2,
+ "round_trip_ms": 2148,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "122.051933",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=52,cfOrigin;dur=0,cfWorker;dur=367"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#0",
+    "text": "---\ntitle: Defining Entities\n---\n\nimport Tabs from '@theme/Tabs';\nimport TabItem from '@theme/TabItem';\n\nEntities are simple javascript objects (so called POJO) without restrictions and without the need to extend base classes. Using [entity constructors](./entity-constructors.md) works as well - they are never executed for managed entities (loaded from database). Every entity is required to have a primary key.\n\nEntities can be defined in two ways:\n\n- **`defineEntity` helper** - Define entities programmatically with full TypeScript type inference. You can use it with a class (recommended) or without one. Read more about this in the [`defineEntity` section](./define-entity.md).\n- **Decorated classes** - the attributes of the entity, as well as each property are provided via decorators. You use `@Entity()` decorator on the class. Entity properties are decorated either with `@Property` decorator, or with one of reference decorators: `@ManyToOne`, `@OneToMany`, `@OneToOne` and `@ManyToMany`. Check out the full [decorator reference](./decorators.md).\n\nMoreover, how the metadata extraction from decorators happens is controlled via `MetadataProvider`. Three main metadata providers are:\n\n- `MetadataProvider` - default provider that only enforces the types are provided explicitly.\n- `ReflectMetadataProvider` - uses `reflect-metadata` to read the property types. Faster but simpler and more verbose.\n- `TsMorphMetadataProvider` - uses `ts-morph` to read the type information from the TypeScript compiled API. Heavier (requires full TS as a dependency), but allows DRY entity definition. With `ts-morph` you are able to extract the type as it is defined in the code, including interface names, as well as optionality of properties."
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-adonis.md#7",
+    "text": "## Entity Definitions\n\nDefine entities using `defineEntity` for full type inference:\n\n```ts title=\"app/entities/base.ts\"\nimport { defineEntity, p } from '@mikro-orm/core'\n\nexport const BaseSchema = defineEntity({\n  name: 'BaseEntity',\n  abstract: true,\n  properties: {\n    id: p.integer().primary(),\n    createdAt: p.datetime().onCreate(() => new Date()),\n    updatedAt: p.datetime().onCreate(() => new Date()).onUpdate(() => new Date()),\n  },\n})\n```\n\n```ts title=\"app/entities/article.ts\"\nimport { defineEntity, type InferEntity, p } from '@mikro-orm/core'\nimport { BaseSchema } from '#entities/base'\nimport { User } from '#entities/user'\nimport { ArticleRepository } from '#repositories/article_repository'\n\nexport const ArticleSchema = defineEntity({\n  name: 'Article',\n  extends: BaseSchema,\n  repository: () => ArticleRepository,\n  properties: {\n    slug: p.string().unique(),\n    title: p.string().index(),\n    text: p.text().lazy(),\n    author: () => p.manyToOne(User).ref(),\n  },\n})\n\nexport type IArticle = InferEntity<typeof ArticleSchema>\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-adonis.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/defining-entities.md#0",
+    "b": "mikro-orm:docs/docs/usage-with-adonis.md#7",
+    "relation": "overlapping",
+    "related": 0.9978,
+    "probabilities": {
+     "same": 0.0082,
+     "overlapping": 0.9865,
+     "conflicting": 0.0031,
+     "unrelated": 0.0022
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 56,
+   "passages": 1,
+   "counterparts_ms": 74
+  },
+  "timing": {
+   "read_ms": 158,
+   "total_ms": 161
+  }
+ }
+}

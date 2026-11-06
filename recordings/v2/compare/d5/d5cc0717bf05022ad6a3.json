@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d5/d5cc0717bf05022ad6a3",
+ "request_hash": "d5cc0717bf05022ad6a373cca3be211bce4ded5ef4b9e654c3238f7bf7d2dc1b",
+ "recorded_at": "2026-11-06T14:50:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1080,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "185.641954",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=327"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/events.md#2",
+    "text": "## Defining Hooks\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'reflect-metadata', value: 'reflect-metadata'},\n    {label: 'ts-morph', value: 'ts-morph'},\n  ]}\n>\n<TabItem value=\"define-entity-class\">\n\nWith `defineEntity + class`, use the `addHook` method to register hooks after the class is defined:\n\n```ts title=\"./entities/Article.ts\"\nimport { defineEntity, type EventArgs, p } from '@mikro-orm/core';\n\nconst ArticleSchema = defineEntity({\n  name: 'Article',\n  properties: {\n    id: p.integer().primary(),\n    title: p.string(),\n    slug: p.string().unique(),\n    updatedAt: p.datetime(),\n  },\n});\n\nexport class Article extends ArticleSchema.class {}\nArticleSchema.setClass(Article);\n\n// highlight-start\nArticleSchema.addHook('beforeCreate', async (args: EventArgs<Article>) => {\n  const article = args.entity;\n  if (!article.slug) {\n    article.slug = article.title.toLowerCase().replace(/\\s+/g, '-');\n  }\n});\n\nArticleSchema.addHook('beforeUpdate', async (args: EventArgs<Article>) => {\n  args.entity.updatedAt = new Date();\n});\n// highlight-end\n```\n\n> You can also pass hooks inline via the `hooks` property in the `defineEntity` call, but `args.entity` will be typed as `any` there because the entity type is not yet known. Explicitly typing the parameter (e.g. `EventArgs<Article>`) won't work either, as it would create a circular reference. Use `addHook` after the class is defined to get full type safety."
+   },
+   {
+    "id": "mikro-orm:docs/docs/events.md#3",
+    "text": "</TabItem>\n<TabItem value=\"define-entity\">\n\nWith `defineEntity` (no class), use the `addHook` method to register hooks after the entity is defined:\n\n```ts title=\"./entities/Article.ts\"\nimport { defineEntity, type InferEntity, type EventArgs, p } from '@mikro-orm/core';\n\nexport const Article = defineEntity({\n  name: 'Article',\n  properties: {\n    id: p.integer().primary(),\n    title: p.string(),\n    slug: p.string().unique(),\n    updatedAt: p.datetime(),\n  },\n});\n\nexport type IArticle = InferEntity<typeof Article>;\n\n// highlight-start\nArticle.addHook('beforeCreate', async (args: EventArgs<IArticle>) => {\n  const article = args.entity;\n  if (!article.slug) {\n    article.slug = article.title.toLowerCase().replace(/\\s+/g, '-');\n  }\n});\n\nArticle.addHook('beforeUpdate', async (args: EventArgs<IArticle>) => {\n  args.entity.updatedAt = new Date();\n});\n// highlight-end\n```\n\n> You can also pass hooks inline via the `hooks` property in the `defineEntity` call, but `args.entity` will be typed as `any` there because the entity type is not yet known. Explicitly typing the parameter (e.g. `EventArgs<IArticle>`) won't work either, as it would create a circular reference. Use `addHook` after the entity and its type alias are defined to get full type safety.\n\n</TabItem>\n<TabItem value=\"reflect-metadata\">\n\nWith decorators, mark entity methods with hook decorators like `@BeforeCreate()`, `@BeforeUpdate()`, etc.:"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/events.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/events.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/events.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/events.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/events.md#2",
+    "b": "mikro-orm:docs/docs/events.md#3",
+    "relation": "overlapping",
+    "related": 0.9937,
+    "probabilities": {
+     "same": 0.0197,
+     "overlapping": 0.9643,
+     "conflicting": 0.0097,
+     "unrelated": 0.0063
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0206,
+       "restated": 0.9474,
+       "elaborated": 0.0171,
+       "different": 0.0149
+      },
+      "confidence": 0.981,
+      "a": {
+       "document": "mikro-orm:docs/docs/events.md#2",
+       "quote": "Explicitly typing the parameter (e.g.",
+       "start": 1396,
+       "end": 1433,
+       "confidence": 0.994
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/events.md#3",
+       "quote": "Explicitly typing the parameter (e.g. `EventArgs<IArticle>`) won't work either, as it would create a circular reference.",
+       "start": 1053,
+       "end": 1173,
+       "confidence": 0.981
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 2,
+   "counterparts_ms": 79
+  },
+  "timing": {
+   "read_ms": 195,
+   "total_ms": 198
+  }
+ }
+}

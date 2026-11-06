@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f4/f4695b7f788cff23930a",
+ "request_hash": "f4695b7f788cff23930af6d300ad3b9aedd236c4d657edb6838cdb40e406c398",
+ "recorded_at": "2026-11-06T14:50:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2021,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "70.847906",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=191"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#31",
+    "text": "Cloning works across single-table-inheritance and table-per-type (TPT) inheritance — for TPT, MikroORM emits one `INSERT ... SELECT` per ancestor table so the full row is reconstructed in every table.\n\nAll SQL drivers (SQLite, libSQL, PostgreSQL, MySQL, MariaDB, MSSQL) execute a server-side `INSERT ... SELECT`. MongoDB falls back to a `find` + `insertOne` round-trip with the same end shape.\n\n> For the lower-level building block, see [`qb.insertFrom()`](./query-builder.md#insert-from-select-insertfrom) in the Query Builder — it generates the raw `INSERT ... SELECT` statement that `em.clone()` builds on top of."
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#33",
+    "text": "### Composable with `onConflict()` and `returning()`\n\nThe returned `InsertQueryBuilder` exposes the same methods as a regular `qb.insert()`, so you can chain conflict handlers or RETURNING clauses:\n\n```ts\n// Skip duplicates by unique constraint\nconst source = em.createQueryBuilder(Author).where({ id: 1 });\nawait em.createQueryBuilder(Author)\n  .insertFrom(source)\n  .onConflict('email').ignore()\n  .execute();\n\n// Return the inserted rows (PostgreSQL / MSSQL / SQLite / libSQL)\nconst inserted = await em.createQueryBuilder(Author)\n  .insertFrom(source)\n  .returning('*')\n  .execute();\n```\n\nThe statement runs on all SQL drivers (SQLite, libSQL, PostgreSQL, MySQL, MariaDB, MSSQL). MySQL / MariaDB don't support `RETURNING`, so prefer `onConflict()` or a follow-up SELECT there."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#31",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#33",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-manager.md#31",
+    "b": "mikro-orm:docs/docs/query-builder.md#33",
+    "relation": "overlapping",
+    "related": 0.9926,
+    "probabilities": {
+     "same": 0.0102,
+     "overlapping": 0.9776,
+     "conflicting": 0.0049,
+     "unrelated": 0.0074
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 77,
+   "total_ms": 79
+  }
+ }
+}

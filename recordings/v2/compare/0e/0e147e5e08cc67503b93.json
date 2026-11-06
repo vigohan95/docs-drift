@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0e/0e147e5e08cc67503b93",
+ "request_hash": "0e147e5e08cc67503b93e5f25fadf64a5b79bb23c86d1752200f75abb8a212a5",
+ "recorded_at": "2026-11-06T14:50:13Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1489,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "131.635971",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=259"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#2",
+    "text": "### Type-safe `$` access\n\nWhen a collection is populated, MikroORM types it as `LoadedCollection`, which exposes a `$` accessor (and its alias `get()`). This gives you type-safe access to the collection that TypeScript knows is initialized:\n\n```ts\nconst author = await em.findOne(Author, '...', { populate: ['books'] });\n\n// `author.books.$` is typed as `Collection<Book>` — TypeScript knows it's loaded\nfor (const book of author.books.$) {\n  console.log(book.title);\n}\n```\n\nWithout the populate hint, accessing `$` is a compile error, preventing you from accidentally working with an uninitialized collection:\n\n```ts\nconst author = await em.findOne(Author, '...');\n\n// TS Error: Property '$' does not exist on type 'Collection<Book>'\nfor (const book of author.books.$) { ... }\n```\n\nYou can also use the `Loaded` type in function signatures to require a populated collection:\n\n```ts\nfunction listBookTitles(author: Loaded<Author, 'books'>): string[] {\n  // Type-safe — books is guaranteed to be loaded\n  return author.books.$.map(book => book.title);\n}\n```\n\nSee the [Type-Safe Relations](./type-safe-relations.md) guide for full documentation on `Loaded`, `Ref`, and the `$` accessor."
+   },
+   {
+    "id": "mikro-orm:docs/docs/type-safe-relations.md#12",
+    "text": "### Type-Safe Access with `$`\n\nWhen a relation is in the `Loaded` hints, you can access it synchronously via the `$` symbol:\n\n```ts\n// Type: Loaded<User, 'identity'>\nconst user = await em.findOneOrFail(User, 1, { populate: ['identity'] });\n\n// Type-safe synchronous access\nconsole.log(user.identity.$.email);\n```\n\nWithout the populate hint, accessing `$` is a compile error:\n\n```ts\n// Type: Loaded<User, never>\nconst user = await em.findOneOrFail(User, 1);\n\n// TS Error: Property '$' does not exist on type 'Ref<Identity>'\nconsole.log(user.identity.$.email);\n```\n\n> If you don't like symbols with magic names like `$`, you can use the `get()` method, which is an alias for it."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/collections.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/type-safe-relations.md#12"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/type-safe-relations.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/collections.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/collections.md#2",
+    "b": "mikro-orm:docs/docs/type-safe-relations.md#12",
+    "relation": "overlapping",
+    "related": 0.9988,
+    "probabilities": {
+     "same": 0.0066,
+     "overlapping": 0.99,
+     "conflicting": 0.0022,
+     "unrelated": 0.0012
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0047,
+       "restated": 0.983,
+       "elaborated": 0.0073,
+       "different": 0.005
+      },
+      "confidence": 0.995,
+      "a": {
+       "document": "mikro-orm:docs/docs/collections.md#2",
+       "quote": "### Type-safe `$` access",
+       "start": 0,
+       "end": 24,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/type-safe-relations.md#12",
+       "quote": "### Type-Safe Access with `$`\n\nWhen a relation is in the `Loaded` hints, you can access it synchronously via the `$` symbol:\n\n```ts\n// Type: Loaded<User, 'identity'>\nconst user = await em.findOneOrFail(User, 1, { populate: ['identity'] });\n\n// Type-safe synchronous access\nconsole.log(user.identity.$.email);\n```\n\nWithout the populate hint, accessing `$` is a compile error:\n\n```ts\n// Type: Loaded<User, never>\nconst user = await em.findOneOrFail(User, 1);\n\n// TS Error: Property '$' does not exist on type 'Ref<Identity>'\nconsole.log(user.identity.$.email);\n```\n\n> If you don't like symbols with magic names like `$`, you can use the `get()` method, which is an alias for it.",
+       "start": 0,
+       "end": 676,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 1,
+   "counterparts_ms": 63
+  },
+  "timing": {
+   "read_ms": 139,
+   "total_ms": 142
+  }
+ }
+}

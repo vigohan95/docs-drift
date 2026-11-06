@@ -1,0 +1,276 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/e0/e0bf74d7e3debe9ff664",
+ "request_hash": "e0bf74d7e3debe9ff66403a0dec3649a663c26d4cbc083eea1a96e3fa7b00576",
+ "recorded_at": "2026-11-06T14:52:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2280,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "118.27459",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=185,cfOrigin;dur=0,cfWorker;dur=331"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) - [`setupListeners()`](../rtk-query/api/setupListeners.mdx): A utility used to enable `refetchOnMount` and `refetchOnReconnect` behaviors. (2) # `setupListeners` A utility used to enable `refetchOnFocus` and `refetchOnReconnect` behaviors.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "redux-toolkit:packages/toolkit/README.md#7",
+    "title": "packages/toolkit/README.md > Redux Toolkit > RTK Query > What's included",
+    "text": "### What's included\n\nRTK Query includes these APIs:\n\n- `createApi()`: The core of RTK Query's functionality. It allows you to define a set of endpoints describe how to retrieve data from a series of endpoints, including configuration of how to fetch and transform that data. In most cases, you should use this once per app, with \"one API slice per base URL\" as a rule of thumb.\n- `fetchBaseQuery()`: A small wrapper around fetch that aims to simplify requests. Intended as the recommended baseQuery to be used in createApi for the majority of users.\n- `<ApiProvider />`: Can be used as a Provider if you do not already have a Redux store.\n- `setupListeners()`: A utility used to enable refetchOnMount and refetchOnReconnect behaviors.\n\nSee the [**RTK Query Overview**](https://redux-toolkit.js.org/rtk-query/overview) page for more details on what RTK Query is, what problems it solves, and how to use it."
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/overview.md#4",
+    "title": "docs/rtk-query/overview.md > RTK Query Overview > What's included > APIs",
+    "text": "### APIs\n\nRTK Query is included within the installation of the core Redux Toolkit package. It is available via either of the two entry points below:\n\n```ts no-transpile\nimport { createApi } from '@reduxjs/toolkit/query'\n\n/* React-specific entry point that automatically generates\n   hooks corresponding to the defined endpoints */\nimport { createApi } from '@reduxjs/toolkit/query/react'\n```\n\nRTK Query includes these APIs:\n\n- [`createApi()`](./api/createApi.mdx): The core of RTK Query's functionality. It allows you to define a set of \"endpoints\" that describe how to retrieve data from backend APIs and other async sources, including the configuration of how to fetch and transform that data. In most cases, you should use this once per app, with \"one API slice per base URL\" as a rule of thumb.\n- [`fetchBaseQuery()`](./api/fetchBaseQuery.mdx): A small wrapper around [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) that aims to simplify requests. Intended as the recommended `baseQuery` to be used in `createApi` for the majority of users.\n- [`<ApiProvider />`](./api/ApiProvider.mdx): Can be used as a `Provider` if you **do not already have a Redux store**.\n- [`setupListeners()`](./api/setupListeners.mdx): A utility used to enable `refetchOnMount` and `refetchOnReconnect` behaviors."
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/cache-behavior.mdx#11",
+    "title": "docs/rtk-query/usage/cache-behavior.mdx > Cache Behavior > Manipulating Cache Behavior > Re-fetching on window focus with `refetchOnFocus`",
+    "text": "```ts title=\"src/store.ts\"\n// file: src/services/types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: src/services/api.ts noEmit\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'\nimport type { Post } from './types'\n\nexport const api = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: '/' }),\n  // highlight-start\n  // global configuration for the api\n  refetchOnFocus: true,\n  // highlight-end\n  endpoints: (build) => ({\n    getPosts: build.query<Post[], number>({\n      query: () => `posts`,\n    }),\n  }),\n})\n\n// file: src/store.ts\nimport { configureStore } from '@reduxjs/toolkit'\nimport { setupListeners } from '@reduxjs/toolkit/query'\nimport { api } from './services/api'\n\nexport const store = configureStore({\n  reducer: {\n    [api.reducerPath]: api.reducer,\n  },\n  middleware: (gDM) => gDM().concat(api.middleware),\n})\n\n// highlight-start\n// enable listener behavior for the store\nsetupListeners(store.dispatch)\n// highlight-end\n\nexport type RootState = ReturnType<typeof store.getState>\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/cache-behavior.mdx#13",
+    "title": "docs/rtk-query/usage/cache-behavior.mdx > Cache Behavior > Manipulating Cache Behavior > Re-fetching on network reconnection with `refetchOnReconnect`",
+    "text": "```ts title=\"src/store.ts\"\n// file: src/services/types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: src/services/api.ts noEmit\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'\nimport type { Post } from './types'\n\nexport const api = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: '/' }),\n  // highlight-start\n  // global configuration for the api\n  refetchOnReconnect: true,\n  // highlight-end\n  endpoints: (build) => ({\n    getPosts: build.query<Post[], number>({\n      query: () => `posts`,\n    }),\n  }),\n})\n\n// file: src/store.ts\nimport { configureStore } from '@reduxjs/toolkit'\nimport { setupListeners } from '@reduxjs/toolkit/query'\nimport { api } from './services/api'\n\nexport const store = configureStore({\n  reducer: {\n    [api.reducerPath]: api.reducer,\n  },\n  middleware: (gDM) => gDM().concat(api.middleware),\n})\n\n// highlight-start\n// enable listener behavior for the store\nsetupListeners(store.dispatch)\n// highlight-end\n\nexport type RootState = ReturnType<typeof store.getState>\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/endpoints.mdx#2",
+    "title": "docs/rtk-query/api/created-api/endpoints.mdx > API Slices: Endpoints > `initiate` > Signature",
+    "text": "#### Signature\n\n```ts no-transpile\ntype InitiateRequestThunk = StartQueryActionCreator | StartMutationActionCreator;\n\ntype StartQueryActionCreator = (\n  arg:any,\n  options?: StartQueryActionCreatorOptions\n) => ThunkAction<QueryActionCreatorResult, any, any, UnknownAction>;\n\ntype StartMutationActionCreator<D extends MutationDefinition<any, any, any, any>> = (\n  arg: any\n  options?: StartMutationActionCreatorOptions\n) => ThunkAction<MutationActionCreatorResult<D>, any, any, UnknownAction>;\n\ntype SubscriptionOptions = {\n  /**\n   * How frequently to automatically re-fetch data (in milliseconds). Defaults to `0` (off).\n   */\n  pollingInterval?: number;\n  /**\n   * Defaults to `false`. This setting allows you to control whether RTK Query will try to refetch all subscribed queries after regaining a network connection.\n   *\n   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.\n   *\n   * Note: requires `setupListeners` to have been called.\n   */\n  refetchOnReconnect?: boolean;\n  /**\n   * Defaults to `false`. This setting allows you to control whether RTK Query will try to refetch all subscribed queries after the application window regains focus.\n   *\n   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.\n   *\n   * Note: requires `setupListeners` to have been called.\n   */\n  refetchOnFocus?: boolean;\n};\n\ninterface StartQueryActionCreatorOptions {\n  subscribe?: boolean;\n  forceRefetch?: boolean | number;\n  subscriptionOptions?: SubscriptionOptions;\n}\n\ninterface StartMutationActionCreatorOptions {\n  /**\n   * If this mutation should be tracked in the store.\n   * If you just want to manually trigger this mutation using `dispatch` and don't care about the\n   * result, state & potential errors being held in store, you can set this to false.\n   * (defaults to `true`)\n   */\n  track?: boolean;\n}\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#3",
+    "title": "docs/rtk-query/api/createApi.mdx > `createApi` > `createApi` Parameters",
+    "text": "## `createApi` Parameters\n\n`createApi` accepts a single configuration object parameter with the following options:\n\n```ts no-transpile\n  baseQuery(args: InternalQueryArgs, api: BaseQueryApi, extraOptions?: DefinitionExtraOptions): any;\n  endpoints(build: EndpointBuilder<InternalQueryArgs, TagTypes>): Definitions;\n  extractRehydrationInfo?: (\n    action: UnknownAction,\n    {\n      reducerPath,\n    }: {\n      reducerPath: ReducerPath\n    }\n  ) =>\n    | undefined\n    | CombinedState<Definitions, TagTypes, ReducerPath>\n  tagTypes?: readonly TagTypes[];\n  reducerPath?: ReducerPath;\n  serializeQueryArgs?: SerializeQueryArgs<InternalQueryArgs>;\n  keepUnusedDataFor?: number; // value is in seconds\n  refetchOnMountOrArgChange?: boolean | number; // value is in seconds\n  refetchOnFocus?: boolean;\n  refetchOnReconnect?: boolean;\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/hooks.mdx#28",
+    "title": "docs/rtk-query/api/created-api/hooks.mdx > API Slices: React Hooks > Implementation Hooks > `useQuerySubscription` > `useQuerySubscription` Signature",
+    "text": "##### `useQuerySubscription` Signature\n\n```ts no-transpile\ntype UseQuerySubscription = (\n  arg: any | SkipToken,\n  options?: UseQuerySubscriptionOptions,\n) => UseQuerySubscriptionResult\n\ntype UseQuerySubscriptionOptions = {\n  skip?: boolean\n  refetchOnMountOrArgChange?: boolean | number\n  pollingInterval?: number\n  skipPollingIfUnfocused?: boolean\n  refetchOnReconnect?: boolean\n  refetchOnFocus?: boolean\n}\n\ntype UseQuerySubscriptionResult = {\n  refetch: () => void // A function to force refetch the query\n}\n```\n\n- **Parameters**\n\n  - `arg`: The argument passed to the query defined in the endpoint.\n    You can also pass in `skipToken` here as an alternative way of skipping the query, see [skipToken](#skiptoken)\n  - `options`: A set of options that control the fetching behavior of the hook\n\n- **Returns**\n  - An object containing a function to `refetch` the data"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/hooks.mdx#33",
+    "title": "docs/rtk-query/api/created-api/hooks.mdx > API Slices: React Hooks > Implementation Hooks > `useLazyQuerySubscription` > `useLazyQuerySubscription` Signature",
+    "text": "##### `useLazyQuerySubscription` Signature\n\n```ts no-transpile\ntype UseLazyQuerySubscription = (\n  options?: UseLazyQuerySubscriptionOptions,\n) => [UseLazyQuerySubscriptionTrigger, LastArg]\n\ntype UseLazyQuerySubscriptionOptions = {\n  pollingInterval?: number\n  skipPollingIfUnfocused?: boolean\n  refetchOnReconnect?: boolean\n  refetchOnFocus?: boolean\n}\n\ntype UseLazyQuerySubscriptionTrigger = (\n  arg: any,\n  preferCacheValue?: boolean,\n) => void\n```\n\n- **Parameters**\n\n  - `options`: A set of options that control the fetching behavior of the hook. The options will only have an effect after the lazy query has been triggered at least once.\n\n- **Returns**: A tuple containing:\n  - `trigger`: A function that fetches the corresponding data for the endpoint when called\n  - `lastArg`: The last argument used to call the trigger function"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/overview.md#7",
+    "title": "docs/rtk-query/overview.md > RTK Query Overview > Basic Usage > Configure the Store",
+    "text": "### Configure the Store\n\nThe \"API slice\" also contains an auto-generated Redux slice reducer and a custom middleware that manages subscription lifetimes. Both of those need to be added to the Redux store:\n\n```ts\nimport { configureStore } from '@reduxjs/toolkit'\n// Or from '@reduxjs/toolkit/query/react'\nimport { setupListeners } from '@reduxjs/toolkit/query'\nimport { pokemonApi } from './services/pokemon'\n\nexport const store = configureStore({\n  reducer: {\n    // Add the generated reducer as a specific top-level slice\n    [pokemonApi.reducerPath]: pokemonApi.reducer,\n  },\n  // Adding the api middleware enables caching, invalidation, polling,\n  // and other useful features of `rtk-query`.\n  middleware: (getDefaultMiddleware) =>\n    getDefaultMiddleware().concat(pokemonApi.middleware),\n})\n\n// optional, but required for refetchOnFocus/refetchOnReconnect behaviors\n// see `setupListeners` docs - takes an optional callback as the 2nd arg for customization\nsetupListeners(store.dispatch)\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/hooks.mdx#31",
+    "title": "docs/rtk-query/api/created-api/hooks.mdx > API Slices: React Hooks > Implementation Hooks > `useInfiniteQuerySubscription` > `useInfiniteQuerySubscription` Signature",
+    "text": "##### `useInfiniteQuerySubscription` Signature\n\n```ts no-transpile\ntype UseInfiniteQuerySubscription = (\n  arg: any | SkipToken,\n  options?: UseInfiniteQuerySubscriptionOptions,\n) => UseInfiniteQuerySubscriptionResult\n\ntype UseInfiniteQuerySubscriptionOptions = {\n  skip?: boolean\n  refetchOnMountOrArgChange?: boolean | number\n  pollingInterval?: number\n  skipPollingIfUnfocused?: boolean\n  refetchOnReconnect?: boolean\n  refetchOnFocus?: boolean\n  initialPageParam?: PageParam\n  refetchCachedPages?: boolean\n}\n\ntype UseInfiniteQuerySubscriptionResult = {\n  trigger: (\n    arg: any,\n    direction: 'forward' | 'backward',\n  ) => InfiniteQueryActionCreatorResult\n  refetch: (options?: {\n    refetchCachedPages?: boolean\n  }) => InfiniteQueryActionCreatorResult\n  fetchNextPage: () => InfiniteQueryActionCreatorResult\n  fetchPreviousPage: () => InfiniteQueryActionCreatorResult\n}\n```\n\n- **Parameters**\n  - `arg`: The query argument passed to the infinite query endpoint.\n  - `options`: A set of options that control the fetching behavior of the hook.\n- **Returns**\n  - An object containing:\n  - `trigger`: manually fetches a page in the given direction for the current cache entry\n  - `refetch`: refetches the infinite query\n  - `fetchNextPage`: fetches the next page\n  - `fetchPreviousPage`: fetches the previous page"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/cache-behavior.mdx#10",
+    "title": "docs/rtk-query/usage/cache-behavior.mdx > Cache Behavior > Manipulating Cache Behavior > Re-fetching on window focus with `refetchOnFocus`",
+    "text": "### Re-fetching on window focus with `refetchOnFocus`\n\nThe [`refetchOnFocus`](../api/createApi.mdx#refetchonfocus) option allows you to control whether RTK Query will try to refetch all subscribed queries after the application window regains focus.\n\nIf you specify this option alongside `skip: true`, this will not be evaluated until skip is false.\n\nNote that this requires [`setupListeners`](../api/setupListeners.mdx) to have been called.\n\nThis option is available on both the api definition with [`createApi`](../api/createApi.mdx), as well as on the [`useQuery`](../api/created-api/hooks.mdx#usequery), [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription), [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery), and [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription) hooks.\n\n```ts title=\"src/services/api.ts\"\n// file: src/services/types.ts noEmit\nexport interface Post {\n  id: number\n  name: string\n}\n\n// file: src/services/api.ts\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'\nimport type { Post } from './types'\n\nexport const api = createApi({\n  baseQuery: fetchBaseQuery({ baseUrl: '/' }),\n  // highlight-start\n  // global configuration for the api\n  refetchOnFocus: true,\n  // highlight-end\n  endpoints: (build) => ({\n    getPosts: build.query<Post[], number>({\n      query: () => `posts`,\n    }),\n  }),\n})\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/tutorials/rtk-query.mdx#7",
+    "title": "docs/tutorials/rtk-query.mdx > RTK Query Quick Start > Setting up your store and API service > Add the service to your store",
+    "text": "### Add the service to your store\n\nAn RTKQ service generates a \"slice reducer\" that should be included in the Redux root reducer, and a custom middleware that handles the data fetching. Both need to be added to the Redux store.\n\n```ts title=\"src/store.ts\"\n// file: services/pokemon.ts noEmit\nimport { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'\n\nexport const pokemonApi = createApi({\n  reducerPath: 'pokemonApi',\n  baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),\n  endpoints: (builder) => ({\n    getPokemonByName: builder.query({\n      query: (name: string) => `pokemon/${name}`,\n    }),\n  }),\n})\n\n// file: store.ts\nimport { configureStore } from '@reduxjs/toolkit'\n// Or from '@reduxjs/toolkit/query/react'\nimport { setupListeners } from '@reduxjs/toolkit/query'\nimport { pokemonApi } from './services/pokemon'\n\nexport const store = configureStore({\n  reducer: {\n    // highlight-start\n    // Add the generated reducer as a specific top-level slice\n    [pokemonApi.reducerPath]: pokemonApi.reducer,\n    // highlight-end\n  },\n  // highlight-start\n  // Adding the api middleware enables caching, invalidation, polling,\n  // and other useful features of `rtk-query`.\n  middleware: (getDefaultMiddleware) =>\n    getDefaultMiddleware().concat(pokemonApi.middleware),\n  // highlight-end\n})\n\n// optional, but required for refetchOnFocus/refetchOnReconnect behaviors\n// see `setupListeners` docs - takes an optional callback as the 2nd arg for customization\nsetupListeners(store.dispatch)\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "redux-toolkit:packages/toolkit/README.md#7",
+    "action": "use",
+    "relevance_score": 0.9809,
+    "document_score": 0.9846,
+    "levels": {
+     "answers": 0.9809,
+     "elsewhere": 0.0037,
+     "different_case": 0.0057,
+     "unrelated": 0.0097
+    }
+   },
+   {
+    "index": 8,
+    "id": "redux-toolkit:docs/rtk-query/overview.md#7",
+    "action": "use",
+    "relevance_score": 0.9802,
+    "document_score": 0.9877,
+    "levels": {
+     "answers": 0.9802,
+     "elsewhere": 0.0074,
+     "different_case": 0.0069,
+     "unrelated": 0.0055
+    }
+   },
+   {
+    "index": 1,
+    "id": "redux-toolkit:docs/rtk-query/overview.md#4",
+    "action": "use",
+    "relevance_score": 0.9516,
+    "document_score": 0.9606,
+    "levels": {
+     "answers": 0.9516,
+     "elsewhere": 0.0089,
+     "different_case": 0.0167,
+     "unrelated": 0.0228
+    }
+   },
+   {
+    "index": 11,
+    "id": "redux-toolkit:docs/tutorials/rtk-query.mdx#7",
+    "action": "use",
+    "relevance_score": 0.935,
+    "document_score": 0.9626,
+    "levels": {
+     "answers": 0.935,
+     "elsewhere": 0.0276,
+     "different_case": 0.0248,
+     "unrelated": 0.0126
+    }
+   },
+   {
+    "index": 4,
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/endpoints.mdx#2",
+    "action": "use",
+    "relevance_score": 0.7866,
+    "document_score": 0.8943,
+    "levels": {
+     "answers": 0.7866,
+     "elsewhere": 0.1076,
+     "different_case": 0.0384,
+     "unrelated": 0.0674
+    }
+   },
+   {
+    "index": 10,
+    "id": "redux-toolkit:docs/rtk-query/usage/cache-behavior.mdx#10",
+    "action": "expand",
+    "relevance_score": 0.1763,
+    "document_score": 0.727,
+    "levels": {
+     "answers": 0.1763,
+     "elsewhere": 0.5507,
+     "different_case": 0.0669,
+     "unrelated": 0.2061
+    }
+   },
+   {
+    "index": 3,
+    "id": "redux-toolkit:docs/rtk-query/usage/cache-behavior.mdx#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0886,
+    "document_score": 0.1392,
+    "levels": {
+     "answers": 0.0886,
+     "elsewhere": 0.0505,
+     "different_case": 0.0505,
+     "unrelated": 0.8103
+    }
+   },
+   {
+    "index": 2,
+    "id": "redux-toolkit:docs/rtk-query/usage/cache-behavior.mdx#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0692,
+    "document_score": 0.2405,
+    "levels": {
+     "answers": 0.0692,
+     "elsewhere": 0.1713,
+     "different_case": 0.0556,
+     "unrelated": 0.7039
+    }
+   },
+   {
+    "index": 5,
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0055,
+    "document_score": 0.023,
+    "levels": {
+     "answers": 0.0055,
+     "elsewhere": 0.0175,
+     "different_case": 0.0289,
+     "unrelated": 0.9481
+    }
+   },
+   {
+    "index": 6,
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/hooks.mdx#28",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0052,
+    "document_score": 0.0255,
+    "levels": {
+     "answers": 0.0052,
+     "elsewhere": 0.0204,
+     "different_case": 0.0467,
+     "unrelated": 0.9278
+    }
+   },
+   {
+    "index": 7,
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/hooks.mdx#33",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.0258,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.0209,
+     "different_case": 0.0485,
+     "unrelated": 0.9257
+    }
+   },
+   {
+    "index": 9,
+    "id": "redux-toolkit:docs/rtk-query/api/created-api/hooks.mdx#31",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.013,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0101,
+     "different_case": 0.0262,
+     "unrelated": 0.9607
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5739
+  },
+  "timing": {
+   "total_ms": 122,
+   "rerank_ms": 121,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6591,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 176
+   }
+  }
+ }
+}

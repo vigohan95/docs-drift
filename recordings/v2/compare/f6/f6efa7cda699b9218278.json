@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f6/f6efa7cda699b9218278",
+ "request_hash": "f6efa7cda699b9218278157d6e3435b6bf31319cc8c7aa4128ba79a9e778a7e7",
+ "recorded_at": "2026-11-06T14:50:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1146,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "67.126431",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=401"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/filters.md#0",
+    "text": "---\ntitle: Filters\n---\n\nMikroORM has the ability to pre-define filter criteria and attach those filters to given entities. The application can then decide at runtime whether certain filters should be enabled and what their parameter values should be. Filters can be used like database views, but they are parameterized inside the application.\n\n:::info Enforcing filters in the database\n\nFilters are applied inside the application, so a raw query or a forgotten `filters` option can still read past them. On PostgreSQL you can flag an entity filter with `rls: true` to also compile it to a database row level security policy — one declaration enforced at both the application and database layers. See [Row Level Security](./row-level-security.md#the-filter-bridge).\n\n:::\n\n> Filter can be defined at the entity level, dynamically via EM (global filters) or in the ORM configuration.\n\nFilters are applied to those methods of `EntityManager`: `find()`, `findOne()`, `findAndCount()`, `findOneOrFail()`, `count()`, `nativeUpdate()` and `nativeDelete()`.\n\n> The `cond` parameter can be a callback, possibly asynchronous.\n\n```ts\n@Entity()\n@Filter({ name: 'expensive', cond: { price: { $gt: 1000 } } })\n@Filter({ name: 'long', cond: { 'length(text)': { $gt: 10000 } } })\n@Filter({ name: 'hasAuthor', cond: { author: { $ne: null } }, default: true })\n@Filter({ name: 'writtenBy', cond: args => ({ author: { name: args.name } }) })\nexport class Book {\n  ...\n}\n\nconst books1 = await orm.em.find(Book, {}, {\n  filters: ['long', 'expensive'],\n});\nconst books2 = await orm.em.find(Book, {}, {\n  filters: { hasAuthor: false, long: true, writtenBy: { name: 'God' } },\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-generator.md#10",
+    "text": "## PostgreSQL row level security\n\nTable-level row level security policies declared via `@Entity({ policies, rowLevelSecurity })` (and the equivalent `EntitySchema` / `defineEntity` options) are managed by the schema generator just like check constraints and indexes: `schema:create`, `schema:update`, and `migration:create` create, recreate, and drop policies, and existing policies are introspected back so the diff stays clean. See the [Row Level Security](./row-level-security.md) guide for details."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/filters.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/schema-generator.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/filters.md#0",
+    "b": "mikro-orm:docs/docs/schema-generator.md#10",
+    "relation": "overlapping",
+    "related": 0.9945,
+    "probabilities": {
+     "same": 0.0066,
+     "overlapping": 0.9825,
+     "conflicting": 0.0053,
+     "unrelated": 0.0055
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 127,
+   "passage_reads": 1,
+   "passages_ms": 46,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 173,
+   "total_ms": 176
+  }
+ }
+}

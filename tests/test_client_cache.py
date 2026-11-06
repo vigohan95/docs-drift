@@ -45,10 +45,20 @@ def test_offline_client_raises_on_a_cache_miss(tmp_path):
         c.call("compare", {"documents": []})
 
 
-def test_failed_recordings_are_not_indexed(tmp_path):
+def test_server_errors_are_not_indexed(tmp_path):
     payload = {"documents": [{"id": "a", "text": "x"}]}
-    record(tmp_path, "compare", payload, {"error": "nope"}, name="bad.json", status=422)
+    record(tmp_path, "compare", payload, {"error": "nope"}, name="bad.json", status=503)
     assert build_index(tmp_path) == {}
+
+
+def test_a_recorded_refusal_is_replayed_as_the_same_error(tmp_path):
+    from docsdrift.client import ClockedError
+    payload = {"documents": [{"id": "a", "text": "x"}]}
+    record(tmp_path, "compare", payload, {"error": "a suffix of 3124 tokens exceeds one forward"}, name="r.json", status=422)
+    c = Clocked(offline=True, recordings=tmp_path)
+    with pytest.raises(ClockedError) as e:
+        c.call("compare", payload)
+    assert e.value.status == 422 and c.live_calls == 0
 
 
 def test_index_is_written_and_reused(tmp_path):

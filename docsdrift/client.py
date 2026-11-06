@@ -102,7 +102,9 @@ def build_index(recordings: Path = RECORDINGS) -> dict:
             rec = json.loads(f.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             continue
-        if not isinstance(rec, dict) or rec.get("status") != 200 or "request" not in rec:
+        # 200 answers are replayable. So is a 422: the engine refuses the same request every
+        # time (for example a table too long to read in one pass) and never charges for it.
+        if not isinstance(rec, dict) or rec.get("status") not in (200, 422) or "request" not in rec:
             continue
         index[request_hash(rec["endpoint"], rec["request"])] = f.relative_to(recordings).as_posix()
     return index
@@ -172,6 +174,8 @@ class Clocked:
             if rec is not None:
                 with _lock:
                     self.cache_hits += 1
+                if rec.get("status") != 200:
+                    raise ClockedError(rec["status"], json.dumps(rec.get("response")))
                 return rec["response"], float(rec.get("response_headers", {}).get("x-clocked-credits") or 0)
         if self.offline:
             raise CacheMiss(f"no recording for {endpoint} request {h[:16]}")
@@ -259,7 +263,7 @@ class Clocked:
             self._spent += credits
             self.live_calls += 1
             self.live_credits += credits
-            if status == 200 and not force_live:
+            if status in (200, 422) and not force_live:
                 self._index[h] = rel
         if status != 200:
             raise ClockedError(status, raw)

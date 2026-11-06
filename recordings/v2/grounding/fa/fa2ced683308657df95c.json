@@ -1,0 +1,100 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/fa/fa2ced683308657df95c",
+ "request_hash": "fa2ced683308657df95c74af791dea9e630598798a8320e8d5dac51118ad542a",
+ "recorded_at": "2026-11-06T14:46:33Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3666,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "80.939104",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=205"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "text": "### Changed preParsing hook behavior ([#2286](https://github.com/fastify/fastify/pull/2286))\n\nFrom Fastify v3, the behavior of the `preParsing` hook will change slightly\nto support request payload manipulation.\n\nThe hook now takes an additional argument, `payload`, and therefore the new hook\nsignature is `fn(request, reply, payload, done)` or `async fn(request, reply,\npayload)`.\n\nThe hook can optionally return a new stream via `done(null, stream)` or\nreturning the stream in case of async functions.\n\nIf the hook returns a new stream, it will be used instead of the original one in\nsubsequent hooks. A sample use case for this is handling compressed requests.\n\nThe new stream should add the `receivedEncodedLength` property to the stream\nthat should reflect the actual data size received from the client. For instance,\nin a compressed request it should be the size of the compressed payload. This\nproperty can (and should) be dynamically updated during `data` events.\n\nThe old syntax of Fastify v2 without payload is supported but it is deprecated."
+   }
+  ],
+  "answer": "In the [preParsing](#preparsing) hook, `request.body` will always be `undefined`, because the body parsing happens before the [preValidation](#prevalidation) hook. The previous hook was `onRequest`, the next hook will be `preValidation`. Notice: in the `preParsing` hook, request.body will always be null, because the body parsing happens before the `preValidation` hook. Notice: you should also add `receivedEncodedLength` property to the returned stream.",
+  "claims": [
+   "In the [preParsing](#preparsing) hook, `request.body` will always be `undefined`, because the body parsing happens before the [preValidation](#prevalidation) hook.",
+   "The previous hook was `onRequest`, the next hook will be `preValidation`. Notice: in the `preParsing` hook, request.body will always be null, because the body parsing happens before the `preValidation` hook. Notice: you should also add `receivedEncodedLength` property to the returned stream."
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0108,
+  "ungrounded": 0.9892,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+    "share": 1,
+    "share_of_answer": 0.0108,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "In the [preParsing](#preparsing) hook, `request.body` will always be `undefined`, because the body parsing happens before the [preValidation](#prevalidation) hook.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.3582,
+    "supported": 0.0029,
+    "contradicted": 0.0046,
+    "not_stated": 0.9858,
+    "not_a_claim": 0.0067,
+    "verdict": "not_stated",
+    "sources": {
+     "fastify:docs/Guides/Migration-Guide-V3.md#5": 1
+    },
+    "source": null
+   },
+   {
+    "claim": "The previous hook was `onRequest`, the next hook will be `preValidation`. Notice: in the `preParsing` hook, request.body will always be null, because the body parsing happens before the `preValidation` hook. Notice: you should also add `receivedEncodedLength` property to the returned stream.",
+    "kind": "claim",
+    "counted": true,
+    "weight": 0.6418,
+    "supported": 0.0151,
+    "contradicted": 0.0275,
+    "not_stated": 0.9318,
+    "not_a_claim": 0.0257,
+    "verdict": "not_stated",
+    "sources": {
+     "fastify:docs/Guides/Migration-Guide-V3.md#5": 1
+    },
+    "source": null,
+    "evidence": {
+     "document": "fastify:docs/Guides/Migration-Guide-V3.md#5",
+     "quote": "The new stream should add the `receivedEncodedLength` property to the stream",
+     "start": 665,
+     "end": 741,
+     "confidence": 0.92
+    }
+   }
+  ],
+  "unsupported_claims": [
+   0,
+   1
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0029
+  },
+  "timing": {
+   "read_ms": 87,
+   "total_ms": 89
+  }
+ }
+}

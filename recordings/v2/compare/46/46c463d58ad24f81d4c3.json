@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/46/46c463d58ad24f81d4c3",
+ "request_hash": "46c463d58ad24f81d4c323a9e96e6a34838c1ff334a69d60de29e60f6d7dd7d1",
+ "recorded_at": "2026-11-06T14:50:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2476,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.616512",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=51,cfOrigin;dur=0,cfWorker;dur=156"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#25",
+    "text": "## Using QueryBuilder\n\nThe `listArticlesQuery()` repository method will be a bit more complex. We want to load the articles together with the number of corresponding comments. To do that, we can use the `QueryBuilder` with a sub-query which will load the comments count for each selected article. Similarly, we want to load all the tags added to the article. To get the author's name, we can use a simple `JOIN`.\n\n> You can find more details in the [Using Query Builder](../query-builder.md) section.\n\nLet's first do the easy things - we want to select `slug`, `title`, `description` and `author` columns:\n\n```ts title='modules/article/article.repository.ts'\nreturn this.createQueryBuilder('a')\n  .select(['slug', 'title', 'description', 'author']);\n```\n\nNow let's join the `User` entity and select the author's name. To have a custom alias on the column, we will use `sql.ref()` helper:\n\n```ts title='modules/article/article.repository.ts'\nreturn this.createQueryBuilder('a')\n  .select(['slug', 'title', 'description', 'author'])\n  .addSelect(sql.ref('u.full_name').as('authorName'))\n  .join('author', 'u')\n```\n\nAnd now the sub-queries - we will need two of them, both will use the same `sql.ref()` helper (this time without aliasing) and the `QueryBuilder.as()` method to alias the whole sub-query.\n\n```ts title='modules/article/article.repository.ts'\nimport { FindOptions, sql, EntityRepository } from '@mikro-orm/sqlite';\nimport { type IArticle, ArticleSchema } from './article.entity.js';\nimport { type IArticleListing, ArticleListingSchema } from './article-listing.entity.js';\nimport { CommentSchema } from './comment.entity.js';\n\nexport class ArticleRepository extends EntityRepository<IArticle> {\n\n  // ...\n\n  listArticlesQuery() {\n    // sub-query for total number of comments\n    const totalComments = this.em.createQueryBuilder(CommentSchema)\n      .count()\n      .where({ article: sql.ref('a.id') })\n      // by calling `qb.as()` we alias the sub-query\n      .as('totalComments');\n\n    // sub-query for all used tags\n    const usedTags = this.em.createQueryBuilder(ArticleSchema, 'aa')\n      // we need to mark raw query fragment with `sql` helper\n      // otherwise it would be escaped\n      .select(sql`group_concat(distinct t.name)`)\n      .join('aa.tags', 't')\n      .where({ 'aa.id': sql.ref('a.id') })\n      .groupBy('aa.author')\n      .as('tags');"
+   },
+   {
+    "id": "mikro-orm:docs/docs/raw-queries.md#1",
+    "text": "## `raw()` helper\n\nWhen you want to use a raw SQL fragment as part of your query, you can use the `raw()` helper. It creates a raw SQL query fragment instance that can be assigned to a property or part of a filter. This fragment is represented by `RawQueryFragment` class instance that can be serialized to a string, so it can be used both as an object value and key. When serialized, the fragment key gets cached and only such a cached key will be recognized by the ORM. This adds runtime safety to the raw query fragments.\n\n> **`raw()` helper is required since v6 to use a raw SQL fragment in your query, both through EntityManager and QueryBuilder.**\n\n```ts\n// as a value\nawait em.find(User, { time: raw('now()') });\n\n// as a key\nawait em.find(User, { [raw('lower(name)')]: name.toLowerCase() });\n\n// with operators\nawait em.find(User, { [raw('lower(name)')]: { $like: name.toLowerCase() } });\n\n// value can be empty array to skip operator\nawait em.find(User, { [raw('(select 1 = 1)')]: [] });\n```\n\nThe `raw` helper supports several signatures, you can pass in a callback that receives the current property alias:\n\n```ts\nawait em.find(User, { [raw(alias => `lower(${alias}.name)`)]: name.toLowerCase() });\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/04-advanced.md#25",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/raw-queries.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/04-advanced.md#25",
+    "b": "mikro-orm:docs/docs/raw-queries.md#1",
+    "relation": "unrelated",
+    "related": 0.0216,
+    "probabilities": {
+     "same": 0.0067,
+     "overlapping": 0.0078,
+     "conflicting": 0.0072,
+     "unrelated": 0.9784
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 36
+  }
+ }
+}

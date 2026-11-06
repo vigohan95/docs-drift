@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/3c/3c0ce3cf23781305f503",
+ "request_hash": "3c0ce3cf23781305f50381416f4d6d22b3e01ad55e014cabdd9b1b1687d94cc5",
+ "recorded_at": "2026-11-06T14:49:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1395,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "118.458336",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=175,cfOrigin;dur=0,cfWorker;dur=309"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) Union type of: `'DELETE' | 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'OPTIONS'` (2) ### Routes options <a id=\"options\"></a> * `method`: currently it supports `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`, `PATCH`, `PUT`, `POST` and `QUERY`.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#73",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > addHttpMethod",
+    "text": "#### addHttpMethod\n<a id=\"addHttpMethod\"></a>\n\nFastify supports the `GET`, `HEAD`, `TRACE`, `DELETE`, `OPTIONS`,\n`PATCH`, `PUT`, `POST` and `QUERY` HTTP methods by default.\nThe `addHttpMethod` method allows to add any non standard HTTP\nmethods to the server that are [supported by Node.js](https://nodejs.org/api/http.html#httpmethods).\n\nThe method accepts an optional configuration object:\n\n| Property | Type | Default | Description |\n| -------- | ---- | ------- | ----------- |\n| `hasBody` | `boolean` | `false` | Whether the method accepts a request body. |\n| `overrideExisting` | `boolean` | `false` | Whether to explicitly override an existing method. |\n\n```js\n// Add a new HTTP method called 'MKCOL' that supports a request body\nfastify.addHttpMethod('MKCOL', { hasBody: true,  })\n\n// Add a new HTTP method called 'COPY' that does not support a request body\nfastify.addHttpMethod('COPY')\n```\n\nAfter calling `addHttpMethod`, it is possible to use the route shorthand\nmethods to define routes for the new HTTP method:\n\n```js\nfastify.addHttpMethod('MKCOL', { hasBody: true })\nfastify.mkcol('/', (req, reply) => {\n  // Handle the 'MKCOL' request\n})\n```\n\nCalling `addHttpMethod` for an existing method requires `overrideExisting: true`\nand overrides its body behavior.\n\n```js\nfastify.addHttpMethod('GET', {\n  hasBody: true,\n  overrideExisting: true\n})\n```\n\nOmitting `overrideExisting: true` when the method already exists throws\n`FST_ERR_ROUTE_METHOD_ALREADY_SUPPORTED`."
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser",
+    "text": "Note that for `GET` and `HEAD` requests, the payload is never parsed. For\n`OPTIONS` and `DELETE` requests, the payload is parsed only if a valid\n`content-type` header is provided. Unlike `POST`, `PUT`, and `PATCH`, the\n[catch-all](#catch-all) parser is not executed, and the payload is simply not\nparsed.\n\n> ⚠ Warning:\n> When using regular expressions to detect `Content-Type`, it is important to\n> ensure proper detection. For example, to match `application/*`, use\n> `/^application\\/([\\w-]+);?/` to match the\n> [essence MIME type](https://mimesniff.spec.whatwg.org/#mime-type-miscellaneous)\n> only.\n>\n> Additionally, if the route uses per-content-type body validation via\n> `schema.body.content`, the schema is selected by an **exact match** on the\n> essence MIME type, not by the parser's regex. A regex parser that accepts\n> content types with no matching key in the `content` schema map will result\n> in those requests **not being validated**. Ensure every content type matched\n> by the regex has a corresponding entry in the schema's `content` map. See\n> [Validation and Serialization](./Validation-and-Serialization.md) for details.\n\n> ℹ️ Note:\n> Fastify validates the request's `Content-Type` header before selecting a body\n> parser. String, `RegExp`, and [catch-all](#catch-all) parsers therefore will\n> never handle an invalid header. An `onRequest` hook can rewrite a malformed\n> header prior to validation:\n>\n> ```js\n> fastify.addHook('onRequest', async function rewriteContentType (request) {\n>   if (request.headers['content-type'] === 'application/json,application/json') {\n>     request.headers['content-type'] = 'application/json'\n>   }\n> })\n> ```\n>\n> Apply only unambiguous rewrites and reject other malformed values. An invalid\n> media type can select a different body parser or `schema.body.content`\n> validation schema. Rewrite the header before accessing `request.mediaType`,\n> which parses and caches the current value."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#4",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Validation",
+    "text": "### Validation\nRoute validation relies on [Ajv v8](https://www.npmjs.com/package/ajv), a\nhigh-performance JSON Schema validator. To validate input, add the required\nfields to the route schema.\n\nSupported validations include:\n- `body`: validates the request body for POST, PUT, or PATCH methods.\n- `querystring` or `query`: validates the query string.\n- `params`: validates the route parameters.\n- `headers`: validates the request headers.\n\nValidations can be a complete JSON Schema object with a `type` of `'object'` and\na `'properties'` object containing parameters, or a simpler variation listing\nparameters at the top level.\n\n> ℹ For using the latest Ajv (v8), refer to the\n> [`schemaController`](./Server.md#schema-controller) section."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#58",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Logger > fastify.LogLevel",
+    "text": "##### fastify.LogLevel\n\n[src](https://github.com/fastify/fastify/blob/main/types/logger.d.ts#L12)\n\nUnion type of: `'info' | 'error' | 'debug' | 'fatal' | 'warn' | 'trace'`\n\n---"
+   },
+   {
+    "id": "fastify:docs/Guides/Ecosystem.md#10",
+    "title": "docs/Guides/Ecosystem.md > Ecosystem > [Community](#community)",
+    "text": "  that adds support for KafkaJS - a modern Apache Kafka client library.\n- [`fastify-keycloak-adapter`](https://github.com/yubinTW/fastify-keycloak-adapter)\n  A keycloak adapter for a Fastify app.\n- [`fastify-kubernetes`](https://github.com/greguz/fastify-kubernetes) Fastify\n  Kubernetes client plugin.\n- [`fastify-kysely`](https://github.com/alenap93/fastify-kysely) Fastify\n  plugin for supporting Kysely type-safe query builder.\n- [`fastify-language-parser`](https://github.com/lependu/fastify-language-parser)\n  Fastify plugin to parse request language.\n- [`fastify-lcache`](https://github.com/denbon05/fastify-lcache)\n  Lightweight cache plugin\n- [`fastify-list-routes`](https://github.com/chuongtrh/fastify-list-routes)\n  A simple plugin for Fastify to list all available routes.\n- [`fastify-lm`](https://github.com/galiprandi/fastify-lm#readme)\n  Use OpenAI, Claude, Google, Deepseek, and others LMs with one Fastify plugin.\n- [`fastify-loader`](https://github.com/TheNoim/fastify-loader) Load routes from\n  a directory and inject the Fastify instance in each file.\n- [`fastify-log-controller`](https://github.com/Eomm/fastify-log-controller/)\n  changes the log level of your Fastify server at runtime.\n- [`fastify-lured`](https://github.com/lependu/fastify-lured) Plugin to load lua\n  scripts with [fastify-redis](https://github.com/fastify/fastify-redis) and\n  [lured](https://github.com/enobufs/lured).\n- [`fastify-mailer`](https://github.com/coopflow/fastify-mailer) Plugin to\n  initialize and encapsulate [Nodemailer](https://nodemailer.com)'s transporters\n  instances in Fastify.\n- [`fastify-markdown`](https://github.com/freezestudio/fastify-markdown) Plugin\n  to markdown support.\n- [`fastify-method-override`](https://github.com/corsicanec82/fastify-method-override)\n  Plugin for Fastify, which allows the use of HTTP verbs, such as DELETE, PATCH,\n  HEAD, PUT, OPTIONS in case the client doesn't support them.\n- [`fastify-metrics`](https://gitlab.com/m03geek/fastify-metrics) Plugin for\n  exporting [Prometheus](https://prometheus.io) metrics.\n- [`fastify-minify`](https://github.com/Jelenkee/fastify-minify) Plugin for\n  minification and transformation of responses.\n- [`fastify-mongodb-sanitizer`](https://github.com/KlemenKozelj/fastify-mongodb-sanitizer)\n  Fastify plugin that sanitizes client input to prevent\n  potential MongoDB query injection attacks.\n- [`fastify-mongoose-api`](https://github.com/jeka-kiselyov/fastify-mongoose-api)\n  Fastify plugin to create REST API methods based on Mongoose MongoDB models.\n- [`fastify-mongoose-driver`](https://github.com/alex-ppg/fastify-mongoose)\n  Fastify Mongoose plugin that connects to a MongoDB via the Mongoose plugin\n  with support for Models.\n- [`fastify-mosquitto-dynsec`](https://github.com/LuizTakeda/fastify-mosquitto-dynsec)\n  Fastify plugin to manage Mosquitto Dynamic Security over MQTT.\n- [`fastify-mqtt`](https://github.com/love-lena/fastify-mqtt) Plugin to share\n  [mqtt](https://www.npmjs.com/package/mqtt) client across Fastify.\n- [`fastify-msgpack`](https://github.com/kenriortega/fastify-msgpack) Fastify\n  and MessagePack, together at last. Uses @msgpack/msgpack by default.\n- [`fastify-msgraph-webhook`](https://github.com/flower-of-the-bridges/fastify-msgraph-change-notifications-webhook)\n  to manage\n  [MS Graph Change Notifications webhooks](https://learn.microsoft.com/it-it/graph/change-notifications-delivery-webhooks?tabs=http).\n- [`fastify-multer`](https://github.com/fox1t/fastify-multer) Multer is a plugin\n  for handling multipart/form-data, which is primarily used for uploading files."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "title": "docs/Guides/Migration-Guide-V4.md > V4 Migration Guide > Breaking Changes > `exposeHeadRoutes` true by default",
+    "text": "### `exposeHeadRoutes` true by default\n\nStarting with v4, every `GET` route will create a sibling `HEAD` route.\nYou can revert this behavior by setting `exposeHeadRoutes: false` in the server\noptions."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#92",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > addConstraintStrategy",
+    "text": "#### addConstraintStrategy\n<a id=\"addConstraintStrategy\"></a>\n\nFunction to add a custom constraint strategy. To register a new type of\nconstraint, you must add a new constraint strategy that knows how to match\nvalues to handlers, and that knows how to get the constraint value from a\nrequest.\n\nAdd a custom constraint strategy using the `fastify.addConstraintStrategy`\nmethod:\n\n```js\nconst customResponseTypeStrategy = {\n  // strategy name for referencing in the route handler `constraints` options\n  name: 'accept',\n  // storage factory for storing routes in the find-my-way route tree\n  storage: function () {\n    let handlers = {}\n    return {\n      get: (type) => { return handlers[type] || null },\n      set: (type, store) => { handlers[type] = store }\n    }\n  },\n  // function to get the value of the constraint from each incoming request\n  deriveConstraint: (req, ctx) => {\n    return req.headers['accept']\n  },\n  // optional flag marking if handlers without constraints can match requests that have a value for this constraint\n  mustMatchWhenDerived: true\n}\n\nconst router = Fastify();\nrouter.addConstraintStrategy(customResponseTypeStrategy);\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#12",
+    "title": "docs/Guides/Serverless.md > Google Cloud Functions > Define your endpoint (examples)",
+    "text": "### Define your endpoint (examples)\n\nA simple `GET` endpoint:\n```js\nfastify.get('/', async (request, reply) => {\n  reply.send({message: 'Hello World!'})\n})\n```\n\nOr a more complete `POST` endpoint with schema validation:\n```js\nfastify.route({\n  method: 'POST',\n  url: '/hello',\n  schema: {\n    body: {\n      type: 'object',\n      properties: {\n        name: { type: 'string'}\n      },\n      required: ['name']\n    },\n    response: {\n      200: {\n        type: 'object',\n        properties: {\n          message: {type: 'string'}\n        }\n      }\n    },\n  },\n  handler: async (request, reply) => {\n    const { name } = request.body;\n    reply.code(200).send({\n      message: `Hello ${name}!`\n    })\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#25",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > New Features > Diagnostic Channel support",
+    "text": "### Diagnostic Channel support\n\nFastify v5 now supports the [Diagnostics Channel](https://nodejs.org/api/diagnostics_channel.html)\nAPI natively\nand provides a way to trace the lifecycle of a request.\n\n```js\n'use strict'\n\nconst diagnostics = require('node:diagnostics_channel')\nconst Fastify = require('fastify')\n\ndiagnostics.subscribe('tracing:fastify.request.handler:start', (msg) => {\n  console.log(msg.route.url) // '/:id'\n  console.log(msg.route.method) // 'GET'\n})\n\ndiagnostics.subscribe('tracing:fastify.request.handler:end', (msg) => {\n  // msg is the same as the one emitted by the 'tracing:fastify.request.handler:start' channel\n  console.log(msg)\n})\n\ndiagnostics.subscribe('tracing:fastify.request.handler:error', (msg) => {\n  // in case of error\n})\n\nconst fastify = Fastify()\nfastify.route({\n  method: 'GET',\n  url: '/:id',\n  handler: function (req, reply) {\n    return { hello: 'world' }\n  }\n})\n\nfastify.listen({ port: 0 }, async function () {\n  const result = await fetch(fastify.listeningOrigin + '/7')\n\n  t.assert.ok(result.ok)\n  t.assert.strictEqual(response.status, 200)\n  t.assert.deepStrictEqual(await result.json(), { hello: 'world' })\n})\n```\n\nSee the [documentation](https://github.com/fastify/fastify/blob/main/docs/Reference/Hooks.md#diagnostics-channel-hooks)\nand [#5252](https://github.com/fastify/fastify/pull/5252) for additional details."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#94",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > printRoutes",
+    "text": "#### printRoutes\n<a id=\"print-routes\"></a>\n\n`fastify.printRoutes()`: Fastify router builds a tree of routes for each HTTP\nmethod. If you call the prettyPrint without specifying an HTTP method, it will\nmerge all the trees into one and print it. The merged tree doesn't represent the\ninternal router structure. **Do not use it for debugging.**\n\n*Remember to call it inside or after a `ready` call.*\n\n```js\nfastify.get('/test', () => {})\nfastify.get('/test/hello', () => {})\nfastify.get('/testing', () => {})\nfastify.get('/testing/:param', () => {})\nfastify.put('/update', () => {})\n\nfastify.ready(() => {\n  console.log(fastify.printRoutes())\n  // └── /\n  //     ├── test (GET)\n  //     │   ├── /hello (GET)\n  //     │   └── ing (GET)\n  //     │       └── /\n  //     │           └── :param (GET)\n  //     └── update (PUT)\n})\n```\n\nIf you want to print the internal router tree, you should specify the `method`\nparam. Printed tree will represent the internal router structure.\n**You can use it for debugging.**\n\n```js\n  console.log(fastify.printRoutes({ method: 'GET' }))\n  // └── /\n  //     └── test (GET)\n  //         ├── /hello (GET)\n  //         └── ing (GET)\n  //             └── /\n  //                 └── :param (GET)\n\n  console.log(fastify.printRoutes({ method: 'PUT' }))\n  // └── /\n  //     └── update (PUT)\n```\n\n`fastify.printRoutes({ commonPrefix: false })` will print compressed trees. This\nmay be useful when you have a large number of routes with common prefixes.\nIt doesn't represent the internal router structure. **Do not use it for debugging.**"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#41",
+    "title": "docs/Guides/Serverless.md > Vercel",
+    "text": "## Vercel\n\n[Vercel](https://vercel.com) fully supports deploying Fastify applications.\nAdditionally, with Vercel's\n[Fluid compute](https://vercel.com/docs/fluid-compute), you can combine\nserver-like concurrency with the autoscaling properties of traditional\nserverless functions.\n\nGet started with the\n[Fastify template on Vercel](\nhttps://vercel.com/templates/backend/fastify-on-vercel).\n\n[Fluid compute](https://vercel.com/docs/fluid-compute) currently\nrequires an explicit opt-in. Learn more about enabling Fluid compute\n[here](\nhttps://vercel.com/docs/fluid-compute#enabling-fluid-compute)."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#95",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > printRoutes",
+    "text": "```js\n  console.log(fastify.printRoutes({ commonPrefix: false }))\n  // ├── /test (GET)\n  // │   ├── /hello (GET)\n  // │   └── ing (GET)\n  // │       └── /:param (GET)\n  // └── /update (PUT)\n```\n\n`fastify.printRoutes({ includeMeta: (true | []) })` will display properties from\nthe `route.store` object for each displayed route. This can be an `array` of\nkeys (e.g. `['onRequest', Symbol('key')]`), or `true` to display all properties.\nA shorthand option, `fastify.printRoutes({ includeHooks: true })` will include\nall [hooks](./Hooks.md).\n\n```js\n  fastify.get('/test', () => {})\n  fastify.get('/test/hello', () => {})\n\n  const onTimeout = () => {}\n\n  fastify.addHook('onRequest', () => {})\n  fastify.addHook('onTimeout', onTimeout)\n\n  console.log(fastify.printRoutes({ includeHooks: true, includeMeta: ['errorHandler'] }))\n  // └── /\n  //     └── test (GET)\n  //         • (onTimeout) [\"onTimeout()\"]\n  //         • (onRequest) [\"anonymous()\"]\n  //         • (errorHandler) \"defaultErrorHandler()\"\n  //         test (HEAD)\n  //         • (onTimeout) [\"onTimeout()\"]\n  //         • (onRequest) [\"anonymous()\"]\n  //         • (onSend) [\"headRouteOnSendHandler()\"]\n  //         • (errorHandler) \"defaultErrorHandler()\"\n  //         └── /hello (GET)\n  //             • (onTimeout) [\"onTimeout()\"]\n  //             • (onRequest) [\"anonymous()\"]\n  //             • (errorHandler) \"defaultErrorHandler()\"\n  //             /hello (HEAD)\n  //             • (onTimeout) [\"onTimeout()\"]\n  //             • (onRequest) [\"anonymous()\"]\n  //             • (onSend) [\"headRouteOnSendHandler()\"]\n  //             • (errorHandler) \"defaultErrorHandler()\"\n\n  console.log(fastify.printRoutes({ includeHooks: true }))\n  // └── /\n  //     └── test (GET)\n  //         • (onTimeout) [\"onTimeout()\"]\n  //         • (onRequest) [\"anonymous()\"]\n  //         test (HEAD)\n  //         • (onTimeout) [\"onTimeout()\"]\n  //         • (onRequest) [\"anonymous()\"]\n  //         • (onSend) [\"headRouteOnSendHandler()\"]\n  //         └── /hello (GET)\n  //             • (onTimeout) [\"onTimeout()\"]\n  //             • (onRequest) [\"anonymous()\"]\n  //             /hello (HEAD)\n  //             • (onTimeout) [\"onTimeout()\"]\n  //             • (onRequest) [\"anonymous()\"]\n  //             • (onSend) [\"headRouteOnSendHandler()\"]\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Server.md#73",
+    "action": "use",
+    "relevance_score": 0.9751,
+    "document_score": 0.9813,
+    "levels": {
+     "answers": 0.9751,
+     "elsewhere": 0.0062,
+     "different_case": 0.0108,
+     "unrelated": 0.0079
+    }
+   },
+   {
+    "index": 11,
+    "id": "fastify:docs/Reference/Server.md#95",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0055,
+    "document_score": 0.0155,
+    "levels": {
+     "answers": 0.0055,
+     "elsewhere": 0.01,
+     "different_case": 0.0256,
+     "unrelated": 0.9589
+    }
+   },
+   {
+    "index": 7,
+    "id": "fastify:docs/Guides/Serverless.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0081,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0048,
+     "different_case": 0.0083,
+     "unrelated": 0.9836
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.013,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.01,
+     "different_case": 0.0091,
+     "unrelated": 0.9779
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Guides/Ecosystem.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0065,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0038,
+     "different_case": 0.0103,
+     "unrelated": 0.9832
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0066,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0041,
+     "different_case": 0.0112,
+     "unrelated": 0.9822
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Guides/Migration-Guide-V4.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.008,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0062,
+     "different_case": 0.01,
+     "unrelated": 0.982
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/TypeScript.md#58",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0018,
+    "document_score": 0.0041,
+    "levels": {
+     "answers": 0.0018,
+     "elsewhere": 0.0023,
+     "different_case": 0.0062,
+     "unrelated": 0.9898
+    }
+   },
+   {
+    "index": 9,
+    "id": "fastify:docs/Reference/Server.md#94",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0035,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.002,
+     "different_case": 0.0043,
+     "unrelated": 0.9922
+    }
+   },
+   {
+    "index": 10,
+    "id": "fastify:docs/Guides/Serverless.md#41",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0014,
+    "document_score": 0.003,
+    "levels": {
+     "answers": 0.0014,
+     "elsewhere": 0.0016,
+     "different_case": 0.003,
+     "unrelated": 0.994
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Server.md#92",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0026,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0013,
+     "different_case": 0.003,
+     "unrelated": 0.9944
+    }
+   },
+   {
+    "index": 8,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0013,
+    "document_score": 0.0028,
+    "levels": {
+     "answers": 0.0013,
+     "elsewhere": 0.0014,
+     "different_case": 0.0031,
+     "unrelated": 0.9941
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 6543
+  },
+  "timing": {
+   "total_ms": 122,
+   "rerank_ms": 122,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 7203,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 192
+   }
+  }
+ }
+}

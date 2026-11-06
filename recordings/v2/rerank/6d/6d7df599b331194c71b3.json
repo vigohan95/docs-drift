@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/6d/6d7df599b331194c71b3",
+ "request_hash": "6d7df599b331194c71b3dd054a9bfae1d38bab0c810f930202cad2ca3b6aa3fa",
+ "recorded_at": "2026-11-06T14:51:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2246,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "117.875587",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=173,cfOrigin;dur=0,cfWorker;dur=307"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) By default, uses the runtime value. (2) By default, converts to the database value. - `getColumnType(prop: EntityProperty, platform: Platform): string` Gets the SQL declaration snippet for a field of this type. More information can be found in [Custom Types](./custom-types.md) section.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/custom-types.md#1",
+    "title": "docs/docs/custom-types.md > (preamble)",
+    "text": "- `getColumnType(prop: EntityProperty, platform: Platform): string`\n\n  Gets the SQL declaration snippet for a field of this type. By default, returns `columnType` of given property.\n\n- `convertToDatabaseValueSQL(key: string, platform: Platform): string`\n\n  Wraps the parameter placeholder in an SQL expression. Use this when the database needs to transform the value via an SQL function before storing.\n\n- `convertToJSValueSQL(key: string, platform: Platform): string`\n\n  Wraps the column identifier in an SQL expression during SELECT. Use this when the database needs to transform the stored value via an SQL function before returning it.\n\n- `compareAsType(): string`\n\n  How should the raw database values be compared? Used in `EntityComparator`. Possible values: `string` | `number` | `boolean` | `date` | `any` | `buffer` | `array`.\n\n- `ensureComparable(): boolean`\n\n  When a value is hydrated, we convert it back to the database value to ensure comparability, as often the raw database response is not the same as the `convertToDatabaseValue` result. This allows to disable the additional conversion in case you know it is not needed.\n\n- `compareValues(a, b): boolean`\n\n  Allows to override the internal comparison logic. Works with the database values (results of `convertToDatabaseValue` method). This can be helpful when the database value is not stable."
+   },
+   {
+    "id": "mikro-orm:docs/docs/custom-types.md#6",
+    "title": "docs/docs/custom-types.md > Normalizing string properties > Handling null and undefined",
+    "text": "### Handling null and undefined\n\n**Important:** The ORM handles `null` values from the database automatically - they will **not** be passed to your custom type's `convertToJSValue` method. However, `null` or `undefined` values **can** be passed to `convertToDatabaseValue` when using `em.create()` or when setting property values directly.\n\nTherefore, your `convertToDatabaseValue` implementation should handle `null`/`undefined`:\n\n```ts\nconvertToDatabaseValue(value: MyType | null | undefined): string | null {\n  if (value == null) {\n    return null;\n  }\n  // ... convert the value\n}\n```\n\n```ts\nimport { Type, Platform, EntityProperty, ValidationError } from '@mikro-orm/core';\n\n/**\n * A custom type that maps SQL date column to JS Date objects.\n * Note that the built-in ORM DateType maps to string instead of Date.\n *\n * This example only uses runtime conversion (convertToDatabaseValue/convertToJSValue)\n * because the database can directly store and return date strings - no SQL functions needed.\n */\nexport class MyDateType extends Type<Date, string> {\n\n  convertToDatabaseValue(value: Date | string | null | undefined, platform: Platform): string | null {\n    // Handle null/undefined - these can come from em.create() or direct assignment\n    if (value == null) {\n      return null;\n    }\n\n    if (value instanceof Date) {\n      return value.toISOString().substr(0, 10);\n    }\n\n    if (value.toString().match(/^\\d{4}-\\d{2}-\\d{2}$/)) {\n      return value;\n    }\n\n    throw ValidationError.invalidType(MyDateType, value, 'JS');\n  }\n\n  // Note: null values from the database are handled by the ORM and won't reach this method\n  convertToJSValue(value: string, platform: Platform): Date {\n    const date = new Date(value);\n\n    if (date.toString() === 'Invalid Date') {\n      throw ValidationError.invalidType(MyDateType, value, 'database');\n    }\n\n    return date;\n  }\n\n  getColumnType(prop: EntityProperty, platform: Platform) {\n    return `date(${prop.length})`;\n  }\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-generator.md#16",
+    "title": "docs/docs/entity-generator.md > Processing of generated metadata > Example: Defining custom types for scalar properties",
+    "text": "### Example: Defining custom types for scalar properties\n\nThe entity generator will try to look for type names (the value of the \"type\" property in the previous example) by string first, via the platform's `getMappedType()` method. If the type is found, the output is that string. If the result of this call is MikroORM's `UnknownType`, the identifier is assumed to be the name of a class extending MikroORM's `Type` class, and gets imported. See [Custom Types](./custom-types.md) for more details on defining such a class. Note that only a reference to the identifier is used (no \"new\" added), meaning you are always using a \"stateless\" type implementation.\n\nSo, you may register your custom types at the config (see [\"Adjusting default type mapping\" in \"Configuration\"](./configuration.md#adjusting-default-type-mapping)), in which case, you should define the same type override in both your entity generation script and your runtime configuration. Or you may not do that, and instead use the class names as type identifiers, in which case, you need to ensure the types are importable by the entity files. To achieve this, you may override the `fileName`, to conditionally adjust the path to where the type is, relative to your output folder. Or alternatively, you may place the type classes inside your output folder."
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-generator.md#17",
+    "title": "docs/docs/entity-generator.md > Processing of generated metadata > Example: Defining custom types for scalar properties",
+    "text": "You may also change the `runtimeType` option of properties. If necessary, this type will be wrapped up in `IType` (see [\"Mapping to objects and type-safety\" in \"Custom types\"](./custom-types.md#mapping-to-objects-and-type-safety)) where the runtime type is taken from the property's `runtimeType` option, and the raw type is taken from the `runtimeType` of the first `customTypes`, or if that's not defined, the `type`'s `runtimeType`, or, in the case of unregistered types, from the `runtimeType` of the type inferred from the first value in `columnTypes`. Тhe serialized type will be taken from the `runtimeType` property of the `customType` option, or fallback to whatever was inferred for the raw type, and if necessary, that type will be included in the `IType` wrapper as well. If all of these types are the same, the `IType` wrapper will not be added around `runtimeType`.\n\nYou may also override the nullability of the `IType` pieces by filling in the `prop` of the respective mapped type with an object that has `nullable` set to the desired value. This means using new `Type` instances in `customTypes` and/or `customType`, rather than the results from the platform's `getMappedType()` method or the `Type.getType()` method.\n\nIf you modify the `runtimeType` of a primary key column, and also reference that same relation with `mapToPk` at the reference, then at the reference, you may need to add the `customTypes` array with overrides for each primary key column, in their declaration order. That way, the types between the referenced column and the reference will match."
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#7",
+    "title": "docs/docs/decorators.md > Entity Properties > @Property()",
+    "text": "### @Property()\n\n`@Property()` decorator is used to define regular entity property. All following decorators extend the `@Property()` decorator, so you can also use its parameters there.\n\n| Parameter          | Type                                              | Optional | Description                                                                                                                                                                                                                                                                                                                                                     |\n|--------------------|---------------------------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| `fieldName`        | `string`                                          | yes      | Override default property name (see [Naming Strategy](./naming-strategy.md)).                                                                                                                                                                                                                                                                                   |\n| `type`             | `string` &#124; `Constructor<Type>` &#124; `Type` | yes      | Explicitly specify the property type. This value is mapped based on the current driver (see [Metadata Providers](./metadata-providers.md) and [Custom Types](./custom-types.md)).                                                                                                                                                                               |\n| `runtimeType`      | `string`                                          | yes      | Runtime type of the property. This is the JS type that your property is mapped to, e.g. `string` or `number`, and is normally inferred automatically via `reflect-metadata`. In some cases, the inference won't work, and you might need to specify the `runtimeType` explicitly - the most common one is when you use a union type with null like `foo: number \\| null`.                                                                                                |\n| `returning`        | `boolean`                                         | yes      | Whether this property should be part of the `returning` clause of inserts, updates and upserts, reloading the database value into the entity. Works only in PostgreSQL, SQLite, MS SQL Server and Oracle drivers; MySQL and MariaDB do not reload the value.                                                                                                                                                                                 |\n| `onUpdate`         | `() => any`                                       | yes      | Automatically update the property value every time entity gets updated.                                                                                                                                                                                                                                                                                         |\n| `persist`          | `boolean`                                         | yes      | Set to `false` to define [Shadow Property](serializing.md#shadow-properties).                                                                                                                                                                                                                                                                                   |"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#13",
+    "title": "docs/docs/upgrading-v3-to-v4.md > Custom type serialization",
+    "text": "## Custom type serialization\n\nCustom types used to be serialized to the database value. In v4, the runtime value is used by default. Implement custom `toJSON()` method if you need to customize this."
+   },
+   {
+    "id": "mikro-orm:docs/docs/custom-types.md#12",
+    "title": "docs/docs/custom-types.md > Advanced example - PointType and WKT",
+    "text": "Then the mapping type:\n\n```ts\nexport class PointType extends Type<Point | undefined, string | undefined> {\n\n  // Runtime: Convert Point object to WKT string\n  // This string will be bound to the SQL parameter\n  convertToDatabaseValue(value: Point | null | undefined): string | null {\n    if (value == null) {\n      return null;\n    }\n\n    return `point(${value.latitude} ${value.longitude})`;\n  }\n\n  // Runtime: Convert WKT string (returned by ST_AsText) to Point object\n  convertToJSValue(value: string | undefined): Point | undefined {\n    const m = value?.match(/point\\((-?\\d+(\\.\\d+)?) (-?\\d+(\\.\\d+)?)\\)/i);\n\n    if (!m) {\n      return undefined;\n    }\n\n    return new Point(+m[1], +m[3]);\n  }\n\n  // SQL: Wrap the column with ST_AsText() in SELECT queries\n  // This converts MySQL's internal binary format to WKT string\n  convertToJSValueSQL(key: string) {\n    return `ST_AsText(${key})`;\n  }\n\n  // SQL: Wrap the parameter placeholder with ST_PointFromText() in INSERT/UPDATE\n  // This converts the WKT string to MySQL's internal binary format\n  convertToDatabaseValueSQL(key: string) {\n    return `ST_PointFromText(${key})`;\n  }\n\n  getColumnType(): string {\n    return 'point';\n  }\n\n}\n```\n\nNow let's define an entity:\n\n```ts\n@Entity()\nexport class Location {\n\n  @PrimaryKey()\n  id!: number;\n\n  @Property({ type: PointType })\n  point?: Point;\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/quick-start.md#7",
+    "title": "docs/docs/quick-start.md > Entity definition",
+    "text": "  </TabItem>\n  <TabItem value=\"decorators\">\n\nDecorators require additional setup - see the [Using Decorators guide](./using-decorators.md) for configuration details:\n\n```ts title=\"./entities/Book.ts\"\nimport { Collection } from '@mikro-orm/core';\nimport { Entity, PrimaryKey, Property, ManyToOne, ManyToMany } from '@mikro-orm/decorators/legacy';\n\n@Entity()\nexport class Book {\n\n  @PrimaryKey()\n  id!: bigint;\n\n  @Property()\n  title!: string;\n\n  @ManyToOne(() => Author)\n  author!: Author;\n\n  @ManyToMany(() => BookTag)\n  tags = new Collection<BookTag>(this);\n\n}\n```\n\n  </TabItem>\n</Tabs>\n\nFor UUID primary keys, use `p.uuid()` with `defineEntity`, `@PrimaryKey({ type: 'uuid' })` with decorators, or `{ type: 'uuid', primary: true }` with `EntitySchema`.\n\nMore information can be found in the [Defining Entities section](./defining-entities.md) in docs."
+   },
+   {
+    "id": "mikro-orm:docs/docs/configuration.md#15",
+    "title": "docs/docs/configuration.md > Naming Strategy",
+    "text": "## Naming Strategy\n\nWhen mapping your entities to database tables and columns, their names will be defined by naming strategy. There are 3 basic naming strategies you can choose from:\n\n- `UnderscoreNamingStrategy` - default of all SQL drivers\n- `MongoNamingStrategy` - default of `MongoDriver`\n- `EntityCaseNamingStrategy` - uses unchanged entity and property names\n\n> You can also define your own custom `NamingStrategy` implementation.\n\n```ts\nMikroORM.init({\n  namingStrategy: EntityCaseNamingStrategy,\n});\n```\n\nRead more about this in [Naming Strategy](./naming-strategy.md) section."
+   },
+   {
+    "id": "mikro-orm:docs/docs/populating-relations.md#4",
+    "title": "docs/docs/populating-relations.md > Loading strategies",
+    "text": "## Loading strategies\n\nThe way that MikroORM fetches the data based on populate hint is also configurable. By default, MikroORM uses a \"select in\" strategy which runs one separate query for each level of a populate. If you're using an SQL database you can also ask MikroORM to use a join for all tables involved in the populate and run it as a single query. This is again configurable globally or per query.\n\nYou can also use `populateHints` to override the strategy or join type for individual relations:\n\n```ts\nconst tags = await em.find(BookTag, {}, {\n  populate: ['books.author'],\n  strategy: 'joined',\n  populateHints: {\n    'books.author': { strategy: 'select-in' },\n  },\n});\n```\n\nYou can also use `populateHints` to limit the number of items loaded per parent:\n\n```ts\nconst users = await em.find(User, {}, {\n  populate: ['posts'],\n  populateHints: {\n    posts: { limit: 5, orderBy: { createdAt: 'desc' } },\n  },\n});\n```\n\nFor more information see the [Loading Strategies section](./loading-strategies.md#per-parent-limiting)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-transpilers.md#0",
+    "title": "docs/docs/usage-with-transpilers.md > Babel",
+    "text": "## Babel\n\nWhen compiling TS via babel, decorators are by default handled different implementation than what `tsc` uses. To make the metadata extraction from decorators via Babel work, you need to use the following plugins:\n\n```json\n{\n  \"plugins\": [\n    \"babel-plugin-transform-typescript-metadata\",\n    [\"@babel/plugin-proposal-decorators\", { \"legacy\": true }],\n    [\"@babel/plugin-proposal-class-properties\", { \"loose\": true  }]\n  ]\n}\n```\n\n> Make sure to install the plugins first: `yarn add -D babel-plugin-transform-typescript-metadata @babel/plugin-proposal-decorators @babel/plugin-proposal-class-properties`\n\nLastly you need to set the `BABEL_DECORATORS_COMPAT` environment variable to `true` to adjust the return value of decorators.\n\nMore information about this topic can be found here:\n\n- https://github.com/mikro-orm/mikro-orm/issues/840\n- https://jonahallibonetech.medium.com/next-js-9-mikroorm-eb6f6e08e1a1"
+   },
+   {
+    "id": "mikro-orm:docs/docs/custom-types.md#4",
+    "title": "docs/docs/custom-types.md > Understanding the conversion methods > When to use which",
+    "text": "### When to use which\n\n| Scenario                                                    | Method to use                                                     |\n|-------------------------------------------------------------|-------------------------------------------------------------------|\n| Simple value transformation (e.g., Date ↔ string)           | `convertToDatabaseValue` / `convertToJSValue` only                |\n| Database stores in a special format requiring SQL functions | Both runtime AND SQL methods                                      |\n| Value needs database-specific encoding/decoding             | SQL methods (`convertToDatabaseValueSQL` / `convertToJSValueSQL`) |\n\nFor most custom types, you only need the runtime conversion methods. The SQL-level methods are needed when:\n\n- The database stores values in a binary or internal format that requires SQL functions to convert (e.g., PostGIS geometry, MySQL spatial types)\n- You want to leverage database-specific functions for encoding/decoding"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 5,
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#13",
+    "action": "use",
+    "relevance_score": 0.9941,
+    "document_score": 0.9957,
+    "levels": {
+     "answers": 0.9941,
+     "elsewhere": 0.0016,
+     "different_case": 0.0021,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 6,
+    "id": "mikro-orm:docs/docs/custom-types.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0491,
+    "document_score": 0.0981,
+    "levels": {
+     "answers": 0.0491,
+     "elsewhere": 0.0491,
+     "different_case": 0.0491,
+     "unrelated": 0.8528
+    }
+   },
+   {
+    "index": 0,
+    "id": "mikro-orm:docs/docs/custom-types.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0285,
+    "document_score": 0.1376,
+    "levels": {
+     "answers": 0.0285,
+     "elsewhere": 0.1091,
+     "different_case": 0.0516,
+     "unrelated": 0.8108
+    }
+   },
+   {
+    "index": 1,
+    "id": "mikro-orm:docs/docs/custom-types.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0161,
+    "document_score": 0.0597,
+    "levels": {
+     "answers": 0.0161,
+     "elsewhere": 0.0436,
+     "different_case": 0.0362,
+     "unrelated": 0.9041
+    }
+   },
+   {
+    "index": 3,
+    "id": "mikro-orm:docs/docs/entity-generator.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.015,
+    "document_score": 0.0371,
+    "levels": {
+     "answers": 0.015,
+     "elsewhere": 0.0221,
+     "different_case": 0.0235,
+     "unrelated": 0.9394
+    }
+   },
+   {
+    "index": 11,
+    "id": "mikro-orm:docs/docs/custom-types.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0105,
+    "document_score": 0.0842,
+    "levels": {
+     "answers": 0.0105,
+     "elsewhere": 0.0738,
+     "different_case": 0.0327,
+     "unrelated": 0.8831
+    }
+   },
+   {
+    "index": 4,
+    "id": "mikro-orm:docs/docs/decorators.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0068,
+    "document_score": 0.0341,
+    "levels": {
+     "answers": 0.0068,
+     "elsewhere": 0.0273,
+     "different_case": 0.0206,
+     "unrelated": 0.9454
+    }
+   },
+   {
+    "index": 2,
+    "id": "mikro-orm:docs/docs/entity-generator.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0174,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0139,
+     "different_case": 0.0115,
+     "unrelated": 0.971
+    }
+   },
+   {
+    "index": 7,
+    "id": "mikro-orm:docs/docs/quick-start.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0089,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0066,
+     "different_case": 0.0093,
+     "unrelated": 0.9818
+    }
+   },
+   {
+    "index": 8,
+    "id": "mikro-orm:docs/docs/configuration.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0051,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0029,
+     "different_case": 0.0069,
+     "unrelated": 0.988
+    }
+   },
+   {
+    "index": 9,
+    "id": "mikro-orm:docs/docs/populating-relations.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.004,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0021,
+     "different_case": 0.0045,
+     "unrelated": 0.9915
+    }
+   },
+   {
+    "index": 10,
+    "id": "mikro-orm:docs/docs/usage-with-transpilers.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0016,
+    "document_score": 0.0032,
+    "levels": {
+     "answers": 0.0016,
+     "elsewhere": 0.0016,
+     "different_case": 0.0047,
+     "unrelated": 0.9921
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5332
+  },
+  "timing": {
+   "total_ms": 122,
+   "rerank_ms": 121,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6184,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 176
+   }
+  }
+ }
+}

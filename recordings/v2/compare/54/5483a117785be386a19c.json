@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/54/5483a117785be386a19c",
+ "request_hash": "5483a117785be386a19c67c6350fa1646f7758c141b1e080cffdd575d8f97ba3",
+ "recorded_at": "2026-11-06T14:52:05Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1295,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "192.857313",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=32,cfOrigin;dur=0,cfWorker;dur=353"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "text": "#### Infinite Query endpoint definition\n\nInfinite query endpoints (defined with `build.infiniteQuery()`) are used to cache multi-page data sets from the server. They have all the same callbacks and options as standard query endpoints, but also require an additional [`infiniteQueryOptions`](#infinitequeryoptions) field to specify how to calculate the unique parameters to fetch each page.\n\nFor infinite query endpoints, there is a separation between the \"query arg\" used for the cache key, and the \"page param\" used to fetch a specific page. For example, a Pokemon API endpoint might have a string query arg like `\"fire\"` , but use a page number as the param to determine which page to fetch out of the results. The `query` and `queryFn` methods will receive a combined `{queryArg, pageParam}` object as the argument, rather than just the `queryArg` by itself.\n\n```ts title=\"Infinite Query endpoint definition\" no-transpile\nexport type PageParamFunction<DataType, PageParam, QueryArg> = (\n  firstPage: DataType,\n  allPages: Array<DataType>,\n  firstPageParam: PageParam,\n  allPageParams: Array<PageParam>,\n  queryArg: QueryArg,\n) => PageParam | undefined | null\n\ntype InfiniteQueryCombinedArg<QueryArg, PageParam> = {\n  queryArg: QueryArg\n  pageParam: PageParam\n}\n\nexport type InfiniteQueryDefinition<\n  QueryArg,\n  PageParam,\n  BaseQuery extends BaseQueryFn,\n  TagTypes extends string,\n  ResultType,\n  ReducerPath extends string = string,\n> =\n  // Infinite queries have all the same options as query endpoints,\n  // but store the `{pages, pageParams}` structure, and receive an object\n  // with both `{queryArg, pageParam}` as the arg for `query` and `queryFn`.\n  QueryDefinition<\n    InfiniteQueryCombinedArg<QueryArg, PageParam>,\n    BaseQuery,\n    TagTypes,\n    InfiniteData<ResultType>\n  > & {\n    /**\n     * Required options to configure the infinite query behavior.\n     * `initialPageParam` and `getNextPageParam` are required, to\n     * ensure the infinite query can properly fetch the next page of data.\n     * `initialPageParam` may be specified when using the\n     * endpoint, to override the default value.\n     */\n    infiniteQueryOptions: {\n      /**\n       * The initial page parameter to use for the first page fetch.\n       */\n      initialPageParam: PageParam\n      /**\n       * This function is required to automatically get the next cursor for infinite queries.\n       * The result will also be used to determine the value of `hasNextPage`.\n       */\n      getNextPageParam: PageParamFunction<DataType, PageParam, QueryArg>\n      /**\n       * This function can be set to automatically get the previous cursor for infinite queries.\n       * The result will also be used to determine the value of `hasPreviousPage`.\n       */\n      getPreviousPageParam?: PageParamFunction<DataType, PageParam, QueryArg>\n      /**\n       * If specified, only keep this many pages in cache at once.\n       * If additional pages are fetched, older pages in the other\n       * direction will be dropped from the cache.\n       */\n      maxPages?: number\n      /**\n       * Defaults to `true`. When this is `true` and an infinite query endpoint is refetched\n       * (due to tag invalidation, polling, arg change configuration, or manual refetching),\n       * RTK Query will try to sequentially refetch all pages currently in the cache.\n       * When `false` only the first page will be refetched.\n       */\n      refetchCachedPages?: boolean\n    }\n  }\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "text": "## Defining Infinite Query Endpoints\n\nInfinite query endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.infiniteQuery()` method. They are an extension of standard query endpoints - you can specify [the same options as standard queries](./queries.mdx#defining-query-endpoints) (providing either `query` or `queryFn`, customizing with `transformResponse`, lifecycles with `onCacheEntryAdded` and `onQueryStarted`, defining tags, etc). However, they also require an additional `infiniteQueryOptions` field to specify the infinite query behavior.\n\nWith TypeScript, you must supply 3 generic arguments: `build.infiniteQuery<ResultType, QueryArg, PageParam>`, where `ResultType` is the contents of a single page, `QueryArg` is the type passed in as the cache key, and `PageParam` is the value used to request a specific page. If there is no argument, use `void` for the arg type instead."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "duplicates": [],
+    "overlaps": [
+     "redux-toolkit:docs/rtk-query/api/createApi.mdx#10"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+    "b": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0036,
+     "overlapping": 0.9923,
+     "conflicting": 0.0025,
+     "unrelated": 0.0015
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0197,
+       "restated": 0.8264,
+       "elaborated": 0.0622,
+       "different": 0.0918
+      },
+      "confidence": 0.9082,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "Infinite query endpoints (defined with `build.infiniteQuery()`) are used to cache multi-page data sets from the server.",
+       "start": 41,
+       "end": 160,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+       "quote": "## Defining Infinite Query Endpoints\n\nInfinite query endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.infiniteQuery()` method.",
+       "start": 0,
+       "end": 210,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0087,
+       "restated": 0.9507,
+       "elaborated": 0.0276,
+       "different": 0.0131
+      },
+      "confidence": 0.9869,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "They have all the same callbacks and options as standard query endpoints, but also require an additional [`infiniteQueryOptions`](#infinitequeryoptions) field to specify how to calculate the unique parameters to fetch each page.",
+       "start": 161,
+       "end": 389,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+       "quote": "They are an extension of standard query endpoints - you can specify [the same options as standard queries](./queries.mdx#defining-query-endpoints) (providing either `query` or `queryFn`, customizing with `transformResponse`, lifecycles with `onCacheEntryAdded` and `onQueryStarted`, defining tags, etc).",
+       "start": 211,
+       "end": 514,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0151,
+       "restated": 0.7042,
+       "elaborated": 0.2474,
+       "different": 0.0333
+      },
+      "confidence": 0.9667,
+      "a": {
+       "document": "redux-toolkit:docs/rtk-query/api/createApi.mdx#10",
+       "quote": "They have all the same callbacks and options as standard query endpoints, but also require an additional [`infiniteQueryOptions`](#infinitequeryoptions) field to specify how to calculate the unique parameters to fetch each page.",
+       "start": 161,
+       "end": 389,
+       "confidence": 1
+      },
+      "b": {
+       "document": "redux-toolkit:docs/rtk-query/usage/infinite-queries.mdx#4",
+       "quote": "However, they also require an additional `infiniteQueryOptions` field to specify the infinite query behavior.\n\nWith TypeScript, you must supply 3 generic arguments: `build.infiniteQuery<ResultType, QueryArg, PageParam>`, where `ResultType` is the contents of a single page, `QueryArg` is the type passed in as the cache key, and `PageParam` is the value used to request a specific page.",
+       "start": 515,
+       "end": 901,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 56,
+   "passage_reads": 1,
+   "passages_ms": 74,
+   "passages": 3,
+   "counterparts_ms": 107
+  },
+  "timing": {
+   "read_ms": 237,
+   "total_ms": 241
+  }
+ }
+}

@@ -1,0 +1,86 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/67/676e7e5bd6a4e4b8623c",
+ "request_hash": "676e7e5bd6a4e4b8623c10e8e4418bca36d8e4c0a7cf87cffc414871705cd099",
+ "recorded_at": "2026-11-06T14:48:08Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3288,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "197.506491",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=345"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#20",
+    "text": "###### Errors\n<a id=\"errors\"></a>\n\nIf you pass to *send* an object that is an instance of *Error*, Fastify will\nautomatically create an error structured as the following:\n\n```js\n{\n  error: String        // the HTTP error message\n  code: String         // the Fastify error code\n  message: String      // the user error message\n  statusCode: Number   // the HTTP status code\n}\n```\n\nYou can add custom properties to the Error object, such as `headers`, that will\nbe used to enhance the HTTP response.\n\n> ℹ️ Note:\n> If you are passing an error to `send` and the statusCode is less than\n> 400, Fastify will automatically set it at 500.\n\nTip: you can simplify errors by using the\n[`http-errors`](https://www.npmjs.com/package/http-errors) module or\n[`@fastify/sensible`](https://github.com/fastify/fastify-sensible) plugin to\ngenerate errors:\n\n```js\nfastify.get('/', function (request, reply) {\n  reply.send(httpErrors.Gone())\n})\n```\n\nTo customize the JSON error output you can do it by:\n\n- setting a response JSON schema for the status code you need\n- add the additional properties to the `Error` instance\n\nNotice that if the returned status code is not in the response schema list, the\ndefault behavior will be applied.\n\n```js\nfastify.get('/', {\n  schema: {\n    response: {\n      501: {\n        type: 'object',\n        properties: {\n          statusCode: { type: 'number' },\n          code: { type: 'string' },\n          error: { type: 'string' },\n          message: { type: 'string' },\n          time: { type: 'string' }\n        }\n      }\n    }\n  }\n}, function (request, reply) {\n  const error = new Error('This endpoint has not been implemented')\n  error.time = 'it will be implemented in two weeks'\n  reply.code(501).send(error)\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#20",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#88",
+    "b": "fastify:docs/Reference/Reply.md#20",
+    "relation": "overlapping",
+    "related": 0.9953,
+    "probabilities": {
+     "same": 0.022,
+     "overlapping": 0.9634,
+     "conflicting": 0.0099,
+     "unrelated": 0.0047
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 1,
+   "counterparts_ms": 92
+  },
+  "timing": {
+   "read_ms": 205,
+   "total_ms": 209
+  }
+ }
+}

@@ -1,0 +1,275 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/d6/d68d0cb535d85450d820",
+ "request_hash": "d68d0cb535d85450d8203b1631f97041031a3fd149a142d8f27c135c6ab702d5",
+ "recorded_at": "2026-11-06T14:51:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1786,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "121.402237",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=168,cfOrigin;dur=0,cfWorker;dur=318"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) When persisting or removing entity, all your references are by default cascade persisted. (2) Defaults to `[Cascade.PERSIST, Cascade.MERGE]` (see [Cascading](./cascading.md)).",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#18",
+    "title": "docs/docs/guide/02-relationships.md > Cascading",
+    "text": "## Cascading\n\nWhen persisting or removing entities, MikroORM automatically cascades the operation to associated entities. By default, `Cascade.PERSIST` is enabled on all relations - this means that when you persist an entity, all its loaded associations are persisted too. This is why `em.create()` with nested data \"just works\".\n\nYou can control this behavior via the `.cascade()` builder method:\n\n```ts\nimport { Cascade } from '@mikro-orm/core';\n\n// default: cascade persist only\ntags: () => p.manyToMany(TagSchema),\n\n// cascade both persist and remove\ntags: () => p.manyToMany(TagSchema).cascade(Cascade.PERSIST, Cascade.REMOVE),\n\n// cascade everything (persist + remove)\ntags: () => p.manyToMany(TagSchema).cascade(Cascade.ALL),\n\n// disable cascade entirely\ntags: () => p.manyToMany(TagSchema).cascade(),\n```\n\n`Cascade.REMOVE` means removing the parent entity will also remove the related entities. Be careful with this on ManyToOne relations, as the removed entity might still be referenced elsewhere."
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#19",
+    "title": "docs/docs/decorators.md > Entity Relationships > @ManyToOne()",
+    "text": "### @ManyToOne()\n\n> `@ManyToOne()` decorator extend the `@Property()` decorator, so you can use all its parameters.\n\nMany instances of the current Entity refer to One instance of the referred Entity.\n\nSee [Defining Entities](./relationships.md#manytoone) for more examples.\n\n| Parameter    | Type                                          | Optional | Description                                                                                                                                                 |\n|--------------|-----------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| `entity`     | `string` &#124; `() => EntityName`            | yes      | Set target entity type.                                                                                                                                     |\n| `cascade`    | `Cascade[]`                                   | yes      | Set what actions on owning entity should be cascaded to the relationship. Defaults to `[Cascade.PERSIST, Cascade.MERGE]` (see [Cascading](./cascading.md)). |\n| `eager`      | `boolean`                                     | yes      | Always load the relationship. (Discouraged for use with to-many relations.)                                                                                 |\n| `inversedBy` | `(string & keyof T) ` &#124; ` (e: T) => any` | yes      | Point to the inverse side property name.                                                                                                                    |\n| `ref`        | `boolean`                                     | yes      | Wrap the entity in [`Reference` wrapper](type-safe-relations.md).                                                                                           |\n| `primary`    | `boolean`                                     | yes      | Use this relation as primary key.                                                                                                                           |\n| `deleteRule` | `string`                                      | yes      | [Referential integrity](./cascading.md#declarative-referential-integrity).                                                                                  |\n| `updateRule` | `string`                                      | yes      | [Referential integrity](./cascading.md#declarative-referential-integrity).                                                                                  |\n| `deferMode`  | `immediate` &#124; `deferred`                 | yes      | only for postgres unique constraints                                                                                                                        |"
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#21",
+    "title": "docs/docs/decorators.md > Entity Relationships > @OneToOne()",
+    "text": "### @OneToOne()\n\n> `@OneToOne()` decorator extend the `@Property()` decorator, so you can use all its parameters.\n\nOne instance of the current Entity refers to One instance of the referred Entity.\n\nSee [Defining Entities](./relationships.md#onetoone) for more examples, including bidirectional 1:1.\n\n| Parameter       | Type                                          | Optional | Description                                                                                                                                                 |\n|-----------------|-----------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| `entity`        | `string` &#124; `() => EntityName`            | yes      | Set target entity type.                                                                                                                                     |\n| `cascade`       | `Cascade[]`                                   | yes      | Set what actions on owning entity should be cascaded to the relationship. Defaults to `[Cascade.PERSIST, Cascade.MERGE]` (see [Cascading](./cascading.md)). |\n| `eager`         | `boolean`                                     | yes      | Always load the relationship. (Discouraged for use with to-many relations.)                                                                                 |\n| `owner`         | `boolean`                                     | yes      | Explicitly set as owning side (same as providing `inversedBy`).                                                                                             |\n| `inversedBy`    | `(string & keyof T) ` &#124; ` (e: T) => any` | yes      | Point to the inverse side property name.                                                                                                                    |\n| `mappedBy`      | `(string & keyof T)` &#124; `(e: T) => any`   | yes      | Point to the owning side property name.                                                                                                                     |\n| `ref`           | `boolean`                                     | yes      | Wrap the entity in [`Reference` wrapper](type-safe-relations.md).                                                                                           |\n| `orphanRemoval` | `boolean`                                     | yes      | Remove the entity when it gets disconnected from the relationship (see [Cascading](./cascading.md#orphan-removal)).                                         |\n| `joinColumn`    | `string`                                      | yes      | Override default database column name on the owning side (see [Naming Strategy](./naming-strategy.md)).                                                     |\n| `primary`       | `boolean`                                     | yes      | Use this relation as primary key.                                                                                                                           |\n| `deleteRule`    | `string`                                      | yes      | [Referential integrity](./cascading.md#declarative-referential-integrity).                                                                                  |\n| `updateRule`    | `string`                                      | yes      | [Referential integrity](./cascading.md#declarative-referential-integrity).                                                                                  |"
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#25",
+    "title": "docs/docs/decorators.md > Entity Relationships > @ManyToMany()",
+    "text": "### @ManyToMany()\n\n> `@ManyToMany()` decorator extend the `@Property()` decorator, so you can use all its parameters.\n\nMany instances of the current Entity refers to Many instances of the referred Entity.\n\nSee [Defining Entities](./relationships.md#manytomany) for more examples, including bidirectional m:n.\n\n> You need to initialize the value with `Collection<T>` instance.\n\n| Parameter           | Type                                          | Optional | Description                                                                                                                                                 |\n|---------------------|-----------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| `entity`            | `string` &#124; `() => EntityName`            | yes      | Set target entity type.                                                                                                                                     |\n| `cascade`           | `Cascade[]`                                   | yes      | Set what actions on owning entity should be cascaded to the relationship. Defaults to `[Cascade.PERSIST, Cascade.MERGE]` (see [Cascading](./cascading.md)). |\n| `eager`             | `boolean`                                     | yes      | Always load the relationship. (Discouraged for use with to-many relations.)                                                                                 |\n| `owner`             | `boolean`                                     | yes      | Explicitly set as owning side (same as providing `inversedBy`).                                                                                             |\n| `inversedBy`        | `(string & keyof T) ` &#124; ` (e: T) => any` | yes      | Point to the inverse side property name.                                                                                                                    |\n| `mappedBy`          | `(string & keyof T)` &#124; `(e: T) => any`   | yes      | Point to the owning side property name.                                                                                                                     |\n| `orderBy`           | `{ [field: string]: QueryOrder }`             | yes      | Set default ordering condition.                                                                                                                             |\n| `fixedOrder`        | `boolean`                                     | yes      | Force stable insertion order of items in the collection (see [Collections](./collections.md#forcing-fixed-order-of-collection-items)).                      |\n| `fixedOrderColumn`  | `string`                                      | yes      | Override default order column name (`id`).                                                                                                                  |\n| `pivotTable`        | `string`                                      | yes      | Override default name for pivot table (see [Naming Strategy](./naming-strategy.md)).                                                                        |\n| `joinColumn`        | `string`                                      | yes      | Override default database column name on the owning side (see [Naming Strategy](./naming-strategy.md)).                                                     |\n| `inverseJoinColumn` | `string`                                      | yes      | Override default database column name on the inverse side (see [Naming Strategy](./naming-strategy.md)).                                                    |"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "title": "docs/docs/upgrading-v6-to-v7.md > Foreign key rules no longer inferred from `cascade` option",
+    "text": "## Foreign key rules no longer inferred from `cascade` option\n\nPreviously, MikroORM inferred `updateRule` and `deleteRule` from the [`cascade` option](./cascading.md):\n- `Cascade.REMOVE` or `Cascade.ALL` → `deleteRule: 'cascade'`\n- `Cascade.PERSIST` or `Cascade.ALL` → `updateRule: 'cascade'`\n- Nullable relation → `deleteRule: 'set null'`\n\nThis inference has been removed. FK rules are now independent of the `cascade` option, which only controls ORM-level cascading behavior.\n\nThe ORM still applies sensible semantic defaults for specific relation patterns:\n\n| Scenario | `deleteRule` | `updateRule` |\n|----------|--------------|--------------|\n| FK-as-PK (entity's PK is also a FK) | `cascade` | `cascade` |\n| Pivot tables (M:N join tables) | `cascade` | `cascade` |\n| Relation to composite PK target | — | `cascade` |\n| Nullable relation | `set null` | — |\n| Self-referencing FK on MSSQL | `no action` | `no action` |\n\nIf you relied on the old `cascade` option inference, you have two options:\n\n1. Set rules explicitly on individual relations:\n\n```ts\n@ManyToOne({ deleteRule: 'cascade', updateRule: 'cascade' })\nauthor?: Author;\n```\n\n2. Set global defaults in your config:\n\n```ts\nMikroORM.init({\n  schemaGenerator: {\n    defaultDeleteRule: 'cascade',\n    defaultUpdateRule: 'cascade',\n  },\n});\n```\n\nWhen neither is set, the database uses its native default (NO ACTION for PostgreSQL, SQLite, MSSQL, Oracle; RESTRICT for MySQL/MariaDB). See [Declarative Referential Integrity](./cascading.md#declarative-referential-integrity) for details on how FK rules work."
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#2",
+    "title": "docs/docs/entity-manager.md > Persisting and Cascading",
+    "text": "## Persisting and Cascading\n\nTo save entity state to database, you need to persist it. Persist determines whether to use `insert` or `update` and computes appropriate change-set. Entity references that are not persisted yet (does not have identifier) will be cascade persisted automatically.\n\n```ts\n// use constructors in your entities for required parameters\nconst author = new Author('Jon Snow', 'snow@wall.st');\nauthor.born = new Date();\n\nconst publisher = new Publisher('7K publisher');\n\nconst book1 = new Book('My Life on The Wall, part 1', author);\nbook1.publisher = publisher;\nconst book2 = new Book('My Life on The Wall, part 2', author);\nbook2.publisher = publisher;\nconst book3 = new Book('My Life on The Wall, part 3', author);\nbook3.publisher = publisher;\n\n// just persist books, author and publisher will be automatically cascade persisted\nawait em.persist([book1, book2, book3]).flush();\n\n// or one by one\nem.persist(book1);\nem.persist(book2);\nem.persist(book3);\nawait em.flush(); // flush everything to database at once\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#1",
+    "title": "docs/docs/cascading.md > Cascade persist",
+    "text": "## Cascade persist\n\nHere is example of how cascade persist works:\n\n```ts\nconst book = await orm.em.findOne(Book, 'id', { populate: ['author', 'tags'] });\nbook.author.name = 'Foo Bar';\nbook.tags[0].name = 'new name 1';\nbook.tags[1].name = 'new name 2';\nawait orm.em.persist(book).flush(); // all book tags and author will be persisted too\n```\n\n> When cascade persisting collections, keep in mind only fully initialized collections will be cascade persisted."
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#20",
+    "title": "docs/docs/guide/02-relationships.md > Cascading > Propagation",
+    "text": "### Propagation\n\nMikroORM also propagates relation assignments automatically. When you set `comment.article = article`, the `article.comments` collection is updated too (and vice versa). This works for all bidirectional relations and is what makes the Identity Map consistent.\n\n> The discovery phase (which happens during `MikroORM.init()` or `new MikroORM()`) is required for propagation to work. See the [Propagation](../propagation.md) docs for more details.\n\nRead more about [Cascading](../cascading.md) in the documentation."
+   },
+   {
+    "id": "mikro-orm:docs/docs/relationships.md#3",
+    "title": "docs/docs/relationships.md > OneToMany",
+    "text": "## OneToMany\n\n> One instance of the current Entity has Many instances (references) to the referred Entity.\n\nAgain, all of the following is equivalent:\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'reflect-metadata', value: 'reflect-metadata'},\n    {label: 'ts-morph', value: 'ts-morph'},\n]\n  }\n>\n  <TabItem value=\"define-entity-class\">\n\n```ts\nimport { defineEntity, p } from '@mikro-orm/core';\n\nconst AuthorSchema = defineEntity({\n  name: 'Author',\n  properties: {\n    id: p.integer().primary(),\n    books: () => p.oneToMany(Book).mappedBy('author'),\n  },\n});\n\nexport class Author extends AuthorSchema.class {}\nAuthorSchema.setClass(Author);\n```\n\n  </TabItem>\n\n  <TabItem value=\"define-entity\">\n\n```ts\nimport { defineEntity, InferEntity, p } from '@mikro-orm/core';\n\nexport const Author = defineEntity({\n  name: 'Author',\n  properties: {\n    id: p.integer().primary(),\n    books: () => p.oneToMany(Book).mappedBy('author'),\n  },\n});\n\nexport type IAuthor = InferEntity<typeof Author>;\n```\n\n  </TabItem>\n  <TabItem value=\"reflect-metadata\">\n\n```ts\n@Entity()\nexport class Author {\n\n  @OneToMany(() => Book, book => book.author)\n  books1 = new Collection<Book>(this);\n\n  @OneToMany({ mappedBy: book => book.author }) // referenced entity type can be sniffed too\n  books2 = new Collection<Book>(this);\n\n  @OneToMany({ entity: () => Book, mappedBy: 'author', orphanRemoval: true })\n  books3 = new Collection<Book>(this);\n\n}\n```\n\n  </TabItem>\n  <TabItem value=\"ts-morph\">\n\n```ts\n@Entity()\nexport class Author {\n\n  @OneToMany(() => Book, book => book.author)\n  books = new Collection<Book>(this);\n\n}\n```\n\n  </TabItem>\n</Tabs>\n\nAs you can see, OneToMany is the inverse side of ManyToOne (which is the owning side). More about how collections work can be found on [collections page](./collections.md).\n\nYou can also specify how operations on given entity should [cascade](./cascading.md) to the referred entities. There is also more aggressive remove mode called [Orphan Removal](./cascading.md#orphan-removal) (`books3` example)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#6",
+    "title": "docs/docs/cascading.md > Declarative Referential Integrity > Priority Order",
+    "text": "### Priority Order\n\nFK rules are resolved in this order:\n\n1. Explicit property-level `deleteRule`/`updateRule`\n2. ORM semantic defaults (table above)\n3. Global config `schemaGenerator.defaultDeleteRule`/`defaultUpdateRule`\n4. Database native default (NO ACTION for PostgreSQL, SQLite, MSSQL, Oracle; RESTRICT for MySQL/MariaDB)\n\n> Note: Oracle does not support `ON UPDATE CASCADE`. If you need cascading updates on Oracle, you must handle them at the application level or use triggers."
+   },
+   {
+    "id": "mikro-orm:docs/docs/cascading.md#4",
+    "title": "docs/docs/cascading.md > Declarative Referential Integrity",
+    "text": "## Declarative Referential Integrity\n\n> This is only supported in SQL drivers.\n\nAs opposed to the application level cascading controlled by the `cascade` option, you can also define database level referential integrity actions: `on update` and `on delete`.\n\nThese rules are independent of the `cascade` option (which only controls ORM-level behavior). You can set FK rules via:\n\n1. **Property-level options:** Use `updateRule` and `deleteRule` on individual relations.\n\n```ts\n@Entity()\nexport class Book {\n\n  @ManyToOne({ updateRule: 'set null', deleteRule: 'cascade' })\n  author?: Author;\n\n}\n```\n\n2. **Global defaults:** Set `defaultUpdateRule` and `defaultDeleteRule` in your config.\n\n```ts\nMikroORM.init({\n  schemaGenerator: {\n    defaultDeleteRule: 'cascade',\n    defaultUpdateRule: 'cascade',\n  },\n});\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/inheritance-mapping.md#27",
+    "title": "docs/docs/inheritance-mapping.md > Table-Per-Type Inheritance (TPT) > Limitations",
+    "text": "### Limitations\n\n- **Delete cascading and lifecycle hooks**: Child table rows are deleted via `ON DELETE CASCADE` at the database level. This means `beforeDelete`/`afterDelete` hooks will only fire for the entity being explicitly removed — not for child table rows cascaded by the database. If you need hooks on every table in the hierarchy, issue explicit deletes per table.\n- **Soft delete**: Because delete cascading is handled by the database, soft-delete patterns (e.g., `@Filter` to hide deleted rows) are not automatically TPT-aware. The database CASCADE will physically delete child rows even if the parent uses a soft-delete filter.\n- **Schema callbacks scope**: Index expressions, check constraints, and generated column callbacks for a TPT entity only have access to columns in that entity's own table. You cannot reference inherited columns from a parent table in these callbacks.\n- **Custom discriminator columns**: TPT uses a computed discriminator (CASE WHEN) at query time. Unlike STI, you cannot specify a custom persisted discriminator column."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "mikro-orm:docs/docs/decorators.md#25",
+    "action": "use",
+    "relevance_score": 0.976,
+    "document_score": 0.9806,
+    "levels": {
+     "answers": 0.976,
+     "elsewhere": 0.0046,
+     "different_case": 0.0132,
+     "unrelated": 0.0062
+    }
+   },
+   {
+    "index": 1,
+    "id": "mikro-orm:docs/docs/decorators.md#19",
+    "action": "use",
+    "relevance_score": 0.9727,
+    "document_score": 0.9769,
+    "levels": {
+     "answers": 0.9727,
+     "elsewhere": 0.0041,
+     "different_case": 0.0174,
+     "unrelated": 0.0057
+    }
+   },
+   {
+    "index": 5,
+    "id": "mikro-orm:docs/docs/entity-manager.md#2",
+    "action": "use",
+    "relevance_score": 0.9607,
+    "document_score": 0.9709,
+    "levels": {
+     "answers": 0.9607,
+     "elsewhere": 0.0102,
+     "different_case": 0.0147,
+     "unrelated": 0.0144
+    }
+   },
+   {
+    "index": 0,
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#18",
+    "action": "use",
+    "relevance_score": 0.957,
+    "document_score": 0.9673,
+    "levels": {
+     "answers": 0.957,
+     "elsewhere": 0.0103,
+     "different_case": 0.0175,
+     "unrelated": 0.0152
+    }
+   },
+   {
+    "index": 2,
+    "id": "mikro-orm:docs/docs/decorators.md#21",
+    "action": "use",
+    "relevance_score": 0.9546,
+    "document_score": 0.9612,
+    "levels": {
+     "answers": 0.9546,
+     "elsewhere": 0.0066,
+     "different_case": 0.0305,
+     "unrelated": 0.0083
+    }
+   },
+   {
+    "index": 6,
+    "id": "mikro-orm:docs/docs/cascading.md#1",
+    "action": "use",
+    "relevance_score": 0.723,
+    "document_score": 0.8015,
+    "levels": {
+     "answers": 0.723,
+     "elsewhere": 0.0786,
+     "different_case": 0.0215,
+     "unrelated": 0.177
+    }
+   },
+   {
+    "index": 8,
+    "id": "mikro-orm:docs/docs/relationships.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0143,
+    "document_score": 0.2409,
+    "levels": {
+     "answers": 0.0143,
+     "elsewhere": 0.2267,
+     "different_case": 0.0342,
+     "unrelated": 0.7248
+    }
+   },
+   {
+    "index": 9,
+    "id": "mikro-orm:docs/docs/cascading.md#6",
+    "action": "expand",
+    "relevance_score": 0.0137,
+    "document_score": 0.6435,
+    "levels": {
+     "answers": 0.0137,
+     "elsewhere": 0.6298,
+     "different_case": 0.0391,
+     "unrelated": 0.3174
+    }
+   },
+   {
+    "index": 7,
+    "id": "mikro-orm:docs/docs/guide/02-relationships.md#20",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0124,
+    "document_score": 0.1733,
+    "levels": {
+     "answers": 0.0124,
+     "elsewhere": 0.1609,
+     "different_case": 0.0337,
+     "unrelated": 0.793
+    }
+   },
+   {
+    "index": 10,
+    "id": "mikro-orm:docs/docs/cascading.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0077,
+    "document_score": 0.0486,
+    "levels": {
+     "answers": 0.0077,
+     "elsewhere": 0.0409,
+     "different_case": 0.0674,
+     "unrelated": 0.884
+    }
+   },
+   {
+    "index": 4,
+    "id": "mikro-orm:docs/docs/upgrading-v6-to-v7.md#38",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0065,
+    "document_score": 0.0324,
+    "levels": {
+     "answers": 0.0065,
+     "elsewhere": 0.0259,
+     "different_case": 0.0515,
+     "unrelated": 0.9161
+    }
+   },
+   {
+    "index": 11,
+    "id": "mikro-orm:docs/docs/inheritance-mapping.md#27",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.0125,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.0084,
+     "different_case": 0.0323,
+     "unrelated": 0.9553
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5593
+  },
+  "timing": {
+   "total_ms": 140,
+   "rerank_ms": 125,
+   "questions_ms": 0,
+   "model_ms": 109,
+   "engine": {
+    "rows": 6637,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 8192,
+    "long": 0,
+    "total_ms": 109,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 106,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 160
+   }
+  }
+ }
+}

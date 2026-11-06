@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/99/994032d5a357cf3a8ab4",
+ "request_hash": "994032d5a357cf3a8ab400c8dd3abb8ecd9c39d143337e1c31846704cc3267f5",
+ "recorded_at": "2026-11-06T14:50:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1007,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.622625",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=243"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#4",
+    "text": "## Entity state and `WrappedEntity`\n\nDuring entity discovery (which happens when you call `MikroORM.init()`), the ORM will patch the entity prototype and generate a lazy getter for the `WrappedEntity` - a class holding various metadata and state information about the entity. Each entity instance will have one, available under a hidden `__helper` property - to access its API in a type-safe way, use the `wrap()` helper:\n\n```ts\nimport { wrap } from '@mikro-orm/core';\n\nconst userRef = em.getReference(User, 1);\nconsole.log('userRef is initialized:', wrap(userRef).isInitialized()); // false\n\nawait wrap(userRef).init();\nconsole.log('userRef is initialized:', wrap(userRef).isInitialized()); // true\n```\n\n> You can also extend the `BaseEntity` provided by MikroORM. It defines all the public methods available via `wrap()` helper, so you could do `userRef.isInitialized()` or `userRef.init()`.\n\nThe `WrappedEntity` instance also holds the state of the entity at the time it was loaded or flushed - this state is then used by the Unit of Work during flush to compute the differences. Another use case is serialization, you can use the `toObject()`, `toPOJO()` and `toJSON()` methods to convert the entity instance to a plain JavaScript object."
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#8",
+    "text": "## Changes in `wrap()` helper, `WrappedEntity` interface and `Reference` wrapper\n\nPreviously all the methods and properties of `WrappedEntity` interface were added to the entity prototype during discovery. In v4 there is only one property added: `__helper: WrappedEntity`. `WrappedEntity` has been converted to actual class.\n\n`wrap(entity)` no longer returns the entity, now the `WrappedEntity` instance is being returned. It contains only public methods (`init`, `assign`, `isInitialized`, ...), if you want to access internal properties like `__meta` or `__em`, you need to explicitly ask for the helper via `wrap(entity, true)`.\n\nInternal methods (with `__` prefix) were also removed from the `Reference` class, use `wrap(ref, true)` to access them.\n\nInstead of interface merging with `WrappedEntity`, one can now use classic inheritance, by extending `BaseEntity` exported from `@mikro-orm/core`. If you do so, `wrap(entity)` will return your entity."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-manager.md#4",
+    "b": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#8",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0049,
+     "overlapping": 0.989,
+     "conflicting": 0.0041,
+     "unrelated": 0.002
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 97,
+   "total_ms": 100
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a7/a73a04774d66f689e172",
+ "request_hash": "a73a04774d66f689e1723ade1fac3365ef93d918ddda2bb58d3bb9cedab41cde",
+ "recorded_at": "2026-11-06T14:51:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3217,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "91.536291",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=271"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/createEntityAdapter.mdx#14",
+    "text": "If no instance is passed, it will default to [`createDraftSafeSelector`](./createSelector.mdx#createdraftsafeselector).\n\n:::\n\nBecause selector functions are dependent on knowing where in the state tree this specific entity state object is kept, `getSelectors()` can be called in two ways:\n\n- If called without any arguments (or with undefined as the first parameter), it returns an \"unglobalized\" set of selector functions that assume their `state` argument is the actual entity state object to read from.\n- It may also be called with a selector function that accepts the entire Redux state tree and returns the correct entity state object.\n\nFor example, the entity state for a `Book` type might be kept in the Redux state tree as `state.books`. You can use `getSelectors()` to read from that state in two ways:\n\n```js\nconst store = configureStore({\n  reducer: {\n    books: booksReducer,\n  },\n})\n\nconst simpleSelectors = booksAdapter.getSelectors()\nconst globalizedSelectors = booksAdapter.getSelectors((state) => state.books)\n\n// Need to manually pass the correct entity state object in to this selector\nconst bookIds = simpleSelectors.selectIds(store.getState().books)\n\n// This selector already knows how to find the books entity state\nconst allBooks = globalizedSelectors.selectAll(store.getState())\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/api/createSelector.mdx#2",
+    "text": "## `createDraftSafeSelector`\n\nIn general, we recommend against using selectors inside of reducers:\n\n- Selectors typically expect the entire Redux state object as an argument, while slice reducers only have access to a specific subset of the entire Redux state\n- Reselect's `createSelector` relies on reference comparisons to determine if inputs have changed, and if an Immer Proxy-wrapped draft value is passed in to a selector, the selector may see the same reference and think nothing has changed.\n\nHowever, some users have requested the ability to create selectors that will work correctly inside of Immer-powered reducers. One use case for this might be collecting an ordered set of items when using `createEntityAdapter`, such as `const orderedTodos = todosSelectors.selectAll(todosState)`, and then using `orderedTodos` in the rest of the reducer logic.\n\nBesides re-exporting `createSelector`, RTK also exports a wrapped version of `createSelector` named `createDraftSafeSelector` that allows you to create selectors that can safely be used inside of `createReducer` and `createSlice` reducers with Immer-powered mutable logic. When used with plain state values, the selector will still memoize normally based on the inputs. But, when used with Immer draft values, the selector will err on the side of recalculating the results, just to be safe."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/createEntityAdapter.mdx#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/api/createSelector.mdx#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/api/createEntityAdapter.mdx#14",
+    "b": "redux-toolkit:docs/api/createSelector.mdx#2",
+    "relation": "overlapping",
+    "related": 0.9922,
+    "probabilities": {
+     "same": 0.0083,
+     "overlapping": 0.9793,
+     "conflicting": 0.0046,
+     "unrelated": 0.0078
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 99,
+   "total_ms": 102
+  }
+ }
+}

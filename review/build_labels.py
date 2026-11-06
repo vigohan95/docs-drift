@@ -96,6 +96,25 @@ V.update({
 })
 
 
+# ------------------------------------------------------------- extended and both-order runs
+# reports/extended/: more candidate pairs on mikro-orm, redux-toolkit and typeorm.
+# reports/both-orders/: every fastify pair compared in both document orders.
+V.update({
+ "84ca97ee15": (T, "mikroorm-type-tojson-default", "a", "custom-types.md:20 says Type.toJSON uses the runtime value by default; defining-entities.md:1618 says it converts to the database value by default. packages/core/src/types/Type.ts:90-92: toJSON(value) { return value; }."),
+ "2576821b2a": (T, "mikroorm-raw-tojson", "b", "entity-manager.md:681 says the raw() fragment disallows serialization via toJSON; raw-queries.md:7 says the fragment can be serialized to a string. RawQueryFragment.ts:100-102: toJSON() returns the string raw('...'); only non-string coercion throws (86-94)."),
+ "17243a2829": (F, None, None, "@Transactional() defaults to REQUIRED (decorators/src/es/Transactional.ts:29) and em.transactional() to NESTED (TransactionManager.ts:23). transactions.md states both; the table header is loose, the facts agree."),
+ "ce3d626a1a": (F, None, None, "'References are cascade persisted by default' and a cascade option that 'sets what is cascaded' do not disagree."),
+ "c57cf90377": (F, None, None, "'Cascade persisted by default' is compatible with a default list that contains Cascade.PERSIST."),
+ "b76f4539ff": (T, "rtk-setuplisteners-refetchonmount", "b", "getting-started.md:184 says setupListeners enables refetchOnMount and refetchOnReconnect; rtk-query/api/setupListeners.mdx:14 says refetchOnFocus and refetchOnReconnect. setupListeners.ts dispatches onFocus, onFocusLost, onOnline and onOffline; nothing about mount. The wrong wording is also at rtk-query/overview.md:85 and packages/toolkit/README.md:107."),
+ "8dbc525de8": (T, "rtk-setuplisteners-refetchonmount", "a", "Same defect, this time setupListeners.mdx:14 against packages/toolkit/README.md:107."),
+ "cc29289b7b": (T, "fastify-preparsing-body-null", "b", "Same defect as 3359c8962b, found with the two passages in the other order."),
+ "bfdf3bfa2b": (T, "fastify-onrequest-body-null", "b", "Same defect as 2f2b5d9048, other order."),
+ "995662794b": (T, "fastify-httpmethods-union", "b", "Same defect as 2226ed1a9c, other order."),
+ "81db55b3f9": (T, "fastify-httpmethods-union", "b", "Same defect as ba8d973e45, other order."),
+ "7b725ab594": (T, "fastify-reply-final-payload-types", "b", "Reply.md:575-583 says the final payload must be string, Buffer, stream, undefined or null, otherwise an error is thrown; the onSend section of Hooks.md (line 240-241) also allows ReadableStream and Response, and lib/reply.js:183-188 accepts them."),
+})
+
+
 def write():
     out = {fid: {"label": l, "defect": d, "source_agrees_with": s, "reason": r} for fid, (l, d, s, r) in V.items()}
     Path(__file__).with_name("labels_v2.json").write_text(json.dumps(out, indent=1, ensure_ascii=False), encoding="utf-8")

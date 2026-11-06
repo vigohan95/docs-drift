@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/76/769e004ffca6aa0ed02c",
+ "request_hash": "769e004ffca6aa0ed02cccec39cd7a0ffec5053122842ea7e34a0e41df56f030",
+ "recorded_at": "2026-11-06T14:50:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3707,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "132.867548",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=258"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#7",
+    "text": "### Using a custom class\n\nIf you need to add custom methods to your entity, you can extend the schema's auto-generated class via `setClass()`:\n\n```ts title='user.entity.ts'\nexport const UserSchema = defineEntity({\n  name: 'User',\n  properties: {\n    // ...\n  },\n});\n\nexport class User extends UserSchema.class {\n  // custom methods go here\n}\n\nUserSchema.setClass(User);\n```\n\nThis avoids redeclaring all properties in the class - they are inferred from the schema automatically. We will use this pattern in Chapter 2 when adding methods to the `User` entity."
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-adonis.md#8",
+    "text": "### Adding Methods and Hooks\n\nTo add custom methods to an entity, extend the generated class via `setClass`. Lifecycle hooks are added via `addHook`:\n\n```ts title=\"app/entities/user.ts\"\nimport { defineEntity, type EventArgs, p } from '@mikro-orm/core'\nimport { hash, verify } from 'argon2'\nimport { BaseSchema } from '#entities/base'\n\nexport const UserSchema = defineEntity({\n  name: 'User',\n  extends: BaseSchema,\n  properties: {\n    fullName: p.string(),\n    email: p.string(),\n    password: p.string().hidden().lazy(),\n  },\n})\n\nexport class User extends UserSchema.class {\n  async verifyPassword(password: string) {\n    return verify(this.password, password)\n  }\n}\n\nUserSchema.setClass(User)\n\nasync function hashPassword(args: EventArgs<User>) {\n  const password = args.changeSet?.payload.password\n\n  if (typeof password === 'string') {\n    args.entity.password = await hash(password)\n  }\n}\n\nUserSchema.addHook('beforeCreate', hashPassword)\nUserSchema.addHook('beforeUpdate', hashPassword)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/usage-with-adonis.md#8"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-adonis.md#8",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/guide/01-first-entity.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/guide/01-first-entity.md#7",
+    "b": "mikro-orm:docs/docs/usage-with-adonis.md#8",
+    "relation": "overlapping",
+    "related": 0.9988,
+    "probabilities": {
+     "same": 0.0058,
+     "overlapping": 0.9903,
+     "conflicting": 0.0027,
+     "unrelated": 0.0012
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0096,
+       "restated": 0.9731,
+       "elaborated": 0.0106,
+       "different": 0.0066
+      },
+      "confidence": 0.9934,
+      "a": {
+       "document": "mikro-orm:docs/docs/guide/01-first-entity.md#7",
+       "quote": "If you need to add custom methods to your entity, you can extend the schema's auto-generated class via `setClass()`:",
+       "start": 26,
+       "end": 142,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/usage-with-adonis.md#8",
+       "quote": "### Adding Methods and Hooks\n\nTo add custom methods to an entity, extend the generated class via `setClass`.",
+       "start": 0,
+       "end": 108,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 57,
+   "passages": 1,
+   "counterparts_ms": 57
+  },
+  "timing": {
+   "read_ms": 142,
+   "total_ms": 144
+  }
+ }
+}

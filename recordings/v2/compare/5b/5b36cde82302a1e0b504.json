@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5b/5b36cde82302a1e0b504",
+ "request_hash": "5b36cde82302a1e0b50418119257f1e703cd5ab1e0bc147e333ade2570c40292",
+ "recorded_at": "2026-11-06T14:50:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2613,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "29.057024",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=210"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#28",
+    "text": "There is also `em.upsertMany()` with similar signature:\n\n```ts\nconst [author1, author2, author3] = await em.upsertMany(Author, [\n  { email: 'a1', age: 41 },\n  { email: 'a2', age: 42 },\n  { email: 'a3', age: 43 },\n]);\n```\n\nBy default, the EntityManager will prefer using the primary key, and fallback to the first unique property with a value. Sometimes this might not be the wanted behaviour, one example is when you generate the primary key via property initializer, e.g. with `uuid.v4()`. For those advanced cases, you can control how the underlying upserting logic works via the following options:\n\n- `onConflictFields?: (keyof T)[]` to control the conflict clause\n- `onConflictAction?: 'ignore' | 'merge'` used ignore and merge as that is how the QB methods are called\n- `onConflictMergeFields?: (keyof T)[]` to control the merge clause\n- `onConflictExcludeFields?: (keyof T)[]` to omit fields from the merge clause\n- `onConflictWhere?: FilterQuery<T>` to allow conditional updates\n\n```ts\nconst [author1, author2, author3] = await em.upsertMany(Author, [{ ... }, { ... }, { ... }], {\n  onConflictFields: ['email'], // specify a manual set of fields pass to the on conflict clause\n  onConflictAction: 'merge',\n  onConflictExcludeFields: ['id'],\n});\n```\n\nThis will generate query similar to the following:\n\n```sql\ninsert into \"author\"\n  (\"id\", \"current_age\", \"email\", \"foo\")\n  values\n    (1, 41, 'a1', true),\n    (2, 42, 'a2', true),\n    (5, 43, 'a3', true)\n  on conflict (\"email\")\n  do update set\n    \"current_age\" = excluded.\"current_age\",\n    \"foo\" = excluded.\"foo\"\n  returning \"_id\", \"current_age\", \"foo\", \"bar\"\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#10",
+    "text": "## Joining sub-queries\n\nSometimes you might want to join a relation, but want to have more control over the query. The ORM allows you to override the join target with a sub-query, while keeping the original metadata for hydration:\n\n```ts\nconst subquery = em.createQueryBuilder(Book, 'b')\n  .where({ ... })\n  .orderBy({ title: 'asc' }).limit(1);\n\nconst authors = await em.createQueryBuilder(Author, 'a')\n  .select('*')\n  // pass in both the property path and the subquery into the first argument as a tuple\n  .leftJoinAndSelect(['a.books', subquery], 'b')\n  // you can join more relations on top of the subquery join\n  .leftJoinAndSelect('b.tags', 't')\n  .getResultList();\n```\n\nThis will produce query similar to the following:\n\n```sql\nselect `a`.*,\n  `b`.`id` as `b__id`, `b`.`title` as `b__title`, `b`.`author_id` as `b__author_id`, `b`.`publisher_id` as `b__publisher_id`,\n  `t`.`id` as `t__id`, `t`.`name` as `t__name`\n  from `author` as `a`\n  left join (\n    select `b`.*, `b`.price * 1.19 as `price_taxed`\n    from `book` as `b`\n    order by `b`.`title` asc\n    limit 1\n  ) as `b` on `b`.`author_id` = `a`.`id`\n  left join `book_tags` as `e1` on `b`.`uuid_pk` = `e1`.`book_uuid_pk`\n  left join `book_tag` as `t` on `e1`.`book_tag_id` = `t`.`id`\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/entity-manager.md#28",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/entity-manager.md#28",
+    "b": "mikro-orm:docs/docs/query-builder.md#10",
+    "relation": "unrelated",
+    "related": 0.003,
+    "probabilities": {
+     "same": 0.0011,
+     "overlapping": 0.0011,
+     "conflicting": 0.0008,
+     "unrelated": 0.997
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 37
+  }
+ }
+}

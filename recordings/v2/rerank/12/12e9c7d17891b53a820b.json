@@ -1,0 +1,281 @@
+{
+ "endpoint": "rerank",
+ "tag": "v2/rerank/12/12e9c7d17891b53a820b",
+ "request_hash": "12e9c7d17891b53a820b08f2c79278319a50739f090aee6dbd6afed96cd66fd2",
+ "recorded_at": "2026-11-06T14:51:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2700,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.861183",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=327,cfOrigin;dur=0,cfWorker;dur=283"
+ },
+ "request": {
+  "query": "Which passages state the same fact as either of these two statements? (1) It disallows serialization (via `toJSON`) as well as working with the value (via [`valueOf()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/valueOf)). (2) This fragment is represented by `RawQueryFragment` class instance that can be serialized to a string, so it can be used both as an object value and key.",
+  "instructions": "A passage answers only if it itself states the fact that the two statements disagree about: a value, version, limit, name, list or rule for the same thing. A passage that only mentions the topic does not answer.",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#13",
+    "title": "docs/docs/upgrading-v3-to-v4.md > Custom type serialization",
+    "text": "## Custom type serialization\n\nCustom types used to be serialized to the database value. In v4, the runtime value is used by default. Implement custom `toJSON()` method if you need to customize this."
+   },
+   {
+    "id": "mikro-orm:docs/docs/raw-queries.md#4",
+    "title": "docs/docs/raw-queries.md > `raw()` helper > Raw fragments in filters",
+    "text": "### Raw fragments in filters\n\nWhen using raw query fragment inside a filter, you might have to use a callback signature to create new raw instance for every filter usage - namely when you use the fragment as an object key, which requires its serialization.\n\n```ts\n@Filter({ name: 'long', cond: () => ({ [raw('length(perex)')]: { $gt: 10000 } }) })\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#6",
+    "title": "docs/docs/serializing.md > Explicit serialization",
+    "text": "## Explicit serialization\n\nThe serialization process is normally driven by the `populate` hints. If you want to take control over this, you can use the `serialize()` helper:\n\n```ts\nimport { serialize } from '@mikro-orm/core';\n\nconst dtos = serialize([user1, user2]);\n// [\n//   { name: '...', books: [1, 2, 3], identity: 123 },\n//   { name: '...', ... },\n// ]\n\nconst [dto] = serialize(user1); // always returns an array\n// { name: '...', books: [1, 2, 3], identity: 123 }\n\n// for a single entity instance you can as well use `wrap(e).serialize()`\nconst dto2 = wrap(user1).serialize();\n// { name: '...', books: [1, 2, 3], identity: 123 }\n```\n\nBy default, every relation is considered as not populated - this will result in the foreign key values to be present. Loaded collections will be represented as arrays of the foreign keys. To control the shape of the serialized response you can use the second `options` parameter:\n\n```ts\ninterface SerializeOptions<T extends object, P extends string = never, E extends string = never, F extends string = never> {\n  /** Specify which relation should be serialized as populated and which as a FK. */\n  populate?: AutoPath<T, P>[] | boolean;\n\n  /** Specify which properties should be omitted. */\n  exclude?: AutoPath<T, E>[];\n\n  /**\n   * Whitelist of properties to serialize (supports dot-paths). When set, only the listed\n   * properties end up in the output, including primary keys. `exclude` takes precedence on conflict.\n   */\n  fields?: AutoPath<T, F>[];\n\n  /** Enforce unpopulated references to be returned as objects, e.g. `{ author: { id: 1 } }` instead of `{ author: 1 }`. */\n  forceObject?: boolean;\n\n  /** Ignore custom property serializers. */\n  ignoreSerializers?: boolean;\n\n  /** Include properties marked as `hidden`. */\n  includeHidden?: boolean;\n\n  /** Skip properties with `null` value. */\n  skipNull?: boolean;\n\n  /** Only include properties for a specific group. If a property does not specify any group, it will be included, otherwise only properties with a matching group are included. */\n  groups?: string[];\n\n  /** Convert custom types to their database representation. By default, the `Type.toJSON` method is invoked instead. */\n  convertCustomTypes?: boolean;\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#12",
+    "title": "docs/docs/decorators.md > Entity Properties > @SerializedPrimaryKey()",
+    "text": "### @SerializedPrimaryKey()\n\n> Property marked with `@SerializedPrimaryKey()` is virtual, it will not be persisted into the database.\n\nFor MongoDB, you can define serialized primary key, which will be then used in entity serialization via `JSON.stringify()` (through method `entity.toJSON()`). You will be able to use it to manipulate with the primary key as string.\n\nSee [Usage with MongoDB](./usage-with-mongo.md) and [Serializing](serializing.md).\n\n```ts\n@PrimaryKey()\n_id: ObjectId;\n\n@SerializedPrimaryKey()\nid!: string;\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#13",
+    "title": "docs/docs/architecture.md > Serialization > Implicit Serialization",
+    "text": "### Implicit Serialization\n\nWhen you call `toJSON()` or `toObject()` on an entity, serialization is driven by the `populate` hints used when loading:\n\n```ts\nconst user = await em.findOne(User, 1, {\n  populate: ['books'],\n  fields: ['name', 'books.title'],\n});\n\nconst dto = wrap(user).toObject();\n// Only includes: id, name, books[].id, books[].title\n```\n\nKey behaviors:\n- Only populated relations are serialized as objects\n- Unpopulated relations serialize as foreign key values\n- The `fields` option controls which properties appear in output"
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+    "title": "docs/docs/upgrading-v5-to-v6.md > Implicit serialization changes",
+    "text": "## Implicit serialization changes\n\nImplicit serialization, so calling `toObject()` or `toJSON()` on the entity, as opposed to explicitly using the `serialize()` helper, now works entirely based on `populate` hints. This means that, unless you explicitly marked some entity as populated via `wrap(entity).populated()`, it will be part of the serialized form only if it was part of the `populate` hint:\n\n```ts\n// let's say both Author and Book entity has a m:1 relation to Publisher entity\n// we only populate the publisher relation of the Book entity\nconst user = await em.findOneOrFail(Author, 1, {\n  populate: ['books.publisher'],\n});\n\nconst dto = wrap(user).toObject();\nconsole.log(dto.publisher); // only the FK, e.g. `123`\nconsole.log(dto.books[0].publisher); // populated, e.g. `{ id: 123, name: '...' }`\n```\n\nMoreover, the implicit serialization now respects the partial loading hints too. Previously, all loaded properties were serialized, partial loading worked only on the database query level. Since v6, we also prune the data on runtime. This means that unless the property is part of the partial loading hint (`fields` option), it won't be part of the DTO - only exception is the primary key, you can optionally hide it via `hidden: true` in the property options. Main difference here will be the foreign keys, those are often automatically selected as they are needed to build the entity graph, but will no longer be part of the DTO.\n\n```ts\nconst user = await em.findOneOrFail(Author, 1, {\n  fields: ['books.publisher.name'],\n});\n\nconst dto = wrap(user).toObject();\n// only the publisher's name will be available, previously there would be also `book.author`\n// `{ id: 1, books: [{ id: 2, publisher: { id: 3, name: '...' } }] }`\n```\n\n**This also works for embeddables, including nesting and object mode.**"
+   },
+   {
+    "id": "mikro-orm:docs/docs/entity-constructors.md#2",
+    "title": "docs/docs/entity-constructors.md > POJO vs entity instance in constructor",
+    "text": "```ts\n@ManyToOne({ entity: () => Author, ref: true })\nauthor: Ref<Author>;\n\nconstructor(dto: { title: string; author: number }) {\n  this.title = dto.title;\n  this.author = ref(Author, dto.author);\n}\n```\n\nOr, to keep the runtime as a plain entity (no wrapper) while still getting compile-time populate-state safety, declare the property as [`LazyRef<T>`](./type-safe-relations.md#lazyreft--type-only-reference) and assign with `rel()`:\n\n```ts\n@ManyToOne({ entity: () => Author })\nauthor: LazyRef<Author>;\n\nconstructor(dto: { title: string; author: number }) {\n  this.title = dto.title;\n  this.author = rel(Author, dto.author);\n}\n```\n\nThe `rel` and `ref` helpers will accept both primary key and entity instance, as well as empty value (`null` or `undefined`).\n\n```ts\nbook.author = ref(Author, null);\nbook.author = ref(Author, undefined);\nbook.author = ref(null);\nbook.author = ref(undefined);\nbook.author = ref(Author, 1);\nbook.author = ref(Author, author);\nbook.author = ref(author);\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/defining-entities.md#32",
+    "title": "docs/docs/defining-entities.md > Custom Types",
+    "text": "## Custom Types\n\nYou can define custom types by extending `Type` abstract class. It has 4 optional methods:\n\n- `convertToDatabaseValue(value: any, platform: Platform): any`\n\n  Converts a value from its JS representation to its database representation of this type.\n\n- `convertToJSValue(value: any, platform: Platform): any`\n\n  Converts a value from its database representation to its JS representation of this type.\n\n- `toJSON(value: any, platform: Platform): any`\n\n  Converts a value from its JS representation to its serialized JSON form of this type. By default, converts to the database value.\n\n- `getColumnType(prop: EntityProperty, platform: Platform): string`\n\n  Gets the SQL declaration snippet for a field of this type.\n\nMore information can be found in [Custom Types](./custom-types.md) section."
+   },
+   {
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#26",
+    "title": "docs/docs/guide/01-first-entity.md > Working with Entity Manager > Entity state and `WrappedEntity`",
+    "text": "### Entity state and `WrappedEntity`\n\nWe just said that entity reference is a regular entity, but only with a primary key. How does it work? During entity discovery (which happens when you call `MikroORM.init()`), the ORM will patch the entity prototype and generate a lazy getter for the `WrappedEntity` - a class holding various metadata and state information about the entity. Each entity instance will have one, available under a hidden `__helper` property - to access its API in a type-safe way, use the `wrap()` helper:\n\n```ts\nimport { wrap } from '@mikro-orm/core';\n\nconst userRef = em.getReference(UserSchema, 1);\nconsole.log('userRef is initialized:', wrap(userRef).isInitialized());\n\nawait wrap(userRef).init();\nconsole.log('userRef is initialized:', wrap(userRef).isInitialized());\n```\n\nThe `WrappedEntity` instance also holds the state of the entity at the time it was loaded or flushed - this state is then used by the Unit of Work during flush to compute the differences. Another use case is serialization, we can use the `toObject()`, `toPOJO()` and `toJSON()` methods to convert the entity instance to a plain JavaScript object."
+   },
+   {
+    "id": "mikro-orm:docs/docs/usage-with-nestjs.md#14",
+    "title": "docs/docs/usage-with-nestjs.md > Serialization caveat",
+    "text": "## Serialization caveat\n\n[NestJS built-in serialization](https://docs.nestjs.com/techniques/serialization) relies on [class-transformer](https://github.com/typestack/class-transformer). Since MikroORM wraps every single entity relation in a `Reference` or a `Collection` instance (for type-safety), this will make the built-in `ClassSerializerInterceptor` blind to any wrapped relations. In other words, if you return MikroORM entities from your HTTP or WebSocket handlers, all of their relations will NOT be serialized.\n\nLuckily, MikroORM provides a [serialization API](https://mikro-orm.io/docs/serializing) which can be used in lieu of `ClassSerializerInterceptor`.\n\n```typescript\n@Entity()\nexport class Book {\n  @Property({ hidden: true })   // --> Equivalent of class-transformer's `@Exclude`\n  hiddenField: number = Date.now();\n\n  @Property({ persist: false }) // --> Will only exist in memory (and will be serialized). Similar to class-transformer's `@Expose()`\n  count?: number;\n\n  @ManyToOne({ serializer: value => value.name, serializedName: 'authorName' })   // Equivalent of class-transformer's `@Transform()`\n  author: Author;\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/serializing.md#1",
+    "title": "docs/docs/serializing.md > Hidden Properties",
+    "text": "## Hidden Properties\n\nIf you want to omit some properties from serialized result, you can mark them with `hidden` flag on `@Property()` decorator. To have this information available on the type level, you also need to use the `HiddenProps` symbol:\n\n```ts\n@Entity()\nclass Book {\n\n  // we use the `HiddenProps` symbol to define hidden properties on type level\n  [HiddenProps]?: 'hiddenField' | 'otherHiddenField';\n\n  @Property({ hidden: true })\n  hiddenField = Date.now();\n\n  @Property({ hidden: true, nullable: true })\n  otherHiddenField?: string;\n\n}\n\nconst book = new Book(...);\nconsole.log(wrap(book).toObject().hiddenField); // undefined\n\n// @ts-expect-error accessing `hiddenField` will fail to compile thanks to the `HiddenProps` symbol\nconsole.log(wrap(book).toJSON().hiddenField); // undefined\n```\n\nAlternatively, you can use the `Hidden` type for **primitive property types** (`string`, `number`, `boolean`, `bigint`, `symbol`). It works the same as the `Opt` type (an alternative for `OptionalProps` symbol), and can be used in two ways:\n\n- with generics: `hiddenField?: Hidden<string>;`\n- with intersections: `hiddenField?: string & Hidden;`\n\nBoth will work the same, and can be combined with the `HiddenProps` symbol approach.\n\n> With `ReflectMetadataProvider`, intersection types are emitted as `Object`, so the property type needs to be provided explicitly (e.g. `@PrimaryKey({ type: 'number' })`), unless it can be inferred from a default value. See [Metadata Providers](./metadata-providers.md#intersection-types-opt-hidden).\n\n```ts\n@Entity()\nclass Book {\n\n  @Property({ hidden: true })\n  hiddenField: Hidden<number> = Date.now();\n\n  @Property({ hidden: true, nullable: true })\n  otherHiddenField?: string & Hidden;\n\n}\n```\n\n> **Note:** The `Hidden` type brand only works for primitive types. For object-type properties like `Date`, `Record<string, unknown>`, or JSON properties, you must use the `HiddenProps` symbol approach instead:\n>\n> ```ts\n> @Entity()\n> class User {\n>\n>   [HiddenProps]?: 'secretData' | 'hiddenDate';\n>\n>   @Property({ type: JsonType, hidden: true })\n>   secretData!: Record<string, unknown>;\n>\n>   @Property({ hidden: true })\n>   hiddenDate!: Date;\n>\n> }\n> ```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/inheritance-mapping.md#7",
+    "title": "docs/docs/inheritance-mapping.md > Single Table Inheritance > Explicit discriminator column",
+    "text": "### Explicit discriminator column\n\nThe `discriminatorColumn` specifies the name of a special column that will be used to define what type of class a given row should be represented with. It will be defined automatically for us, and it will stay hidden (it won't be hydrated as a regular property).\n\nOn the other hand, it is perfectly fine to define the column explicitly. When you do so, use the `discriminator` option (which refers to the property name on the entity) instead — the column name is derived from the property via the naming strategy. Defining it explicitly lets you:\n\n- query by the type, e.g. `em.find(Person, { type: { $ne: 'employee' } }`\n- include the column in the serialized response\n\n> `discriminator` is the property name on the entity; `discriminatorColumn` is an optional override for the underlying column name. When `discriminator` is omitted, `discriminatorColumn` is used as the property name too (legacy behavior). The same applies to `@Embeddable`.\n\nFollowing example shows how you can define the discriminator explicitly, as well as a version where root entity is abstract class.\n\n<Tabs\n  groupId=\"entity-def\"\n  defaultValue=\"define-entity-class\"\n  values={[\n    {label: 'defineEntity + class', value: 'define-entity-class'},\n    {label: 'defineEntity', value: 'define-entity'},\n    {label: 'decorators', value: 'decorators'},\n]\n}\n>\n  <TabItem value=\"define-entity-class\">"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "mikro-orm:docs/docs/raw-queries.md#4",
+    "action": "use",
+    "relevance_score": 0.9168,
+    "document_score": 0.9321,
+    "levels": {
+     "answers": 0.9168,
+     "elsewhere": 0.0153,
+     "different_case": 0.0501,
+     "unrelated": 0.0178
+    }
+   },
+   {
+    "index": 3,
+    "id": "mikro-orm:docs/docs/decorators.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0525,
+    "document_score": 0.0974,
+    "levels": {
+     "answers": 0.0525,
+     "elsewhere": 0.0449,
+     "different_case": 0.1077,
+     "unrelated": 0.7948
+    }
+   },
+   {
+    "index": 8,
+    "id": "mikro-orm:docs/docs/guide/01-first-entity.md#26",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0129,
+    "document_score": 0.0559,
+    "levels": {
+     "answers": 0.0129,
+     "elsewhere": 0.043,
+     "different_case": 0.0828,
+     "unrelated": 0.8613
+    }
+   },
+   {
+    "index": 0,
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0105,
+    "document_score": 0.0528,
+    "levels": {
+     "answers": 0.0105,
+     "elsewhere": 0.0423,
+     "different_case": 0.0698,
+     "unrelated": 0.8774
+    }
+   },
+   {
+    "index": 7,
+    "id": "mikro-orm:docs/docs/defining-entities.md#32",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.0165,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.0127,
+     "different_case": 0.0223,
+     "unrelated": 0.9612
+    }
+   },
+   {
+    "index": 4,
+    "id": "mikro-orm:docs/docs/architecture.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0113,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0083,
+     "different_case": 0.0171,
+     "unrelated": 0.9716
+    }
+   },
+   {
+    "index": 5,
+    "id": "mikro-orm:docs/docs/upgrading-v5-to-v6.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0095,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0065,
+     "different_case": 0.0162,
+     "unrelated": 0.9743
+    }
+   },
+   {
+    "index": 2,
+    "id": "mikro-orm:docs/docs/serializing.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0074,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0048,
+     "different_case": 0.016,
+     "unrelated": 0.9766
+    }
+   },
+   {
+    "index": 9,
+    "id": "mikro-orm:docs/docs/usage-with-nestjs.md#14",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.0059,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0034,
+     "different_case": 0.0081,
+     "unrelated": 0.986
+    }
+   },
+   {
+    "index": 10,
+    "id": "mikro-orm:docs/docs/serializing.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0021,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.0021,
+     "elsewhere": 0.0021,
+     "different_case": 0.0057,
+     "unrelated": 0.99
+    }
+   },
+   {
+    "index": 11,
+    "id": "mikro-orm:docs/docs/inheritance-mapping.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.002,
+    "document_score": 0.0043,
+    "levels": {
+     "answers": 0.002,
+     "elsewhere": 0.0023,
+     "different_case": 0.0074,
+     "unrelated": 0.9883
+    }
+   },
+   {
+    "index": 6,
+    "id": "mikro-orm:docs/docs/entity-constructors.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0019,
+    "document_score": 0.0036,
+    "levels": {
+     "answers": 0.0019,
+     "elsewhere": 0.0016,
+     "different_case": 0.0059,
+     "unrelated": 0.9905
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 5476
+  },
+  "timing": {
+   "total_ms": 111,
+   "rerank_ms": 95,
+   "questions_ms": 0,
+   "model_ms": 86,
+   "engine": {
+    "rows": 6136,
+    "branches": 12,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 86,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 192
+   }
+  }
+ }
+}

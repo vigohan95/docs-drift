@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/7a/7a9053ab177d2e336760",
+ "request_hash": "7a9053ab177d2e336760e1bbd4daa629f16531085db83e5524c964e958620af8",
+ "recorded_at": "2026-11-06T14:49:10Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2369,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "22.425152",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=145"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#9",
+    "text": "### Direct return of trailers has been removed\n\nIn v4, you could directly return trailers from a handler.\nThis is no longer possible in v5.\n\n```js\n// v4\nfastify.get('/route', (req, reply) => {\n  reply.trailer('ETag', function (reply, payload) {\n    return 'custom-etag'\n  })\n  reply.send('')\n});\n```\n\n```js\n// v5\nfastify.get('/route', (req, reply) => {\n  reply.trailer('ETag', async function (reply, payload) {\n    return 'custom-etag'\n  })\n  reply.send('')\n});\n```\n\nA callback could also be used.\nThis was already deprecated in v4 as `FSTDEP013`,\nso you should have already updated your code to use the new signature."
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#6",
+    "text": "### The parameters object no longer has a prototype\n\nIn v4, the `parameters` object had a prototype. This is no longer the case in v5.\nThis means that you can no longer access properties inherited from `Object` on\nthe `parameters` object, such as `toString` or `hasOwnProperty`.\n\n```js\n// v4\nfastify.get('/route/:name', (req, reply) => {\n  console.log(req.params.hasOwnProperty('name')); // true\n  return { hello: req.params.name };\n});\n```\n\n```js\n// v5\nfastify.get('/route/:name', (req, reply) => {\n  console.log(Object.hasOwn(req.params, 'name')); // true\n  return { hello: req.params.name };\n});\n```\n\nThis increases the security of the application by hardening against prototype\npollution attacks."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#9",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Migration-Guide-V5.md#9",
+    "b": "fastify:docs/Guides/Migration-Guide-V5.md#6",
+    "relation": "unrelated",
+    "related": 0.0041,
+    "probabilities": {
+     "same": 0.0013,
+     "overlapping": 0.0015,
+     "conflicting": 0.0013,
+     "unrelated": 0.9959
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27
+  },
+  "timing": {
+   "read_ms": 27,
+   "total_ms": 28
+  }
+ }
+}

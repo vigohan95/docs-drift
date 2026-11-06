@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1c/1ceb2740392291061b30",
+ "request_hash": "1ceb2740392291061b3093e00d6efa5661d2ad9921147399497288c7baf3828b",
+ "recorded_at": "2026-11-06T14:50:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2815,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "151.285021",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=63,cfOrigin;dur=0,cfWorker;dur=281"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#0",
+    "text": "---\ntitle: Using Query Builder\nsidebar_label: Query Builder\n---\n\n:::info\n\nTo have access to `createQueryBuilder()` method, you need to import `EntityManager` from your driver package.\n\n```ts\nimport { EntityManager } from '@mikro-orm/mysql'; // or any other SQL driver package\n```\n\n:::\n\nWhen you need to execute some SQL query without all the ORM stuff involved, you can either compose the query yourself, or use the `QueryBuilder` helper to construct the query for you:\n\n```ts\nconst qb = em.createQueryBuilder(Author);\n// or use the `em.qb()` shortcut\n// const qb = em.qb(Author);\nqb.update({ name: 'test 123', type: PublisherType.GLOBAL }).where({ id: 123, type: PublisherType.LOCAL });\n\nconsole.log(qb.getQuery());\n// update `publisher2` set `name` = ?, `type` = ? where `id` = ? and `type` = ?\n\nconsole.log(qb.getParams());\n// ['test 123', PublisherType.GLOBAL, 123, PublisherType.LOCAL]\n\n// run the query\nconst res1 = await qb.execute();\n```\n\n`QueryBuilder` also supports [smart query conditions](./query-conditions.md)."
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#5",
+    "text": "## SqlEntityManager and MongoEntityManager\n\nIn v4 the `core` package, where `EntityManager` and `EntityRepository` are defined, is not dependent on knex, and therefore it cannot have a method returning a `QueryBuilder`. You need to import the SQL flavour of the EM from the driver package to access the `createQueryBuilder()` method.\n\n> The SQL flavour of EM is actually called `SqlEntityManager`, it is exported both under this name and under `EntityManager` alias, so you can just change the location from where you import.\n\n```ts\nimport { EntityManager } from '@mikro-orm/mysql'; // or any other SQL driver package\n\nconst em: EntityManager;\nconst qb = await em.createQueryBuilder(...);\n```\n\nSame applies for the `aggregate()` method in mongo driver:\n\n```ts\nimport { EntityManager } from '@mikro-orm/mongodb';\n\nconst em: EntityManager;\nconst ret = await em.aggregate(...);\n```\n\n> The mongo flavour of EM is actually called `MongoEntityManager`, it is exported both under this name and under `EntityManager` alias, so you can just change the location from where you import."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/upgrading-v3-to-v4.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "mikro-orm:docs/docs/query-builder.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/query-builder.md#0",
+    "b": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#5",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0098,
+     "overlapping": 0.9842,
+     "conflicting": 0.0037,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0109,
+       "restated": 0.9467,
+       "elaborated": 0.0272,
+       "different": 0.0153
+      },
+      "confidence": 0.9847,
+      "a": {
+       "document": "mikro-orm:docs/docs/query-builder.md#0",
+       "quote": "To have access to `createQueryBuilder()` method, you need to import `EntityManager` from your driver package.",
+       "start": 74,
+       "end": 183,
+       "confidence": 1
+      },
+      "b": {
+       "document": "mikro-orm:docs/docs/upgrading-v3-to-v4.md#5",
+       "quote": "You need to import the SQL flavour of the EM from the driver package to access the `createQueryBuilder()` method.\n\n> The SQL flavour of EM is actually called `SqlEntityManager`, it is exported both under this name and under `EntityManager` alias, so you can just change the location from where you import.\n\n```ts\nimport { EntityManager } from '@mikro-orm/mysql'; // or any other SQL driver package\n\nconst em: EntityManager;\nconst qb = await em.createQueryBuilder(...)",
+       "start": 220,
+       "end": 687,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 69,
+   "passages": 2,
+   "counterparts_ms": 65
+  },
+  "timing": {
+   "read_ms": 160,
+   "total_ms": 162
+  }
+ }
+}

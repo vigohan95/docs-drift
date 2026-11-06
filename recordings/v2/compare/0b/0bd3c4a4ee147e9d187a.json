@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/0b/0bd3c4a4ee147e9d187a",
+ "request_hash": "0bd3c4a4ee147e9d187aa3cd1494dbdd2c7ba57ee324e33b6c5bc50d07636d94",
+ "recorded_at": "2026-11-06T14:50:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2520,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "90.560575",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=239"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#40",
+    "text": "### @Transactional()\n\n`@Transactional()` decorator wraps the method in a transaction. It supports all options from `em.transactional()`.\n\nSee [Transactions](./transactions.md) for more details.\n\n| Parameter     | Type                                          | Optional | Description                                                  |\n|---------------|-----------------------------------------------|----------|--------------------------------------------------------------|\n| `context`     | `() => MikroORM` &#124; `() => EntityManager` | yes      | Callback to get the ORM instance or EntityManager.           |\n| `contextName` | `string`                                      | yes      | Name of the context to use.                                  |\n| `isolationLevel` | `IsolationLevel`                           | yes      | Transaction isolation level.                                 |\n| `readOnly`    | `boolean`                                     | yes      | Whether the transaction is read-only.                        |\n| `propagation` | `TransactionPropagation`                      | yes      | Transaction propagation mode. Defaults to `REQUIRED`.        |\n\n```ts\nexport class MyService {\n\n  constructor(private readonly orm: MikroORM) {}\n\n  @Transactional()\n  async createUser(data: CreateUserDto) {\n    // this method runs in a transaction\n    const user = this.orm.em.create(User, data);\n    await this.orm.em.persist(user).flush();\n    return user;\n  }\n\n  @Transactional({ isolationLevel: IsolationLevel.SERIALIZABLE })\n  async transferMoney(from: number, to: number, amount: number) {\n    // runs with SERIALIZABLE isolation level\n  }\n\n}\n```\n\nUnlike `em.transactional()`, the `@Transactional()` decorator uses `REQUIRED` propagation by default, which means it will join an existing transaction if one is active."
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#4",
+    "text": "### Transaction Propagation\n\nTransaction propagation defines how transactions relate to each other when multiple transactional methods are called. This is particularly useful when building complex business logic that spans multiple service layers.\n\nBy default, MikroORM uses `NESTED` propagation for explicit transactions via `em.transactional`. When you call `em.transactional()` within another transaction, it automatically creates a savepoint (nested transaction) rather than joining the existing transaction. This allows inner transaction failures to be handled independently.\n\n```ts\nawait em.transactional(async em1 => {\n  // outer transaction\n  await em1.transactional(async em2 => {\n    // inner transaction with NESTED propagation\n  });\n});\n```\n\nWhen using the `@Transactional()` decorator, the default propagation is `REQUIRED`, which means that if a transaction already exists, it will be used; otherwise, a new transaction will be created.\n\n```ts\nclass BookService {\n\n  constructor(private readonly em: EntityManager) { }\n\n  @Transactional() // uses REQUIRED propagation by default\n  async createBook() {\n    // outer transaction\n    await this.addAuthor(); // inner transaction with REQUIRED propagation\n  }\n\n  @Transactional()\n  async addAuthor() {\n    // inner transaction\n  }\n}\n```\n\n You can customize this behavior using the `propagation` option in both methods:"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#40",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/transactions.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/decorators.md#40",
+    "b": "mikro-orm:docs/docs/transactions.md#4",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.0068,
+     "overlapping": 0.9864,
+     "conflicting": 0.0045,
+     "unrelated": 0.0023
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 26,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 96,
+   "total_ms": 99
+  }
+ }
+}

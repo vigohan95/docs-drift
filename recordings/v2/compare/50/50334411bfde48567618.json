@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/50/50334411bfde48567618",
+ "request_hash": "50334411bfde485676180554f3c26da2529c668756cbd6c410c74181bdbd154d",
+ "recorded_at": "2026-11-06T14:50:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 990,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "96.926817",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=58,cfOrigin;dur=0,cfWorker;dur=226"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#16",
+    "text": "### @Index() and @Unique()\n\nUse `@Index()` to create an index, or `@Unique()` to create unique constraint. You can use those decorators both on the entity level and on property level. To create compound index, use the decorator on the entity level and provide list of property names via the `properties` option.\n\nSee [Defining Entities](./defining-entities.md#indexes).\n\n| Parameter     | Type                          | Optional | Description                                                                                              |\n|---------------|-------------------------------|----------|----------------------------------------------------------------------------------------------------------|\n| `name`        | `string`                      | yes      | index name                                                                                               |\n| `properties`  | `string` &#124; `string[]`    | yes      | list of properties, required when using on entity level                                                  |\n| `type`        | `string`                      | yes      | index type, not available for `@Unique()`. Use `fulltext` to enable support for the `$fulltext` operator |\n| `deferMode`   | `immediate` &#124; `deferred` | yes      | only for postgres unique constraints                                                                     |\n\n```ts\n@Entity()\n@Index({ properties: ['name', 'age'] }) // compound index, with generated name\n@Index({ name: 'custom_idx_name', properties: ['name'] }) // simple index, with custom name\n@Unique({ properties: ['name', 'email'] })\nexport class Author {\n\n  @Property()\n  @Unique()\n  email!: string;\n\n  @Index() // generated name\n  @Property()\n  age?: number;\n\n  @Index({ name: 'born_index' })\n  @Property()\n  born?: string;\n\n}\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/json-properties.md#3",
+    "text": "## Indexes on JSON properties\n\nTo create an index on a JSON property, use an entity-level `@Index()` decorator with a dot path:\n\n```ts\n@Entity()\n@Index({ properties: 'metaData.foo' })\n@Index({ properties: ['metaData.foo', 'metaData.bar'] }) // compound index\nexport class Book {\n\n  @Property({ type: 'json', nullable: true })\n  metaData?: { foo: string; bar: number };\n\n}\n```\n\nIn PostgreSQL, this will generate a query like the following:\n\n```sql\ncreate index \"book_meta_data_foo_index\" on \"book\" ((\"meta_data\"->>'foo'));\n```\n\nTo create a unique index, use the `@Unique()` decorator:\n\n```ts\n@Entity()\n@Unique({ properties: 'metaData.foo' })\n@Unique({ properties: ['metaData.foo', 'metaData.bar'] }) // compound unique index\nexport class Book {\n\n  @Property({ type: 'json', nullable: true })\n  metaData?: { foo: string; bar: number };\n\n}\n```\n\nIn MySQL, you can also set the type explicitly:\n\n```ts\n@Entity()\n@Index({ properties: 'metaData.foo', options: { returning: 'char(200)' } })\nexport class Book {\n\n  @Property({ type: 'json', nullable: true })\n  metaData?: { foo: string; bar: number };\n\n}\n```\n\nThis will generate a query like the following:\n\n```sql\nalter table `book`\n  add index `book_meta_data_foo_index`((json_value(`meta_data`, '$.foo' returning char(200))));\n```\n\n> MariaDB driver does not support this feature."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/decorators.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/json-properties.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/decorators.md#16",
+    "b": "mikro-orm:docs/docs/json-properties.md#3",
+    "relation": "overlapping",
+    "related": 0.9971,
+    "probabilities": {
+     "same": 0.0094,
+     "overlapping": 0.9827,
+     "conflicting": 0.005,
+     "unrelated": 0.0029
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 70,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 105,
+   "total_ms": 108
+  }
+ }
+}

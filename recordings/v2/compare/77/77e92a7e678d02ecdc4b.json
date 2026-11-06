@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/77/77e92a7e678d02ecdc4b",
+ "request_hash": "77e92a7e678d02ecdc4b0f1c5a97d028845f92284f100e56b745a35c482105f9",
+ "recorded_at": "2026-11-06T14:48:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2000,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "94.068701",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=26,cfOrigin;dur=0,cfWorker;dur=274"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Decorators.md#5",
+    "text": "#### `decorateRequest(name, value, [dependencies])`\n<a id=\"decorate-request\"></a>\n\nAs with [`decorateReply`](#decorate-reply), this API adds new methods/properties\nto the core `Request` object:\n\n```js\nfastify.decorateRequest('utility', function () {\n  // something very useful\n})\n```\n\nUsing an arrow function will break the binding of `this` to the Fastify\n`Request` instance.\n\nUsing `decorateRequest` will emit an error if used with a reference type:\n\n```js\n// Don't do this\nfastify.decorateRequest('foo', { bar: 'fizz'})\n```\nIn this example, the object reference would be shared with all requests, and\n**any mutation will impact all requests, potentially creating security\nvulnerabilities or memory leaks**. Fastify blocks this.\n\nTo achieve proper encapsulation across requests configure a new value for each\nincoming request in the [`'onRequest'` hook](./Hooks.md#onrequest).\n\nExample:\n\n```js\nconst fp = require('fastify-plugin')\n\nasync function myPlugin (app) {\n  app.decorateRequest('foo')\n  app.addHook('onRequest', async (req, reply) => {\n    req.foo = { bar: 42 }\n  })\n}\n\nmodule.exports = fp(myPlugin)\n```\n\nThe hook solution is more flexible and allows for more complex initialization\nbecause more logic can be added to the `onRequest` hook.\n\nAnother approach is to use the getter/setter pattern, but it requires 2 decorators:\n\n```js\nfastify.decorateRequest('my_decorator_holder') // define the holder\nfastify.decorateRequest('user', {\n  getter () {\n    this.my_decorator_holder ??= {} // initialize the holder\n    return this.my_decorator_holder\n  }\n})\n\nfastify.get('/', async function (req, reply) {\n  req.user.access = 'granted'\n  // other code\n})\n```\n\nThis ensures that the `user` property is always unique for each request.\n\nSee [`decorate`](#decorate) for information about the `dependencies` parameter."
+   },
+   {
+    "id": "fastify:docs/Reference/Decorators.md#4",
+    "text": "#### `decorateReply(name, value, [dependencies])`\n<a id=\"decorate-reply\"></a>\n\nThis API adds new methods/properties to the core `Reply` object:\n\n```js\nfastify.decorateReply('utility', function () {\n  // Something very useful\n})\n```\n\nUsing an arrow function will break the binding of `this` to the Fastify\n`Reply` instance.\n\nUsing `decorateReply` will throw and error if used with a reference type:\n\n```js\n// Don't do this\nfastify.decorateReply('foo', { bar: 'fizz'})\n```\nIn this example, the object reference would be shared with all requests, and\n**any mutation will impact all requests, potentially creating security\nvulnerabilities or memory leaks**. Fastify blocks this.\n\nTo achieve proper encapsulation across requests configure a new value for each\nincoming request in the [`'onRequest'` hook](./Hooks.md#onrequest).\n\n```js\nconst fp = require('fastify-plugin')\n\nasync function myPlugin (app) {\n  app.decorateReply('foo')\n  app.addHook('onRequest', async (req, reply) => {\n    reply.foo = { bar: 42 }\n  })\n}\n\nmodule.exports = fp(myPlugin)\n```\n\nSee [`decorate`](#decorate) for information about the `dependencies` parameter."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Decorators.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Decorators.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Decorators.md#5",
+    "b": "fastify:docs/Reference/Decorators.md#4",
+    "relation": "overlapping",
+    "related": 0.991,
+    "probabilities": {
+     "same": 0.0123,
+     "overlapping": 0.9627,
+     "conflicting": 0.016,
+     "unrelated": 0.009
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 69,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 100,
+   "total_ms": 102
+  }
+ }
+}

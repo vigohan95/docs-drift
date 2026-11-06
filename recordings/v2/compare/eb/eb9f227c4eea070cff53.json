@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/eb/eb9f227c4eea070cff53",
+ "request_hash": "eb9f227c4eea070cff532f119beb7ab980339d3315b556ea3c489dbd6271dee3",
+ "recorded_at": "2026-11-06T14:50:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1784,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.86192",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=180"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#10",
+    "text": "### `qb.execute()` - Raw Data\n\nReturns plain JavaScript objects directly from the driver. Does **not** use the IdentityMap or hydration:\n\n```ts\nconst rows = await em.createQueryBuilder(User)\n  .select(['id', 'name'])\n  .where({ active: true })\n  .execute();\n\n// rows = [{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }]\n// These are plain objects, not entity instances\n```"
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#16",
+    "text": "## Count queries\n\nTo create a count query, you can use `qb.count()`, which will initialize a select clause with `count()` function. By default, it will use the primary key.\n\n```ts\nconst qb = em.createQueryBuilder(Test);\nqb.count().where({ $and: [{ id: { $nin: [3, 4] } }, { id: { $gt: 2 } }] });\n\nconsole.log(qb.getQuery());\n// select count(`e0`.`id`) from `test` as `e0` where (`e0`.`id` not in (?, ?) and `e0`.`id` > ?)\n\n// to get the count, we can use `qb.execute()`\nconst res = await qb.execute('get');\nconst count = res ? +res.count : 0;\n```\n\nTo simplify this process, you can use `qb.getCount()` method. Following code is equivalent:\n\n```ts\nconst qb = em.createQueryBuilder(Test);\nqb.select('*').limit(10, 20).where({ $and: [{ id: { $nin: [3, 4] } }, { id: { $gt: 2 } }] });\n\nconst count = await qb.getCount();\n```\n\nThis will also remove any existing limit and offset from the query (the QB will be cloned under the hood, so calling `getCount()` does not mutate the original QB state)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "mikro-orm:docs/docs/architecture.md#10",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "mikro-orm:docs/docs/query-builder.md#16",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "mikro-orm:docs/docs/architecture.md#10",
+    "b": "mikro-orm:docs/docs/query-builder.md#16",
+    "relation": "unrelated",
+    "related": 0.428,
+    "probabilities": {
+     "same": 0.0124,
+     "overlapping": 0.4021,
+     "conflicting": 0.0134,
+     "unrelated": 0.572
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 43
+  },
+  "timing": {
+   "read_ms": 42,
+   "total_ms": 45
+  }
+ }
+}

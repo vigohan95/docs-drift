@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/dc/dcc3015dda1767ae1c55",
+ "request_hash": "dcc3015dda1767ae1c55c91c1002c16675da808aeb97af8afa0af9b84356ba2e",
+ "recorded_at": "2026-11-06T14:48:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 943,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.888033",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=43,cfOrigin;dur=0,cfWorker;dur=159"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#91",
+    "text": "#### setgenreqid\n<a id=\"set-gen-req-id\"></a>\n\n`fastify.setGenReqId(function (rawReq))` Synchronous function for setting the request-id\nfor additional Fastify instances. It will receive the _raw_ incoming request as\na parameter. The provided function should not throw an Error in any case.\n\nEspecially in distributed systems, you may want to override the default ID\ngeneration behavior to handle custom ways of generating different IDs in\norder to handle different use cases. Such as observability or webhooks plugins.\n\nFor example:\n```js\nconst fastify = require('fastify')({\n  genReqId: (req) => {\n    return 'base'\n  }\n})\n\nfastify.register((instance, opts, done) => {\n  instance.setGenReqId((req) => {\n    // custom request ID for `/webhooks`\n    return 'webhooks-id'\n  })\n  done()\n}, { prefix: '/webhooks' })\n\nfastify.register((instance, opts, done) => {\n  instance.setGenReqId((req) => {\n    // custom request ID for `/observability`\n    return 'observability-id'\n  })\n  done()\n}, { prefix: '/observability' })\n```\n\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set a different request ID."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#91",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#91",
+    "b": "fastify:docs/Reference/Server.md#88",
+    "relation": "unrelated",
+    "related": 0.0045,
+    "probabilities": {
+     "same": 0.0015,
+     "overlapping": 0.0017,
+     "conflicting": 0.0013,
+     "unrelated": 0.9955
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 34
+  }
+ }
+}

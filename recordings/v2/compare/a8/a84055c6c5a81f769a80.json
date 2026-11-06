@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a8/a84055c6c5a81f769a80",
+ "request_hash": "a84055c6c5a81f769a80a0687201b35c30c5d00bd464f26ee7457e9a55a7464d",
+ "recorded_at": "2026-11-06T14:48:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2610,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "36.744161",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=158"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#77",
+    "text": "#### setReplySerializer\n<a id=\"set-reply-serializer\"></a>\n\nSet the reply serializer for all the routes. This will be used as default if a\n[Reply.serializer(func)](./Reply.md#serializerfunc) has not been set. The\nhandler is fully encapsulated, so different plugins can set different error\nhandlers. Note: the function parameter is called only for status `2xx`. Check\nout the [`setErrorHandler`](#seterrorhandler) for errors.\n\n```js\nfastify.setReplySerializer(function (payload, statusCode){\n  // serialize the payload with a sync function\n  return `my serialized ${statusCode} content: ${payload}`\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#77",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#88",
+    "b": "fastify:docs/Reference/Server.md#77",
+    "relation": "unrelated",
+    "related": 0.0981,
+    "probabilities": {
+     "same": 0.021,
+     "overlapping": 0.057,
+     "conflicting": 0.02,
+     "unrelated": 0.9019
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 43
+  },
+  "timing": {
+   "read_ms": 43,
+   "total_ms": 45
+  }
+ }
+}

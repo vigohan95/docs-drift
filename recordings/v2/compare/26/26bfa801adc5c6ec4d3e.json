@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/26/26bfa801adc5c6ec4d3e",
+ "request_hash": "26bfa801adc5c6ec4d3e7af935cedbf69e2e2a5eb4c8b886a666927a1e16c2ec",
+ "recorded_at": "2026-11-06T14:51:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2023,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "28.318687",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=189"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/createEntityAdapter.mdx#14",
+    "text": "If no instance is passed, it will default to [`createDraftSafeSelector`](./createSelector.mdx#createdraftsafeselector).\n\n:::\n\nBecause selector functions are dependent on knowing where in the state tree this specific entity state object is kept, `getSelectors()` can be called in two ways:\n\n- If called without any arguments (or with undefined as the first parameter), it returns an \"unglobalized\" set of selector functions that assume their `state` argument is the actual entity state object to read from.\n- It may also be called with a selector function that accepts the entire Redux state tree and returns the correct entity state object.\n\nFor example, the entity state for a `Book` type might be kept in the Redux state tree as `state.books`. You can use `getSelectors()` to read from that state in two ways:\n\n```js\nconst store = configureStore({\n  reducer: {\n    books: booksReducer,\n  },\n})\n\nconst simpleSelectors = booksAdapter.getSelectors()\nconst globalizedSelectors = booksAdapter.getSelectors((state) => state.books)\n\n// Need to manually pass the correct entity state object in to this selector\nconst bookIds = simpleSelectors.selectIds(store.getState().books)\n\n// This selector already knows how to find the books entity state\nconst allBooks = globalizedSelectors.selectAll(store.getState())\n```"
+   },
+   {
+    "id": "redux-toolkit:docs/api/createSelector.mdx#4",
+    "text": "### Defining a Pre-Typed `createDraftSelector`\n\nAs of RTK 2.1, you can define a \"pre-typed\" version of `createDraftSafeSelector` that can have the type for `state` built in. This lets you set up those types once, so you don't have to repeat them each time you call `createDraftSafeSelector`.\n\n```ts no-transpile\nconst createTypedDraftSafeSelector =\n  createDraftSafeSelector.withTypes<RootState>()\n```\n\nImport and use the pre-typed `createTypedDraftSafeSelector` function, and it will automatically know that the `state` argument is of type `RootState`.\n\n:::warning Known Limitations\nCurrently this approach only works if input selectors are provided as a single array.\n\nIf you pass the input selectors as separate inline arguments, the parameter types of the result function will not be inferred. As a workaround you can either\n\n1. Wrap your input selectors in a single array\n2. You can annotate the parameter types of the result function:\n\n```ts no-transpile\nimport { createSelector } from 'reselect'\n\ninterface Todo {\n  id: number\n  completed: boolean\n}\n\ninterface Alert {\n  id: number\n  read: boolean\n}\n\nexport interface RootState {\n  todos: Todo[]\n  alerts: Alert[]\n}\n\nexport const createTypedDraftSafeSelector =\n  createDraftSafeSelector.withTypes<RootState>()\n\nconst selectTodoIds = createTypedDraftSafeSelector(\n  // Type of `state` is set to `RootState`, no need to manually set the type\n  (state) => state.todos,\n  // ❌ Known limitation: Parameter types are not inferred in this scenario\n  // so you will have to manually annotate them.\n  (todos: Todo[]) => todos.map(({ id }) => id),\n)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "redux-toolkit:docs/api/createEntityAdapter.mdx#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "redux-toolkit:docs/api/createSelector.mdx#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "redux-toolkit:docs/api/createEntityAdapter.mdx#14",
+    "b": "redux-toolkit:docs/api/createSelector.mdx#4",
+    "relation": "unrelated",
+    "related": 0.0162,
+    "probabilities": {
+     "same": 0.0066,
+     "overlapping": 0.0052,
+     "conflicting": 0.0044,
+     "unrelated": 0.9838
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34
+  },
+  "timing": {
+   "read_ms": 34,
+   "total_ms": 36
+  }
+ }
+}

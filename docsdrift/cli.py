@@ -74,7 +74,8 @@ def _run(args, project, root, includes, excludes, repo, commit):
     client = Clocked(offline=args.offline, budget=args.budget)
     try:
         rep = scan(project, root, includes, excludes, repo=repo, commit=commit, client=client,
-                   max_neardup=args.max_pairs, max_key=args.max_key_pairs, swap=not args.no_swap,
+                   max_neardup=args.max_pairs, max_key=args.max_key_pairs, both_orders=args.both_orders,
+                   swap=not args.no_swap,
                    gate=not args.no_gate, elsewhere=not args.no_elsewhere,
                    log=(lambda *a: None) if args.quiet else (lambda *a: print(*a, file=sys.stderr)))
     except CacheMiss as e:
@@ -97,6 +98,8 @@ def main(argv=None) -> int:
     def common(p):
         p.add_argument("--max-pairs", type=int, default=120, help="near-duplicate passage pairs to compare")
         p.add_argument("--max-key-pairs", type=int, default=30, help="shared-option passage pairs to compare")
+        p.add_argument("--both-orders", action="store_true",
+                       help="compare every pair in both orders (finds more, costs twice as much)")
         p.add_argument("--no-swap", action="store_true", help="skip the swapped-order /compare check")
         p.add_argument("--no-gate", action="store_true", help="skip the /grounding second opinion")
         p.add_argument("--no-elsewhere", action="store_true", help="skip the /rerank search for other places")
