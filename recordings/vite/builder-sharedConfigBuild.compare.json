@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "vite/builder-sharedConfigBuild.compare",
+ "recorded_at": "2026-11-06T13:30:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1105,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "127.473824",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=374"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "text": "## Shared Plugins During Build\n\nBefore Vite 6, the plugins pipelines worked in a different way during dev and build:\n\n- **During dev:** plugins are shared\n- **During Build:** plugins are isolated for each environment (in different processes: `vite build` then `vite build --ssr`).\n\nThis forced frameworks to share state between the `client` build and the `ssr` build through manifest files written to the file system. In Vite 6, we are now building all environments in a single process so the way the plugins pipeline and inter-environment communication can be aligned with dev.\n\nIn a future major, we could have complete alignment:\n\n- **During both dev and build:** plugins are shared, with [per-environment filtering](#per-environment-plugins-using-the-applytoenvironment-hook)\n\nThere will also be a single `ResolvedConfig` instance shared during build, allowing for caching at entire app build process level in the same way as we have been doing with `WeakMap<ResolvedConfig, CachedData>` during dev.\n\nFor Vite 6, we need to do a smaller step to keep backward compatibility. Ecosystem plugins are currently using `config.build` instead of `environment.config.build` to access configuration, so we need to create a new `ResolvedConfig` per-environment by default. A project can opt-in into sharing the full config and plugins pipeline setting `builder.sharedConfigBuild` to `true`.\n\nThis option would only work of a small subset of projects at first, so plugin authors can opt-in for a particular plugin to be shared by setting the `sharedDuringBuild` flag to `true`. This allows for easily sharing state both for regular plugins:\n\n```js\nfunction myPlugin() {\n  // Share state among all environments in dev and build\n  const sharedState = ...\n  return {\n    name: 'shared-plugin',\n    transform(code, id) { ... },\n\n    // Opt-in into a single instance for all environments\n    sharedDuringBuild: true,\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/changes/shared-plugins-during-build.md#0",
+    "text": "# Shared Plugins during Build\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nSee [Shared plugins during build](/guide/api-environment-plugins.md#shared-plugins-during-build).\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Default Change\n`builder.sharedConfigBuild` was first introduced in `v6.0`. You can set it true to check how your plugins work with a shared config. We're looking for feedback about changing the default in a future major once the plugin ecosystem is ready.\n:::"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#13",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/changes/shared-plugins-during-build.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/changes/shared-plugins-during-build.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-plugins.md#13"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment-plugins.md#13",
+    "b": "vite:docs/changes/shared-plugins-during-build.md#0",
+    "relation": "overlapping",
+    "related": 0.9969,
+    "probabilities": {
+     "same": 0.0144,
+     "overlapping": 0.9747,
+     "conflicting": 0.0078,
+     "unrelated": 0.0031
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0191,
+       "restated": 0.5843,
+       "elaborated": 0.3505,
+       "different": 0.0461
+      },
+      "confidence": 0.659,
+      "a": {
+       "document": "vite:docs/guide/api-environment-plugins.md#13",
+       "quote": "## Shared Plugins During Build",
+       "start": 0,
+       "end": 30,
+       "confidence": 0.667
+      },
+      "b": {
+       "document": "vite:docs/changes/shared-plugins-during-build.md#0",
+       "quote": "# Shared Plugins during Build\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nSee [Shared plugins during build](/guide/api-environment-plugins.md#shared-plugins-during-build).\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Default Change\n`builder.sharedConfigBuild` was first introduced in `v6.0`.",
+       "start": 0,
+       "end": 392,
+       "confidence": 0.659
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 29,
+   "passage_reads": 1,
+   "passages_ms": 56,
+   "passages": 1,
+   "counterparts_ms": 55
+  },
+  "timing": {
+   "read_ms": 139,
+   "total_ms": 143
+  }
+ }
+}

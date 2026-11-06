@@ -1,0 +1,146 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/server-moduleGraph.rerank",
+ "recorded_at": "2026-11-06T13:30:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 991,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.423233",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=211"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `server.moduleGraph`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `server.moduleGraph`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-instances.md#4",
+    "title": "docs/guide/api-environment-instances.md > Using `Environment` Instances > Separate Module Graphs",
+    "text": "## Separate Module Graphs\n\nEach environment has an isolated module graph. All module graphs have the same signature, so generic algorithms can be implemented to crawl or query the graph without depending on the environment. `hotUpdate` is a good example. When a file is modified, the module graph of each environment will be used to discover the affected modules and perform HMR for each environment independently.\n\n::: info\nVite v5 had a mixed Client and SSR module graph. Given an unprocessed or invalidated node, it isn't possible to know if it corresponds to the Client, SSR, or both environments. Module nodes have some properties prefixed, like `clientImportedModules` and `ssrImportedModules` (and `importedModules` that returns the union of both). `importers` contains all importers from both the Client and SSR environment for each module node. A module node also has `transformResult` and `ssrTransformResult`. A backward compatibility layer allows the ecosystem to migrate from the deprecated `server.moduleGraph`.\n:::\n\nEach module is represented by a `EnvironmentModuleNode` instance. Modules may be registered in the graph without yet being processed (`transformResult` would be `null` in that case). `importers` and `importedModules` are also updated after the module is processed.\n\n```ts\nclass EnvironmentModuleNode {\n  environment: string\n\n  url: string\n  id: string | null = null\n  file: string | null = null\n\n  type: 'js' | 'css'\n\n  importers = new Set<EnvironmentModuleNode>()\n  importedModules = new Set<EnvironmentModuleNode>()\n  importedBindings: Map<string, Set<string>> | null = null\n\n  info?: ModuleInfo\n  meta?: Record<string, any>\n  transformResult: TransformResult | null = null\n\n  acceptedHmrDeps = new Set<EnvironmentModuleNode>()\n  acceptedHmrExports: Set<string> | null = null\n  isSelfAccepting?: boolean\n  lastHMRTimestamp = 0\n  lastInvalidationTimestamp = 0\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#4",
+    "title": "docs/guide/api-environment.md > Environment API > Environments Configuration",
+    "text": "The `EnvironmentOptions` interface exposes all the per-environment options. There are environment options that apply to both `build` and `dev`, like `resolve`. And there are `DevEnvironmentOptions` and `BuildEnvironmentOptions` for dev and build specific options (like `dev.warmup` or `build.outDir`). Some options like `optimizeDeps` only applies to dev, but is kept as top level instead of nested in `dev` for backward compatibility.\n\n```ts\ninterface EnvironmentOptions {\n  define?: Record<string, any>\n  resolve?: EnvironmentResolveOptions\n  optimizeDeps: DepOptimizationOptions\n  consumer?: 'client' | 'server'\n  dev: DevOptions\n  build: BuildOptions\n}\n```\n\nThe `UserConfig` interface extends from the `EnvironmentOptions` interface, allowing to configure the client and defaults for other environments, configured through the `environments` option. The `client` and a server environment named `ssr` are always present during dev. This allows backward compatibility with `server.ssrLoadModule(url)` and `server.moduleGraph`. During build, the `client` environment is always present, and the `ssr` environment is only present if it is explicitly configured (using `environments.ssr` or for backward compatibility `build.ssr`). An app doesn't need to use the `ssr` name for its SSR environment, it could name it `server` for example."
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#7",
+    "title": "docs/guide/api-environment.md > Environment API > Backward Compatibility",
+    "text": "## Backward Compatibility\n\nThe current Vite server API is not yet deprecated and is backward compatible with Vite 5.\n\nThe `server.moduleGraph` returns a mixed view of the client and ssr module graphs. Backward compatible mixed module nodes will be returned from all its methods. The same scheme is used for the module nodes passed to `handleHotUpdate`.\n\nWe don't recommend switching to Environment API yet. We are aiming for a good portion of the user base to adopt Vite 6 before so plugins don't need to maintain two versions. Checkout the future breaking changes section for information on future deprecations and upgrade path:\n\n- [`this.environment` in Hooks](/changes/this-environment-in-hooks)\n- [HMR `hotUpdate` Plugin Hook](/changes/hotupdate-hook)\n- [Move to Per-environment APIs](/changes/per-environment-apis)\n- [SSR Using `ModuleRunner` API](/changes/ssr-using-modulerunner)\n- [Shared Plugins During Build](/changes/shared-plugins-during-build)"
+   },
+   {
+    "id": "vite:docs/changes/per-environment-apis.md#0",
+    "title": "docs/changes/per-environment-apis.md > Move to Per-environment APIs",
+    "text": "# Move to Per-environment APIs\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nMultiple APIs from `ViteDevServer` related to module graph and modules transforms have been moved to the `DevEnvironment` instances.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\nThe `Environment` instance was first introduced at `v6.0`. The deprecation of `server.moduleGraph` and other methods that are now in environments is planned for a future major. We don't recommend moving away from server methods yet. To identify your usage, set these in your vite config.\n\n```ts\nfuture: {\n  removeServerModuleGraph: 'warn',\n  removeServerReloadModule: 'warn',\n  removeServerPluginContainer: 'warn',\n  removeServerHot: 'warn',\n  removeServerTransformRequest: 'warn',\n  removeServerWarmupRequest: 'warn',\n}\n```\n\n:::"
+   },
+   {
+    "id": "vite:docs/changes/per-environment-apis.md#1",
+    "title": "docs/changes/per-environment-apis.md > Move to Per-environment APIs > Motivation",
+    "text": "## Motivation\n\nIn Vite v5 and before, a single Vite dev server always had two environments (`client` and `ssr`). The `server.moduleGraph` had mixed modules from both of these environments. Nodes were connected through `clientImportedModules` and `ssrImportedModules` lists (but a single `importers` list was maintained for each). A transformed module was represented by an `id` and a `ssr` boolean. This boolean needed to be passed to APIs, for example `server.moduleGraph.getModuleByUrl(url, ssr)` and `server.transformRequest(url, { ssr })`.\n\nIn Vite v6, it is now possible to create any number of custom environments (`client`, `ssr`, `edge`, etc). A single `ssr` boolean isn't enough anymore. Instead of changing the APIs to be of the form `server.transformRequest(url, { environment })`, we moved these methods to the environment instance allowing them to be called without a Vite dev server."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "vite:docs/guide/api-environment.md#7",
+    "action": "use",
+    "relevance_score": 0.9855,
+    "document_score": 0.9908,
+    "levels": {
+     "answers": 0.9855,
+     "elsewhere": 0.0053,
+     "different_case": 0.0062,
+     "unrelated": 0.0031
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-instances.md#4",
+    "action": "use",
+    "relevance_score": 0.6001,
+    "document_score": 0.9025,
+    "levels": {
+     "answers": 0.6001,
+     "elsewhere": 0.3024,
+     "different_case": 0.0449,
+     "unrelated": 0.0525
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/changes/per-environment-apis.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0759,
+    "document_score": 0.3858,
+    "levels": {
+     "answers": 0.0759,
+     "elsewhere": 0.3098,
+     "different_case": 0.0446,
+     "unrelated": 0.5696
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/changes/per-environment-apis.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0092,
+    "document_score": 0.0543,
+    "levels": {
+     "answers": 0.0092,
+     "elsewhere": 0.0451,
+     "different_case": 0.0291,
+     "unrelated": 0.9166
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-environment.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0144,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.011,
+     "different_case": 0.0191,
+     "unrelated": 0.9666
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1889
+  },
+  "timing": {
+   "total_ms": 61,
+   "rerank_ms": 60,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2564,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,91 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/memSeries.rerank",
+ "recorded_at": "2026-11-06T13:31:06Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 887,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.393089",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=165"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `memSeries`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `memSeries`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/refs.md#9",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used internally in TSDB",
+    "text": "## Used internally in TSDB\n\n* [`HeadChunkID`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb/chunks#HeadChunkID) references a chunk of a `memSeries` (either an `mmappedChunk` or `headChunk`).\n  If a caller has, for whatever reason, an \"old\" `HeadChunkID` that refers to a chunk that has been compacted into a block, querying the memSeries for it will not return any data.\n* [`ChunkDiskMapperRef`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb/chunks#ChunkDiskMapperRef) is an 8 Byte integer.\n  4 Bytes are used to refer to a chunks file number and 4 bytes serve as byte offset (similar to `BlockChunkRef`).  `mmappedChunk` provide this value such that callers can load the mmapped chunk from disk."
+   },
+   {
+    "id": "prometheus:tsdb/docs/usage.md#1",
+    "title": "tsdb/docs/usage.md > Usage > Instantiating a database",
+    "text": "## Instantiating a database\n\nCallers should use [`tsdb.Open`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#Open) to open a TSDB\n(the directory may be new or pre-existing).\nThis returns a [`*tsdb.DB`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#DB) which is the actual database.\n\nA `DB` has the following main components:\n\n* Compactor: a [leveled compactor](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#LeveledCompactor). Note: it is currently the only compactor implementation. It runs automatically.\n* [`Head`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#DB.Head)\n* [Blocks (persistent blocks)](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#DB.Blocks)\n\nThe `Head` is responsible for a lot. Here are its main components:\n\n* [WAL](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb/wal#WAL) (Write Ahead Log).\n* [`stripeSeries`](https://github.com/prometheus/prometheus/blob/411021ada9ab41095923b8d2df9365b632fd40c3/tsdb/head.go#L1292):\n  this holds all the active series by linking to [`memSeries`](https://github.com/prometheus/prometheus/blob/411021ada9ab41095923b8d2df9365b632fd40c3/tsdb/head.go#L1462)\n  by an ID (aka \"ref\") and by labels hash.\n* Postings list (reverse index): For any label-value pair, holds all the corresponding series refs. Used for queries.\n* Tombstones."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/refs.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0037,
+    "document_score": 0.0087,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.005,
+     "different_case": 0.014,
+     "unrelated": 0.9773
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/usage.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0034,
+    "document_score": 0.0085,
+    "levels": {
+     "answers": 0.0034,
+     "elsewhere": 0.0052,
+     "different_case": 0.0179,
+     "unrelated": 0.9736
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 840
+  },
+  "timing": {
+   "total_ms": 44,
+   "rerank_ms": 43,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1110,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

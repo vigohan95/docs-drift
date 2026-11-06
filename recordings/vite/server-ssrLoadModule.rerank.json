@@ -1,0 +1,128 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/server-ssrLoadModule.rerank",
+ "recorded_at": "2026-11-06T13:30:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 899,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "46.948383",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=186"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `server.ssrLoadModule`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `server.ssrLoadModule`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#2",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > `RunnableDevEnvironment`",
+    "text": "### `RunnableDevEnvironment`\n\n`RunnableDevEnvironment` is an environment that can communicate arbitrary JavaScript values with your application code. Importing a module returns its real, live exports (functions, class instances, and any other values), so frameworks can run their server entries directly. The implicit `ssr` environment and other non-client environments use a `RunnableDevEnvironment` by default during dev. You can guard access to the runner with the `isRunnableDevEnvironment` function.\n\nIts `runner` is a `ModuleRunner`. You import modules through it with `runner.import(url)`, which fetches, transforms, and evaluates a module from the Vite module graph (the `url` accepts a file path, server path, or id relative to the root) and returns the instantiated module with full HMR support. It is the modern replacement for `server.ssrLoadModule`, so frameworks can migrate to it to enable HMR for their SSR dev story.\n\n:::info Why it can communicate arbitrary values\nA `RunnableDevEnvironment` evaluates modules in the same runtime as the Vite server, so values cross the boundary in-process instead of being serialized. This is what distinguishes it from [`FetchableDevEnvironment`](#fetchabledevenvironment), which can only communicate through serialized `Request`/`Response` objects over the Fetch API. As a result, using a `RunnableDevEnvironment` requires the runner's runtime to be the same as the one the Vite server is running in.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-environment.md#4",
+    "title": "docs/guide/api-environment.md > Environment API > Environments Configuration",
+    "text": "The `EnvironmentOptions` interface exposes all the per-environment options. There are environment options that apply to both `build` and `dev`, like `resolve`. And there are `DevEnvironmentOptions` and `BuildEnvironmentOptions` for dev and build specific options (like `dev.warmup` or `build.outDir`). Some options like `optimizeDeps` only applies to dev, but is kept as top level instead of nested in `dev` for backward compatibility.\n\n```ts\ninterface EnvironmentOptions {\n  define?: Record<string, any>\n  resolve?: EnvironmentResolveOptions\n  optimizeDeps: DepOptimizationOptions\n  consumer?: 'client' | 'server'\n  dev: DevOptions\n  build: BuildOptions\n}\n```\n\nThe `UserConfig` interface extends from the `EnvironmentOptions` interface, allowing to configure the client and defaults for other environments, configured through the `environments` option. The `client` and a server environment named `ssr` are always present during dev. This allows backward compatibility with `server.ssrLoadModule(url)` and `server.moduleGraph`. During build, the `client` environment is always present, and the `ssr` environment is only present if it is explicitly configured (using `environments.ssr` or for backward compatibility `build.ssr`). An app doesn't need to use the `ssr` name for its SSR environment, it could name it `server` for example."
+   },
+   {
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "title": "docs/changes/ssr-using-modulerunner.md > SSR Using `ModuleRunner` API",
+    "text": "# SSR Using `ModuleRunner` API\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\n`server.ssrLoadModule` has been replaced by importing from a [Module Runner](/guide/api-environment-runtimes#modulerunner).\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`ModuleRunner` was first introduced in `v6.0`. The deprecation of `server.ssrLoadModule` is planned for a future major. To identify your usage, set `future.removeSsrLoadModule` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#1",
+    "title": "docs/changes/ssr-using-modulerunner.md > SSR Using `ModuleRunner` API > Motivation",
+    "text": "## Motivation\n\nThe `server.ssrLoadModule(url)` only allows importing modules in the `ssr` environment and can only execute the modules in the same process as the Vite dev server. For apps with custom environments, each is associated with a `ModuleRunner` that may be running in a separate thread or process. To import modules, we now have `moduleRunner.import(url)`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#1",
+    "action": "use",
+    "relevance_score": 0.8565,
+    "document_score": 0.9032,
+    "levels": {
+     "answers": 0.8565,
+     "elsewhere": 0.0467,
+     "different_case": 0.0387,
+     "unrelated": 0.0581
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/changes/ssr-using-modulerunner.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0328,
+    "document_score": 0.1491,
+    "levels": {
+     "answers": 0.0328,
+     "elsewhere": 0.1163,
+     "different_case": 0.0338,
+     "unrelated": 0.8171
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-environment.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0058,
+    "document_score": 0.0477,
+    "levels": {
+     "answers": 0.0058,
+     "elsewhere": 0.042,
+     "different_case": 0.0263,
+     "unrelated": 0.926
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-frameworks.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0048,
+    "document_score": 0.024,
+    "levels": {
+     "answers": 0.0048,
+     "elsewhere": 0.0192,
+     "different_case": 0.0218,
+     "unrelated": 0.9542
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1268
+  },
+  "timing": {
+   "total_ms": 65,
+   "rerank_ms": 50,
+   "questions_ms": 0,
+   "model_ms": 44,
+   "engine": {
+    "rows": 1808,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 44,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

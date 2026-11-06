@@ -1,0 +1,143 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/vite-config-js.rerank",
+ "recorded_at": "2026-11-06T13:30:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 964,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.951454",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=255"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `vite.config.js`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `vite.config.js`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/static-deploy.md#4",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site > GitHub Pages",
+    "text": "## GitHub Pages\n\n1. **Update Vite Config**\n\n   Set the correct `base` in `vite.config.js`.\n\n   If you are deploying to `https://<USERNAME>.github.io/`, or to a custom domain through GitHub Pages (eg. `www.example.com`), set `base` to `'/'`. Alternatively, you can remove `base` from the configuration, as it defaults to `'/'`.\n\n   If you are deploying to `https://<USERNAME>.github.io/<REPO>/` (eg. your repository is at `https://github.com/<USERNAME>/<REPO>`), then set `base` to `'/<REPO>/'`.\n\n2. **Enable GitHub Pages**\n\n   In your repository, go to **Settings → Pages**. Under **Build and deployment**, open the **Source** dropdown, and select **GitHub Actions**.\n\n   GitHub will now deploy your site using a GitHub Actions [workflow](https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows), which is necessary since Vite requires a build step for deployment.\n\n3. **Create a Workflow**\n\n   Create a new file in your repository at `.github/workflows/deploy.yml`. You can also click on **“create your own”** from the previous step, which will generate a starter workflow file for you.\n\n   Here’s a sample workflow that installs dependencies with npm, builds the site, and deploys it whenever you push changes to the `main` branch:\n\n   <<< ./static-deploy-github-pages.yaml#content [.github/workflows/deploy.yml]"
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#5",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site > GitLab Pages and GitLab CI",
+    "text": "## GitLab Pages and GitLab CI\n\n1. Set the correct `base` in `vite.config.js`.\n\n   If you are deploying to `https://<USERNAME or GROUP>.gitlab.io/`, you can omit `base` as it defaults to `'/'`.\n\n   If you are deploying to `https://<USERNAME or GROUP>.gitlab.io/<REPO>/`, for example your repository is at `https://gitlab.com/<USERNAME>/<REPO>`, then set `base` to `'/<REPO>/'`.\n\n2. Create a file called `.gitlab-ci.yml` in the root of your project with the content below. This will build and deploy your site whenever you make changes to your content:\n\n   ```yaml [.gitlab-ci.yml]\n   image: node:lts\n   pages:\n     stage: deploy\n     cache:\n       key:\n         files:\n           - package-lock.json\n         prefix: npm\n       paths:\n         - node_modules/\n     script:\n       - npm install\n       - npm run build\n       - cp -a dist/. public/\n     artifacts:\n       paths:\n         - public\n     rules:\n       - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH\n   ```"
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#2",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Config > This package is ESM only",
+    "text": "### This package is ESM only\n\nWhen importing an ESM only package by `require`, the following error happens.\n\n> Failed to resolve \"foo\". This package is ESM only but it was tried to load by `require`.\n\n> Error [ERR_REQUIRE_ESM]: require() of ES Module /path/to/dependency.js from /path/to/vite.config.js not supported.\n> Instead change the require of index.js in /path/to/vite.config.js to a dynamic import() which is available in all CommonJS modules.\n\nIn Node.js <=22, ESM files cannot be loaded by [`require`](https://nodejs.org/docs/latest-v22.x/api/esm.html#require) by default.\n\nWhile it may work using [`--experimental-require-module`](https://nodejs.org/docs/latest-v22.x/api/modules.html#loading-ecmascript-modules-using-require), or Node.js >22, or in other runtimes, we still recommend converting your config to ESM by either:\n\n- adding `\"type\": \"module\"` to the nearest `package.json`\n- renaming `vite.config.js`/`vite.config.ts` to `vite.config.mjs`/`vite.config.mts`"
+   },
+   {
+    "id": "vite:docs/guide/using-plugins.md#1",
+    "title": "docs/guide/using-plugins.md > Using Plugins > Adding a Plugin",
+    "text": "## Adding a Plugin\n\nTo use a plugin, it needs to be added to the `devDependencies` of the project and included in the `plugins` array in the `vite.config.js` config file. For example, to provide support for legacy browsers, the official [@vitejs/plugin-legacy](https://github.com/vitejs/vite/tree/main/packages/plugin-legacy) can be used:\n\n```bash\n$ npm add -D @vitejs/plugin-legacy\n```\n\n```js twoslash [vite.config.js]\nimport legacy from '@vitejs/plugin-legacy'\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  plugins: [\n    legacy({\n      targets: ['defaults', 'not IE 11'],\n    }),\n  ],\n})\n```\n\n`plugins` also accepts presets including several plugins as a single element. This is useful for complex features (like framework integration) that are implemented using several plugins. The array will be flattened internally.\n\nFalsy plugins will be ignored, which can be used to easily activate or deactivate plugins."
+   },
+   {
+    "id": "vite:docs/config/index.md#0",
+    "title": "docs/config/index.md > Configuring Vite",
+    "text": "# Configuring Vite\n\nWhen running `vite` from the command line, Vite will automatically try to resolve a config file named `vite.config.js` inside [project root](/guide/#index-html-and-project-root) (other JS and TS extensions are also supported).\n\nThe most basic config file looks like this:\n\n```js [vite.config.js]\nexport default {\n  // config options\n}\n```\n\nNote that to use ES modules syntax in the config file, it should be in a file detected as ESM by Node.js, e.g. `.mjs` or `.js` with `\"type\": \"module\"` in closest `package.json`.\n\nYou can also explicitly specify a config file to use with the `--config` CLI option (resolved relative to `cwd`):\n\n```bash\nvite --config my-config.js\n```\n\n<ScrimbaLink href=\"https://scrimba.com/intro-to-vite-c03p6pbbdq/~05jg?via=vite\" title=\"Configuring Vite\">Watch an interactive lesson on Scrimba</ScrimbaLink>\n\n::: tip CONFIG LOADING\nBy default, Vite uses [Rolldown](https://rolldown.rs/) to bundle the config into a temporary file and load it. If you're using an environment that supports TypeScript (e.g. Node 22.18+), or if you're only writing plain JavaScript, you can specify `--configLoader native` to use the environment's native runtime to load the config file. `configLoader: 'native'` is planned to become the default in a future major version.\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/static-deploy.md#4",
+    "action": "use",
+    "relevance_score": 0.9952,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9952,
+     "elsewhere": 0.0012,
+     "different_case": 0.0017,
+     "unrelated": 0.0018
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/static-deploy.md#5",
+    "action": "use",
+    "relevance_score": 0.9908,
+    "document_score": 0.9935,
+    "levels": {
+     "answers": 0.9908,
+     "elsewhere": 0.0027,
+     "different_case": 0.0032,
+     "unrelated": 0.0033
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/config/index.md#0",
+    "action": "use",
+    "relevance_score": 0.9847,
+    "document_score": 0.991,
+    "levels": {
+     "answers": 0.9847,
+     "elsewhere": 0.0063,
+     "different_case": 0.005,
+     "unrelated": 0.004
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/using-plugins.md#1",
+    "action": "use",
+    "relevance_score": 0.5918,
+    "document_score": 0.769,
+    "levels": {
+     "answers": 0.5918,
+     "elsewhere": 0.1772,
+     "different_case": 0.0593,
+     "unrelated": 0.1717
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/troubleshooting.md#2",
+    "action": "expand",
+    "relevance_score": 0.0723,
+    "document_score": 0.647,
+    "levels": {
+     "answers": 0.0723,
+     "elsewhere": 0.5747,
+     "different_case": 0.1085,
+     "unrelated": 0.2445
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1981
+  },
+  "timing": {
+   "total_ms": 77,
+   "rerank_ms": 61,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2656,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

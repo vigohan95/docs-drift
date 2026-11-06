@@ -1,0 +1,156 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify/forceCloseConnections.compare",
+ "recorded_at": "2026-11-06T13:30:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2249,
+ "response_headers": {
+  "x-clocked-credits": "31",
+  "x-clocked-model-ms": "750.359692",
+  "x-clocked-cost-usd": "0.006175",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=1533"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#7",
+    "text": "### `forceCloseConnections`\n<a id=\"forcecloseconnections\"></a>\n\n+ Default: `\"idle\"` if the HTTP server allows it, `false` otherwise\n\nWhen set to `true`, upon [`close`](#close) the server will iterate the current\npersistent connections and [destroy their\nsockets](https://nodejs.org/dist/latest-v16.x/docs/api/net.html#socketdestroyerror).\n\nWhen used with HTTP/2 server, it will also close all active HTTP/2 sessions.\n\n> ℹ️ Note:\n> Since Node.js v24 active sessions are closed by default\n\n\n> ⚠ Warning:\n> Connections are not inspected to determine if requests have\n> been completed.\n\nFastify will prefer the HTTP server's\n[`closeAllConnections`](https://nodejs.org/dist/latest-v18.x/docs/api/http.html#servercloseallconnections)\nmethod if supported, otherwise, it will use internal connection tracking.\n\nWhen set to `\"idle\"`, upon [`close`](#close) the server will iterate the current\npersistent connections which are not sending a request or waiting for a response\nand destroy their sockets. The value is only supported if the HTTP server\nsupports the\n[`closeIdleConnections`](https://nodejs.org/dist/latest-v18.x/docs/api/http.html#servercloseidleconnections)\nmethod, otherwise attempting to set it will throw an exception."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "text": "##### Shutdown lifecycle\n\nWhen `fastify.close()` is called, the following steps happen in order:\n\n1. The server is flagged as **closing**. New incoming requests receive a\n   `Connection: close` header (HTTP/1.1) and are handled according to\n   [`return503OnClosing`](#factory-return-503-on-closing).\n2. [`preClose`](./Hooks.md#pre-close) hooks execute. The server is still\n   processing in-flight requests at this point.\n3. **Connection draining** based on the\n   [`forceCloseConnections`](#forcecloseconnections) option:\n   - `\"idle\"` — idle keep-alive connections are closed; in-flight requests\n     continue.\n   - `true` — all persistent connections are destroyed immediately.\n   - `false` — no forced closure; idle connections remain open until they time\n     out naturally (see [`keepAliveTimeout`](#keepalivetimeout)).\n4. The HTTP server **stops accepting** new TCP connections\n   (`server.close()`). Node.js waits for all in-flight requests to complete\n   before invoking the callback.\n5. [`onClose`](./Hooks.md#on-close) hooks execute. All in-flight requests have\n   completed and the server is no longer listening.\n6. The `close` callback (or the returned Promise) resolves.\n\n```\nfastify.close() called\n  │\n  ├─▶ closing = true (new requests receive 503)\n  │\n  ├─▶ preClose hooks\n  │     (in-flight requests still active)\n  │\n  ├─▶ Connection draining (forceCloseConnections)\n  │\n  ├─▶ server.close()\n  │     (waits for in-flight requests to complete)\n  │\n  ├─▶ onClose hooks\n  │     (server stopped, all requests done)\n  │\n  └─▶ close callback / Promise resolves\n```\n\n> ℹ️ Note:\n> Upgraded connections (such as WebSocket) are not tracked by the HTTP\n> server and will prevent `server.close()` from completing. Close them\n> explicitly in a [`preClose`](./Hooks.md#pre-close) hook."
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#17",
+    "text": "| <a id=\"fst_err_force_close_connections_idle_not_available\">FST_ERR_FORCE_CLOSE_CONNECTIONS_IDLE_NOT_AVAILABLE</a> | Cannot set forceCloseConnections to `idle` as your HTTP server does not support `closeIdleConnections` method. | Use a different value for `forceCloseConnections`. | [#3925](https://github.com/fastify/fastify/pull/3925) |\n| <a id=\"fst_err_duplicated_route\">FST_ERR_DUPLICATED_ROUTE</a> | The HTTP method already has a registered controller for that URL. | Use a different URL or register the controller for another HTTP method. | [#2954](https://github.com/fastify/fastify/pull/2954) |\n| <a id=\"fst_err_bad_url\">FST_ERR_BAD_URL</a> | The router received an invalid URL. | Use a valid URL. | [#2106](https://github.com/fastify/fastify/pull/2106) |\n| <a id=\"fst_err_max_param_length\">FST_ERR_MAX_PARAM_LENGTH</a> | The router received an URL that exceed max param length. | Adjust the param length or increase the max param length to meet your needs. | [#2106](https://github.com/fastify/fastify/pull/6716) |\n| <a id=\"fst_err_async_constraint\">FST_ERR_ASYNC_CONSTRAINT</a> | The router received an error when using asynchronous constraints. | - | [#4323](https://github.com/fastify/fastify/pull/4323) |\n| <a id=\"fst_err_invalid_url\">FST_ERR_INVALID_URL</a> | URL must be a string. | Use a string for the URL. | [#3653](https://github.com/fastify/fastify/pull/3653) |\n| <a id=\"fst_err_route_options_not_obj\">FST_ERR_ROUTE_OPTIONS_NOT_OBJ</a> | Options for the route must be an object. | Use an object for the route options. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_duplicated_handler\">FST_ERR_ROUTE_DUPLICATED_HANDLER</a> | Duplicate handler for the route is not allowed. | Use a different handler. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_handler_not_fn\">FST_ERR_ROUTE_HANDLER_NOT_FN</a> | Handler for the route must be a function. | Use a function for the handler. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_missing_handler\">FST_ERR_ROUTE_MISSING_HANDLER</a> | Missing handler function for the route. | Add a handler function. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_method_invalid\">FST_ERR_ROUTE_METHOD_INVALID</a> | Method is not a valid value. | Use a valid value for the method. | [#4750](https://github.com/fastify/fastify/pull/4750) |\n| <a id=\"fst_err_route_method_already_supported\">FST_ERR_ROUTE_METHOD_ALREADY_SUPPORTED</a> | The HTTP method is already supported. | Pass `{ overrideExisting: true }` to explicitly override it. | [#6909](https://github.com/fastify/fastify/pull/6909) |\n| <a id=\"fst_err_route_method_not_supported\">FST_ERR_ROUTE_METHOD_NOT_SUPPORTED</a> | Method is not supported for the route. | Use a supported method. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_log_level_invalid\">FST_ERR_ROUTE_LOG_LEVEL_INVALID</a> | `logLevel` must match a configured logger level. | Use one of the configured logger levels for the route. | [#6523](https://github.com/fastify/fastify/pull/6523) |\n| <a id=\"fst_err_route_body_validation_schema_not_supported\">FST_ERR_ROUTE_BODY_VALIDATION_SCHEMA_NOT_SUPPORTED</a> | Body validation schema route is not supported. | Use a different different method for the route. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_route_body_limit_option_not_int\">FST_ERR_ROUTE_BODY_LIMIT_OPTION_NOT_INT</a> | `bodyLimit` option must be an integer. | Use an integer for the `bodyLimit` option. | [#4554](https://github.com/fastify/fastify/pull/4554) |"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Server.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Errors.md#17"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#17",
+    "duplicates": [],
+    "overlaps": [
+     "fastify:docs/Reference/Server.md#7"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Server.md#7",
+    "b": "fastify:docs/Reference/Server.md#62",
+    "relation": "overlapping",
+    "related": 0.9976,
+    "probabilities": {
+     "same": 0.0102,
+     "overlapping": 0.9836,
+     "conflicting": 0.0038,
+     "unrelated": 0.0024
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#7",
+    "b": "fastify:docs/Reference/Errors.md#17",
+    "relation": "overlapping",
+    "related": 0.9967,
+    "probabilities": {
+     "same": 0.0068,
+     "overlapping": 0.9859,
+     "conflicting": 0.0041,
+     "unrelated": 0.0033
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0074,
+       "restated": 0.9674,
+       "elaborated": 0.0178,
+       "different": 0.0074
+      },
+      "confidence": 0.9926,
+      "a": {
+       "document": "fastify:docs/Reference/Server.md#7",
+       "quote": "The value is only supported if the HTTP server",
+       "start": 992,
+       "end": 1038,
+       "confidence": 1
+      },
+      "b": {
+       "document": "fastify:docs/Reference/Errors.md#17",
+       "quote": "| <a id=\"fst_err_force_close_connections_idle_not_available\">FST_ERR_FORCE_CLOSE_CONNECTIONS_IDLE_NOT_AVAILABLE</a> | Cannot set forceCloseConnections to `idle` as your HTTP server does not support `closeIdleConnections` method.",
+       "start": 0,
+       "end": 228,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Server.md#62",
+    "b": "fastify:docs/Reference/Errors.md#17",
+    "relation": "overlapping",
+    "related": 0.9936,
+    "probabilities": {
+     "same": 0.0125,
+     "overlapping": 0.9737,
+     "conflicting": 0.0074,
+     "unrelated": 0.0064
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   1
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 322,
+   "passage_reads": 1,
+   "passages_ms": 620,
+   "passages": 2,
+   "counterparts_ms": 453
+  },
+  "timing": {
+   "read_ms": 1394,
+   "total_ms": 1400
+  }
+ }
+}

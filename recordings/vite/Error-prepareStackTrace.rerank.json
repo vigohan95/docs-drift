@@ -1,0 +1,91 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/Error-prepareStackTrace.rerank",
+ "recorded_at": "2026-11-06T13:30:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 894,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.238369",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=224"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `Error.prepareStackTrace`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `Error.prepareStackTrace`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > `RunnableDevEnvironment`",
+    "text": "```ts\nexport class RunnableDevEnvironment extends DevEnvironment {\n  public readonly runner: ModuleRunner\n}\n\nclass ModuleRunner {\n  /**\n   * URL to execute.\n   * Accepts file path, server path, or id relative to the root.\n   * Returns an instantiated module (same as in ssrLoadModule)\n   */\n  public async import(url: string): Promise<Record<string, any>>\n  /**\n   * Other ModuleRunner methods...\n   */\n}\n\nif (isRunnableDevEnvironment(server.environments.ssr)) {\n  await server.environments.ssr.runner.import('/entry-point.js')\n}\n```\n\n:::warning\nThe `runner` is evaluated lazily only when it's accessed for the first time. Beware that Vite enables source map support when the `runner` is created by calling `process.setSourceMapsEnabled` or by overriding `Error.prepareStackTrace` if it's not available.\n:::\n\nGiven a Vite server configured in middleware mode as described by the [SSR setup guide](/guide/ssr#setting-up-the-dev-server), let's implement the SSR middleware using the environment API. Remember that it doesn't have to be called `ssr`, so we'll name it `server` in this example. Error handling is omitted.\n\n```js\nimport fs from 'node:fs'\nimport path from 'node:path'\nimport { createServer } from 'vite'\n\nconst viteServer = await createServer({\n  server: { middlewareMode: true },\n  appType: 'custom',\n  environments: {\n    server: {\n      // by default, modules are run in the same process as the vite server\n    },\n  },\n})\n\n// You might need to cast this to RunnableDevEnvironment in TypeScript or\n// use isRunnableDevEnvironment to guard the access to the runner\nconst serverEnvironment = viteServer.environments.server\n\napp.use('*', async (req, res, next) => {\n  const url = req.originalUrl\n\n  // 1. Read index.html\n  const indexHtmlPath = path.resolve(import.meta.dirname, 'index.html')\n  let template = fs.readFileSync(indexHtmlPath, 'utf-8')\n\n  // 2. Apply Vite HTML transforms. This injects the Vite HMR client,\n  //    and also applies HTML transforms from Vite plugins, e.g. global\n  //    preambles from @vitejs/plugin-react\n  template = await viteServer.transformIndexHtml(url, template)\n\n  // 3. Load the server entry. import(url) automatically transforms\n  //    ESM source code to be usable in Node.js! There is no bundling\n  //    required, and provides full HMR support.\n  const { render } = await serverEnvironment.runner.import(\n    '/src/entry-server.js',\n  )"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#6",
+    "title": "docs/guide/api-environment-runtimes.md > Environment API for Runtimes > `ModuleRunnerOptions`",
+    "text": "## `ModuleRunnerOptions`\n\n```ts twoslash\nimport type { Debug } from '@type-challenges/utils'\nimport type {\n  InterceptorOptions as InterceptorOptionsRaw,\n  ModuleRunnerHmr as ModuleRunnerHmrRaw,\n  EvaluatedModules,\n} from 'vite/module-runner'\n\ntype InterceptorOptions = Debug<InterceptorOptionsRaw>\ntype ModuleRunnerHmr = Debug<ModuleRunnerHmrRaw>\n/** see below */\ntype ModuleRunnerTransport = unknown\n\n// ---cut---\ninterface ModuleRunnerOptions {\n  /**\n   * A set of methods to communicate with the server.\n   */\n  transport: ModuleRunnerTransport\n  /**\n   * Configure how source maps are resolved.\n   * Prefers `node` if `process.setSourceMapsEnabled` is available.\n   * Otherwise it will use `prepareStackTrace` by default which overrides\n   * `Error.prepareStackTrace` method.\n   * You can provide an object to configure how file contents and\n   * source maps are resolved for files that were not processed by Vite.\n   */\n  sourcemapInterceptor?:\n    | false\n    | 'node'\n    | 'prepareStackTrace'\n    | InterceptorOptions\n  /**\n   * Disable HMR or configure HMR options.\n   *\n   * @default true\n   */\n  hmr?: boolean | ModuleRunnerHmr\n  /**\n   * Custom module cache. If not provided, it creates a separate module\n   * cache for each module runner instance.\n   */\n  evaluatedModules?: EvaluatedModules\n}\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-frameworks.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0043,
+    "document_score": 0.0171,
+    "levels": {
+     "answers": 0.0043,
+     "elsewhere": 0.0128,
+     "different_case": 0.0262,
+     "unrelated": 0.9567
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-environment-runtimes.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0184,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.0154,
+     "different_case": 0.0166,
+     "unrelated": 0.965
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1202
+  },
+  "timing": {
+   "total_ms": 46,
+   "rerank_ms": 45,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1440,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

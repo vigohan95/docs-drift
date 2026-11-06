@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/logController.rerank",
+ "recorded_at": "2026-11-06T13:29:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 965,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.471294",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=266"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `logController`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `logController`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Errors.md#15",
+    "title": "docs/Reference/Errors.md > Errors > Fastify Error Codes",
+    "text": "| <a id=\"fst_err_hook_invalid_async_handler\">FST_ERR_HOOK_INVALID_ASYNC_HANDLER</a> | Async function has too many arguments. Async hooks should not use the `done` argument. | Remove the `done` argument from the async hook. | [#4367](https://github.com/fastify/fastify/pull/4367) |\n| <a id=\"fst_err_hook_not_supported\">FST_ERR_HOOK_NOT_SUPPORTED</a> | The hook is not supported. | Use a supported hook. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_missing_middleware\">FST_ERR_MISSING_MIDDLEWARE</a> | You must register a plugin for handling middlewares, visit [`Middleware`](./Middleware.md) for more info. | Register a plugin for handling middlewares. | [#2014](https://github.com/fastify/fastify/pull/2014) |\n| <a id=\"fst_err_hook_timeout\">FST_ERR_HOOK_TIMEOUT</a> | A callback for a hook timed out. | Increase the timeout for the hook. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_log_invalid_destination\">FST_ERR_LOG_INVALID_DESTINATION</a> | The logger does not accept the specified destination. | Use a `'stream'` or a `'file'` as the destination. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_log_invalid_logger\">FST_ERR_LOG_INVALID_LOGGER</a> | The logger should have all these methods: `'info'`, `'error'`, `'debug'`, `'fatal'`, `'warn'`, `'trace'`, `'child'`. | Use a logger with all the required methods. | [#4520](https://github.com/fastify/fastify/pull/4520) |\n| <a id=\"fst_err_log_invalid_logger_instance\">FST_ERR_LOG_INVALID_LOGGER_INSTANCE</a> | The `loggerInstance` only accepts a logger instance, not a configuration object. | To pass a configuration object, use `'logger'` instead. | [#5020](https://github.com/fastify/fastify/pull/5020) |\n| <a id=\"fst_err_log_invalid_logger_config\">FST_ERR_LOG_INVALID_LOGGER_CONFIG</a> | The logger option only accepts a configuration object, not a logger instance. | To pass an instance, use `'loggerInstance'` instead.  | [#5020](https://github.com/fastify/fastify/pull/5020) |\n| <a id=\"fst_err_log_logger_and_logger_instance_provided\">FST_ERR_LOG_LOGGER_AND_LOGGER_INSTANCE_PROVIDED</a> | You cannot provide both `'logger'` and `'loggerInstance'`. | Please provide only one option.  | [#5020](https://github.com/fastify/fastify/pull/5020) |\n| <a id=\"fst_err_log_invalid_log_controller\">FST_ERR_LOG_INVALID_LOG_CONTROLLER</a> | The `logController` option must be an instance of `LogController`. | Extend the `LogController` class and pass an instance. | - |\n| <a id=\"fst_err_rep_invalid_payload_type\">FST_ERR_REP_INVALID_PAYLOAD_TYPE</a> | Reply payload can be either a `string` or a `Buffer`. | Use a `string` or a `Buffer` for the payload. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_rep_response_body_consumed\">FST_ERR_REP_RESPONSE_BODY_CONSUMED</a> | Using `Response` as reply payload, but the body is being consumed. | Make sure you don't consume the `Response.body` | [#5286](https://github.com/fastify/fastify/pull/5286) |\n| <a id=\"fst_err_rep_readable_stream_locked\">FST_ERR_REP_READABLE_STREAM_LOCKED</a> | Using `ReadableStream` as reply payload, but locked with another reader. | Make sure you don't call the `Readable.getReader` before sending or release lock with `reader.releaseLock()` before sending. | [#5920](https://github.com/fastify/fastify/pull/5920) |\n| <a id=\"fst_err_rep_already_sent\">FST_ERR_REP_ALREADY_SENT</a> | A response was already sent. | - | [#1336](https://github.com/fastify/fastify/pull/1336) |\n| <a id=\"fst_err_rep_sent_value\">FST_ERR_REP_SENT_VALUE</a> | The only possible value for `reply.sent` is `true`. | - | [#1336](https://github.com/fastify/fastify/pull/1336) |"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#17",
+    "title": "docs/Reference/Server.md > Factory > `logController`",
+    "text": "### `logController`\n<a id=\"factory-log-controller\"></a>\n\n+ Default: `undefined`\n\nAccepts an instance of `LogController` (or a subclass) to customize Fastify's\ninternal log lines. Extend the `LogController` class and override only the\nmethods you want to customize; all others keep their default behavior.\n\nThe `LogController` class is exported from `fastify`:\n\n```js\nconst { LogController } = require('fastify')\n```\n\nThe constructor accepts an optional options object:\n\n| Property | Type | Default | Description |\n|----------|------|---------|-------------|\n| `disableRequestLogging` | `boolean \\| (req) => boolean` | `false` | When `true` (or a function returning `true`), per-request log lines are suppressed. |\n| `requestIdLogLabel` | `string` | `'reqId'` | The label used for the request identifier when logging. |\n\n```js\nconst { LogController } = require('fastify')\n\nclass MyLogController extends LogController {\n  constructor () {\n    super({\n      requestIdLogLabel: 'traceId',\n      disableRequestLogging: (request) => {\n        return request.url === '/health'\n      }\n    })\n  }\n\n  incomingRequest (request, reply, metadata) {\n    // Use debug level instead of info for incoming requests\n    request.log.debug({ req: request }, 'incoming request')\n  }\n\n  requestCompleted (error, request, reply, metadata) {\n    // Add custom fields to the request completed log\n    if (error) {\n      reply.log.error({ res: reply, err: error, responseTime: reply.elapsedTime, customField: 'value' }, 'request errored')\n    } else {\n      reply.log.info({ res: reply, responseTime: reply.elapsedTime, customField: 'value' }, 'request completed')\n    }\n  }\n}\n\nconst fastify = require('fastify')({\n  logger: true,\n  logController: new MyLogController()\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#17",
+    "action": "use",
+    "relevance_score": 0.9947,
+    "document_score": 0.9961,
+    "levels": {
+     "answers": 0.9947,
+     "elsewhere": 0.0014,
+     "different_case": 0.0016,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Errors.md#15",
+    "action": "use",
+    "relevance_score": 0.9896,
+    "document_score": 0.9922,
+    "levels": {
+     "answers": 0.9896,
+     "elsewhere": 0.0026,
+     "different_case": 0.0026,
+     "unrelated": 0.0052
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1902
+  },
+  "timing": {
+   "total_ms": 78,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 2172,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

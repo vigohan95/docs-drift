@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/keep-firing-for.rerank",
+ "recorded_at": "2026-11-06T13:30:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 955,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.152607",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=223"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `keep_firing_for`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `keep_firing_for`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/alerting_rules.md#1",
+    "title": "docs/configuration/alerting_rules.md > Defining alerting rules",
+    "text": "## Defining alerting rules\n\nAlerting rules are configured in Prometheus in the same way as [recording\nrules](recording_rules.md).\n\nAn example rules file with an alert would be:\n\n```yaml\ngroups:\n- name: example\n  labels:\n    team: myteam\n  rules:\n  - alert: HighRequestLatency\n    expr: job:request_latency_seconds:mean5m{job=\"myjob\"} > 0.5\n    for: 10m\n    keep_firing_for: 5m\n    labels:\n      severity: page\n    annotations:\n      summary: High request latency\n```\n\nThe optional `for` clause causes Prometheus to wait for a certain duration\nbetween first encountering a new expression output vector element and counting\nan alert as firing for this element. In this case, Prometheus will check that\nthe alert continues to be active during each evaluation for 10 minutes before\nfiring the alert. Elements that are active, but not firing yet, are in the pending state.\nAlerting rules without the `for` clause will become active on the first evaluation.\n\nThere is also an optional `keep_firing_for` clause that tells Prometheus to keep\nthis alert firing for the specified duration after the firing condition was last met.\nThis can be used to prevent situations such as flapping alerts, false resolutions\ndue to lack of data loss, etc. Alerting rules without the `keep_firing_for` clause\nwill deactivate on the first evaluation where the condition is not met (assuming\nany optional `for` duration described above has been satisfied).\n\nThe `labels` clause allows specifying a set of additional labels to be attached\nto the alert. Any existing conflicting labels will be overwritten. The label\nvalues can be templated.\n\nThe `annotations` clause specifies a set of informational labels that can be used to store longer additional information such as alert descriptions or runbook links. The annotation values can be templated."
+   },
+   {
+    "id": "prometheus:docs/configuration/recording_rules.md#5",
+    "title": "docs/configuration/recording_rules.md > Recording rules > `<rule>`",
+    "text": "### `<rule>`\n\nThe syntax for recording rules is:\n\n```yaml\n# The name of the time series to output to. Must be a valid metric name.\nrecord: <string>\n\n# The PromQL expression to evaluate. Every evaluation cycle this is\n# evaluated at the current time, and the result recorded as a new set of\n# time series with the metric name as given by 'record'.\nexpr: <string>\n\n# Labels to add or overwrite before storing the result.\nlabels:\n  [ <labelname>: <labelvalue> ]\n\n# Optional metric metadata for the recorded time series.\nmetadata:\n  [ help: <string> ]\n  [ type: <string> ] # One of counter, gauge, histogram, gaugehistogram, summary, info, stateset, unknown.\n  [ unit: <string> ]\n```\n\nThe syntax for alerting rules is:\n\n```yaml\n# The name of the alert. Must be a valid label value.\nalert: <string>\n\n# The PromQL expression to evaluate. Every evaluation cycle this is\n# evaluated at the current time, and all resultant time series become\n# pending/firing alerts.\nexpr: <string>\n\n# Alerts are considered firing once they have been returned for this long.\n# Alerts which have not yet fired for long enough are considered pending.\n[ for: <duration> | default = 0s ]\n\n# How long an alert will continue firing after the condition that triggered it\n# has cleared.\n[ keep_firing_for: <duration> | default = 0s ]\n\n# Labels to add or overwrite for each alert.\nlabels:\n  [ <labelname>: <tmpl_string> ]\n\n# Annotations to add to each alert.\nannotations:\n  [ <labelname>: <tmpl_string> ]\n```\n\nSee also the\n[best practices for naming metrics created by recording rules](https://prometheus.io/docs/practices/rules/#recording-rules)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/recording_rules.md#5",
+    "action": "use",
+    "relevance_score": 0.9935,
+    "document_score": 0.9954,
+    "levels": {
+     "answers": 0.9935,
+     "elsewhere": 0.0019,
+     "different_case": 0.0023,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/alerting_rules.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0315,
+    "document_score": 0.2127,
+    "levels": {
+     "answers": 0.0315,
+     "elsewhere": 0.1812,
+     "different_case": 0.0444,
+     "unrelated": 0.743
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1031
+  },
+  "timing": {
+   "total_ms": 46,
+   "rerank_ms": 45,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1301,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

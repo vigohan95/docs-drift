@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/extra-scrape-metrics.compare",
+ "recorded_at": "2026-11-06T13:30:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 992,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "119.532578",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=315"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#6",
+    "text": "  # When enabled, Prometheus stores additional time series for each scrape:\n  # scrape_timeout_seconds, scrape_sample_limit, and scrape_body_size_bytes.\n  # These metrics help monitor how close targets are to their configured limits.\n  # This option can be overridden per scrape config.\n  [ extra_scrape_metrics: <boolean> | default = false ]\n\nruntime:\n  # The minimum severity of messages emitted by the process logger.\n  # This setting can be changed by reloading the configuration.\n  [ log_level: <string> | default = info ]\n\n  # Configure the Go garbage collector GOGC parameter\n  # See: https://tip.golang.org/doc/gc-guide#GOGC\n  # Lowering this number increases CPU usage.\n  [ gogc: <int> | default = 75 ]\n\n# Rule files specifies a list of globs. Rules and alerts are read from\n# all matching files.\nrule_files:\n  [ - <filepath_glob> ... ]\n\n# Scrape config files specifies a list of globs. Scrape configs are read from\n# all matching files and appended to the list of scrape configs.\nscrape_config_files:\n  [ - <filepath_glob> ... ]\n\n# A list of scrape configurations.\nscrape_configs:\n  [ - <scrape_config> ... ]\n\n# Alerting specifies settings related to the Alertmanager.\nalerting:\n  alert_relabel_configs:\n    [ - <relabel_config> ... ]\n  alertmanagers:\n    [ - <alertmanager_config> ... ]\n\n# Settings related to the remote write feature.\nremote_write:\n  [ - <remote_write> ... ]\n\n# Settings related to the OTLP receiver feature.\n# See https://prometheus.io/docs/guides/opentelemetry/ for best practices.\notlp:\n  # Promote specific list of resource attributes to labels.\n  # It cannot be configured simultaneously with 'promote_all_resource_attributes: true'.\n  [ promote_resource_attributes: [<string>, ...] | default = [ ] ]\n  # Promoting all resource attributes to labels, except for the ones configured with 'ignore_resource_attributes'.\n  # Be aware that changes in attributes received by the OTLP endpoint may result in time series churn and lead to high memory usage by the Prometheus server.\n  # It cannot be set to 'true' simultaneously with 'promote_resource_attributes'.\n  [ promote_all_resource_attributes: <boolean> | default = false ]\n  # Which resource attributes to ignore, can only be set when 'promote_all_resource_attributes' is true.\n  [ ignore_resource_attributes: [<string>, ...] | default = [] ]\n  # Configures translation of OTLP metrics when received through the OTLP metrics\n  # endpoint. Available values:\n  # - \"UnderscoreEscapingWithSuffixes\" refers to commonly agreed normalization used\n  #   by OpenTelemetry in https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/pkg/translator/prometheus\n  # - \"NoUTF8EscapingWithSuffixes\" is a mode that relies on UTF-8 support in Prometheus.\n  #   It preserves all special characters like dots, but still adds required metric name suffixes\n  #   for units and _total, as UnderscoreEscapingWithSuffixes does.\n  # - \"UnderscoreEscapingWithoutSuffixes\" translates metric name characters that\n  #   are not alphanumerics/underscores/colons to underscores, and label name\n  #   characters that are not alphanumerics/underscores to underscores, but\n  #   unlike UnderscoreEscapingWithSuffixes it does not append any suffixes to\n  #   the names.\n  # - (EXPERIMENTAL) \"NoTranslation\" is a mode that relies on UTF-8 support in Prometheus.\n  #   It preserves all special character like dots and won't append special suffixes for metric\n  #   unit and type.\n  #\n  #   WARNING: The \"NoTranslation\" setting has significant known risks and limitations (see https://prometheus.io/docs/practices/naming/"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#13",
+    "text": "# +----------------------------+----------------------------+\n# |              1.005         |              7             |\n# +----------------------------+----------------------------+\n# |              1.002         |              8             |\n# +----------------------------+----------------------------+\n#\n# 0 results in the smallest supported factor (which is currently ~1.0027 or\n# schema 8, but might change in the future).\n[ native_histogram_min_bucket_factor: <float> | default = 0 ]\n\n# If true, native histograms exposed by a target are recognized during\n# scraping and ingested as such. If false, any native parts of histograms\n# are ignored and only the classic parts are recognized (possibly as\n# a classic histogram with only the +Inf buckets if no explicit classic\n# buckets are part of the histogram).\n[ scrape_native_histograms: <bool> | default = <global.scrape_native_histograms> ]\n\n# Specifies whether to convert classic histograms into native histograms with\n# custom buckets.\n[ convert_classic_histograms_to_nhcb: <bool> | default = <global.convert_classic_histograms_to_nhcb>]\n\n# Specifies whether to additionally scrape the classic parts of a histogram,\n# even if it is also exposed with native parts or it is converted into a\n# native histogram with custom buckets.\n[ always_scrape_classic_histograms: <boolean> | default = <global.always_scrape_classic_histograms> ]\n\n# See global configuration above for further explanations of how the last three\n# options combine their effects.\n\n# When enabled, Prometheus stores additional time series for this scrape job:\n# scrape_timeout_seconds, scrape_sample_limit, and scrape_body_size_bytes.\n# These metrics help monitor how close targets are to their configured limits.\n# If not set, inherits the value from the global configuration.\n[ extra_scrape_metrics: <boolean> | default = <global.extra_scrape_metrics> ]\n\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#6",
+    "b": "prometheus:docs/configuration/configuration.md#13",
+    "relation": "overlapping",
+    "related": 0.9952,
+    "probabilities": {
+     "same": 0.0237,
+     "overlapping": 0.9582,
+     "conflicting": 0.0133,
+     "unrelated": 0.0048
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 86,
+   "passage_reads": 1,
+   "passages_ms": 87,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 173,
+   "total_ms": 177
+  }
+ }
+}

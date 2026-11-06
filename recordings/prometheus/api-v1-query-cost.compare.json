@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/api-v1-query-cost.compare",
+ "recorded_at": "2026-11-06T13:30:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1013,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "195.036354",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=330"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/api.md#12",
+    "text": "## Query cost\n\n*The query cost endpoints require the [`query-cost`](../feature_flags.md#query-cost) feature flag.*\n\nThe following endpoints estimate the resource cost of a query *without executing\nit*, allowing clients to gauge how expensive a query would be before running it:\n\n```\nGET /api/v1/query_cost\nPOST /api/v1/query_cost\nGET /api/v1/query_range_cost\nPOST /api/v1/query_range_cost\n```\n\n`/api/v1/query_cost` accepts the same URL query parameters as\n[`/api/v1/query`](#instant-queries), and `/api/v1/query_range_cost` accepts the\nsame parameters as [`/api/v1/query_range`](#range-queries), so a request accepted\nby one endpoint is accepted by the other. The parameters that only shape the\nresponse of an executed query (`limit`, `stats` and `cost`) are validated in the\nsame way and then ignored, since these endpoints return no query result. As with\nthe other query endpoints, parameters may be URL-encoded in the request body\nusing the `POST` method with a `Content-Type: application/x-www-form-urlencoded`\nheader.\n\nThe `data` section of the response has the following format:\n\n```json\n{\n  \"estimate\": {\n    \"seriesTouched\": <number>,\n    \"samplesRead\": <number>\n  }\n}\n```\n\n- `seriesTouched`: the number of series the query reads, summed per selector.\n- `samplesRead`: an estimate of the `samplesRead`\n  [query statistic](#query-statistics), the samples the evaluator reads in the\n  engine's sample units, rather than the peak number of samples in memory."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#30",
+    "text": "## Query cost\n\n`--enable-feature=query-cost`\n\nEnables query cost estimation and enforcement. When set, Prometheus exposes the\n[`/api/v1/query_cost` and `/api/v1/query_range_cost`](querying/api.md#query-cost)\nendpoints, which provide a pre-execution *estimate* of the resource cost of a\nquery (series touched and samples read) without executing it, and the instant\nand range query endpoints accept a `cost=true` boolean parameter that adds an\nestimated-versus-actual cost comparison to the response. Estimation enumerates matching index entries and samples a bounded amount of\nchunk data. Both values can overestimate or underestimate actual cost; the\nestimate is informational only and is never used to reject a query. Queries\nusing `info()` return a warning because its runtime-dependent additional reads\nare omitted from the estimate.\n\nThis flag also activates enforcement of the reloadable cost limits configured\nunder the `global:` section of the\n[configuration file](configuration/configuration.md#configuration-file):\n`query_max_series`, `query_max_samples_read`, and `query_max_duration`. These\nlimits are enforced *during* query execution against the query's actual running\ncost: a query is rejected as soon as the number of series it loads or the number\nof samples it reads exceeds the configured limit, and `query_max_duration`\nsurfaces as a query timeout. The limits are reloaded together with the rest of\nthe configuration and have no effect when the feature flag is not set."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/api.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/feature_flags.md#30"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#30",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/querying/api.md#12"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/querying/api.md#12",
+    "b": "prometheus:docs/feature_flags.md#30",
+    "relation": "overlapping",
+    "related": 0.9987,
+    "probabilities": {
+     "same": 0.0032,
+     "overlapping": 0.9933,
+     "conflicting": 0.0022,
+     "unrelated": 0.0013
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0128,
+       "restated": 0.7713,
+       "elaborated": 0.0319,
+       "different": 0.184
+      },
+      "confidence": 0.816,
+      "a": {
+       "document": "prometheus:docs/querying/api.md#12",
+       "quote": "The following endpoints estimate the resource cost of a query *without executing",
+       "start": 116,
+       "end": 196,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/feature_flags.md#30",
+       "quote": "When set, Prometheus exposes the\n[`/api/v1/query_cost` and `/api/v1/query_range_cost`](querying/api.md#query-cost)\nendpoints, which provide a pre-execution *estimate* of the resource cost of a\nquery (series touched and samples read) without executing it, and the instant\nand range query endpoints accept a `cost=true` boolean parameter that adds an\nestimated-versus-actual cost comparison to the response.",
+       "start": 93,
+       "end": 498,
+       "confidence": 0.984
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 96,
+   "passages": 1,
+   "counterparts_ms": 76
+  },
+  "timing": {
+   "read_ms": 207,
+   "total_ms": 211
+  }
+ }
+}

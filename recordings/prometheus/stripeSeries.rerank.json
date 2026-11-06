@@ -1,0 +1,91 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/stripeSeries.rerank",
+ "recorded_at": "2026-11-06T13:30:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 925,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.994656",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=200"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `stripeSeries`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `stripeSeries`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "title": "tsdb/docs/refs.md > An overview of different Series and Chunk reference types > Used by callers of TSDB > `SeriesRef` > `HeadSeriesRef`",
+    "text": "#### `HeadSeriesRef`\n\n`HeadSeriesRef` is simply a 64bit counter that increments when a new series comes in.\nDue to series churn, the set of actively used `HeadSeriesRef`s may be well above zero (e.g. 0-10M may not be used, and 10M-11M is active)\n\nUsage:\n* [`stripeSeries`](https://github.com/prometheus/prometheus/blob/fdbc40a9efcc8197a94f23f0e479b0b56e52d424/tsdb/head.go#L1292-L1298) (note: when you don't know a `HeadSeriesRef` for a series, you can also access it by a hash of the series' labels)\n* WAL\n* `HeadChunkRef`s include them for addressing head chunks, as those are owned by the `memSeries`.\n\nNotes:\n1) M-mapped Head chunks, while they use `HeadSeriesRef`s, don't contain an index and depend on the series listing in memory.\nOnce mmapped, chunks have `HeadSeriesRef`s inside them, allowing you to recreate the index from reading chunks\n(Along with WAL which has the labels for those `HeadSeriesRef`s. It also has all those samples, but by using m-mapped chunks we can save cpu/time and not replay all of WAL on startup)\n\n2) During querying, `HeadSeriesRef` are limited to 2^40 (see `HeadChunkRef`)\n\n3) The last `HeadSeriesRef` is always replayed from the WAL and is continued from there."
+   },
+   {
+    "id": "prometheus:tsdb/docs/usage.md#1",
+    "title": "tsdb/docs/usage.md > Usage > Instantiating a database",
+    "text": "## Instantiating a database\n\nCallers should use [`tsdb.Open`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#Open) to open a TSDB\n(the directory may be new or pre-existing).\nThis returns a [`*tsdb.DB`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#DB) which is the actual database.\n\nA `DB` has the following main components:\n\n* Compactor: a [leveled compactor](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#LeveledCompactor). Note: it is currently the only compactor implementation. It runs automatically.\n* [`Head`](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#DB.Head)\n* [Blocks (persistent blocks)](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb#DB.Blocks)\n\nThe `Head` is responsible for a lot. Here are its main components:\n\n* [WAL](https://pkg.go.dev/github.com/prometheus/prometheus/tsdb/wal#WAL) (Write Ahead Log).\n* [`stripeSeries`](https://github.com/prometheus/prometheus/blob/411021ada9ab41095923b8d2df9365b632fd40c3/tsdb/head.go#L1292):\n  this holds all the active series by linking to [`memSeries`](https://github.com/prometheus/prometheus/blob/411021ada9ab41095923b8d2df9365b632fd40c3/tsdb/head.go#L1462)\n  by an ID (aka \"ref\") and by labels hash.\n* Postings list (reverse index): For any label-value pair, holds all the corresponding series refs. Used for queries.\n* Tombstones."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/usage.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0042,
+    "document_score": 0.0238,
+    "levels": {
+     "answers": 0.0042,
+     "elsewhere": 0.0197,
+     "different_case": 0.0314,
+     "unrelated": 0.9448
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:tsdb/docs/refs.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.0117,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.0077,
+     "different_case": 0.0241,
+     "unrelated": 0.9642
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1031
+  },
+  "timing": {
+   "total_ms": 49,
+   "rerank_ms": 47,
+   "questions_ms": 0,
+   "model_ms": 40,
+   "engine": {
+    "rows": 1301,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 40,
+    "build_ms": 0,
+    "doc_ms": 3,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

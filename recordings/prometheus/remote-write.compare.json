@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/remote-write.compare",
+ "recorded_at": "2026-11-06T13:29:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 949,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "37.558528",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=236"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/migration.md#2",
+    "text": "## Configuration\n\n- The scrape job level configuration option `scrape_classic_histograms` has\n  been renamed to `always_scrape_classic_histograms`. If you use the\n  `scrape_native_histograms` scrape configuration option to ingest native\n  histograms and you also want to ingest classic histograms that an endpoint\n  might expose along with native histograms, be sure to add this configuration\n  or change your configuration from the old name.\n- The `http_config.enable_http2` in `remote_write` items default has been\n  changed to `false`. In Prometheus v2 the remote write http client would\n  default to use http2. In order to parallelize multiple remote write queues\n  across multiple sockets its preferable to not default to http2.\n  If you prefer to use http2 for remote write you must now set\n  `http_config.enable_http2: true` in your `remote_write` configuration section."
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#15",
+    "text": "### Remote storage\n\nThe remote storage is a [`remote.Storage`](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/remote/storage.go#L31-L44) that implements the [`storage.Storage` interface](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/interface.go#L31-L44) and is responsible for interfacing with remote read and write endpoints.\n\nFor each [`remote_write`](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write) section in the configuration file, the remote storage creates and runs one [`remote.QueueManager`](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/remote/queue_manager.go#L141-L161), which in turn queues and sends samples to a specific remote write endpoint. Each queue manager parallelizes writes to the remote endpoint by running a dynamic number of shards based on current and past load observations. When a configuration reload is applied, all remote storage queues are shut down and new ones are created.\n\nFor each [`remote_read`](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_read) section in the configuration file, the remote storage creates a [reader client](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/remote/storage.go#L96-L118) and results from each remote source are merged."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/migration.md#2",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/migration.md#2",
+    "b": "prometheus:documentation/internal_architecture.md#15",
+    "relation": "unrelated",
+    "related": 0.4304,
+    "probabilities": {
+     "same": 0.0158,
+     "overlapping": 0.3998,
+     "conflicting": 0.0148,
+     "unrelated": 0.5696
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 46
+  },
+  "timing": {
+   "read_ms": 46,
+   "total_ms": 48
+  }
+ }
+}

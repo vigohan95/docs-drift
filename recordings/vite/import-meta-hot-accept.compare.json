@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "vite/import-meta-hot-accept.compare",
+ "recorded_at": "2026-11-06T13:30:29Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 931,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.046623",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=190"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-hmr.md#3",
+    "text": "## `hot.accept(cb)`\n\nFor a module to self-accept, use `import.meta.hot.accept` with a callback which receives the updated module:\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nexport const count = 1\n\nif (import.meta.hot) {\n  import.meta.hot.accept((newModule) => {\n    if (newModule) {\n      // newModule is undefined when SyntaxError happened\n      console.log('updated: count is now ', newModule.count)\n    }\n  })\n}\n```\n\nA module that \"accepts\" hot updates is considered an **HMR boundary**.\n\n```dot\ndigraph hmr_boundary {\n  rankdir=RL\n  ranksep=0.3\n  node [shape=box style=\"rounded,filled\" fontname=\"Arial\" fontsize=11 margin=\"0.2,0.1\" fontcolor=\"${#3c3c43|#ffffff}\" color=\"${#c2c2c4|#3c3f44}\"]\n  edge [color=\"${#67676c|#98989f}\" fontname=\"Arial\" fontsize=10 fontcolor=\"${#67676c|#98989f}\"]\n  bgcolor=\"transparent\"\n\n  root [label=\"main.js\" fillcolor=\"${#f6f6f7|#2e2e32}\"]\n  parent [label=\"App.vue\" fillcolor=\"${#f6f6f7|#2e2e32}\"]\n  boundary [label=\"Component.vue\\n(HMR boundary)\\nhot.accept()\" fillcolor=\"${#def5ed|#15312d}\" color=\"${#18794e|#3dd68c}\" penwidth=2]\n  edited [label=\"utils.js\\n(edited)\" fillcolor=\"${#fcf4dc|#38301a}\" color=\"${#915930|#f9b44e}\" penwidth=2]\n\n  boundary -> edited [label=\"imports\" color=\"${#915930|#f9b44e}\" style=bold]\n  parent -> boundary [label=\"imports\" style=dashed]\n  root -> parent [label=\"imports\" style=dashed]\n}\n```\n\nVite's HMR does not actually swap the originally imported module: if an HMR boundary module re-exports imports from a dep, then it is responsible for updating those re-exports (and these exports must be using `let`). In addition, importers up the chain from the boundary module will not be notified of the change. This simplified HMR implementation is sufficient for most dev use cases, while allowing us to skip the expensive work of generating proxy modules.\n\nVite requires that the call to this function appears as `import.meta.hot.accept(` (whitespace-sensitive) in the source code in order for the module to accept update. This is a requirement of the static analysis that Vite does to enable HMR support for a module."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#21",
+    "text": "## Removed Deprecated Features [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)\n\n- Passing a URL to `import.meta.hot.accept` is no longer supported. Please pass an id instead. ([#21382](https://github.com/vitejs/vite/pull/21382))"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-hmr.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/migration.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-hmr.md#3",
+    "b": "vite:docs/guide/migration.md#21",
+    "relation": "unrelated",
+    "related": 0.3573,
+    "probabilities": {
+     "same": 0.0199,
+     "overlapping": 0.32,
+     "conflicting": 0.0174,
+     "unrelated": 0.6427
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 53
+  },
+  "timing": {
+   "read_ms": 52,
+   "total_ms": 55
+  }
+ }
+}

@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/track-timestamps-staleness.rerank",
+ "recorded_at": "2026-11-06T13:30:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 840,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.66851",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=169"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `track_timestamps_staleness`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `track_timestamps_staleness`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#9",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "# honor_timestamps controls whether Prometheus respects the timestamps present\n# in scraped data.\n#\n# If honor_timestamps is set to \"true\", the timestamps of the metrics exposed\n# by the target will be used.\n#\n# If honor_timestamps is set to \"false\", the timestamps of the metrics exposed\n# by the target will be ignored.\n[ honor_timestamps: <boolean> | default = true ]\n\n# track_timestamps_staleness controls whether Prometheus tracks staleness of\n# the metrics that have an explicit timestamps present in scraped data.\n#\n# If track_timestamps_staleness is set to \"true\", a staleness marker will be\n# inserted in the TSDB when a metric is no longer present or the target\n# is down.\n[ track_timestamps_staleness: <boolean> | default = false ]\n\n# Configures the protocol scheme used for requests.\n[ scheme: <scheme> | default = http ]\n\n# Optional HTTP URL parameters.\nparams:\n  [ <string>: [<string>, ...] ]\n\n# If enable_compression is set to \"false\", Prometheus will request uncompressed\n# response from the scraped target.\n[ enable_compression: <boolean> | default = true ]\n\n# File to which scrape failures are logged.\n# Reloading the configuration will reopen the file.\n[ scrape_failure_log_file: <string> ]\n\n# HTTP client settings, including authentication methods (such as basic auth and\n# authorization), proxy configurations, TLS options, custom HTTP headers, etc.\n[ <http_config> ]\n\n# List of AWS service discovery configurations.\naws_sd_configs:\n  [ - <aws_sd_config> ... ]\n\n# List of Azure service discovery configurations.\nazure_sd_configs:\n  [ - <azure_sd_config> ... ]\n\n# List of Consul service discovery configurations.\nconsul_sd_configs:\n  [ - <consul_sd_config> ... ]\n\n# List of DigitalOcean service discovery configurations.\ndigitalocean_sd_configs:\n  [ - <digitalocean_sd_config> ... ]\n\n# List of Docker service discovery configurations.\ndocker_sd_configs:\n  [ - <docker_sd_config> ... ]\n\n# List of Docker Swarm service discovery configurations.\ndockerswarm_sd_configs:\n  [ - <dockerswarm_sd_config> ... ]\n\n# List of DNS service discovery configurations.\ndns_sd_configs:\n  [ - <dns_sd_config> ... ]\n\n# List of EC2 service discovery configurations.\nec2_sd_configs:\n  [ - <ec2_sd_config> ... ]"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#28",
+    "title": "docs/querying/basics.md > Gotchas > Staleness",
+    "text": "### Staleness\n\nThe timestamps at which to sample data, during a query, are selected\nindependently of the actual present time series data. This is mainly to support\ncases like aggregation (`sum`, `avg`, and so on), where multiple aggregated\ntime series do not precisely align in time. Because of their independence,\nPrometheus needs to assign a value at those timestamps for each relevant time\nseries. It does so by taking the newest sample that is less than the lookback period ago.\nThe lookback period is 5 minutes by default, but can be\n[set with the `--query.lookback-delta` flag](../command-line/prometheus.md)\nor overridden on an individual query via the `lookback_delta` parameter.\n\nIf a target scrape or rule evaluation no longer returns a sample for a time\nseries that was previously present, this time series will be marked as stale.\nIf a target is removed, the previously retrieved time series will be marked as\nstale soon after removal.\n\nIf a query is evaluated at a sampling timestamp after a time series is marked\nas stale, then no value is returned for that time series. If new samples are\nsubsequently ingested for that time series, they will be returned as expected.\n\nA time series will go stale when it is no longer exported, or the target no\nlonger exists. Such time series will disappear from graphs\nat the times of their latest collected sample, and they will not be returned\nin queries after they are marked stale.\n\nSome exporters, which put their own timestamps on samples, get a different behaviour:\nseries that stop being exported take the last value for (by default) 5 minutes before\ndisappearing. The `track_timestamps_staleness` setting can change this."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#9",
+    "action": "use",
+    "relevance_score": 0.9939,
+    "document_score": 0.9952,
+    "levels": {
+     "answers": 0.9939,
+     "elsewhere": 0.0013,
+     "different_case": 0.0019,
+     "unrelated": 0.0029
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/basics.md#28",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0121,
+    "document_score": 0.1795,
+    "levels": {
+     "answers": 0.0121,
+     "elsewhere": 0.1674,
+     "different_case": 0.0379,
+     "unrelated": 0.7825
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1150
+  },
+  "timing": {
+   "total_ms": 46,
+   "rerank_ms": 45,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1420,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

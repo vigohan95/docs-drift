@@ -1,0 +1,125 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/query-lookback-delta.compare",
+ "recorded_at": "2026-11-06T13:30:03Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1709,
+ "response_headers": {
+  "x-clocked-credits": "17",
+  "x-clocked-model-ms": "402.152069",
+  "x-clocked-cost-usd": "0.003386",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=53,cfOrigin;dur=0,cfWorker;dur=939"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/promtool.md#5",
+    "text": "#### Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">--query.lookback-delta</code> | The server's maximum query lookback duration. | `5m` |"
+   },
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "text": "| <code class=\"text-nowrap\">--storage.agent.checkpoint-batch-size</code> | Size of a single WAL log entry chunk to be flushed. Has no effect without --storage.agent.checkpoint-from-in-memory-series flag. Use with agent mode only. | `1000` |\n| <code class=\"text-nowrap\">--storage.agent.no-lockfile</code> | Do not create lockfile in data directory. Use with agent mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.remote.flush-deadline</code> | How long to wait flushing sample on shutdown or config reload. | `1m` |\n| <code class=\"text-nowrap\">--storage.remote.read-sample-limit</code> | Maximum overall number of samples to return via the remote read interface, in a single query. 0 means no limit. This limit is ignored for streamed response types. Use with server mode only. | `5e7` |\n| <code class=\"text-nowrap\">--storage.remote.read-concurrent-limit</code> | Maximum number of concurrent remote read calls. 0 means no limit. Use with server mode only. | `10` |\n| <code class=\"text-nowrap\">--storage.remote.read-max-bytes-in-frame</code> | Maximum number of bytes in a single frame for streaming remote read response types before marshalling. Note that client might have limit on frame size as well. 1MB as recommended by protobuf by default. Use with server mode only. | `1048576` |\n| <code class=\"text-nowrap\">--web.search.max-limit</code> | Hard upper bound on the \"limit\" query parameter accepted by the experimental search API (--enable-feature=search-api). Requests with a higher limit are rejected with HTTP 400. 0 disables the cap. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--rules.alert.for-outage-tolerance</code> | Max time to tolerate prometheus outage for restoring \"for\" state of alert. Use with server mode only. | `1h` |\n| <code class=\"text-nowrap\">--rules.alert.for-grace-period</code> | Minimum duration between alert and restored \"for\" state. This is maintained only for alerts with configured \"for\" time greater than grace period. Use with server mode only. | `10m` |\n| <code class=\"text-nowrap\">--rules.alert.resend-delay</code> | Minimum amount of time to wait before resending an alert to Alertmanager. Use with server mode only. | `1m` |\n| <code class=\"text-nowrap\">--rules.max-concurrent-evals</code> | Global concurrency limit for independent rules that can run concurrently. When set, \"query.max-concurrency\" may need to be adjusted accordingly. Use with server mode only. | `4` |\n| <code class=\"text-nowrap\">--alertmanager.notification-queue-capacity</code> | The capacity of the queue for pending Alertmanager notifications. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--alertmanager.notification-batch-size</code> | The maximum number of notifications per batch to send to the Alertmanager. Use with server mode only. | `256` |\n| <code class=\"text-nowrap\">--alertmanager.drain-notification-queue-on-shutdown</code> | Send any outstanding Alertmanager notifications when shutting down. If false, any outstanding Alertmanager notifications will be dropped when shutting down. Use with server mode only. | `true` |\n| <code class=\"text-nowrap\">--query.lookback-delta</code> | The maximum lookback duration for retrieving metrics during expression evaluations and federation. Use with server mode only. | `5m` |\n| <code class=\"text-nowrap\">--query.timeout</code> | Maximum time a query may take before being aborted. Use with server mode only. | `2m` |\n| <code class=\"text-nowrap\">--query.max-concurrency</code> | Maximum number of queries executed concurrently. Use with server mode only. | `20` |"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#28",
+    "text": "### Staleness\n\nThe timestamps at which to sample data, during a query, are selected\nindependently of the actual present time series data. This is mainly to support\ncases like aggregation (`sum`, `avg`, and so on), where multiple aggregated\ntime series do not precisely align in time. Because of their independence,\nPrometheus needs to assign a value at those timestamps for each relevant time\nseries. It does so by taking the newest sample that is less than the lookback period ago.\nThe lookback period is 5 minutes by default, but can be\n[set with the `--query.lookback-delta` flag](../command-line/prometheus.md)\nor overridden on an individual query via the `lookback_delta` parameter.\n\nIf a target scrape or rule evaluation no longer returns a sample for a time\nseries that was previously present, this time series will be marked as stale.\nIf a target is removed, the previously retrieved time series will be marked as\nstale soon after removal.\n\nIf a query is evaluated at a sampling timestamp after a time series is marked\nas stale, then no value is returned for that time series. If new samples are\nsubsequently ingested for that time series, they will be returned as expected.\n\nA time series will go stale when it is no longer exported, or the target no\nlonger exists. Such time series will disappear from graphs\nat the times of their latest collected sample, and they will not be returned\nin queries after they are marked stale.\n\nSome exporters, which put their own timestamps on samples, get a different behaviour:\nseries that stop being exported take the last value for (by default) 5 minutes before\ndisappearing. The `track_timestamps_staleness` setting can change this."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/promtool.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#28",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/command-line/promtool.md#5",
+    "b": "prometheus:docs/command-line/prometheus.md#3",
+    "relation": "overlapping",
+    "related": 0.9921,
+    "probabilities": {
+     "same": 0.0236,
+     "overlapping": 0.9565,
+     "conflicting": 0.012,
+     "unrelated": 0.0079
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/command-line/promtool.md#5",
+    "b": "prometheus:docs/querying/basics.md#28",
+    "relation": "overlapping",
+    "related": 0.996,
+    "probabilities": {
+     "same": 0.0186,
+     "overlapping": 0.9705,
+     "conflicting": 0.0068,
+     "unrelated": 0.004
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/command-line/prometheus.md#3",
+    "b": "prometheus:docs/querying/basics.md#28",
+    "relation": "overlapping",
+    "related": 0.9963,
+    "probabilities": {
+     "same": 0.0108,
+     "overlapping": 0.981,
+     "conflicting": 0.0045,
+     "unrelated": 0.0037
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 261,
+   "passage_reads": 1,
+   "passages_ms": 380,
+   "passages": 1,
+   "counterparts_ms": 51
+  },
+  "timing": {
+   "read_ms": 691,
+   "total_ms": 696
+  }
+ }
+}

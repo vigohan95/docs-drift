@@ -1,0 +1,145 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/evaluation-interval.rerank",
+ "recorded_at": "2026-11-06T13:29:54Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1447,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "70.608383",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `evaluation_interval`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `evaluation_interval`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "The other placeholders are specified separately.\n\nA valid example file can be found [here](/config/testdata/conf.good.yml).\n\nThe global configuration specifies parameters that are valid in all other configuration\ncontexts. They also serve as defaults for other configuration sections.\n\n```yaml\nglobal:\n  # How frequently to scrape targets by default.\n  [ scrape_interval: <duration> | default = 1m ]\n\n  # How long until a scrape request times out.\n  # It cannot be greater than the scrape interval.\n  [ scrape_timeout: <duration> | default = 10s ]\n\n  # The protocols to negotiate during a scrape with the client.\n  # Supported values (case sensitive): PrometheusProto, OpenMetricsText0.0.1,\n  # OpenMetricsText1.0.0, PrometheusText0.0.4, PrometheusText1.0.0.\n  # If left unset both here and in an individual scrape config, the\n  # negotiation order used in that scrape config depends on the effective\n  # value of scrape_native_histograms for that scrape config.\n  # If scrape_native_histograms is false, the order is\n  # [ OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  # If scrape_native_histograms is true, the order is\n  # [ PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText1.0.0, PrometheusText0.0.4 ].\n  [ scrape_protocols: [<string>, ...] ]\n\n  # How frequently to evaluate rules.\n  [ evaluation_interval: <duration> | default = 1m ]\n\n  # Offset the rule evaluation timestamp of this particular group by the\n  # specified duration into the past to ensure the underlying metrics have\n  # been received. Metric availability delays are more likely to occur when\n  # Prometheus is running as a remote write target, but can also occur when\n  # there's anomalies with scraping.\n  [ rule_query_offset: <duration> | default = 0s ]\n\n  # The labels to add to any time series or alerts when communicating with\n  # external systems (federation, remote storage, Alertmanager).\n  # Environment variable references `${var}` or `$var` are replaced according\n  # to the values of the current environment variables.\n  # References to undefined variables are replaced by the empty string.\n  # The `$` character can be escaped by using `$$`.\n  external_labels:\n    [ <labelname>: <labelvalue> ... ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#1",
+    "title": "docs/configuration/unit_testing_rules.md > Test file format",
+    "text": "## Test file format\n\n```yaml\n# This is a list of rule files to consider for testing. Globs are supported.\nrule_files:\n  [ - <file_name> ]\n\n[ evaluation_interval: <duration> | default = 1m ]\n\n# Setting fuzzy_compare true will very slightly weaken floating point comparisons.\n# This will (effectively) ignore differences in the last bit of the mantissa.\n[ fuzzy_compare: <boolean> | default = false ]\n\n# The order in which group names are listed below will be the order of evaluation of\n# rule groups (at a given evaluation time). The order is guaranteed only for the groups mentioned below.\n# All the groups need not be mentioned below.\ngroup_eval_order:\n  [ - <group_name> ]\n\n# All the tests are listed here.\ntests:\n  [ - <test_group> ]\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "title": "docs/configuration/unit_testing_rules.md > Example > `test.yml`",
+    "text": "### `test.yml`\n\n```yaml\n# This is the main input for unit testing.\n# Only this file is passed as command line argument.\n\nrule_files:\n    - alerts.yml\n\nevaluation_interval: 1m\n\ntests:\n    # Test 1.\n    - interval: 1m\n      # Series data.\n      input_series:\n          - series: 'up{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'\n          - series: 'up{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '1+0x6 0 0 0 0 0 0 0 0' # 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0\n          - series: 'go_goroutines{job=\"prometheus\", instance=\"localhost:9090\"}'\n            values: '10+10x2 30+20x5' # 10 20 30 30 50 70 90 110 130\n          - series: 'go_goroutines{job=\"node_exporter\", instance=\"localhost:9100\"}'\n            values: '10+10x7 10+30x4' # 10 20 30 40 50 60 70 80 10 40 70 100 130\n\n      # Unit test for alerting rules.\n      alert_rule_test:\n          # Unit test 1.\n          - eval_time: 10m\n            alertname: InstanceDown\n            exp_alerts:\n                # Alert 1.\n                - exp_labels:\n                      severity: page\n                      instance: localhost:9090\n                      job: prometheus\n                  exp_annotations:\n                      summary: \"Instance localhost:9090 down\"\n                      description: \"localhost:9090 of job prometheus has been down for more than 5 minutes.\"\n      # Unit tests for promql expressions.\n      promql_expr_test:\n          # Unit test 1.\n          - expr: go_goroutines > 5\n            eval_time: 4m\n            exp_samples:\n                # Sample 1.\n                - labels: 'go_goroutines{job=\"prometheus\",instance=\"localhost:9090\"}'\n                  value: 50\n                # Sample 2.\n                - labels: 'go_goroutines{job=\"node_exporter\",instance=\"localhost:9100\"}'\n                  value: 50\n```"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#9",
+    "title": "docs/getting_started.md > Configure rules for aggregating scraped data into new time series",
+    "text": "## Configure rules for aggregating scraped data into new time series\n\nThough not a problem in our example, queries that aggregate over thousands of\ntime series can get slow when computed ad-hoc. To make this more efficient,\nPrometheus can prerecord expressions into new persisted\ntime series via configured _recording rules_. Let's say we are interested in\nrecording the per-second rate of cpu time (`node_cpu_seconds_total`) averaged\nover all cpus per instance (but preserving the `job`, `instance` and `mode`\ndimensions) as measured over a window of 5 minutes. We could write this as:\n\n```\navg by (job, instance, mode) (rate(node_cpu_seconds_total[5m]))\n```\n\nTry graphing this expression.\n\nTo record the time series resulting from this expression into a new metric\ncalled `job_instance_mode:node_cpu_seconds:avg_rate5m`, create a file\nwith the following recording rule and save it as `prometheus.rules.yml`:\n\n```yaml\ngroups:\n- name: cpu-node\n  rules:\n  - record: job_instance_mode:node_cpu_seconds:avg_rate5m\n    expr: avg by (job, instance, mode) (rate(node_cpu_seconds_total[5m]))\n```\n\nTo make Prometheus pick up this new rule, add a `rule_files` statement in your `prometheus.yml`. The config should now\nlook like this:\n\n```yaml\nglobal:\n  scrape_interval:     15s # By default, scrape targets every 15 seconds.\n  evaluation_interval: 15s # Evaluate rules every 15 seconds.\n\n  # Attach these extra labels to all timeseries collected by this Prometheus instance.\n  external_labels:\n    monitor: 'codelab-monitor'\n\nrule_files:\n  - 'prometheus.rules.yml'\n\nscrape_configs:\n  - job_name: 'prometheus'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:9090']\n\n  - job_name:       'node'\n\n    # Override the global default and scrape targets from this job every 5 seconds.\n    scrape_interval: 5s\n\n    static_configs:\n      - targets: ['localhost:8080', 'localhost:8081']\n        labels:\n          group: 'production'\n\n      - targets: ['localhost:8082']\n        labels:\n          group: 'canary'\n```"
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#17",
+    "title": "documentation/internal_architecture.md > Internal architecture > Rule manager",
+    "text": "## Rule manager\n\nThe rule manager is a [`rules.Manager`](https://github.com/prometheus/prometheus/blob/v2.3.1/rules/manager.go#L410-L418) that is responsible for evaluating recording and alerting rules on a periodic basis (as configured using the `evaluation_interval` configuration file setting). It evaluates all rules on every iteration using PromQL and writes the resulting time series back into the storage.\n\nFor alerting rules, the rule manager performs several actions on every iteration:\n\n- It stores the series `ALERTS{alertname=\"<alertname>\", <alert labels>}` for any pending or firing alerts.\n- It tracks the lifecycle state of active alerts to decide when to transition an alert from pending to firing (depending on the `for` duration in the alerting rule).\n- It expands the label and annotation templates from the alerting rule for each active alert.\n- It sends firing alerts to the notifier (see below) and keeps sending resolved alerts for 15 minutes."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#2",
+    "action": "use",
+    "relevance_score": 0.9951,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9951,
+     "elsewhere": 0.0013,
+     "different_case": 0.0014,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#1",
+    "action": "use",
+    "relevance_score": 0.995,
+    "document_score": 0.9963,
+    "levels": {
+     "answers": 0.995,
+     "elsewhere": 0.0013,
+     "different_case": 0.0016,
+     "unrelated": 0.0021
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/getting_started.md#9",
+    "action": "use",
+    "relevance_score": 0.9923,
+    "document_score": 0.9942,
+    "levels": {
+     "answers": 0.9923,
+     "elsewhere": 0.002,
+     "different_case": 0.0025,
+     "unrelated": 0.0032
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0668,
+    "document_score": 0.1701,
+    "levels": {
+     "answers": 0.0668,
+     "elsewhere": 0.1034,
+     "different_case": 0.0283,
+     "unrelated": 0.8016
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:documentation/internal_architecture.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0068,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0046,
+     "different_case": 0.0105,
+     "unrelated": 0.9827
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2690
+  },
+  "timing": {
+   "total_ms": 89,
+   "rerank_ms": 74,
+   "questions_ms": 0,
+   "model_ms": 65,
+   "engine": {
+    "rows": 3365,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 65,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 62,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

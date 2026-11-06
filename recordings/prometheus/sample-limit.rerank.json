@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/sample-limit.rerank",
+ "recorded_at": "2026-11-06T13:31:09Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 941,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "58.108833",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=196"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `sample_limit`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `sample_limit`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "  # File to which PromQL queries are logged.\n  # Reloading the configuration will reopen the file.\n  [ query_log_file: <string> ]\n\n  # Maximum number of series a query may load before it is rejected. The limit\n  # is enforced during execution against the query's actual running cost, never\n  # against the cost estimate returned by the query cost API: the query is\n  # rejected as soon as it loads more series than this. 0 means no limit.\n  # These three query cost limits are reloadable and only enforced when the\n  # query-cost feature flag is enabled (--enable-feature=query-cost).\n  # They apply to every query the engine evaluates, including recording and\n  # alerting rule evaluation.\n  # A client may lower any of them for a single request with the max_series,\n  # max_samples_read and max_query_duration query parameters. A request that\n  # asks for a value above the ceiling set here is an error, it is not silently\n  # clamped down.\n  [ query_max_series: <int> | default = 0 ]\n\n  # Maximum number of samples a query may read before it is rejected. Like\n  # query_max_series, it is enforced during execution against the samples the\n  # query actually reads, never against the estimate: the query is\n  # rejected as soon as it reads more samples than this. 0 means no limit.\n  [ query_max_samples_read: <int> | default = 0 ]\n\n  # Maximum wall-clock duration a query may take. It surfaces as a query\n  # timeout: the query is aborted once it has run for this long. 0s falls back\n  # to --query.timeout. A nonzero value overrides that flag only when the\n  # query-cost feature is enabled. The per-query timeout parameter\n  # of the query endpoints is capped at this ceiling.\n  [ query_max_duration: <duration> | default = 0s ]\n\n  # File to which scrape failures are logged.\n  # Reloading the configuration will reopen the file.\n  [ scrape_failure_log_file: <string> ]\n\n  # An uncompressed response body larger than this many bytes will cause the\n  # scrape to fail. 0 means no limit. Example: 100MB.\n  # This is an experimental feature, this behaviour could\n  # change or be removed in the future.\n  [ body_size_limit: <size> | default = 0 ]\n\n  # Per-scrape limit on the number of scraped samples that will be accepted.\n  # If more than this number of samples are present after metric relabeling\n  # the entire scrape will be treated as failed. 0 means no limit.\n  [ sample_limit: <int> | default = 0 ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#11",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "# List of Uyuni service discovery configurations.\nuyuni_sd_configs:\n  [ - <uyuni_sd_config> ... ]\n\n# List of labeled statically configured targets for this job.\nstatic_configs:\n  [ - <static_config> ... ]\n\n# List of target relabel configurations.\nrelabel_configs:\n  [ - <relabel_config> ... ]\n\n# List of metric relabel configurations.\nmetric_relabel_configs:\n  [ - <relabel_config> ... ]\n\n# An uncompressed response body larger than this many bytes will cause the\n# scrape to fail. 0 means no limit. Example: 100MB.\n# This is an experimental feature, this behaviour could\n# change or be removed in the future.\n[ body_size_limit: <size> | default = 0 ]\n\n# Per-scrape limit on the number of scraped samples that will be accepted.\n# If more than this number of samples are present after metric relabeling\n# the entire scrape will be treated as failed. 0 means no limit.\n[ sample_limit: <int> | default = 0 ]\n\n# Limit on the number of labels that will be accepted per sample. If more\n# than this number of labels are present on any sample post metric-relabeling,\n# the entire scrape will be treated as failed. 0 means no limit.\n[ label_limit: <int> | default = 0 ]\n\n# Limit on the length (in bytes) of each individual label name. If any label\n# name in a scrape is longer than this number post metric-relabeling, the\n# entire scrape will be treated as failed. Note that label names are UTF-8\n# encoded, and characters can take up to 4 bytes. 0 means no limit.\n[ label_name_length_limit: <int> | default = 0 ]\n\n# Limit on the length (in bytes) of each individual label value. If any label\n# value in a scrape is longer than this number post metric-relabeling, the\n# entire scrape will be treated as failed. Note that label values are UTF-8\n# encoded, and characters can take up to 4 bytes. 0 means no limit.\n[ label_value_length_limit: <int> | default = 0 ]\n\n# Limit per scrape config on number of unique targets that will be\n# accepted. If more than this number of targets are present after target\n# relabeling, Prometheus will mark the targets as failed without scraping them.\n# 0 means no limit. This is an experimental feature, this behaviour could\n# change in the future.\n[ target_limit: <int> | default = 0 ]"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#3",
+    "title": "docs/feature_flags.md > Extra scrape metrics",
+    "text": "## Extra scrape metrics\n\n`--enable-feature=extra-scrape-metrics`\n\n> **Note:** This feature flag is deprecated. Please use the `extra_scrape_metrics` configuration option instead (available at both global and scrape-config level). The feature flag will be removed in a future major version. See the [configuration documentation](configuration/configuration.md) for more details.\n\nWhen enabled, for each instance scrape, Prometheus stores a sample in the following additional time series:\n\n- `scrape_timeout_seconds`. The configured `scrape_timeout` for a target. This allows you to measure each target to find out how close they are to timing out with `scrape_duration_seconds / scrape_timeout_seconds`.\n- `scrape_sample_limit`. The configured `sample_limit` for a target. This allows you to measure each target\n  to find out how close they are to reaching the limit with `scrape_samples_post_metric_relabeling / scrape_sample_limit`. Note that `scrape_sample_limit` can be zero if there is no limit configured, which means that the query above can return `+Inf` for targets with no limit (as we divide by zero). If you want to query only for targets that do have a sample limit use this query: `scrape_samples_post_metric_relabeling / (scrape_sample_limit > 0)`.\n- `scrape_body_size_bytes`. The uncompressed size of the most recent scrape response, if successful. Scrapes failing because `body_size_limit` is exceeded report `-1`, other scrape failures report `0`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "action": "use",
+    "relevance_score": 0.9946,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9946,
+     "elsewhere": 0.0012,
+     "different_case": 0.0017,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#11",
+    "action": "use",
+    "relevance_score": 0.9945,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9945,
+     "elsewhere": 0.0013,
+     "different_case": 0.0017,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/feature_flags.md#3",
+    "action": "expand",
+    "relevance_score": 0.0803,
+    "document_score": 0.812,
+    "levels": {
+     "answers": 0.0803,
+     "elsewhere": 0.7317,
+     "different_case": 0.0472,
+     "unrelated": 0.1408
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1839
+  },
+  "timing": {
+   "total_ms": 77,
+   "rerank_ms": 61,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2244,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

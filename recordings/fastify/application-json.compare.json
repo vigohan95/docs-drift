@@ -1,0 +1,122 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify/application-json.compare",
+ "recorded_at": "2026-11-06T13:30:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 976,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "149.316193",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=287"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#14",
+    "text": "###### Strings\n<a id=\"send-string\"></a>\n\nIf you pass a string to `send` without a `Content-Type`, it will be sent as\n`text/plain; charset=utf-8`. If you set the `Content-Type` header and pass a\nstring to `send`, it will be serialized with the custom serializer if one is\nset, otherwise, it will be sent unmodified.\n\n> ℹ️ Note:\n> Even when the `Content-Type` header is set to `application/json`,\n> strings are sent unmodified by default. To serialize a string as JSON, you\n> must set a custom serializer:\n\n```js\nfastify.get('/json-string', async function (request, reply) {\n  reply\n    .type('application/json; charset=utf-8')\n    .serializer(JSON.stringify)\n    .send('Hello') // Returns \"Hello\" (JSON-encoded string)\n})\n```\n```js\nfastify.get('/json', options, function (request, reply) {\n  reply.send('plain string')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "text": "## `Content-Type` Parser\nFastify natively supports `'application/json'` and `'text/plain'` content types\nwith a default charset of `utf-8`. These default parsers can be changed or\nremoved.\n\nUnsupported or [syntactically invalid](https://httpwg.org/specs/rfc9110.html#media.type)\ncontent types result in a `415 Unsupported Media Type` response with an\n[`FST_ERR_CTP_INVALID_MEDIA_TYPE`](./Errors.md#fst_err_ctp_invalid_media_type)\nerror.\n\nTo support other content types, use the `addContentTypeParser` API or an\nexisting [plugin](https://fastify.dev/ecosystem/).\n\nAs with other APIs, `addContentTypeParser` is encapsulated in the scope in which\nit is declared. If declared in the root scope, it is available everywhere; if\ndeclared in a plugin, it is available only in that scope and its children.\n\nFastify automatically adds the parsed request payload to the [Fastify\nrequest](./Request.md) object, accessible via `request.body`.\n\n> **Important:** When using a body schema with the\n> [`content`](./Validation-and-Serialization.md#body-content-type-validation)\n> property to validate per content type, only content types listed in the schema\n> will be validated. If you add a custom content type parser but do not include\n> its content type in the body schema's `content` property, the incoming data\n> will be parsed but **not validated**."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "text": "## Validation and Serialization\nFastify uses a schema-based approach. We recommend using\n[JSON Schema](https://json-schema.org/) to validate routes and serialize outputs.\nFastify compiles the schema into a highly performant function.\n\nValidation is only attempted if the content type is `application/json`,\nunless the body schema uses the [`content`](#body-content-type-validation)\nproperty to specify validation per content type. When the body schema defines\na `content` field, it must enumerate all possible content types the\napplication expects to handle with the associated handler.\n\nAll examples use the\n[JSON Schema Draft 7](https://json-schema.org/draft-07)\nspecification.\n\n> ⚠ Warning:\n> Treat schema definitions as application code. Validation and serialization\n> features use `new Function()`, which is unsafe with user-provided schemas. See\n> [Ajv](https://www.npmjs.com/package/ajv) and\n> [fast-json-stringify](https://www.npmjs.com/package/fast-json-stringify) for details.\n>\n> Whilst Fastify supports the\n> [`$async` Ajv feature](https://ajv.js.org/guide/async-validation.html),\n> it should not be used for initial validation. Accessing databases during\n> validation may lead to Denial of Service attacks. Use\n> [Fastify's hooks](./Hooks.md) like `preHandler` for `async` tasks after validation.\n>\n> When using custom validators with async `preValidation` hooks,\n> validators **must return** `{error}` objects instead of throwing errors.\n> Throwing errors from custom validators will cause unhandled promise rejections\n> that crash the application when combined with async hooks. See the\n> [custom validator examples](#using-other-validation-libraries) below for the\n> correct pattern."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#14",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Reply.md#14",
+    "b": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "relation": "unrelated",
+    "related": 0.443,
+    "probabilities": {
+     "same": 0.0114,
+     "overlapping": 0.421,
+     "conflicting": 0.0106,
+     "unrelated": 0.557
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#14",
+    "b": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "relation": "unrelated",
+    "related": 0.0907,
+    "probabilities": {
+     "same": 0.0174,
+     "overlapping": 0.0538,
+     "conflicting": 0.0196,
+     "unrelated": 0.9093
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "b": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "relation": "overlapping",
+    "related": 0.9937,
+    "probabilities": {
+     "same": 0.0098,
+     "overlapping": 0.9765,
+     "conflicting": 0.0074,
+     "unrelated": 0.0063
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   2
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 65,
+   "passage_reads": 1,
+   "passages_ms": 100,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 165,
+   "total_ms": 168
+  }
+ }
+}

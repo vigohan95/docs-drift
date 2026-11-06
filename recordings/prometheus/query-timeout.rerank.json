@@ -1,0 +1,128 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/query-timeout.rerank",
+ "recorded_at": "2026-11-06T13:29:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1005,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.29818",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--query.timeout`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--query.timeout`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--storage.agent.checkpoint-batch-size</code> | Size of a single WAL log entry chunk to be flushed. Has no effect without --storage.agent.checkpoint-from-in-memory-series flag. Use with agent mode only. | `1000` |\n| <code class=\"text-nowrap\">--storage.agent.no-lockfile</code> | Do not create lockfile in data directory. Use with agent mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.remote.flush-deadline</code> | How long to wait flushing sample on shutdown or config reload. | `1m` |\n| <code class=\"text-nowrap\">--storage.remote.read-sample-limit</code> | Maximum overall number of samples to return via the remote read interface, in a single query. 0 means no limit. This limit is ignored for streamed response types. Use with server mode only. | `5e7` |\n| <code class=\"text-nowrap\">--storage.remote.read-concurrent-limit</code> | Maximum number of concurrent remote read calls. 0 means no limit. Use with server mode only. | `10` |\n| <code class=\"text-nowrap\">--storage.remote.read-max-bytes-in-frame</code> | Maximum number of bytes in a single frame for streaming remote read response types before marshalling. Note that client might have limit on frame size as well. 1MB as recommended by protobuf by default. Use with server mode only. | `1048576` |\n| <code class=\"text-nowrap\">--web.search.max-limit</code> | Hard upper bound on the \"limit\" query parameter accepted by the experimental search API (--enable-feature=search-api). Requests with a higher limit are rejected with HTTP 400. 0 disables the cap. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--rules.alert.for-outage-tolerance</code> | Max time to tolerate prometheus outage for restoring \"for\" state of alert. Use with server mode only. | `1h` |\n| <code class=\"text-nowrap\">--rules.alert.for-grace-period</code> | Minimum duration between alert and restored \"for\" state. This is maintained only for alerts with configured \"for\" time greater than grace period. Use with server mode only. | `10m` |\n| <code class=\"text-nowrap\">--rules.alert.resend-delay</code> | Minimum amount of time to wait before resending an alert to Alertmanager. Use with server mode only. | `1m` |\n| <code class=\"text-nowrap\">--rules.max-concurrent-evals</code> | Global concurrency limit for independent rules that can run concurrently. When set, \"query.max-concurrency\" may need to be adjusted accordingly. Use with server mode only. | `4` |\n| <code class=\"text-nowrap\">--alertmanager.notification-queue-capacity</code> | The capacity of the queue for pending Alertmanager notifications. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--alertmanager.notification-batch-size</code> | The maximum number of notifications per batch to send to the Alertmanager. Use with server mode only. | `256` |\n| <code class=\"text-nowrap\">--alertmanager.drain-notification-queue-on-shutdown</code> | Send any outstanding Alertmanager notifications when shutting down. If false, any outstanding Alertmanager notifications will be dropped when shutting down. Use with server mode only. | `true` |\n| <code class=\"text-nowrap\">--query.lookback-delta</code> | The maximum lookback duration for retrieving metrics during expression evaluations and federation. Use with server mode only. | `5m` |\n| <code class=\"text-nowrap\">--query.timeout</code> | Maximum time a query may take before being aborted. Use with server mode only. | `2m` |\n| <code class=\"text-nowrap\">--query.max-concurrency</code> | Maximum number of queries executed concurrently. Use with server mode only. | `20` |"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "  # File to which PromQL queries are logged.\n  # Reloading the configuration will reopen the file.\n  [ query_log_file: <string> ]\n\n  # Maximum number of series a query may load before it is rejected. The limit\n  # is enforced during execution against the query's actual running cost, never\n  # against the cost estimate returned by the query cost API: the query is\n  # rejected as soon as it loads more series than this. 0 means no limit.\n  # These three query cost limits are reloadable and only enforced when the\n  # query-cost feature flag is enabled (--enable-feature=query-cost).\n  # They apply to every query the engine evaluates, including recording and\n  # alerting rule evaluation.\n  # A client may lower any of them for a single request with the max_series,\n  # max_samples_read and max_query_duration query parameters. A request that\n  # asks for a value above the ceiling set here is an error, it is not silently\n  # clamped down.\n  [ query_max_series: <int> | default = 0 ]\n\n  # Maximum number of samples a query may read before it is rejected. Like\n  # query_max_series, it is enforced during execution against the samples the\n  # query actually reads, never against the estimate: the query is\n  # rejected as soon as it reads more samples than this. 0 means no limit.\n  [ query_max_samples_read: <int> | default = 0 ]\n\n  # Maximum wall-clock duration a query may take. It surfaces as a query\n  # timeout: the query is aborted once it has run for this long. 0s falls back\n  # to --query.timeout. A nonzero value overrides that flag only when the\n  # query-cost feature is enabled. The per-query timeout parameter\n  # of the query endpoints is capped at this ceiling.\n  [ query_max_duration: <duration> | default = 0s ]\n\n  # File to which scrape failures are logged.\n  # Reloading the configuration will reopen the file.\n  [ scrape_failure_log_file: <string> ]\n\n  # An uncompressed response body larger than this many bytes will cause the\n  # scrape to fail. 0 means no limit. Example: 100MB.\n  # This is an experimental feature, this behaviour could\n  # change or be removed in the future.\n  [ body_size_limit: <size> | default = 0 ]\n\n  # Per-scrape limit on the number of scraped samples that will be accepted.\n  # If more than this number of samples are present after metric relabeling\n  # the entire scrape will be treated as failed. 0 means no limit.\n  [ sample_limit: <int> | default = 0 ]"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#31",
+    "title": "docs/feature_flags.md > Query cost",
+    "text": "These limits apply to every query the engine evaluates, not only to API\nrequests. Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` query parameters. A\nrequest asking for a value above the operator-set ceiling is rejected with HTTP\n400 (`bad_data`) rather than silently clamped. For `max_query_duration`, the\nceiling is `--query.timeout` while `query_max_duration` is unset. A `timeout`\nparameter above the effective duration ceiling is capped at that ceiling.\n\n`query_max_duration` overrides `--query.timeout` only while this feature flag is\nenabled. The command-line flag remains supported and controls the timeout when\nthe feature is disabled or `query_max_duration` is unset.\n\nClients can detect the feature through [`/api/v1/features`](querying/api.md#features),\nwhere it is reported as `query_cost` in the `api` category."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#15",
+    "title": "docs/querying/api.md > Query cost",
+    "text": "When the `query-cost` feature flag is enabled, the engine also enforces the\nreloadable cost limits configured under the `global:` section of the\n[configuration file](../configuration/configuration.md#configuration-file)\n(`query_max_series`, `query_max_samples_read`, and `query_max_duration`).\nThese limits are enforced *during* query execution against the query's actual\nrunning cost, not against the estimate above. A query is rejected as soon as the\nnumber of series it loads or the number of samples it reads exceeds the\nconfigured limit, and `query_max_duration` surfaces as a query timeout. The\nestimate returned by these endpoints is informational only and is never used to\nreject a query.\n\nThese limits apply to every query the engine evaluates, not only to API\nrequests. Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nWith query-cost enabled, sample accounting includes all storage input consumed\nby child evaluators, even when their output falls between outer query windows.\nReusing a materialized child result does not charge its storage reads again.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` parameters. These can\nonly tighten the operator-set value, never loosen it: a request asking for a\nvalue above the ceiling is rejected with HTTP 400 (`bad_data`) so that the\ncaller sees that the limit it asked for was not applied, instead of being\nsilently clamped down. The `timeout` parameter can also shorten the deadline,\nbut a larger value is capped at the effective duration ceiling rather than\nrejected."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "action": "use",
+    "relevance_score": 0.9934,
+    "document_score": 0.9947,
+    "levels": {
+     "answers": 0.9934,
+     "elsewhere": 0.0013,
+     "different_case": 0.0019,
+     "unrelated": 0.0034
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/feature_flags.md#31",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0291,
+    "document_score": 0.1767,
+    "levels": {
+     "answers": 0.0291,
+     "elsewhere": 0.1476,
+     "different_case": 0.041,
+     "unrelated": 0.7823
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0193,
+    "document_score": 0.4137,
+    "levels": {
+     "answers": 0.0193,
+     "elsewhere": 0.3944,
+     "different_case": 0.0551,
+     "unrelated": 0.5312
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/api.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0098,
+    "document_score": 0.0963,
+    "levels": {
+     "answers": 0.0098,
+     "elsewhere": 0.0864,
+     "different_case": 0.0576,
+     "unrelated": 0.8462
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2630
+  },
+  "timing": {
+   "total_ms": 94,
+   "rerank_ms": 79,
+   "questions_ms": 0,
+   "model_ms": 67,
+   "engine": {
+    "rows": 3170,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 67,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 63,
+    "state_ms": 0,
+    "logits_ms": 1,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

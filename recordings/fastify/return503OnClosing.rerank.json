@@ -1,0 +1,144 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/return503OnClosing.rerank",
+ "recorded_at": "2026-11-06T13:30:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 935,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "70.326019",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=207"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `return503OnClosing`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `return503OnClosing`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#20",
+    "title": "docs/Reference/Hooks.md > Application Hooks > preClose",
+    "text": "### preClose\n<a id=\"pre-close\"></a>\n\nTriggered when `fastify.close()` is invoked to stop the server. At this\npoint the server is already rejecting new requests with `503` (when\n[`return503OnClosing`](./Server.md#factory-return-503-on-closing) is `true`),\nbut the HTTP server has not yet stopped listening and in-flight requests are\nstill being processed.\n\nIt is useful when [plugins](./Plugins.md) have set up state attached to the HTTP\nserver that would prevent the server from closing, such as open WebSocket\nconnections or Server-Sent Events streams that must be explicitly terminated for\n`server.close()` to complete.\n_It is unlikely you will need to use this hook_,\nuse the [`onClose`](#onclose) for the most common case.\n\n```js\n// callback style\nfastify.addHook('preClose', (done) => {\n  // Some code\n  done()\n})\n\n// or async/await style\nfastify.addHook('preClose', async () => {\n  // Some async code\n  await removeSomeServerState()\n})\n```\n\nFor example, closing WebSocket connections during shutdown:\n\n```js\nfastify.addHook('preClose', async () => {\n  // Close all WebSocket connections so that server.close() can complete.\n  // Without this, open connections would keep the server alive.\n  for (const ws of activeWebSockets) {\n    ws.close(1001, 'Server shutting down')\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "title": "docs/Reference/Server.md > Factory",
+    "text": "## Factory\n<a id=\"factory\"></a>\n\nThe Fastify module exports a factory function that is used to create new\n<code><b>Fastify server</b></code> instances. This factory function accepts an\noptions object which is used to customize the resulting instance. This document\ndescribes the properties available in that options object.\n\n- [Factory](#factory)\n  - [`http`](#http)\n  - [`http2`](#http2)\n  - [`https`](#https)\n  - [`connectionTimeout`](#connectiontimeout)\n  - [`keepAliveTimeout`](#keepalivetimeout)\n  - [`forceCloseConnections`](#forcecloseconnections)\n  - [`maxRequestsPerSocket`](#maxrequestspersocket)\n  - [`requestTimeout`](#requesttimeout)\n  - [`bodyLimit`](#bodylimit)\n  - [`onProtoPoisoning`](#onprotopoisoning)\n  - [`onConstructorPoisoning`](#onconstructorpoisoning)\n  - [`logger`](#logger)\n  - [`loggerInstance`](#loggerinstance)\n  - [`logController`](#logcontroller)\n  - [`serverFactory`](#serverfactory)\n  - [`requestIdHeader`](#requestidheader)\n  - [`genReqId`](#genreqid)\n  - [`trustProxy`](#trustproxy)\n  - [`pluginTimeout`](#plugintimeout)\n  - [`exposeHeadRoutes`](#exposeheadroutes)\n  - [`return503OnClosing`](#return503onclosing)\n  - [`ajv`](#ajv)\n  - [`serializerOpts`](#serializeropts)\n  - [`http2SessionTimeout`](#http2sessiontimeout)\n  - [`frameworkErrors`](#frameworkerrors)\n  - [`clientErrorHandler`](#clienterrorhandler)\n  - [`rewriteUrl`](#rewriteurl)\n  - [`allowErrorHandlerOverride`](#allowerrorhandleroverride)\n  - [RouterOptions](#routeroptions)\n    - [`allowUnsafeRegex`](#allowunsaferegex)\n    - [`buildPrettyMeta`](#buildprettymeta)\n    - [`caseSensitive`](#casesensitive)\n    - [`compile`](#compile)\n    - [`constraints`](#constraints)\n    - [`defaultRoute`](#defaultroute)\n    - [`ignoreDuplicateSlashes`](#ignoreduplicateslashes)\n    - [`ignoreTrailingSlash`](#ignoretrailingslash)\n    - [`maxParamLength`](#maxparamlength)\n    - [`onBadUrl`](#onbadurl)\n    - [`onMaxParamLength`](#onmaxparamlength)\n    - [`querystringParser`](#querystringparser)\n    - [`useSemicolonDelimiter`](#usesemicolondelimiter)\n- [Instance](#instance)\n  - [Server Methods](#server-methods)\n    - [server](#server)\n    - [after](#after)\n    - [ready](#ready)\n    - [listen](#listen)\n    - [addresses](#addresses)\n    - [routing](#routing)\n    - [route](#route)\n    - [hasRoute](#hasroute)\n    - [findRoute](#findroute)\n    - [close](#close)\n    - [decorate\\*](#decorate)\n    - [register](#register)\n    - [addHook](#addhook)\n    - [prefix](#prefix)\n    - [pluginName](#pluginname)\n    - [hasPlugin](#hasplugin)\n    - [listeningOrigin](#listeningorigin)\n    - [log](#log)\n    - [version](#version)\n    - [inject](#inject)\n    - [addHttpMethod](#addHttpMethod)\n    - [addSchema](#addschema)\n    - [getSchemas](#getschemas)\n    - [getSchema](#getschema)\n    - [setReplySerializer](#setreplyserializer)\n    - [setValidatorCompiler](#setvalidatorcompiler)\n    - [setSchemaErrorFormatter](#setschemaerrorformatter)\n    - [setSerializerCompiler](#setserializercompiler)\n    - [validatorCompiler](#validatorcompiler)\n    - [serializerCompiler](#serializercompiler)\n    - [schemaErrorFormatter](#schemaerrorformatter)\n    - [schemaController](#schemacontroller)\n    - [setNotFoundHandler](#setnotfoundhandler)\n    - [setErrorHandler](#seterrorhandler)\n    - [setChildLoggerFactory](#setchildloggerfactory)\n    - [setGenReqId](#setgenreqid)\n    - [addConstraintStrategy](#addconstraintstrategy)\n    - [hasConstraintStrategy](#hasconstraintstrategy)\n    - [printRoutes](#printroutes)\n    - [printPlugins](#printplugins)"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#27",
+    "title": "docs/Reference/Server.md > Factory > `return503OnClosing`",
+    "text": "### `return503OnClosing`\n<a id=\"factory-return-503-on-closing\"></a>\n\n+ Default: `true`\n\nWhen `true`, any request arriving after [`close`](#close) has been called will\nreceive a `503 Service Unavailable` response with `Connection: close` header\n(HTTP/1.1). This lets load balancers detect that the server is shutting down and\nstop routing traffic to it.\n\nWhen `false`, requests arriving during the closing phase are routed and\nprocessed normally. They will still receive a `Connection: close` header so that\nclients do not attempt to reuse the connection."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#61",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > close",
+    "text": "#### close\n<a id=\"close\"></a>\n\n`fastify.close(callback)`: call this function to close the server instance and\nrun the [`'onClose'`](./Hooks.md#on-close) hook.\n\nCalling `close` will also cause the server to respond to every new incoming\nrequest with a `503` error and destroy that request. See [`return503OnClosing`\nflags](#factory-return-503-on-closing) for changing this behavior.\n\nIf it is called without any arguments, it will return a Promise:\n\n```js\nfastify.close().then(() => {\n  console.log('successfully closed!')\n}, (err) => {\n  console.log('an error happened', err)\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > close > Shutdown lifecycle",
+    "text": "##### Shutdown lifecycle\n\nWhen `fastify.close()` is called, the following steps happen in order:\n\n1. The server is flagged as **closing**. New incoming requests receive a\n   `Connection: close` header (HTTP/1.1) and are handled according to\n   [`return503OnClosing`](#factory-return-503-on-closing).\n2. [`preClose`](./Hooks.md#pre-close) hooks execute. The server is still\n   processing in-flight requests at this point.\n3. **Connection draining** based on the\n   [`forceCloseConnections`](#forcecloseconnections) option:\n   - `\"idle\"` — idle keep-alive connections are closed; in-flight requests\n     continue.\n   - `true` — all persistent connections are destroyed immediately.\n   - `false` — no forced closure; idle connections remain open until they time\n     out naturally (see [`keepAliveTimeout`](#keepalivetimeout)).\n4. The HTTP server **stops accepting** new TCP connections\n   (`server.close()`). Node.js waits for all in-flight requests to complete\n   before invoking the callback.\n5. [`onClose`](./Hooks.md#on-close) hooks execute. All in-flight requests have\n   completed and the server is no longer listening.\n6. The `close` callback (or the returned Promise) resolves.\n\n```\nfastify.close() called\n  │\n  ├─▶ closing = true (new requests receive 503)\n  │\n  ├─▶ preClose hooks\n  │     (in-flight requests still active)\n  │\n  ├─▶ Connection draining (forceCloseConnections)\n  │\n  ├─▶ server.close()\n  │     (waits for in-flight requests to complete)\n  │\n  ├─▶ onClose hooks\n  │     (server stopped, all requests done)\n  │\n  └─▶ close callback / Promise resolves\n```\n\n> ℹ️ Note:\n> Upgraded connections (such as WebSocket) are not tracked by the HTTP\n> server and will prevent `server.close()` from completing. Close them\n> explicitly in a [`preClose`](./Hooks.md#pre-close) hook."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#27",
+    "action": "use",
+    "relevance_score": 0.9953,
+    "document_score": 0.9963,
+    "levels": {
+     "answers": 0.9953,
+     "elsewhere": 0.001,
+     "different_case": 0.0015,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Hooks.md#20",
+    "action": "expand",
+    "relevance_score": 0.0149,
+    "document_score": 0.7639,
+    "levels": {
+     "answers": 0.0149,
+     "elsewhere": 0.749,
+     "different_case": 0.034,
+     "unrelated": 0.2021
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Server.md#62",
+    "action": "expand",
+    "relevance_score": 0.0113,
+    "document_score": 0.8466,
+    "levels": {
+     "answers": 0.0113,
+     "elsewhere": 0.8353,
+     "different_case": 0.0317,
+     "unrelated": 0.1216
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#61",
+    "action": "expand",
+    "relevance_score": 0.0063,
+    "document_score": 0.9618,
+    "levels": {
+     "answers": 0.0063,
+     "elsewhere": 0.9555,
+     "different_case": 0.0121,
+     "unrelated": 0.0261
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0041,
+    "document_score": 0.1517,
+    "levels": {
+     "answers": 0.0041,
+     "elsewhere": 0.1476,
+     "different_case": 0.0216,
+     "unrelated": 0.8267
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2665
+  },
+  "timing": {
+   "total_ms": 88,
+   "rerank_ms": 73,
+   "questions_ms": 0,
+   "model_ms": 66,
+   "engine": {
+    "rows": 3260,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 66,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 63,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

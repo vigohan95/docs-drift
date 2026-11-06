@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/extra-scrape-metrics.rerank",
+ "recorded_at": "2026-11-06T13:30:58Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 895,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.455009",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=200"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `extra_scrape_metrics`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `extra_scrape_metrics`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#6",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "  # When enabled, Prometheus stores additional time series for each scrape:\n  # scrape_timeout_seconds, scrape_sample_limit, and scrape_body_size_bytes.\n  # These metrics help monitor how close targets are to their configured limits.\n  # This option can be overridden per scrape config.\n  [ extra_scrape_metrics: <boolean> | default = false ]\n\nruntime:\n  # The minimum severity of messages emitted by the process logger.\n  # This setting can be changed by reloading the configuration.\n  [ log_level: <string> | default = info ]\n\n  # Configure the Go garbage collector GOGC parameter\n  # See: https://tip.golang.org/doc/gc-guide#GOGC\n  # Lowering this number increases CPU usage.\n  [ gogc: <int> | default = 75 ]\n\n# Rule files specifies a list of globs. Rules and alerts are read from\n# all matching files.\nrule_files:\n  [ - <filepath_glob> ... ]\n\n# Scrape config files specifies a list of globs. Scrape configs are read from\n# all matching files and appended to the list of scrape configs.\nscrape_config_files:\n  [ - <filepath_glob> ... ]\n\n# A list of scrape configurations.\nscrape_configs:\n  [ - <scrape_config> ... ]\n\n# Alerting specifies settings related to the Alertmanager.\nalerting:\n  alert_relabel_configs:\n    [ - <relabel_config> ... ]\n  alertmanagers:\n    [ - <alertmanager_config> ... ]\n\n# Settings related to the remote write feature.\nremote_write:\n  [ - <remote_write> ... ]\n\n# Settings related to the OTLP receiver feature.\n# See https://prometheus.io/docs/guides/opentelemetry/ for best practices.\notlp:\n  # Promote specific list of resource attributes to labels.\n  # It cannot be configured simultaneously with 'promote_all_resource_attributes: true'.\n  [ promote_resource_attributes: [<string>, ...] | default = [ ] ]\n  # Promoting all resource attributes to labels, except for the ones configured with 'ignore_resource_attributes'.\n  # Be aware that changes in attributes received by the OTLP endpoint may result in time series churn and lead to high memory usage by the Prometheus server.\n  # It cannot be set to 'true' simultaneously with 'promote_resource_attributes'.\n  [ promote_all_resource_attributes: <boolean> | default = false ]\n  # Which resource attributes to ignore, can only be set when 'promote_all_resource_attributes' is true.\n  [ ignore_resource_attributes: [<string>, ...] | default = [] ]\n  # Configures translation of OTLP metrics when received through the OTLP metrics\n  # endpoint. Available values:\n  # - \"UnderscoreEscapingWithSuffixes\" refers to commonly agreed normalization used\n  #   by OpenTelemetry in https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/pkg/translator/prometheus\n  # - \"NoUTF8EscapingWithSuffixes\" is a mode that relies on UTF-8 support in Prometheus.\n  #   It preserves all special characters like dots, but still adds required metric name suffixes\n  #   for units and _total, as UnderscoreEscapingWithSuffixes does.\n  # - \"UnderscoreEscapingWithoutSuffixes\" translates metric name characters that\n  #   are not alphanumerics/underscores/colons to underscores, and label name\n  #   characters that are not alphanumerics/underscores to underscores, but\n  #   unlike UnderscoreEscapingWithSuffixes it does not append any suffixes to\n  #   the names.\n  # - (EXPERIMENTAL) \"NoTranslation\" is a mode that relies on UTF-8 support in Prometheus.\n  #   It preserves all special character like dots and won't append special suffixes for metric\n  #   unit and type.\n  #\n  #   WARNING: The \"NoTranslation\" setting has significant known risks and limitations (see https://prometheus.io/docs/practices/naming/"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#13",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "# +----------------------------+----------------------------+\n# |              1.005         |              7             |\n# +----------------------------+----------------------------+\n# |              1.002         |              8             |\n# +----------------------------+----------------------------+\n#\n# 0 results in the smallest supported factor (which is currently ~1.0027 or\n# schema 8, but might change in the future).\n[ native_histogram_min_bucket_factor: <float> | default = 0 ]\n\n# If true, native histograms exposed by a target are recognized during\n# scraping and ingested as such. If false, any native parts of histograms\n# are ignored and only the classic parts are recognized (possibly as\n# a classic histogram with only the +Inf buckets if no explicit classic\n# buckets are part of the histogram).\n[ scrape_native_histograms: <bool> | default = <global.scrape_native_histograms> ]\n\n# Specifies whether to convert classic histograms into native histograms with\n# custom buckets.\n[ convert_classic_histograms_to_nhcb: <bool> | default = <global.convert_classic_histograms_to_nhcb>]\n\n# Specifies whether to additionally scrape the classic parts of a histogram,\n# even if it is also exposed with native parts or it is converted into a\n# native histogram with custom buckets.\n[ always_scrape_classic_histograms: <boolean> | default = <global.always_scrape_classic_histograms> ]\n\n# See global configuration above for further explanations of how the last three\n# options combine their effects.\n\n# When enabled, Prometheus stores additional time series for this scrape job:\n# scrape_timeout_seconds, scrape_sample_limit, and scrape_body_size_bytes.\n# These metrics help monitor how close targets are to their configured limits.\n# If not set, inherits the value from the global configuration.\n[ extra_scrape_metrics: <boolean> | default = <global.extra_scrape_metrics> ]\n\n```"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#3",
+    "title": "docs/feature_flags.md > Extra scrape metrics",
+    "text": "## Extra scrape metrics\n\n`--enable-feature=extra-scrape-metrics`\n\n> **Note:** This feature flag is deprecated. Please use the `extra_scrape_metrics` configuration option instead (available at both global and scrape-config level). The feature flag will be removed in a future major version. See the [configuration documentation](configuration/configuration.md) for more details.\n\nWhen enabled, for each instance scrape, Prometheus stores a sample in the following additional time series:\n\n- `scrape_timeout_seconds`. The configured `scrape_timeout` for a target. This allows you to measure each target to find out how close they are to timing out with `scrape_duration_seconds / scrape_timeout_seconds`.\n- `scrape_sample_limit`. The configured `sample_limit` for a target. This allows you to measure each target\n  to find out how close they are to reaching the limit with `scrape_samples_post_metric_relabeling / scrape_sample_limit`. Note that `scrape_sample_limit` can be zero if there is no limit configured, which means that the query above can return `+Inf` for targets with no limit (as we divide by zero). If you want to query only for targets that do have a sample limit use this query: `scrape_samples_post_metric_relabeling / (scrape_sample_limit > 0)`.\n- `scrape_body_size_bytes`. The uncompressed size of the most recent scrape response, if successful. Scrapes failing because `body_size_limit` is exceeded report `-1`, other scrape failures report `0`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#6",
+    "action": "use",
+    "relevance_score": 0.9936,
+    "document_score": 0.9951,
+    "levels": {
+     "answers": 0.9936,
+     "elsewhere": 0.0015,
+     "different_case": 0.0018,
+     "unrelated": 0.0031
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#13",
+    "action": "use",
+    "relevance_score": 0.9903,
+    "document_score": 0.9932,
+    "levels": {
+     "answers": 0.9903,
+     "elsewhere": 0.0029,
+     "different_case": 0.0036,
+     "unrelated": 0.0032
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/feature_flags.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.2199,
+    "document_score": 0.3808,
+    "levels": {
+     "answers": 0.2199,
+     "elsewhere": 0.1609,
+     "different_case": 0.0343,
+     "unrelated": 0.585
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2003
+  },
+  "timing": {
+   "total_ms": 78,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 2408,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,178 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/start-timestamp.compare",
+ "recorded_at": "2026-11-06T13:29:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1162,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "201.350437",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=440"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#2",
+    "text": "### `<test_group>`\n\n``` yaml\n# Series data\n[ interval: <duration> | default = evaluation_interval ]\ninput_series:\n  [ - <series> ]\n\n# Name of the test group\n[ name: <string> ]\n\n# Start timestamp for the test group. This sets the base time for all samples\n# and evaluations in this test group.\n# Accepts either a Unix timestamp (e.g., 1609459200) or an RFC3339 formatted\n# timestamp (e.g., \"2021-01-01T00:00:00Z\").\n# Default: 0 (Unix epoch: 1970-01-01 00:00:00 UTC)\n#\n# When set:\n# - All input_series samples are timestamped starting from start_timestamp\n# - The eval_time in test cases is relative to start_timestamp\n# - The time() function returns start_timestamp + eval_time\n[ start_timestamp: <int> | <rfc3339_string> | default = 0 ]\n\n# Unit tests for the above data.\n\n# Unit tests for alerting rules. We consider the alerting rules from the input file.\nalert_rule_test:\n  [ - <alert_test_case> ]\n\n# Unit tests for PromQL expressions.\npromql_expr_test:\n  [ - <promql_test_case> ]\n\n# External labels accessible to the alert template.\nexternal_labels:\n  [ <labelname>: <string> ... ]\n\n# External URL accessible to the alert template.\n# Usually set using --web.external-url.\n  [ external_url: <string> ]\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "text": "### Time within tests\n\nIt should be noted that in all tests, either in `alert_test_case` or\n`promql_test_case`, the output from all functions related to the current time,\nfor example the `time()` and `day_of_*()` functions, will output a consistent value\nfor tests.\n\nBy default, at the start of the test evaluation, `time()` returns 0 (Unix epoch:\nJanuary 1, 1970 00:00:00 UTC). The `eval_time` field specifies a duration relative\nto `start_timestamp`, so by default `time()` will return a value of `0 + eval_time`.\n\nYou can configure a custom start timestamp for your tests by setting the `start_timestamp`\nfield in your test group. This field accepts either:\n- A Unix timestamp (e.g., `1609459200` for January 1, 2021 00:00:00 UTC)\n- An RFC3339 formatted timestamp (e.g., `\"2021-01-01T00:00:00Z\"`)\n\nWhen you set `start_timestamp`:\n- All `input_series` samples will be timestamped starting from `start_timestamp`\n- The `eval_time` field in test cases is interpreted as a duration relative to `start_timestamp`\n- The `time()` function will return `start_timestamp + eval_time`"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#60",
+    "text": "## `start_timestamp()`\n\n`start_timestamp(v instant-vector)` returns the start timestamp of each of the samples of\nthe given vector as the number of seconds since January 1, 1970 UTC. It acts on\nfloat and histogram samples in the same way.\n\nThis function only works when used directly on an instant vector and when `use-start-timestamps` feature flag is enabled. Otherwise, if it's used on an expression or if `use-start-timestamps` is disabled, it returns empty results."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/configuration/unit_testing_rules.md#12"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/configuration/unit_testing_rules.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#60",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/unit_testing_rules.md#2",
+    "b": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "relation": "overlapping",
+    "related": 0.9975,
+    "probabilities": {
+     "same": 0.0133,
+     "overlapping": 0.9785,
+     "conflicting": 0.0056,
+     "unrelated": 0.0025
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0075,
+       "restated": 0.9765,
+       "elaborated": 0.0107,
+       "different": 0.0053
+      },
+      "confidence": 0.9947,
+      "a": {
+       "document": "prometheus:docs/configuration/unit_testing_rules.md#2",
+       "quote": "# When set:",
+       "start": 467,
+       "end": 478,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "prometheus:docs/configuration/unit_testing_rules.md#12",
+       "quote": "The `eval_time` field specifies a duration relative\nto `start_timestamp`, so by default `time()` will return a value of `0 + eval_time`.\n\nYou can configure a custom start timestamp for your tests by setting the `start_timestamp`\nfield in your test group.",
+       "start": 379,
+       "end": 633,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0092,
+       "restated": 0.9779,
+       "elaborated": 0.0077,
+       "different": 0.0053
+      },
+      "confidence": 0.9947,
+      "a": {
+       "document": "prometheus:docs/configuration/unit_testing_rules.md#2",
+       "quote": "# Accepts either a Unix timestamp (e.g., 1609459200) or an RFC3339 formatted",
+       "start": 293,
+       "end": 369,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/configuration/unit_testing_rules.md#12",
+       "quote": "This field accepts either:\n- A Unix timestamp (e.g., `1609459200` for January 1, 2021 00:00:00 UTC)\n- An RFC3339 formatted timestamp (e.g., `\"2021-01-01T00:00:00Z\"`)\n\nWhen you set `start_timestamp`:\n- All `input_series` samples will be timestamped starting from `start_timestamp`\n- The `eval_time` field in test cases is interpreted as a duration relative to `start_timestamp`\n- The `time()` function will return `start_timestamp + eval_time`",
+       "start": 634,
+       "end": 1076,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/configuration/unit_testing_rules.md#2",
+    "b": "prometheus:docs/querying/functions.md#60",
+    "relation": "unrelated",
+    "related": 0.0807,
+    "probabilities": {
+     "same": 0.0228,
+     "overlapping": 0.0308,
+     "conflicting": 0.0272,
+     "unrelated": 0.9193
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "b": "prometheus:docs/querying/functions.md#60",
+    "relation": "unrelated",
+    "related": 0.0267,
+    "probabilities": {
+     "same": 0.0083,
+     "overlapping": 0.0068,
+     "conflicting": 0.0116,
+     "unrelated": 0.9733
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 61,
+   "passage_reads": 1,
+   "passages_ms": 83,
+   "passages": 2,
+   "counterparts_ms": 113
+  },
+  "timing": {
+   "read_ms": 255,
+   "total_ms": 260
+  }
+ }
+}

@@ -1,0 +1,127 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/prometheus-WriteRequest.rerank",
+ "recorded_at": "2026-11-06T13:30:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 970,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "71.183136",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=215"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `prometheus.WriteRequest`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `prometheus.WriteRequest`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--web.remote-write-receiver.accepted-protobuf-messages</code> | List of the remote write protobuf messages to accept when receiving the remote writes. Supported values: prometheus.WriteRequest, io.prometheus.write.v2.Request | `prometheus.WriteRequest` |\n| <code class=\"text-nowrap\">--web.enable-otlp-receiver</code> | Enable API endpoint accepting OTLP write requests. | `false` |\n| <code class=\"text-nowrap\">--web.console.templates</code> | Path to the console template directory, available at /consoles. | `consoles` |\n| <code class=\"text-nowrap\">--web.console.libraries</code> | Path to the console library directory. | `console_libraries` |\n| <code class=\"text-nowrap\">--web.page-title</code> | Document title of Prometheus instance. | `Prometheus Time Series Collection and Processing Server` |\n| <code class=\"text-nowrap\">--web.cors.origin</code> | Regex for CORS origin. It is fully anchored. Example: 'https?://(domain1\\|domain2)\\.com' | `.*` |\n| <code class=\"text-nowrap\">--storage.tsdb.path</code> | Base path for metrics storage. Use with server mode only. | `data/` |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.time</code> | [DEPRECATED] How long to retain samples in storage. If neither this flag nor \"storage.tsdb.retention.size\" is set, the retention time defaults to 15d. Units Supported: y, w, d, h, m, s, ms. This flag has been deprecated, use the storage.tsdb.retention.time field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.size</code> | [DEPRECATED] Maximum number of bytes that can be stored for blocks. A unit is required, supported units: B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. This flag has been deprecated, use the storage.tsdb.retention.size field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.no-lockfile</code> | Do not create lockfile in data directory. Use with server mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.tsdb.head-chunks-write-queue-size</code> | Size of the queue through which head chunks are written to the disk to be m-mapped, 0 disables the queue completely. Experimental. Use with server mode only. | `0` |\n| <code class=\"text-nowrap\">--storage.tsdb.delay-compact-file.path</code> | Path to a JSON file with uploaded TSDB blocks e.g. Thanos shipper meta file. If set TSDB will only compact 1 level blocks that are marked as uploaded in that file, improving external storage integrations e.g. with Thanos sidecar. 1+ level compactions won't be delayed. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.agent.path</code> | Base path for metrics storage. Use with agent mode only. | `data-agent/` |\n| <code class=\"text-nowrap\">--storage.agent.wal-compression</code> | Compress the agent WAL. If false, the --storage.agent.wal-compression-type flag is ignored. Use with agent mode only. | `true` |\n| <code class=\"text-nowrap\">--storage.agent.retention.min-time</code> | Minimum age samples may be before being considered for deletion when the WAL is truncated Use with agent mode only. | `5m` |\n| <code class=\"text-nowrap\">--storage.agent.retention.max-time</code> | Maximum age samples may be before being forcibly deleted when the WAL is truncated Use with agent mode only. | `4h` |\n| <code class=\"text-nowrap\">--storage.agent.checkpoint-from-in-memory-series</code> | Use only in-memory series data when building a checkpoint. Use with agent mode only. | `false` |"
+   },
+   {
+    "id": "prometheus:docs/command-line/promtool.md#49",
+    "title": "docs/command-line/promtool.md > Commands > `promtool push` > Flags > `promtool push metrics` > Flags",
+    "text": "###### Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">--label</code> | Label to attach to metrics. Can be specified multiple times. | `job=promtool` |\n| <code class=\"text-nowrap\">--timeout</code> | The time to wait for pushing metrics. | `30s` |\n| <code class=\"text-nowrap\">--header</code> | Prometheus remote write header. |  |\n| <code class=\"text-nowrap\">--protobuf_message</code> | Protobuf message to use when writing (prometheus.WriteRequest or io.prometheus.write.v2.Request). | `prometheus.WriteRequest` |\n| <code class=\"text-nowrap\">--remote-write.path</code> | Override the default remote write API path. | `/api/v1/write` |"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#123",
+    "title": "docs/configuration/configuration.md > Configuration file > `<remote_write>`",
+    "text": "### `<remote_write>`\n\n`write_relabel_configs` is relabeling applied to samples before sending them\nto the remote endpoint. Write relabeling is applied after external labels. This\ncould be used to limit which samples are sent.\n\nThere is a [small demo](/documentation/examples/remote_storage) of how to use\nthis functionality.\n\n```yaml\n# The URL of the endpoint to send samples to.\nurl: <string>\n\n# protobuf message to use when writing to the remote write endpoint.\n#\n# * The `prometheus.WriteRequest` represents the message introduced in Remote Write 1.0, which\n# will be deprecated eventually.\n# * The `io.prometheus.write.v2.Request` was introduced in Remote Write 2.0 and replaces the former,\n# by improving efficiency and sending metadata, start timestamp and native histograms by default.\n#\n# Before changing this value, consult with your remote storage provider (or test) what message it supports.\n# Read more on https://prometheus.io/docs/specs/remote_write_spec_2_0/#io-prometheus-write-v2-request\n[ protobuf_message: <prometheus.WriteRequest | io.prometheus.write.v2.Request> | default = prometheus.WriteRequest ]\n\n# EXPERIMENTAL: Remote-Write 2.0 mode to use when `protobuf_message` is `io.prometheus.write.v2.Request`.\n#\n# * `none`: default Remote-Write 2.0 behavior with no additional restrictions.\n# * `stateless`: appends `;mode=stateless` to the Content-Type header, defaults `send_native_histograms` to `true`,\n#   requires `--enable-feature=metadata-wal-records` or `--enable-feature=type-and-unit-labels`, and drops classic\n#   histogram float series, series with unspecified metadata type, and all exemplars (until sample-exemplar coalescing\n#   is implemented, as `stateless` mode forbids detached exemplars).\n# * `stateless-st`: appends `;mode=stateless-st` to the Content-Type header, includes all `stateless` rules,\n#   additionally requires `--enable-feature=st-storage`, and drops cumulative metrics missing a start timestamp.\n#\n# Support for metadata relabeling (https://github.com/prometheus/proposals/pull/104) is coming to allow relabeling\n# untyped series (such as recording rule outputs) to `counter` or `gauge` (relabeling `__type__` already works when\n# `--enable-feature=type-and-unit-labels` is enabled).\n#\n# Read more on https://prometheus.io/docs/specs/prw/remote_write_spec_2_0/#modes\n[ mode: <none | stateless | stateless-st> | default = none ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#127",
+    "title": "docs/configuration/configuration.md > Configuration file > `<remote_write>`",
+    "text": "# Configures the sending of series metadata to remote storage\n# if the `prometheus.WriteRequest` message was chosen. When\n# `io.prometheus.write.v2.Request` is used, metadata is always sent.\n#\n# Metadata configuration is subject to change at any point\n# or be removed in future releases.\nmetadata_config:\n  # Whether metric metadata is sent to remote storage or not.\n  [ send: <boolean> | default = true ]\n  # How frequently metric metadata is sent to remote storage.\n  [ send_interval: <duration> | default = 1m ]\n  # Maximum number of samples per send.\n  [ max_samples_per_send: <int> | default = 2000]\n\n# EXPERIMENTAL: Converts native histograms with custom buckets (NHCB)\n# to classic histograms after applying write_relabel_configs. This enables\n# using NHCB locally (for cheaper storage and histogram atomicity) while\n# sending classic histograms to external systems that do not support\n# native histograms yet. Also useful for migration scenarios.\n# NHCBs are converted even when send_native_histograms is enabled; that setting\n# controls forwarding of other native histograms. Classic series ingested\n# alongside NHCBs, for example with always_scrape_classic_histograms, are sent\n# too, so the converted series duplicate them; drop one copy with\n# write_relabel_configs. Gauge histograms are converted with _count and _sum\n# series. Conversion state is not persisted across restarts, so bucket layout or\n# sample type changes that span a restart do not produce stale markers for\n# retired classic series.\n[ convert_nhcb_to_classic: <boolean> | default = false ]\n\n# HTTP client settings, including authentication methods (such as basic auth and\n# authorization), proxy configurations, TLS options, custom HTTP headers, etc.\n# enable_http2 defaults to false for remote-write.\n[ <http_config> ]\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "prometheus:docs/configuration/configuration.md#123",
+    "action": "use",
+    "relevance_score": 0.9807,
+    "document_score": 0.9857,
+    "levels": {
+     "answers": 0.9807,
+     "elsewhere": 0.005,
+     "different_case": 0.0073,
+     "unrelated": 0.007
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/command-line/promtool.md#49",
+    "action": "use",
+    "relevance_score": 0.7332,
+    "document_score": 0.8141,
+    "levels": {
+     "answers": 0.7332,
+     "elsewhere": 0.0809,
+     "different_case": 0.0348,
+     "unrelated": 0.1511
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/configuration/configuration.md#127",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0931,
+    "document_score": 0.4614,
+    "levels": {
+     "answers": 0.0931,
+     "elsewhere": 0.3683,
+     "different_case": 0.0388,
+     "unrelated": 0.4997
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0364,
+    "document_score": 0.0984,
+    "levels": {
+     "answers": 0.0364,
+     "elsewhere": 0.062,
+     "different_case": 0.0439,
+     "unrelated": 0.8576
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2690
+  },
+  "timing": {
+   "total_ms": 90,
+   "rerank_ms": 75,
+   "questions_ms": 0,
+   "model_ms": 66,
+   "engine": {
+    "rows": 3230,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 66,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 63,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

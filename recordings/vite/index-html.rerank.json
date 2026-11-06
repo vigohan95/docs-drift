@@ -1,0 +1,145 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/index-html.rerank",
+ "recorded_at": "2026-11-06T13:29:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1012,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.515583",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=272"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `index.html`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `index.html`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/index.md#6",
+    "title": "docs/guide/index.md > Getting Started > Manual Installation",
+    "text": "## Manual Installation\n\nIn your project, you can install the `vite` CLI using:\n\n::: code-group\n\n```bash [npm]\n$ npm install -D vite\n```\n\n```bash [Yarn]\n$ yarn add -D vite\n```\n\n```bash [pnpm]\n$ pnpm add -D vite\n```\n\n```bash [Bun]\n$ bun add -D vite\n```\n\n```bash [Deno]\n$ deno add -D npm:vite\n```\n\n:::\n\nAnd create an `index.html` file like this:\n\n```html\n<p>Hello Vite!</p>\n```\n\nThen run the appropriate CLI command in your terminal:\n\n::: code-group\n\n```bash [npm]\n$ npx vite\n```\n\n```bash [Yarn]\n$ yarn vite\n```\n\n```bash [pnpm]\n$ pnpm vite\n```\n\n```bash [Bun]\n$ bunx vite\n```\n\n```bash [Deno]\n$ deno run -A npm:vite\n```\n\n:::\n\nThe `index.html` will be served on `http://localhost:5173`."
+   },
+   {
+    "id": "vite:docs/guide/index.md#7",
+    "title": "docs/guide/index.md > Getting Started > `index.html` and Project Root",
+    "text": "## `index.html` and Project Root\n\nOne thing you may have noticed is that in a Vite project, `index.html` is front-and-central instead of being tucked away inside `public`. This is intentional: during development Vite is a server, and `index.html` is the entry point to your application.\n\nVite treats `index.html` as source code and part of the module graph. It resolves `<script type=\"module\" src=\"...\">` that references your JavaScript source code. Even inline `<script type=\"module\">` and CSS referenced via `<link href>` also enjoy Vite-specific features. In addition, URLs inside `index.html` are automatically rebased so there's no need for special `%PUBLIC_URL%` placeholders.\n\nSimilar to static http servers, Vite has the concept of a \"root directory\" which your files are served from. You will see it referenced as `<root>` throughout the rest of the docs. Absolute URLs in your source code will be resolved using the project root as base, so you can write code as if you are working with a normal static file server (except way more powerful!). Vite is also capable of handling dependencies that resolve to out-of-root file system locations, which makes it usable even in a monorepo-based setup.\n\nVite also supports [multi-page apps](./build#multi-page-app) with multiple `.html` entry points."
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#8",
+    "title": "docs/guide/ssr.md > Server-Side Rendering (SSR) > Building for Production",
+    "text": "## Building for Production\n\nTo ship an SSR project for production, we need to:\n\n1. Produce a client build as normal;\n2. Produce an SSR build, which can be directly loaded via `import()` so that we don't have to go through Vite's `ssrLoadModule`;\n\nOur scripts in `package.json` will look like this:\n\n```json [package.json]\n{\n  \"scripts\": {\n    \"dev\": \"node server\",\n    \"build:client\": \"vite build --outDir dist/client\",\n    \"build:server\": \"vite build --outDir dist/server --ssr src/entry-server.js\"\n  }\n}\n```\n\nNote the `--ssr` flag which indicates this is an SSR build. It should also specify the SSR entry.\n\nThen, in `server.js` we need to add some production specific logic by checking `process.env.NODE_ENV`:\n\n- Instead of reading the root `index.html`, use the `dist/client/index.html` as the template, since it contains the correct asset links to the client build.\n\n- Instead of `await vite.ssrLoadModule('/src/entry-server.js')`, use `import('./dist/server/entry-server.js')` (this file is the result of the SSR build).\n\n- Move the creation and all usage of the `vite` dev server behind dev-only conditional branches, then add static file serving middlewares to serve files from `dist/client`.\n\nRefer to the [example projects](#example-projects) for a working setup."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#2",
+    "title": "docs/config/build-options.md > Build Options > build.modulePreload",
+    "text": "## build.modulePreload\n\n- **Type:** `boolean | { polyfill?: boolean, resolveDependencies?: ResolveModulePreloadDependenciesFn }`\n- **Default:** `{ polyfill: true }`\n\nBy default, a [module preload polyfill](https://guybedford.com/es-module-preloading-integrity#modulepreload-polyfill) is automatically injected. The polyfill is auto injected into the proxy module of each `index.html` entry. If the build is configured to use a non-HTML custom entry via `build.rolldownOptions.input`, then it is necessary to manually import the polyfill in your custom entry:\n\n```js\nimport 'vite/modulepreload-polyfill'\n```\n\nNote: the polyfill does **not** apply to [Library Mode](/guide/build#library-mode). If you need to support browsers without native dynamic import, you should probably avoid using it in your library.\n\nThe polyfill can be disabled using `{ polyfill: false }`.\n\nThe list of chunks to preload for each dynamic import is computed by Vite. By default, an absolute path including the `base` will be used when loading these dependencies. If the `base` is relative (`''` or `'./'`), `import.meta.url` is used at runtime to avoid absolute paths that depend on the final deployed base.\n\nThere is experimental support for fine grained control over the dependencies list and their paths using the `resolveDependencies` function. [Give Feedback](https://github.com/vitejs/vite/discussions/13841). It expects a function of type `ResolveModulePreloadDependenciesFn`:"
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#4",
+    "title": "docs/config/shared-options.md > Shared Options > input <NonInheritBadge />",
+    "text": "## input <NonInheritBadge />\n\n- **Type:** `string | string[] | { [entryAlias: string]: string }`\n\nEntry points of your application, resolved relative to the project root. This works as the default value for [`build.rolldownOptions.input`](/config/build-options#build-rolldownoptions), [`build.lib.entry`](/config/build-options#build-lib), [`build.ssr`](/config/build-options#build-ssr) (if `true`), and [`optimizeDeps.entries`](/config/dep-optimization-options#optimizedeps-entries) when those are not set explicitly.\n\nThis is useful when your application does not use an `index.html` entry, so you only need to declare the entry once instead of repeating it across the options above.\n\n```js twoslash [vite.config.js]\nimport { defineConfig } from 'vite'\n\nexport default defineConfig({\n  input: 'src/main.ts',\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/index.md#7",
+    "action": "use",
+    "relevance_score": 0.9909,
+    "document_score": 0.9946,
+    "levels": {
+     "answers": 0.9909,
+     "elsewhere": 0.0038,
+     "different_case": 0.0029,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/ssr.md#8",
+    "action": "use",
+    "relevance_score": 0.9805,
+    "document_score": 0.988,
+    "levels": {
+     "answers": 0.9805,
+     "elsewhere": 0.0075,
+     "different_case": 0.0067,
+     "unrelated": 0.0053
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/config/build-options.md#2",
+    "action": "use",
+    "relevance_score": 0.6349,
+    "document_score": 0.7699,
+    "levels": {
+     "answers": 0.6349,
+     "elsewhere": 0.135,
+     "different_case": 0.0512,
+     "unrelated": 0.1788
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/index.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0401,
+    "document_score": 0.0767,
+    "levels": {
+     "answers": 0.0401,
+     "elsewhere": 0.0365,
+     "different_case": 0.0276,
+     "unrelated": 0.8957
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/config/shared-options.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.004,
+    "document_score": 0.0096,
+    "levels": {
+     "answers": 0.004,
+     "elsewhere": 0.0057,
+     "different_case": 0.0146,
+     "unrelated": 0.9758
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1922
+  },
+  "timing": {
+   "total_ms": 62,
+   "rerank_ms": 62,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2597,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

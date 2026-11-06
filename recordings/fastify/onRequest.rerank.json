@@ -1,0 +1,204 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/onRequest.rerank",
+ "recorded_at": "2026-11-06T13:29:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1107,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.293373",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=361"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `onRequest`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `onRequest`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "##### delay\n\n`delay` is not a plugin itself. It's actually a plugin *factory*. It expects a\nFastify plugin with `routes` and exports the actual plugin that'll handle\nenveloping those routes with an `onRequest` hook that will make sure no requests\nare handled until we're ready for them.\n\n```js\nconst delay = (routes) =>\n  function (fastify, opts, done) {\n    // Make sure customer requests won't be accepted if the magicKey is not\n    // available\n    fastify.addHook('onRequest', function (request, reply, next) {\n      if (!request.server.magicKey) {\n        reply.statusCode = 503\n        reply.header('Retry-After', USUAL_WAIT_TIME_MS)\n        reply.send({ error: true, retryInMs: USUAL_WAIT_TIME_MS })\n      }\n\n      next()\n    })\n\n    // Register to-be-delayed routes\n    fastify.register(routes, opts)\n\n    done()\n  }\n```\n\nInstead of updating every single controller that might use the `magicKey`, we\nsimply make sure that no route that's related to customer requests will be\nserved until we have everything ready. And there's more: we fail **FAST** and\nhave the possibility of giving the customer meaningful information, like how\nlong they should wait before retrying the request. Going even further, by\nissuing a [`503` status\ncode](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/503) we're\nsignaling to our infrastructure components (namely load balancers) that we're\nstill not ready to take incoming requests and they should redirect traffic to\nother instances, if available. Additionally, we are providing a `Retry-After`\nheader with the time in milliseconds the client should wait before retrying."
+   },
+   {
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#12",
+    "title": "docs/Guides/Delay-Accepting-Requests.md > Delay Accepting Requests > Solution > Hands-on > delay",
+    "text": "It's noteworthy that we didn't use the `fastify-plugin` wrapper in the `delay`\nfactory. That's because we wanted the `onRequest` hook to only be set within\nthat specific scope and not to the scope that called it (in our case, the main\n`server` object defined in `index.js`). `fastify-plugin` sets the\n`skip-override` hidden property, which has a practical effect of making whatever\nchanges we make to our `fastify` object available to the upper scope. That's\nalso why we used it with the `customerRoutes` plugin: we wanted those routes to\nbe available to its calling scope, the `delay` plugin. For more info on that\nsubject refer to [Plugins](../Reference/Plugins.md#handle-the-scope).\n\nLet's see how that behaves in action. If we fired our server up with `node\nindex.js` and made a few requests to test things out. These were the logs we'd\nsee (some bloat was removed to ease things up):\n\n<!-- markdownlint-disable -->\n```sh\n{\"time\":1650063793316,\"msg\":\"Doing magic!\"}\n{\"time\":1650063793316,\"msg\":\"Server listening at http://127.0.0.1:1234\"}\n{\"time\":1650063795030,\"reqId\":\"req-1\",\"req\":{\"method\":\"GET\",\"url\":\"/v1\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51928},\"msg\":\"incoming request\"}\n{\"time\":1650063795033,\"reqId\":\"req-1\",\"res\":{\"statusCode\":503},\"responseTime\":2.5721680000424385,\"msg\":\"request completed\"}\n{\"time\":1650063796248,\"reqId\":\"req-2\",\"req\":{\"method\":\"GET\",\"url\":\"/ping\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51930},\"msg\":\"incoming request\"}\n{\"time\":1650063796248,\"reqId\":\"req-2\",\"res\":{\"statusCode\":200},\"responseTime\":0.4802369996905327,\"msg\":\"request completed\"}\n{\"time\":1650063798377,\"reqId\":\"req-3\",\"req\":{\"method\":\"POST\",\"url\":\"/webhook\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51932},\"msg\":\"incoming request\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"msg\":\"Ready for customer requests!\"}\n{\"time\":1650063798379,\"reqId\":\"req-3\",\"res\":{\"statusCode\":200},\"responseTime\":1.3567829988896847,\"msg\":\"request completed\"}\n{\"time\":1650063799858,\"reqId\":\"req-4\",\"req\":{\"method\":\"GET\",\"url\":\"/v1\",\"hostname\":\"localhost:1234\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":51934},\"msg\":\"incoming request\"}\n{\"time\":1650063800561,\"reqId\":\"req-4\",\"res\":{\"statusCode\":200},\"responseTime\":702.4662979990244,\"msg\":\"request completed\"}\n```\n<!-- markdownlint-enable -->"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#21",
+    "title": "docs/Guides/Serverless.md > Google Firebase Functions > The onRequest() handler",
+    "text": "### The onRequest() handler\n\nWe use the `onRequest` function to wrap our Fastify application instance.\n\nAs such, we'll begin with importing it to the code:\n\n```js\nconst { onRequest } = require(\"firebase-functions/v2/https\")\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#24",
+    "title": "docs/Guides/Serverless.md > Google Firebase Functions > Export the function using Firebase onRequest",
+    "text": "### Export the function using Firebase onRequest\n\nFinal step is to export the Fastify app instance to Firebase's own\n`onRequest()` function so it can pass the request and reply objects to it:\n\n```js\nexports.app = onRequest(fastifyApp)\n```"
+   },
+   {
+    "id": "fastify:docs/Guides/Serverless.md#25",
+    "title": "docs/Guides/Serverless.md > Google Firebase Functions > A note on per-route functions and observability",
+    "text": "### A note on per-route functions and observability\n\nWhen a Fastify instance is wrapped with a single `onRequest()` handler, all\nroutes are handled through a single Cloud Function entry point (e.g. `app`).\nFastify still performs internal routing as usual, but from the provider's\nperspective there is only one deployed function. As a result, logs, metrics,\nand analytics in the Cloud Console are grouped under that single function\nrather than being split per route (e.g. `app-api-v1-user`).\n\nThis behavior is expected because Fastify acts as a single HTTP server with\ninternal routing, while Cloud Functions exposes only function-level\nobservability. This is different from architectures where each route is\ndeployed as an individual Cloud Function.\n\nIf per-function grouping is required, you must export multiple `onRequest()`\nhandlers instead of routing everything through a single Fastify instance.\n\nAlternatively, you can keep a single Fastify application and deploy it to\nCloud Run, where it runs as a long-lived server. In that setup, Fastify's\nbuilt-in logging (request method, URL, and response timing) provides per-route\nobservability. On Cloud Functions, similar request-level logs are still\navailable, but they are grouped under the single function entry in the\nprovider's console."
+   },
+   {
+    "id": "fastify:docs/Reference/Decorators.md#4",
+    "title": "docs/Reference/Decorators.md > Decorators > Usage > `decorateReply(name, value, [dependencies])`",
+    "text": "#### `decorateReply(name, value, [dependencies])`\n<a id=\"decorate-reply\"></a>\n\nThis API adds new methods/properties to the core `Reply` object:\n\n```js\nfastify.decorateReply('utility', function () {\n  // Something very useful\n})\n```\n\nUsing an arrow function will break the binding of `this` to the Fastify\n`Reply` instance.\n\nUsing `decorateReply` will throw and error if used with a reference type:\n\n```js\n// Don't do this\nfastify.decorateReply('foo', { bar: 'fizz'})\n```\nIn this example, the object reference would be shared with all requests, and\n**any mutation will impact all requests, potentially creating security\nvulnerabilities or memory leaks**. Fastify blocks this.\n\nTo achieve proper encapsulation across requests configure a new value for each\nincoming request in the [`'onRequest'` hook](./Hooks.md#onrequest).\n\n```js\nconst fp = require('fastify-plugin')\n\nasync function myPlugin (app) {\n  app.decorateReply('foo')\n  app.addHook('onRequest', async (req, reply) => {\n    reply.foo = { bar: 42 }\n  })\n}\n\nmodule.exports = fp(myPlugin)\n```\n\nSee [`decorate`](#decorate) for information about the `dependencies` parameter."
+   },
+   {
+    "id": "fastify:docs/Reference/Decorators.md#5",
+    "title": "docs/Reference/Decorators.md > Decorators > Usage > `decorateRequest(name, value, [dependencies])`",
+    "text": "#### `decorateRequest(name, value, [dependencies])`\n<a id=\"decorate-request\"></a>\n\nAs with [`decorateReply`](#decorate-reply), this API adds new methods/properties\nto the core `Request` object:\n\n```js\nfastify.decorateRequest('utility', function () {\n  // something very useful\n})\n```\n\nUsing an arrow function will break the binding of `this` to the Fastify\n`Request` instance.\n\nUsing `decorateRequest` will emit an error if used with a reference type:\n\n```js\n// Don't do this\nfastify.decorateRequest('foo', { bar: 'fizz'})\n```\nIn this example, the object reference would be shared with all requests, and\n**any mutation will impact all requests, potentially creating security\nvulnerabilities or memory leaks**. Fastify blocks this.\n\nTo achieve proper encapsulation across requests configure a new value for each\nincoming request in the [`'onRequest'` hook](./Hooks.md#onrequest).\n\nExample:\n\n```js\nconst fp = require('fastify-plugin')\n\nasync function myPlugin (app) {\n  app.decorateRequest('foo')\n  app.addHook('onRequest', async (req, reply) => {\n    req.foo = { bar: 42 }\n  })\n}\n\nmodule.exports = fp(myPlugin)\n```\n\nThe hook solution is more flexible and allows for more complex initialization\nbecause more logic can be added to the `onRequest` hook.\n\nAnother approach is to use the getter/setter pattern, but it requires 2 decorators:\n\n```js\nfastify.decorateRequest('my_decorator_holder') // define the holder\nfastify.decorateRequest('user', {\n  getter () {\n    this.my_decorator_holder ??= {} // initialize the holder\n    return this.my_decorator_holder\n  }\n})\n\nfastify.get('/', async function (req, reply) {\n  req.user.access = 'granted'\n  // other code\n})\n```\n\nThis ensures that the `user` property is always unique for each request.\n\nSee [`decorate`](#decorate) for information about the `dependencies` parameter."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#72",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.onRequestHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void",
+    "text": "##### fastify.onRequestHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L17)\n\n`onRequest` is the first hook to be executed in the request lifecycle. There was\nno previous hook, the next hook will be `preParsing`.\n\nNotice: in the `onRequest` hook, request.body will always be null, because the\nbody parsing happens before the `preHandler` hook."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 7,
+    "id": "fastify:docs/Reference/TypeScript.md#72",
+    "action": "use",
+    "relevance_score": 0.982,
+    "document_score": 0.9884,
+    "levels": {
+     "answers": 0.982,
+     "elsewhere": 0.0063,
+     "different_case": 0.0065,
+     "unrelated": 0.0051
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0277,
+    "document_score": 0.0985,
+    "levels": {
+     "answers": 0.0277,
+     "elsewhere": 0.0708,
+     "different_case": 0.0486,
+     "unrelated": 0.8529
+    }
+   },
+   {
+    "index": 6,
+    "id": "fastify:docs/Reference/Decorators.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0096,
+    "document_score": 0.0969,
+    "levels": {
+     "answers": 0.0096,
+     "elsewhere": 0.0873,
+     "different_case": 0.0258,
+     "unrelated": 0.8773
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Guides/Serverless.md#25",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0047,
+    "document_score": 0.0219,
+    "levels": {
+     "answers": 0.0047,
+     "elsewhere": 0.0172,
+     "different_case": 0.0201,
+     "unrelated": 0.958
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Guides/Serverless.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0039,
+    "document_score": 0.0148,
+    "levels": {
+     "answers": 0.0039,
+     "elsewhere": 0.0109,
+     "different_case": 0.0116,
+     "unrelated": 0.9735
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Guides/Serverless.md#24",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0061,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0032,
+     "different_case": 0.0079,
+     "unrelated": 0.986
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Guides/Delay-Accepting-Requests.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0025,
+    "document_score": 0.013,
+    "levels": {
+     "answers": 0.0025,
+     "elsewhere": 0.0105,
+     "different_case": 0.0129,
+     "unrelated": 0.9741
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Decorators.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0023,
+    "document_score": 0.0184,
+    "levels": {
+     "answers": 0.0023,
+     "elsewhere": 0.0162,
+     "different_case": 0.0192,
+     "unrelated": 0.9624
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3517
+  },
+  "timing": {
+   "total_ms": 148,
+   "rerank_ms": 140,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 4597,
+    "branches": 8,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

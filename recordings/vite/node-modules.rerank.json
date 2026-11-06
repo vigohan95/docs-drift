@@ -1,0 +1,201 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/node-modules.rerank",
+ "recorded_at": "2026-11-06T13:30:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 971,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.341438",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=221"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `node_modules`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `node_modules`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/dep-pre-bundling.md#3",
+    "title": "docs/guide/dep-pre-bundling.md > Dependency Pre-Bundling > Monorepos and Linked Dependencies",
+    "text": "## Monorepos and Linked Dependencies\n\nIn a monorepo setup, a dependency may be a linked package from the same repo. Vite automatically detects dependencies that are not resolved from `node_modules` and treats the linked dep as source code. It will not attempt to bundle the linked dep, and will analyze the linked dep's dependency list instead.\n\nHowever, this requires the linked dep to be exported as ESM. If not, you can add the dependency to [`optimizeDeps.include`](/config/dep-optimization-options.md#optimizedeps-include) in your config.\n\n```js twoslash [vite.config.js]\nimport { defineConfig } from 'vite'\n// ---cut---\nexport default defineConfig({\n  optimizeDeps: {\n    include: ['linked-dep'],\n  },\n})\n```\n\nWhen making changes to the linked dep, restart the dev server with the `--force` command line option for the changes to take effect."
+   },
+   {
+    "id": "vite:docs/guide/performance.md#3",
+    "title": "docs/guide/performance.md > Performance > Reduce Resolve Operations",
+    "text": "## Reduce Resolve Operations\n\nResolving import paths can be an expensive operation when hitting its worst case often. For example, Vite supports \"guessing\" import paths with the [`resolve.extensions`](/config/shared-options.md#resolve-extensions) option, which defaults to `['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json']`.\n\nWhen you try to import `./Component.jsx` with `import './Component'`, Vite will run these steps to resolve it:\n\n1. Check if `./Component` exists, no.\n2. Check if `./Component.mjs` exists, no.\n3. Check if `./Component.js` exists, no.\n4. Check if `./Component.mts` exists, no.\n5. Check if `./Component.ts` exists, no.\n6. Check if `./Component.jsx` exists, yes!\n\nAs shown, a total of 6 filesystem checks is required to resolve an import path. The more implicit imports you have, the more time it adds up to resolve the paths.\n\nHence, it's usually better to be explicit with your import paths, e.g. `import './Component.jsx'`. You can also narrow down the list for `resolve.extensions` to reduce the general filesystem checks, but you have to make sure it works for files in `node_modules` too.\n\nIf you're a plugin author, make sure to only call [`this.resolve`](https://rollupjs.org/plugin-development/#this-resolve) when needed to reduce the number of checks above.\n\n::: tip TypeScript\nIf you are using TypeScript, enable `\"moduleResolution\": \"bundler\"` and `\"allowImportingTsExtensions\": true` in your `tsconfig.json`'s `compilerOptions` to use `.ts` and `.tsx` extensions directly in your code.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/ssr.md#11",
+    "title": "docs/guide/ssr.md > Server-Side Rendering (SSR) > SSR Externals",
+    "text": "## SSR Externals\n\nDependencies are \"externalized\" from Vite's SSR transform module system by default when running SSR. This speeds up both dev and build.\n\nIf a dependency needs to be transformed by Vite's pipeline, for example, because Vite features are used untranspiled in them, they can be added to [`ssr.noExternal`](../config/ssr-options.md#ssr-noexternal).\n\nFor linked dependencies, they are not externalized by default to take advantage of Vite's HMR. If this isn't desired, for example, to test dependencies as if they aren't linked, you can add it to [`ssr.external`](../config/ssr-options.md#ssr-external).\n\n:::warning Working with Aliases\nIf you have configured aliases that redirect one package to another, you may want to alias the actual `node_modules` packages instead to make it work for SSR externalized dependencies. Both [Yarn](https://classic.yarnpkg.com/en/docs/cli/add/#toc-yarn-add-alias) and [pnpm](https://pnpm.io/aliases/) support aliasing via the `npm:` prefix.\n:::"
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#1",
+    "title": "docs/config/dep-optimization-options.md > Dep Optimization Options > optimizeDeps.entries <NonInheritBadge />",
+    "text": "## optimizeDeps.entries <NonInheritBadge />\n\n- **Type:** `string | string[]`\n\nBy default, Vite will crawl all your `.html` files to detect dependencies that need to be pre-bundled (ignoring `node_modules`, `build.outDir`, `__tests__` and `coverage`). If the top-level [`input`](/config/shared-options#input) or `build.rolldownOptions.input` is specified, Vite will crawl those entry points instead.\n\nIf neither of these fit your needs, you can specify custom entries using this option - the value should be a [`tinyglobby` pattern](https://superchupu.dev/tinyglobby/comparison) or array of patterns that are relative from Vite project root. This will overwrite default entries inference. Only `node_modules` and `build.outDir` folders will be ignored by default when `optimizeDeps.entries` is explicitly defined. If other folders need to be ignored, you can use an ignore pattern as part of the entries list, marked with an initial `!`. `node_modules` will not be ignored for patterns that explicitly include the string `node_modules`."
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#3",
+    "title": "docs/config/dep-optimization-options.md > Dep Optimization Options > optimizeDeps.include <NonInheritBadge />",
+    "text": "## optimizeDeps.include <NonInheritBadge />\n\n- **Type:** `string[]`\n\nBy default, linked packages not inside `node_modules` are not pre-bundled. Use this option to force a linked package to be pre-bundled.\n\n**Experimental:** If you're using a library with many deep imports, you can also specify a trailing glob pattern to pre-bundle all deep imports at once. This will avoid constantly pre-bundling whenever a new deep import is used. [Give Feedback](https://github.com/vitejs/vite/discussions/15833). For example:\n\n```js twoslash\nimport { defineConfig } from 'vite'\n// ---cut---\nexport default defineConfig({\n  optimizeDeps: {\n    include: ['my-lib/components/**/*.vue'],\n  },\n})\n```"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#15",
+    "title": "docs/config/server-options.md > Server Options > server.watch",
+    "text": "## server.watch\n\n- **Type:** `object | null`\n\nFile system watcher options to pass on to [chokidar](https://github.com/paulmillr/chokidar/tree/3.6.0#api).\n\nWhen bundled-dev mode is enabled, [Rolldown watch options](https://rolldown.rs/reference/InputOptions.watch) (for example, `usePolling`, `pollInterval`, `useDebounce`, `debounceDuration`, `include`, `exclude`) are also accepted. The chokidar-only options are still used by the chokidar watcher, which keeps watching files outside the module graph, such as config file dependencies and env files.\n\nThe Vite server watcher watches the `root` and skips the `.git/`, `node_modules/`, `test-results/`, and Vite's `cacheDir` and `build.outDir` directories by default. When updating a watched file, Vite will apply HMR and update the page only if needed.\n\nIf set to `null`, no files will be watched. [`server.watcher`](/guide/api-javascript.html#vitedevserver) will provide a compatible event emitter, but calling `add` or `unwatch` will have no effect.\n\n::: warning Watching files in `node_modules`\n\nIt's currently not possible to watch files and packages in `node_modules`. For further progress and workarounds, you can follow [issue #8619](https://github.com/vitejs/vite/issues/8619).\n\n:::\n\n::: warning Using Vite on Windows Subsystem for Linux (WSL) 2\n\nWhen running Vite on WSL2, file system watching does not work when a file is edited by Windows applications (non-WSL2 process). This is due to [a WSL2 limitation](https://github.com/microsoft/WSL/issues/4739). This also applies to running on Docker with a WSL2 backend.\n\nTo fix it, you could either:\n\n- **Recommended**: Use WSL2 applications to edit your files.\n  - It is also recommended to move the project folder outside of a Windows filesystem. Accessing Windows filesystem from WSL2 is slow. Removing that overhead will improve performance.\n- Set `{ usePolling: true }`.\n  - Note that [`usePolling` leads to high CPU utilization](https://github.com/paulmillr/chokidar/tree/3.6.0#performance).\n\n:::"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#21",
+    "title": "docs/config/server-options.md > Server Options > server.sourcemapIgnoreList",
+    "text": "## server.sourcemapIgnoreList\n\n- **Type:** `false | (sourcePath: string, sourcemapPath: string) => boolean`\n- **Default:** `(sourcePath) => /(?:^|[\\\\/])node_modules(?:[\\\\/]|$)/.test(sourcePath)`\n\nWhether or not to ignore source files in the server sourcemap, used to populate the [`x_google_ignoreList` source map extension](https://developer.chrome.com/articles/x-google-ignore-list/).\n\n`server.sourcemapIgnoreList` is the equivalent of [`build.rolldownOptions.output.sourcemapIgnoreList`](https://rolldown.rs/reference/OutputOptions.sourcemapIgnoreList) for the dev server. A difference between the two config options is that the Rolldown function is called with a relative path for `sourcePath` while `server.sourcemapIgnoreList` is called with an absolute path. During dev, most modules have the map and the source in the same folder, so the relative path for `sourcePath` is the file name itself. In these cases, absolute paths make it convenient to be used instead.\n\nBy default, it excludes all paths that contain `node_modules` as a path segment. You can pass `false` to disable this behavior, or, for full control, a function that takes the source path and sourcemap path and returns whether to ignore the source path.\n\n```js\nexport default defineConfig({\n  server: {\n    // This is the default value, and will add all files that have\n    // node_modules as a path segment to the ignore list.\n    sourcemapIgnoreList(sourcePath, sourcemapPath) {\n      return /(?:^|[\\\\/])node_modules(?:[\\\\/]|$)/.test(sourcePath)\n    },\n  },\n})\n```\n\n::: tip Note\n[`server.sourcemapIgnoreList`](#server-sourcemapignorelist) and [`build.rolldownOptions.output.sourcemapIgnoreList`](https://rolldown.rs/reference/OutputOptions.sourcemapIgnoreList) need to be set independently. `server.sourcemapIgnoreList` is a server only config and doesn't get its default value from the defined Rolldown options.\n:::"
+   },
+   {
+    "id": "vite:docs/config/shared-options.md#9",
+    "title": "docs/config/shared-options.md > Shared Options > resolve.alias",
+    "text": "## resolve.alias\n\n- **Type:**\n  `Record<string, string> | Array<{ find: string | RegExp, replacement: string }>`\n\nDefines aliases used to replace values in `import` or `require` statements. This works similar to [`@rollup/plugin-alias`](https://github.com/rollup/plugins/tree/master/packages/alias).\n\nThe order of the entries is important, in that the first defined rules are applied first.\n\nWhen aliasing to file system paths, always use absolute paths. Relative alias values will be used as-is and will not be resolved into file system paths.\n\nMore advanced custom resolution can be achieved through [plugins](/guide/api-plugin).\n\n::: warning Using with SSR\nIf you have configured aliases for [SSR externalized dependencies](/guide/ssr.md#ssr-externals), you may want to alias the actual `node_modules` packages. Both [Yarn](https://classic.yarnpkg.com/en/docs/cli/add/#toc-yarn-add-alias) and [pnpm](https://pnpm.io/aliases/) support aliasing via the `npm:` prefix.\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 5,
+    "id": "vite:docs/config/server-options.md#15",
+    "action": "use",
+    "relevance_score": 0.9908,
+    "document_score": 0.9936,
+    "levels": {
+     "answers": 0.9908,
+     "elsewhere": 0.0028,
+     "different_case": 0.0038,
+     "unrelated": 0.0026
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/config/dep-optimization-options.md#1",
+    "action": "use",
+    "relevance_score": 0.9866,
+    "document_score": 0.9902,
+    "levels": {
+     "answers": 0.9866,
+     "elsewhere": 0.0036,
+     "different_case": 0.0058,
+     "unrelated": 0.0039
+    }
+   },
+   {
+    "index": 6,
+    "id": "vite:docs/config/server-options.md#21",
+    "action": "use",
+    "relevance_score": 0.9829,
+    "document_score": 0.9882,
+    "levels": {
+     "answers": 0.9829,
+     "elsewhere": 0.0053,
+     "different_case": 0.0059,
+     "unrelated": 0.0059
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/config/dep-optimization-options.md#3",
+    "action": "use",
+    "relevance_score": 0.8385,
+    "document_score": 0.8842,
+    "levels": {
+     "answers": 0.8385,
+     "elsewhere": 0.0458,
+     "different_case": 0.0379,
+     "unrelated": 0.0778
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/dep-pre-bundling.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0307,
+    "document_score": 0.0769,
+    "levels": {
+     "answers": 0.0307,
+     "elsewhere": 0.0461,
+     "different_case": 0.0327,
+     "unrelated": 0.8904
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/ssr.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0071,
+    "document_score": 0.0256,
+    "levels": {
+     "answers": 0.0071,
+     "elsewhere": 0.0186,
+     "different_case": 0.0235,
+     "unrelated": 0.9509
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/performance.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0098,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0065,
+     "different_case": 0.02,
+     "unrelated": 0.9702
+    }
+   },
+   {
+    "index": 7,
+    "id": "vite:docs/config/shared-options.md#9",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0028,
+    "document_score": 0.0064,
+    "levels": {
+     "answers": 0.0028,
+     "elsewhere": 0.0037,
+     "different_case": 0.0176,
+     "unrelated": 0.9759
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 3348
+  },
+  "timing": {
+   "total_ms": 97,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 87,
+   "engine": {
+    "rows": 4428,
+    "branches": 8,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 87,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 84,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

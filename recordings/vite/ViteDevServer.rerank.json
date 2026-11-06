@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/ViteDevServer.rerank",
+ "recorded_at": "2026-11-06T13:30:10Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 939,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "43.603134",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=29,cfOrigin;dur=0,cfWorker;dur=167"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `ViteDevServer`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `ViteDevServer`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#10",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > Environments During Build",
+    "text": "## Environments During Build\n\nIn the CLI, calling `vite build` and `vite build --ssr` will still build the client only and ssr only environments for backward compatibility.\n\nWhen the `builder` option is set (even to an empty object `{}`, which is what `vite build --app` does), `vite build` opts in to building the entire app instead. This will become the default in a future major. In this mode, Vite creates a `ViteBuilder` instance (the build-time equivalent of a `ViteDevServer`) and uses it to build all configured environments for production. By default, environments are built in series, following the order of the `environments` record."
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#4",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `ViteDevServer`",
+    "text": "## `ViteDevServer`\n\n```ts\ninterface ViteDevServer {\n  /**\n   * The resolved Vite config object.\n   */\n  config: ResolvedConfig\n  /**\n   * A connect app instance\n   * - Can be used to attach custom middlewares to the dev server.\n   * - Can also be used as the handler function of a custom http server\n   *   or as a middleware in any connect-style Node.js frameworks.\n   *\n   * https://github.com/senchalabs/connect#use-middleware\n   */\n  middlewares: Connect.Server\n  /**\n   * Native Node http server instance.\n   * Will be null in middleware mode.\n   */\n  httpServer: http.Server | null\n  /**\n   * Chokidar watcher instance. If `config.server.watch` is set to `null`,\n   * it will not watch any files and calling `add` or `unwatch` will have no effect.\n   * https://github.com/paulmillr/chokidar/tree/3.6.0#api\n   */\n  watcher: FSWatcher\n  /**\n   * WebSocket server with `send(payload)` method.\n   */\n  ws: WebSocketServer\n  /**\n   * Rollup plugin container that can run plugin hooks on a given file.\n   */\n  pluginContainer: PluginContainer\n  /**\n   * Module graph that tracks the import relationships, url to file mapping\n   * and hmr state.\n   */\n  moduleGraph: ModuleGraph\n  /**\n   * The resolved urls Vite prints on the CLI (URL-encoded). Returns `null`\n   * in middleware mode or if the server is not listening on any port.\n   */\n  resolvedUrls: ResolvedServerUrls | null\n  /**\n   * Programmatically resolve, load and transform a URL and get the result\n   * without going through the http request pipeline.\n   */\n  transformRequest(\n    url: string,\n    options?: TransformOptions,\n  ): Promise<TransformResult | null>\n  /**\n   * Apply Vite built-in HTML transforms and any plugin HTML transforms.\n   */\n  transformIndexHtml(\n    url: string,\n    html: string,\n    originalUrl?: string,\n  ): Promise<string>\n  /**\n   * Load a given URL as an instantiated module for SSR.\n   */\n  ssrLoadModule(\n    url: string,\n    options?: { fixStacktrace?: boolean },\n  ): Promise<Record<string, any>>\n  /**\n   * Fix ssr error stacktrace.\n   */\n  ssrFixStacktrace(e: Error): void\n  /**\n   * Triggers HMR for a module in the module graph. You can use the `server.moduleGraph`\n   * API to retrieve the module to be reloaded. If `hmr` is false, this is a no-op.\n   */\n  reloadModule(module: ModuleNode): Promise<void>\n  /**\n   * Start the server.\n   */\n  listen(port?: number, isRestart?: boolean): Promise<ViteDevServer>\n  /**\n   * Restart the server.\n   *\n   * @param forceOptimize - force the optimizer to re-bundle, same as --force cli flag\n   */\n  restart(forceOptimize?: boolean): Promise<void>\n  /**\n   * Stop the server.\n   */\n  close(): Promise<void>\n  /**\n   * Bind CLI shortcuts\n   */\n  bindCLIShortcuts(options?: BindCLIShortcutsOptions<ViteDevServer>): void\n  /**\n   * Calling `await server.waitForRequestsIdle(id)` will wait until all static imports\n   * are processed. If called from a load or transform plugin hook, the id needs to be\n   * passed as a parameter to avoid deadlocks. Calling this function after the first\n   * static imports section of the module graph has been processed will resolve immediately.\n   * @experimental\n   */\n  waitForRequestsIdle: (ignoredId?: string) => Promise<void>\n}\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-javascript.md#4",
+    "action": "use",
+    "relevance_score": 0.9792,
+    "document_score": 0.9888,
+    "levels": {
+     "answers": 0.9792,
+     "elsewhere": 0.0095,
+     "different_case": 0.0065,
+     "unrelated": 0.0047
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-frameworks.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0086,
+    "document_score": 0.0531,
+    "levels": {
+     "answers": 0.0086,
+     "elsewhere": 0.0444,
+     "different_case": 0.052,
+     "unrelated": 0.895
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1255
+  },
+  "timing": {
+   "total_ms": 48,
+   "rerank_ms": 47,
+   "questions_ms": 0,
+   "model_ms": 40,
+   "engine": {
+    "rows": 1525,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 40,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 37,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

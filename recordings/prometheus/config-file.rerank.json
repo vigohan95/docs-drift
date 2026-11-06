@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/config-file.rerank",
+ "recorded_at": "2026-11-06T13:30:21Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 981,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "60.083649",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=44,cfOrigin;dur=0,cfWorker;dur=264"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--config.file`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--config.file`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#1",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "## Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">-h</code>, <code class=\"text-nowrap\">--help</code> | Show context-sensitive help (also try --help-long and --help-man). |  |\n| <code class=\"text-nowrap\">--version</code> | Show application version. |  |\n| <code class=\"text-nowrap\">--config.file</code> | Prometheus configuration file path. | `prometheus.yml` |\n| <code class=\"text-nowrap\">--config.auto-reload</code> | Enable automatic configuration file reloading. See also --config.auto-reload-interval. | `false` |\n| <code class=\"text-nowrap\">--config.auto-reload-interval</code> | Specifies the interval for checking and automatically reloading the Prometheus configuration file upon detecting changes. Only used when --config.auto-reload is set. | `30s` |\n| <code class=\"text-nowrap\">--web.listen-address</code> <code class=\"text-nowrap\">...</code> | Address to listen on for UI, API, and telemetry. Can be repeated. | `0.0.0.0:9090` |\n| <code class=\"text-nowrap\">--auto-gomaxprocs</code> | Automatically set GOMAXPROCS to match Linux container CPU quota | `true` |\n| <code class=\"text-nowrap\">--auto-gomemlimit</code> | Automatically set GOMEMLIMIT to match Linux container or system memory limit | `true` |\n| <code class=\"text-nowrap\">--auto-gomemlimit.ratio</code> | The ratio of reserved GOMEMLIMIT memory to the detected maximum container or system memory | `0.9` |\n| <code class=\"text-nowrap\">--auto-gomemlimit.refresh-interval</code> | Interval at which to re-detect the container or system memory limit and update GOMEMLIMIT accordingly. Useful when the limit can change at runtime, e.g. with a Vertical Pod Autoscaler. Set to 0 to detect the limit only once at startup. Note that a downward change in the limit can cause a temporary increase in garbage collection activity. Only used when --auto-gomemlimit is set. | `0s` |\n| <code class=\"text-nowrap\">--web.config.file</code> | [EXPERIMENTAL] Path to configuration file that can enable TLS or authentication. |  |\n| <code class=\"text-nowrap\">--web.read-timeout</code> | Maximum duration before timing out read of the request, and closing idle connections. | `5m` |\n| <code class=\"text-nowrap\">--web.max-connections</code> | Maximum number of simultaneous connections across all listeners. | `512` |\n| <code class=\"text-nowrap\">--web.max-notifications-subscribers</code> | Limits the maximum number of subscribers that can concurrently receive live notifications. If the limit is reached, new subscription requests will be denied until existing connections close. | `16` |\n| <code class=\"text-nowrap\">--web.external-url</code> | The URL under which Prometheus is externally reachable (for example, if Prometheus is served via a reverse proxy). Used for generating relative and absolute links back to Prometheus itself. If the URL has a path portion, it will be used to prefix all HTTP endpoints served by Prometheus. If omitted, relevant URL components will be derived automatically. |  |\n| <code class=\"text-nowrap\">--web.route-prefix</code> | Prefix for the internal routes of web endpoints. Defaults to path of --web.external-url. |  |\n| <code class=\"text-nowrap\">--web.user-assets</code> | Path to static asset directory, available at /user. |  |\n| <code class=\"text-nowrap\">--web.enable-lifecycle</code> | Enable shutdown and reload via HTTP request. | `false` |\n| <code class=\"text-nowrap\">--web.enable-admin-api</code> | Enable API endpoints for admin control actions. | `false` |\n| <code class=\"text-nowrap\">--web.enable-remote-write-receiver</code> | Enable API endpoint accepting remote write requests. | `false` |"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#3",
+    "title": "docs/getting_started.md > Starting Prometheus",
+    "text": "## Starting Prometheus\n\nTo start Prometheus with your newly created configuration file, change to the\ndirectory containing the Prometheus binary and run:\n\n```bash\n# Start Prometheus.\n# By default, Prometheus stores its database in ./data (flag --storage.tsdb.path).\n./prometheus --config.file=prometheus.yml\n```\n\nPrometheus should start up. You should also be able to browse to a status page\nabout itself at [localhost:9090](http://localhost:9090). Give it a couple of\nseconds to collect data about itself from its own HTTP metrics endpoint.\n\nYou can also verify that Prometheus is serving metrics about itself by\nnavigating to its metrics endpoint:\n[localhost:9090/metrics](http://localhost:9090/metrics)"
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#1",
+    "title": "documentation/internal_architecture.md > Internal architecture > Main function",
+    "text": "## Main function\n\nThe [`main()` function](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L77-L600) initializes and runs all other Prometheus server components. It also connects interdependent components to each other.\n\nAs a first step, `main()` defines and parses the server's command-line flags into a [local configuration structure](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L83-L100), while performing extra sanitization and initialization for some values. Note that this flag-based configuration structure is independent of the configuration that is later read from a configuration file (as provided by the `--config.file` flag). Prometheus distinguishes between flag-based configuration and file-based configuration: flags are used for simple settings that do not support being updated without a server restart, while any settings provided in the configuration file have to support being reloaded without restarting the entire server.\n\nNext, `main()` instantiates all the major run-time components of Prometheus and connects them together using channels, references, or passing in contexts for later coordination and cancellation. These components include service discovery, target scraping, storage, and more (as laid out in the rest of this document).\n\nFinally, the server [runs all components](https://github.com/prometheus/prometheus/blob/v2.3.1/cmd/prometheus/main.go#L366-L598) in an [actor-like model](https://www.brianstorti.com/the-actor-model/), using [`github.com/oklog/oklog/pkg/group`](https://pkg.go.dev/github.com/oklog/run) to coordinate the startup and shutdown of all interconnected actors. Multiple channels are used to enforce ordering constraints, such as not enabling the web interface before the storage is ready and the initial configuration file load has happened."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#1",
+    "action": "use",
+    "relevance_score": 0.9955,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9955,
+     "elsewhere": 0.0008,
+     "different_case": 0.0014,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/getting_started.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0044,
+    "document_score": 0.0134,
+    "levels": {
+     "answers": 0.0044,
+     "elsewhere": 0.009,
+     "different_case": 0.0123,
+     "unrelated": 0.9743
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:documentation/internal_architecture.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0077,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0055,
+     "different_case": 0.0079,
+     "unrelated": 0.9845
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1848
+  },
+  "timing": {
+   "total_ms": 78,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2253,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

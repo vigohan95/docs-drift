@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/trustProxy.rerank",
+ "recorded_at": "2026-11-06T13:30:23Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 992,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.964321",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=182"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `trustProxy`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `trustProxy`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Request.md#15",
+    "title": "docs/Reference/Request.md > Request > Request > Properties > .ips",
+    "text": "##### .ips\n\nAn array of IP addresses, ordered from closest to furthest, from\n`X-Forwarded-For` (only when [`trustProxy`](./Server.md#factory-trust-proxy) is\nenabled). It is `undefined` when `trustProxy` is not enabled."
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#16",
+    "title": "docs/Reference/Request.md > Request > Request > Properties > .host",
+    "text": "##### .host\n\nThe host of the incoming request (derived from `X-Forwarded-Host` when\n[`trustProxy`](./Server.md#factory-trust-proxy) is enabled). For HTTP/2\ncompatibility, it returns `:authority` if no host header exists. The host header\nmay return an empty string if `requireHostHeader` is `false`, not provided with\nHTTP/1.0, or removed by schema validation."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#23",
+    "title": "docs/Reference/Server.md > Factory > `trustProxy`",
+    "text": "### `trustProxy`\n<a id=\"factory-trust-proxy\"></a>\n\n+ Default: `false`\n+ `true/false`: Trust all proxies (`true`) or do not trust any proxies\n  (`false`).\n+ `string`: Trust only given IP/CIDR (e.g. `'127.0.0.1'`). May be a list of\n  comma separated values (e.g. `'127.0.0.1,192.168.1.1/24'`).\n+ `Array<string>`: Trust only given IP/CIDR list (e.g. `['127.0.0.1']`).\n+ `number`: Hop-count-only trust is disabled because it cannot validate the\n  immediate peer and lets direct clients spoof `X-Forwarded-*` values. Use an\n  IP/CIDR string, array, or custom function that validates the proxy address\n  instead.\n+ `Function`: Custom trust function that takes `address` as first argument\n    ```js\n    function myTrustFn(address, hop) {\n      return address === '1.2.3.4' && hop === 0\n    }\n    ```\n\nBy enabling the `trustProxy` option, Fastify will know that it is sitting behind\na proxy and that the `X-Forwarded-*` header fields may be trusted, which\notherwise may be easily spoofed.\n\n```js\nconst fastify = Fastify({ trustProxy: true })\n```\n\nFor more examples, refer to the\n[`@fastify/proxy-addr`](https://www.npmjs.com/package/@fastify/proxy-addr) package.\n\nYou may access the `ip`, `ips`, `host` and `protocol` values on the\n[`request`](./Request.md) object.\n\n> ⚠️ Security:\n> These values are derived from socket/forwarding metadata and must be treated\n> as untrusted input unless your proxy chain is explicitly trusted and\n> validated. Do not use them directly for authorization or other\n> security-sensitive decisions without explicit validation. Custom trust\n> functions must validate the `address` argument; hop-count-only checks such as\n> `hop < 1` are unsafe when the Fastify origin can be reached directly.\n\n```js\nfastify.get('/', (request, reply) => {\n  console.log(request.ip)\n  console.log(request.ips)\n  console.log(request.host)\n  console.log(request.protocol)\n})\n```\n\n> ℹ️ Note:\n> If a request contains multiple `x-forwarded-host` or `x-forwarded-proto`\n> headers, it is only the last one that is used to derive `request.hostname`\n> and `request.protocol`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#23",
+    "action": "use",
+    "relevance_score": 0.9949,
+    "document_score": 0.9961,
+    "levels": {
+     "answers": 0.9949,
+     "elsewhere": 0.0012,
+     "different_case": 0.0016,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Request.md#15",
+    "action": "expand",
+    "relevance_score": 0.0599,
+    "document_score": 0.7181,
+    "levels": {
+     "answers": 0.0599,
+     "elsewhere": 0.6582,
+     "different_case": 0.0375,
+     "unrelated": 0.2444
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Request.md#16",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0035,
+    "document_score": 0.0747,
+    "levels": {
+     "answers": 0.0035,
+     "elsewhere": 0.0712,
+     "different_case": 0.0266,
+     "unrelated": 0.8987
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1051
+  },
+  "timing": {
+   "total_ms": 62,
+   "rerank_ms": 46,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1456,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

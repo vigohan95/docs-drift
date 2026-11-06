@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/searchForWorkspaceRoot.rerank",
+ "recorded_at": "2026-11-06T13:30:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1019,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.192768",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=269"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `searchForWorkspaceRoot`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `searchForWorkspaceRoot`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-javascript.md#11",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `searchForWorkspaceRoot`",
+    "text": "## `searchForWorkspaceRoot`\n\n**Type Signature:**\n\n```ts\nfunction searchForWorkspaceRoot(\n  current: string,\n  root = searchForPackageRoot(current),\n): string\n```\n\n**Related:** [server.fs.allow](/config/server-options.md#server-fs-allow)\n\nSearch for the root of the potential workspace if it meets the following conditions, otherwise it would fallback to `root`:\n\n- contains `workspaces` field in `package.json`\n- contains one of the following file\n  - `lerna.json`\n  - `pnpm-workspace.yaml`"
+   },
+   {
+    "id": "vite:docs/config/server-options.md#18",
+    "title": "docs/config/server-options.md > Server Options > server.fs.allow",
+    "text": "## server.fs.allow\n\n- **Type:** `string[]`\n\nRestrict files that could be served via `/@fs/`. When `server.fs.strict` is set to `true`, accessing files outside this directory list that aren't imported from an allowed file will result in a 403.\n\nBoth directories and files can be provided.\n\nVite will search for the root of the potential workspace and use it as default. A valid workspace met the following conditions, otherwise will fall back to the [project root](/guide/#index-html-and-project-root).\n\n- contains `workspaces` field in `package.json`\n- contains one of the following file\n  - `lerna.json`\n  - `pnpm-workspace.yaml`\n\nAccepts a path to specify the custom workspace root. Could be a absolute path or a path relative to [project root](/guide/#index-html-and-project-root). For example:\n\n```js\nexport default defineConfig({\n  server: {\n    fs: {\n      // Allow serving files from one level up to the project root\n      allow: ['..'],\n    },\n  },\n})\n```\n\nWhen `server.fs.allow` is specified, the auto workspace root detection will be disabled. To extend the original behavior, a utility `searchForWorkspaceRoot` is exposed:\n\n```js\nimport { defineConfig, searchForWorkspaceRoot } from 'vite'\n\nexport default defineConfig({\n  server: {\n    fs: {\n      allow: [\n        // search up for workspace root\n        searchForWorkspaceRoot(process.cwd()),\n        // your custom rules\n        '/path/to/custom/allow_directory',\n        '/path/to/custom/allow_file.demo',\n      ],\n    },\n  },\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-javascript.md#11",
+    "action": "use",
+    "relevance_score": 0.9751,
+    "document_score": 0.9846,
+    "levels": {
+     "answers": 0.9751,
+     "elsewhere": 0.0095,
+     "different_case": 0.0095,
+     "unrelated": 0.006
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/config/server-options.md#18",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0324,
+    "document_score": 0.1352,
+    "levels": {
+     "answers": 0.0324,
+     "elsewhere": 0.1028,
+     "different_case": 0.0442,
+     "unrelated": 0.8206
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 726
+  },
+  "timing": {
+   "total_ms": 39,
+   "rerank_ms": 38,
+   "questions_ms": 0,
+   "model_ms": 33,
+   "engine": {
+    "rows": 996,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1024,
+    "long": 0,
+    "total_ms": 33,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 30,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

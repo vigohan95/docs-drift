@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/follow-redirects.rerank",
+ "recorded_at": "2026-11-06T13:31:01Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 913,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "57.99408",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=213"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `follow_redirects`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `follow_redirects`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#15",
+    "title": "docs/configuration/configuration.md > Configuration file > `<http_config>`",
+    "text": "### `<http_config>`\n\nA `http_config` allows configuring HTTP requests.\n\n```yaml\n# Sets the `Authorization` header on every request with the\n# configured username and password.\n# username and username_file are mutually exclusive.\n# password and password_file are mutually exclusive.\nbasic_auth:\n  [ username: <string> ]\n  [ username_file: <string> ]\n  [ password: <secret> ]\n  [ password_file: <string> ]\n\n# Sets the `Authorization` header on every request with\n# the configured credentials.\nauthorization:\n  # Sets the authentication type of the request.\n  [ type: <string> | default: Bearer ]\n  # Sets the credentials of the request. It is mutually exclusive with\n  # `credentials_file`.\n  [ credentials: <secret> ]\n  # Sets the credentials of the request with the credentials read from the\n  # configured file. It is mutually exclusive with `credentials`.\n  [ credentials_file: <filename> ]\n\n# Optional OAuth 2.0 configuration.\n# Cannot be used at the same time as basic_auth or authorization.\noauth2:\n  [ <oauth2> ]\n\n# Configure whether requests follow HTTP 3xx redirects.\n[ follow_redirects: <boolean> | default = true ]\n\n# Whether to enable HTTP2.\n[ enable_http2: <boolean> | default: true ]\n\n# Configures the request's TLS settings.\ntls_config:\n  [ <tls_config> ]\n\n# Optional proxy URL.\n[ proxy_url: <string> ]\n# Comma-separated string that can contain IPs, CIDR notation, domain names\n# that should be excluded from proxying. IP and domain names can\n# contain port numbers.\n[ no_proxy: <string> ]\n# Use proxy URL indicated by environment variables (HTTP_PROXY, HTTPS_PROXY, NO_PROXY, and their lowercase versions)\n[ proxy_from_environment: <boolean> | default: false ]\n# Specifies headers to send to proxies during CONNECT requests.\n[ proxy_connect_header:\n  [ <string>: [<secret>, ...] ] ]\n\n# Custom HTTP headers to be sent along with each request.\n# Headers that are set by Prometheus itself can't be overwritten.\nhttp_headers:\n  # Header name.\n  [ <string>:\n    # Header values.\n    [ values: [<string>, ...] ]\n    # Headers values. Hidden in configuration page.\n    [ secrets: [<secret>, ...] ]\n    # Files to read header values from.\n    [ files: [<string>, ...] ] ]\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#95",
+    "title": "docs/configuration/configuration.md > Configuration file > `<oci_sd_config>`",
+    "text": "# Optional proxy URL.\n[ proxy_url: <string> ]\n# Comma-separated string that can contain IPs, CIDR notation, domain names\n# that should be excluded from proxying. IP and domain names can\n# contain port numbers.\n[ no_proxy: <string> ]\n# Use proxy URL indicated by environment variables (HTTP_PROXY, HTTPS_PROXY, NO_PROXY, and their lowercase versions)\n[ proxy_from_environment: <boolean> | default: false ]\n# Specifies headers to send to proxies during CONNECT requests.\n[ proxy_connect_header:\n  [ <string>: [<secret>, ...] ] ]\n\n# Configure whether HTTP requests follow HTTP 3xx redirects.\n[ follow_redirects: <boolean> | default = true ]\n\n# Whether to enable HTTP2.\n[ enable_http2: <boolean> | default: true ]\n\n# Configures the TLS settings.\ntls_config:\n  [ <tls_config> ]\n\n# The port to scrape metrics from.\n[ port: <int> | default = 80 ]\n\n# The time after which the instances are refreshed.\n[ refresh_interval: <duration> | default = 60s ]\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/promtool.md#1",
+    "title": "docs/configuration/promtool.md > (preamble)",
+    "text": "A valid example file can be found [here](/documentation/examples/promtool-http-config-file.yml).\n\n```yaml\n# Note that `basic_auth` and `authorization` options are mutually exclusive.\n\n# Sets the `Authorization` header with the configured username and password.\n# `username_ref` and `password_ref`refer to the name of the secret within the secret manager.\n# `password`, `password_file` and `password_ref` are mutually exclusive.\nbasic_auth:\n  [ username: <string> ]\n  [ username_file: <filename> ]\n  [ username_ref: <string> ]\n  [ password: <secret> ]\n  [ password_file: <string> ]\n  [ password_ref: <string> ]\n\n# Optional the `Authorization` header configuration.\nauthorization:\n  # Sets the authentication type.\n  [ type: <string> | default: Bearer ]\n  # Sets the credentials. It is mutually exclusive with\n  # `credentials_file`.\n  [ credentials: <secret> ]\n  # Sets the credentials with the credentials read from the configured file.\n  # It is mutually exclusive with `credentials`.\n  [ credentials_file: <filename> ]\n  [ credentials_ref: <string> ]\n\n# Optional OAuth 2.0 configuration.\n# Cannot be used at the same time as basic_auth or authorization.\noauth2:\n  [ <oauth2> ]\n\ntls_config:\n  [ <tls_config> ]\n\n[ follow_redirects: <bool> | default: true ]\n\n# Whether to enable HTTP2.\n[ enable_http2: <bool> | default: true ]\n\n# Optional proxy URL.\n[ proxy_url: <string> ]\n# Comma-separated string that can contain IPs, CIDR notation, domain names\n# that should be excluded from proxying. IP and domain names can\n# contain port numbers.\n[ no_proxy: <string> ]\n[ proxy_from_environment: <bool> ]\n[ proxy_connect_header:\n  [ <string>: [ <secret>, ... ] ] ]\n\n# `http_headers` specifies a set of headers that will be injected into each request.\nhttp_headers:\n  [ <string>: <header> ]\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#95",
+    "action": "use",
+    "relevance_score": 0.9953,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9953,
+     "elsewhere": 0.0011,
+     "different_case": 0.0014,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#15",
+    "action": "use",
+    "relevance_score": 0.9947,
+    "document_score": 0.9961,
+    "levels": {
+     "answers": 0.9947,
+     "elsewhere": 0.0013,
+     "different_case": 0.0017,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/configuration/promtool.md#1",
+    "action": "use",
+    "relevance_score": 0.993,
+    "document_score": 0.9947,
+    "levels": {
+     "answers": 0.993,
+     "elsewhere": 0.0017,
+     "different_case": 0.002,
+     "unrelated": 0.0032
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1644
+  },
+  "timing": {
+   "total_ms": 76,
+   "rerank_ms": 61,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2049,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

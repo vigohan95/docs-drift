@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/web-max-notifications-subscribers.rerank",
+ "recorded_at": "2026-11-06T13:30:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 904,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "48.245342",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=240"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--web.max-notifications-subscribers`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--web.max-notifications-subscribers`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#1",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "## Flags\n\n| Flag | Description | Default |\n| --- | --- | --- |\n| <code class=\"text-nowrap\">-h</code>, <code class=\"text-nowrap\">--help</code> | Show context-sensitive help (also try --help-long and --help-man). |  |\n| <code class=\"text-nowrap\">--version</code> | Show application version. |  |\n| <code class=\"text-nowrap\">--config.file</code> | Prometheus configuration file path. | `prometheus.yml` |\n| <code class=\"text-nowrap\">--config.auto-reload</code> | Enable automatic configuration file reloading. See also --config.auto-reload-interval. | `false` |\n| <code class=\"text-nowrap\">--config.auto-reload-interval</code> | Specifies the interval for checking and automatically reloading the Prometheus configuration file upon detecting changes. Only used when --config.auto-reload is set. | `30s` |\n| <code class=\"text-nowrap\">--web.listen-address</code> <code class=\"text-nowrap\">...</code> | Address to listen on for UI, API, and telemetry. Can be repeated. | `0.0.0.0:9090` |\n| <code class=\"text-nowrap\">--auto-gomaxprocs</code> | Automatically set GOMAXPROCS to match Linux container CPU quota | `true` |\n| <code class=\"text-nowrap\">--auto-gomemlimit</code> | Automatically set GOMEMLIMIT to match Linux container or system memory limit | `true` |\n| <code class=\"text-nowrap\">--auto-gomemlimit.ratio</code> | The ratio of reserved GOMEMLIMIT memory to the detected maximum container or system memory | `0.9` |\n| <code class=\"text-nowrap\">--auto-gomemlimit.refresh-interval</code> | Interval at which to re-detect the container or system memory limit and update GOMEMLIMIT accordingly. Useful when the limit can change at runtime, e.g. with a Vertical Pod Autoscaler. Set to 0 to detect the limit only once at startup. Note that a downward change in the limit can cause a temporary increase in garbage collection activity. Only used when --auto-gomemlimit is set. | `0s` |\n| <code class=\"text-nowrap\">--web.config.file</code> | [EXPERIMENTAL] Path to configuration file that can enable TLS or authentication. |  |\n| <code class=\"text-nowrap\">--web.read-timeout</code> | Maximum duration before timing out read of the request, and closing idle connections. | `5m` |\n| <code class=\"text-nowrap\">--web.max-connections</code> | Maximum number of simultaneous connections across all listeners. | `512` |\n| <code class=\"text-nowrap\">--web.max-notifications-subscribers</code> | Limits the maximum number of subscribers that can concurrently receive live notifications. If the limit is reached, new subscription requests will be denied until existing connections close. | `16` |\n| <code class=\"text-nowrap\">--web.external-url</code> | The URL under which Prometheus is externally reachable (for example, if Prometheus is served via a reverse proxy). Used for generating relative and absolute links back to Prometheus itself. If the URL has a path portion, it will be used to prefix all HTTP endpoints served by Prometheus. If omitted, relevant URL components will be derived automatically. |  |\n| <code class=\"text-nowrap\">--web.route-prefix</code> | Prefix for the internal routes of web endpoints. Defaults to path of --web.external-url. |  |\n| <code class=\"text-nowrap\">--web.user-assets</code> | Path to static asset directory, available at /user. |  |\n| <code class=\"text-nowrap\">--web.enable-lifecycle</code> | Enable shutdown and reload via HTTP request. | `false` |\n| <code class=\"text-nowrap\">--web.enable-admin-api</code> | Enable API endpoints for admin control actions. | `false` |\n| <code class=\"text-nowrap\">--web.enable-remote-write-receiver</code> | Enable API endpoint accepting remote write requests. | `false` |"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#67",
+    "title": "docs/querying/api.md > Notifications > Live Notifications",
+    "text": "### Live Notifications\n\nThe `/api/v1/notifications/live` endpoint streams live notifications as they occur, using [Server-Sent Events](https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events). Deleted notifications are sent with `active: false`. Active notifications will be sent when connecting to the endpoint.\n\n```\nGET /api/v1/notifications/live\n```\n\nExample:\n\n```bash\ncurl http://localhost:9090/api/v1/notifications/live\n```\n\n```\ndata: {\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"text\": \"Prometheus is shutting down and gracefully stopping all operations.\",\n      \"date\": \"2024-10-07T12:33:08.551376578+02:00\",\n      \"active\": true\n    }\n  ]\n}\n```\n\n**Note:** The `/notifications/live` endpoint will return a `204 No Content` response if the maximum number of subscribers has been reached. You can set the maximum number of listeners with the flag `--web.max-notifications-subscribers`, which defaults to 16.\n\n```\nGET /api/v1/notifications/live\n204 No Content\n```\n\n*New in v3.0*"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/api.md#67",
+    "action": "use",
+    "relevance_score": 0.9957,
+    "document_score": 0.9968,
+    "levels": {
+     "answers": 0.9957,
+     "elsewhere": 0.0011,
+     "different_case": 0.0012,
+     "unrelated": 0.002
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#1",
+    "action": "use",
+    "relevance_score": 0.9951,
+    "document_score": 0.9962,
+    "levels": {
+     "answers": 0.9951,
+     "elsewhere": 0.0011,
+     "different_case": 0.0012,
+     "unrelated": 0.0026
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1492
+  },
+  "timing": {
+   "total_ms": 66,
+   "rerank_ms": 51,
+   "questions_ms": 0,
+   "model_ms": 45,
+   "engine": {
+    "rows": 1730,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 45,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 42,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

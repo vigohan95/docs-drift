@@ -1,0 +1,360 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/storage-tsdb-path.compare",
+ "recorded_at": "2026-11-06T13:29:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1890,
+ "response_headers": {
+  "x-clocked-credits": "37",
+  "x-clocked-model-ms": "916.213995",
+  "x-clocked-cost-usd": "0.007370",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=1173"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "text": "### Operational aspects\n\nPrometheus has several flags that configure local storage. The most important are:\n\n- `--storage.tsdb.path`: Where Prometheus writes its database. Defaults to `data/`.\n- `--storage.tsdb.retention.time`: How long to retain samples in storage. If neither\n  this flag nor `storage.tsdb.retention.size` is set, the retention time defaults to\n  `15d`. Supported units: y, w, d, h, m, s, ms.\n- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.\n  The oldest data will be removed first. Defaults to `0` or disabled. Units supported:\n  B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. Only\n  the persistent blocks are deleted to honor this retention although WAL and m-mapped\n  chunks are counted in the total size. So the minimum requirement for the disk is the\n  peak space taken by the `wal` (the WAL and Checkpoint) and `chunks_head`\n  (m-mapped Head chunks) directory combined (peaks every 2 hours).\n- `--storage.tsdb.wal-compression`: Enables compression of the write-ahead log (WAL).\n  Depending on your data, you can expect the WAL size to be halved with little extra\n  CPU load. This flag was introduced in 2.11.0 and enabled by default in 2.20.0.\n  Note that once enabled, downgrading Prometheus to a version below 2.11.0 will\n  require deleting the WAL."
+   },
+   {
+    "id": "prometheus:docs/prometheus_agent.md#4",
+    "text": "### How to Use Agent Mode in Detail\n\nIf you show the help output of Prometheus (--help flag), you should see more or less the following:\n\n```\nusage: prometheus [<flags>]\n\nThe Prometheus monitoring server\n\nFlags:\n  -h, --help                     Show context-sensitive help (also try --help-long and --help-man).\n      (... other flags)\n      --storage.tsdb.path=\"data/\"\n                                 Base path for metrics storage. Use with server mode only.\n      --storage.agent.path=\"data-agent/\"\n                                 Base path for metrics storage. Use with agent mode only.\n      (... other flags)\n      --[no-]agent               Run Prometheus in 'Agent mode'.\n```\n\nUse the `--agent` flag to run Prometheus in the Agent mode. The rest of the flags are either for both server and Agent or only for a specific mode. You can see which flag is for which mode by checking the last sentence of a flag's help string. \"Use with server mode only\" means it's only for server mode. If you don't see any mention like this, it means the flag is shared.\n\nThe Agent mode accepts the same scrape configuration with the same discovery options and remote write options. It also exposes a web UI on port 9095 with disabled query capabilities but shows build info, configuration, targets, and service discovery information as in a normal Prometheus server."
+   },
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "text": "| <code class=\"text-nowrap\">--web.remote-write-receiver.accepted-protobuf-messages</code> | List of the remote write protobuf messages to accept when receiving the remote writes. Supported values: prometheus.WriteRequest, io.prometheus.write.v2.Request | `prometheus.WriteRequest` |\n| <code class=\"text-nowrap\">--web.enable-otlp-receiver</code> | Enable API endpoint accepting OTLP write requests. | `false` |\n| <code class=\"text-nowrap\">--web.console.templates</code> | Path to the console template directory, available at /consoles. | `consoles` |\n| <code class=\"text-nowrap\">--web.console.libraries</code> | Path to the console library directory. | `console_libraries` |\n| <code class=\"text-nowrap\">--web.page-title</code> | Document title of Prometheus instance. | `Prometheus Time Series Collection and Processing Server` |\n| <code class=\"text-nowrap\">--web.cors.origin</code> | Regex for CORS origin. It is fully anchored. Example: 'https?://(domain1\\|domain2)\\.com' | `.*` |\n| <code class=\"text-nowrap\">--storage.tsdb.path</code> | Base path for metrics storage. Use with server mode only. | `data/` |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.time</code> | [DEPRECATED] How long to retain samples in storage. If neither this flag nor \"storage.tsdb.retention.size\" is set, the retention time defaults to 15d. Units Supported: y, w, d, h, m, s, ms. This flag has been deprecated, use the storage.tsdb.retention.time field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.size</code> | [DEPRECATED] Maximum number of bytes that can be stored for blocks. A unit is required, supported units: B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. This flag has been deprecated, use the storage.tsdb.retention.size field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.no-lockfile</code> | Do not create lockfile in data directory. Use with server mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.tsdb.head-chunks-write-queue-size</code> | Size of the queue through which head chunks are written to the disk to be m-mapped, 0 disables the queue completely. Experimental. Use with server mode only. | `0` |\n| <code class=\"text-nowrap\">--storage.tsdb.delay-compact-file.path</code> | Path to a JSON file with uploaded TSDB blocks e.g. Thanos shipper meta file. If set TSDB will only compact 1 level blocks that are marked as uploaded in that file, improving external storage integrations e.g. with Thanos sidecar. 1+ level compactions won't be delayed. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.agent.path</code> | Base path for metrics storage. Use with agent mode only. | `data-agent/` |\n| <code class=\"text-nowrap\">--storage.agent.wal-compression</code> | Compress the agent WAL. If false, the --storage.agent.wal-compression-type flag is ignored. Use with agent mode only. | `true` |\n| <code class=\"text-nowrap\">--storage.agent.retention.min-time</code> | Minimum age samples may be before being considered for deletion when the WAL is truncated Use with agent mode only. | `5m` |\n| <code class=\"text-nowrap\">--storage.agent.retention.max-time</code> | Maximum age samples may be before being forcibly deleted when the WAL is truncated Use with agent mode only. | `4h` |\n| <code class=\"text-nowrap\">--storage.agent.checkpoint-from-in-memory-series</code> | Use only in-memory series data when building a checkpoint. Use with agent mode only. | `false` |"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#3",
+    "text": "## Starting Prometheus\n\nTo start Prometheus with your newly created configuration file, change to the\ndirectory containing the Prometheus binary and run:\n\n```bash\n# Start Prometheus.\n# By default, Prometheus stores its database in ./data (flag --storage.tsdb.path).\n./prometheus --config.file=prometheus.yml\n```\n\nPrometheus should start up. You should also be able to browse to a status page\nabout itself at [localhost:9090](http://localhost:9090). Give it a couple of\nseconds to collect data about itself from its own HTTP metrics endpoint.\n\nYou can also verify that Prometheus is serving metrics about itself by\nnavigating to its metrics endpoint:\n[localhost:9090/metrics](http://localhost:9090/metrics)"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/command-line/prometheus.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/prometheus_agent.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/command-line/prometheus.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/prometheus_agent.md#4",
+     "prometheus:docs/storage.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/storage.md#5",
+    "b": "prometheus:docs/prometheus_agent.md#4",
+    "relation": "overlapping",
+    "related": 0.9888,
+    "probabilities": {
+     "same": 0.0253,
+     "overlapping": 0.9555,
+     "conflicting": 0.008,
+     "unrelated": 0.0112
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/storage.md#5",
+    "b": "prometheus:docs/command-line/prometheus.md#2",
+    "relation": "overlapping",
+    "related": 0.9963,
+    "probabilities": {
+     "same": 0.0144,
+     "overlapping": 0.9732,
+     "conflicting": 0.0087,
+     "unrelated": 0.0037
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0313,
+       "restated": 0.8039,
+       "elaborated": 0.1207,
+       "different": 0.0442
+      },
+      "confidence": 0.9558,
+      "a": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "- `--storage.tsdb.retention.time`: How long to retain samples in storage.",
+       "start": 193,
+       "end": 266,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/command-line/prometheus.md#2",
+       "quote": "| `data/` |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.time</code> | [DEPRECATED] How long to retain samples in storage.",
+       "start": 1097,
+       "end": 1227,
+       "confidence": 0.998
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.7909,
+       "restated": 0.1751,
+       "elaborated": 0.0212,
+       "different": 0.0127
+      },
+      "confidence": 0.9873,
+      "a": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "If neither",
+       "start": 267,
+       "end": 277,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/command-line/prometheus.md#2",
+       "quote": "If neither this flag nor \"storage.tsdb.retention.size\" is set, the retention time defaults to 15d.",
+       "start": 1228,
+       "end": 1326,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0175,
+       "restated": 0.8812,
+       "elaborated": 0.0704,
+       "different": 0.0308
+      },
+      "confidence": 0.9692,
+      "a": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.",
+       "start": 411,
+       "end": 502,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/command-line/prometheus.md#2",
+       "quote": "|  |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.size</code> | [DEPRECATED] Maximum number of bytes that can be stored for blocks.",
+       "start": 1494,
+       "end": 1633,
+       "confidence": 0.991
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.975,
+       "restated": 0.0123,
+       "elaborated": 0.0066,
+       "different": 0.0061
+      },
+      "confidence": 0.9939,
+      "a": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "Ex: \"512MB\".",
+       "start": 619,
+       "end": 631,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/command-line/prometheus.md#2",
+       "quote": "Ex: \"512MB\".",
+       "start": 1698,
+       "end": 1710,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9776,
+       "restated": 0.0115,
+       "elaborated": 0.006,
+       "different": 0.0049
+      },
+      "confidence": 0.9951,
+      "a": {
+       "document": "prometheus:docs/storage.md#5",
+       "quote": "Based on powers-of-2, so 1KB is 1024B.",
+       "start": 632,
+       "end": 670,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/command-line/prometheus.md#2",
+       "quote": "Based on powers-of-2, so 1KB is 1024B.",
+       "start": 1711,
+       "end": 1749,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/storage.md#5",
+    "b": "prometheus:docs/getting_started.md#3",
+    "relation": "overlapping",
+    "related": 0.9939,
+    "probabilities": {
+     "same": 0.0386,
+     "overlapping": 0.9474,
+     "conflicting": 0.008,
+     "unrelated": 0.0061
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/prometheus_agent.md#4",
+    "b": "prometheus:docs/command-line/prometheus.md#2",
+    "relation": "overlapping",
+    "related": 0.9938,
+    "probabilities": {
+     "same": 0.0136,
+     "overlapping": 0.9744,
+     "conflicting": 0.0058,
+     "unrelated": 0.0062
+    },
+    "duplicates": [
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.3779,
+       "restated": 0.5096,
+       "elaborated": 0.0631,
+       "different": 0.0494
+      },
+      "confidence": 0.897,
+      "a": {
+       "document": "prometheus:docs/prometheus_agent.md#4",
+       "quote": "Use with server mode only.",
+       "start": 434,
+       "end": 460,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/command-line/prometheus.md#2",
+       "quote": "Use with server mode only.",
+       "start": 1070,
+       "end": 1096,
+       "confidence": 0.897
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9438,
+       "restated": 0.0291,
+       "elaborated": 0.0112,
+       "different": 0.0159
+      },
+      "confidence": 0.9841,
+      "a": {
+       "document": "prometheus:docs/prometheus_agent.md#4",
+       "quote": "--storage.agent.path=\"data-agent/\"",
+       "start": 467,
+       "end": 501,
+       "confidence": 0.998
+      },
+      "b": {
+       "document": "prometheus:docs/command-line/prometheus.md#2",
+       "quote": "|  |\n| <code class=\"text-nowrap\">--storage.agent.path</code> | Base path for metrics storage.",
+       "start": 2647,
+       "end": 2740,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/prometheus_agent.md#4",
+    "b": "prometheus:docs/getting_started.md#3",
+    "relation": "overlapping",
+    "related": 0.6916,
+    "probabilities": {
+     "same": 0.0431,
+     "overlapping": 0.6204,
+     "conflicting": 0.0281,
+     "unrelated": 0.3084
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/command-line/prometheus.md#2",
+    "b": "prometheus:docs/getting_started.md#3",
+    "relation": "overlapping",
+    "related": 0.9916,
+    "probabilities": {
+     "same": 0.0119,
+     "overlapping": 0.9729,
+     "conflicting": 0.0068,
+     "unrelated": 0.0084
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   1,
+   3
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 108,
+   "passage_reads": 1,
+   "passages_ms": 627,
+   "passages": 11,
+   "counterparts_ms": 278
+  },
+  "timing": {
+   "read_ms": 1012,
+   "total_ms": 1019
+  }
+ }
+}

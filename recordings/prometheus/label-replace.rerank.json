@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/label-replace.rerank",
+ "recorded_at": "2026-11-06T13:29:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1021,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "39.789505",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=46,cfOrigin;dur=0,cfWorker;dur=239"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `label_replace`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `label_replace`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#6",
+    "title": "docs/querying/basics.md > Literals > String literals",
+    "text": "### String literals\n\nString literals are designated by single quotes, double quotes or backticks.\n\nPromQL follows the same [escaping rules as\nGo](https://golang.org/ref/spec#String_literals). For string literals in single or double quotes, a\nbackslash begins an escape sequence, which may be followed by `a`, `b`, `f`,\n`n`, `r`, `t`, `v` or `\\`.  Specific characters can be provided using octal\n(`\\nnn`) or hexadecimal (`\\xnn`, `\\unnnn` and `\\Unnnnnnnn`) notations.\n\nConversely, escape characters are not parsed in string literals designated by backticks. It is important to note that, unlike Go, Prometheus does not discard newlines inside backticks.\n\nExample:\n\n    \"this is a string\"\n    'these are unescaped: \\n \\\\ \\t'\n    `these are not unescaped: \\n ' \" \\t`\n\nThis can be useful for [`regular expressions`](#regular-expressions) in [`label_replace()`](functions.md#label_replace), for example:\n\n    label_replace(up, \"host\", \"$1\", \"instance\", \"(.*)\\\\.example\\\\.com\")\n    label_replace(up, \"host\", \"$1\", \"instance\", `(.*)\\.example\\.com`)"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#39",
+    "title": "docs/querying/functions.md > `label_replace()`",
+    "text": "## `label_replace()`\n\nFor each timeseries in `v`, `label_replace(v instant-vector, dst_label string, replacement string, src_label string, regex string)`\nmatches the [regular expression](./basics.md#regular-expressions) `regex` against the value of the label `src_label`. If it\nmatches, the value of the label `dst_label` in the returned timeseries will be the expansion\nof `replacement`, together with the original labels in the input. Capturing groups in the\nregular expression can be referenced with `$1`, `$2`, etc. Named capturing groups in the regular expression can be referenced with `$name` (where `name` is the  capturing group name). If the regular expression doesn't match then the timeseries is returned unchanged.\n\n`label_replace` acts on float and histogram samples in the same way.\n\nThis example will return timeseries with the values `a:c` at label `service` and `a` at label `foo`:\n\n```\nlabel_replace(up{job=\"api-server\",service=\"a:c\"}, \"foo\", \"$1\", \"service\", \"(.*):.*\")\n```\n\nThis second example has the same effect than the first example, and illustrates use of named capturing groups:\n```\nlabel_replace(up{job=\"api-server\",service=\"a:c\"}, \"foo\", \"$name\", \"service\", \"(?P<name>.*):(?P<version>.*)\")\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/functions.md#39",
+    "action": "use",
+    "relevance_score": 0.9874,
+    "document_score": 0.992,
+    "levels": {
+     "answers": 0.9874,
+     "elsewhere": 0.0046,
+     "different_case": 0.0043,
+     "unrelated": 0.0037
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/basics.md#6",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.0147,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.0114,
+     "different_case": 0.0133,
+     "unrelated": 0.972
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 798
+  },
+  "timing": {
+   "total_ms": 43,
+   "rerank_ms": 43,
+   "questions_ms": 0,
+   "model_ms": 37,
+   "engine": {
+    "rows": 1068,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 37,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

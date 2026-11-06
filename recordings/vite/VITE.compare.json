@@ -1,0 +1,269 @@
+{
+ "endpoint": "compare",
+ "tag": "vite/VITE.compare",
+ "recorded_at": "2026-11-06T13:30:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1528,
+ "response_headers": {
+  "x-clocked-credits": "17",
+  "x-clocked-model-ms": "420.792915",
+  "x-clocked-cost-usd": "0.003386",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=690"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/config/shared-options.md#37",
+    "text": "## envPrefix\n\n- **Type:** `string | string[]`\n- **Default:** `VITE_`\n\nEnv variables starting with `envPrefix` will be exposed to your client source code via `import.meta.env`.\n\n:::warning SECURITY NOTES\n`envPrefix` should not be set as `''`, which will expose all your env variables and cause unexpected leaking of sensitive information. Vite will throw an error when detecting `''`.\n\nIf you would like to expose an unprefixed variable, you can use [define](#define) to expose it:\n\n```js\ndefine: {\n  'import.meta.env.ENV_VARIABLE': JSON.stringify(process.env.ENV_VARIABLE)\n}\n```\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/env-and-mode.md#2",
+    "text": "## Env Variables\n\nVite exposes env variables under the `import.meta.env` object as strings automatically.\n\nVariables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling. To prevent accidentally leaking env variables to the client, avoid using this prefix. As an example, consider the following:\n\n```[.env]\nVITE_SOME_KEY=123\nDB_PASSWORD=foobar\n```\n\nThe parsed value of `VITE_SOME_KEY` – `\"123\"` – will be exposed on the client, but the value of `DB_PASSWORD` will not. You can test this by adding the following to your code:\n\n```js\nconsole.log(import.meta.env.VITE_SOME_KEY) // \"123\"\nconsole.log(import.meta.env.DB_PASSWORD) // undefined\n```\n\nIf you want to customize the env variables prefix, see the [envPrefix](/config/shared-options.html#envprefix) option.\n\n:::tip Env parsing\nAs shown above, `VITE_SOME_KEY` is a number but returns a string when parsed. The same would also happen for boolean env variables. Make sure to convert to the desired type when using it in your code.\n:::\n\n:::warning Protecting secrets\n\n`VITE_*` variables should _not_ contain sensitive information such as API keys. The values of these variables are bundled into your source code at build time. For production deployments, consider a backend server or serverless/edge functions to properly secure secrets.\n\n:::"
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#12",
+    "text": "## `loadEnv`\n\n**Type Signature:**\n\n```ts\nfunction loadEnv(\n  mode: string,\n  envDir: string,\n  prefixes: string | string[] = 'VITE_',\n): Record<string, string>\n```\n\n**Related:** [`.env` Files](./env-and-mode.md#env-files)\n\nLoad `.env` files within the `envDir` and merge them with the matching variables already present in `process.env`. By default, only env variables prefixed with `VITE_` are loaded, unless `prefixes` is changed."
+   },
+   {
+    "id": "vite:docs/config/index.md#4",
+    "text": "## Using Environment Variables in Config\n\nEnvironment variables available while the config itself is being evaluated are only those that already exist in the current process environment (`process.env`). Vite deliberately defers loading any `.env*` files until _after_ the user config has been resolved because the set of files to load depends on config options like [`root`](/guide/#index-html-and-project-root) and [`envDir`](/config/shared-options.md#envdir), and also on the final `mode`.\n\nThis means: variables defined in `.env`, `.env.local`, `.env.[mode]`, or `.env.[mode].local` are **not** automatically injected into `process.env` while your `vite.config.*` is running. They _are_ automatically loaded later and exposed to application code via `import.meta.env` (with the default `VITE_` prefix filter) exactly as documented in [Env Variables and Modes](/guide/env-and-mode.html). So if you only need to pass values from `.env*` files to the app, you don't need to call anything in the config.\n\nIf, however, values from `.env*` files must influence the config itself (for example to set `server.port`, conditionally enable plugins, or compute `define` replacements), you can load them manually using the exported [`loadEnv`](/guide/api-javascript.html#loadenv) helper.\n\n```js twoslash\nimport { defineConfig, loadEnv } from 'vite'\n\nexport default defineConfig(({ mode }) => {\n  // Load env file based on `mode` in the current working directory.\n  // Set the third parameter to '' to load all env regardless of the\n  // `VITE_` prefix.\n  const env = loadEnv(mode, process.cwd(), '')\n  return {\n    define: {\n      // Provide an explicit app-level constant derived from an env var.\n      __APP_ENV__: JSON.stringify(env.APP_ENV),\n    },\n    // Example: use an env var to set the dev server port conditionally.\n    server: {\n      port: env.APP_PORT ? Number(env.APP_PORT) : 5173,\n    },\n  }\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/config/shared-options.md#37",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/config/index.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/env-and-mode.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/config/index.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-javascript.md#12",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/config/index.md#4"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/index.md#4",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/config/shared-options.md#37",
+     "vite:docs/guide/api-javascript.md#12",
+     "vite:docs/guide/env-and-mode.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/config/shared-options.md#37",
+    "b": "vite:docs/guide/env-and-mode.md#2",
+    "relation": "overlapping",
+    "related": 0.9973,
+    "probabilities": {
+     "same": 0.0067,
+     "overlapping": 0.9861,
+     "conflicting": 0.0045,
+     "unrelated": 0.0027
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/config/shared-options.md#37",
+    "b": "vite:docs/guide/api-javascript.md#12",
+    "relation": "overlapping",
+    "related": 0.9966,
+    "probabilities": {
+     "same": 0.0236,
+     "overlapping": 0.9669,
+     "conflicting": 0.0061,
+     "unrelated": 0.0034
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/config/shared-options.md#37",
+    "b": "vite:docs/config/index.md#4",
+    "relation": "overlapping",
+    "related": 0.9706,
+    "probabilities": {
+     "same": 0.0281,
+     "overlapping": 0.9316,
+     "conflicting": 0.0108,
+     "unrelated": 0.0294
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0127,
+       "restated": 0.9403,
+       "elaborated": 0.0293,
+       "different": 0.0176
+      },
+      "confidence": 0.9824,
+      "a": {
+       "document": "vite:docs/config/shared-options.md#37",
+       "quote": "Env variables starting with `envPrefix` will be exposed to your client source code via `import.meta.env`.",
+       "start": 70,
+       "end": 175,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/config/index.md#4",
+       "quote": "They _are_ automatically loaded later and exposed to application code via `import.meta.env` (with the default `VITE_` prefix filter) exactly as documented in [Env Variables and Modes](/guide/env-and-mode.html).",
+       "start": 679,
+       "end": 889,
+       "confidence": 0.998
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/guide/env-and-mode.md#2",
+    "b": "vite:docs/guide/api-javascript.md#12",
+    "relation": "overlapping",
+    "related": 0.9964,
+    "probabilities": {
+     "same": 0.0156,
+     "overlapping": 0.9755,
+     "conflicting": 0.0053,
+     "unrelated": 0.0036
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/guide/env-and-mode.md#2",
+    "b": "vite:docs/config/index.md#4",
+    "relation": "overlapping",
+    "related": 0.9941,
+    "probabilities": {
+     "same": 0.0191,
+     "overlapping": 0.9682,
+     "conflicting": 0.0068,
+     "unrelated": 0.0059
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0061,
+       "restated": 0.9787,
+       "elaborated": 0.0072,
+       "different": 0.008
+      },
+      "confidence": 0.992,
+      "a": {
+       "document": "vite:docs/guide/env-and-mode.md#2",
+       "quote": "Variables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling.",
+       "start": 107,
+       "end": 202,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/config/index.md#4",
+       "quote": "They _are_ automatically loaded later and exposed to application code via `import.meta.env` (with the default `VITE_` prefix filter) exactly as documented in [Env Variables and Modes](/guide/env-and-mode.html).",
+       "start": 679,
+       "end": 889,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/guide/api-javascript.md#12",
+    "b": "vite:docs/config/index.md#4",
+    "relation": "overlapping",
+    "related": 0.9938,
+    "probabilities": {
+     "same": 0.0195,
+     "overlapping": 0.9667,
+     "conflicting": 0.0077,
+     "unrelated": 0.0062
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0125,
+       "restated": 0.9213,
+       "elaborated": 0.033,
+       "different": 0.0332
+      },
+      "confidence": 0.9668,
+      "a": {
+       "document": "vite:docs/guide/api-javascript.md#12",
+       "quote": "By default, only env variables prefixed with `VITE_` are loaded, unless `prefixes` is changed.",
+       "start": 338,
+       "end": 432,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/config/index.md#4",
+       "quote": "They _are_ automatically loaded later and exposed to application code via `import.meta.env` (with the default `VITE_` prefix filter) exactly as documented in [Env Variables and Modes](/guide/env-and-mode.html).",
+       "start": 679,
+       "end": 889,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   2,
+   4,
+   5
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 43,
+   "passage_reads": 1,
+   "passages_ms": 285,
+   "passages": 4,
+   "counterparts_ms": 143
+  },
+  "timing": {
+   "read_ms": 470,
+   "total_ms": 477
+  }
+ }
+}

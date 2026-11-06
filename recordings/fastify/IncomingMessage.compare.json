@@ -1,0 +1,79 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify/IncomingMessage.compare",
+ "recorded_at": "2026-11-06T13:30:29Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 871,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "24.532385",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=171"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#23",
+    "text": "### Add Custom `contentTypeParser` to Fastify instance and define endpoints\n\nFirebase Function's HTTP layer already parses the request and makes a JSON\npayload available through the property `payload.body` below. It also provides\naccess to the raw body, unparsed, which is useful for calculating request\nsignatures to validate HTTP webhooks.\n\nAdd as follows to the `registerRoutes()` function:\n\n```js\nasync function registerRoutes (fastify) {\n  fastify.addContentTypeParser(\"application/json\", {}, (req, payload, done) => {\n    // useful to include the request's raw body on the `req` object that will\n    // later be available in your other routes so you can calculate the HMAC\n    // if needed\n    req.rawBody = payload.rawBody\n\n    // payload.body is already the parsed JSON so we just fire the done callback\n    // with it\n    done(null, payload.body)\n  })\n\n  // define your endpoints here...\n  fastify.post(\"/some-route-here\", async (request, reply) => {})\n\n  fastify.get('/', async (request, reply) => {\n    reply.send({message: 'Hello World!'})\n  })\n}\n```\n\n**Failing to add this `ContentTypeParser` may lead to the Fastify process\nremaining stuck and not processing any other requests after receiving one with\nthe Content-Type `application/json`.**\n\nWhen using Typescript, since the type of `payload` is a native `IncomingMessage`\nthat gets modified by Firebase, it won't be able to find the property\n`payload.body`.\n\nIn order to suppress the error, you can use the following signature:\n\n```ts\ndeclare module 'http' {\n\tinterface IncomingMessage {\n\t\tbody?: unknown;\n\t}\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#40",
+    "text": "### `defaultRoute`\n<a id=\"default-route\"></a>\n\nFastify uses [find-my-way](https://github.com/delvedor/find-my-way) which supports,\ncan pass a default route with the option defaultRoute.\n\n```js\nconst fastify = require('fastify')({\n  routerOptions: {\n    defaultRoute: (req, res) => {\n      res.statusCode = 404\n      res.end()\n    }\n  }\n})\n```\n\n> ℹ️ Note:\n> The `req` and `res` objects passed to `defaultRoute` are the raw Node.js\n> `IncomingMessage` and `ServerResponse` instances. They do **not** expose the\n> Fastify-specific methods available on `FastifyRequest`/`FastifyReply` (for\n> example, `res.send`)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#23",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#40",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Guides/Serverless.md#23",
+    "b": "fastify:docs/Reference/Server.md#40",
+    "relation": "unrelated",
+    "related": 0.0054,
+    "probabilities": {
+     "same": 0.002,
+     "overlapping": 0.0019,
+     "conflicting": 0.0016,
+     "unrelated": 0.9946
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33
+  },
+  "timing": {
+   "read_ms": 33,
+   "total_ms": 36
+  }
+ }
+}

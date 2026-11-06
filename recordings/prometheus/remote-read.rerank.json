@@ -1,0 +1,110 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/remote-read.rerank",
+ "recorded_at": "2026-11-06T13:30:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 909,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "48.006176",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=41,cfOrigin;dur=0,cfWorker;dur=174"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `remote_read`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `remote_read`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#29",
+    "title": "docs/feature_flags.md > Native histograms as classic histograms in PromQL",
+    "text": "## Native histograms as classic histograms in PromQL\n\n`--enable-feature=promql-native-histograms-as-classic`\n\nWhen enabled, PromQL queries for classic histogram series (e.g. `_bucket`, `_count`, `_sum`) will\nautomatically convert native histograms into classic histogram series. Currently only Native\nHistograms with Custom Buckets (NHCB) are converted.\n\nFor example, if `request_duration_seconds` is stored as an NHCB native histogram:\n\n```promql\n# Querying with a classic histogram suffix triggers the conversion:\nhistogram_quantile(0.95, rate(request_duration_seconds_bucket[5m]))\n\n# Querying without a suffix returns the regular NHCB native histogram:\nrate(request_duration_seconds[5m])\n```\n\nThis feature only affects PromQL query evaluation (e.g. the query APIs and rule evaluation). The\nconversion is applied on top of all data the query engine reads, including series fetched from\n`remote_read` endpoints. It does not apply to remote write (NHCB series are not converted when being\nforwarded to remote endpoints), the remote read API, federation, or the series API (the\n`/api/v1/series` endpoint will not return the converted classic series). Note that remote write has its\nown `convert_nhcb_to_classic` setting, see the [`remote_write`](configuration/configuration.md#remote_write)\nconfiguration.\n\nKnown limitations:\n\n* The conversion only triggers on exact metric name matchers (e.g. `request_duration_seconds_bucket`), not on\n  regex or negative name matchers.\n* Handling of collisions and transitions between stored classic series and converted NHCB series is not\n  implemented yet, so results may contain duplicates.\n* Native histograms with exponential buckets are not converted yet; support may be added later.\n* There is no control label yet; one will be added to disable and debug the conversion.\n* There is no metric counting the converted series yet; one will be added to help track the progress of\n  a migration from classic histograms to NHCB."
+   },
+   {
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#2",
+    "title": "documentation/examples/remote_storage/remote_storage_adapter/README.md > Remote storage adapter > Configuring Prometheus",
+    "text": "## Configuring Prometheus\n\nTo configure Prometheus to send samples to this binary, add the following to your `prometheus.yml`:\n\n```yaml\n# Remote write configuration (for Graphite, OpenTSDB, or InfluxDB).\nremote_write:\n  - url: \"http://localhost:9201/write\"\n\n# Remote read configuration (for InfluxDB only at the moment).\nremote_read:\n  - url: \"http://localhost:9201/read\"\n```"
+   },
+   {
+    "id": "prometheus:documentation/internal_architecture.md#15",
+    "title": "documentation/internal_architecture.md > Internal architecture > Storage > Remote storage",
+    "text": "### Remote storage\n\nThe remote storage is a [`remote.Storage`](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/remote/storage.go#L31-L44) that implements the [`storage.Storage` interface](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/interface.go#L31-L44) and is responsible for interfacing with remote read and write endpoints.\n\nFor each [`remote_write`](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write) section in the configuration file, the remote storage creates and runs one [`remote.QueueManager`](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/remote/queue_manager.go#L141-L161), which in turn queues and sends samples to a specific remote write endpoint. Each queue manager parallelizes writes to the remote endpoint by running a dynamic number of shards based on current and past load observations. When a configuration reload is applied, all remote storage queues are shut down and new ones are created.\n\nFor each [`remote_read`](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_read) section in the configuration file, the remote storage creates a [reader client](https://github.com/prometheus/prometheus/blob/v2.3.1/storage/remote/storage.go#L96-L118) and results from each remote source are merged."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "prometheus:documentation/internal_architecture.md#15",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0248,
+    "document_score": 0.1242,
+    "levels": {
+     "answers": 0.0248,
+     "elsewhere": 0.0995,
+     "different_case": 0.0415,
+     "unrelated": 0.8343
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:documentation/examples/remote_storage/remote_storage_adapter/README.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.007,
+    "document_score": 0.0246,
+    "levels": {
+     "answers": 0.007,
+     "elsewhere": 0.0176,
+     "different_case": 0.0155,
+     "unrelated": 0.9599
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/feature_flags.md#29",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0062,
+    "document_score": 0.0631,
+    "levels": {
+     "answers": 0.0062,
+     "elsewhere": 0.0569,
+     "different_case": 0.0314,
+     "unrelated": 0.9054
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1186
+  },
+  "timing": {
+   "total_ms": 53,
+   "rerank_ms": 52,
+   "questions_ms": 0,
+   "model_ms": 44,
+   "engine": {
+    "rows": 1591,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 44,
+    "build_ms": 0,
+    "doc_ms": 3,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

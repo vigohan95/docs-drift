@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/protobuf-message.rerank",
+ "recorded_at": "2026-11-06T13:30:49Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 908,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.18845",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=31,cfOrigin;dur=0,cfWorker;dur=204"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `protobuf_message`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `protobuf_message`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#123",
+    "title": "docs/configuration/configuration.md > Configuration file > `<remote_write>`",
+    "text": "### `<remote_write>`\n\n`write_relabel_configs` is relabeling applied to samples before sending them\nto the remote endpoint. Write relabeling is applied after external labels. This\ncould be used to limit which samples are sent.\n\nThere is a [small demo](/documentation/examples/remote_storage) of how to use\nthis functionality.\n\n```yaml\n# The URL of the endpoint to send samples to.\nurl: <string>\n\n# protobuf message to use when writing to the remote write endpoint.\n#\n# * The `prometheus.WriteRequest` represents the message introduced in Remote Write 1.0, which\n# will be deprecated eventually.\n# * The `io.prometheus.write.v2.Request` was introduced in Remote Write 2.0 and replaces the former,\n# by improving efficiency and sending metadata, start timestamp and native histograms by default.\n#\n# Before changing this value, consult with your remote storage provider (or test) what message it supports.\n# Read more on https://prometheus.io/docs/specs/remote_write_spec_2_0/#io-prometheus-write-v2-request\n[ protobuf_message: <prometheus.WriteRequest | io.prometheus.write.v2.Request> | default = prometheus.WriteRequest ]\n\n# EXPERIMENTAL: Remote-Write 2.0 mode to use when `protobuf_message` is `io.prometheus.write.v2.Request`.\n#\n# * `none`: default Remote-Write 2.0 behavior with no additional restrictions.\n# * `stateless`: appends `;mode=stateless` to the Content-Type header, defaults `send_native_histograms` to `true`,\n#   requires `--enable-feature=metadata-wal-records` or `--enable-feature=type-and-unit-labels`, and drops classic\n#   histogram float series, series with unspecified metadata type, and all exemplars (until sample-exemplar coalescing\n#   is implemented, as `stateless` mode forbids detached exemplars).\n# * `stateless-st`: appends `;mode=stateless-st` to the Content-Type header, includes all `stateless` rules,\n#   additionally requires `--enable-feature=st-storage`, and drops cumulative metrics missing a start timestamp.\n#\n# Support for metadata relabeling (https://github.com/prometheus/proposals/pull/104) is coming to allow relabeling\n# untyped series (such as recording rule outputs) to `counter` or `gauge` (relabeling `__type__` already works when\n# `--enable-feature=type-and-unit-labels` is enabled).\n#\n# Read more on https://prometheus.io/docs/specs/prw/remote_write_spec_2_0/#modes\n[ mode: <none | stateless | stateless-st> | default = none ]"
+   },
+   {
+    "id": "prometheus:documentation/examples/remote_storage/example_write_adapter/README.md#0",
+    "title": "documentation/examples/remote_storage/example_write_adapter/README.md > Remote Write Adapter Example",
+    "text": "## Remote Write Adapter Example\n\nThis is a simple example of how to write a server to\nreceive samples from the remote storage output.\n\nTo use it:\n\n```\ngo build\n\n./example_write_adapter\n```\n\n...and then add the following to your `prometheus.yml`:\n\n```yaml\nremote_write:\n  - url: \"http://localhost:1234/receive\"\n    protobuf_message: \"io.prometheus.write.v2.Request\"\n```\n\nor for the eventually deprecated Remote Write 1.0 message:\n\n```yaml\nremote_write:\n  - url: \"http://localhost:1234/receive\"\n    protobuf_message: \"prometheus.WriteRequest\"\n```\n\nThen start Prometheus (in separate terminal):\n\n```\n./prometheus --enable-feature=metadata-wal-records\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#123",
+    "action": "use",
+    "relevance_score": 0.9952,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9952,
+     "elsewhere": 0.0013,
+     "different_case": 0.0017,
+     "unrelated": 0.0019
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:documentation/examples/remote_storage/example_write_adapter/README.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0065,
+    "document_score": 0.0174,
+    "levels": {
+     "answers": 0.0065,
+     "elsewhere": 0.0109,
+     "different_case": 0.0197,
+     "unrelated": 0.9629
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1016
+  },
+  "timing": {
+   "total_ms": 46,
+   "rerank_ms": 45,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1286,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

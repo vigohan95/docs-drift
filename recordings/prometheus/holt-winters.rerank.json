@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/holt-winters.rerank",
+ "recorded_at": "2026-11-06T13:29:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 927,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.443359",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=210"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `holt_winters`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `holt_winters`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/migration.md#5",
+    "title": "docs/migration.md > PromQL > holt_winters function renamed",
+    "text": "### holt_winters function renamed\n\nThe `holt_winters` function has been renamed to `double_exponential_smoothing`\nand is now guarded by the `promql-experimental-functions` feature flag.\nIf you want to keep using `holt_winters`, you have to do both of these things:\n  - Rename `holt_winters` to `double_exponential_smoothing` in your queries.\n  - Pass `--enable-feature=promql-experimental-functions` in your Prometheus\n    CLI invocation."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#16",
+    "title": "docs/querying/functions.md > `double_exponential_smoothing()`",
+    "text": "## `double_exponential_smoothing()`\n\n**This function has to be enabled via the [feature\nflag](../feature_flags.md#experimental-promql-functions)\n`--enable-feature=promql-experimental-functions`.**\n\n`double_exponential_smoothing(v range-vector, sf scalar, tf scalar)` produces a\nsmoothed value for each float time series in the range in `v`. The lower the\nsmoothing factor `sf`, the more importance is given to old data. The higher the\ntrend factor `tf`, the more trends in the data is considered. Both `sf` and\n`tf` must be between 0 and 1. For additional details, refer to [NIST\nEngineering Statistics\nHandbook](https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc433.htm). In\nPrometheus V2 this function was called `holt_winters`. This caused confusion\nsince the Holt-Winters method usually refers to triple exponential smoothing.\nDouble exponential smoothing as implemented here is also referred to as \"Holt\nLinear\".\n\n`double_exponential_smoothing` should only be used with gauges and only works\nfor float samples. Elements in the range vector that contain only histogram\nsamples are ignored entirely. For elements that contain a mix of float and\nhistogram samples, only the float samples are used as input, which is flagged\nby an info-level annotation."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/migration.md#5",
+    "action": "use",
+    "relevance_score": 0.6482,
+    "document_score": 0.8169,
+    "levels": {
+     "answers": 0.6482,
+     "elsewhere": 0.1687,
+     "different_case": 0.0388,
+     "unrelated": 0.1443
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/functions.md#16",
+    "action": "use",
+    "relevance_score": 0.577,
+    "document_score": 0.7857,
+    "levels": {
+     "answers": 0.577,
+     "elsewhere": 0.2087,
+     "different_case": 0.0617,
+     "unrelated": 0.1527
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 613
+  },
+  "timing": {
+   "total_ms": 51,
+   "rerank_ms": 50,
+   "questions_ms": 0,
+   "model_ms": 33,
+   "engine": {
+    "rows": 883,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1024,
+    "long": 0,
+    "total_ms": 33,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 30,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

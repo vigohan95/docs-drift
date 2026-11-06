@@ -1,0 +1,405 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/query-max-duration.compare",
+ "recorded_at": "2026-11-06T13:30:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1685,
+ "response_headers": {
+  "x-clocked-credits": "28",
+  "x-clocked-model-ms": "684.373795",
+  "x-clocked-cost-usd": "0.005578",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=952"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "text": "  # File to which PromQL queries are logged.\n  # Reloading the configuration will reopen the file.\n  [ query_log_file: <string> ]\n\n  # Maximum number of series a query may load before it is rejected. The limit\n  # is enforced during execution against the query's actual running cost, never\n  # against the cost estimate returned by the query cost API: the query is\n  # rejected as soon as it loads more series than this. 0 means no limit.\n  # These three query cost limits are reloadable and only enforced when the\n  # query-cost feature flag is enabled (--enable-feature=query-cost).\n  # They apply to every query the engine evaluates, including recording and\n  # alerting rule evaluation.\n  # A client may lower any of them for a single request with the max_series,\n  # max_samples_read and max_query_duration query parameters. A request that\n  # asks for a value above the ceiling set here is an error, it is not silently\n  # clamped down.\n  [ query_max_series: <int> | default = 0 ]\n\n  # Maximum number of samples a query may read before it is rejected. Like\n  # query_max_series, it is enforced during execution against the samples the\n  # query actually reads, never against the estimate: the query is\n  # rejected as soon as it reads more samples than this. 0 means no limit.\n  [ query_max_samples_read: <int> | default = 0 ]\n\n  # Maximum wall-clock duration a query may take. It surfaces as a query\n  # timeout: the query is aborted once it has run for this long. 0s falls back\n  # to --query.timeout. A nonzero value overrides that flag only when the\n  # query-cost feature is enabled. The per-query timeout parameter\n  # of the query endpoints is capped at this ceiling.\n  [ query_max_duration: <duration> | default = 0s ]\n\n  # File to which scrape failures are logged.\n  # Reloading the configuration will reopen the file.\n  [ scrape_failure_log_file: <string> ]\n\n  # An uncompressed response body larger than this many bytes will cause the\n  # scrape to fail. 0 means no limit. Example: 100MB.\n  # This is an experimental feature, this behaviour could\n  # change or be removed in the future.\n  [ body_size_limit: <size> | default = 0 ]\n\n  # Per-scrape limit on the number of scraped samples that will be accepted.\n  # If more than this number of samples are present after metric relabeling\n  # the entire scrape will be treated as failed. 0 means no limit.\n  [ sample_limit: <int> | default = 0 ]"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#31",
+    "text": "These limits apply to every query the engine evaluates, not only to API\nrequests. Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` query parameters. A\nrequest asking for a value above the operator-set ceiling is rejected with HTTP\n400 (`bad_data`) rather than silently clamped. For `max_query_duration`, the\nceiling is `--query.timeout` while `query_max_duration` is unset. A `timeout`\nparameter above the effective duration ceiling is capped at that ceiling.\n\n`query_max_duration` overrides `--query.timeout` only while this feature flag is\nenabled. The command-line flag remains supported and controls the timeout when\nthe feature is disabled or `query_max_duration` is unset.\n\nClients can detect the feature through [`/api/v1/features`](querying/api.md#features),\nwhere it is reported as `query_cost` in the `api` category."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#7",
+    "text": "### Range queries\n\nThe following endpoint evaluates an expression query over a range of time:\n\n```\nGET /api/v1/query_range\nPOST /api/v1/query_range\n```\n\nURL query parameters:\n\n- `query=<string>`: Prometheus expression query string.\n- `start=<rfc3339 | unix_timestamp>`: Start timestamp, inclusive.\n- `end=<rfc3339 | unix_timestamp>`: End timestamp, inclusive.\n- `step=<duration | float>`: Query resolution step width in `duration` format or float number of seconds.\n- `timeout=<duration>`: Evaluation timeout. Optional. Must be positive. Defaults\n   to and is capped by the effective server-side maximum, which is the\n   `query_max_duration` configuration option when the\n   [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled and\n   the value is set, and otherwise the value of the `-query.timeout` flag.\n- `limit=<number>`: Maximum number of returned series. Optional. 0 means disabled.\n- `lookback_delta=<duration | float>`: Override the [lookback period](#staleness) just for this query in `duration` format or float number of seconds. Optional.\n- `stats=<string>`: Include query statistics in the response. Supported values are `true` (basic statistics) and `all` (additionally includes detailed per-step statistics: timings and sample counts). Any other non-empty value currently behaves like `true`, but is deprecated, adds a warning to the response, and will be rejected in the next major release. Optional. See [Query statistics](#query-statistics).\n- `cost=<bool>`: Include an estimated-versus-actual cost comparison in the response `data`. Optional. Ignored unless the [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled. It is a plain on/off switch: any value that is not a boolean is an error. See [Query statistics](#query-statistics).\n- `max_series=<number>`: Lower the per-query maximum number of series this query may load. Optional. Ignored unless the [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled. It may only *lower* the operator-set ceiling configured via `query_max_series`, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.\n- `max_samples_read=<number>`: Lower the per-query maximum number of samples this query may read. Optional. Ignored unless the [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled. It may only *lower* the operator-set ceiling configured via `query_max_samples_read`, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.\n- `max_query_duration=<duration>`: Lower the per-query maximum execution duration. Optional. Ignored unless the [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled. It may only *lower* the effective duration ceiling, which is `query_max_duration` when set and otherwise the `-query.timeout` flag, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/feature_flags.md#31",
+     "prometheus:docs/querying/api.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#31",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/configuration/configuration.md#3",
+     "prometheus:docs/querying/api.md#7"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#7",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/configuration/configuration.md#3",
+     "prometheus:docs/feature_flags.md#31"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#3",
+    "b": "prometheus:docs/feature_flags.md#31",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.011,
+     "overlapping": 0.9783,
+     "conflicting": 0.0081,
+     "unrelated": 0.0026
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0142,
+       "restated": 0.9358,
+       "elaborated": 0.0382,
+       "different": 0.0118
+      },
+      "confidence": 0.9882,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "# They apply to every query the engine evaluates, including recording and",
+       "start": 585,
+       "end": 658,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "These limits apply to every query the engine evaluates, not only to API\nrequests.",
+       "start": 0,
+       "end": 81,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.007,
+       "restated": 0.9717,
+       "elaborated": 0.0145,
+       "different": 0.0069
+      },
+      "confidence": 0.952,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "# They apply to every query the engine evaluates, including recording and",
+       "start": 585,
+       "end": 658,
+       "confidence": 0.952
+      },
+      "b": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "Recording and alerting rules are subject to them too: a rule whose\nquery exceeds a limit fails to evaluate like any other query error, and\n`query_max_duration` replaces `--query.timeout` as the timeout of rule queries.\n\nA client may lower any of these ceilings for a single request with the\n`max_series`, `max_samples_read` and `max_query_duration` query parameters.",
+       "start": 82,
+       "end": 448,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0073,
+       "restated": 0.9748,
+       "elaborated": 0.0089,
+       "different": 0.009
+      },
+      "confidence": 0.988,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "A request that",
+       "start": 828,
+       "end": 842,
+       "confidence": 0.99
+      },
+      "b": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "A\nrequest asking for a value above the operator-set ceiling is rejected with HTTP\n400 (`bad_data`) rather than silently clamped.",
+       "start": 449,
+       "end": 577,
+       "confidence": 0.988
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0172,
+       "restated": 0.916,
+       "elaborated": 0.0444,
+       "different": 0.0225
+      },
+      "confidence": 0.687,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "A nonzero value overrides that flag only when the",
+       "start": 1508,
+       "end": 1557,
+       "confidence": 0.917
+      },
+      "b": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "A `timeout`\nparameter above the effective duration ceiling is capped at that ceiling.\n\n`query_max_duration` overrides `--query.timeout` only while this feature flag is\nenabled.",
+       "start": 674,
+       "end": 850,
+       "confidence": 0.687
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/configuration/configuration.md#3",
+    "b": "prometheus:docs/querying/api.md#7",
+    "relation": "overlapping",
+    "related": 0.9965,
+    "probabilities": {
+     "same": 0.0103,
+     "overlapping": 0.9776,
+     "conflicting": 0.0086,
+     "unrelated": 0.0035
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.02,
+       "restated": 0.7799,
+       "elaborated": 0.0661,
+       "different": 0.1339
+      },
+      "confidence": 0.8661,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "0s falls back",
+       "start": 1470,
+       "end": 1483,
+       "confidence": 0.982
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#7",
+       "quote": "Defaults\n   to and is capped by the effective server-side maximum, which is the\n   `query_max_duration` configuration option when the\n   [`query-cost`](../feature_flags.md#query-cost) feature flag is enabled and\n   the value is set, and otherwise the value of the `-query.timeout` flag.\n- `limit=<number>`: Maximum number of returned series.",
+       "start": 538,
+       "end": 879,
+       "confidence": 0.951
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0117,
+       "restated": 0.9583,
+       "elaborated": 0.0187,
+       "different": 0.0114
+      },
+      "confidence": 0.9886,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "A request that",
+       "start": 828,
+       "end": 842,
+       "confidence": 0.989
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#7",
+       "quote": "It may only *lower* the operator-set ceiling configured via `query_max_series`, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.\n- `max_samples_read=<number>`: Lower the per-query maximum number of samples this query may read.",
+       "start": 1980,
+       "end": 2257,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0112,
+       "restated": 0.9504,
+       "elaborated": 0.0225,
+       "different": 0.0159
+      },
+      "confidence": 0.9841,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "A request that",
+       "start": 828,
+       "end": 842,
+       "confidence": 0.986
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#7",
+       "quote": "It may only *lower* the operator-set ceiling configured via `query_max_samples_read`, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.\n- `max_query_duration=<duration>`: Lower the per-query maximum execution duration.",
+       "start": 2359,
+       "end": 2627,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0172,
+       "restated": 0.9248,
+       "elaborated": 0.0306,
+       "different": 0.0275
+      },
+      "confidence": 0.9725,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#3",
+       "quote": "A request that",
+       "start": 828,
+       "end": 842,
+       "confidence": 0.988
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#7",
+       "quote": "It may only *lower* the effective duration ceiling, which is `query_max_duration` when set and otherwise the `-query.timeout` flag, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.",
+       "start": 2729,
+       "end": 2960,
+       "confidence": 0.999
+      }
+     }
+    ],
+    "conflicts": []
+   },
+   {
+    "a": "prometheus:docs/feature_flags.md#31",
+    "b": "prometheus:docs/querying/api.md#7",
+    "relation": "overlapping",
+    "related": 0.9962,
+    "probabilities": {
+     "same": 0.0128,
+     "overlapping": 0.9708,
+     "conflicting": 0.0126,
+     "unrelated": 0.0038
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0071,
+       "restated": 0.9735,
+       "elaborated": 0.0112,
+       "different": 0.0082
+      },
+      "confidence": 0.706,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "A",
+       "start": 449,
+       "end": 450,
+       "confidence": 0.706
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#7",
+       "quote": "It may only *lower* the operator-set ceiling configured via `query_max_series`, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.\n- `max_samples_read=<number>`: Lower the per-query maximum number of samples this query may read.",
+       "start": 1980,
+       "end": 2257,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0079,
+       "restated": 0.971,
+       "elaborated": 0.0121,
+       "different": 0.0089
+      },
+      "confidence": 0.9911,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "A",
+       "start": 449,
+       "end": 450,
+       "confidence": 0.996
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#7",
+       "quote": "It may only *lower* the operator-set ceiling configured via `query_max_samples_read`, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.\n- `max_query_duration=<duration>`: Lower the per-query maximum execution duration.",
+       "start": 2359,
+       "end": 2627,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0088,
+       "restated": 0.9647,
+       "elaborated": 0.0149,
+       "different": 0.0116
+      },
+      "confidence": 0.9884,
+      "a": {
+       "document": "prometheus:docs/feature_flags.md#31",
+       "quote": "A",
+       "start": 449,
+       "end": 450,
+       "confidence": 0.989
+      },
+      "b": {
+       "document": "prometheus:docs/querying/api.md#7",
+       "quote": "It may only *lower* the effective duration ceiling, which is `query_max_duration` when set and otherwise the `-query.timeout` flag, never raise it: a higher value is rejected with HTTP 400 (`bad_data`) rather than silently clamped.",
+       "start": 2729,
+       "end": 2960,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0,
+   1,
+   2
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1,
+   2
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 66,
+   "passage_reads": 1,
+   "passages_ms": 306,
+   "passages": 13,
+   "counterparts_ms": 384
+  },
+  "timing": {
+   "read_ms": 755,
+   "total_ms": 761
+  }
+ }
+}

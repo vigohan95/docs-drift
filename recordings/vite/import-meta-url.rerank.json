@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/import-meta-url.rerank",
+ "recorded_at": "2026-11-06T13:29:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 923,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "44.902977",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=204"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `import.meta.url`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `import.meta.url`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/assets.md#7",
+    "title": "docs/guide/assets.md > Static Asset Handling > new URL(url, import.meta.url)",
+    "text": "## new URL(url, import.meta.url)\n\n[import.meta.url](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import.meta) is a native ESM feature that exposes the current module's URL. Combining it with the native [URL constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL), we can obtain the full, resolved URL of a static asset using relative path from a JavaScript module:\n\n```js\nconst imgUrl = new URL('./img.png', import.meta.url).href\n\ndocument.getElementById('hero-img').src = imgUrl\n```\n\nThis works natively in modern browsers - in fact, Vite doesn't need to process this code at all during development!\n\nThis pattern also supports dynamic URLs via template literals:\n\n```js\nfunction getImageUrl(name) {\n  // note that this does not include files in subdirectories\n  return new URL(`./dir/${name}.png`, import.meta.url).href\n}\n```\n\nDuring the production build, Vite will perform necessary transforms so that the URLs still point to the correct location even after bundling and asset hashing. However, the URL string must be static so it can be analyzed, otherwise the code will be left as is, which can cause runtime errors if `build.target` does not support `import.meta.url`.\n\n```js\n// Vite will not transform this\nconst imgUrl = new URL(imagePath, import.meta.url).href\n```\n\n::: details How it works\n\nVite will transform the `getImageUrl` function to:\n\n```js\nimport __img0png from './dir/img0.png'\nimport __img1png from './dir/img1.png'\n\nfunction getImageUrl(name) {\n  const modules = {\n    './dir/img0.png': __img0png,\n    './dir/img1.png': __img1png,\n  }\n  return new URL(modules[`./dir/${name}.png`], import.meta.url).href\n}\n```\n\n:::\n\n::: warning Does not work with SSR\nThis pattern does not work if you are using Vite for Server-Side Rendering, because `import.meta.url` has different semantics in browsers vs. Node.js. The server bundle also cannot determine the client host URL ahead of time.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/migration.md#15",
+    "title": "docs/guide/migration.md > Migration from v7 > Rolldown > `import.meta.url` in UMD / IIFE",
+    "text": "### `import.meta.url` in UMD / IIFE\n\n`import.meta.url` is no longer polyfilled in UMD / IIFE output formats. It will be replaced with `undefined` by default. If you prefer the previous behavior, you can use the [`define`](/config/shared-options#define) option with [`build.rolldownOptions.output.intro`](https://rolldown.rs/reference/OutputOptions.intro) option. See Rolldown's docs for more details: [Well-known `import.meta` properties - Non ESM Output Formats | Rolldown](https://rolldown.rs/in-depth/non-esm-output-formats#well-known-import-meta-properties)."
+   },
+   {
+    "id": "vite:docs/config/build-options.md#2",
+    "title": "docs/config/build-options.md > Build Options > build.modulePreload",
+    "text": "## build.modulePreload\n\n- **Type:** `boolean | { polyfill?: boolean, resolveDependencies?: ResolveModulePreloadDependenciesFn }`\n- **Default:** `{ polyfill: true }`\n\nBy default, a [module preload polyfill](https://guybedford.com/es-module-preloading-integrity#modulepreload-polyfill) is automatically injected. The polyfill is auto injected into the proxy module of each `index.html` entry. If the build is configured to use a non-HTML custom entry via `build.rolldownOptions.input`, then it is necessary to manually import the polyfill in your custom entry:\n\n```js\nimport 'vite/modulepreload-polyfill'\n```\n\nNote: the polyfill does **not** apply to [Library Mode](/guide/build#library-mode). If you need to support browsers without native dynamic import, you should probably avoid using it in your library.\n\nThe polyfill can be disabled using `{ polyfill: false }`.\n\nThe list of chunks to preload for each dynamic import is computed by Vite. By default, an absolute path including the `base` will be used when loading these dependencies. If the `base` is relative (`''` or `'./'`), `import.meta.url` is used at runtime to avoid absolute paths that depend on the final deployed base.\n\nThere is experimental support for fine grained control over the dependencies list and their paths using the `resolveDependencies` function. [Give Feedback](https://github.com/vitejs/vite/discussions/13841). It expects a function of type `ResolveModulePreloadDependenciesFn`:"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/migration.md#15",
+    "action": "use",
+    "relevance_score": 0.9943,
+    "document_score": 0.9959,
+    "levels": {
+     "answers": 0.9943,
+     "elsewhere": 0.0016,
+     "different_case": 0.0017,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/assets.md#7",
+    "action": "use",
+    "relevance_score": 0.9525,
+    "document_score": 0.969,
+    "levels": {
+     "answers": 0.9525,
+     "elsewhere": 0.0166,
+     "different_case": 0.02,
+     "unrelated": 0.011
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/config/build-options.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0221,
+    "document_score": 0.3567,
+    "levels": {
+     "answers": 0.0221,
+     "elsewhere": 0.3346,
+     "different_case": 0.0659,
+     "unrelated": 0.5774
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1345
+  },
+  "timing": {
+   "total_ms": 85,
+   "rerank_ms": 84,
+   "questions_ms": 0,
+   "model_ms": 42,
+   "engine": {
+    "rows": 1750,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 42,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 41,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/appType.rerank",
+ "recorded_at": "2026-11-06T13:30:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 852,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "35.815647",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=165"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `appType`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `appType`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/cli.md#9",
+    "title": "docs/guide/cli.md > Command Line Interface > Others > `vite preview`",
+    "text": "### `vite preview`\n\nLocally preview the production build. Do not use this as a production server as it's not designed for it.\n\nThis command starts a server in the build directory (by default `dist`). Run `vite build` beforehand to ensure that the build directory is up-to-date. Depending on the project's configured [`appType`](/config/shared-options#apptype), it makes use of certain middleware."
+   },
+   {
+    "id": "vite:docs/config/server-options.md#16",
+    "title": "docs/config/server-options.md > Server Options > server.middlewareMode",
+    "text": "## server.middlewareMode\n\n- **Type:** `boolean | { server: http.Server }`\n- **Default:** `false`\n\nCreate Vite server in middleware mode.\n\nIf [proxy](./server-options#server-proxy) is setup for WebSocket, the `server` should be provided to bind the proxy correctly.\n\n- **Related:** [appType](./shared-options#apptype), [SSR - Setting Up the Dev Server](/guide/ssr#setting-up-the-dev-server)\n\n- **Example:**\n\n```js twoslash\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    // don't include Vite's default HTML handling middlewares\n    appType: 'custom',\n  })\n  // Use vite's connect instance as middleware\n  app.use(vite.middlewares)\n\n  app.use('*', async (req, res) => {\n    // Since `appType` is `'custom'`, should serve response here.\n    // Note: if `appType` is `'spa'` or `'mpa'`, Vite includes middlewares\n    // to handle HTML requests and 404s so user middlewares should be added\n    // before Vite's middlewares to take effect instead\n  })\n}\n\ncreateServer()\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/cli.md#9",
+    "action": "expand",
+    "relevance_score": 0.0075,
+    "document_score": 0.8633,
+    "levels": {
+     "answers": 0.0075,
+     "elsewhere": 0.8558,
+     "different_case": 0.0194,
+     "unrelated": 0.1172
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/config/server-options.md#16",
+    "action": "expand",
+    "relevance_score": 0.0064,
+    "document_score": 0.5376,
+    "levels": {
+     "answers": 0.0064,
+     "elsewhere": 0.5312,
+     "different_case": 0.0394,
+     "unrelated": 0.4231
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 601
+  },
+  "timing": {
+   "total_ms": 40,
+   "rerank_ms": 39,
+   "questions_ms": 0,
+   "model_ms": 33,
+   "engine": {
+    "rows": 871,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1024,
+    "long": 0,
+    "total_ms": 33,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 30,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

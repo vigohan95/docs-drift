@@ -1,0 +1,163 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/build-target.rerank",
+ "recorded_at": "2026-11-06T13:30:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 973,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "70.773315",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=225"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `build.target`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `build.target`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/assets.md#7",
+    "title": "docs/guide/assets.md > Static Asset Handling > new URL(url, import.meta.url)",
+    "text": "## new URL(url, import.meta.url)\n\n[import.meta.url](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import.meta) is a native ESM feature that exposes the current module's URL. Combining it with the native [URL constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL), we can obtain the full, resolved URL of a static asset using relative path from a JavaScript module:\n\n```js\nconst imgUrl = new URL('./img.png', import.meta.url).href\n\ndocument.getElementById('hero-img').src = imgUrl\n```\n\nThis works natively in modern browsers - in fact, Vite doesn't need to process this code at all during development!\n\nThis pattern also supports dynamic URLs via template literals:\n\n```js\nfunction getImageUrl(name) {\n  // note that this does not include files in subdirectories\n  return new URL(`./dir/${name}.png`, import.meta.url).href\n}\n```\n\nDuring the production build, Vite will perform necessary transforms so that the URLs still point to the correct location even after bundling and asset hashing. However, the URL string must be static so it can be analyzed, otherwise the code will be left as is, which can cause runtime errors if `build.target` does not support `import.meta.url`.\n\n```js\n// Vite will not transform this\nconst imgUrl = new URL(imagePath, import.meta.url).href\n```\n\n::: details How it works\n\nVite will transform the `getImageUrl` function to:\n\n```js\nimport __img0png from './dir/img0.png'\nimport __img1png from './dir/img1.png'\n\nfunction getImageUrl(name) {\n  const modules = {\n    './dir/img0.png': __img0png,\n    './dir/img1.png': __img1png,\n  }\n  return new URL(modules[`./dir/${name}.png`], import.meta.url).href\n}\n```\n\n:::\n\n::: warning Does not work with SSR\nThis pattern does not work if you are using Vite for Server-Side Rendering, because `import.meta.url` has different semantics in browsers vs. Node.js. The server bundle also cannot determine the client host URL ahead of time.\n:::"
+   },
+   {
+    "id": "vite:docs/guide/build.md#1",
+    "title": "docs/guide/build.md > Building for Production > Browser Compatibility",
+    "text": "## Browser Compatibility\n\nBy default, the production bundle targets the minimum browser versions compatible with [Baseline](https://web-platform-dx.github.io/baseline/) Widely Available as of a date fixed for each major release. The default browser support range for this major is:\n\n<!-- Search for the `ESBUILD_BASELINE_WIDELY_AVAILABLE_TARGET` constant for more information -->\n\n- Chrome >=111\n- Edge >=111\n- Firefox >=114\n- Safari >=16.4\n\nYou can specify custom targets via the [`build.target` config option](/config/build-options.md#build-target), where the lowest target is `es2015`. If a lower target is set, Vite will still require these minimum browser support ranges as it relies on [native ESM dynamic import](https://caniuse.com/es6-module-dynamic-import), and [`import.meta`](https://caniuse.com/mdn-javascript_operators_import_meta):\n\n<!-- Search for the `defaultEsbuildSupported` constant for more information -->\n\n- Chrome >=64\n- Firefox >=67\n- Safari >=11.1\n- Edge >=79\n\nNote that by default, Vite only handles syntax transforms and **does not cover polyfills**. You can check out https://cdnjs.cloudflare.com/polyfill/ which automatically generates polyfill bundles based on the user's browser UserAgent string.\n\nLegacy browsers can be supported via [@vitejs/plugin-legacy](https://github.com/vitejs/vite/tree/main/packages/plugin-legacy), which will automatically generate legacy chunks and corresponding ES language feature polyfills. The legacy chunks are conditionally loaded only in browsers that do not have native ESM support."
+   },
+   {
+    "id": "vite:docs/guide/features.md#8",
+    "title": "docs/guide/features.md > Features > TypeScript > TypeScript Compiler Options > `target`",
+    "text": "#### `target`\n\n- [TypeScript documentation](https://www.typescriptlang.org/tsconfig#target)\n\nVite ignores the `target` value in the `tsconfig.json`, following the same behavior as [esbuild](https://esbuild.github.io/).\n\nTo specify the target in dev, the [`oxc.target`](/config/shared-options.html#oxc) option can be used, which defaults to `esnext` for minimal transpilation. In builds, the [`build.target`](/config/build-options.html#build-target) option takes higher priority over `oxc.target` and can also be set if needed."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#1",
+    "title": "docs/guide/migration.md > Migration from v7 > Default Browser Target Change [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)",
+    "text": "## Default Browser Target Change [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)\n\nThe default browser values of `build.target` and `'baseline-widely-available'` are updated to newer browser versions:\n\n- Chrome 107 → 111\n- Edge 107 → 111\n- Firefox 104 → 114\n- Safari 16.0 → 16.4\n\nThese browser versions align with [Baseline Widely Available](https://web-platform-dx.github.io/baseline/) feature sets as of 2026-01-01. In other words, they were all released about two and a half years ago."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#22",
+    "title": "docs/guide/migration.md > Migration from v7 > Advanced",
+    "text": "## Advanced\n\nThese breaking changes are expected to only affect a minority of use cases:\n\n- [Extglobs](https://github.com/micromatch/picomatch/blob/master/README.md#extglobs) are not supported yet ([rolldown-vite#365](https://github.com/vitejs/rolldown-vite/issues/365))\n- TypeScript legacy namespace is only supported partially. See [Oxc Transformer's related documentation](https://oxc.rs/docs/guide/usage/transformer/typescript.html#partial-namespace-support) for more details.\n- `define` does not share reference for objects: When you pass an object as a value to `define`, each variable will have a separate copy of the object. See [Oxc Transformer's related documentation](https://oxc.rs/docs/guide/usage/transformer/global-variable-replacement#define) for more details.\n- `bundle` object changes (`bundle` is an object passed in `generateBundle` / `writeBundle` hooks, returned by `build` function):\n  - Assigning to `bundle[foo]` is not supported. This is discouraged by Rollup as well. Please use `this.emitFile()` instead.\n  - the reference is not shared across the hooks ([rolldown-vite#410](https://github.com/vitejs/rolldown-vite/issues/410))\n  - `structuredClone(bundle)` errors with `DataCloneError: #<Object> could not be cloned`. This is not supported anymore. Please clone it with `structuredClone({ ...bundle })`. ([rolldown-vite#128](https://github.com/vitejs/rolldown-vite/issues/128))\n- All parallel hooks in Rollup work as sequential hooks. See [Rolldown's documentation](https://rolldown.rs/apis/plugin-api#sequential-hook-execution) for more details.\n- `\"use strict\";` is not injected sometimes. See [Rolldown's documentation](https://rolldown.rs/in-depth/directives) for more details.\n- Transforming to ES5 and below with plugin-legacy is not supported ([rolldown-vite#452](https://github.com/vitejs/rolldown-vite/issues/452))\n- Passing the same browser with multiple versions of it to `build.target` option now errors: esbuild selects the latest version of it, which was probably not what you intended.\n- Missing support by Rolldown: The following features are not supported by Rolldown and are no longer supported by Vite.\n  - `build.rollupOptions.output.format: 'system'` ([rolldown#2387](https://github.com/rolldown/rolldown/issues/2387))\n  - `build.rollupOptions.output.format: 'amd'` ([rolldown#2528](https://github.com/rolldown/rolldown/issues/2528))\n  - `shouldTransformCachedModule` hook ([rolldown#4389](https://github.com/rolldown/rolldown/issues/4389))\n  - `resolveImportMeta` hook ([rolldown#1010](https://github.com/rolldown/rolldown/issues/1010))\n  - `renderDynamicImport` hook ([rolldown#4532](https://github.com/rolldown/rolldown/issues/4532))\n  - `resolveFileUrl` hook\n- `parseAst` / `parseAstAsync` functions are now deprecated in favor of `parseSync` / `parse` functions which have more features.\n- comments are removed before the `renderChunk` hook instead of after the `renderChunk` hook\n- comments other than the ones listed [here](https://rolldown.rs/reference/OutputOptions.comments) are moved, while Rollup only removes comments if the adjacent code is removed"
+   },
+   {
+    "id": "vite:docs/config/build-options.md#9",
+    "title": "docs/config/build-options.md > Build Options > build.cssTarget",
+    "text": "## build.cssTarget\n\n- **Type:** `string | string[]`\n- **Default:** the same as [`build.target`](#build-target)\n\nThis option allows users to set a different browser target for CSS minification from the one used for JavaScript transpilation.\n\nWhen `build.cssMinify` is `'lightningcss'` (the default), this option takes precedence over [`css.lightningcss.targets`](./shared-options.md#css-lightningcss) for the minification step.\n\nIt should only be used when you are targeting a non-mainstream browser.\nOne example is Android WeChat WebView, which supports most modern JavaScript features but not the [`#RGBA` hexadecimal color notation in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#rgb_colors).\nIn this case, you need to set `build.cssTarget` to `chrome61` to prevent Vite from transforming `rgba()` colors into `#RGBA` hexadecimal notations."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/build.md#1",
+    "action": "use",
+    "relevance_score": 0.9928,
+    "document_score": 0.9953,
+    "levels": {
+     "answers": 0.9928,
+     "elsewhere": 0.0025,
+     "different_case": 0.0025,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/guide/migration.md#22",
+    "action": "use",
+    "relevance_score": 0.983,
+    "document_score": 0.9884,
+    "levels": {
+     "answers": 0.983,
+     "elsewhere": 0.0055,
+     "different_case": 0.0067,
+     "unrelated": 0.0048
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/guide/migration.md#1",
+    "action": "use",
+    "relevance_score": 0.9807,
+    "document_score": 0.9871,
+    "levels": {
+     "answers": 0.9807,
+     "elsewhere": 0.0063,
+     "different_case": 0.0066,
+     "unrelated": 0.0063
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/features.md#8",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0112,
+    "document_score": 0.1641,
+    "levels": {
+     "answers": 0.0112,
+     "elsewhere": 0.1529,
+     "different_case": 0.0278,
+     "unrelated": 0.808
+    }
+   },
+   {
+    "index": 5,
+    "id": "vite:docs/config/build-options.md#9",
+    "action": "expand",
+    "relevance_score": 0.0098,
+    "document_score": 0.922,
+    "levels": {
+     "answers": 0.0098,
+     "elsewhere": 0.9122,
+     "different_case": 0.0189,
+     "unrelated": 0.0591
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/assets.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0042,
+    "document_score": 0.0153,
+    "levels": {
+     "answers": 0.0042,
+     "elsewhere": 0.0111,
+     "different_case": 0.0242,
+     "unrelated": 0.9605
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2907
+  },
+  "timing": {
+   "total_ms": 89,
+   "rerank_ms": 75,
+   "questions_ms": 0,
+   "model_ms": 65,
+   "engine": {
+    "rows": 3717,
+    "branches": 6,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 65,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 62,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

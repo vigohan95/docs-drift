@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "vite/server-moduleGraph.compare",
+ "recorded_at": "2026-11-06T13:30:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1107,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "132.057762",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=408"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment.md#7",
+    "text": "## Backward Compatibility\n\nThe current Vite server API is not yet deprecated and is backward compatible with Vite 5.\n\nThe `server.moduleGraph` returns a mixed view of the client and ssr module graphs. Backward compatible mixed module nodes will be returned from all its methods. The same scheme is used for the module nodes passed to `handleHotUpdate`.\n\nWe don't recommend switching to Environment API yet. We are aiming for a good portion of the user base to adopt Vite 6 before so plugins don't need to maintain two versions. Checkout the future breaking changes section for information on future deprecations and upgrade path:\n\n- [`this.environment` in Hooks](/changes/this-environment-in-hooks)\n- [HMR `hotUpdate` Plugin Hook](/changes/hotupdate-hook)\n- [Move to Per-environment APIs](/changes/per-environment-apis)\n- [SSR Using `ModuleRunner` API](/changes/ssr-using-modulerunner)\n- [Shared Plugins During Build](/changes/shared-plugins-during-build)"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-instances.md#4",
+    "text": "## Separate Module Graphs\n\nEach environment has an isolated module graph. All module graphs have the same signature, so generic algorithms can be implemented to crawl or query the graph without depending on the environment. `hotUpdate` is a good example. When a file is modified, the module graph of each environment will be used to discover the affected modules and perform HMR for each environment independently.\n\n::: info\nVite v5 had a mixed Client and SSR module graph. Given an unprocessed or invalidated node, it isn't possible to know if it corresponds to the Client, SSR, or both environments. Module nodes have some properties prefixed, like `clientImportedModules` and `ssrImportedModules` (and `importedModules` that returns the union of both). `importers` contains all importers from both the Client and SSR environment for each module node. A module node also has `transformResult` and `ssrTransformResult`. A backward compatibility layer allows the ecosystem to migrate from the deprecated `server.moduleGraph`.\n:::\n\nEach module is represented by a `EnvironmentModuleNode` instance. Modules may be registered in the graph without yet being processed (`transformResult` would be `null` in that case). `importers` and `importedModules` are also updated after the module is processed.\n\n```ts\nclass EnvironmentModuleNode {\n  environment: string\n\n  url: string\n  id: string | null = null\n  file: string | null = null\n\n  type: 'js' | 'css'\n\n  importers = new Set<EnvironmentModuleNode>()\n  importedModules = new Set<EnvironmentModuleNode>()\n  importedBindings: Map<string, Set<string>> | null = null\n\n  info?: ModuleInfo\n  meta?: Record<string, any>\n  transformResult: TransformResult | null = null\n\n  acceptedHmrDeps = new Set<EnvironmentModuleNode>()\n  acceptedHmrExports: Set<string> | null = null\n  isSelfAccepting?: boolean\n  lastHMRTimestamp = 0\n  lastInvalidationTimestamp = 0\n}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment.md#7",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/api-environment-instances.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-environment.md#7",
+    "b": "vite:docs/guide/api-environment-instances.md#4",
+    "relation": "overlapping",
+    "related": 0.9974,
+    "probabilities": {
+     "same": 0.0094,
+     "overlapping": 0.9826,
+     "conflicting": 0.0053,
+     "unrelated": 0.0026
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 146,
+   "passage_reads": 1,
+   "passages_ms": 112,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 258,
+   "total_ms": 261
+  }
+ }
+}

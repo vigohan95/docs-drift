@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/start-timestamp.rerank",
+ "recorded_at": "2026-11-06T13:29:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 949,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.014561",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=23,cfOrigin;dur=0,cfWorker;dur=241"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `start_timestamp`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `start_timestamp`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#2",
+    "title": "docs/configuration/unit_testing_rules.md > Test file format > `<test_group>`",
+    "text": "### `<test_group>`\n\n``` yaml\n# Series data\n[ interval: <duration> | default = evaluation_interval ]\ninput_series:\n  [ - <series> ]\n\n# Name of the test group\n[ name: <string> ]\n\n# Start timestamp for the test group. This sets the base time for all samples\n# and evaluations in this test group.\n# Accepts either a Unix timestamp (e.g., 1609459200) or an RFC3339 formatted\n# timestamp (e.g., \"2021-01-01T00:00:00Z\").\n# Default: 0 (Unix epoch: 1970-01-01 00:00:00 UTC)\n#\n# When set:\n# - All input_series samples are timestamped starting from start_timestamp\n# - The eval_time in test cases is relative to start_timestamp\n# - The time() function returns start_timestamp + eval_time\n[ start_timestamp: <int> | <rfc3339_string> | default = 0 ]\n\n# Unit tests for the above data.\n\n# Unit tests for alerting rules. We consider the alerting rules from the input file.\nalert_rule_test:\n  [ - <alert_test_case> ]\n\n# Unit tests for PromQL expressions.\npromql_expr_test:\n  [ - <promql_test_case> ]\n\n# External labels accessible to the alert template.\nexternal_labels:\n  [ <labelname>: <string> ... ]\n\n# External URL accessible to the alert template.\n# Usually set using --web.external-url.\n  [ external_url: <string> ]\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "title": "docs/configuration/unit_testing_rules.md > Example > Time within tests",
+    "text": "### Time within tests\n\nIt should be noted that in all tests, either in `alert_test_case` or\n`promql_test_case`, the output from all functions related to the current time,\nfor example the `time()` and `day_of_*()` functions, will output a consistent value\nfor tests.\n\nBy default, at the start of the test evaluation, `time()` returns 0 (Unix epoch:\nJanuary 1, 1970 00:00:00 UTC). The `eval_time` field specifies a duration relative\nto `start_timestamp`, so by default `time()` will return a value of `0 + eval_time`.\n\nYou can configure a custom start timestamp for your tests by setting the `start_timestamp`\nfield in your test group. This field accepts either:\n- A Unix timestamp (e.g., `1609459200` for January 1, 2021 00:00:00 UTC)\n- An RFC3339 formatted timestamp (e.g., `\"2021-01-01T00:00:00Z\"`)\n\nWhen you set `start_timestamp`:\n- All `input_series` samples will be timestamped starting from `start_timestamp`\n- The `eval_time` field in test cases is interpreted as a duration relative to `start_timestamp`\n- The `time()` function will return `start_timestamp + eval_time`"
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#60",
+    "title": "docs/querying/functions.md > `start_timestamp()`",
+    "text": "## `start_timestamp()`\n\n`start_timestamp(v instant-vector)` returns the start timestamp of each of the samples of\nthe given vector as the number of seconds since January 1, 1970 UTC. It acts on\nfloat and histogram samples in the same way.\n\nThis function only works when used directly on an instant vector and when `use-start-timestamps` feature flag is enabled. Otherwise, if it's used on an expression or if `use-start-timestamps` is disabled, it returns empty results."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#2",
+    "action": "use",
+    "relevance_score": 0.9945,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9945,
+     "elsewhere": 0.0013,
+     "different_case": 0.0016,
+     "unrelated": 0.0026
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/unit_testing_rules.md#12",
+    "action": "use",
+    "relevance_score": 0.9914,
+    "document_score": 0.9942,
+    "levels": {
+     "answers": 0.9914,
+     "elsewhere": 0.0027,
+     "different_case": 0.0033,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/functions.md#60",
+    "action": "use",
+    "relevance_score": 0.9812,
+    "document_score": 0.9889,
+    "levels": {
+     "answers": 0.9812,
+     "elsewhere": 0.0077,
+     "different_case": 0.0062,
+     "unrelated": 0.0049
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1120
+  },
+  "timing": {
+   "total_ms": 56,
+   "rerank_ms": 55,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1525,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

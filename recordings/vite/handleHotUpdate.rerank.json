@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/handleHotUpdate.rerank",
+ "recorded_at": "2026-11-06T13:29:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 986,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "47.716766",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=246"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `handleHotUpdate`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `handleHotUpdate`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment.md#7",
+    "title": "docs/guide/api-environment.md > Environment API > Backward Compatibility",
+    "text": "## Backward Compatibility\n\nThe current Vite server API is not yet deprecated and is backward compatible with Vite 5.\n\nThe `server.moduleGraph` returns a mixed view of the client and ssr module graphs. Backward compatible mixed module nodes will be returned from all its methods. The same scheme is used for the module nodes passed to `handleHotUpdate`.\n\nWe don't recommend switching to Environment API yet. We are aiming for a good portion of the user base to adopt Vite 6 before so plugins don't need to maintain two versions. Checkout the future breaking changes section for information on future deprecations and upgrade path:\n\n- [`this.environment` in Hooks](/changes/this-environment-in-hooks)\n- [HMR `hotUpdate` Plugin Hook](/changes/hotupdate-hook)\n- [Move to Per-environment APIs](/changes/per-environment-apis)\n- [SSR Using `ModuleRunner` API](/changes/ssr-using-modulerunner)\n- [Shared Plugins During Build](/changes/shared-plugins-during-build)"
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `handleHotUpdate`",
+    "text": "### `handleHotUpdate`\n\n- **Type:** `(ctx: HmrContext) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [HMR API](./api-hmr)\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Perform custom HMR update handling. The hook receives a context object with the following signature:\n\n  ```ts\n  interface HmrContext {\n    file: string\n    timestamp: number\n    modules: Array<ModuleNode>\n    read: () => string | Promise<string>\n    server: ViteDevServer\n  }\n  ```\n\n  - `modules` is an array of modules that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n  - `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior.\n\n  The hook can choose to:\n  - Filter and narrow down the affected module list so that the HMR is more accurate.\n\n  - Return an empty array and perform a full reload:\n\n    ```js\n    handleHotUpdate({ server, modules, timestamp }) {\n      // Invalidate modules manually\n      const invalidatedModules = new Set()\n      for (const mod of modules) {\n        server.moduleGraph.invalidateModule(\n          mod,\n          invalidatedModules,\n          timestamp,\n          true\n        )\n      }\n      server.ws.send({ type: 'full-reload' })\n      return []\n    }\n    ```"
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#0",
+    "title": "docs/changes/hotupdate-hook.md > HMR `hotUpdate` Plugin Hook",
+    "text": "# HMR `hotUpdate` Plugin Hook\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nWe're planning to deprecate the `handleHotUpdate` plugin hook in favor of [`hotUpdate` hook](/guide/api-environment-plugins#the-hotupdate-hook) to be [Environment API](/guide/api-environment.md) aware, and handle additional watch events with `create` and `delete`.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`hotUpdate` was first introduced in `v6.0`. The deprecation of `handleHotUpdate` is planned for a future major. We don't recommend moving away from `handleHotUpdate` yet. If you want to experiment and give us feedback, you can use the `future.removePluginHookHandleHotUpdate` to `\"warn\"` in your vite config.\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "action": "use",
+    "relevance_score": 0.7742,
+    "document_score": 0.9065,
+    "levels": {
+     "answers": 0.7742,
+     "elsewhere": 0.1323,
+     "different_case": 0.0249,
+     "unrelated": 0.0686
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/changes/hotupdate-hook.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0211,
+    "document_score": 0.1423,
+    "levels": {
+     "answers": 0.0211,
+     "elsewhere": 0.1212,
+     "different_case": 0.0358,
+     "unrelated": 0.8219
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0072,
+    "document_score": 0.0951,
+    "levels": {
+     "answers": 0.0072,
+     "elsewhere": 0.0879,
+     "different_case": 0.039,
+     "unrelated": 0.8659
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1144
+  },
+  "timing": {
+   "total_ms": 53,
+   "rerank_ms": 52,
+   "questions_ms": 0,
+   "model_ms": 44,
+   "engine": {
+    "rows": 1549,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 44,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

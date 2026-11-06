@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/api-v1-query-cost.rerank",
+ "recorded_at": "2026-11-06T13:30:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 894,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.74992",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=179"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `/api/v1/query_cost`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `/api/v1/query_cost`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#30",
+    "title": "docs/feature_flags.md > Query cost",
+    "text": "## Query cost\n\n`--enable-feature=query-cost`\n\nEnables query cost estimation and enforcement. When set, Prometheus exposes the\n[`/api/v1/query_cost` and `/api/v1/query_range_cost`](querying/api.md#query-cost)\nendpoints, which provide a pre-execution *estimate* of the resource cost of a\nquery (series touched and samples read) without executing it, and the instant\nand range query endpoints accept a `cost=true` boolean parameter that adds an\nestimated-versus-actual cost comparison to the response. Estimation enumerates matching index entries and samples a bounded amount of\nchunk data. Both values can overestimate or underestimate actual cost; the\nestimate is informational only and is never used to reject a query. Queries\nusing `info()` return a warning because its runtime-dependent additional reads\nare omitted from the estimate.\n\nThis flag also activates enforcement of the reloadable cost limits configured\nunder the `global:` section of the\n[configuration file](configuration/configuration.md#configuration-file):\n`query_max_series`, `query_max_samples_read`, and `query_max_duration`. These\nlimits are enforced *during* query execution against the query's actual running\ncost: a query is rejected as soon as the number of series it loads or the number\nof samples it reads exceeds the configured limit, and `query_max_duration`\nsurfaces as a query timeout. The limits are reloaded together with the rest of\nthe configuration and have no effect when the feature flag is not set."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#12",
+    "title": "docs/querying/api.md > Query cost",
+    "text": "## Query cost\n\n*The query cost endpoints require the [`query-cost`](../feature_flags.md#query-cost) feature flag.*\n\nThe following endpoints estimate the resource cost of a query *without executing\nit*, allowing clients to gauge how expensive a query would be before running it:\n\n```\nGET /api/v1/query_cost\nPOST /api/v1/query_cost\nGET /api/v1/query_range_cost\nPOST /api/v1/query_range_cost\n```\n\n`/api/v1/query_cost` accepts the same URL query parameters as\n[`/api/v1/query`](#instant-queries), and `/api/v1/query_range_cost` accepts the\nsame parameters as [`/api/v1/query_range`](#range-queries), so a request accepted\nby one endpoint is accepted by the other. The parameters that only shape the\nresponse of an executed query (`limit`, `stats` and `cost`) are validated in the\nsame way and then ignored, since these endpoints return no query result. As with\nthe other query endpoints, parameters may be URL-encoded in the request body\nusing the `POST` method with a `Content-Type: application/x-www-form-urlencoded`\nheader.\n\nThe `data` section of the response has the following format:\n\n```json\n{\n  \"estimate\": {\n    \"seriesTouched\": <number>,\n    \"samplesRead\": <number>\n  }\n}\n```\n\n- `seriesTouched`: the number of series the query reads, summed per selector.\n- `samplesRead`: an estimate of the `samplesRead`\n  [query statistic](#query-statistics), the samples the evaluator reads in the\n  engine's sample units, rather than the peak number of samples in memory."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/api.md#12",
+    "action": "use",
+    "relevance_score": 0.8915,
+    "document_score": 0.9423,
+    "levels": {
+     "answers": 0.8915,
+     "elsewhere": 0.0508,
+     "different_case": 0.0318,
+     "unrelated": 0.0259
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/feature_flags.md#30",
+    "action": "use",
+    "relevance_score": 0.6368,
+    "document_score": 0.8976,
+    "levels": {
+     "answers": 0.6368,
+     "elsewhere": 0.2609,
+     "different_case": 0.0364,
+     "unrelated": 0.066
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 933
+  },
+  "timing": {
+   "total_ms": 59,
+   "rerank_ms": 44,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1171,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

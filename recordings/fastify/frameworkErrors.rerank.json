@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/frameworkErrors.rerank",
+ "recorded_at": "2026-11-06T13:29:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 945,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.470016",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=210"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `frameworkErrors`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `frameworkErrors`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Routes.md#21",
+    "title": "docs/Reference/Routes.md > Routes > Constraints > Asynchronous Custom Constraints",
+    "text": "#### Asynchronous Custom Constraints\n\nCustom constraints can be provided, and the `constraint` criteria can be\nfetched from another source such as a database. Use asynchronous custom\nconstraints as a last resort, as they impact router performance.\n\n```js\nfunction databaseOperation(field, done) {\n  done(null, field)\n}\n\nconst secret = {\n  // strategy name for referencing in the route handler `constraints` options\n  name: 'secret',\n  // storage factory for storing routes in the find-my-way route tree\n  storage: function () {\n    let handlers = {}\n    return {\n      get: (type) => { return handlers[type] || null },\n      set: (type, store) => { handlers[type] = store }\n    }\n  },\n  // function to get the value of the constraint from each incoming request\n  deriveConstraint: (req, ctx, done) => {\n    databaseOperation(req.headers['secret'], done)\n  },\n  // optional flag marking if handlers without constraints can match requests that have a value for this constraint\n  mustMatchWhenDerived: true\n}\n```\n\n> ⚠ Warning:\n> When using asynchronous constraints, avoid returning errors inside the\n> callback. If errors are unavoidable, provide a custom `frameworkErrors`\n> handler to manage them. Otherwise, route selection may break or expose\n> sensitive information.\n>\n> ```js\n> const Fastify = require('fastify')\n>\n> const fastify = Fastify({\n>   frameworkErrors: function (err, req, res) {\n>     if (err instanceof Fastify.errorCodes.FST_ERR_ASYNC_CONSTRAINT) {\n>       res.code(400)\n>       return res.send(\"Invalid header provided\")\n>     } else {\n>       res.send(err)\n>     }\n>   }\n> })\n> ```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "title": "docs/Reference/Server.md > Factory",
+    "text": "## Factory\n<a id=\"factory\"></a>\n\nThe Fastify module exports a factory function that is used to create new\n<code><b>Fastify server</b></code> instances. This factory function accepts an\noptions object which is used to customize the resulting instance. This document\ndescribes the properties available in that options object.\n\n- [Factory](#factory)\n  - [`http`](#http)\n  - [`http2`](#http2)\n  - [`https`](#https)\n  - [`connectionTimeout`](#connectiontimeout)\n  - [`keepAliveTimeout`](#keepalivetimeout)\n  - [`forceCloseConnections`](#forcecloseconnections)\n  - [`maxRequestsPerSocket`](#maxrequestspersocket)\n  - [`requestTimeout`](#requesttimeout)\n  - [`bodyLimit`](#bodylimit)\n  - [`onProtoPoisoning`](#onprotopoisoning)\n  - [`onConstructorPoisoning`](#onconstructorpoisoning)\n  - [`logger`](#logger)\n  - [`loggerInstance`](#loggerinstance)\n  - [`logController`](#logcontroller)\n  - [`serverFactory`](#serverfactory)\n  - [`requestIdHeader`](#requestidheader)\n  - [`genReqId`](#genreqid)\n  - [`trustProxy`](#trustproxy)\n  - [`pluginTimeout`](#plugintimeout)\n  - [`exposeHeadRoutes`](#exposeheadroutes)\n  - [`return503OnClosing`](#return503onclosing)\n  - [`ajv`](#ajv)\n  - [`serializerOpts`](#serializeropts)\n  - [`http2SessionTimeout`](#http2sessiontimeout)\n  - [`frameworkErrors`](#frameworkerrors)\n  - [`clientErrorHandler`](#clienterrorhandler)\n  - [`rewriteUrl`](#rewriteurl)\n  - [`allowErrorHandlerOverride`](#allowerrorhandleroverride)\n  - [RouterOptions](#routeroptions)\n    - [`allowUnsafeRegex`](#allowunsaferegex)\n    - [`buildPrettyMeta`](#buildprettymeta)\n    - [`caseSensitive`](#casesensitive)\n    - [`compile`](#compile)\n    - [`constraints`](#constraints)\n    - [`defaultRoute`](#defaultroute)\n    - [`ignoreDuplicateSlashes`](#ignoreduplicateslashes)\n    - [`ignoreTrailingSlash`](#ignoretrailingslash)\n    - [`maxParamLength`](#maxparamlength)\n    - [`onBadUrl`](#onbadurl)\n    - [`onMaxParamLength`](#onmaxparamlength)\n    - [`querystringParser`](#querystringparser)\n    - [`useSemicolonDelimiter`](#usesemicolondelimiter)\n- [Instance](#instance)\n  - [Server Methods](#server-methods)\n    - [server](#server)\n    - [after](#after)\n    - [ready](#ready)\n    - [listen](#listen)\n    - [addresses](#addresses)\n    - [routing](#routing)\n    - [route](#route)\n    - [hasRoute](#hasroute)\n    - [findRoute](#findroute)\n    - [close](#close)\n    - [decorate\\*](#decorate)\n    - [register](#register)\n    - [addHook](#addhook)\n    - [prefix](#prefix)\n    - [pluginName](#pluginname)\n    - [hasPlugin](#hasplugin)\n    - [listeningOrigin](#listeningorigin)\n    - [log](#log)\n    - [version](#version)\n    - [inject](#inject)\n    - [addHttpMethod](#addHttpMethod)\n    - [addSchema](#addschema)\n    - [getSchemas](#getschemas)\n    - [getSchema](#getschema)\n    - [setReplySerializer](#setreplyserializer)\n    - [setValidatorCompiler](#setvalidatorcompiler)\n    - [setSchemaErrorFormatter](#setschemaerrorformatter)\n    - [setSerializerCompiler](#setserializercompiler)\n    - [validatorCompiler](#validatorcompiler)\n    - [serializerCompiler](#serializercompiler)\n    - [schemaErrorFormatter](#schemaerrorformatter)\n    - [schemaController](#schemacontroller)\n    - [setNotFoundHandler](#setnotfoundhandler)\n    - [setErrorHandler](#seterrorhandler)\n    - [setChildLoggerFactory](#setchildloggerfactory)\n    - [setGenReqId](#setgenreqid)\n    - [addConstraintStrategy](#addconstraintstrategy)\n    - [hasConstraintStrategy](#hasconstraintstrategy)\n    - [printRoutes](#printroutes)\n    - [printPlugins](#printplugins)"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#31",
+    "title": "docs/Reference/Server.md > Factory > `frameworkErrors`",
+    "text": "### `frameworkErrors`\n<a id=\"framework-errors\"></a>\n\n+ Default: `null`\n\nFastify provides default error handlers for the most common use cases. It is\npossible to override one or more of those handlers with custom code using this\noption.\n\n> ℹ️ Note:\n> Only `FST_ERR_BAD_URL` and `FST_ERR_ASYNC_CONSTRAINT` are implemented at present.\n\n```js\nconst fastify = require('fastify')({\n  frameworkErrors: function (error, req, res) {\n    if (error instanceof FST_ERR_BAD_URL) {\n      res.code(400)\n      return res.send(\"Provided url is not valid\")\n    } else if(error instanceof FST_ERR_ASYNC_CONSTRAINT) {\n      res.code(400)\n      return res.send(\"Provided header is not valid\")\n    } else {\n      res.send(error)\n    }\n  }\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#31",
+    "action": "use",
+    "relevance_score": 0.9951,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9951,
+     "elsewhere": 0.0013,
+     "different_case": 0.0014,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Routes.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0323,
+    "document_score": 0.1271,
+    "levels": {
+     "answers": 0.0323,
+     "elsewhere": 0.0948,
+     "different_case": 0.0492,
+     "unrelated": 0.8237
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0033,
+    "document_score": 0.1042,
+    "levels": {
+     "answers": 0.0033,
+     "elsewhere": 0.1009,
+     "different_case": 0.0218,
+     "unrelated": 0.874
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1934
+  },
+  "timing": {
+   "total_ms": 79,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2339,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

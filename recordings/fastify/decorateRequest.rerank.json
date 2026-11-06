@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/decorateRequest.rerank",
+ "recorded_at": "2026-11-06T13:30:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 983,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.958942",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=24,cfOrigin;dur=0,cfWorker;dur=261"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `decorateRequest`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `decorateRequest`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Plugins-Guide.md#4",
+    "title": "docs/Guides/Plugins-Guide.md > The hitchhiker's guide to plugins > Decorators",
+    "text": "Let's step back for a moment and dig deeper into this: every time you use the\n`register` API, a new context is created that avoids the negative situations\nmentioned above.\n\nDo note that encapsulation applies to the ancestors and siblings, but not the\nchildren.\n```js\nfastify.register((instance, opts, done) => {\n  instance.decorate('util', (a, b) => a + b)\n  console.log(instance.util('that is ', 'awesome'))\n\n  instance.register((instance, opts, done) => {\n    console.log(instance.util('that is ', 'awesome')) // This will not throw an error\n    done()\n  })\n\n  done()\n})\n\nfastify.register((instance, opts, done) => {\n  console.log(instance.util('that is ', 'awesome')) // This will throw an error\n\n  done()\n})\n```\n*Take home message: if you need a utility that is available in every part of\nyour application, take care that it is declared in the root scope of your\napplication. If that is not an option,  you can use the `fastify-plugin` utility\nas described [here](#distribution).*\n\n`decorate` is not the only API that you can use to extend the server\nfunctionality, you can also use `decorateRequest` and `decorateReply`.\n\n*`decorateRequest` and `decorateReply`? Why do we need them if we already have\n`decorate`?*\n\nGood question, we added them to make Fastify more developer-friendly. Let's see\nan example:\n```js\nfastify.decorate('html', payload => {\n  return generateHtml(payload)\n})\n\nfastify.get('/html', (request, reply) => {\n  reply\n    .type('text/html')\n    .send(fastify.html({ hello: 'world' }))\n})\n```\nIt works, but it could be much better!\n```js\nfastify.decorateReply('html', function (payload) {\n  this.type('text/html') // This is the 'Reply' object\n  this.send(generateHtml(payload))\n})\n\nfastify.get('/html', (request, reply) => {\n  reply.html({ hello: 'world' })\n})\n```\nReminder that the `this` keyword is not available on *arrow functions*,\nso when passing functions in *`decorateReply`* and *`decorateRequest`* as\na utility that also needs access to the `request` and `reply` instance,\na function that is defined using the `function` keyword is needed instead\nof an *arrow function expression*."
+   },
+   {
+    "id": "fastify:docs/Reference/Decorators.md#5",
+    "title": "docs/Reference/Decorators.md > Decorators > Usage > `decorateRequest(name, value, [dependencies])`",
+    "text": "#### `decorateRequest(name, value, [dependencies])`\n<a id=\"decorate-request\"></a>\n\nAs with [`decorateReply`](#decorate-reply), this API adds new methods/properties\nto the core `Request` object:\n\n```js\nfastify.decorateRequest('utility', function () {\n  // something very useful\n})\n```\n\nUsing an arrow function will break the binding of `this` to the Fastify\n`Request` instance.\n\nUsing `decorateRequest` will emit an error if used with a reference type:\n\n```js\n// Don't do this\nfastify.decorateRequest('foo', { bar: 'fizz'})\n```\nIn this example, the object reference would be shared with all requests, and\n**any mutation will impact all requests, potentially creating security\nvulnerabilities or memory leaks**. Fastify blocks this.\n\nTo achieve proper encapsulation across requests configure a new value for each\nincoming request in the [`'onRequest'` hook](./Hooks.md#onrequest).\n\nExample:\n\n```js\nconst fp = require('fastify-plugin')\n\nasync function myPlugin (app) {\n  app.decorateRequest('foo')\n  app.addHook('onRequest', async (req, reply) => {\n    req.foo = { bar: 42 }\n  })\n}\n\nmodule.exports = fp(myPlugin)\n```\n\nThe hook solution is more flexible and allows for more complex initialization\nbecause more logic can be added to the `onRequest` hook.\n\nAnother approach is to use the getter/setter pattern, but it requires 2 decorators:\n\n```js\nfastify.decorateRequest('my_decorator_holder') // define the holder\nfastify.decorateRequest('user', {\n  getter () {\n    this.my_decorator_holder ??= {} // initialize the holder\n    return this.my_decorator_holder\n  }\n})\n\nfastify.get('/', async function (req, reply) {\n  req.user.access = 'granted'\n  // other code\n})\n```\n\nThis ensures that the `user` property is always unique for each request.\n\nSee [`decorate`](#decorate) for information about the `dependencies` parameter."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Decorators.md#5",
+    "action": "use",
+    "relevance_score": 0.994,
+    "document_score": 0.9959,
+    "levels": {
+     "answers": 0.994,
+     "elsewhere": 0.002,
+     "different_case": 0.0023,
+     "unrelated": 0.0017
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Plugins-Guide.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0132,
+    "document_score": 0.0917,
+    "levels": {
+     "answers": 0.0132,
+     "elsewhere": 0.0785,
+     "different_case": 0.0395,
+     "unrelated": 0.8688
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1265
+  },
+  "timing": {
+   "total_ms": 62,
+   "rerank_ms": 46,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1535,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

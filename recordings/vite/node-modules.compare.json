@@ -1,0 +1,169 @@
+{
+ "endpoint": "compare",
+ "tag": "vite/node-modules.compare",
+ "recorded_at": "2026-11-06T13:30:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1057,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "64.8584",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=37,cfOrigin;dur=0,cfWorker;dur=277"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/config/server-options.md#15",
+    "text": "## server.watch\n\n- **Type:** `object | null`\n\nFile system watcher options to pass on to [chokidar](https://github.com/paulmillr/chokidar/tree/3.6.0#api).\n\nWhen bundled-dev mode is enabled, [Rolldown watch options](https://rolldown.rs/reference/InputOptions.watch) (for example, `usePolling`, `pollInterval`, `useDebounce`, `debounceDuration`, `include`, `exclude`) are also accepted. The chokidar-only options are still used by the chokidar watcher, which keeps watching files outside the module graph, such as config file dependencies and env files.\n\nThe Vite server watcher watches the `root` and skips the `.git/`, `node_modules/`, `test-results/`, and Vite's `cacheDir` and `build.outDir` directories by default. When updating a watched file, Vite will apply HMR and update the page only if needed.\n\nIf set to `null`, no files will be watched. [`server.watcher`](/guide/api-javascript.html#vitedevserver) will provide a compatible event emitter, but calling `add` or `unwatch` will have no effect.\n\n::: warning Watching files in `node_modules`\n\nIt's currently not possible to watch files and packages in `node_modules`. For further progress and workarounds, you can follow [issue #8619](https://github.com/vitejs/vite/issues/8619).\n\n:::\n\n::: warning Using Vite on Windows Subsystem for Linux (WSL) 2\n\nWhen running Vite on WSL2, file system watching does not work when a file is edited by Windows applications (non-WSL2 process). This is due to [a WSL2 limitation](https://github.com/microsoft/WSL/issues/4739). This also applies to running on Docker with a WSL2 backend.\n\nTo fix it, you could either:\n\n- **Recommended**: Use WSL2 applications to edit your files.\n  - It is also recommended to move the project folder outside of a Windows filesystem. Accessing Windows filesystem from WSL2 is slow. Removing that overhead will improve performance.\n- Set `{ usePolling: true }`.\n  - Note that [`usePolling` leads to high CPU utilization](https://github.com/paulmillr/chokidar/tree/3.6.0#performance).\n\n:::"
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#1",
+    "text": "## optimizeDeps.entries <NonInheritBadge />\n\n- **Type:** `string | string[]`\n\nBy default, Vite will crawl all your `.html` files to detect dependencies that need to be pre-bundled (ignoring `node_modules`, `build.outDir`, `__tests__` and `coverage`). If the top-level [`input`](/config/shared-options#input) or `build.rolldownOptions.input` is specified, Vite will crawl those entry points instead.\n\nIf neither of these fit your needs, you can specify custom entries using this option - the value should be a [`tinyglobby` pattern](https://superchupu.dev/tinyglobby/comparison) or array of patterns that are relative from Vite project root. This will overwrite default entries inference. Only `node_modules` and `build.outDir` folders will be ignored by default when `optimizeDeps.entries` is explicitly defined. If other folders need to be ignored, you can use an ignore pattern as part of the entries list, marked with an initial `!`. `node_modules` will not be ignored for patterns that explicitly include the string `node_modules`."
+   },
+   {
+    "id": "vite:docs/config/server-options.md#21",
+    "text": "## server.sourcemapIgnoreList\n\n- **Type:** `false | (sourcePath: string, sourcemapPath: string) => boolean`\n- **Default:** `(sourcePath) => /(?:^|[\\\\/])node_modules(?:[\\\\/]|$)/.test(sourcePath)`\n\nWhether or not to ignore source files in the server sourcemap, used to populate the [`x_google_ignoreList` source map extension](https://developer.chrome.com/articles/x-google-ignore-list/).\n\n`server.sourcemapIgnoreList` is the equivalent of [`build.rolldownOptions.output.sourcemapIgnoreList`](https://rolldown.rs/reference/OutputOptions.sourcemapIgnoreList) for the dev server. A difference between the two config options is that the Rolldown function is called with a relative path for `sourcePath` while `server.sourcemapIgnoreList` is called with an absolute path. During dev, most modules have the map and the source in the same folder, so the relative path for `sourcePath` is the file name itself. In these cases, absolute paths make it convenient to be used instead.\n\nBy default, it excludes all paths that contain `node_modules` as a path segment. You can pass `false` to disable this behavior, or, for full control, a function that takes the source path and sourcemap path and returns whether to ignore the source path.\n\n```js\nexport default defineConfig({\n  server: {\n    // This is the default value, and will add all files that have\n    // node_modules as a path segment to the ignore list.\n    sourcemapIgnoreList(sourcePath, sourcemapPath) {\n      return /(?:^|[\\\\/])node_modules(?:[\\\\/]|$)/.test(sourcePath)\n    },\n  },\n})\n```\n\n::: tip Note\n[`server.sourcemapIgnoreList`](#server-sourcemapignorelist) and [`build.rolldownOptions.output.sourcemapIgnoreList`](https://rolldown.rs/reference/OutputOptions.sourcemapIgnoreList) need to be set independently. `server.sourcemapIgnoreList` is a server only config and doesn't get its default value from the defined Rolldown options.\n:::"
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#3",
+    "text": "## optimizeDeps.include <NonInheritBadge />\n\n- **Type:** `string[]`\n\nBy default, linked packages not inside `node_modules` are not pre-bundled. Use this option to force a linked package to be pre-bundled.\n\n**Experimental:** If you're using a library with many deep imports, you can also specify a trailing glob pattern to pre-bundle all deep imports at once. This will avoid constantly pre-bundling whenever a new deep import is used. [Give Feedback](https://github.com/vitejs/vite/discussions/15833). For example:\n\n```js twoslash\nimport { defineConfig } from 'vite'\n// ---cut---\nexport default defineConfig({\n  optimizeDeps: {\n    include: ['my-lib/components/**/*.vue'],\n  },\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/config/server-options.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/server-options.md#21",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/config/server-options.md#15",
+    "b": "vite:docs/config/dep-optimization-options.md#1",
+    "relation": "unrelated",
+    "related": 0.0287,
+    "probabilities": {
+     "same": 0.0086,
+     "overlapping": 0.0097,
+     "conflicting": 0.0104,
+     "unrelated": 0.9713
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/config/server-options.md#15",
+    "b": "vite:docs/config/server-options.md#21",
+    "relation": "unrelated",
+    "related": 0.0225,
+    "probabilities": {
+     "same": 0.0083,
+     "overlapping": 0.0075,
+     "conflicting": 0.0067,
+     "unrelated": 0.9775
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/config/server-options.md#15",
+    "b": "vite:docs/config/dep-optimization-options.md#3",
+    "relation": "unrelated",
+    "related": 0.0077,
+    "probabilities": {
+     "same": 0.0029,
+     "overlapping": 0.0027,
+     "conflicting": 0.002,
+     "unrelated": 0.9923
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/config/dep-optimization-options.md#1",
+    "b": "vite:docs/config/server-options.md#21",
+    "relation": "unrelated",
+    "related": 0.0067,
+    "probabilities": {
+     "same": 0.0028,
+     "overlapping": 0.0023,
+     "conflicting": 0.0017,
+     "unrelated": 0.9933
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/config/dep-optimization-options.md#1",
+    "b": "vite:docs/config/dep-optimization-options.md#3",
+    "relation": "unrelated",
+    "related": 0.0145,
+    "probabilities": {
+     "same": 0.005,
+     "overlapping": 0.0059,
+     "conflicting": 0.0035,
+     "unrelated": 0.9855
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "vite:docs/config/server-options.md#21",
+    "b": "vite:docs/config/dep-optimization-options.md#3",
+    "relation": "unrelated",
+    "related": 0.0056,
+    "probabilities": {
+     "same": 0.0023,
+     "overlapping": 0.0021,
+     "conflicting": 0.0012,
+     "unrelated": 0.9944
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 78
+  },
+  "timing": {
+   "read_ms": 78,
+   "total_ms": 83
+  }
+ }
+}

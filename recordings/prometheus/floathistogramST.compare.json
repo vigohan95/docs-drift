@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/floathistogramST.compare",
+ "recorded_at": "2026-11-06T13:30:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1058,
+ "response_headers": {
+  "x-clocked-credits": "7",
+  "x-clocked-model-ms": "160.281536",
+  "x-clocked-cost-usd": "0.001394",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=313"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#1",
+    "text": "# Chunk\n\n```\n┌───────────────┬───────────────────┬─────────────┬───────────────────┐\n│ len <uvarint> │ encoding <1 byte> │ data <data> │ checksum <4 byte> │\n└───────────────┴───────────────────┴─────────────┴───────────────────┘\n```\n\nNotes:\n\n* `len`: Chunk size in bytes. 1 to 5 bytes long using the [`<uvarint>` encoding](https://go.dev/src/encoding/binary/varint.go).\n* `encoding`: Currently one of `XOR`, `XOR2`, `histogram`, `floathistogram`, `histogramST`, or `floathistogramST`, see [code for numerical values](https://github.com/prometheus/prometheus/blob/02d0de9987ad99dee5de21853715954fadb3239f/tsdb/chunkenc/chunk.go#L28-L47). The `XOR2`, `histogramST`, and `floathistogramST` encodings extend their non-ST counterparts with optional Start Timestamp (ST) data. `XOR2` is selected by the [`storage.tsdb.chunk_encoding.floats`](../../../docs/configuration/configuration.md#tsdb) configuration field; `histogramST` and `floathistogramST` are gated behind the experimental [`histograms-st-encoding` feature flag](../../../docs/feature_flags.md#histogram-st-chunk-encoding).\n* `data`: See below for each encoding.\n* `checksum`: Checksum of `encoding` and `data`. It's a [cyclic redundancy check](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) with the Castagnoli polynomial, serialised as an unsigned 32 bits big endian number. Can be referred as a `CRC-32C`."
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#23",
+    "text": "## Histogram ST chunk encoding\n\n`--enable-feature=histograms-st-encoding`\n\n> WARNING: This is highly experimental and risky setting:\n> * Chunks encoded with `histogramST` and `floathistogramST` **cannot be read by older Prometheus versions** that do not support the encoding. Once enabled and data is written, you need to **manually delete blocks from the disk**, otherwise Prometheus will return error on all queries.\n> * We are still experimenting on the final encoding. As of now this encoding can change in any Prometheus version. All your persistent block data will be lost between versions.\n> * This encoding is new, meaning downstream tools and LTS systems might not support it yet (e.g. Thanos sidecar uploaded blocks).\n\nThis setting enables the new `histogramST` and `floathistogramST` chunk encodings for native histogram and float histogram samples. These encodings extend the corresponding histogram chunk formats with a Start Timestamp (ST) header and per-sample ST encoding, equivalent to what the [XOR2 encoding](configuration/configuration.md#tsdb) does for float chunks. The flag does not affect float chunks.\n\nThe [`st-storage`](#start-timestamp-st-native-storage) feature automatically enables these histogram encodings. When enabled without `st-storage`, Prometheus uses the ST-capable histogram chunk encodings but does not store start timestamps from ingestion."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/feature_flags.md#23"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#23",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:tsdb/docs/format/chunks.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:tsdb/docs/format/chunks.md#1",
+    "b": "prometheus:docs/feature_flags.md#23",
+    "relation": "overlapping",
+    "related": 0.9986,
+    "probabilities": {
+     "same": 0.0028,
+     "overlapping": 0.9933,
+     "conflicting": 0.0025,
+     "unrelated": 0.0014
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0077,
+       "restated": 0.9704,
+       "elaborated": 0.0116,
+       "different": 0.0104
+      },
+      "confidence": 0.9896,
+      "a": {
+       "document": "prometheus:tsdb/docs/format/chunks.md#1",
+       "quote": "The `XOR2`, `histogramST`, and `floathistogramST` encodings extend their non-ST counterparts with optional Start Timestamp (ST) data.",
+       "start": 637,
+       "end": 770,
+       "confidence": 1
+      },
+      "b": {
+       "document": "prometheus:docs/feature_flags.md#23",
+       "quote": "These encodings extend the corresponding histogram chunk formats with a Start Timestamp (ST) header and per-sample ST encoding, equivalent to what the [XOR2 encoding](configuration/configuration.md#tsdb) does for float chunks.",
+       "start": 861,
+       "end": 1087,
+       "confidence": 0.992
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 85,
+   "passages": 1,
+   "counterparts_ms": 52
+  },
+  "timing": {
+   "read_ms": 172,
+   "total_ms": 176
+  }
+ }
+}

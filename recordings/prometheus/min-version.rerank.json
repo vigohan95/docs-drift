@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/min-version.rerank",
+ "recorded_at": "2026-11-06T13:30:11Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 936,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.910561",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=221"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `min_version`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `min_version`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#16",
+    "title": "docs/configuration/configuration.md > Configuration file > `<tls_config>`",
+    "text": "### `<tls_config>`\n\nA `tls_config` allows configuring TLS connections.\n\n```yaml\n# CA certificate to validate API server certificate with. At most one of ca and ca_file is allowed.\n[ ca: <string> ]\n[ ca_file: <filename> ]\n\n# Certificate and key for client cert authentication to the server.\n# At most one of cert and cert_file is allowed.\n# At most one of key and key_file is allowed.\n[ cert: <string> ]\n[ cert_file: <filename> ]\n[ key: <secret> ]\n[ key_file: <filename> ]\n\n# ServerName extension to indicate the name of the server.\n# https://tools.ietf.org/html/rfc4366#section-3.1\n[ server_name: <string> ]\n\n# Disable validation of the server certificate.\n[ insecure_skip_verify: <boolean> ]\n\n# Minimum acceptable TLS version. Accepted values: TLS10 (TLS 1.0), TLS11 (TLS\n# 1.1), TLS12 (TLS 1.2), TLS13 (TLS 1.3).\n# If unset, Prometheus will use Go default minimum version, which is TLS 1.2.\n# See MinVersion in https://pkg.go.dev/crypto/tls#Config.\n[ min_version: <string> ]\n# Maximum acceptable TLS version. Accepted values: TLS10 (TLS 1.0), TLS11 (TLS\n# 1.1), TLS12 (TLS 1.2), TLS13 (TLS 1.3).\n# If unset, Prometheus will use Go default maximum version, which is TLS 1.3.\n# See MaxVersion in https://pkg.go.dev/crypto/tls#Config.\n[ max_version: <string> ]\n```"
+   },
+   {
+    "id": "prometheus:docs/configuration/https.md#1",
+    "title": "docs/configuration/https.md > (preamble)",
+    "text": "  # CA certificate for client certificate authentication to the server.\n  [ client_ca_file: <filename> ]\n\n  # Verify that the client certificate has a Subject Alternate Name (SAN)\n  # which is an exact match to an entry in this list, else terminate the\n  # connection. SAN match can be one or multiple of the following: DNS,\n  # IP, e-mail, or URI address from https://pkg.go.dev/crypto/x509#Certificate.\n  [ client_allowed_sans:\n    [ - <string> ] ]\n\n  # Minimum TLS version that is acceptable.\n  [ min_version: <string> | default = \"TLS12\" ]\n\n  # Maximum TLS version that is acceptable.\n  [ max_version: <string> | default = \"TLS13\" ]\n\n  # List of supported cipher suites for TLS versions up to TLS 1.2. If empty,\n  # Go default cipher suites are used. Available cipher suites are documented\n  # in the go documentation:\n  # https://golang.org/pkg/crypto/tls/#pkg-constants\n  #\n  # Note that only the cipher returned by the following function are supported:\n  # https://pkg.go.dev/crypto/tls#CipherSuites\n  [ cipher_suites:\n    [ - <string> ] ]\n\n  # Deprecated: this setting is accepted and ignored.\n  #\n  # It used to control whether the server followed its own cipher suite\n  # preference, as expressed in the order of elements in cipher_suites, or the\n  # client's. Go has selected the cipher suite itself since Go 1.17, taking\n  # into account inferred client hardware, server hardware and security, and\n  # the underlying setting has had no effect since then.\n  [ prefer_server_cipher_suites: <boolean> | default = true ]\n\n  # Elliptic curves that will be used in an ECDHE handshake, in preference\n  # order. Available curves are documented in the go documentation:\n  # https://golang.org/pkg/crypto/tls/#CurveID\n  [ curve_preferences:\n    [ - <string> ] ]\n\nhttp_server_config:\n  # Enable HTTP/2 support. Note that HTTP/2 is only supported with TLS.\n  # This can not be changed on the fly.\n  [ http2: <boolean> | default = true ]\n  # List of headers that can be added to HTTP responses.\n  [ headers:\n    # Set the Content-Security-Policy header to HTTP responses.\n    # Unset if blank.\n    [ Content-Security-Policy: <string> ]\n    # Set the X-Frame-Options header to HTTP responses.\n    # Unset if blank. Accepted values are deny and sameorigin.\n    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options\n    [ X-Frame-Options: <string> ]\n    # Set the X-Content-Type-Options header to HTTP responses.\n    # Unset if blank. Accepted value is nosniff.\n    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options\n    [ X-Content-Type-Options: <string> ]\n    # Set the X-XSS-Protection header to all responses.\n    # Unset if blank.\n    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection\n    [ X-XSS-Protection: <string> ]\n    # Set the Strict-Transport-Security header to HTTP responses.\n    # Unset if blank.\n    # Please make sure that you use this with care as this header might force\n    # browsers to load Prometheus and the other applications hosted on the same\n    # domain and subdomains over HTTPS.\n    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security\n    [ Strict-Transport-Security: <string> ] ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/promtool.md#3",
+    "title": "docs/configuration/promtool.md > <tls_config>",
+    "text": "## <tls_config>\n```yaml\n# For the following configurations, use either `ca`, `cert` and `key` or `ca_file`, `cert_file` and `key_file` or use `ca_ref`, `cert_ref` or `key_ref`.\n# Text of the CA certificate to use for the server.\n[ ca: <string> ]\n# CA certificate to validate the server certificate with.\n[ ca_file: <filename> ]\n# `ca_ref` is the name of the secret within the secret manager to use as the CA cert.\n[ ca_ref: <string> ]\n\n# Text of the client cert file for the server.\n[ cert: <string> ]\n# Certificate file for client certificate authentication.\n[ cert_file: <filename> ]\n# `cert_ref` is the name of the secret within the secret manager to use as the client certificate.\n[ cert_ref: <string> ]\n\n# Text of the client key file for the server.\n[ key: <secret> ]\n# Key file for client certificate authentication.\n[ key_file: <filename> ]\n# `key_ref` is the name of the secret within the secret manager to use as the client key.\n[ key_ref: <string> ]\n\n# ServerName extension to indicate the name of the server.\n# http://tools.ietf.org/html/rfc4366#section-3.1\n[ server_name: <string> ]\n\n# Disable validation of the server certificate.\n[ insecure_skip_verify: <bool> ]\n\n# Minimum acceptable TLS version. Accepted values: TLS10 (TLS 1.0), TLS11 (TLS\n# 1.1), TLS12 (TLS 1.2), TLS13 (TLS 1.3).\n# If unset, promtool will use Go default minimum version, which is TLS 1.2.\n# See MinVersion in https://pkg.go.dev/crypto/tls#Config.\n[ min_version: <string> ]\n# Maximum acceptable TLS version. Accepted values: TLS10 (TLS 1.0), TLS11 (TLS\n# 1.1), TLS12 (TLS 1.2), TLS13 (TLS 1.3).\n# If unset, promtool will use Go default maximum version, which is TLS 1.3.\n# See MaxVersion in https://pkg.go.dev/crypto/tls#Config.\n[ max_version: <string> ]\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#16",
+    "action": "use",
+    "relevance_score": 0.9951,
+    "document_score": 0.9962,
+    "levels": {
+     "answers": 0.9951,
+     "elsewhere": 0.0011,
+     "different_case": 0.0015,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/configuration/promtool.md#3",
+    "action": "use",
+    "relevance_score": 0.9945,
+    "document_score": 0.996,
+    "levels": {
+     "answers": 0.9945,
+     "elsewhere": 0.0015,
+     "different_case": 0.0018,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/https.md#1",
+    "action": "use",
+    "relevance_score": 0.9929,
+    "document_score": 0.9942,
+    "levels": {
+     "answers": 0.9929,
+     "elsewhere": 0.0013,
+     "different_case": 0.0021,
+     "unrelated": 0.0037
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2166
+  },
+  "timing": {
+   "total_ms": 64,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2571,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

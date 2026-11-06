@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "vite/module-exports.compare",
+ "recorded_at": "2026-11-06T13:31:00Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1051,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "140.027647",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=322"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/migration.md#12",
+    "text": "### Consistent CommonJS Interop\n\nThe `default` import from a CommonJS (CJS) module is now handled in a consistent way.\n\nIf it matches one of the following conditions, the `default` import is the `module.exports` value of the importee CJS module. Otherwise, the `default` import is the `module.exports.default` value of the importee CJS module:\n\n- The importer is `.mjs` or `.mts`.\n- The closest `package.json` for the importer has a `type` field set to `module`.\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n\n::: details The previous behavior\n\nIn development, if it matches one of the following conditions, the `default` import is the `module.exports` value of the importee CJS module. Otherwise, the `default` import is the `module.exports.default` value of the importee CJS module:\n\n- _The importer is included in the dependency optimization_ and `.mjs` or `.mts`.\n- _The importer is included in the dependency optimization_ and the closest `package.json` for the importer has a `type` field set to `module`.\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n\nIn build, the conditions were:\n\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n- _`default` property of `module.exports` does not exist_.\n\n(assuming [`build.commonjsOptions.defaultIsModuleExports`](https://github.com/rollup/plugins/tree/master/packages/commonjs#defaultismoduleexports) is not changed from the default `'auto'`)\n\n:::\n\nSee Rolldown's docs about this problem for more details: [Ambiguous `default` import from CJS modules - Bundling CJS | Rolldown](https://rolldown.rs/in-depth/bundling-cjs#ambiguous-default-import-from-cjs-modules).\n\nThis change may break some existing code importing CJS modules. You can use the deprecated `legacy.inconsistentCjsInterop: true` option to temporarily restore the previous behavior. If you find a package that is affected by this change, please report it to the package author or send them a pull request. Make sure to link to the Rolldown documentation above so that the author can understand the context."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#25",
+    "text": "### Default import unexpectedly returns an object\n\nThe default import returns the `module.exports` object for CJS modules, while you may expect it to return the `module.exports.default` value.\n\nThis may cause errors like:\n\n> Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.\n\n> foo is not a function\n\nSee Rolldown's docs about this problem for more details: [Ambiguous `default` import from CJS modules - Bundling CJS | Rolldown](https://rolldown.rs/in-depth/bundling-cjs#ambiguous-default-import-from-cjs-modules).\n\n<script setup lang=\"ts\">\n// redirect old links with hash to old version docs\nif (typeof window !== \"undefined\") {\n  const hashForOldVersion = {\n    'vite-cjs-node-api-deprecated': 6\n  }\n\n  const version = hashForOldVersion[location.hash.slice(1)]\n  if (version) {\n    // update the scheme and the port as well so that it works in local preview (it is http and 4173 locally)\n    location.href = `https://v${version}.vite.dev` + location.pathname + location.search + location.hash\n  }\n}\n</script>"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/migration.md#12",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#25",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/migration.md#12",
+    "b": "vite:docs/guide/troubleshooting.md#25",
+    "relation": "overlapping",
+    "related": 0.9954,
+    "probabilities": {
+     "same": 0.0156,
+     "overlapping": 0.973,
+     "conflicting": 0.0069,
+     "unrelated": 0.0046
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 65,
+   "passages": 1,
+   "counterparts_ms": 95
+  },
+  "timing": {
+   "read_ms": 196,
+   "total_ms": 199
+  }
+ }
+}

@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/keep-dropped-targets.rerank",
+ "recorded_at": "2026-11-06T13:31:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 897,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "60.489536",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=201"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `keep_dropped_targets`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `keep_dropped_targets`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#4",
+    "title": "docs/configuration/configuration.md > Configuration file",
+    "text": "  # Limit on the number of labels that will be accepted per sample. If more\n  # than this number of labels are present on any sample post metric-relabeling,\n  # the entire scrape will be treated as failed. 0 means no limit.\n  [ label_limit: <int> | default = 0 ]\n\n  # Limit on the length (in bytes) of each individual label name. If any label\n  # name in a scrape is longer than this number post metric-relabeling, the\n  # entire scrape will be treated as failed. Note that label names are UTF-8\n  # encoded, and characters can take up to 4 bytes. 0 means no limit.\n  [ label_name_length_limit: <int> | default = 0 ]\n\n  # Limit on the length (in bytes) of each individual label value. If any label\n  # value in a scrape is longer than this number post metric-relabeling, the\n  # entire scrape will be treated as failed. Note that label values are UTF-8\n  # encoded, and characters can take up to 4 bytes. 0 means no limit.\n  [ label_value_length_limit: <int> | default = 0 ]\n\n  # Limit per scrape config on number of unique targets that will be\n  # accepted. If more than this number of targets are present after target\n  # relabeling, Prometheus will mark the targets as failed without scraping them.\n  # 0 means no limit. This is an experimental feature, this behaviour could\n  # change in the future.\n  [ target_limit: <int> | default = 0 ]\n\n  # Limit per scrape config on the number of targets dropped by relabeling\n  # that will be kept in memory. 0 means no limit.\n  [ keep_dropped_targets: <int> | default = 0 ]\n\n  # Specifies the validation scheme for metric and label names. Either blank or\n  # \"utf8\" for full UTF-8 support, or \"legacy\" for letters, numbers, colons,\n  # and underscores.\n  [ metric_name_validation_scheme: <string> | default \"utf8\" ]\n\n  # If true, native histograms exposed by a target are recognized during\n  # scraping and ingested as such. If false, any native parts of histograms\n  # are ignored and only the classic parts are recognized (possibly as\n  # a classic histogram with only the +Inf buckets if no explicit classic\n  # buckets are part of the histogram).\n  [ scrape_native_histograms: <bool> | default = false ]\n\n  # Specifies whether to convert scraped classic histograms into native\n  # histograms with custom buckets.\n  [ convert_classic_histograms_to_nhcb: <bool> | default = false ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#12",
+    "title": "docs/configuration/configuration.md > Configuration file > `<scrape_config>`",
+    "text": "# Limit per scrape config on the number of targets dropped by relabeling\n# that will be kept in memory. 0 means no limit.\n[ keep_dropped_targets: <int> | default = 0 ]\n\n# Specifies the validation scheme for metric and label names. Either blank or\n# \"utf8\" for full UTF-8 support, or \"legacy\" for letters, numbers, colons, and\n# underscores.\n[ metric_name_validation_scheme: <string> | default \"utf8\" ]\n\n# Specifies the character escaping scheme that will be requested when scraping\n# for metric and label names that do not conform to the legacy Prometheus\n# character set. Available options are:\n#   * `allow-utf-8`: Full UTF-8 support, no escaping needed.\n#   * `underscores`: Escape all legacy-invalid characters to underscores.\n#   * `dots`: Escapes dots to `_dot_`, underscores to `__`, and all other\n#     legacy-invalid characters to underscores.\n#   * `values`: Prepend the name with `U__` and replace all invalid\n#     characters with their unicode value, surrounded by underscores. Single\n#     underscores are replaced with double underscores.\n#     e.g. \"U__my_2e_dotted_2e_name\".\n# If this value is left blank, Prometheus will default to `allow-utf-8` if the\n# validation scheme for the current scrape config is set to utf8, or\n# `underscores` if the validation scheme is set to `legacy`.\n[ metric_name_escaping_scheme: <string> | default \"allow-utf-8\" ]\n\n# Limit on total number of positive and negative buckets allowed in a single\n# native histogram. The resolution of a histogram with more buckets will be\n# reduced until the number of buckets is within the limit. If the limit cannot\n# be reached, the scrape will fail.\n# 0 means no limit.\n[ native_histogram_bucket_limit: <int> | default = 0 ]\n\n# Lower limit for the growth factor of one bucket to the next in each native\n# histogram. The resolution of a histogram with a lower growth factor will be\n# reduced as much as possible until it is within the limit.\n# To set an upper limit for the schema (equivalent to \"scale\" in OTel's\n# exponential histograms), use the following factor limits:\n#\n# +----------------------------+----------------------------+\n# |        growth factor       | resulting schema AKA scale |\n# +----------------------------+----------------------------+\n# |          65536             |             -4             |\n# +----------------------------+----------------------------+\n# |            256             |             -3             |\n# +----------------------------+----------------------------+\n# |             16             |             -2             |\n# +----------------------------+----------------------------+\n# |              4             |             -1             |\n# +----------------------------+----------------------------+\n# |              2             |              0             |\n# +----------------------------+----------------------------+\n# |              1.4           |              1             |\n# +----------------------------+----------------------------+\n# |              1.1           |              2             |\n# +----------------------------+----------------------------+\n# |              1.09          |              3             |\n# +----------------------------+----------------------------+\n# |              1.04          |              4             |\n# +----------------------------+----------------------------+\n# |              1.02          |              5             |\n# +----------------------------+----------------------------+\n# |              1.01          |              6             |"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#36",
+    "title": "docs/querying/api.md > Targets",
+    "text": "## Targets\n\nThe following endpoint returns an overview of the current state of the\nPrometheus target discovery:\n\n```\nGET /api/v1/targets\n```\n\nBoth the active and dropped targets are part of the response by default.\nDropped targets are subject to `keep_dropped_targets` limit, if set.\n`labels` represents the label set after relabeling has occurred.\n`discoveredLabels` represent the unmodified labels retrieved during service discovery before relabeling has occurred.\n\n```bash\ncurl http://localhost:9090/api/v1/targets\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"activeTargets\": [\n      {\n        \"discoveredLabels\": {\n          \"__address__\": \"127.0.0.1:9090\",\n          \"__metrics_path__\": \"/metrics\",\n          \"__scheme__\": \"http\",\n          \"job\": \"prometheus\"\n        },\n        \"labels\": {\n          \"instance\": \"127.0.0.1:9090\",\n          \"job\": \"prometheus\"\n        },\n        \"scrapePool\": \"prometheus\",\n        \"scrapeUrl\": \"http://127.0.0.1:9090/metrics\",\n        \"globalUrl\": \"http://example-prometheus:9090/metrics\",\n        \"lastError\": \"\",\n        \"lastScrape\": \"2017-01-17T15:07:44.723715405+01:00\",\n        \"lastScrapeDuration\": 0.050688943,\n        \"health\": \"up\",\n        \"scrapeInterval\": \"1m\",\n        \"scrapeTimeout\": \"10s\"\n      }\n    ],\n    \"droppedTargets\": [\n      {\n        \"discoveredLabels\": {\n          \"__address__\": \"127.0.0.1:9100\",\n          \"__always_scrape_classic_histograms__\": \"false\",\n          \"__convert_classic_histograms_to_nhcb__\": \"false\",\n          \"__metrics_path__\": \"/metrics\",\n          \"__scheme__\": \"http\",\n          \"__scrape_interval__\": \"1m\",\n          \"__scrape_native_histograms__\": \"false\",\n          \"__scrape_timeout__\": \"10s\",\n          \"job\": \"node\"\n        },\n        \"scrapePool\": \"node\"\n      }\n    ]\n  }\n}\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#12",
+    "action": "use",
+    "relevance_score": 0.9946,
+    "document_score": 0.9958,
+    "levels": {
+     "answers": 0.9946,
+     "elsewhere": 0.0012,
+     "different_case": 0.0017,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#4",
+    "action": "use",
+    "relevance_score": 0.9934,
+    "document_score": 0.9949,
+    "levels": {
+     "answers": 0.9934,
+     "elsewhere": 0.0015,
+     "different_case": 0.0019,
+     "unrelated": 0.0032
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/api.md#36",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0208,
+    "document_score": 0.1232,
+    "levels": {
+     "answers": 0.0208,
+     "elsewhere": 0.1024,
+     "different_case": 0.0583,
+     "unrelated": 0.8184
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2273
+  },
+  "timing": {
+   "total_ms": 79,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 2678,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

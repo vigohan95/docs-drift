@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/rules-max-concurrent-evals.rerank",
+ "recorded_at": "2026-11-06T13:30:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 874,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "48.005695",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=209"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--rules.max-concurrent-evals`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--rules.max-concurrent-evals`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--storage.agent.checkpoint-batch-size</code> | Size of a single WAL log entry chunk to be flushed. Has no effect without --storage.agent.checkpoint-from-in-memory-series flag. Use with agent mode only. | `1000` |\n| <code class=\"text-nowrap\">--storage.agent.no-lockfile</code> | Do not create lockfile in data directory. Use with agent mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.remote.flush-deadline</code> | How long to wait flushing sample on shutdown or config reload. | `1m` |\n| <code class=\"text-nowrap\">--storage.remote.read-sample-limit</code> | Maximum overall number of samples to return via the remote read interface, in a single query. 0 means no limit. This limit is ignored for streamed response types. Use with server mode only. | `5e7` |\n| <code class=\"text-nowrap\">--storage.remote.read-concurrent-limit</code> | Maximum number of concurrent remote read calls. 0 means no limit. Use with server mode only. | `10` |\n| <code class=\"text-nowrap\">--storage.remote.read-max-bytes-in-frame</code> | Maximum number of bytes in a single frame for streaming remote read response types before marshalling. Note that client might have limit on frame size as well. 1MB as recommended by protobuf by default. Use with server mode only. | `1048576` |\n| <code class=\"text-nowrap\">--web.search.max-limit</code> | Hard upper bound on the \"limit\" query parameter accepted by the experimental search API (--enable-feature=search-api). Requests with a higher limit are rejected with HTTP 400. 0 disables the cap. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--rules.alert.for-outage-tolerance</code> | Max time to tolerate prometheus outage for restoring \"for\" state of alert. Use with server mode only. | `1h` |\n| <code class=\"text-nowrap\">--rules.alert.for-grace-period</code> | Minimum duration between alert and restored \"for\" state. This is maintained only for alerts with configured \"for\" time greater than grace period. Use with server mode only. | `10m` |\n| <code class=\"text-nowrap\">--rules.alert.resend-delay</code> | Minimum amount of time to wait before resending an alert to Alertmanager. Use with server mode only. | `1m` |\n| <code class=\"text-nowrap\">--rules.max-concurrent-evals</code> | Global concurrency limit for independent rules that can run concurrently. When set, \"query.max-concurrency\" may need to be adjusted accordingly. Use with server mode only. | `4` |\n| <code class=\"text-nowrap\">--alertmanager.notification-queue-capacity</code> | The capacity of the queue for pending Alertmanager notifications. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--alertmanager.notification-batch-size</code> | The maximum number of notifications per batch to send to the Alertmanager. Use with server mode only. | `256` |\n| <code class=\"text-nowrap\">--alertmanager.drain-notification-queue-on-shutdown</code> | Send any outstanding Alertmanager notifications when shutting down. If false, any outstanding Alertmanager notifications will be dropped when shutting down. Use with server mode only. | `true` |\n| <code class=\"text-nowrap\">--query.lookback-delta</code> | The maximum lookback duration for retrieving metrics during expression evaluations and federation. Use with server mode only. | `5m` |\n| <code class=\"text-nowrap\">--query.timeout</code> | Maximum time a query may take before being aborted. Use with server mode only. | `2m` |\n| <code class=\"text-nowrap\">--query.max-concurrency</code> | Maximum number of queries executed concurrently. Use with server mode only. | `20` |"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#10",
+    "title": "docs/feature_flags.md > Concurrent evaluation of independent rules",
+    "text": "## Concurrent evaluation of independent rules\n\n`--enable-feature=concurrent-rule-eval`\n\nBy default, rule groups execute concurrently, but the rules within a group execute sequentially; this is because rules can use the\noutput of a preceding rule as its input. However, if there is no detectable relationship between rules then there is no\nreason to run them sequentially.\nWhen the `concurrent-rule-eval` feature flag is enabled, rules without any dependency on other rules within a rule group will be evaluated concurrently.\nThis has the potential to improve rule group evaluation latency and resource utilization at the expense of adding more concurrent query load.\n\nThe number of concurrent rule evaluations can be configured with `--rules.max-concurrent-evals`, which is set to `4` by default."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/feature_flags.md#10",
+    "action": "use",
+    "relevance_score": 0.9954,
+    "document_score": 0.9964,
+    "levels": {
+     "answers": 0.9954,
+     "elsewhere": 0.001,
+     "different_case": 0.0014,
+     "unrelated": 0.0022
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "action": "use",
+    "relevance_score": 0.9939,
+    "document_score": 0.9952,
+    "levels": {
+     "answers": 0.9939,
+     "elsewhere": 0.0013,
+     "different_case": 0.0016,
+     "unrelated": 0.0032
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1335
+  },
+  "timing": {
+   "total_ms": 80,
+   "rerank_ms": 79,
+   "questions_ms": 0,
+   "model_ms": 45,
+   "engine": {
+    "rows": 1573,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 45,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 41,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

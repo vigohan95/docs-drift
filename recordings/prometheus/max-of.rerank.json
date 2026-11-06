@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/max-of.rerank",
+ "recorded_at": "2026-11-06T13:29:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 913,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "46.430527",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=214"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `max_of`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `max_of`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/basics.md#8",
+    "title": "docs/querying/basics.md > Literals > Duration expressions",
+    "text": "### Duration expressions\n\nArithmetic expressions can be used wherever a time duration is expected, that is\nin [range vector selectors](#range-vector-selectors) and in\n[offset durations](#offset-modifier).\n\nIn range vectors:\n\n    rate(http_requests_total[5m * 2])     # 10 minute range\n    rate(http_requests_total[(5+2) * 1m]) # 7 minute range\n\nIn offset durations:\n\n    http_requests_total offset (1h / 2)       # 30 minute offset\n    http_requests_total offset ((2 ^ 3) * 1m) # 8 minute offset\n\nWhen using `offset` with a duration expression, you must wrap the expression in\nparentheses. Without parentheses, only the first duration value is used in the\noffset calculation.\n\nThe following operators are supported, following the usual precedence rules:\n\n* `+` – addition\n* `-` – subtraction\n* `*` – multiplication\n* `/` – division\n* `%` – modulo\n* `^` – exponentiation\n\nThe following functions can be used inside duration expressions:\n\n* `step()` resolves to the step width of a [range query](api.md#range-queries),\n  and to `0s` for an [instant query](api.md#instant-queries).\n* `range()` resolves to the full range of a range query (end time − start time),\n  and to `0s` for an instant query. This is particularly useful in combination\n  with `@ end()` to look back over the entire query range, e.g.\n  `max_over_time(metric[range()] @ end())`.\n* `min_of(<duration>, <duration>)` returns the smaller of the two durations,\n  which is useful for capping a duration at a maximum value.\n* `max_of(<duration>, <duration>)` returns the larger of the two durations,\n  which is useful for enforcing a minimum value."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#9",
+    "title": "docs/querying/basics.md > Literals > Duration expressions",
+    "text": "For example, `max_of(step(), 5s)` ensures the duration is never shorter than\n`5s`, while `min_of(range(), 1h)` caps the duration at `1h`.\n\nLike the scalar functions, `min_of` and `max_of` ignore a `NaN` argument if the\nother argument is not `NaN`. If both arguments are `NaN`, the result is `NaN`.\nA duration expression whose final result is `NaN` or infinite is rejected.\n\n**Note**: Duration expressions are not supported in the [`@` modifier](#modifier).\n\nExamples of equivalent durations:\n\n* `5m * 2` is equivalent to `10m` or `600s`.\n* `10m - 1m` is equivalent to `9m` or `540s`.\n* `(5+2) * 1m` is equivalent to `7m` or `420s`.\n* `1h / 2` is equivalent to `30m` or `1800s`.\n* `4h % 3h` is equivalent to `1h` or `3600s`.\n* `(2 ^ 3) * 1m` is equivalent to `8m` or `480s`.\n* `step() + 1` is equivalent to the query step width increased by `1s`.\n* `max_of(step(), 5s)` is equivalent to the larger of the query step width and `5s`.\n* `min_of(2 * step() + 5s, 5m)` is equivalent to the smaller of twice the query step increased by `5s` and `5m`."
+   },
+   {
+    "id": "prometheus:docs/querying/functions.md#40",
+    "title": "docs/querying/functions.md > `max_of()`",
+    "text": "## `max_of()`\n\n**This function has to be enabled via the [feature\nflag](../feature_flags.md#experimental-promql-functions)\n`--enable-feature=promql-experimental-functions`.**\n\n`max_of(a scalar, b scalar)` returns the larger of the two scalar values `a`\nand `b`. `NaN` is only returned if both `a` and `b` are `NaN`, like for\nthe [`max` aggregation operator](operators.md#min-and-max)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/basics.md#9",
+    "action": "use",
+    "relevance_score": 0.9916,
+    "document_score": 0.9941,
+    "levels": {
+     "answers": 0.9916,
+     "elsewhere": 0.0026,
+     "different_case": 0.003,
+     "unrelated": 0.0028
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/basics.md#8",
+    "action": "use",
+    "relevance_score": 0.9909,
+    "document_score": 0.9941,
+    "levels": {
+     "answers": 0.9909,
+     "elsewhere": 0.0032,
+     "different_case": 0.0032,
+     "unrelated": 0.0028
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/functions.md#40",
+    "action": "use",
+    "relevance_score": 0.9843,
+    "document_score": 0.9893,
+    "levels": {
+     "answers": 0.9843,
+     "elsewhere": 0.005,
+     "different_case": 0.0054,
+     "unrelated": 0.0054
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1201
+  },
+  "timing": {
+   "total_ms": 87,
+   "rerank_ms": 72,
+   "questions_ms": 0,
+   "model_ms": 43,
+   "engine": {
+    "rows": 1606,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 43,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

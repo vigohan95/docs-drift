@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/keepAliveTimeout.rerank",
+ "recorded_at": "2026-11-06T13:30:08Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1076,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "47.525631",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=291"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `keepAliveTimeout`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `keepAliveTimeout`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#10",
+    "title": "docs/Guides/Migration-Guide-V3.md > V3 Migration Guide > Further additions and improvements",
+    "text": "## Further additions and improvements\n\n- Hooks now have consistent context regardless of how they are registered\n  ([#2005](https://github.com/fastify/fastify/pull/2005))\n- Deprecated `request.req` and `reply.res` for\n  [`request.raw`](../Reference/Request.md) and\n  [`reply.raw`](../Reference/Reply.md)\n  ([#2008](https://github.com/fastify/fastify/pull/2008))\n- Removed `modifyCoreObjects` option\n  ([#2015](https://github.com/fastify/fastify/pull/2015))\n- Added [`connectionTimeout`](../Reference/Server.md#factory-connection-timeout)\n  option ([#2086](https://github.com/fastify/fastify/pull/2086))\n- Added [`keepAliveTimeout`](../Reference/Server.md#factory-keep-alive-timeout)\n  option ([#2086](https://github.com/fastify/fastify/pull/2086))\n- Added async-await support for [plugins](../Reference/Plugins.md#async-await)\n  ([#2093](https://github.com/fastify/fastify/pull/2093))\n- Added the feature to throw object as error\n  ([#2134](https://github.com/fastify/fastify/pull/2134))"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#6",
+    "title": "docs/Reference/Server.md > Factory > `keepAliveTimeout`",
+    "text": "### `keepAliveTimeout`\n<a id=\"factory-keep-alive-timeout\"></a>\n\n+ Default: `72000` (72 seconds)\n\nDefines the server keep-alive timeout in milliseconds. See documentation for\n[`server.keepAliveTimeout`\nproperty](https://nodejs.org/api/http.html#serverkeepalivetimeout) to\nunderstand the effect of this option. This option only applies when HTTP/1 is in\nuse.\n\nWhen `serverFactory` option is specified this option is ignored."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > close > Shutdown lifecycle",
+    "text": "##### Shutdown lifecycle\n\nWhen `fastify.close()` is called, the following steps happen in order:\n\n1. The server is flagged as **closing**. New incoming requests receive a\n   `Connection: close` header (HTTP/1.1) and are handled according to\n   [`return503OnClosing`](#factory-return-503-on-closing).\n2. [`preClose`](./Hooks.md#pre-close) hooks execute. The server is still\n   processing in-flight requests at this point.\n3. **Connection draining** based on the\n   [`forceCloseConnections`](#forcecloseconnections) option:\n   - `\"idle\"` — idle keep-alive connections are closed; in-flight requests\n     continue.\n   - `true` — all persistent connections are destroyed immediately.\n   - `false` — no forced closure; idle connections remain open until they time\n     out naturally (see [`keepAliveTimeout`](#keepalivetimeout)).\n4. The HTTP server **stops accepting** new TCP connections\n   (`server.close()`). Node.js waits for all in-flight requests to complete\n   before invoking the callback.\n5. [`onClose`](./Hooks.md#on-close) hooks execute. All in-flight requests have\n   completed and the server is no longer listening.\n6. The `close` callback (or the returned Promise) resolves.\n\n```\nfastify.close() called\n  │\n  ├─▶ closing = true (new requests receive 503)\n  │\n  ├─▶ preClose hooks\n  │     (in-flight requests still active)\n  │\n  ├─▶ Connection draining (forceCloseConnections)\n  │\n  ├─▶ server.close()\n  │     (waits for in-flight requests to complete)\n  │\n  ├─▶ onClose hooks\n  │     (server stopped, all requests done)\n  │\n  └─▶ close callback / Promise resolves\n```\n\n> ℹ️ Note:\n> Upgraded connections (such as WebSocket) are not tracked by the HTTP\n> server and will prevent `server.close()` from completing. Close them\n> explicitly in a [`preClose`](./Hooks.md#pre-close) hook."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#6",
+    "action": "use",
+    "relevance_score": 0.995,
+    "document_score": 0.9961,
+    "levels": {
+     "answers": 0.995,
+     "elsewhere": 0.001,
+     "different_case": 0.0016,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#62",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0058,
+    "document_score": 0.1465,
+    "levels": {
+     "answers": 0.0058,
+     "elsewhere": 0.1407,
+     "different_case": 0.0409,
+     "unrelated": 0.8126
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#10",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0038,
+    "document_score": 0.3755,
+    "levels": {
+     "answers": 0.0038,
+     "elsewhere": 0.3717,
+     "different_case": 0.0168,
+     "unrelated": 0.6077
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1240
+  },
+  "timing": {
+   "total_ms": 151,
+   "rerank_ms": 135,
+   "questions_ms": 0,
+   "model_ms": 45,
+   "engine": {
+    "rows": 1645,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 45,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 41,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

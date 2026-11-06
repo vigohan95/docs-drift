@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/clientErrorHandler.rerank",
+ "recorded_at": "2026-11-06T13:30:04Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 953,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.956799",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=231"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `clientErrorHandler`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `clientErrorHandler`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#5",
+    "title": "docs/Guides/Detecting-When-Clients-Abort.md > Detecting When Clients Abort > Conclusion",
+    "text": "## Conclusion\n\nSpecifics of the implementation will vary from one problem to another, but the\nmain goal of this guide was to show a very specific use case of an issue that\ncould be solved within Fastify's ecosystem.\n\nYou can listen to the request close event and determine if the request was\naborted or if it was successfully delivered. You can implement this solution\nin an onRequest hook or directly in an individual route.\n\nThis approach will not trigger in the event of internet disruption, and such\ndetection would require additional business logic. If you have flawed backend\napplication logic that results in a server crash, then you could trigger a\nfalse detection. The `clientErrorHandler`, either by default or with custom\nlogic, is not intended to handle this scenario and will not trigger when the\nclient aborts a request."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#32",
+    "title": "docs/Reference/Server.md > Factory > `clientErrorHandler`",
+    "text": "### `clientErrorHandler`\n<a id=\"client-error-handler\"></a>\n\nSet a\n[clientErrorHandler](https://nodejs.org/api/http.html#event-clienterror)\nthat listens to `error` events emitted by client connections and responds with a\n`400`.\n\nIt is possible to override the default `clientErrorHandler` using this option.\n\n+ Default:\n```js\nfunction defaultClientErrorHandler (err, socket) {\n  if (err.code === 'ECONNRESET') {\n    return\n  }\n\n  const body = JSON.stringify({\n    error: http.STATUS_CODES['400'],\n    message: 'Client Error',\n    statusCode: 400\n  })\n  this.log.trace({ err }, 'client error')\n\n  if (socket.writable) {\n    socket.end([\n      'HTTP/1.1 400 Bad Request',\n      `Content-Length: ${body.length}`,\n      `Content-Type: application/json\\r\\n\\r\\n${body}`\n    ].join('\\r\\n'))\n  }\n}\n```\n\n> ℹ️ Note:\n> `clientErrorHandler` operates with raw sockets. The handler is expected to\n> return a properly formed HTTP response that includes a status line, HTTP headers\n> and a message body. Before attempting to write the socket, the handler should\n> check if the socket is still writable as it may have already been destroyed.\n\n```js\nconst fastify = require('fastify')({\n  clientErrorHandler: function (err, socket) {\n    const body = JSON.stringify({\n      error: {\n        message: 'Client error',\n        code: '400'\n      }\n    })\n\n    // `this` is bound to fastify instance\n    this.log.trace({ err }, 'client error')\n\n    // the handler is responsible for generating a valid HTTP response\n    socket.end([\n      'HTTP/1.1 400 Bad Request',\n      `Content-Length: ${body.length}`,\n      `Content-Type: application/json\\r\\n\\r\\n${body}`\n    ].join('\\r\\n'))\n  }\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#32",
+    "action": "use",
+    "relevance_score": 0.9942,
+    "document_score": 0.9955,
+    "levels": {
+     "answers": 0.9942,
+     "elsewhere": 0.0013,
+     "different_case": 0.002,
+     "unrelated": 0.0024
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Detecting-When-Clients-Abort.md#5",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0551,
+    "document_score": 0.2728,
+    "levels": {
+     "answers": 0.0551,
+     "elsewhere": 0.2177,
+     "different_case": 0.0416,
+     "unrelated": 0.6857
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 855
+  },
+  "timing": {
+   "total_ms": 53,
+   "rerank_ms": 52,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1125,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

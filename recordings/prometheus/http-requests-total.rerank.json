@@ -1,0 +1,262 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/http-requests-total.rerank",
+ "recorded_at": "2026-11-06T13:30:29Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1155,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "92.020927",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=156,cfOrigin;dur=0,cfWorker;dur=332"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `http_requests_total`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `http_requests_total`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/querying/api.md#3",
+    "title": "docs/querying/api.md > Format overview",
+    "text": "Generic placeholders are defined as follows:\n\n* `<rfc3339 | unix_timestamp>`: Input timestamps may be provided either in\n[RFC3339](https://www.ietf.org/rfc/rfc3339.txt) format or as a Unix timestamp\nin seconds, with optional decimal places for sub-second precision. Output\ntimestamps are always represented as Unix timestamps in seconds.\n* `<series_selector>`: Prometheus [time series\nselectors](basics.md#time-series-selectors) like `http_requests_total` or\n`http_requests_total{method=~\"(GET|POST)\"}` and need to be URL-encoded.\n* `<duration>`: [the subset of Prometheus float literals using time units](basics.md#float-literals-and-time-durations).\nFor example, `5m` refers to a duration of 5 minutes.\n* `<bool>`: boolean values (strings `true` and `false`).\n\nNote: Names of query parameters that may be repeated end with `[]`."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#44",
+    "title": "docs/querying/api.md > Querying metric metadata",
+    "text": "## Querying metric metadata\n\nIt returns metadata about metrics currently scraped from targets. However, it does not provide any target information.\nThis is considered **experimental** and might change in the future.\n\n```\nGET /api/v1/metadata\n```\n\nURL query parameters:\n\n- `limit=<number>`: Maximum number of metrics to return.\n- `limit_per_metric=<number>`: Maximum number of metadata to return per metric.\n- `metric=<string>`: A metric name to filter metadata for. All metric metadata is retrieved if left empty.\n\nThe `data` section of the query result consists of an object where each key is a metric name and each value is a list of unique metadata objects, as exposed for that metric name across all targets.\n\nThe following example returns two metrics. Note that the metric `http_requests_total` has more than one object in the list. At least one target has a value for `HELP` that do not match with the rest.\n\n```bash\ncurl -G http://localhost:9090/api/v1/metadata?limit=2\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"cortex_ring_tokens\": [\n      {\n        \"type\": \"gauge\",\n        \"help\": \"Number of tokens in the ring\",\n        \"unit\": \"\"\n      }\n    ],\n    \"http_requests_total\": [\n      {\n        \"type\": \"counter\",\n        \"help\": \"Number of HTTP requests\",\n        \"unit\": \"\"\n      },\n      {\n        \"type\": \"counter\",\n        \"help\": \"Amount of HTTP requests\",\n        \"unit\": \"\"\n      }\n    ]\n  }\n}\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#45",
+    "title": "docs/querying/api.md > Querying metric metadata",
+    "text": "The following example returns only one metadata entry for each metric.\n\n```bash\ncurl -G http://localhost:9090/api/v1/metadata?limit_per_metric=1\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"cortex_ring_tokens\": [\n      {\n        \"type\": \"gauge\",\n        \"help\": \"Number of tokens in the ring\",\n        \"unit\": \"\"\n      }\n    ],\n    \"http_requests_total\": [\n      {\n        \"type\": \"counter\",\n        \"help\": \"Number of HTTP requests\",\n        \"unit\": \"\"\n      }\n    ]\n  }\n}\n```\n\nThe following example returns metadata only for the metric `http_requests_total`.\n\n```bash\ncurl -G http://localhost:9090/api/v1/metadata?metric=http_requests_total\n```\n\n```json\n{\n  \"status\": \"success\",\n  \"data\": {\n    \"http_requests_total\": [\n      {\n        \"type\": \"counter\",\n        \"help\": \"Number of HTTP requests\",\n        \"unit\": \"\"\n      },\n      {\n        \"type\": \"counter\",\n        \"help\": \"Amount of HTTP requests\",\n        \"unit\": \"\"\n      }\n    ]\n  }\n}\n```"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#11",
+    "title": "docs/querying/basics.md > Time series selectors > Instant vector selectors",
+    "text": "### Instant vector selectors\n\nInstant vector selectors allow the selection of a set of time series and a\nsingle sample value for each at a given timestamp (point in time).  In the simplest\nform, only a metric name is specified, which results in an instant vector\ncontaining elements for all time series that have this metric name.\n\nThe value returned will be that of the most recent sample at or before the\nquery's evaluation timestamp (in the case of an\n[instant query](api.md#instant-queries))\nor the current step within the query (in the case of a\n[range query](api.md#range-queries)).\nThe [`@` modifier](#modifier) allows overriding the timestamp relative to which\nthe selection takes place. Time series are only returned if their most recent sample is less than the [lookback period](#staleness) ago.\n\nThis example selects all time series that have the `http_requests_total` metric\nname, returning the most recent sample for each:\n\n    http_requests_total\n\nIt is possible to filter these time series further by appending a comma-separated list of label\nmatchers in curly braces (`{}`).\n\nThis example selects only those time series with the `http_requests_total`\nmetric name that also have the `job` label set to `prometheus` and their\n`group` label set to `canary`:\n\n    http_requests_total{job=\"prometheus\",group=\"canary\"}"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#13",
+    "title": "docs/querying/basics.md > Time series selectors > Instant vector selectors",
+    "text": "The query `http_requests_total{environment=\"\"}` would match and return:\n\n    http_requests_total\n    http_requests_total{replica=\"rep-a\"}\n    http_requests_total{replica=\"rep-b\"}\n\nand would exclude:\n\n    http_requests_total{environment=\"development\"}\n\nMultiple matchers can be used for the same label name; they all must pass for a result to be returned.\n\nThe query:\n\n    http_requests_total{replica!=\"rep-a\",replica=~\"rep.*\"}\n\nWould then match:\n\n    http_requests_total{replica=\"rep-b\"}\n\nVector selectors must either specify a name or at least one label matcher\nthat does not match the empty string. The following expression is illegal:\n\n    {job=~\".*\"} # Bad!\n\nIn contrast, these expressions are valid as they both have a selector that does not\nmatch empty label values.\n\n    {job=~\".+\"}              # Good!\n    {job=~\".*\",method=\"get\"} # Good!\n\nLabel matchers can also be applied to metric names by matching against the internal\n`__name__` label. For example, the expression `http_requests_total` is equivalent to\n`{__name__=\"http_requests_total\"}`. Matchers other than `=` (`!=`, `=~`, `!~`) may also be used.\nThe following expression selects all metrics that have a name starting with `job:`:\n\n    {__name__=~\"job:.*\"}\n\nThe metric name must not be one of the keywords `bool`, `on`, `ignoring`, `group_left` and `group_right`. The following expression is illegal:"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#17",
+    "title": "docs/querying/basics.md > Time series selectors > Range Vector Selectors",
+    "text": "### Range Vector Selectors\n\nRange vector literals work like instant vector literals, except that they\nselect a range of samples back from the current instant. Syntactically, a\n[float literal](#float-literals-and-time-durations) is appended in square\nbrackets (`[]`) at the end of a vector selector to specify for how many seconds\nback in time values should be fetched for each resulting range vector element.\nCommonly, the float literal uses the syntax with one or more time units, e.g.\n`[5m]`. The range is a left-open and right-closed interval, i.e. samples with\ntimestamps coinciding with the left boundary of the range are excluded from the\nselection, while samples coinciding with the right boundary of the range are\nincluded in the selection.\n\nIn this example, we select all the values recorded less than 5m ago for all\ntime series that have the metric name `http_requests_total` and a `job` label\nset to `prometheus`:\n\n    http_requests_total{job=\"prometheus\"}[5m]"
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#21",
+    "title": "docs/querying/basics.md > Time series selectors > Offset modifier",
+    "text": "### Offset modifier\n\nThe `offset` modifier allows changing the time offset for individual\ninstant and range vectors in a query.\n\nFor example, the following expression returns the value of\n`http_requests_total` 5 minutes in the past relative to the current\nquery evaluation time:\n\n    http_requests_total offset 5m\n\nNote that the `offset` modifier always needs to follow the selector\nimmediately, i.e. the following would be correct:\n\n    sum(http_requests_total{method=\"GET\"} offset 5m) // GOOD.\n\nWhile the following would be *incorrect*:\n\n    sum(http_requests_total{method=\"GET\"}) offset 5m // INVALID.\n\nThe same works for range vectors. This returns the 5-minute [rate](./functions.md#rate)\nthat `http_requests_total` had a week ago:\n\n    rate(http_requests_total[5m] offset 1w)\n\nWhen querying for samples in the past, a negative offset will enable temporal comparisons forward in time:\n\n    rate(http_requests_total[5m] offset -1w)\n\nNote that this allows a query to look ahead of its evaluation time."
+   },
+   {
+    "id": "prometheus:docs/querying/basics.md#22",
+    "title": "docs/querying/basics.md > Time series selectors > @ modifier",
+    "text": "### @ modifier\n\nThe `@` modifier allows changing the evaluation time for individual instant\nand range vectors in a query. The time supplied to the `@` modifier\nis a Unix timestamp and described with a float literal.\n\nFor example, the following expression returns the value of\n`http_requests_total` at `2021-01-04T07:40:00+00:00`:\n\n    http_requests_total @ 1609746000\n\nNote that the `@` modifier always needs to follow the selector\nimmediately, i.e. the following would be correct:\n\n    sum(http_requests_total{method=\"GET\"} @ 1609746000) // GOOD.\n\nWhile the following would be *incorrect*:\n\n    sum(http_requests_total{method=\"GET\"}) @ 1609746000 // INVALID.\n\nThe same works for range vectors. This returns the 5-minute rate that\n`http_requests_total` had at `2021-01-04T07:40:00+00:00`:\n\n    rate(http_requests_total[5m] @ 1609746000)\n\nThe `@` modifier supports all representations of numeric literals described above.\nIt works with the `offset` modifier where the offset is applied relative to the `@`\nmodifier time.  The results are the same irrespective of the order of the modifiers.\n\nFor example, these two queries will produce the same result:\n\n    # offset after @\n    http_requests_total @ 1609746000 offset 5m\n    # offset before @\n    http_requests_total offset 5m @ 1609746000\n\nAdditionally, `start()` and `end()` can also be used as values for the `@` modifier as special values.\n\nFor a range query, they resolve to the start and end of the range query respectively and remain the same for all steps.\n\nFor an instant query, `start()` and `end()` both resolve to the evaluation time.\n\n    http_requests_total @ start()\n    rate(http_requests_total[5m] @ end())\n\nNote that the `@` modifier allows a query to look ahead of its evaluation time."
+   },
+   {
+    "id": "prometheus:docs/querying/examples.md#1",
+    "title": "docs/querying/examples.md > Simple time series selection",
+    "text": "## Simple time series selection\n\nReturn all time series with the metric `http_requests_total`:\n\n    http_requests_total\n\nReturn all time series with the metric `http_requests_total` and the given\n`job` and `handler` labels:\n\n    http_requests_total{job=\"apiserver\", handler=\"/api/comments\"}\n\nReturn a whole range of time (in this case 5 minutes up to the query time)\nfor the same vector, making it a [range vector](../basics/#range-vector-selectors):\n\n    http_requests_total{job=\"apiserver\", handler=\"/api/comments\"}[5m]\n\nNote that an expression resulting in a range vector cannot be graphed directly,\nbut viewed in the tabular (\"Console\") view of the expression browser.\n\nUsing [regular expressions](./basics.md#regular-expressions), you could select time series only for jobs whose\nname match a certain pattern, in this case, all jobs that end with `server`:\n\n    http_requests_total{job=~\".*server\"}\n\nTo select all HTTP status codes except 4xx ones, you could run:\n\n    http_requests_total{status!~\"4..\"}"
+   },
+   {
+    "id": "prometheus:docs/querying/examples.md#2",
+    "title": "docs/querying/examples.md > Subquery",
+    "text": "## Subquery\n\nReturn the 5-minute [rate](./functions.md#rate) of the `http_requests_total` metric for the past 30 minutes, with a resolution of 1 minute.\n\n    rate(http_requests_total[5m])[30m:1m]\n\nThis is an example of a nested subquery. The subquery for the `deriv` function uses the default resolution. Note that using subqueries unnecessarily is unwise.\n\n    max_over_time(deriv(rate(distance_covered_total[5s])[30s:5s])[10m:])"
+   },
+   {
+    "id": "prometheus:docs/querying/examples.md#3",
+    "title": "docs/querying/examples.md > Using functions, operators, etc.",
+    "text": "## Using functions, operators, etc.\n\nReturn the per-second rate for all time series with the `http_requests_total`\nmetric name, as measured over the last 5 minutes:\n\n    rate(http_requests_total[5m])\n\nAssuming that the `http_requests_total` time series all have the labels `job`\n(fanout by job name) and `instance` (fanout by instance of the job), we might\nwant to sum over the rate of all instances, so we get fewer output time series,\nbut still preserve the `job` dimension:\n\n    sum by (job) (\n      rate(http_requests_total[5m])\n    )\n\nIf we have two different metrics with the same dimensional labels, we can apply\nbinary operators to them and elements on both sides with the same label set\nwill get matched and propagated to the output. For example, this expression\nreturns the unused memory in MiB for every instance (on a fictional cluster\nscheduler exposing these metrics about the instances it runs):\n\n    (instance_memory_limit_bytes - instance_memory_usage_bytes) / 1024 / 1024\n\nThe same expression, but summed by application, could be written like this:\n\n    sum by (app, proc) (\n      instance_memory_limit_bytes - instance_memory_usage_bytes\n    ) / 1024 / 1024\n\nIf the same fictional cluster scheduler exposed CPU usage metrics like the\nfollowing for every instance:\n\n    instance_cpu_time_ns{app=\"lion\", proc=\"web\", rev=\"34d0f99\", env=\"prod\", job=\"cluster-manager\"}\n    instance_cpu_time_ns{app=\"elephant\", proc=\"worker\", rev=\"34d0f99\", env=\"prod\", job=\"cluster-manager\"}\n    instance_cpu_time_ns{app=\"turtle\", proc=\"api\", rev=\"4d3a513\", env=\"prod\", job=\"cluster-manager\"}\n    instance_cpu_time_ns{app=\"fox\", proc=\"widget\", rev=\"4d3a513\", env=\"prod\", job=\"cluster-manager\"}\n    ..."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 8,
+    "id": "prometheus:docs/querying/examples.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0043,
+    "document_score": 0.0098,
+    "levels": {
+     "answers": 0.0043,
+     "elsewhere": 0.0054,
+     "different_case": 0.0084,
+     "unrelated": 0.9819
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/querying/api.md#44",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0037,
+    "document_score": 0.0088,
+    "levels": {
+     "answers": 0.0037,
+     "elsewhere": 0.0051,
+     "different_case": 0.0146,
+     "unrelated": 0.9766
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/api.md#45",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0031,
+    "document_score": 0.0098,
+    "levels": {
+     "answers": 0.0031,
+     "elsewhere": 0.0066,
+     "different_case": 0.007,
+     "unrelated": 0.9832
+    }
+   },
+   {
+    "index": 6,
+    "id": "prometheus:docs/querying/basics.md#21",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.003,
+    "document_score": 0.0086,
+    "levels": {
+     "answers": 0.003,
+     "elsewhere": 0.0056,
+     "different_case": 0.0123,
+     "unrelated": 0.9791
+    }
+   },
+   {
+    "index": 3,
+    "id": "prometheus:docs/querying/basics.md#11",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0029,
+    "document_score": 0.0074,
+    "levels": {
+     "answers": 0.0029,
+     "elsewhere": 0.0045,
+     "different_case": 0.0102,
+     "unrelated": 0.9824
+    }
+   },
+   {
+    "index": 4,
+    "id": "prometheus:docs/querying/basics.md#13",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0076,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0049,
+     "different_case": 0.0106,
+     "unrelated": 0.9818
+    }
+   },
+   {
+    "index": 10,
+    "id": "prometheus:docs/querying/examples.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0088,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0061,
+     "different_case": 0.0092,
+     "unrelated": 0.982
+    }
+   },
+   {
+    "index": 7,
+    "id": "prometheus:docs/querying/basics.md#22",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0054,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0027,
+     "different_case": 0.0085,
+     "unrelated": 0.9861
+    }
+   },
+   {
+    "index": 9,
+    "id": "prometheus:docs/querying/examples.md#2",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0026,
+    "document_score": 0.0059,
+    "levels": {
+     "answers": 0.0026,
+     "elsewhere": 0.0033,
+     "different_case": 0.0116,
+     "unrelated": 0.9825
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/querying/api.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0024,
+    "document_score": 0.006,
+    "levels": {
+     "answers": 0.0024,
+     "elsewhere": 0.0036,
+     "different_case": 0.011,
+     "unrelated": 0.983
+    }
+   },
+   {
+    "index": 5,
+    "id": "prometheus:docs/querying/basics.md#17",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0038,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0023,
+     "different_case": 0.0046,
+     "unrelated": 0.9917
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 4538
+  },
+  "timing": {
+   "total_ms": 97,
+   "rerank_ms": 96,
+   "questions_ms": 0,
+   "model_ms": 85,
+   "engine": {
+    "rows": 5847,
+    "branches": 11,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 6144,
+    "long": 0,
+    "total_ms": 85,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 82,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

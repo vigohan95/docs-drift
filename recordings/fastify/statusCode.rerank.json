@@ -1,51 +1,31 @@
 {
  "endpoint": "rerank",
  "tag": "fastify/statusCode.rerank",
- "recorded_at": "2026-11-06T13:28:35Z",
+ "recorded_at": "2026-11-06T13:29:47Z",
  "status": 200,
  "attempts": 1,
- "round_trip_ms": 1031,
+ "round_trip_ms": 909,
  "response_headers": {
-  "x-clocked-credits": "3",
-  "x-clocked-model-ms": "66.786461",
-  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "42.365185",
+  "x-clocked-cost-usd": "0.000398",
   "x-clocked-cost-basis": "reference",
   "x-clocked-transport": "door:east",
-  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=320"
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=207"
  },
  "request": {
-  "query": "What is the default value, limit, requirement, or documented behavior of `statusCode`?",
-  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `statusCode`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "query": "What is the default value, limit, requirement, or documented behavior of `.statusCode`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `.statusCode`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
   "documents": [
    {
-    "id": "fastify:docs/Reference/Errors.md#9",
-    "title": "docs/Reference/Errors.md > Errors > Errors In Fastify > What The Default Error Handler Sends",
-    "text": "#### What The Default Error Handler Sends\nThe default error handler serializes the error into a JSON body with the\n`statusCode`, `error`, and `message` properties, plus `code` when the error\ncarries one:\n\n```js\napp.get('/', async () => { throw new Error('kaboom') })\n```\n\n```json\n{\n  \"statusCode\": 500,\n  \"error\": \"Internal Server Error\",\n  \"message\": \"kaboom\"\n}\n```\n\nThe `error` property is the generic HTTP status text, but **`message` is\n`error.message` verbatim**. This applies to every status code, including `500`.\nFastify's built-in error serializer emits only these four properties, so the\nstack trace is not part of the default payload — but a route-level response\nschema replaces that serializer, and one that declares a `stack` property will\nserialize it.\n\n> Security:\n> Because `message` and `code` are forwarded as-is, errors thrown by libraries\n> deeper in your application are exposed to the client. A database driver\n> error, for example, can leak schema details and query text:\n>\n> ```json\n> {\n>   \"statusCode\": 500,\n>   \"code\": \"ER_BAD_FIELD_ERROR\",\n>   \"error\": \"Internal Server Error\",\n>   \"message\": \"Unknown column 'username' in 'field list'\"\n> }\n> ```\n>\n> Fastify does not distinguish between development and production here. If\n> unexpected errors must not reach the client, handle this explicitly."
+    "id": "fastify:docs/Reference/Reply.md#1",
+    "title": "docs/Reference/Reply.md > Reply > Introduction",
+    "text": "### Introduction\n<a id=\"introduction\"></a>\n\nThe second parameter of the handler function is `Reply`. Reply is a core Fastify\nobject that exposes the following functions and properties:\n\n- `.code(statusCode)` - Sets the status code.\n- `.status(statusCode)` - An alias for `.code(statusCode)`.\n- `.statusCode` - Read and set the HTTP status code.\n- `.elapsedTime` - Returns the amount of time passed\nsince the request was received by Fastify.\n- `.mediaType` - The media type extracted from `Content-Type` header.\n- `.server` - A reference to the fastify instance object.\n- `.header(name, value)` - Sets a response header.\n- `.headers(object)` - Sets all the keys of the object as response headers.\n- `.getHeader(name)` - Retrieve value of already set header.\n- `.getHeaders()` - Gets a shallow copy of all current response headers.\n- `.removeHeader(key)` - Remove the value of a previously set header.\n- `.hasHeader(name)` - Determine if a header has been set.\n- `.writeEarlyHints(hints, callback)` - Sends early hints to the user\n  while the response is being prepared.\n- `.trailer(key, function)` - Sets a response trailer.\n- `.hasTrailer(key)` - Determine if a trailer has been set.\n- `.removeTrailer(key)` - Remove the value of a previously set trailer.\n- `.type(value)` - Sets the header `Content-Type`.\n- `.redirect(dest, [code])` - Redirect to the specified URL, the status code is\n  optional (defaults to `302`).\n- `.callNotFound()` - Invokes the custom not found handler.\n- `.serialize(payload)` - Serializes the specified payload using the default\n  JSON serializer or using the custom serializer (if one is set) and returns the\n  serialized payload.\n- `.getSerializationFunction(schema | httpStatus, [contentType])` - Returns the\n  serialization function for the specified schema or http status, if any of\n  either are set.\n- `.compileSerializationSchema(schema, [httpStatus], [contentType])` - Compiles\n  the specified schema and returns a serialization function using the default\n  (or customized) `SerializerCompiler`. The optional `httpStatus` is forwarded\n  to the `SerializerCompiler` if provided, default to `undefined`.\n- `.serializeInput(data, schema, [,httpStatus], [contentType])` - Serializes\n  the specified data using the specified schema and returns the serialized payload.\n  If the optional `httpStatus`, and `contentType` are provided, the function\n  will use the serializer function given for that specific content type and\n  HTTP Status Code. Default to `undefined`.\n- `.serializer(function)` - Sets a custom serializer for the payload.\n- `.send(payload)` - Sends the payload to the user, could be a plain text, a\n  buffer, JSON, stream, or an Error object.\n- `.sent` - A boolean value that you can use if you need to know if `send` has\n  already been called.\n- `.hijack()` - interrupt the normal request lifecycle.\n- `.raw` - The\n  [`http.ServerResponse`](https://nodejs.org/dist/latest-v20.x/docs/api/http.html#http_class_http_serverresponse)\n  from Node core.\n- `.log` - The logger instance of the incoming request.\n- `.request` - The incoming request.\n- `.getDecorator(name)` - Returns the value of a reply decorator."
    },
    {
-    "id": "fastify:docs/Reference/Reply.md#22",
-    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .send(data) > Async-Await and Promises",
-    "text": "###### Async-Await and Promises\n<a id=\"async-await-promise\"></a>\n\nFastify natively handles promises and supports async-await.\n\n*Note that in the following examples we are not using reply.send.*\n```js\nconst { promisify } = require('node:util')\nconst delay = promisify(setTimeout)\n\nfastify.get('/promises', options, function (request, reply) {\n return delay(200).then(() => { return { hello: 'world' }})\n})\n\nfastify.get('/async-await', options, async function (request, reply) {\n  await delay(200)\n  return { hello: 'world' }\n})\n```\n\nRejected promises default to a `500` HTTP status code. Reject the promise, or\n`throw` in an `async function`, with an object that has `statusCode` (or\n`status`) and `message` properties to modify the reply.\n\n```js\nfastify.get('/teapot', async function (request, reply) {\n  const err = new Error()\n  err.statusCode = 418\n  err.message = 'short and stout'\n  throw err\n})\n\nfastify.get('/botnet', async function (request, reply) {\n  throw { statusCode: 418, message: 'short and stout' }\n  // will return to the client the same json\n})\n```\n\nIf you want to know more please review\n[Routes#async-await](./Routes.md#async-await)."
-   },
-   {
-    "id": "fastify:docs/Reference/Reply.md#24",
-    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .code(statusCode)",
-    "text": "##### .code(statusCode)\n<a id=\"code\"></a>\n\nIf not set via `reply.code`, the resulting `statusCode` will be `200`.\n\n`.status(statusCode)` is an alias of `.code(statusCode)`."
-   },
-   {
-    "id": "fastify:docs/Reference/Server.md#18",
-    "title": "docs/Reference/Server.md > Factory > `logController`",
-    "text": "The error-related methods share a unified signature:\n`(error, request, reply, metadata)`, where `metadata` carries any extra\nper-method data (for example, the `statusCode` passed to `serializerError`).\n`incomingRequest` and `routeNotFound` omit the `error` argument, since they fire\nat lifecycle points where no error exists. `serviceUnavailable` is a further\nexception, since no route — and therefore no `request`/`reply` — is formed.\n\n| Method | Signature | Description |\n|--------|-----------|-------------|\n| `isLogDisabled` | `(request)` | Checks whether request logging is disabled for the given request. It impacts all other log methods. |\n| `incomingRequest` | `(request, reply, metadata)` | Logs an incoming request at `info` level. |\n| `requestCompleted` | `(error, request, reply, metadata)` | Logs the outcome of a completed request. Uses `error` level when an error is present, `info` otherwise. |\n| `defaultErrorLog` | `(error, request, reply, metadata)` | Logs an error handled by the default error handler. Uses `error` for 5xx, `info` for 4xx. |\n| `streamError` | `(error, request, reply, metadata)` | Logs stream-level errors after headers have been sent. |\n| `routeNotFound` | `(request, reply, metadata)` | Logs a \"route not found\" message at `info` level. |\n| `writeHeadError` | `(error, request, reply, metadata)` | Logs a warning when `writeHead` fails during error handling. |\n| `serializerError` | `(error, request, reply, metadata)` | Logs an error when the serializer for a given status code fails. The triggering status code is available as `metadata.statusCode`. |\n| `serviceUnavailable` | `(logger, server)` | Logs a 503 when the server is closing. Always emitted, not gated by `disableRequestLogging`. |"
-   },
-   {
-    "id": "fastify:docs/Reference/Server.md#88",
-    "title": "docs/Reference/Server.md > Instance > Server Methods > setErrorHandler",
-    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
-   },
-   {
-    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
-    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Error Handling",
-    "text": "### Error Handling\nWhen schema validation fails for a request, Fastify will automatically return a\nstatus 400 response including the result from the validator in the payload. For\nexample, if the following schema is used for a route:\n\n```js\nconst schema = {\n  body: {\n    type: 'object',\n    properties: {\n      name: { type: 'string' }\n    },\n    required: ['name']\n  }\n}\n```\n\nIf the request fails to satisfy the schema, the route will return a response\nwith the following payload:\n\n```js\n{\n  \"statusCode\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"body should have required property 'name'\"\n}\n```\n\n> ⚠ Security Consideration: By default, validation error details from the schema\n> are included in the response payload. If your organization requires sanitizing\n> or customizing these error messages (e.g., to avoid exposing internal schema\n> details), configure a custom error handler using\n> [`setErrorHandler()`](./Server.md#seterrorhandler).\n\nTo handle errors inside the route, specify the `attachValidation` option. If\nthere is a validation error, the `validationError` property of the request will\ncontain the same `Error` object Fastify would have sent on its own, so no\nmessage has to be rebuilt from the raw validation result:\n\n- `message` is the formatted message, identical to the one in the response\n  payload above (for example `body must have required property 'name'`). It is\n  produced by [`schemaErrorFormatter`](#schemaerrorformatter), so a custom\n  formatter is reflected here too.\n- `validation` is the raw validation result, as returned by the validator.\n- `validationContext` is the part of the request that failed validation\n  (`body`, `params`, `querystring` or `headers`).\n- `code` is `FST_ERR_VALIDATION` and `statusCode` is `400`.\n- When the validator reports a list of errors (as Ajv does) and the default\n  [`schemaErrorFormatter`](#schemaerrorformatter) is used, the error is an\n  instance of [`FST_ERR_VALIDATION`](./Errors.md#fst_err_validation) without a\n  [stack trace](./Errors.md#errors-in-input-data). Errors returned by the\n  validator itself, or by a custom formatter, are used as they are."
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#15",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Validation > Validator Compiler > .statusCode property",
+    "text": "##### .statusCode property\n\nAll validation errors have a `.statusCode` property set to `400`, ensuring the\ndefault error handler sets the response status code to `400`.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  request.log.error(error, `This error has status code ${error.statusCode}`)\n  reply.status(error.statusCode).send(error)\n})\n```"
    }
   ]
  },
@@ -53,104 +33,52 @@
   "model": "clocked-1.0",
   "results": [
    {
-    "index": 2,
-    "id": "fastify:docs/Reference/Reply.md#24",
+    "index": 1,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#15",
     "action": "use",
-    "relevance_score": 0.9955,
-    "document_score": 0.9965,
+    "relevance_score": 0.9946,
+    "document_score": 0.9959,
     "levels": {
-     "answers": 0.9955,
-     "elsewhere": 0.001,
-     "different_case": 0.0015,
-     "unrelated": 0.002
-    }
-   },
-   {
-    "index": 4,
-    "id": "fastify:docs/Reference/Server.md#88",
-    "action": "use",
-    "relevance_score": 0.9934,
-    "document_score": 0.9955,
-    "levels": {
-     "answers": 0.9934,
-     "elsewhere": 0.0021,
-     "different_case": 0.0023,
-     "unrelated": 0.0021
-    }
-   },
-   {
-    "index": 5,
-    "id": "fastify:docs/Reference/Validation-and-Serialization.md#20",
-    "action": "use",
-    "relevance_score": 0.9879,
-    "document_score": 0.9915,
-    "levels": {
-     "answers": 0.9879,
-     "elsewhere": 0.0036,
-     "different_case": 0.0047,
-     "unrelated": 0.0037
+     "answers": 0.9946,
+     "elsewhere": 0.0013,
+     "different_case": 0.0016,
+     "unrelated": 0.0025
     }
    },
    {
     "index": 0,
-    "id": "fastify:docs/Reference/Errors.md#9",
-    "action": "use",
-    "relevance_score": 0.9874,
-    "document_score": 0.9908,
-    "levels": {
-     "answers": 0.9874,
-     "elsewhere": 0.0033,
-     "different_case": 0.0049,
-     "unrelated": 0.0043
-    }
-   },
-   {
-    "index": 1,
-    "id": "fastify:docs/Reference/Reply.md#22",
-    "action": "use",
-    "relevance_score": 0.9809,
-    "document_score": 0.9865,
-    "levels": {
-     "answers": 0.9809,
-     "elsewhere": 0.0055,
-     "different_case": 0.0081,
-     "unrelated": 0.0055
-    }
-   },
-   {
-    "index": 3,
-    "id": "fastify:docs/Reference/Server.md#18",
+    "id": "fastify:docs/Reference/Reply.md#1",
     "action": "skip",
     "reason": "unrelated",
-    "relevance_score": 0.0032,
-    "document_score": 0.0124,
+    "relevance_score": 0.0063,
+    "document_score": 0.0822,
     "levels": {
-     "answers": 0.0032,
-     "elsewhere": 0.0092,
-     "different_case": 0.013,
-     "unrelated": 0.9746
+     "answers": 0.0063,
+     "elsewhere": 0.0759,
+     "different_case": 0.0279,
+     "unrelated": 0.8898
     }
    }
   ],
   "usage": {
-   "input_tokens": 2713
+   "input_tokens": 1072
   },
   "timing": {
-   "total_ms": 70,
-   "rerank_ms": 69,
+   "total_ms": 61,
+   "rerank_ms": 46,
    "questions_ms": 0,
-   "model_ms": 63,
+   "model_ms": 39,
    "engine": {
-    "rows": 3523,
-    "branches": 6,
+    "rows": 1342,
+    "branches": 2,
     "forwards": 1,
     "bins": 1,
-    "bucket_rows": 4096,
+    "bucket_rows": 1536,
     "long": 0,
-    "total_ms": 63,
+    "total_ms": 39,
     "build_ms": 0,
-    "doc_ms": 1,
-    "forward_ms": 61,
+    "doc_ms": 2,
+    "forward_ms": 36,
     "state_ms": 0,
     "logits_ms": 0,
     "state_chars": 0,

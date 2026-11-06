@@ -1,0 +1,116 @@
+{
+ "endpoint": "compare",
+ "tag": "prometheus/basic-auth.compare",
+ "recorded_at": "2026-11-06T13:30:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1210,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "203.932129",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=427"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#94",
+    "text": "In tag and namespace names, any character outside `[a-zA-Z0-9_]` is replaced\nwith an underscore; case is preserved. For example, a freeform tag named\n`appOwner` is exposed as `__meta_oci_tag_appOwner`, and a defined tag in\nnamespace `Operations` with key `Cost Center` is exposed as\n`__meta_oci_defined_tag_Operations_Cost_Center`. Because case is preserved,\ntag keys that differ only in case (`Env` and `env`) produce distinct labels.\n\nTo restrict targets to instances carrying a specific tag, use\n[`relabel_configs`](#relabel_config) with `keep` or `drop` actions matching the\nrelevant `__meta_oci_tag_*` or `__meta_oci_defined_tag_*` label.\n\nTargets with no resolvable primary-VNIC IP (neither private nor public) are\ndropped to avoid emitting unscrapeable `:<port>` addresses. The address used\nis the private IP when available, falling back to the public IP.\n\n```yaml\n# Authentication method. Supported values: \"api_key\" (default), \"instance_principal\".\n# \"instance_principal\" uses IMDS-based credentials and requires no credential fields;\n# it is the recommended method when Prometheus runs on OCI compute.\n[ auth: <string> | default = \"api_key\" ]\n\n# API key auth fields. Required when auth is \"api_key\".\n[ tenancy: <string> ]\n[ user: <string> ]\n[ fingerprint: <string> ]\n[ key_file: <string> ]\n# Passphrase for the private key. Mutually exclusive with key_passphrase_file.\n[ key_passphrase: <secret> ]\n# Path to a file containing the passphrase for the private key. Mutually\n# exclusive with key_passphrase. The file is read at configuration load\n# time; rotating the file requires reloading Prometheus.\n[ key_passphrase_file: <string> ]\n\n# OCI region identifier. Required.\nregion: <string>\n\n# Explicit list of compartment OCIDs to scan. When empty, all active\n# compartments reachable from the tenancy root are discovered automatically\n# via the OCI Identity API using a breadth-first walk. Compartments that\n# cannot be listed due to missing permissions are skipped with a warning so\n# that a single permission gap does not abort the walk.\n[ compartments:\n  [ - <string> ... ] ]\n\n# Authentication information used to authenticate to the API server.\n# Note that `basic_auth`, `authorization`, and `oauth2` options are\n# mutually exclusive. `password` and `password_file` are mutually exclusive.\n# It is mostly useful to configure `proxy_url`, `tls_config`, and the\n# underlying HTTP transport when targeting OCI through a corporate proxy\n# or with a custom CA bundle.\n# Optional HTTP basic authentication information, currently not supported by OCI.\n[ basic_auth: <basic_auth> ]\n# Optional `Authorization` header configuration, currently not supported by OCI.\n[ authorization: <authorization> ]\n# Optional OAuth 2.0 configuration, currently not supported by OCI.\n[ oauth2: <oauth2> ]"
+   },
+   {
+    "id": "prometheus:docs/configuration/promtool.md#1",
+    "text": "A valid example file can be found [here](/documentation/examples/promtool-http-config-file.yml).\n\n```yaml\n# Note that `basic_auth` and `authorization` options are mutually exclusive.\n\n# Sets the `Authorization` header with the configured username and password.\n# `username_ref` and `password_ref`refer to the name of the secret within the secret manager.\n# `password`, `password_file` and `password_ref` are mutually exclusive.\nbasic_auth:\n  [ username: <string> ]\n  [ username_file: <filename> ]\n  [ username_ref: <string> ]\n  [ password: <secret> ]\n  [ password_file: <string> ]\n  [ password_ref: <string> ]\n\n# Optional the `Authorization` header configuration.\nauthorization:\n  # Sets the authentication type.\n  [ type: <string> | default: Bearer ]\n  # Sets the credentials. It is mutually exclusive with\n  # `credentials_file`.\n  [ credentials: <secret> ]\n  # Sets the credentials with the credentials read from the configured file.\n  # It is mutually exclusive with `credentials`.\n  [ credentials_file: <filename> ]\n  [ credentials_ref: <string> ]\n\n# Optional OAuth 2.0 configuration.\n# Cannot be used at the same time as basic_auth or authorization.\noauth2:\n  [ <oauth2> ]\n\ntls_config:\n  [ <tls_config> ]\n\n[ follow_redirects: <bool> | default: true ]\n\n# Whether to enable HTTP2.\n[ enable_http2: <bool> | default: true ]\n\n# Optional proxy URL.\n[ proxy_url: <string> ]\n# Comma-separated string that can contain IPs, CIDR notation, domain names\n# that should be excluded from proxying. IP and domain names can\n# contain port numbers.\n[ no_proxy: <string> ]\n[ proxy_from_environment: <bool> ]\n[ proxy_connect_header:\n  [ <string>: [ <secret>, ... ] ] ]\n\n# `http_headers` specifies a set of headers that will be injected into each request.\nhttp_headers:\n  [ <string>: <header> ]\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#94",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/configuration/promtool.md#1"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "prometheus:docs/configuration/promtool.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "prometheus:docs/configuration/configuration.md#94"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "prometheus:docs/configuration/configuration.md#94",
+    "b": "prometheus:docs/configuration/promtool.md#1",
+    "relation": "overlapping",
+    "related": 0.9933,
+    "probabilities": {
+     "same": 0.0168,
+     "overlapping": 0.964,
+     "conflicting": 0.0125,
+     "unrelated": 0.0067
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0242,
+       "restated": 0.7847,
+       "elaborated": 0.0605,
+       "different": 0.1306
+      },
+      "confidence": 0.8694,
+      "a": {
+       "document": "prometheus:docs/configuration/configuration.md#94",
+       "quote": "# Note that `basic_auth`, `authorization`, and `oauth2` options are",
+       "start": 2157,
+       "end": 2224,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "prometheus:docs/configuration/promtool.md#1",
+       "quote": "A valid example file can be found [here](/documentation/examples/promtool-http-config-file.yml).\n\n```yaml\n# Note that `basic_auth` and `authorization` options are mutually exclusive.\n\n# Sets the `Authorization` header with the configured username and password.\n# `username_ref` and `password_ref`refer to the name of the secret within the secret manager.\n# `password`, `password_file` and `password_ref` are mutually exclusive.\nbasic_auth:\n  [ username: <string> ]\n  [ username_file: <filename> ]\n  [ username_ref: <string> ]\n  [ password: <secret> ]\n  [ password_file: <string> ]\n  [ password_ref: <string> ]\n\n# Optional the `Authorization` header configuration.\nauthorization:\n  # Sets the authentication type.\n  [ type: <string> | default: Bearer ]\n  # Sets the credentials.",
+       "start": 0,
+       "end": 777,
+       "confidence": 0.958
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 43,
+   "passage_reads": 1,
+   "passages_ms": 99,
+   "passages": 1,
+   "counterparts_ms": 75
+  },
+  "timing": {
+   "read_ms": 216,
+   "total_ms": 221
+  }
+ }
+}

@@ -1,0 +1,84 @@
+{
+ "endpoint": "compare",
+ "tag": "vite/env-local.compare",
+ "recorded_at": "2026-11-06T13:30:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 996,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "123.276484",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=27,cfOrigin;dur=0,cfWorker;dur=275"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/env-and-mode.md#3",
+    "text": "### `.env` Files\n\nVite uses [dotenv](https://github.com/motdotla/dotenv) to load additional environment variables from the following files in your [environment directory](/config/shared-options.md#envdir):\n\n```\n.env                # loaded in all cases\n.env.local          # loaded in all cases, ignored by git\n.env.[mode]         # only loaded in specified mode\n.env.[mode].local   # only loaded in specified mode, ignored by git\n```\n\n:::tip Env Loading Priorities\n\nAn env file for a specific mode (e.g. `.env.production`) will take higher priority than a generic one (e.g. `.env`).\n\nVite will always load `.env` and `.env.local` in addition to the mode-specific `.env.[mode]` file. Variables declared in mode-specific files will take precedence over those in generic files, but variables defined only in `.env` or `.env.local` will still be available in the environment.\n\nIn addition, environment variables that already exist when Vite is executed have the highest priority and will not be overwritten by `.env` files. For example, when running `VITE_SOME_KEY=123 vite build`.\n\n`.env` files are loaded at the start of Vite. Restart the server after making changes.\n\n:::\n\n:::warning Bun users\n\nWhen using [Bun](https://bun.sh), be aware that Bun automatically loads `.env` files before your script runs. This built-in behavior loads environment variables directly into `process.env` and can interfere with Vite's feature, as it respects existing `process.env` values. See [oven-sh/bun#5515](https://github.com/oven-sh/bun/issues/5515) for workarounds."
+   },
+   {
+    "id": "vite:docs/config/index.md#4",
+    "text": "## Using Environment Variables in Config\n\nEnvironment variables available while the config itself is being evaluated are only those that already exist in the current process environment (`process.env`). Vite deliberately defers loading any `.env*` files until _after_ the user config has been resolved because the set of files to load depends on config options like [`root`](/guide/#index-html-and-project-root) and [`envDir`](/config/shared-options.md#envdir), and also on the final `mode`.\n\nThis means: variables defined in `.env`, `.env.local`, `.env.[mode]`, or `.env.[mode].local` are **not** automatically injected into `process.env` while your `vite.config.*` is running. They _are_ automatically loaded later and exposed to application code via `import.meta.env` (with the default `VITE_` prefix filter) exactly as documented in [Env Variables and Modes](/guide/env-and-mode.html). So if you only need to pass values from `.env*` files to the app, you don't need to call anything in the config.\n\nIf, however, values from `.env*` files must influence the config itself (for example to set `server.port`, conditionally enable plugins, or compute `define` replacements), you can load them manually using the exported [`loadEnv`](/guide/api-javascript.html#loadenv) helper.\n\n```js twoslash\nimport { defineConfig, loadEnv } from 'vite'\n\nexport default defineConfig(({ mode }) => {\n  // Load env file based on `mode` in the current working directory.\n  // Set the third parameter to '' to load all env regardless of the\n  // `VITE_` prefix.\n  const env = loadEnv(mode, process.cwd(), '')\n  return {\n    define: {\n      // Provide an explicit app-level constant derived from an env var.\n      __APP_ENV__: JSON.stringify(env.APP_ENV),\n    },\n    // Example: use an env var to set the dev server port conditionally.\n    server: {\n      port: env.APP_PORT ? Number(env.APP_PORT) : 5173,\n    },\n  }\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/env-and-mode.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "vite:docs/config/index.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/env-and-mode.md#3",
+    "b": "vite:docs/config/index.md#4",
+    "relation": "overlapping",
+    "related": 0.9954,
+    "probabilities": {
+     "same": 0.0132,
+     "overlapping": 0.9738,
+     "conflicting": 0.0085,
+     "unrelated": 0.0046
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 36,
+   "passage_reads": 1,
+   "passages_ms": 98,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 133,
+   "total_ms": 136
+  }
+ }
+}

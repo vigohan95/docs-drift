@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/import-meta-hot-accept.rerank",
+ "recorded_at": "2026-11-06T13:30:28Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 899,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "47.53632",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=194"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `import.meta.hot.accept`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `import.meta.hot.accept`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-frameworks.md#4",
+    "title": "docs/guide/api-environment-frameworks.md > Environment API for Frameworks > DevEnvironment Communication Levels > `RunnableDevEnvironment`",
+    "text": "  // 4. render the app HTML. This assumes entry-server.js's exported\n  //     `render` function calls appropriate framework SSR APIs,\n  //    e.g. ReactDOMServer.renderToString()\n  const appHtml = await render(url)\n\n  // 5. Inject the app-rendered HTML into the template.\n  const html = template.replace(`<!--ssr-outlet-->`, appHtml)\n\n  // 6. Send the rendered HTML back.\n  res.status(200).set({ 'Content-Type': 'text/html' }).end(html)\n})\n```\n\nWhen using environments that support HMR (such as `RunnableDevEnvironment`), you should add `import.meta.hot.accept()` in your server entry file for optimal behavior. Without this, server file changes will invalidate the entire server module graph:\n\n```js\n// src/entry-server.js\nexport function render(...) { ... }\n\nif (import.meta.hot) {\n  import.meta.hot.accept()\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-hmr.md#3",
+    "title": "docs/guide/api-hmr.md > HMR API > `hot.accept(cb)`",
+    "text": "## `hot.accept(cb)`\n\nFor a module to self-accept, use `import.meta.hot.accept` with a callback which receives the updated module:\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nexport const count = 1\n\nif (import.meta.hot) {\n  import.meta.hot.accept((newModule) => {\n    if (newModule) {\n      // newModule is undefined when SyntaxError happened\n      console.log('updated: count is now ', newModule.count)\n    }\n  })\n}\n```\n\nA module that \"accepts\" hot updates is considered an **HMR boundary**.\n\n```dot\ndigraph hmr_boundary {\n  rankdir=RL\n  ranksep=0.3\n  node [shape=box style=\"rounded,filled\" fontname=\"Arial\" fontsize=11 margin=\"0.2,0.1\" fontcolor=\"${#3c3c43|#ffffff}\" color=\"${#c2c2c4|#3c3f44}\"]\n  edge [color=\"${#67676c|#98989f}\" fontname=\"Arial\" fontsize=10 fontcolor=\"${#67676c|#98989f}\"]\n  bgcolor=\"transparent\"\n\n  root [label=\"main.js\" fillcolor=\"${#f6f6f7|#2e2e32}\"]\n  parent [label=\"App.vue\" fillcolor=\"${#f6f6f7|#2e2e32}\"]\n  boundary [label=\"Component.vue\\n(HMR boundary)\\nhot.accept()\" fillcolor=\"${#def5ed|#15312d}\" color=\"${#18794e|#3dd68c}\" penwidth=2]\n  edited [label=\"utils.js\\n(edited)\" fillcolor=\"${#fcf4dc|#38301a}\" color=\"${#915930|#f9b44e}\" penwidth=2]\n\n  boundary -> edited [label=\"imports\" color=\"${#915930|#f9b44e}\" style=bold]\n  parent -> boundary [label=\"imports\" style=dashed]\n  root -> parent [label=\"imports\" style=dashed]\n}\n```\n\nVite's HMR does not actually swap the originally imported module: if an HMR boundary module re-exports imports from a dep, then it is responsible for updating those re-exports (and these exports must be using `let`). In addition, importers up the chain from the boundary module will not be notified of the change. This simplified HMR implementation is sufficient for most dev use cases, while allowing us to skip the expensive work of generating proxy modules.\n\nVite requires that the call to this function appears as `import.meta.hot.accept(` (whitespace-sensitive) in the source code in order for the module to accept update. This is a requirement of the static analysis that Vite does to enable HMR support for a module."
+   },
+   {
+    "id": "vite:docs/guide/migration.md#21",
+    "title": "docs/guide/migration.md > Migration from v7 > Removed Deprecated Features [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)",
+    "text": "## Removed Deprecated Features [<Badge text=\"NRV\" type=\"warning\" />](#migration-from-v7)\n\n- Passing a URL to `import.meta.hot.accept` is no longer supported. Please pass an id instead. ([#21382](https://github.com/vitejs/vite/pull/21382))"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-hmr.md#3",
+    "action": "use",
+    "relevance_score": 0.9932,
+    "document_score": 0.995,
+    "levels": {
+     "answers": 0.9932,
+     "elsewhere": 0.0018,
+     "different_case": 0.0022,
+     "unrelated": 0.0028
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/guide/migration.md#21",
+    "action": "use",
+    "relevance_score": 0.9929,
+    "document_score": 0.9951,
+    "levels": {
+     "answers": 0.9929,
+     "elsewhere": 0.0022,
+     "different_case": 0.0024,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-frameworks.md#4",
+    "action": "expand",
+    "relevance_score": 0.0923,
+    "document_score": 0.805,
+    "levels": {
+     "answers": 0.0923,
+     "elsewhere": 0.7127,
+     "different_case": 0.0379,
+     "unrelated": 0.1571
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1335
+  },
+  "timing": {
+   "total_ms": 67,
+   "rerank_ms": 52,
+   "questions_ms": 0,
+   "model_ms": 44,
+   "engine": {
+    "rows": 1692,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 44,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 41,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

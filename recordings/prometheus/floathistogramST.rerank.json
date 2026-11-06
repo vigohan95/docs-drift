@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/floathistogramST.rerank",
+ "recorded_at": "2026-11-06T13:30:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 940,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.694561",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=30,cfOrigin;dur=0,cfWorker;dur=172"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `floathistogramST`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `floathistogramST`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/feature_flags.md#23",
+    "title": "docs/feature_flags.md > Histogram ST chunk encoding",
+    "text": "## Histogram ST chunk encoding\n\n`--enable-feature=histograms-st-encoding`\n\n> WARNING: This is highly experimental and risky setting:\n> * Chunks encoded with `histogramST` and `floathistogramST` **cannot be read by older Prometheus versions** that do not support the encoding. Once enabled and data is written, you need to **manually delete blocks from the disk**, otherwise Prometheus will return error on all queries.\n> * We are still experimenting on the final encoding. As of now this encoding can change in any Prometheus version. All your persistent block data will be lost between versions.\n> * This encoding is new, meaning downstream tools and LTS systems might not support it yet (e.g. Thanos sidecar uploaded blocks).\n\nThis setting enables the new `histogramST` and `floathistogramST` chunk encodings for native histogram and float histogram samples. These encodings extend the corresponding histogram chunk formats with a Start Timestamp (ST) header and per-sample ST encoding, equivalent to what the [XOR2 encoding](configuration/configuration.md#tsdb) does for float chunks. The flag does not affect float chunks.\n\nThe [`st-storage`](#start-timestamp-st-native-storage) feature automatically enables these histogram encodings. When enabled without `st-storage`, Prometheus uses the ST-capable histogram chunk encodings but does not store start timestamps from ingestion."
+   },
+   {
+    "id": "prometheus:tsdb/docs/format/chunks.md#1",
+    "title": "tsdb/docs/format/chunks.md > Chunk",
+    "text": "# Chunk\n\n```\n┌───────────────┬───────────────────┬─────────────┬───────────────────┐\n│ len <uvarint> │ encoding <1 byte> │ data <data> │ checksum <4 byte> │\n└───────────────┴───────────────────┴─────────────┴───────────────────┘\n```\n\nNotes:\n\n* `len`: Chunk size in bytes. 1 to 5 bytes long using the [`<uvarint>` encoding](https://go.dev/src/encoding/binary/varint.go).\n* `encoding`: Currently one of `XOR`, `XOR2`, `histogram`, `floathistogram`, `histogramST`, or `floathistogramST`, see [code for numerical values](https://github.com/prometheus/prometheus/blob/02d0de9987ad99dee5de21853715954fadb3239f/tsdb/chunkenc/chunk.go#L28-L47). The `XOR2`, `histogramST`, and `floathistogramST` encodings extend their non-ST counterparts with optional Start Timestamp (ST) data. `XOR2` is selected by the [`storage.tsdb.chunk_encoding.floats`](../../../docs/configuration/configuration.md#tsdb) configuration field; `histogramST` and `floathistogramST` are gated behind the experimental [`histograms-st-encoding` feature flag](../../../docs/feature_flags.md#histogram-st-chunk-encoding).\n* `data`: See below for each encoding.\n* `checksum`: Checksum of `encoding` and `data`. It's a [cyclic redundancy check](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) with the Castagnoli polynomial, serialised as an unsigned 32 bits big endian number. Can be referred as a `CRC-32C`."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:tsdb/docs/format/chunks.md#1",
+    "action": "use",
+    "relevance_score": 0.97,
+    "document_score": 0.9833,
+    "levels": {
+     "answers": 0.97,
+     "elsewhere": 0.0133,
+     "different_case": 0.0104,
+     "unrelated": 0.0064
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/feature_flags.md#23",
+    "action": "use",
+    "relevance_score": 0.7548,
+    "document_score": 0.9362,
+    "levels": {
+     "answers": 0.7548,
+     "elsewhere": 0.1814,
+     "different_case": 0.0246,
+     "unrelated": 0.0392
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 909
+  },
+  "timing": {
+   "total_ms": 45,
+   "rerank_ms": 44,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1179,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

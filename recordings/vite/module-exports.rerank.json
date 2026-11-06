@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/module-exports.rerank",
+ "recorded_at": "2026-11-06T13:30:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 871,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.884449",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=194"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `module.exports`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `module.exports`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/migration.md#12",
+    "title": "docs/guide/migration.md > Migration from v7 > Rolldown > Consistent CommonJS Interop",
+    "text": "### Consistent CommonJS Interop\n\nThe `default` import from a CommonJS (CJS) module is now handled in a consistent way.\n\nIf it matches one of the following conditions, the `default` import is the `module.exports` value of the importee CJS module. Otherwise, the `default` import is the `module.exports.default` value of the importee CJS module:\n\n- The importer is `.mjs` or `.mts`.\n- The closest `package.json` for the importer has a `type` field set to `module`.\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n\n::: details The previous behavior\n\nIn development, if it matches one of the following conditions, the `default` import is the `module.exports` value of the importee CJS module. Otherwise, the `default` import is the `module.exports.default` value of the importee CJS module:\n\n- _The importer is included in the dependency optimization_ and `.mjs` or `.mts`.\n- _The importer is included in the dependency optimization_ and the closest `package.json` for the importer has a `type` field set to `module`.\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n\nIn build, the conditions were:\n\n- The `module.exports.__esModule` value of the importee CJS module is not set to `true`.\n- _`default` property of `module.exports` does not exist_.\n\n(assuming [`build.commonjsOptions.defaultIsModuleExports`](https://github.com/rollup/plugins/tree/master/packages/commonjs#defaultismoduleexports) is not changed from the default `'auto'`)\n\n:::\n\nSee Rolldown's docs about this problem for more details: [Ambiguous `default` import from CJS modules - Bundling CJS | Rolldown](https://rolldown.rs/in-depth/bundling-cjs#ambiguous-default-import-from-cjs-modules).\n\nThis change may break some existing code importing CJS modules. You can use the deprecated `legacy.inconsistentCjsInterop: true` option to temporarily restore the previous behavior. If you find a package that is affected by this change, please report it to the package author or send them a pull request. Make sure to link to the Rolldown documentation above so that the author can understand the context."
+   },
+   {
+    "id": "vite:docs/guide/troubleshooting.md#25",
+    "title": "docs/guide/troubleshooting.md > Troubleshooting > Others > Default import unexpectedly returns an object",
+    "text": "### Default import unexpectedly returns an object\n\nThe default import returns the `module.exports` object for CJS modules, while you may expect it to return the `module.exports.default` value.\n\nThis may cause errors like:\n\n> Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.\n\n> foo is not a function\n\nSee Rolldown's docs about this problem for more details: [Ambiguous `default` import from CJS modules - Bundling CJS | Rolldown](https://rolldown.rs/in-depth/bundling-cjs#ambiguous-default-import-from-cjs-modules).\n\n<script setup lang=\"ts\">\n// redirect old links with hash to old version docs\nif (typeof window !== \"undefined\") {\n  const hashForOldVersion = {\n    'vite-cjs-node-api-deprecated': 6\n  }\n\n  const version = hashForOldVersion[location.hash.slice(1)]\n  if (version) {\n    // update the scheme and the port as well so that it works in local preview (it is http and 4173 locally)\n    location.href = `https://v${version}.vite.dev` + location.pathname + location.search + location.hash\n  }\n}\n</script>"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/migration.md#12",
+    "action": "use",
+    "relevance_score": 0.9332,
+    "document_score": 0.956,
+    "levels": {
+     "answers": 0.9332,
+     "elsewhere": 0.0228,
+     "different_case": 0.0178,
+     "unrelated": 0.0262
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/troubleshooting.md#25",
+    "action": "use",
+    "relevance_score": 0.7535,
+    "document_score": 0.8638,
+    "levels": {
+     "answers": 0.7535,
+     "elsewhere": 0.1103,
+     "different_case": 0.0358,
+     "unrelated": 0.1004
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1038
+  },
+  "timing": {
+   "total_ms": 74,
+   "rerank_ms": 58,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1308,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

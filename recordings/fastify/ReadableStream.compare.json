@@ -1,0 +1,123 @@
+{
+ "endpoint": "compare",
+ "tag": "fastify/ReadableStream.compare",
+ "recorded_at": "2026-11-06T13:29:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1518,
+ "response_headers": {
+  "x-clocked-credits": "15",
+  "x-clocked-model-ms": "371.388966",
+  "x-clocked-cost-usd": "0.002988",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=704"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#18",
+    "text": "###### ReadableStream\n<a id=\"send-readablestream\"></a>\n\n`ReadableStream` will be treated as a node stream mentioned above,\nthe content is considered to be pre-serialized, so they will be\nsent unmodified without response validation.\n\n```js\nconst fs = require('node:fs')\nconst { ReadableStream } = require('node:stream/web')\n\nfastify.get('/streams', function (request, reply) {\n  const stream = fs.createReadStream('some-file')\n  reply.header('Content-Type', 'application/octet-stream')\n  reply.send(ReadableStream.from(stream))\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#15",
+    "text": "| <a id=\"fst_err_hook_invalid_async_handler\">FST_ERR_HOOK_INVALID_ASYNC_HANDLER</a> | Async function has too many arguments. Async hooks should not use the `done` argument. | Remove the `done` argument from the async hook. | [#4367](https://github.com/fastify/fastify/pull/4367) |\n| <a id=\"fst_err_hook_not_supported\">FST_ERR_HOOK_NOT_SUPPORTED</a> | The hook is not supported. | Use a supported hook. | [#4554](https://github.com/fastify/fastify/pull/4554) |\n| <a id=\"fst_err_missing_middleware\">FST_ERR_MISSING_MIDDLEWARE</a> | You must register a plugin for handling middlewares, visit [`Middleware`](./Middleware.md) for more info. | Register a plugin for handling middlewares. | [#2014](https://github.com/fastify/fastify/pull/2014) |\n| <a id=\"fst_err_hook_timeout\">FST_ERR_HOOK_TIMEOUT</a> | A callback for a hook timed out. | Increase the timeout for the hook. | [#3106](https://github.com/fastify/fastify/pull/3106) |\n| <a id=\"fst_err_log_invalid_destination\">FST_ERR_LOG_INVALID_DESTINATION</a> | The logger does not accept the specified destination. | Use a `'stream'` or a `'file'` as the destination. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_log_invalid_logger\">FST_ERR_LOG_INVALID_LOGGER</a> | The logger should have all these methods: `'info'`, `'error'`, `'debug'`, `'fatal'`, `'warn'`, `'trace'`, `'child'`. | Use a logger with all the required methods. | [#4520](https://github.com/fastify/fastify/pull/4520) |\n| <a id=\"fst_err_log_invalid_logger_instance\">FST_ERR_LOG_INVALID_LOGGER_INSTANCE</a> | The `loggerInstance` only accepts a logger instance, not a configuration object. | To pass a configuration object, use `'logger'` instead. | [#5020](https://github.com/fastify/fastify/pull/5020) |\n| <a id=\"fst_err_log_invalid_logger_config\">FST_ERR_LOG_INVALID_LOGGER_CONFIG</a> | The logger option only accepts a configuration object, not a logger instance. | To pass an instance, use `'loggerInstance'` instead.  | [#5020](https://github.com/fastify/fastify/pull/5020) |\n| <a id=\"fst_err_log_logger_and_logger_instance_provided\">FST_ERR_LOG_LOGGER_AND_LOGGER_INSTANCE_PROVIDED</a> | You cannot provide both `'logger'` and `'loggerInstance'`. | Please provide only one option.  | [#5020](https://github.com/fastify/fastify/pull/5020) |\n| <a id=\"fst_err_log_invalid_log_controller\">FST_ERR_LOG_INVALID_LOG_CONTROLLER</a> | The `logController` option must be an instance of `LogController`. | Extend the `LogController` class and pass an instance. | - |\n| <a id=\"fst_err_rep_invalid_payload_type\">FST_ERR_REP_INVALID_PAYLOAD_TYPE</a> | Reply payload can be either a `string` or a `Buffer`. | Use a `string` or a `Buffer` for the payload. | [#1168](https://github.com/fastify/fastify/pull/1168) |\n| <a id=\"fst_err_rep_response_body_consumed\">FST_ERR_REP_RESPONSE_BODY_CONSUMED</a> | Using `Response` as reply payload, but the body is being consumed. | Make sure you don't consume the `Response.body` | [#5286](https://github.com/fastify/fastify/pull/5286) |\n| <a id=\"fst_err_rep_readable_stream_locked\">FST_ERR_REP_READABLE_STREAM_LOCKED</a> | Using `ReadableStream` as reply payload, but locked with another reader. | Make sure you don't call the `Readable.getReader` before sending or release lock with `reader.releaseLock()` before sending. | [#5920](https://github.com/fastify/fastify/pull/5920) |\n| <a id=\"fst_err_rep_already_sent\">FST_ERR_REP_ALREADY_SENT</a> | A response was already sent. | - | [#1336](https://github.com/fastify/fastify/pull/1336) |\n| <a id=\"fst_err_rep_sent_value\">FST_ERR_REP_SENT_VALUE</a> | The only possible value for `reply.sent` is `true`. | - | [#1336](https://github.com/fastify/fastify/pull/1336) |"
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#8",
+    "text": "### onSend\nIf you are using the `onSend` hook, you can change the payload. For example:\n\n```js\nfastify.addHook('onSend', (request, reply, payload, done) => {\n  const err = null;\n  const newPayload = payload.replace('some-text', 'some-new-text')\n  done(err, newPayload)\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('onSend', async (request, reply, payload) => {\n  const newPayload = payload.replace('some-text', 'some-new-text')\n  return newPayload\n})\n```\n\nYou can also clear the payload to send a response with an empty body by\nreplacing the payload with `null`:\n\n```js\nfastify.addHook('onSend', (request, reply, payload, done) => {\n  reply.code(304)\n  const newPayload = null\n  done(null, newPayload)\n})\n```\n\n> You can also send an empty body by replacing the payload with the empty string\n> `''`, but be aware that this will cause the `Content-Length` header to be set\n> to `0`, whereas the `Content-Length` header will not be set if the payload is\n> `null`.\n\n> ℹ️ Note:\n> If you change the payload, you may only change it to a `string`, a\n> `Buffer`, a `stream`, a `ReadableStream`, a `Response`, or `null`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Reply.md#18",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Errors.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "fastify:docs/Reference/Hooks.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "fastify:docs/Reference/Reply.md#18",
+    "b": "fastify:docs/Reference/Errors.md#15",
+    "relation": "overlapping",
+    "related": 0.5311,
+    "probabilities": {
+     "same": 0.0129,
+     "overlapping": 0.5012,
+     "conflicting": 0.017,
+     "unrelated": 0.4689
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Reply.md#18",
+    "b": "fastify:docs/Reference/Hooks.md#8",
+    "relation": "overlapping",
+    "related": 0.9874,
+    "probabilities": {
+     "same": 0.0152,
+     "overlapping": 0.9637,
+     "conflicting": 0.0084,
+     "unrelated": 0.0126
+    },
+    "duplicates": [],
+    "conflicts": []
+   },
+   {
+    "a": "fastify:docs/Reference/Errors.md#15",
+    "b": "fastify:docs/Reference/Hooks.md#8",
+    "relation": "unrelated",
+    "related": 0.4569,
+    "probabilities": {
+     "same": 0.0149,
+     "overlapping": 0.4261,
+     "conflicting": 0.0159,
+     "unrelated": 0.5431
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0,
+   1
+  ],
+  "stages": {
+   "pairs_reread": 2,
+   "pairs_ms": 118,
+   "passage_reads": 1,
+   "passages_ms": 306,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 423,
+   "total_ms": 428
+  }
+ }
+}

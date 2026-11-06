@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/useSemicolonDelimiter.rerank",
+ "recorded_at": "2026-11-06T13:29:59Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 879,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.073631",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=189"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `useSemicolonDelimiter`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `useSemicolonDelimiter`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#5",
+    "title": "docs/Guides/Migration-Guide-V5.md > V5 Migration Guide > Breaking Changes > `useSemicolonDelimiter` false by default",
+    "text": "### `useSemicolonDelimiter` false by default\n\nStarting with v5, Fastify instances will no longer default to supporting the use\nof semicolon delimiters in the query string as they did in v4.\nThis is due to it being non-standard\nbehavior and not adhering to [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986#section-3.4).\n\nIf you still wish to use semicolons as delimiters, you can do so by\nsetting `useSemicolonDelimiter: true` in the server configuration.\n\n```js\nconst fastify = require('fastify')({\n  useSemicolonDelimiter: true\n});\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#0",
+    "title": "docs/Reference/Server.md > Factory",
+    "text": "## Factory\n<a id=\"factory\"></a>\n\nThe Fastify module exports a factory function that is used to create new\n<code><b>Fastify server</b></code> instances. This factory function accepts an\noptions object which is used to customize the resulting instance. This document\ndescribes the properties available in that options object.\n\n- [Factory](#factory)\n  - [`http`](#http)\n  - [`http2`](#http2)\n  - [`https`](#https)\n  - [`connectionTimeout`](#connectiontimeout)\n  - [`keepAliveTimeout`](#keepalivetimeout)\n  - [`forceCloseConnections`](#forcecloseconnections)\n  - [`maxRequestsPerSocket`](#maxrequestspersocket)\n  - [`requestTimeout`](#requesttimeout)\n  - [`bodyLimit`](#bodylimit)\n  - [`onProtoPoisoning`](#onprotopoisoning)\n  - [`onConstructorPoisoning`](#onconstructorpoisoning)\n  - [`logger`](#logger)\n  - [`loggerInstance`](#loggerinstance)\n  - [`logController`](#logcontroller)\n  - [`serverFactory`](#serverfactory)\n  - [`requestIdHeader`](#requestidheader)\n  - [`genReqId`](#genreqid)\n  - [`trustProxy`](#trustproxy)\n  - [`pluginTimeout`](#plugintimeout)\n  - [`exposeHeadRoutes`](#exposeheadroutes)\n  - [`return503OnClosing`](#return503onclosing)\n  - [`ajv`](#ajv)\n  - [`serializerOpts`](#serializeropts)\n  - [`http2SessionTimeout`](#http2sessiontimeout)\n  - [`frameworkErrors`](#frameworkerrors)\n  - [`clientErrorHandler`](#clienterrorhandler)\n  - [`rewriteUrl`](#rewriteurl)\n  - [`allowErrorHandlerOverride`](#allowerrorhandleroverride)\n  - [RouterOptions](#routeroptions)\n    - [`allowUnsafeRegex`](#allowunsaferegex)\n    - [`buildPrettyMeta`](#buildprettymeta)\n    - [`caseSensitive`](#casesensitive)\n    - [`compile`](#compile)\n    - [`constraints`](#constraints)\n    - [`defaultRoute`](#defaultroute)\n    - [`ignoreDuplicateSlashes`](#ignoreduplicateslashes)\n    - [`ignoreTrailingSlash`](#ignoretrailingslash)\n    - [`maxParamLength`](#maxparamlength)\n    - [`onBadUrl`](#onbadurl)\n    - [`onMaxParamLength`](#onmaxparamlength)\n    - [`querystringParser`](#querystringparser)\n    - [`useSemicolonDelimiter`](#usesemicolondelimiter)\n- [Instance](#instance)\n  - [Server Methods](#server-methods)\n    - [server](#server)\n    - [after](#after)\n    - [ready](#ready)\n    - [listen](#listen)\n    - [addresses](#addresses)\n    - [routing](#routing)\n    - [route](#route)\n    - [hasRoute](#hasroute)\n    - [findRoute](#findroute)\n    - [close](#close)\n    - [decorate\\*](#decorate)\n    - [register](#register)\n    - [addHook](#addhook)\n    - [prefix](#prefix)\n    - [pluginName](#pluginname)\n    - [hasPlugin](#hasplugin)\n    - [listeningOrigin](#listeningorigin)\n    - [log](#log)\n    - [version](#version)\n    - [inject](#inject)\n    - [addHttpMethod](#addHttpMethod)\n    - [addSchema](#addschema)\n    - [getSchemas](#getschemas)\n    - [getSchema](#getschema)\n    - [setReplySerializer](#setreplyserializer)\n    - [setValidatorCompiler](#setvalidatorcompiler)\n    - [setSchemaErrorFormatter](#setschemaerrorformatter)\n    - [setSerializerCompiler](#setserializercompiler)\n    - [validatorCompiler](#validatorcompiler)\n    - [serializerCompiler](#serializercompiler)\n    - [schemaErrorFormatter](#schemaerrorformatter)\n    - [schemaController](#schemacontroller)\n    - [setNotFoundHandler](#setnotfoundhandler)\n    - [setErrorHandler](#seterrorhandler)\n    - [setChildLoggerFactory](#setchildloggerfactory)\n    - [setGenReqId](#setgenreqid)\n    - [addConstraintStrategy](#addconstraintstrategy)\n    - [hasConstraintStrategy](#hasconstraintstrategy)\n    - [printRoutes](#printroutes)\n    - [printPlugins](#printplugins)"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#47",
+    "title": "docs/Reference/Server.md > RouterOptions > `useSemicolonDelimiter`",
+    "text": "### `useSemicolonDelimiter`\n<a id=\"use-semicolon-delimiter\"></a>\n\n+ Default `false`\n\nFastify uses [find-my-way](https://github.com/delvedor/find-my-way) which supports,\nseparating the path and query string with a `;` character (code 59), e.g. `/dev;foo=bar`.\nThis decision originated from [delvedor/find-my-way#76]\n(https://github.com/delvedor/find-my-way/issues/76). Thus, this option will support\nbackwards compatibility for the need to split on `;`. To enable support for splitting\non `;` set `useSemicolonDelimiter` to `true`.\n\n```js\nconst fastify = require('fastify')({\n  routerOptions: {\n    useSemicolonDelimiter: true\n  }\n})\n\nfastify.get('/dev', async (request, reply) => {\n  // An example request such as `/dev;foo=bar`\n  // Will produce the following query params result `{ foo = 'bar' }`\n  return request.query\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Migration-Guide-V5.md#5",
+    "action": "use",
+    "relevance_score": 0.9955,
+    "document_score": 0.9967,
+    "levels": {
+     "answers": 0.9955,
+     "elsewhere": 0.0012,
+     "different_case": 0.0016,
+     "unrelated": 0.0017
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Server.md#47",
+    "action": "use",
+    "relevance_score": 0.9942,
+    "document_score": 0.9955,
+    "levels": {
+     "answers": 0.9942,
+     "elsewhere": 0.0013,
+     "different_case": 0.0014,
+     "unrelated": 0.0031
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#0",
+    "action": "expand",
+    "relevance_score": 0.0047,
+    "document_score": 0.5125,
+    "levels": {
+     "answers": 0.0047,
+     "elsewhere": 0.5078,
+     "different_case": 0.0302,
+     "unrelated": 0.4573
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1741
+  },
+  "timing": {
+   "total_ms": 63,
+   "rerank_ms": 62,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2146,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

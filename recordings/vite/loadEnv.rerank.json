@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/loadEnv.rerank",
+ "recorded_at": "2026-11-06T13:29:55Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1099,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.948513",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=172"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `loadEnv`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `loadEnv`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-javascript.md#12",
+    "title": "docs/guide/api-javascript.md > JavaScript API > `loadEnv`",
+    "text": "## `loadEnv`\n\n**Type Signature:**\n\n```ts\nfunction loadEnv(\n  mode: string,\n  envDir: string,\n  prefixes: string | string[] = 'VITE_',\n): Record<string, string>\n```\n\n**Related:** [`.env` Files](./env-and-mode.md#env-files)\n\nLoad `.env` files within the `envDir` and merge them with the matching variables already present in `process.env`. By default, only env variables prefixed with `VITE_` are loaded, unless `prefixes` is changed."
+   },
+   {
+    "id": "vite:docs/config/index.md#4",
+    "title": "docs/config/index.md > Configuring Vite > Using Environment Variables in Config",
+    "text": "## Using Environment Variables in Config\n\nEnvironment variables available while the config itself is being evaluated are only those that already exist in the current process environment (`process.env`). Vite deliberately defers loading any `.env*` files until _after_ the user config has been resolved because the set of files to load depends on config options like [`root`](/guide/#index-html-and-project-root) and [`envDir`](/config/shared-options.md#envdir), and also on the final `mode`.\n\nThis means: variables defined in `.env`, `.env.local`, `.env.[mode]`, or `.env.[mode].local` are **not** automatically injected into `process.env` while your `vite.config.*` is running. They _are_ automatically loaded later and exposed to application code via `import.meta.env` (with the default `VITE_` prefix filter) exactly as documented in [Env Variables and Modes](/guide/env-and-mode.html). So if you only need to pass values from `.env*` files to the app, you don't need to call anything in the config.\n\nIf, however, values from `.env*` files must influence the config itself (for example to set `server.port`, conditionally enable plugins, or compute `define` replacements), you can load them manually using the exported [`loadEnv`](/guide/api-javascript.html#loadenv) helper.\n\n```js twoslash\nimport { defineConfig, loadEnv } from 'vite'\n\nexport default defineConfig(({ mode }) => {\n  // Load env file based on `mode` in the current working directory.\n  // Set the third parameter to '' to load all env regardless of the\n  // `VITE_` prefix.\n  const env = loadEnv(mode, process.cwd(), '')\n  return {\n    define: {\n      // Provide an explicit app-level constant derived from an env var.\n      __APP_ENV__: JSON.stringify(env.APP_ENV),\n    },\n    // Example: use an env var to set the dev server port conditionally.\n    server: {\n      port: env.APP_PORT ? Number(env.APP_PORT) : 5173,\n    },\n  }\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-javascript.md#12",
+    "action": "use",
+    "relevance_score": 0.9961,
+    "document_score": 0.9972,
+    "levels": {
+     "answers": 0.9961,
+     "elsewhere": 0.0011,
+     "different_case": 0.0012,
+     "unrelated": 0.0016
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/config/index.md#4",
+    "action": "use",
+    "relevance_score": 0.7931,
+    "document_score": 0.9536,
+    "levels": {
+     "answers": 0.7931,
+     "elsewhere": 0.1606,
+     "different_case": 0.0275,
+     "unrelated": 0.0189
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 800
+  },
+  "timing": {
+   "total_ms": 45,
+   "rerank_ms": 44,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1070,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

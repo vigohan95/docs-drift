@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/getDecorator.rerank",
+ "recorded_at": "2026-11-06T13:29:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 906,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.146591",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=226"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `getDecorator`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `getDecorator`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Decorators.md#11",
+    "title": "docs/Reference/Decorators.md > Decorators > Getters and Setters > `getDecorator(name)`",
+    "text": "#### `getDecorator(name)`\n<a id=\"get-decorator\"></a>\n\nUsed to retrieve an existing decorator from the Fastify instance, `Request`,\nor `Reply`.\nIf the decorator is not defined, an `FST_ERR_DEC_UNDECLARED` error is thrown.\n\n```js\n// Get a decorator from the Fastify instance\nconst utility = fastify.getDecorator('utility')\n\n// Get a decorator from the request object\nconst user = request.getDecorator('user')\n\n// Get a decorator from the reply object\nconst helper = reply.getDecorator('helper')\n```\n\nThe `getDecorator` method is useful for dependency validation - it can be used to\ncheck for required decorators at registration time. If any are missing, it fails\nat boot, ensuring dependencies are available during the request lifecycle.\n\n```js\nfastify.register(async function (fastify) {\n  // Verify the decorator exists before using it\n  const usersRepository = fastify.getDecorator('usersRepository')\n\n  fastify.get('/users', async function (request, reply) {\n    return usersRepository.findAll()\n  })\n})\n```\n\n> ℹ️ Note:\n> For TypeScript users, `getDecorator` supports generic type parameters.\n> See the [TypeScript documentation](./TypeScript.md) for\n> advanced typing examples."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#42",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .getDecorator(name)",
+    "text": "##### .getDecorator(name)\n\nReturns the value of a reply decorator declared with\n[`decorateReply`](./Decorators.md#decoratereplyname-value-dependencies). If the\ndecorator is a function, it is returned bound to the reply. It throws an\n`FST_ERR_DEC_UNDECLARED` error if the decorator has not been declared. See\n[`getDecorator`](./Decorators.md#getdecoratorname) for more details.\n\n```js\nfastify.decorateReply('helper', function () {\n  return this.statusCode\n})\n\nfastify.get('/', function (request, reply) {\n  const helper = reply.getDecorator('helper')\n  reply.code(201).send({ statusCode: helper() }) // { statusCode: 201 }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Request.md#26",
+    "title": "docs/Reference/Request.md > Request > Request > Methods > .getDecorator(name)",
+    "text": "##### .getDecorator(name)\n<a id=\"getdecorator\"></a>\n\nReturns the value of a request decorator declared with\n[`decorateRequest`](./Decorators.md#decoraterequestname-value-dependencies).\nIf the decorator is a function, it is returned bound to the request. It throws\nan `FST_ERR_DEC_UNDECLARED` error if the decorator has not been declared. See\n[`getDecorator`](./Decorators.md#getdecoratorname) for more details.\n\n```js\nfastify.decorateRequest('user', null)\n\nfastify.get('/', function (request, reply) {\n  const user = request.getDecorator('user')\n  reply.send({ user })\n})\n```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Decorators.md#11",
+    "action": "use",
+    "relevance_score": 0.994,
+    "document_score": 0.9956,
+    "levels": {
+     "answers": 0.994,
+     "elsewhere": 0.0017,
+     "different_case": 0.0023,
+     "unrelated": 0.002
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Request.md#26",
+    "action": "use",
+    "relevance_score": 0.9916,
+    "document_score": 0.9945,
+    "levels": {
+     "answers": 0.9916,
+     "elsewhere": 0.0029,
+     "different_case": 0.0029,
+     "unrelated": 0.0026
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Reply.md#42",
+    "action": "use",
+    "relevance_score": 0.9904,
+    "document_score": 0.9935,
+    "levels": {
+     "answers": 0.9904,
+     "elsewhere": 0.0031,
+     "different_case": 0.0034,
+     "unrelated": 0.0031
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 918
+  },
+  "timing": {
+   "total_ms": 46,
+   "rerank_ms": 45,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1323,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

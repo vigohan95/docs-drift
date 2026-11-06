@@ -1,0 +1,147 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/this-environment.rerank",
+ "recorded_at": "2026-11-06T13:29:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 935,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "56.827999",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=197"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `this.environment`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `this.environment`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#1",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Per-environment Hooks and Global Hooks",
+    "text": "## Per-environment Hooks and Global Hooks\n\nPlugins run on a shared pipeline, but their hooks fall into two categories depending on whether they run once for the whole server or once for each environment.\n\nGlobal hooks are called a single time, independent of the configured environments. They handle app-wide concerns such as resolving the config or setting up the dev and preview servers, so `this.environment` is not relevant to them. Config resolution related hooks and server related hooks are global hooks.\n\nPer-environment hooks are called once for each environment, and expose the current environment through `this.environment` in their context. All [Rolldown hooks](/guide/api-plugin#rolldown-hooks) are per-environment, as are other Vite-specific hooks that handle modules. However, note that `buildStart` and `buildEnd` are only called for the client environment without [the `perEnvironmentStartEndDuringDev: true` flag](#per-environment-state-in-plugins)."
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#7",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Per-environment State in Plugins",
+    "text": "## Per-environment State in Plugins\n\nGiven that the same plugin instance is used for different environments, the plugin state needs to be keyed with `this.environment`. This is the same pattern the ecosystem has already been using to keep state about modules using the `ssr` boolean as key to avoid mixing client and ssr modules state. A `Map<Environment, State>` can be used to keep the state for each environment separately. Note that for backward compatibility, `buildStart` and `buildEnd` are only called for the client environment without the `perEnvironmentStartEndDuringDev: true` flag. Same for `watchChange` and the `perEnvironmentWatchChangeDuringDev: true` flag.\n\n```js\nfunction PerEnvironmentCountTransformedModulesPlugin() {\n  const state = new Map<Environment, { count: number }>()\n  return {\n    name: 'count-transformed-modules',\n    perEnvironmentStartEndDuringDev: true,\n    buildStart() {\n      state.set(this.environment, { count: 0 })\n    },\n    transform(id) {\n      state.get(this.environment).count++\n    },\n    buildEnd() {\n      console.log(this.environment.name, state.get(this.environment).count)\n    }\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "title": "docs/changes/hotupdate-hook.md > HMR `hotUpdate` Plugin Hook > Motivation",
+    "text": "## Motivation\n\nThe [`handleHotUpdate` hook](/guide/api-plugin.md#handlehotupdate) allows to perform custom HMR update handling. A list of modules to be updated is passed in the `HmrContext`.\n\n```ts\ninterface HmrContext {\n  file: string\n  timestamp: number\n  modules: Array<ModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThis hook is called once for all environments, and the passed modules have mixed information from the Client and SSR environments only. Once frameworks move to custom environments, a new hook that is called for each of them is needed.\n\nThe new `hotUpdate` hook works in the same way as `handleHotUpdate` but it is called for each environment and receives a new `HotUpdateOptions` instance:\n\n```ts\ninterface HotUpdateOptions {\n  type: 'create' | 'update' | 'delete'\n  file: string\n  timestamp: number\n  modules: Array<EnvironmentModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\nThe current dev environment can be accessed like in other Plugin hooks with `this.environment`. The `modules` list will now be module nodes from the current environment only. Each environment update can define different update strategies.\n\nThis hook is also now called for additional watch events and not only for `'update'`. Use `type` to differentiate between them."
+   },
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "title": "docs/changes/this-environment-in-hooks.md > `this.environment` in Hooks",
+    "text": "# `this.environment` in Hooks\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nBefore Vite 6, only two environments were available: `client` and `ssr`. A single `options.ssr` plugin hook argument in `resolveId`, `load` and `transform` allowed plugin authors to differentiate between these two environments when processing modules in plugin hooks. In Vite 6, a Vite application can define any number of named environments as needed. We're introducing `this.environment` in the plugin context to interact with the environment of the current module in hooks.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`this.environment` was introduced in `v6.0`. The deprecation of `options.ssr` is planned for a future major. At that point we'll start recommending migrating your plugins to use the new API. To identify your usage, set `future.removePluginHookSsrArgument` to `\"warn\"` in your vite config.\n:::"
+   },
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#1",
+    "title": "docs/changes/this-environment-in-hooks.md > `this.environment` in Hooks > Motivation",
+    "text": "## Motivation\n\n`this.environment` not only allow the plugin hook implementation to know the current environment name, it also gives access to the environment config options, module graph information, and transform pipeline (`environment.config`, `environment.moduleGraph`, `environment.transformRequest()`). Having the environment instance available in the context allows plugin authors to avoid the dependency of the whole dev server (typically cached at startup through the `configureServer` hook)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "vite:docs/changes/this-environment-in-hooks.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.1623,
+    "document_score": 0.3406,
+    "levels": {
+     "answers": 0.1623,
+     "elsewhere": 0.1783,
+     "different_case": 0.031,
+     "unrelated": 0.6284
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-plugins.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0308,
+    "document_score": 0.1546,
+    "levels": {
+     "answers": 0.0308,
+     "elsewhere": 0.1238,
+     "different_case": 0.0378,
+     "unrelated": 0.8076
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/changes/hotupdate-hook.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0193,
+    "document_score": 0.1218,
+    "levels": {
+     "answers": 0.0193,
+     "elsewhere": 0.1025,
+     "different_case": 0.0603,
+     "unrelated": 0.818
+    }
+   },
+   {
+    "index": 4,
+    "id": "vite:docs/changes/this-environment-in-hooks.md#1",
+    "action": "expand",
+    "relevance_score": 0.0099,
+    "document_score": 0.7409,
+    "levels": {
+     "answers": 0.0099,
+     "elsewhere": 0.7311,
+     "different_case": 0.0233,
+     "unrelated": 0.2357
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-environment-plugins.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0052,
+    "document_score": 0.024,
+    "levels": {
+     "answers": 0.0052,
+     "elsewhere": 0.0188,
+     "different_case": 0.0168,
+     "unrelated": 0.9591
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1632
+  },
+  "timing": {
+   "total_ms": 75,
+   "rerank_ms": 60,
+   "questions_ms": 0,
+   "model_ms": 54,
+   "engine": {
+    "rows": 2307,
+    "branches": 5,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 54,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/onClose.rerank",
+ "recorded_at": "2026-11-06T13:30:22Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1985,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.605919",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=248"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `onClose`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `onClose`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#18",
+    "title": "docs/Reference/Hooks.md > Application Hooks > onClose",
+    "text": "### onClose\n<a id=\"on-close\"></a>\n\nTriggered when `fastify.close()` is invoked to stop the server. By the time\n`onClose` hooks execute, the HTTP server has already stopped listening, all\nin-flight HTTP requests have been completed, and connections have been drained.\nThis makes `onClose` the safe place for [plugins](./Plugins.md) to release\nresources such as database connection pools, as no new requests will\narrive.\n\nThe hook function takes the Fastify instance as a first argument,\nand a `done` callback for synchronous hook functions.\n\nAlternatively, an object implementing `Symbol.asyncDispose` or\n`Symbol.dispose` can be registered as an `onClose` hook. Fastify invokes\nthe appropriate disposal method when closing the server, allowing resources\nto be cleaned up using JavaScript's Explicit Resource Management protocol.\n\n```js\n// callback style\nfastify.addHook('onClose', (instance, done) => {\n  // Some code\n  done()\n})\n\n// or async/await style\nfastify.addHook('onClose', async (instance) => {\n  // Some async code\n  await closeDatabaseConnections()\n})\n\n// or disposable object style (Explicit Resource Management)\nfastify.addHook('onClose', {\n  async [Symbol.asyncDispose] () {\n    await closeDatabaseConnections()\n  }\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#62",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > close > Shutdown lifecycle",
+    "text": "##### Shutdown lifecycle\n\nWhen `fastify.close()` is called, the following steps happen in order:\n\n1. The server is flagged as **closing**. New incoming requests receive a\n   `Connection: close` header (HTTP/1.1) and are handled according to\n   [`return503OnClosing`](#factory-return-503-on-closing).\n2. [`preClose`](./Hooks.md#pre-close) hooks execute. The server is still\n   processing in-flight requests at this point.\n3. **Connection draining** based on the\n   [`forceCloseConnections`](#forcecloseconnections) option:\n   - `\"idle\"` — idle keep-alive connections are closed; in-flight requests\n     continue.\n   - `true` — all persistent connections are destroyed immediately.\n   - `false` — no forced closure; idle connections remain open until they time\n     out naturally (see [`keepAliveTimeout`](#keepalivetimeout)).\n4. The HTTP server **stops accepting** new TCP connections\n   (`server.close()`). Node.js waits for all in-flight requests to complete\n   before invoking the callback.\n5. [`onClose`](./Hooks.md#on-close) hooks execute. All in-flight requests have\n   completed and the server is no longer listening.\n6. The `close` callback (or the returned Promise) resolves.\n\n```\nfastify.close() called\n  │\n  ├─▶ closing = true (new requests receive 503)\n  │\n  ├─▶ preClose hooks\n  │     (in-flight requests still active)\n  │\n  ├─▶ Connection draining (forceCloseConnections)\n  │\n  ├─▶ server.close()\n  │     (waits for in-flight requests to complete)\n  │\n  ├─▶ onClose hooks\n  │     (server stopped, all requests done)\n  │\n  └─▶ close callback / Promise resolves\n```\n\n> ℹ️ Note:\n> Upgraded connections (such as WebSocket) are not tracked by the HTTP\n> server and will prevent `server.close()` from completing. Close them\n> explicitly in a [`preClose`](./Hooks.md#pre-close) hook."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Hooks.md#18",
+    "action": "use",
+    "relevance_score": 0.9672,
+    "document_score": 0.9817,
+    "levels": {
+     "answers": 0.9672,
+     "elsewhere": 0.0145,
+     "different_case": 0.0111,
+     "unrelated": 0.0072
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#62",
+    "action": "expand",
+    "relevance_score": 0.0382,
+    "document_score": 0.6679,
+    "levels": {
+     "answers": 0.0382,
+     "elsewhere": 0.6297,
+     "different_case": 0.0364,
+     "unrelated": 0.2956
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 979
+  },
+  "timing": {
+   "total_ms": 65,
+   "rerank_ms": 45,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1249,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

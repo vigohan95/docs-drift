@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/convert-nhcb-to-classic.rerank",
+ "recorded_at": "2026-11-06T13:30:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 854,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.877281",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=167"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `convert_nhcb_to_classic`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `convert_nhcb_to_classic`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/configuration/configuration.md#127",
+    "title": "docs/configuration/configuration.md > Configuration file > `<remote_write>`",
+    "text": "# Configures the sending of series metadata to remote storage\n# if the `prometheus.WriteRequest` message was chosen. When\n# `io.prometheus.write.v2.Request` is used, metadata is always sent.\n#\n# Metadata configuration is subject to change at any point\n# or be removed in future releases.\nmetadata_config:\n  # Whether metric metadata is sent to remote storage or not.\n  [ send: <boolean> | default = true ]\n  # How frequently metric metadata is sent to remote storage.\n  [ send_interval: <duration> | default = 1m ]\n  # Maximum number of samples per send.\n  [ max_samples_per_send: <int> | default = 2000]\n\n# EXPERIMENTAL: Converts native histograms with custom buckets (NHCB)\n# to classic histograms after applying write_relabel_configs. This enables\n# using NHCB locally (for cheaper storage and histogram atomicity) while\n# sending classic histograms to external systems that do not support\n# native histograms yet. Also useful for migration scenarios.\n# NHCBs are converted even when send_native_histograms is enabled; that setting\n# controls forwarding of other native histograms. Classic series ingested\n# alongside NHCBs, for example with always_scrape_classic_histograms, are sent\n# too, so the converted series duplicate them; drop one copy with\n# write_relabel_configs. Gauge histograms are converted with _count and _sum\n# series. Conversion state is not persisted across restarts, so bucket layout or\n# sample type changes that span a restart do not produce stale markers for\n# retired classic series.\n[ convert_nhcb_to_classic: <boolean> | default = false ]\n\n# HTTP client settings, including authentication methods (such as basic auth and\n# authorization), proxy configurations, TLS options, custom HTTP headers, etc.\n# enable_http2 defaults to false for remote-write.\n[ <http_config> ]\n```"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#29",
+    "title": "docs/feature_flags.md > Native histograms as classic histograms in PromQL",
+    "text": "## Native histograms as classic histograms in PromQL\n\n`--enable-feature=promql-native-histograms-as-classic`\n\nWhen enabled, PromQL queries for classic histogram series (e.g. `_bucket`, `_count`, `_sum`) will\nautomatically convert native histograms into classic histogram series. Currently only Native\nHistograms with Custom Buckets (NHCB) are converted.\n\nFor example, if `request_duration_seconds` is stored as an NHCB native histogram:\n\n```promql\n# Querying with a classic histogram suffix triggers the conversion:\nhistogram_quantile(0.95, rate(request_duration_seconds_bucket[5m]))\n\n# Querying without a suffix returns the regular NHCB native histogram:\nrate(request_duration_seconds[5m])\n```\n\nThis feature only affects PromQL query evaluation (e.g. the query APIs and rule evaluation). The\nconversion is applied on top of all data the query engine reads, including series fetched from\n`remote_read` endpoints. It does not apply to remote write (NHCB series are not converted when being\nforwarded to remote endpoints), the remote read API, federation, or the series API (the\n`/api/v1/series` endpoint will not return the converted classic series). Note that remote write has its\nown `convert_nhcb_to_classic` setting, see the [`remote_write`](configuration/configuration.md#remote_write)\nconfiguration.\n\nKnown limitations:\n\n* The conversion only triggers on exact metric name matchers (e.g. `request_duration_seconds_bucket`), not on\n  regex or negative name matchers.\n* Handling of collisions and transitions between stored classic series and converted NHCB series is not\n  implemented yet, so results may contain duplicates.\n* Native histograms with exponential buckets are not converted yet; support may be added later.\n* There is no control label yet; one will be added to disable and debug the conversion.\n* There is no metric counting the converted series yet; one will be added to help track the progress of\n  a migration from classic histograms to NHCB."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "prometheus:docs/configuration/configuration.md#127",
+    "action": "use",
+    "relevance_score": 0.9953,
+    "document_score": 0.9965,
+    "levels": {
+     "answers": 0.9953,
+     "elsewhere": 0.0012,
+     "different_case": 0.0016,
+     "unrelated": 0.0019
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/feature_flags.md#29",
+    "action": "expand",
+    "relevance_score": 0.0586,
+    "document_score": 0.9537,
+    "levels": {
+     "answers": 0.0586,
+     "elsewhere": 0.8951,
+     "different_case": 0.0237,
+     "unrelated": 0.0226
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1097
+  },
+  "timing": {
+   "total_ms": 46,
+   "rerank_ms": 45,
+   "questions_ms": 0,
+   "model_ms": 39,
+   "engine": {
+    "rows": 1335,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 39,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 36,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

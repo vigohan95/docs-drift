@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/configureServer.rerank",
+ "recorded_at": "2026-11-06T13:30:16Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 926,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.787807",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=198"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `configureServer`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `configureServer`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "title": "docs/guide/api-plugin.md > Plugin API > Vite Specific Hooks > `configureServer`",
+    "text": "### `configureServer`\n\n- **Type:** `(server: ViteDevServer) => (() => void) | void | Promise<(() => void) | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [ViteDevServer](./api-javascript#vitedevserver)\n- **Scope:** [Global](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Hook for configuring the dev server. The most common use case is adding custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      server.middlewares.use((req, res, next) => {\n        // custom handle request...\n      })\n    },\n  })\n  ```\n\n  **Injecting Post Middleware**\n\n  The `configureServer` hook is called before internal middlewares are installed, so the custom middlewares will run before internal middlewares by default. If you want to inject a middleware **after** internal middlewares, you can return a function from `configureServer`, which will be called after internal middlewares are installed:\n\n  ```js\n  const myPlugin = () => ({\n    name: 'configure-server',\n    configureServer(server) {\n      // return a post hook that is called after internal middlewares are\n      // installed\n      return () => {\n        server.middlewares.use((req, res, next) => {\n          // custom handle request...\n        })\n      }\n    },\n  })\n  ```\n\n  **Storing Server Access**\n\n  In some cases, other plugin hooks may need access to the dev server instance (e.g. accessing the WebSocket server, the file system watcher, or the module graph). This hook can also be used to store the server instance for access in other hooks:\n\n  ```js\n  const myPlugin = () => {\n    let server\n    return {\n      name: 'configure-server',\n      configureServer(_server) {\n        server = _server\n      },\n      transform(code, id) {\n        if (server) {\n          // use server...\n        }\n      },\n    }\n  }\n  ```\n\n  Note `configureServer` is not called when running the production build so your other hooks need to guard against its absence."
+   },
+   {
+    "id": "vite:docs/changes/this-environment-in-hooks.md#1",
+    "title": "docs/changes/this-environment-in-hooks.md > `this.environment` in Hooks > Motivation",
+    "text": "## Motivation\n\n`this.environment` not only allow the plugin hook implementation to know the current environment name, it also gives access to the environment config options, module graph information, and transform pipeline (`environment.config`, `environment.moduleGraph`, `environment.transformRequest()`). Having the environment instance available in the context allows plugin authors to avoid the dependency of the whole dev server (typically cached at startup through the `configureServer` hook)."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-plugin.md#11",
+    "action": "use",
+    "relevance_score": 0.9861,
+    "document_score": 0.9902,
+    "levels": {
+     "answers": 0.9861,
+     "elsewhere": 0.0041,
+     "different_case": 0.0059,
+     "unrelated": 0.0039
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/changes/this-environment-in-hooks.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0027,
+    "document_score": 0.0131,
+    "levels": {
+     "answers": 0.0027,
+     "elsewhere": 0.0104,
+     "different_case": 0.0128,
+     "unrelated": 0.9741
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 814
+  },
+  "timing": {
+   "total_ms": 59,
+   "rerank_ms": 44,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1084,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

@@ -1,0 +1,108 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/web-search-max-limit.rerank",
+ "recorded_at": "2026-11-06T13:30:08Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1065,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.18259",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=40,cfOrigin;dur=0,cfWorker;dur=346"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--web.search.max-limit`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--web.search.max-limit`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--storage.agent.checkpoint-batch-size</code> | Size of a single WAL log entry chunk to be flushed. Has no effect without --storage.agent.checkpoint-from-in-memory-series flag. Use with agent mode only. | `1000` |\n| <code class=\"text-nowrap\">--storage.agent.no-lockfile</code> | Do not create lockfile in data directory. Use with agent mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.remote.flush-deadline</code> | How long to wait flushing sample on shutdown or config reload. | `1m` |\n| <code class=\"text-nowrap\">--storage.remote.read-sample-limit</code> | Maximum overall number of samples to return via the remote read interface, in a single query. 0 means no limit. This limit is ignored for streamed response types. Use with server mode only. | `5e7` |\n| <code class=\"text-nowrap\">--storage.remote.read-concurrent-limit</code> | Maximum number of concurrent remote read calls. 0 means no limit. Use with server mode only. | `10` |\n| <code class=\"text-nowrap\">--storage.remote.read-max-bytes-in-frame</code> | Maximum number of bytes in a single frame for streaming remote read response types before marshalling. Note that client might have limit on frame size as well. 1MB as recommended by protobuf by default. Use with server mode only. | `1048576` |\n| <code class=\"text-nowrap\">--web.search.max-limit</code> | Hard upper bound on the \"limit\" query parameter accepted by the experimental search API (--enable-feature=search-api). Requests with a higher limit are rejected with HTTP 400. 0 disables the cap. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--rules.alert.for-outage-tolerance</code> | Max time to tolerate prometheus outage for restoring \"for\" state of alert. Use with server mode only. | `1h` |\n| <code class=\"text-nowrap\">--rules.alert.for-grace-period</code> | Minimum duration between alert and restored \"for\" state. This is maintained only for alerts with configured \"for\" time greater than grace period. Use with server mode only. | `10m` |\n| <code class=\"text-nowrap\">--rules.alert.resend-delay</code> | Minimum amount of time to wait before resending an alert to Alertmanager. Use with server mode only. | `1m` |\n| <code class=\"text-nowrap\">--rules.max-concurrent-evals</code> | Global concurrency limit for independent rules that can run concurrently. When set, \"query.max-concurrency\" may need to be adjusted accordingly. Use with server mode only. | `4` |\n| <code class=\"text-nowrap\">--alertmanager.notification-queue-capacity</code> | The capacity of the queue for pending Alertmanager notifications. Use with server mode only. | `10000` |\n| <code class=\"text-nowrap\">--alertmanager.notification-batch-size</code> | The maximum number of notifications per batch to send to the Alertmanager. Use with server mode only. | `256` |\n| <code class=\"text-nowrap\">--alertmanager.drain-notification-queue-on-shutdown</code> | Send any outstanding Alertmanager notifications when shutting down. If false, any outstanding Alertmanager notifications will be dropped when shutting down. Use with server mode only. | `true` |\n| <code class=\"text-nowrap\">--query.lookback-delta</code> | The maximum lookback duration for retrieving metrics during expression evaluations and federation. Use with server mode only. | `5m` |\n| <code class=\"text-nowrap\">--query.timeout</code> | Maximum time a query may take before being aborted. Use with server mode only. | `2m` |\n| <code class=\"text-nowrap\">--query.max-concurrency</code> | Maximum number of queries executed concurrently. Use with server mode only. | `20` |"
+   },
+   {
+    "id": "prometheus:docs/feature_flags.md#26",
+    "title": "docs/feature_flags.md > Search API",
+    "text": "## Search API\n\n`--enable-feature=search-api`\n\nEnables the experimental search API endpoints for discovering metric names,\nlabel names, and label values with fuzzy matching and filtering support. See\n[the search API documentation](querying/api.md#searching-metric-names-label-names-and-label-values)\nfor details.\n\nThe `--web.search.max-limit` flag (default `10000`) bounds the `limit` query\nparameter accepted by the search endpoints. Requests with a higher `limit` are\nrejected with HTTP 400. The default response limit (100) is silently clamped\nto this maximum, so an operator setting a smaller cap does not break\nno-`limit` requests. Setting the flag to `0` disables the cap entirely; this\nis **not recommended** for endpoints exposed beyond a trusted network because a\nsingle client can then request the entire index in one response."
+   },
+   {
+    "id": "prometheus:docs/querying/api.md#24",
+    "title": "docs/querying/api.md > Querying metadata > Searching metric names, label names, and label values",
+    "text": "```json\n{\"results\":[{\"name\":\"http_requests_total\",\"type\":\"counter\",\"help\":\"Total HTTP requests.\"}]}\n{\"status\":\"success\",\"has_more\":false}\n```\n\nIf an error occurs **before** streaming starts, the API returns the usual\nPrometheus JSON error object with a 4xx/5xx status code. If an error occurs\n**after** streaming starts, the stream ends with an NDJSON error line in place\nof the trailer.\n\nClients must tolerate an abrupt EOF without a trailer (for example, on\ntransport failure or server shutdown) and must ignore unknown fields in the\ntrailer for forward compatibility.\n\nThe `has_more` field in the trailer is informational only: this version of\nthe API does not provide a pagination cursor. To retrieve more results, raise\n`limit` (subject to the operator-configured `--web.search.max-limit`) or narrow\nthe request via `match[]`. A future version of the API may add a cursor.\n\nCommon URL query parameters:\n\n- `match[]=<series_selector>`: Repeated series selector used to scope the\n  search. Optional.\n- `search[]=<string>`: Repeated search string matched against names or values.\n  Multiple values use OR semantics. Optional.\n- `fuzz_threshold=<number>`: Fuzzy threshold from 0 to 100. Optional. A value\n  of 0 is the lowest fuzzy threshold.\n- `fuzz_alg=<subsequence | jarowinkler>`: Matching algorithm. Optional. Default\n  is `subsequence`.\n- `case_sensitive=<bool>`: Toggle case-sensitive matching. Optional.\n- `sort_by=<string>`: Sort mode. Supported values depend on the endpoint.\n- `sort_dir=<asc | dsc>`: Sort direction. Optional. Only valid with\n  `sort_by=alpha`.\n- `include_score=<bool>`: Include the relevance score in each result. Optional.\n- `start=<rfc3339 | unix_timestamp>`: Start timestamp. Optional.\n- `end=<rfc3339 | unix_timestamp>`: End timestamp. Optional.\n- `limit=<number>`: Maximum number of returned results. Optional. Default is\n  100.\n- `batch_size=<number>`: Preferred number of results per NDJSON batch.\n  Optional. Default is 100. Clamped to 1000 and the effective result limit."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "prometheus:docs/feature_flags.md#26",
+    "action": "use",
+    "relevance_score": 0.9955,
+    "document_score": 0.9965,
+    "levels": {
+     "answers": 0.9955,
+     "elsewhere": 0.0009,
+     "different_case": 0.0015,
+     "unrelated": 0.0021
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#3",
+    "action": "use",
+    "relevance_score": 0.9931,
+    "document_score": 0.9943,
+    "levels": {
+     "answers": 0.9931,
+     "elsewhere": 0.0012,
+     "different_case": 0.0019,
+     "unrelated": 0.0038
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/querying/api.md#24",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0157,
+    "document_score": 0.3395,
+    "levels": {
+     "answers": 0.0157,
+     "elsewhere": 0.3237,
+     "different_case": 0.0381,
+     "unrelated": 0.6224
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2010
+  },
+  "timing": {
+   "total_ms": 149,
+   "rerank_ms": 149,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 2367,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

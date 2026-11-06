@@ -1,0 +1,89 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/ModuleEvaluator.rerank",
+ "recorded_at": "2026-11-06T13:29:52Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1007,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.507969",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=272"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `ModuleEvaluator`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `ModuleEvaluator`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-instances.md#6",
+    "title": "docs/guide/api-environment-instances.md > Using `Environment` Instances > `FetchResult`",
+    "text": "## `FetchResult`\n\nThe `environment.fetchModule` method returns a `FetchResult` that is meant to be consumed by the module runner. `FetchResult` is a union of `CachedFetchResult`, `ExternalFetchResult`, and `ViteFetchResult`.\n\n`CachedFetchResult` is analogous to the `304` (Not Modified) HTTP status code.\n\n```ts\nexport interface CachedFetchResult {\n  /**\n   * If the module is cached in the runner, this confirms\n   * it was not invalidated on the server side.\n   */\n  cache: true\n}\n```\n\n`ExternalFetchResult` instructs the module runner to import the module using the `runExternalModule` method on the [`ModuleEvaluator`](/guide/api-environment-runtimes#moduleevaluator). In this case, the default module evaluator will use the runtime's native `import` instead of processing the file through Vite.\n\n```ts\nexport interface ExternalFetchResult {\n  /**\n   * The path to the externalized module starting with file://.\n   * By default this will be imported via a dynamic \"import\"\n   * instead of being transformed by Vite and loaded with the Vite runner.\n   */\n  externalize: string\n  /**\n   * Type of the module. Used to determine if the import statement is correct.\n   * For example, if Vite needs to throw an error if a variable is not actually exported.\n   */\n  type: 'module' | 'commonjs' | 'builtin' | 'network'\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-runtimes.md#7",
+    "title": "docs/guide/api-environment-runtimes.md > Environment API for Runtimes > `ModuleEvaluator`",
+    "text": "## `ModuleEvaluator`\n\n**Type Signature:**\n\n```ts twoslash\nimport type { Debug } from '@type-challenges/utils'\nimport type { ModuleRunnerContext as ModuleRunnerContextRaw } from 'vite/module-runner'\n\ntype ModuleRunnerContext = Debug<ModuleRunnerContextRaw>\n\n// ---cut---\nexport interface ModuleEvaluator {\n  /**\n   * Number of prefixed lines in the transformed code.\n   */\n  startOffset?: number\n  /**\n   * Evaluate code that was transformed by Vite.\n   * @param context Function context\n   * @param code Transformed code\n   * @param id ID that was used to fetch the module\n   */\n  runInlinedModule(\n    context: ModuleRunnerContext,\n    code: string,\n    id: string,\n  ): Promise<any>\n  /**\n   * evaluate externalized module.\n   * @param file File URL to the external module\n   */\n  runExternalModule(file: string): Promise<any>\n}\n```\n\nVite exports `ESModulesEvaluator` that implements this interface by default. It uses `new AsyncFunction` to evaluate code, so if the code has inlined source map it should contain an [offset of 2 lines](https://tc39.es/ecma262/#sec-createdynamicfunction) to accommodate for new lines added. This is done automatically by the `ESModulesEvaluator`. Custom evaluators will not add additional lines."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-environment-runtimes.md#7",
+    "action": "use",
+    "relevance_score": 0.9859,
+    "document_score": 0.9912,
+    "levels": {
+     "answers": 0.9859,
+     "elsewhere": 0.0053,
+     "different_case": 0.0054,
+     "unrelated": 0.0034
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-instances.md#6",
+    "action": "expand",
+    "relevance_score": 0.0523,
+    "document_score": 0.6067,
+    "levels": {
+     "answers": 0.0523,
+     "elsewhere": 0.5544,
+     "different_case": 0.0523,
+     "unrelated": 0.341
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 861
+  },
+  "timing": {
+   "total_ms": 100,
+   "rerank_ms": 86,
+   "questions_ms": 0,
+   "model_ms": 37,
+   "engine": {
+    "rows": 1131,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 37,
+    "build_ms": 0,
+    "doc_ms": 1,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

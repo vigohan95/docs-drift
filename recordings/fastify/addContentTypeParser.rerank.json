@@ -1,0 +1,126 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/addContentTypeParser.rerank",
+ "recorded_at": "2026-11-06T13:30:17Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 900,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "46.016254",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=192"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `addContentTypeParser`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `addContentTypeParser`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#7",
+    "title": "docs/Guides/Migration-Guide-V3.md > V3 Migration Guide > Breaking changes > Changed Content Type Parser syntax ([#2286](https://github.com/fastify/fastify/pull/2286))",
+    "text": "### Changed Content Type Parser syntax ([#2286](https://github.com/fastify/fastify/pull/2286))\n\nIn Fastify v3 the content type parsers now have a single signature for parsers.\n\nThe new signatures are `fn(request, payload, done)` or `async fn(request,\npayload)`. Note that `request` is now a Fastify request, not an\n`IncomingMessage`. The payload is, by default, a stream. If the `parseAs` option\nis used in `addContentTypeParser`, then `payload` reflects the option value\n(string or buffer).\n\nThe old signatures `fn(req, [done])` or `fn(req, payload, [done])` (where `req`\nis `IncomingMessage`) are still supported but are deprecated."
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser",
+    "text": "## `Content-Type` Parser\nFastify natively supports `'application/json'` and `'text/plain'` content types\nwith a default charset of `utf-8`. These default parsers can be changed or\nremoved.\n\nUnsupported or [syntactically invalid](https://httpwg.org/specs/rfc9110.html#media.type)\ncontent types result in a `415 Unsupported Media Type` response with an\n[`FST_ERR_CTP_INVALID_MEDIA_TYPE`](./Errors.md#fst_err_ctp_invalid_media_type)\nerror.\n\nTo support other content types, use the `addContentTypeParser` API or an\nexisting [plugin](https://fastify.dev/ecosystem/).\n\nAs with other APIs, `addContentTypeParser` is encapsulated in the scope in which\nit is declared. If declared in the root scope, it is available everywhere; if\ndeclared in a plugin, it is available only in that scope and its children.\n\nFastify automatically adds the parsed request payload to the [Fastify\nrequest](./Request.md) object, accessible via `request.body`.\n\n> **Important:** When using a body schema with the\n> [`content`](./Validation-and-Serialization.md#body-content-type-validation)\n> property to validate per content type, only content types listed in the schema\n> will be validated. If you add a custom content type parser but do not include\n> its content type in the body schema's `content` property, the incoming data\n> will be parsed but **not validated**."
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser > Using addContentTypeParser with fastify.register",
+    "text": "### Using addContentTypeParser with fastify.register\nWhen using `addContentTypeParser` with `fastify.register`, avoid `await`\nwhen registering routes. Using `await` makes route registration asynchronous,\npotentially registering routes before `addContentTypeParser` is set."
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#8",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser > Using addContentTypeParser with fastify.register > Body Parser",
+    "text": "#### Body Parser\nThe request body can be parsed in two ways. First, add a custom content type\nparser and handle the request stream. Or second, use the `parseAs` option in the\n`addContentTypeParser` API, specifying `'string'` or `'buffer'`. Fastify will\nhandle the stream, check the [maximum size](./Server.md#factory-body-limit) of\nthe body, and the content length. If the limit is exceeded, the custom parser\nwill not be invoked.\n```js\nfastify.addContentTypeParser('application/json', { parseAs: 'string' }, function (req, body, done) {\n  try {\n    const json = JSON.parse(body)\n    done(null, json)\n  } catch (err) {\n    err.statusCode = 400\n    done(err, undefined)\n  }\n})\n```\n\nSee\n[`example/parser.js`](https://github.com/fastify/fastify/blob/main/examples/parser.js)\nfor an example."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#8",
+    "action": "use",
+    "relevance_score": 0.9575,
+    "document_score": 0.9791,
+    "levels": {
+     "answers": 0.9575,
+     "elsewhere": 0.0217,
+     "different_case": 0.0114,
+     "unrelated": 0.0095
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Migration-Guide-V3.md#7",
+    "action": "use",
+    "relevance_score": 0.9371,
+    "document_score": 0.9721,
+    "levels": {
+     "answers": 0.9371,
+     "elsewhere": 0.035,
+     "different_case": 0.0176,
+     "unrelated": 0.0103
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "action": "expand",
+    "relevance_score": 0.2309,
+    "document_score": 0.8745,
+    "levels": {
+     "answers": 0.2309,
+     "elsewhere": 0.6436,
+     "different_case": 0.0593,
+     "unrelated": 0.0662
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#3",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0081,
+    "document_score": 0.0439,
+    "levels": {
+     "answers": 0.0081,
+     "elsewhere": 0.0358,
+     "different_case": 0.0192,
+     "unrelated": 0.9369
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1240
+  },
+  "timing": {
+   "total_ms": 65,
+   "rerank_ms": 49,
+   "questions_ms": 0,
+   "model_ms": 43,
+   "engine": {
+    "rows": 1780,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 43,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

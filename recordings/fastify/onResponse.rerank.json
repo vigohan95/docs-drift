@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/onResponse.rerank",
+ "recorded_at": "2026-11-06T13:29:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 929,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "46.428097",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=248"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `onResponse`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `onResponse`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Reference/Hooks.md#9",
+    "title": "docs/Reference/Hooks.md > Request/Reply Hooks > onResponse",
+    "text": "### onResponse\n```js\nfastify.addHook('onResponse', (request, reply, done) => {\n  // Some code\n  done()\n})\n```\nOr `async/await`:\n```js\nfastify.addHook('onResponse', async (request, reply) => {\n  // Some code\n  await asyncMethod()\n})\n```\n\nThe `onResponse` hook is executed when a response has been sent, so you will not\nbe able to send more data to the client. It can however be useful for sending\ndata to external services, for example, to gather statistics."
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#88",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > setErrorHandler",
+    "text": "#### setErrorHandler\n<a id=\"set-error-handler\"></a>\n\n`fastify.setErrorHandler(handler(error, request, reply))`: Set a function that\nwill be invoked whenever an exception is thrown during the request lifecycle.\nThe handler is bound to the Fastify instance and is fully encapsulated, so\ndifferent plugins can set different error handlers. *async-await* is\nsupported as well.\n\nIf the error `statusCode` is less than 400, Fastify will automatically\nset it to 500 before calling the error handler.\n\n`setErrorHandler` will ***not*** catch:\n- exceptions thrown in an `onResponse` hook because the response has already been\n  sent to the client. Use the `onSend` hook instead.\n- not found (404) errors. Use [`setNotFoundHandler`](#set-not-found-handler)\n  instead.\n- Stream errors thrown during piping into the response socket, as\n  headers/response were already sent to the client.\n  Use custom in-stream data to signal such errors.\n\n```js\nfastify.setErrorHandler(function (error, request, reply) {\n  // Log error\n  this.log.error(error)\n  // Send error response\n  reply.status(409).send({ ok: false })\n})\n```\n\nFastify is provided with a default function that is called if no error handler\nis set. It can be accessed using `fastify.errorHandler` and it logs the error\nwith respect to its `statusCode`.\n\n```js\nconst statusCode = error.statusCode\nif (statusCode >= 500) {\n  log.error(error)\n} else if (statusCode >= 400) {\n  log.info(error)\n} else {\n  log.error(error)\n}\n```\n\n> ⚠ Warning:\n> Avoid calling setErrorHandler multiple times in the same scope.\n> See [`allowErrorHandlerOverride`](#allowerrorhandleroverride)."
+   },
+   {
+    "id": "fastify:docs/Reference/TypeScript.md#78",
+    "title": "docs/Reference/TypeScript.md > API Type System Documentation > Hooks > fastify.onResponseHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void",
+    "text": "##### fastify.onResponseHookHandler< [RawServer][RawServerGeneric], [RawRequest][RawRequestGeneric], [RawReply][RawReplyGeneric], [RequestGeneric][FastifyRequestGenericInterface], [ContextConfig][ContextConfigGeneric]>(request: [FastifyRequest][FastifyRequest], reply: [FastifyReply][FastifyReply], done: (err?: [FastifyError][FastifyError]) => void): Promise\\<unknown\\> | void\n\n[src](https://github.com/fastify/fastify/blob/main/types/hooks.d.ts#L134)\n\n`onResponse` is the seventh and last hook in the request hook lifecycle. The\nprevious hook was `onSend`, there is no next hook.\n\nThe onResponse hook is executed when a response has been sent, so you will not\nbe able to send more data to the client. It can however be useful for sending\ndata to external services, for example to gather statistics."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "fastify:docs/Reference/Hooks.md#9",
+    "action": "use",
+    "relevance_score": 0.9397,
+    "document_score": 0.9716,
+    "levels": {
+     "answers": 0.9397,
+     "elsewhere": 0.032,
+     "different_case": 0.0158,
+     "unrelated": 0.0125
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/Server.md#88",
+    "action": "use",
+    "relevance_score": 0.6629,
+    "document_score": 0.7984,
+    "levels": {
+     "answers": 0.6629,
+     "elsewhere": 0.1355,
+     "different_case": 0.0703,
+     "unrelated": 0.1313
+    }
+   },
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/TypeScript.md#78",
+    "action": "expand",
+    "relevance_score": 0.2016,
+    "document_score": 0.7514,
+    "levels": {
+     "answers": 0.2016,
+     "elsewhere": 0.5498,
+     "different_case": 0.034,
+     "unrelated": 0.2146
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1144
+  },
+  "timing": {
+   "total_ms": 66,
+   "rerank_ms": 51,
+   "questions_ms": 0,
+   "model_ms": 43,
+   "engine": {
+    "rows": 1549,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 43,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 40,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

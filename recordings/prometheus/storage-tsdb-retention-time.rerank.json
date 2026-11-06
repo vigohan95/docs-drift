@@ -1,0 +1,107 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/storage-tsdb-retention-time.rerank",
+ "recorded_at": "2026-11-06T13:30:07Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1202,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "61.210304",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=435"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--storage.tsdb.retention.time`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--storage.tsdb.retention.time`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--web.remote-write-receiver.accepted-protobuf-messages</code> | List of the remote write protobuf messages to accept when receiving the remote writes. Supported values: prometheus.WriteRequest, io.prometheus.write.v2.Request | `prometheus.WriteRequest` |\n| <code class=\"text-nowrap\">--web.enable-otlp-receiver</code> | Enable API endpoint accepting OTLP write requests. | `false` |\n| <code class=\"text-nowrap\">--web.console.templates</code> | Path to the console template directory, available at /consoles. | `consoles` |\n| <code class=\"text-nowrap\">--web.console.libraries</code> | Path to the console library directory. | `console_libraries` |\n| <code class=\"text-nowrap\">--web.page-title</code> | Document title of Prometheus instance. | `Prometheus Time Series Collection and Processing Server` |\n| <code class=\"text-nowrap\">--web.cors.origin</code> | Regex for CORS origin. It is fully anchored. Example: 'https?://(domain1\\|domain2)\\.com' | `.*` |\n| <code class=\"text-nowrap\">--storage.tsdb.path</code> | Base path for metrics storage. Use with server mode only. | `data/` |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.time</code> | [DEPRECATED] How long to retain samples in storage. If neither this flag nor \"storage.tsdb.retention.size\" is set, the retention time defaults to 15d. Units Supported: y, w, d, h, m, s, ms. This flag has been deprecated, use the storage.tsdb.retention.time field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.size</code> | [DEPRECATED] Maximum number of bytes that can be stored for blocks. A unit is required, supported units: B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. This flag has been deprecated, use the storage.tsdb.retention.size field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.no-lockfile</code> | Do not create lockfile in data directory. Use with server mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.tsdb.head-chunks-write-queue-size</code> | Size of the queue through which head chunks are written to the disk to be m-mapped, 0 disables the queue completely. Experimental. Use with server mode only. | `0` |\n| <code class=\"text-nowrap\">--storage.tsdb.delay-compact-file.path</code> | Path to a JSON file with uploaded TSDB blocks e.g. Thanos shipper meta file. If set TSDB will only compact 1 level blocks that are marked as uploaded in that file, improving external storage integrations e.g. with Thanos sidecar. 1+ level compactions won't be delayed. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.agent.path</code> | Base path for metrics storage. Use with agent mode only. | `data-agent/` |\n| <code class=\"text-nowrap\">--storage.agent.wal-compression</code> | Compress the agent WAL. If false, the --storage.agent.wal-compression-type flag is ignored. Use with agent mode only. | `true` |\n| <code class=\"text-nowrap\">--storage.agent.retention.min-time</code> | Minimum age samples may be before being considered for deletion when the WAL is truncated Use with agent mode only. | `5m` |\n| <code class=\"text-nowrap\">--storage.agent.retention.max-time</code> | Maximum age samples may be before being forcibly deleted when the WAL is truncated Use with agent mode only. | `4h` |\n| <code class=\"text-nowrap\">--storage.agent.checkpoint-from-in-memory-series</code> | Use only in-memory series data when building a checkpoint. Use with agent mode only. | `false` |"
+   },
+   {
+    "id": "prometheus:docs/configuration/configuration.md#131",
+    "title": "docs/configuration/configuration.md > Configuration file > `<tsdb>`",
+    "text": "# Configures data retention settings for TSDB.\n#\n# Note: When retention is changed at runtime, the retention\n# settings are updated immediately, but block deletion based on the new retention policy\n# occurs during the next block reload cycle. This happens automatically within 1 minute\n# or when a compaction completes, whichever comes first.\n[ retention: <retention> ] :\n  # How long to retain samples in storage. If neither this option nor the size option\n  # is set, the retention time defaults to 15d. Setting this to 0 disables time-based retention.\n  # This option takes precedence over the deprecated command-line flag --storage.tsdb.retention.time.\n  [ time: <duration> ]\n\n  # Maximum number of bytes that can be stored for blocks. A unit is required,\n  # supported units: B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B.\n  # If set to 0 or not set, size-based retention is disabled.\n  # This option takes precedence over the deprecated command-line flag --storage.tsdb.retention.size.\n  [ size: <size> | default = 0 ]\n\n  # Maximum percent of total disk space allowed for storage of blocks. Alternative to `size` and\n  # behaves the same as if size was calculated by hand as a percentage of the total storage capacity.\n  # Prometheus will fail to start if this config is enabled, but it fails to query the total storage capacity.\n  # The total disk space allowed will automatically adapt to volume resize.\n  # If set to 0 or not set, percentage-based retention is disabled.\n  #\n  # This is an experimental feature, this behaviour could change or be removed in the future.\n  [ percentage: <uint> | default = 0 ]\n```"
+   },
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "title": "docs/storage.md > Local storage > Operational aspects",
+    "text": "### Operational aspects\n\nPrometheus has several flags that configure local storage. The most important are:\n\n- `--storage.tsdb.path`: Where Prometheus writes its database. Defaults to `data/`.\n- `--storage.tsdb.retention.time`: How long to retain samples in storage. If neither\n  this flag nor `storage.tsdb.retention.size` is set, the retention time defaults to\n  `15d`. Supported units: y, w, d, h, m, s, ms.\n- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.\n  The oldest data will be removed first. Defaults to `0` or disabled. Units supported:\n  B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. Only\n  the persistent blocks are deleted to honor this retention although WAL and m-mapped\n  chunks are counted in the total size. So the minimum requirement for the disk is the\n  peak space taken by the `wal` (the WAL and Checkpoint) and `chunks_head`\n  (m-mapped Head chunks) directory combined (peaks every 2 hours).\n- `--storage.tsdb.wal-compression`: Enables compression of the write-ahead log (WAL).\n  Depending on your data, you can expect the WAL size to be halved with little extra\n  CPU load. This flag was introduced in 2.11.0 and enabled by default in 2.20.0.\n  Note that once enabled, downgrading Prometheus to a version below 2.11.0 will\n  require deleting the WAL."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "prometheus:docs/storage.md#5",
+    "action": "use",
+    "relevance_score": 0.9947,
+    "document_score": 0.9959,
+    "levels": {
+     "answers": 0.9947,
+     "elsewhere": 0.0012,
+     "different_case": 0.0017,
+     "unrelated": 0.0023
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "action": "use",
+    "relevance_score": 0.9942,
+    "document_score": 0.9953,
+    "levels": {
+     "answers": 0.9942,
+     "elsewhere": 0.0011,
+     "different_case": 0.0016,
+     "unrelated": 0.003
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/configuration/configuration.md#131",
+    "action": "use",
+    "relevance_score": 0.988,
+    "document_score": 0.9936,
+    "levels": {
+     "answers": 0.988,
+     "elsewhere": 0.0057,
+     "different_case": 0.0034,
+     "unrelated": 0.0029
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2136
+  },
+  "timing": {
+   "total_ms": 284,
+   "rerank_ms": 268,
+   "questions_ms": 0,
+   "model_ms": 58,
+   "engine": {
+    "rows": 2493,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 58,
+    "build_ms": 0,
+    "doc_ms": 3,
+    "forward_ms": 53,
+    "state_ms": 0,
+    "logits_ms": 1,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 128
+   }
+  }
+ }
+}

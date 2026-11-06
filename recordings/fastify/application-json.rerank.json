@@ -1,0 +1,164 @@
+{
+ "endpoint": "rerank",
+ "tag": "fastify/application-json.rerank",
+ "recorded_at": "2026-11-06T13:30:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1027,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "71.484734",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=30,cfOrigin;dur=0,cfWorker;dur=269"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `application/json`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `application/json`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "fastify:docs/Guides/Serverless.md#23",
+    "title": "docs/Guides/Serverless.md > Google Firebase Functions > Add Custom `contentTypeParser` to Fastify instance and define endpoints",
+    "text": "### Add Custom `contentTypeParser` to Fastify instance and define endpoints\n\nFirebase Function's HTTP layer already parses the request and makes a JSON\npayload available through the property `payload.body` below. It also provides\naccess to the raw body, unparsed, which is useful for calculating request\nsignatures to validate HTTP webhooks.\n\nAdd as follows to the `registerRoutes()` function:\n\n```js\nasync function registerRoutes (fastify) {\n  fastify.addContentTypeParser(\"application/json\", {}, (req, payload, done) => {\n    // useful to include the request's raw body on the `req` object that will\n    // later be available in your other routes so you can calculate the HMAC\n    // if needed\n    req.rawBody = payload.rawBody\n\n    // payload.body is already the parsed JSON so we just fire the done callback\n    // with it\n    done(null, payload.body)\n  })\n\n  // define your endpoints here...\n  fastify.post(\"/some-route-here\", async (request, reply) => {})\n\n  fastify.get('/', async (request, reply) => {\n    reply.send({message: 'Hello World!'})\n  })\n}\n```\n\n**Failing to add this `ContentTypeParser` may lead to the Fastify process\nremaining stuck and not processing any other requests after receiving one with\nthe Content-Type `application/json`.**\n\nWhen using Typescript, since the type of `payload` is a native `IncomingMessage`\nthat gets modified by Firebase, it won't be able to find the property\n`payload.body`.\n\nIn order to suppress the error, you can use the following signature:\n\n```ts\ndeclare module 'http' {\n\tinterface IncomingMessage {\n\t\tbody?: unknown;\n\t}\n}\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "title": "docs/Reference/ContentTypeParser.md > `Content-Type` Parser",
+    "text": "## `Content-Type` Parser\nFastify natively supports `'application/json'` and `'text/plain'` content types\nwith a default charset of `utf-8`. These default parsers can be changed or\nremoved.\n\nUnsupported or [syntactically invalid](https://httpwg.org/specs/rfc9110.html#media.type)\ncontent types result in a `415 Unsupported Media Type` response with an\n[`FST_ERR_CTP_INVALID_MEDIA_TYPE`](./Errors.md#fst_err_ctp_invalid_media_type)\nerror.\n\nTo support other content types, use the `addContentTypeParser` API or an\nexisting [plugin](https://fastify.dev/ecosystem/).\n\nAs with other APIs, `addContentTypeParser` is encapsulated in the scope in which\nit is declared. If declared in the root scope, it is available everywhere; if\ndeclared in a plugin, it is available only in that scope and its children.\n\nFastify automatically adds the parsed request payload to the [Fastify\nrequest](./Request.md) object, accessible via `request.body`.\n\n> **Important:** When using a body schema with the\n> [`content`](./Validation-and-Serialization.md#body-content-type-validation)\n> property to validate per content type, only content types listed in the schema\n> will be validated. If you add a custom content type parser but do not include\n> its content type in the body schema's `content` property, the incoming data\n> will be parsed but **not validated**."
+   },
+   {
+    "id": "fastify:docs/Reference/Reply.md#14",
+    "title": "docs/Reference/Reply.md > Reply > Reply > Methods > .send(data) > Strings",
+    "text": "###### Strings\n<a id=\"send-string\"></a>\n\nIf you pass a string to `send` without a `Content-Type`, it will be sent as\n`text/plain; charset=utf-8`. If you set the `Content-Type` header and pass a\nstring to `send`, it will be serialized with the custom serializer if one is\nset, otherwise, it will be sent unmodified.\n\n> ℹ️ Note:\n> Even when the `Content-Type` header is set to `application/json`,\n> strings are sent unmodified by default. To serialize a string as JSON, you\n> must set a custom serializer:\n\n```js\nfastify.get('/json-string', async function (request, reply) {\n  reply\n    .type('application/json; charset=utf-8')\n    .serializer(JSON.stringify)\n    .send('Hello') // Returns \"Hello\" (JSON-encoded string)\n})\n```\n```js\nfastify.get('/json', options, function (request, reply) {\n  reply.send('plain string')\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Server.md#89",
+    "title": "docs/Reference/Server.md > Instance > Server Methods > setErrorHandler > Custom error handler for stream replies",
+    "text": "##### Custom error handler for stream replies\n<a id=\"set-error-handler-stream-replies\"></a>\n\nIf `Content-Type` differs between the endpoint and error handler, explicitly\ndefine it in both. For example, if the endpoint returns an `application/text`\nstream and the error handler responds with `application/json`, the error handler\nmust explicitly set `Content-Type`. Otherwise, it will fail serialization with\na `500` status code. Alternatively, always respond with serialized data in the\nerror handler by manually calling a serialization method (e.g.,\n`JSON.stringify`).\n\n```js\nfastify.setErrorHandler((err, req, reply) => {\n  reply\n    .code(400)\n    .type('application/json')\n    .send({ error: err.message })\n})\n```\n\n```js\nfastify.setErrorHandler((err, req, reply) => {\n  reply\n    .code(400)\n    .send(JSON.stringify({ error: err.message }))\n})\n```"
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization",
+    "text": "## Validation and Serialization\nFastify uses a schema-based approach. We recommend using\n[JSON Schema](https://json-schema.org/) to validate routes and serialize outputs.\nFastify compiles the schema into a highly performant function.\n\nValidation is only attempted if the content type is `application/json`,\nunless the body schema uses the [`content`](#body-content-type-validation)\nproperty to specify validation per content type. When the body schema defines\na `content` field, it must enumerate all possible content types the\napplication expects to handle with the associated handler.\n\nAll examples use the\n[JSON Schema Draft 7](https://json-schema.org/draft-07)\nspecification.\n\n> ⚠ Warning:\n> Treat schema definitions as application code. Validation and serialization\n> features use `new Function()`, which is unsafe with user-provided schemas. See\n> [Ajv](https://www.npmjs.com/package/ajv) and\n> [fast-json-stringify](https://www.npmjs.com/package/fast-json-stringify) for details.\n>\n> Whilst Fastify supports the\n> [`$async` Ajv feature](https://ajv.js.org/guide/async-validation.html),\n> it should not be used for initial validation. Accessing databases during\n> validation may lead to Denial of Service attacks. Use\n> [Fastify's hooks](./Hooks.md) like `preHandler` for `async` tasks after validation.\n>\n> When using custom validators with async `preValidation` hooks,\n> validators **must return** `{error}` objects instead of throwing errors.\n> Throwing errors from custom validators will cause unhandled promise rejections\n> that crash the application when combined with async hooks. See the\n> [custom validator examples](#using-other-validation-libraries) below for the\n> correct pattern."
+   },
+   {
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#7",
+    "title": "docs/Reference/Validation-and-Serialization.md > Validation and Serialization > Validation > Body Content-Type Validation",
+    "text": "#### Body Content-Type Validation\n<a id=\"body-content-type-validation\"></a>\n\nFor `body` schema, it is further possible to differentiate the schema per content\ntype by nesting the schemas inside `content` property. The schema validation\nwill be applied based on the `Content-Type` header in the request.\n\n```js\nfastify.post('/the/url', {\n  schema: {\n    body: {\n      content: {\n        'application/json': {\n          schema: { type: 'object' }\n        },\n        'text/plain': {\n          schema: { type: 'string' }\n        }\n        // Other content types will not be validated\n      }\n    }\n  }\n}, handler)\n```\n\n> ⚠ Warning:\n> When using [custom content type parsers](./ContentTypeParser.md), the parsed\n> body is validated **only** when the request content type matches a key in the\n> schema `content` map.\n>\n> Schema selection uses an exact match on the request's\n> [essence MIME type](https://mimesniff.spec.whatwg.org/#mime-type-miscellaneous)\n> (for example, `application/json`). If a parser is registered with a regular\n> expression (for example, `/^application\\/.*json$/`), the parser can accept\n> more content types than the `content` map covers. Requests in that gap are\n> parsed but **not validated**.\n>\n> Ensure every content type accepted by the parser has a corresponding key in\n> the `content` map, or use a catch-all body schema without `content` when\n> strict per-content-type discrimination is not required.\n>\n> ```js\n> // Add a custom parser for YAML\n> fastify.addContentTypeParser('application/yaml', { parseAs: 'string' }, (req, body, done) => {\n>   done(null, YAML.parse(body))\n> })\n>\n> fastify.post('/the/url', {\n>   schema: {\n>     body: {\n>       content: {\n>         'application/json': {\n>           schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] }\n>         },\n>         // Without this entry, application/yaml requests will NOT be validated\n>         'application/yaml': {\n>           schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] }\n>         }\n>       }\n>     }\n>   }\n> }, handler)\n> ```"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "fastify:docs/Reference/Reply.md#14",
+    "action": "use",
+    "relevance_score": 0.9879,
+    "document_score": 0.9922,
+    "levels": {
+     "answers": 0.9879,
+     "elsewhere": 0.0043,
+     "different_case": 0.004,
+     "unrelated": 0.0038
+    }
+   },
+   {
+    "index": 1,
+    "id": "fastify:docs/Reference/ContentTypeParser.md#0",
+    "action": "use",
+    "relevance_score": 0.9836,
+    "document_score": 0.9892,
+    "levels": {
+     "answers": 0.9836,
+     "elsewhere": 0.0056,
+     "different_case": 0.0058,
+     "unrelated": 0.005
+    }
+   },
+   {
+    "index": 4,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#0",
+    "action": "use",
+    "relevance_score": 0.8511,
+    "document_score": 0.9015,
+    "levels": {
+     "answers": 0.8511,
+     "elsewhere": 0.0504,
+     "different_case": 0.0296,
+     "unrelated": 0.0689
+    }
+   },
+   {
+    "index": 0,
+    "id": "fastify:docs/Guides/Serverless.md#23",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0464,
+    "document_score": 0.0928,
+    "levels": {
+     "answers": 0.0464,
+     "elsewhere": 0.0464,
+     "different_case": 0.051,
+     "unrelated": 0.8562
+    }
+   },
+   {
+    "index": 5,
+    "id": "fastify:docs/Reference/Validation-and-Serialization.md#7",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0101,
+    "document_score": 0.0554,
+    "levels": {
+     "answers": 0.0101,
+     "elsewhere": 0.0453,
+     "different_case": 0.0376,
+     "unrelated": 0.907
+    }
+   },
+   {
+    "index": 3,
+    "id": "fastify:docs/Reference/Server.md#89",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0056,
+    "document_score": 0.0177,
+    "levels": {
+     "answers": 0.0056,
+     "elsewhere": 0.0121,
+     "different_case": 0.0249,
+     "unrelated": 0.9573
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2802
+  },
+  "timing": {
+   "total_ms": 90,
+   "rerank_ms": 75,
+   "questions_ms": 0,
+   "model_ms": 66,
+   "engine": {
+    "rows": 3612,
+    "branches": 6,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 4096,
+    "long": 0,
+    "total_ms": 66,
+    "build_ms": 0,
+    "doc_ms": 3,
+    "forward_ms": 61,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

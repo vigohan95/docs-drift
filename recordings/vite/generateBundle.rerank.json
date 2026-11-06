@@ -1,0 +1,109 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/generateBundle.rerank",
+ "recorded_at": "2026-11-06T13:30:27Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 925,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "48.974079",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=228"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `generateBundle`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `generateBundle`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#12",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > Environment in Build Hooks",
+    "text": "## Environment in Build Hooks\n\nIn the same way as during dev, plugin hooks also receive the environment instance during build, replacing the `ssr` boolean.\nThis also works for `renderChunk`, `generateBundle`, and other build only hooks."
+   },
+   {
+    "id": "vite:docs/guide/api-plugin.md#30",
+    "title": "docs/guide/api-plugin.md > Plugin API > Chunk Import Map Information",
+    "text": "## Chunk Import Map Information\n\n:::info Experimental\n\nThis feature is experimental and may change in the future.\n\n:::\n\nWhen [`build.chunkImportMap`](/config/build-options#build-chunkimportmap) option is enabled, the import statements in the generated chunks will use a unique ID for each chunk instead of the file path.\n\nTo get the mapping from the chunk ID to the file path, you can access the import map emitted to the bundle in the `generateBundle` hook or the `writeBundle` hook. The import map has the name specified by [`build.rolldownOptions.experimental.chunkImportMap.fileName`](https://rolldown.rs/reference/InputOptions.experimental#chunkimportmap) (defaults to `importmap.json`).\n\n```ts\nfunction accessImportMap() {\n  let config: ResolvedConfig\n  return {\n    name: 'access-import-map',\n    configResolved(resolvedConfig) {\n      config = resolvedConfig\n    },\n    generateBundle(options, bundle) {\n      const chunkImportMap =\n        config.build.rolldownOptions.experimental?.chunkImportMap\n      if (chunkImportMap) {\n        const importMapFilename =\n          typeof chunkImportMap === 'object' && chunkImportMap.fileName\n            ? chunkImportMap.fileName\n            : 'importmap.json'\n        const importMap = bundle[importMapFilename]! as OutputAsset\n        const mapping = JSON.parse(importMap.source).imports\n        console.log(mapping)\n        // { \"./entry.hash1.js\": \"./entry.hash2.js\" }\n      }\n    },\n  }\n}\n```"
+   },
+   {
+    "id": "vite:docs/guide/migration.md#22",
+    "title": "docs/guide/migration.md > Migration from v7 > Advanced",
+    "text": "## Advanced\n\nThese breaking changes are expected to only affect a minority of use cases:\n\n- [Extglobs](https://github.com/micromatch/picomatch/blob/master/README.md#extglobs) are not supported yet ([rolldown-vite#365](https://github.com/vitejs/rolldown-vite/issues/365))\n- TypeScript legacy namespace is only supported partially. See [Oxc Transformer's related documentation](https://oxc.rs/docs/guide/usage/transformer/typescript.html#partial-namespace-support) for more details.\n- `define` does not share reference for objects: When you pass an object as a value to `define`, each variable will have a separate copy of the object. See [Oxc Transformer's related documentation](https://oxc.rs/docs/guide/usage/transformer/global-variable-replacement#define) for more details.\n- `bundle` object changes (`bundle` is an object passed in `generateBundle` / `writeBundle` hooks, returned by `build` function):\n  - Assigning to `bundle[foo]` is not supported. This is discouraged by Rollup as well. Please use `this.emitFile()` instead.\n  - the reference is not shared across the hooks ([rolldown-vite#410](https://github.com/vitejs/rolldown-vite/issues/410))\n  - `structuredClone(bundle)` errors with `DataCloneError: #<Object> could not be cloned`. This is not supported anymore. Please clone it with `structuredClone({ ...bundle })`. ([rolldown-vite#128](https://github.com/vitejs/rolldown-vite/issues/128))\n- All parallel hooks in Rollup work as sequential hooks. See [Rolldown's documentation](https://rolldown.rs/apis/plugin-api#sequential-hook-execution) for more details.\n- `\"use strict\";` is not injected sometimes. See [Rolldown's documentation](https://rolldown.rs/in-depth/directives) for more details.\n- Transforming to ES5 and below with plugin-legacy is not supported ([rolldown-vite#452](https://github.com/vitejs/rolldown-vite/issues/452))\n- Passing the same browser with multiple versions of it to `build.target` option now errors: esbuild selects the latest version of it, which was probably not what you intended.\n- Missing support by Rolldown: The following features are not supported by Rolldown and are no longer supported by Vite.\n  - `build.rollupOptions.output.format: 'system'` ([rolldown#2387](https://github.com/rolldown/rolldown/issues/2387))\n  - `build.rollupOptions.output.format: 'amd'` ([rolldown#2528](https://github.com/rolldown/rolldown/issues/2528))\n  - `shouldTransformCachedModule` hook ([rolldown#4389](https://github.com/rolldown/rolldown/issues/4389))\n  - `resolveImportMeta` hook ([rolldown#1010](https://github.com/rolldown/rolldown/issues/1010))\n  - `renderDynamicImport` hook ([rolldown#4532](https://github.com/rolldown/rolldown/issues/4532))\n  - `resolveFileUrl` hook\n- `parseAst` / `parseAstAsync` functions are now deprecated in favor of `parseSync` / `parse` functions which have more features.\n- comments are removed before the `renderChunk` hook instead of after the `renderChunk` hook\n- comments other than the ones listed [here](https://rolldown.rs/reference/OutputOptions.comments) are moved, while Rollup only removes comments if the adjacent code is removed"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 2,
+    "id": "vite:docs/guide/migration.md#22",
+    "action": "use",
+    "relevance_score": 0.9787,
+    "document_score": 0.9884,
+    "levels": {
+     "answers": 0.9787,
+     "elsewhere": 0.0097,
+     "different_case": 0.0074,
+     "unrelated": 0.0042
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/guide/api-plugin.md#30",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0102,
+    "document_score": 0.0388,
+    "levels": {
+     "answers": 0.0102,
+     "elsewhere": 0.0286,
+     "different_case": 0.041,
+     "unrelated": 0.9203
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-plugins.md#12",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0022,
+    "document_score": 0.0077,
+    "levels": {
+     "answers": 0.0022,
+     "elsewhere": 0.0055,
+     "different_case": 0.0088,
+     "unrelated": 0.9835
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1601
+  },
+  "timing": {
+   "total_ms": 53,
+   "rerank_ms": 52,
+   "questions_ms": 0,
+   "model_ms": 45,
+   "engine": {
+    "rows": 2006,
+    "branches": 3,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 2048,
+    "long": 0,
+    "total_ms": 45,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 42,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

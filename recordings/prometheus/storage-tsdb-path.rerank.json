@@ -1,0 +1,125 @@
+{
+ "endpoint": "rerank",
+ "tag": "prometheus/storage-tsdb-path.rerank",
+ "recorded_at": "2026-11-06T13:29:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 915,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "62.120895",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=212"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `--storage.tsdb.path`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `--storage.tsdb.path`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "title": "docs/command-line/prometheus.md > Flags",
+    "text": "| <code class=\"text-nowrap\">--web.remote-write-receiver.accepted-protobuf-messages</code> | List of the remote write protobuf messages to accept when receiving the remote writes. Supported values: prometheus.WriteRequest, io.prometheus.write.v2.Request | `prometheus.WriteRequest` |\n| <code class=\"text-nowrap\">--web.enable-otlp-receiver</code> | Enable API endpoint accepting OTLP write requests. | `false` |\n| <code class=\"text-nowrap\">--web.console.templates</code> | Path to the console template directory, available at /consoles. | `consoles` |\n| <code class=\"text-nowrap\">--web.console.libraries</code> | Path to the console library directory. | `console_libraries` |\n| <code class=\"text-nowrap\">--web.page-title</code> | Document title of Prometheus instance. | `Prometheus Time Series Collection and Processing Server` |\n| <code class=\"text-nowrap\">--web.cors.origin</code> | Regex for CORS origin. It is fully anchored. Example: 'https?://(domain1\\|domain2)\\.com' | `.*` |\n| <code class=\"text-nowrap\">--storage.tsdb.path</code> | Base path for metrics storage. Use with server mode only. | `data/` |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.time</code> | [DEPRECATED] How long to retain samples in storage. If neither this flag nor \"storage.tsdb.retention.size\" is set, the retention time defaults to 15d. Units Supported: y, w, d, h, m, s, ms. This flag has been deprecated, use the storage.tsdb.retention.time field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.retention.size</code> | [DEPRECATED] Maximum number of bytes that can be stored for blocks. A unit is required, supported units: B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. This flag has been deprecated, use the storage.tsdb.retention.size field in the config file instead. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.tsdb.no-lockfile</code> | Do not create lockfile in data directory. Use with server mode only. | `false` |\n| <code class=\"text-nowrap\">--storage.tsdb.head-chunks-write-queue-size</code> | Size of the queue through which head chunks are written to the disk to be m-mapped, 0 disables the queue completely. Experimental. Use with server mode only. | `0` |\n| <code class=\"text-nowrap\">--storage.tsdb.delay-compact-file.path</code> | Path to a JSON file with uploaded TSDB blocks e.g. Thanos shipper meta file. If set TSDB will only compact 1 level blocks that are marked as uploaded in that file, improving external storage integrations e.g. with Thanos sidecar. 1+ level compactions won't be delayed. Use with server mode only. |  |\n| <code class=\"text-nowrap\">--storage.agent.path</code> | Base path for metrics storage. Use with agent mode only. | `data-agent/` |\n| <code class=\"text-nowrap\">--storage.agent.wal-compression</code> | Compress the agent WAL. If false, the --storage.agent.wal-compression-type flag is ignored. Use with agent mode only. | `true` |\n| <code class=\"text-nowrap\">--storage.agent.retention.min-time</code> | Minimum age samples may be before being considered for deletion when the WAL is truncated Use with agent mode only. | `5m` |\n| <code class=\"text-nowrap\">--storage.agent.retention.max-time</code> | Maximum age samples may be before being forcibly deleted when the WAL is truncated Use with agent mode only. | `4h` |\n| <code class=\"text-nowrap\">--storage.agent.checkpoint-from-in-memory-series</code> | Use only in-memory series data when building a checkpoint. Use with agent mode only. | `false` |"
+   },
+   {
+    "id": "prometheus:docs/getting_started.md#3",
+    "title": "docs/getting_started.md > Starting Prometheus",
+    "text": "## Starting Prometheus\n\nTo start Prometheus with your newly created configuration file, change to the\ndirectory containing the Prometheus binary and run:\n\n```bash\n# Start Prometheus.\n# By default, Prometheus stores its database in ./data (flag --storage.tsdb.path).\n./prometheus --config.file=prometheus.yml\n```\n\nPrometheus should start up. You should also be able to browse to a status page\nabout itself at [localhost:9090](http://localhost:9090). Give it a couple of\nseconds to collect data about itself from its own HTTP metrics endpoint.\n\nYou can also verify that Prometheus is serving metrics about itself by\nnavigating to its metrics endpoint:\n[localhost:9090/metrics](http://localhost:9090/metrics)"
+   },
+   {
+    "id": "prometheus:docs/prometheus_agent.md#4",
+    "title": "docs/prometheus_agent.md > Prometheus Agent Mode > How to Use Agent Mode in Detail",
+    "text": "### How to Use Agent Mode in Detail\n\nIf you show the help output of Prometheus (--help flag), you should see more or less the following:\n\n```\nusage: prometheus [<flags>]\n\nThe Prometheus monitoring server\n\nFlags:\n  -h, --help                     Show context-sensitive help (also try --help-long and --help-man).\n      (... other flags)\n      --storage.tsdb.path=\"data/\"\n                                 Base path for metrics storage. Use with server mode only.\n      --storage.agent.path=\"data-agent/\"\n                                 Base path for metrics storage. Use with agent mode only.\n      (... other flags)\n      --[no-]agent               Run Prometheus in 'Agent mode'.\n```\n\nUse the `--agent` flag to run Prometheus in the Agent mode. The rest of the flags are either for both server and Agent or only for a specific mode. You can see which flag is for which mode by checking the last sentence of a flag's help string. \"Use with server mode only\" means it's only for server mode. If you don't see any mention like this, it means the flag is shared.\n\nThe Agent mode accepts the same scrape configuration with the same discovery options and remote write options. It also exposes a web UI on port 9095 with disabled query capabilities but shows build info, configuration, targets, and service discovery information as in a normal Prometheus server."
+   },
+   {
+    "id": "prometheus:docs/storage.md#5",
+    "title": "docs/storage.md > Local storage > Operational aspects",
+    "text": "### Operational aspects\n\nPrometheus has several flags that configure local storage. The most important are:\n\n- `--storage.tsdb.path`: Where Prometheus writes its database. Defaults to `data/`.\n- `--storage.tsdb.retention.time`: How long to retain samples in storage. If neither\n  this flag nor `storage.tsdb.retention.size` is set, the retention time defaults to\n  `15d`. Supported units: y, w, d, h, m, s, ms.\n- `--storage.tsdb.retention.size`: The maximum number of bytes of storage blocks to retain.\n  The oldest data will be removed first. Defaults to `0` or disabled. Units supported:\n  B, KB, MB, GB, TB, PB, EB. Ex: \"512MB\". Based on powers-of-2, so 1KB is 1024B. Only\n  the persistent blocks are deleted to honor this retention although WAL and m-mapped\n  chunks are counted in the total size. So the minimum requirement for the disk is the\n  peak space taken by the `wal` (the WAL and Checkpoint) and `chunks_head`\n  (m-mapped Head chunks) directory combined (peaks every 2 hours).\n- `--storage.tsdb.wal-compression`: Enables compression of the write-ahead log (WAL).\n  Depending on your data, you can expect the WAL size to be halved with little extra\n  CPU load. This flag was introduced in 2.11.0 and enabled by default in 2.20.0.\n  Note that once enabled, downgrading Prometheus to a version below 2.11.0 will\n  require deleting the WAL."
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 3,
+    "id": "prometheus:docs/storage.md#5",
+    "action": "use",
+    "relevance_score": 0.9948,
+    "document_score": 0.9961,
+    "levels": {
+     "answers": 0.9948,
+     "elsewhere": 0.0012,
+     "different_case": 0.0018,
+     "unrelated": 0.0021
+    }
+   },
+   {
+    "index": 2,
+    "id": "prometheus:docs/prometheus_agent.md#4",
+    "action": "use",
+    "relevance_score": 0.9937,
+    "document_score": 0.9953,
+    "levels": {
+     "answers": 0.9937,
+     "elsewhere": 0.0016,
+     "different_case": 0.0022,
+     "unrelated": 0.0025
+    }
+   },
+   {
+    "index": 0,
+    "id": "prometheus:docs/command-line/prometheus.md#2",
+    "action": "use",
+    "relevance_score": 0.9933,
+    "document_score": 0.9948,
+    "levels": {
+     "answers": 0.9933,
+     "elsewhere": 0.0015,
+     "different_case": 0.002,
+     "unrelated": 0.0032
+    }
+   },
+   {
+    "index": 1,
+    "id": "prometheus:docs/getting_started.md#3",
+    "action": "use",
+    "relevance_score": 0.9928,
+    "document_score": 0.9949,
+    "levels": {
+     "answers": 0.9928,
+     "elsewhere": 0.0021,
+     "different_case": 0.002,
+     "unrelated": 0.0031
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 2264
+  },
+  "timing": {
+   "total_ms": 82,
+   "rerank_ms": 66,
+   "questions_ms": 0,
+   "model_ms": 56,
+   "engine": {
+    "rows": 2804,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 56,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 52,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

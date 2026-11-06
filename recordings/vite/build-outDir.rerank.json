@@ -1,0 +1,127 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/build-outDir.rerank",
+ "recorded_at": "2026-11-06T13:30:20Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 907,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "59.639774",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=202"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `build.outDir`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `build.outDir`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment.md#4",
+    "title": "docs/guide/api-environment.md > Environment API > Environments Configuration",
+    "text": "The `EnvironmentOptions` interface exposes all the per-environment options. There are environment options that apply to both `build` and `dev`, like `resolve`. And there are `DevEnvironmentOptions` and `BuildEnvironmentOptions` for dev and build specific options (like `dev.warmup` or `build.outDir`). Some options like `optimizeDeps` only applies to dev, but is kept as top level instead of nested in `dev` for backward compatibility.\n\n```ts\ninterface EnvironmentOptions {\n  define?: Record<string, any>\n  resolve?: EnvironmentResolveOptions\n  optimizeDeps: DepOptimizationOptions\n  consumer?: 'client' | 'server'\n  dev: DevOptions\n  build: BuildOptions\n}\n```\n\nThe `UserConfig` interface extends from the `EnvironmentOptions` interface, allowing to configure the client and defaults for other environments, configured through the `environments` option. The `client` and a server environment named `ssr` are always present during dev. This allows backward compatibility with `server.ssrLoadModule(url)` and `server.moduleGraph`. During build, the `client` environment is always present, and the `ssr` environment is only present if it is explicitly configured (using `environments.ssr` or for backward compatibility `build.ssr`). An app doesn't need to use the `ssr` name for its SSR environment, it could name it `server` for example."
+   },
+   {
+    "id": "vite:docs/guide/static-deploy.md#1",
+    "title": "docs/guide/static-deploy.md > Deploying a Static Site",
+    "text": "# Deploying a Static Site\n\nThe following guides are based on some shared assumptions:\n\n- You are using the default build output location (`dist`). This location [can be changed using `build.outDir`](/config/build-options.md#build-outdir), and you can extrapolate instructions from these guides in that case.\n- You are using npm. You can use equivalent commands to run the scripts if you are using Yarn or other package managers.\n- Vite is installed as a local dev dependency in your project, and you have setup the following npm scripts:\n\n```json [package.json]\n{\n  \"scripts\": {\n    \"build\": \"vite build\",\n    \"preview\": \"vite preview\"\n  }\n}\n```\n\nIt is important to note that `vite preview` is intended for previewing the build locally and not meant as a production server.\n\n::: tip NOTE\nThese guides provide instructions for performing a static deployment of your Vite site. Vite also supports Server-Side Rendering. SSR refers to front-end frameworks that support running the same application in Node.js, pre-rendering it to HTML, and finally hydrating it on the client. Check out the [SSR Guide](./ssr) to learn about this feature. On the other hand, if you are looking for integration with traditional server-side frameworks, check out the [Backend Integration guide](./backend-integration) instead.\n:::"
+   },
+   {
+    "id": "vite:docs/config/dep-optimization-options.md#1",
+    "title": "docs/config/dep-optimization-options.md > Dep Optimization Options > optimizeDeps.entries <NonInheritBadge />",
+    "text": "## optimizeDeps.entries <NonInheritBadge />\n\n- **Type:** `string | string[]`\n\nBy default, Vite will crawl all your `.html` files to detect dependencies that need to be pre-bundled (ignoring `node_modules`, `build.outDir`, `__tests__` and `coverage`). If the top-level [`input`](/config/shared-options#input) or `build.rolldownOptions.input` is specified, Vite will crawl those entry points instead.\n\nIf neither of these fit your needs, you can specify custom entries using this option - the value should be a [`tinyglobby` pattern](https://superchupu.dev/tinyglobby/comparison) or array of patterns that are relative from Vite project root. This will overwrite default entries inference. Only `node_modules` and `build.outDir` folders will be ignored by default when `optimizeDeps.entries` is explicitly defined. If other folders need to be ignored, you can use an ignore pattern as part of the entries list, marked with an initial `!`. `node_modules` will not be ignored for patterns that explicitly include the string `node_modules`."
+   },
+   {
+    "id": "vite:docs/config/server-options.md#15",
+    "title": "docs/config/server-options.md > Server Options > server.watch",
+    "text": "## server.watch\n\n- **Type:** `object | null`\n\nFile system watcher options to pass on to [chokidar](https://github.com/paulmillr/chokidar/tree/3.6.0#api).\n\nWhen bundled-dev mode is enabled, [Rolldown watch options](https://rolldown.rs/reference/InputOptions.watch) (for example, `usePolling`, `pollInterval`, `useDebounce`, `debounceDuration`, `include`, `exclude`) are also accepted. The chokidar-only options are still used by the chokidar watcher, which keeps watching files outside the module graph, such as config file dependencies and env files.\n\nThe Vite server watcher watches the `root` and skips the `.git/`, `node_modules/`, `test-results/`, and Vite's `cacheDir` and `build.outDir` directories by default. When updating a watched file, Vite will apply HMR and update the page only if needed.\n\nIf set to `null`, no files will be watched. [`server.watcher`](/guide/api-javascript.html#vitedevserver) will provide a compatible event emitter, but calling `add` or `unwatch` will have no effect.\n\n::: warning Watching files in `node_modules`\n\nIt's currently not possible to watch files and packages in `node_modules`. For further progress and workarounds, you can follow [issue #8619](https://github.com/vitejs/vite/issues/8619).\n\n:::\n\n::: warning Using Vite on Windows Subsystem for Linux (WSL) 2\n\nWhen running Vite on WSL2, file system watching does not work when a file is edited by Windows applications (non-WSL2 process). This is due to [a WSL2 limitation](https://github.com/microsoft/WSL/issues/4739). This also applies to running on Docker with a WSL2 backend.\n\nTo fix it, you could either:\n\n- **Recommended**: Use WSL2 applications to edit your files.\n  - It is also recommended to move the project folder outside of a Windows filesystem. Accessing Windows filesystem from WSL2 is slow. Removing that overhead will improve performance.\n- Set `{ usePolling: true }`.\n  - Note that [`usePolling` leads to high CPU utilization](https://github.com/paulmillr/chokidar/tree/3.6.0#performance).\n\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 1,
+    "id": "vite:docs/guide/static-deploy.md#1",
+    "action": "use",
+    "relevance_score": 0.9887,
+    "document_score": 0.9919,
+    "levels": {
+     "answers": 0.9887,
+     "elsewhere": 0.0032,
+     "different_case": 0.0039,
+     "unrelated": 0.0042
+    }
+   },
+   {
+    "index": 3,
+    "id": "vite:docs/config/server-options.md#15",
+    "action": "expand",
+    "relevance_score": 0.0993,
+    "document_score": 0.6143,
+    "levels": {
+     "answers": 0.0993,
+     "elsewhere": 0.515,
+     "different_case": 0.0602,
+     "unrelated": 0.3255
+    }
+   },
+   {
+    "index": 2,
+    "id": "vite:docs/config/dep-optimization-options.md#1",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0049,
+    "document_score": 0.0293,
+    "levels": {
+     "answers": 0.0049,
+     "elsewhere": 0.0244,
+     "different_case": 0.0215,
+     "unrelated": 0.9492
+    }
+   },
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment.md#4",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0015,
+    "document_score": 0.0082,
+    "levels": {
+     "answers": 0.0015,
+     "elsewhere": 0.0067,
+     "different_case": 0.0131,
+     "unrelated": 0.9787
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 1767
+  },
+  "timing": {
+   "total_ms": 78,
+   "rerank_ms": 63,
+   "questions_ms": 0,
+   "model_ms": 55,
+   "engine": {
+    "rows": 2307,
+    "branches": 4,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 3072,
+    "long": 0,
+    "total_ms": 55,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 51,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}

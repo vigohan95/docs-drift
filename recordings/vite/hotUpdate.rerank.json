@@ -1,0 +1,90 @@
+{
+ "endpoint": "rerank",
+ "tag": "vite/hotUpdate.rerank",
+ "recorded_at": "2026-11-06T13:30:19Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 936,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.583904",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=9,cfOrigin;dur=0,cfWorker;dur=234"
+ },
+ "request": {
+  "query": "What is the default value, limit, requirement, or documented behavior of `hotUpdate`?",
+  "instructions": "A passage answers only if it itself states a concrete value, limit, version, or rule for `hotUpdate`. A passage that only mentions the name, or only uses it in an example without stating a rule, does not answer.",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#5",
+    "title": "docs/guide/api-environment-plugins.md > Environment API for Plugins > The `hotUpdate` Hook",
+    "text": "## The `hotUpdate` Hook\n\n- **Type:** `(this: { environment: DevEnvironment }, options: HotUpdateOptions) => Array<EnvironmentModuleNode> | void | Promise<Array<EnvironmentModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](#per-environment-hooks-and-global-hooks)\n- **See also:** [HMR API](./api-hmr)\n\nThe `hotUpdate` hook allows plugins to perform custom HMR update handling for a given environment. When a file changes, the HMR algorithm is run for each environment in series according to the order in `server.environments`, so the `hotUpdate` hook will be called multiple times. The hook receives a context object with the following signature:\n\n```ts\ninterface HotUpdateOptions {\n  type: 'create' | 'update' | 'delete'\n  file: string\n  timestamp: number\n  modules: Array<EnvironmentModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\n- `this.environment` is the module execution environment where a file update is currently being processed.\n\n- `modules` is an array of modules in this environment that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n- `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file, and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior."
+   },
+   {
+    "id": "vite:docs/changes/hotupdate-hook.md#0",
+    "title": "docs/changes/hotupdate-hook.md > HMR `hotUpdate` Plugin Hook",
+    "text": "# HMR `hotUpdate` Plugin Hook\n\n::: tip Feedback\nGive us feedback at [Environment API feedback discussion](https://github.com/vitejs/vite/discussions/16358)\n:::\n\nWe're planning to deprecate the `handleHotUpdate` plugin hook in favor of [`hotUpdate` hook](/guide/api-environment-plugins#the-hotupdate-hook) to be [Environment API](/guide/api-environment.md) aware, and handle additional watch events with `create` and `delete`.\n\nAffected scope: `Vite Plugin Authors`\n\n::: warning Future Deprecation\n`hotUpdate` was first introduced in `v6.0`. The deprecation of `handleHotUpdate` is planned for a future major. We don't recommend moving away from `handleHotUpdate` yet. If you want to experiment and give us feedback, you can use the `future.removePluginHookHandleHotUpdate` to `\"warn\"` in your vite config.\n:::"
+   }
+  ]
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "results": [
+   {
+    "index": 0,
+    "id": "vite:docs/guide/api-environment-plugins.md#5",
+    "action": "expand",
+    "relevance_score": 0.097,
+    "document_score": 0.7732,
+    "levels": {
+     "answers": 0.097,
+     "elsewhere": 0.6762,
+     "different_case": 0.0278,
+     "unrelated": 0.199
+    }
+   },
+   {
+    "index": 1,
+    "id": "vite:docs/changes/hotupdate-hook.md#0",
+    "action": "skip",
+    "reason": "unrelated",
+    "relevance_score": 0.0694,
+    "document_score": 0.4566,
+    "levels": {
+     "answers": 0.0694,
+     "elsewhere": 0.3872,
+     "different_case": 0.0434,
+     "unrelated": 0.4999
+    }
+   }
+  ],
+  "usage": {
+   "input_tokens": 770
+  },
+  "timing": {
+   "total_ms": 45,
+   "rerank_ms": 44,
+   "questions_ms": 0,
+   "model_ms": 38,
+   "engine": {
+    "rows": 1040,
+    "branches": 2,
+    "forwards": 1,
+    "bins": 1,
+    "bucket_rows": 1536,
+    "long": 0,
+    "total_ms": 38,
+    "build_ms": 0,
+    "doc_ms": 2,
+    "forward_ms": 35,
+    "state_ms": 0,
+    "logits_ms": 0,
+    "state_chars": 0,
+    "row_buckets": "big",
+    "shared_opening_tokens": 112
+   }
+  }
+ }
+}
