@@ -73,7 +73,9 @@ def main() -> int:
         for rev in revs:
             found |= files_with(needle, rev)
         # upstream documentation quoted in recordings and reports may legitimately mention /home/ or /Users/
-        ours = sorted(f for f in found if not f.startswith(("recordings/", "reports/", "runs/")))
+        # this script names the patterns it looks for, so it is not counted either
+        ours = sorted(f for f in found
+                      if not f.startswith(("recordings/", "reports/", "runs/")) and f != "scripts/prepublish_check.py")
         quoted = len(found) - len(ours)
         note = f" (plus {quoted} files of quoted upstream docs)" if quoted else ""
         print(f"{needle!r:14} in {len(ours)} of our files across history{note}", ours[:5])
