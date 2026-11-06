@@ -22,7 +22,7 @@ def test_page_on_disk_is_what_the_build_script_produces():
 
 
 def test_registry_file_is_what_the_registry_script_produces():
-    assert json.loads(json.dumps({"upstream_search": registry.UPSTREAM_SEARCH, "defects": registry.write()})) == REG
+    assert json.loads(json.dumps({"upstream_search": registry.UPSTREAM_SEARCH, "defects": registry.entries()})) == REG
 
 
 def test_page_shows_every_defect_with_pinned_links():

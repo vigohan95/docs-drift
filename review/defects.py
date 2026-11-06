@@ -253,7 +253,7 @@ def check() -> int:
     return 1 if bad else 0
 
 
-def write():
+def entries():
     out = []
     from docsdrift.targets import TARGETS
     for d in DEFECTS:
@@ -265,6 +265,11 @@ def write():
             s["url"] = f"https://github.com/{t['repo']}/blob/{t['commit']}/{s['path']}#L{s['lines'][0]}-L{s['lines'][1]}"
             e[side] = s
         out.append(e)
+    return out
+
+
+def write():
+    out = entries()
     (ROOT / "review" / "defects.json").write_text(
         json.dumps({"upstream_search": UPSTREAM_SEARCH, "defects": out}, indent=1, ensure_ascii=False), encoding="utf-8")
     return out

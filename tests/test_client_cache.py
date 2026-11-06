@@ -73,6 +73,7 @@ def test_save_index_merges_with_entries_written_by_another_process(tmp_path):
     c = Clocked(offline=True, recordings=tmp_path)
     (tmp_path / "index.json").write_text(json.dumps({"other-hash": "other.json"}), encoding="utf-8")
     c._index["mine"] = "mine.json"
+    c.offline, c.live_calls = False, 1      # as after a live call
     c.save_index()
     idx = json.loads((tmp_path / "index.json").read_text(encoding="utf-8"))
     assert idx == {"other-hash": "other.json", "mine": "mine.json"}

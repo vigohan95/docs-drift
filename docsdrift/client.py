@@ -270,6 +270,8 @@ class Clocked:
         return parsed, credits
 
     def save_index(self):
+        if self.offline or self.live_calls == 0:
+            return  # nothing new was recorded
         with _lock:
             idx_file = self.recordings / "index.json"
             merged = {}
