@@ -1,0 +1,171 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e8/e81fdf1c4699348ada0e",
+ "request_hash": "e81fdf1c4699348ada0e903654339d9ddc796e69552b7b781e76db8e356bfae9",
+ "recorded_at": "2026-11-06T14:08:26Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1105,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "242.16416",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=393"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "text": "### `handleHotUpdate`\n\n- **Type:** `(ctx: HmrContext) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [HMR API](./api-hmr)\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Perform custom HMR update handling. The hook receives a context object with the following signature:\n\n  ```ts\n  interface HmrContext {\n    file: string\n    timestamp: number\n    modules: Array<ModuleNode>\n    read: () => string | Promise<string>\n    server: ViteDevServer\n  }\n  ```\n\n  - `modules` is an array of modules that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n  - `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior.\n\n  The hook can choose to:\n  - Filter and narrow down the affected module list so that the HMR is more accurate.\n\n  - Return an empty array and perform a full reload:\n\n    ```js\n    handleHotUpdate({ server, modules, timestamp }) {\n      // Invalidate modules manually\n      const invalidatedModules = new Set()\n      for (const mod of modules) {\n        server.moduleGraph.invalidateModule(\n          mod,\n          invalidatedModules,\n          timestamp,\n          true\n        )\n      }\n      server.ws.send({ type: 'full-reload' })\n      return []\n    }\n    ```"
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#5",
+    "text": "## The `hotUpdate` Hook\n\n- **Type:** `(this: { environment: DevEnvironment }, options: HotUpdateOptions) => Array<EnvironmentModuleNode> | void | Promise<Array<EnvironmentModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **Scope:** [Per-environment](#per-environment-hooks-and-global-hooks)\n- **See also:** [HMR API](./api-hmr)\n\nThe `hotUpdate` hook allows plugins to perform custom HMR update handling for a given environment. When a file changes, the HMR algorithm is run for each environment in series according to the order in `server.environments`, so the `hotUpdate` hook will be called multiple times. The hook receives a context object with the following signature:\n\n```ts\ninterface HotUpdateOptions {\n  type: 'create' | 'update' | 'delete'\n  file: string\n  timestamp: number\n  modules: Array<EnvironmentModuleNode>\n  read: () => string | Promise<string>\n  server: ViteDevServer\n}\n```\n\n- `this.environment` is the module execution environment where a file update is currently being processed.\n\n- `modules` is an array of modules in this environment that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n- `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file, and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-environment-plugins.md#5"
+    ],
+    "conflicts": [
+     "vite:docs/guide/api-environment-plugins.md#5"
+    ]
+   },
+   {
+    "id": "vite:docs/guide/api-environment-plugins.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "vite:docs/guide/api-plugin.md#17"
+    ],
+    "conflicts": [
+     "vite:docs/guide/api-plugin.md#17"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "vite:docs/guide/api-plugin.md#17",
+    "b": "vite:docs/guide/api-environment-plugins.md#5",
+    "relation": "conflicting",
+    "related": 0.9788,
+    "probabilities": {
+     "same": 0.0216,
+     "overlapping": 0.0674,
+     "conflicting": 0.8898,
+     "unrelated": 0.0212
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.5021,
+       "restated": 0.4465,
+       "elaborated": 0.0334,
+       "different": 0.018
+      },
+      "confidence": 0.982,
+      "a": {
+       "document": "vite:docs/guide/api-plugin.md#17",
+       "quote": "- `read` is an async read function that returns the content of the file.",
+       "start": 745,
+       "end": 817,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-environment-plugins.md#5",
+       "quote": "It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n- `read` is an async read function that returns the content of the file.",
+       "start": 1103,
+       "end": 1264,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0426,
+       "restated": 0.9284,
+       "elaborated": 0.0167,
+       "different": 0.0123
+      },
+      "confidence": 0.9877,
+      "a": {
+       "document": "vite:docs/guide/api-plugin.md#17",
+       "quote": "This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file and direct `fs.readFile` will return empty content.",
+       "start": 818,
+       "end": 999,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-environment-plugins.md#5",
+       "quote": "This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file, and direct `fs.readFile` will return empty content.",
+       "start": 1265,
+       "end": 1447,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9771,
+       "restated": 0.0109,
+       "elaborated": 0.0061,
+       "different": 0.0059
+      },
+      "confidence": 0.9941,
+      "a": {
+       "document": "vite:docs/guide/api-plugin.md#17",
+       "quote": "The read function passed in normalizes this behavior.",
+       "start": 1000,
+       "end": 1053,
+       "confidence": 1
+      },
+      "b": {
+       "document": "vite:docs/guide/api-environment-plugins.md#5",
+       "quote": "The read function passed in normalizes this behavior.",
+       "start": 1448,
+       "end": 1501,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 86,
+   "passages": 6,
+   "counterparts_ms": 133
+  },
+  "timing": {
+   "read_ms": 253,
+   "total_ms": 257
+  }
+ }
+}

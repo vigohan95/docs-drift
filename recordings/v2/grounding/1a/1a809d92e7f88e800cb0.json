@@ -1,0 +1,76 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/1a/1a809d92e7f88e800cb0",
+ "request_hash": "1a809d92e7f88e800cb07ec5631760e191866f562997d8ef466a7ae1dbac38e8",
+ "recorded_at": "2026-11-06T14:09:14Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 912,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "67.163519",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=198"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "text": "### `handleHotUpdate`\n\n- **Type:** `(ctx: HmrContext) => Array<ModuleNode> | void | Promise<Array<ModuleNode> | void>`\n- **Kind:** `async`, `sequential`\n- **See also:** [HMR API](./api-hmr)\n- **Scope:** [Per-environment](/guide/api-environment-plugins#per-environment-hooks-and-global-hooks)\n\n  Perform custom HMR update handling. The hook receives a context object with the following signature:\n\n  ```ts\n  interface HmrContext {\n    file: string\n    timestamp: number\n    modules: Array<ModuleNode>\n    read: () => string | Promise<string>\n    server: ViteDevServer\n  }\n  ```\n\n  - `modules` is an array of modules that are affected by the changed file. It's an array because a single file may map to multiple served modules (e.g. Vue SFCs).\n\n  - `read` is an async read function that returns the content of the file. This is provided because on some systems, the file change callback may fire too fast before the editor finishes updating the file and direct `fs.readFile` will return empty content. The read function passed in normalizes this behavior.\n\n  The hook can choose to:\n  - Filter and narrow down the affected module list so that the HMR is more accurate.\n\n  - Return an empty array and perform a full reload:\n\n    ```js\n    handleHotUpdate({ server, modules, timestamp }) {\n      // Invalidate modules manually\n      const invalidatedModules = new Set()\n      for (const mod of modules) {\n        server.moduleGraph.invalidateModule(\n          mod,\n          invalidatedModules,\n          timestamp,\n          true\n        )\n      }\n      server.ws.send({ type: 'full-reload' })\n      return []\n    }\n    ```"
+   }
+  ],
+  "answer": "## The `hotUpdate` Hook",
+  "claims": [
+   "## The `hotUpdate` Hook"
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.0198,
+  "ungrounded": 0.9802,
+  "verdict": "ungrounded",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "vite:docs/guide/api-plugin.md#17",
+    "share": 1,
+    "share_of_answer": 0.0198,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "## The `hotUpdate` Hook",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.0198,
+    "contradicted": 0.034,
+    "not_stated": 0.8673,
+    "not_a_claim": 0.0788,
+    "verdict": "not_stated",
+    "sources": {
+     "vite:docs/guide/api-plugin.md#17": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.0198
+  },
+  "timing": {
+   "read_ms": 75,
+   "total_ms": 78
+  }
+ }
+}
