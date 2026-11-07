@@ -139,6 +139,7 @@ class Clocked:
         self.live_calls = 0
         self.cache_hits = 0
         self.live_credits = 0.0
+        self._this_thread = threading.local()
         recordings.mkdir(parents=True, exist_ok=True)
         self._index = load_index(recordings) if (keep_on_disk and (use_cache or offline)) else {}
 
@@ -159,6 +160,13 @@ class Clocked:
         return float(rec.get("response_headers", {}).get("x-clocked-credits") or 0)
 
     # ------------------------------------------------------------------- call
+    def last_call(self) -> tuple[float, bool]:
+        """(credits charged, answered from the cache) for this thread's latest call.
+
+        The shared counters cannot say this when calls overlap: another thread's charge lands between
+        any two reads of them."""
+        return getattr(self._this_thread, "charged", 0.0), getattr(self._this_thread, "from_cache", False)
+
     def call(self, endpoint: str, payload: dict, tag: str | None = None, max_retries: int = 4,
              force_live: bool = False) -> dict:
         """Like call_cost() but returns only the parsed JSON body."""
@@ -177,9 +185,11 @@ class Clocked:
         when a tag is given.
         """
         h = request_hash(endpoint, payload)
+        self._this_thread.charged, self._this_thread.from_cache = 0.0, False
         if (self.use_cache or self.offline) and not force_live:
             rec = self.cached(endpoint, payload)
             if rec is not None:
+                self._this_thread.from_cache = True
                 with _lock:
                     self.cache_hits += 1
                 if rec.get("status") != 200:
@@ -273,6 +283,7 @@ class Clocked:
                     "request_chars": len(body),
                     "at": record["recorded_at"],
                 }) + "\n")
+            self._this_thread.charged = credits
             self._spent += credits
             self.live_calls += 1
             self.live_credits += credits

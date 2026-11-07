@@ -147,6 +147,9 @@ class Meter:
         self.live_calls += 1
         return {}, 10.0
 
+    def last_call(self):
+        return 10.0, False
+
 
 def test_a_request_cannot_spend_more_than_its_cap():
     capped = CappedClient(Meter(), cap=25, remaining=1000)
@@ -155,6 +158,44 @@ def test_a_request_cannot_spend_more_than_its_cap():
     with pytest.raises(BudgetExceeded):      # 30 spent: over the cap, no fourth call
         capped.call_cost("compare", {})
     assert capped.spent == 30 and capped.inner.live_calls == 3
+
+
+def test_concurrent_calls_are_each_counted_once(tmp_path, monkeypatch):
+    """Found on the deployed service: two workers overlap, and subtracting a shared counter counted a
+    scan that cost 158 credits as 306."""
+    import io
+    import threading
+    import urllib.request
+    from docsdrift.client import Clocked
+    monkeypatch.setenv("CLOCKED_API_KEY", "sk-test-not-a-real-key-000000000000")
+    both_in_flight = threading.Barrier(2, timeout=5)
+
+    class Answer(io.BytesIO):
+        status = 200
+        headers = {"X-Clocked-Credits": "10"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def getheaders(self):
+            return list(self.headers.items())
+
+    def urlopen(req, timeout=None):
+        both_in_flight.wait()                # neither answer lands until both requests are out
+        return Answer(b"{}")
+    monkeypatch.setattr(urllib.request, "urlopen", urlopen)
+
+    capped = CappedClient(Clocked(budget=1000, recordings=tmp_path, keep_on_disk=False), cap=1000, remaining=1000)
+    threads = [threading.Thread(target=capped.call_cost, args=("compare", {"n": n})) for n in range(2)]
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+    assert capped.calls == 2 and capped.spent == 20 and capped.list_price == 20
+
+    capped.call_cost("compare", {"n": 0})    # the same request again comes from memory and costs nothing
+    assert capped.spent == 20 and capped.list_price == 30 and capped.replayed == 1
 
 
 def test_a_request_stops_when_the_trial_budget_runs_out_midway():

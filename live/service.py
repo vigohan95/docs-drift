@@ -90,13 +90,13 @@ class CappedClient:
                 raise BudgetExceeded("the credit cap for one request was reached")
             if self.spent >= self.remaining:
                 raise BudgetExceeded("the live trial budget is used up")
-            before_live, before_hits = self.inner.live_credits, self.inner.cache_hits
         body, price = self.inner.call_cost(endpoint, payload, *a, **kw)
+        charged, from_cache = self.inner.last_call()
         with self._lock:
             self.calls += 1
             self.list_price += price
-            self.spent += self.inner.live_credits - before_live
-            self.replayed += self.inner.cache_hits - before_hits
+            self.spent += charged
+            self.replayed += from_cache
         return body, price
 
     def call(self, endpoint: str, payload: dict, *a, **kw):
