@@ -159,7 +159,7 @@ def build() -> str:
         try_title = "Try it live"
         try_intro = ("Send one pair of passages, or a public GitHub repository, through the same pipeline. Requests go to a "
                      "small service that holds the Clocked key; it has a fixed credit budget, a cap per request and a rate "
-                     "limit, and it says so when the budget is used up.")
+                     "limit, and it says so when the budget is used up. It logs the address, sizes and credits, not the text.")
     else:
         try_title = "See what the two endpoints say about one pair"
         try_intro = ("Three real pairs of passages, with the recorded answers of Clocked /compare (in both orders) and "

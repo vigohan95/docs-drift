@@ -1,5 +1,4 @@
-"""Create one small Vultr instance for the live trial. NOT RUN YET: written while the Vultr API
-refused this machine's address, so treat it as a draft until it has been run once.
+"""Create one small Vultr instance for the live trial.
 
     VULTR_ENV_FILE=/path/to/.env  python live/deploy/provision_vultr.py --ssh-pubkey KEY.pub --ssh-from 203.0.113.7 [--create]
 

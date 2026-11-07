@@ -10,11 +10,10 @@ A small HTTP service that lets a visitor of the demo page run the real pipeline 
 - `GET /api/status`: the remaining trial budget and the limits.
 
 Standard library only. The logic and the limits are in `service.py`, the GitHub reader in `github.py`, the HTTP front
-in `server.py`. All of it is tested offline (`tests/test_live_service.py`, 62 tests).
+in `server.py`. All of it is tested offline (`tests/test_live_service.py`).
 
-**Status: built and tested, not deployed.** The Vultr API refused this machine's address when deployment was
-attempted (its access list did not include it), so no server was created. Until a service address is set in
-`review/live.json`, the demo page shows the recorded answers for its three examples and says so.
+**Status: running** at `https://45-76-12-121.sslip.io` (`/api/status` shows the budget), called by the demo page.
+`review/live.json` holds the address; with an empty address the page shows only the recorded answers of its examples.
 
 ## Limits
 
@@ -32,6 +31,12 @@ attempted (its access list did not include it), so no server was created. Until 
 
 When the budget is used up, every request is answered with HTTP 402 and the sentence "The live trial budget is used
 up…"; `/api/status` says the same and the page shows it. Nothing fails silently.
+
+The budget is read from a ledger on disk, so it survives a restart. The rate limits are kept in memory and start
+again after a restart; the budget and the per-request caps still hold.
+
+A cap is checked before each Clocked request, so with two requests in flight a job can pass its cap by the price of
+those requests (a few credits).
 
 ## What it does with a visitor's input
 
@@ -53,10 +58,25 @@ curl -s http://127.0.0.1:8787/api/status
 `python scripts/e2e_live_page.py <out dir>` drives the page against a local service in headless Chrome, using
 recorded Clocked answers (no key, no credits).
 
-## Deploy (draft, not run yet)
+## Deploy
 
-`deploy/` has what a deployment needs: `provision_vultr.py` (one small instance, its own firewall group and SSH key,
-all named `docsdrift-live`; it only creates, never modifies or deletes), `setup.sh` (Caddy with a
-`<ip-with-dashes>.sslip.io` name, the service under systemd as an unprivileged user), the unit file and the
-Caddyfile. The key goes in `/etc/docsdrift-live.env` with mode 600. After deployment, put the service address in
-`review/live.json` and run `python scripts/build_site.py`. These files have not been run; expect to fix details.
+`deploy/` has what the running instance was built with:
+
+- `provision_vultr.py`: one instance, its own firewall group (80 and 443 open, 22 from one address) and SSH key, all
+  named `docsdrift-live`. Without `--create` it only reads. It creates and never modifies or deletes, and it stops if
+  the account's credit does not cover a month.
+- `setup.sh <ip-with-dashes>.sslip.io`: swap, Caddy (which gets the certificate), the service under systemd as an
+  unprivileged user.
+- Then add `CLOCKED_API_KEY=...` to `/etc/docsdrift-live.env` (mode 600), restart, put the address in `review/live.json`
+  and run `python scripts/build_site.py`.
+
+The instance is the cheapest plan with an IPv4 address (`vc2-1c-0.5gb`, 1 CPU, 512 MB). That plan cannot take Ubuntu
+24.04, so it runs Debian 12. Vultr's image keeps `ufw` on with only SSH open, which `setup.sh` handles.
+
+`python scripts/e2e_live_page.py <out dir> --deployed` clicks through the published page at 1280 and 390 pixels. It
+spends real credits.
+
+Running it for real found two bugs the offline tests had missed, both now covered by tests: with two workers a scan's
+credits were counted up to twice in the per-request figure (the ledger and the budget were right), and candidate
+selection depended on the Python hash seed for tokens of equal weight (the published results were not affected: all
+15 projects replay with the same numbers).

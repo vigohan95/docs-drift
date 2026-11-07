@@ -3,9 +3,9 @@
 #
 #     bash setup.sh <domain>            # for example 203-0-113-7.sslip.io
 #
-# NOT RUN YET (see README.md in this folder). It installs Caddy, checks the public repository out to
-# /opt/docs-drift, and runs the service as an unprivileged user under systemd.
-# The Clocked key is NOT handled here: put it in /etc/docsdrift-live.env yourself (see README.md).
+# It installs Caddy, checks the public repository out to /opt/docs-drift, and runs the service as an
+# unprivileged user under systemd.
+# The Clocked key is NOT handled here: put it in /etc/docsdrift-live.env yourself (see ../README.md).
 set -euo pipefail
 
 DOMAIN="${1:?usage: setup.sh <domain>}"

@@ -22,11 +22,12 @@ Docs Drift gives maintainers a short list of places where their documentation co
 With a key (`CLOCKED_API_KEY`), `python -m docsdrift scan /path/to/any/repo` runs it live. A scan cost 166 to 1,045
 credits on the projects measured.
 
-The block at the top of the demo page shows three real pairs with what `/compare` (both orders) and `/grounding`
-answered for each. Those are recordings. The service that would check pasted passages and scan a repository on
-request is in `live/`, with its limits and 62 offline tests; it is not deployed, because the cloud provider's API
-refused the build machine's address. To try your own input, run the command line tool or `python -m live.server`
-with a key.
+The "Try it live" block at the top of the demo page runs the same pipeline on real calls: paste two passages (or use
+one of three real pairs) to see what `/compare` in both orders and `/grounding` each concluded, or give a public
+GitHub repository to scan. It has a budget of 3,500 credits and allows 10 pair checks and 2 scans per hour per
+address, and a scan reads at most 24 pairs, so it finds less than the command line tool. The page shows the credits
+left; if the budget is used up or the service is down, the examples show recorded answers and the page says so. The
+service and its limits are in `live/`.
 
 ## What each endpoint's output changes
 
@@ -54,9 +55,8 @@ Group award (Verify, Compare, or Rerank):
 - **Explanation and reproducibility (10).** Every request and response is recorded; scans replay offline; the numbers
   in the README are recomputed by the tests.
 
-Best Overall App: the tool uses three of the nine endpoints and is a command-line tool with a static report page
-(the live trial service is written and tested but not hosted), so it is not built to score on "additional
-endpoints" or on interface polish.
+Best Overall App: the tool uses three of the nine endpoints and is a command-line tool with a report page and a small
+live trial, so it is not built to score on "additional endpoints" or on interface polish.
 
 ## What it does not do
 

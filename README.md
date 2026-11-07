@@ -8,7 +8,7 @@ both passages with file and line. It is a list to review, not a verdict: about h
 
 Built for the Clocked Build Challenge (October 21 to November 10, 2026) on `/compare`, `/grounding` and `/rerank`.
 
-Demo page: [`docs/index.html`](docs/index.html) (static; also served by GitHub Pages). Judges: a three-minute path is in [`JUDGES.md`](JUDGES.md).
+Demo page: https://vigohan95.github.io/docs-drift/ (the results, plus a live trial on your own passages or a public repository). Judges: a three-minute path is in [`JUDGES.md`](JUDGES.md).
 
 ## Results
 
@@ -115,13 +115,13 @@ progress while it works.
 
 It has hard limits: a total credit budget, a cap per request, a rate limit per address, one job at a time, input
 size limits, and a plain "budget is used up" answer when the credits run out. The limits and what it keeps of a
-visitor's input are listed in [`live/README.md`](live/README.md). 62 offline tests cover them.
+visitor's input are listed in [`live/README.md`](live/README.md). Offline tests cover all of them.
 
-**It is built and tested but not deployed.** The cloud provider's API refused the build machine's address when the
-deployment was attempted, so no server exists. The demo page therefore shows, for three real pairs, the answers the
-service gave when it was run locally with a real key (recorded in `docs/live-examples.json`), and says that they are
-recordings. When a service address is set in `review/live.json` and the page is rebuilt, the same block checks
-pasted passages and scans a repository on request, and falls back to the recordings if the service cannot be reached.
+**It is running.** The block at the top of the [demo page](https://vigohan95.github.io/docs-drift/) calls it, and it
+shows the credits left. A live scan reads only 24 candidate pairs, so it can list nothing in a project where the full
+tool finds something: a scan of redux-toolkit read 24 of 243 candidates and listed nothing, though two of the sixteen
+defects are in that project. The page says so. If the service cannot be reached, or the trial budget is used up, the
+three examples fall back to the answers recorded in `docs/live-examples.json`, and the page says that too.
 
 ## How it works
 
@@ -203,7 +203,7 @@ review/              verdict for every finding, the defect registry, upstream PR
 experiments/         ablations and rule search
 upstream-patches/    one small patch per defect, with a draft of the pull request text
 docs/                the static demo page (GitHub Pages serves this folder)
-live/                the live trial service for the page (built and tested, not deployed) and deployment drafts
+live/                the live trial service behind the page, and the files that deploy it
 scripts/             fetch the pinned targets, build the page, render it for a visual check
 video/               storyboard and scripts for the demo video
 tests/               178 tests

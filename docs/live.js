@@ -44,7 +44,7 @@
   var tb = el("textarea", { id: "live-b", rows: "7", spellcheck: "false", "aria-label": "Second passage" });
   var pairBtn = el("button", { type: "button", class: "live-btn", text: API ? "Check this pair" : "Show the recorded answer" });
   var pairOut = el("div", { class: "live-out", "aria-live": "polite" });
-  var repoIn = el("input", { id: "live-repo", type: "text", placeholder: "owner/name, for example fastify/fastify",
+  var repoIn = el("input", { id: "live-repo", type: "text", placeholder: "owner/name, e.g. fastify/fastify",
                               autocomplete: "off", spellcheck: "false", "aria-label": "GitHub repository" });
   var repoBtn = el("button", { type: "button", class: "live-btn", text: "Scan this repository" });
   var repoOut = el("div", { class: "live-out", "aria-live": "polite" });
