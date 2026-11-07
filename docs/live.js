@@ -175,9 +175,11 @@
     var r = job.result;
     if (!r) return;
     var s = r.stats;
+    var unread = s.candidate_pairs_found > s.pairs_read;
     repoOut.appendChild(el("p", { class: "live-verdict " + (s.listed ? "is-listed" : "is-clear"),
       text: r.repo + " at " + r.commit.slice(0, 10) + ": " + s.passages + " passages in " + s.files + " files, " + s.pairs_read +
-            " pairs read, " + s.flagged + " flagged by /compare, " + s.listed + " listed for review." }));
+            " pairs read" + (unread ? " (of " + s.candidate_pairs_found + " candidates)" : "") + ", " + s.flagged +
+            " flagged by /compare, " + s.listed + " listed for review." }));
     r.items.forEach(function (it) {
       var card = el("div", { class: "live-item" });
       card.appendChild(el("p", { text: "Disagree on " + it.kind.replace(/_/g, " ") + " (" + it.tier_words + ")" }));
@@ -189,7 +191,8 @@
       if (it.probably_stale) card.appendChild(el("p", { text: "The " + (it.probably_stale === "a" ? "first" : "second") + " passage is probably the stale one." }));
       repoOut.appendChild(card);
     });
-    if (!s.listed) repoOut.appendChild(el("p", { text: "Nothing listed. That means no pair among those read passed the checks, not that the docs are free of contradictions." }));
+    if (!s.listed) repoOut.appendChild(el("p", { text: "Nothing listed. That means no pair among those read passed the checks, not that the docs are free of contradictions." +
+      (unread ? " This trial read only part of the candidates; the command line tool reads more." : "") }));
     repoOut.appendChild(el("p", { class: "live-note", text: r.note + " Credits: " + r.credits.spent_now + " spent now, " + r.credits.list_price + " at list price." }));
     if (r.budget) { state.status.budget = r.budget; showStatus(); }
   }
