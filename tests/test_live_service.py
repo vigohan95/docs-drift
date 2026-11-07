@@ -509,3 +509,29 @@ def test_http_budget_exhausted_is_a_clear_402(http):
     assert status == 402 and out["error"] == "trial_budget_exhausted" and "replay" in out["message"]
     _, _, st = call(base + "/api/status")
     assert st["exhausted"] is True and st["budget"]["remaining"] == 10
+
+
+def test_candidate_pairs_do_not_depend_on_the_hash_seed():
+    """Found on the deployed service: one commit gave 243 candidates, then 241 after a reboot. Tokens with
+    equal weight were ordered by set iteration, which changes with PYTHONHASHSEED."""
+    import os
+    import subprocess
+    import sys
+    program = """
+from docsdrift.neardup import candidates
+from docsdrift.sections import split_text
+pages = [[], [], [], []]
+for g in range(60):
+    shared = ['s%dx%d' % (g, i) for i in range(2)]      # all that links the two sentences under test
+    own_a = ['a%dx%d' % (g, i) for i in range(10)]      # each token appears in exactly two sentences, so all
+    own_b = ['b%dx%d' % (g, i) for i in range(10)]      # weights tie and set order picks the 6 that are indexed
+    for page, words in zip(pages, (own_a + shared, own_b + shared, own_a, own_b)):
+        page += ['## Section %d' % g, '', ' '.join(words) + '.', '']
+chunks = [c for n, page in enumerate(pages) for c in split_text('x', 'docs/p%d.md' % n, chr(10).join(page))]
+print(sorted((p['a'].chunk.cid, p['b'].chunk.cid) for p in candidates(chunks, min_sim=0.05)))
+"""
+    seen = set()
+    for seed in ("1", "2", "3", "4"):
+        env = dict(os.environ, PYTHONHASHSEED=seed, PYTHONPATH=str(Path(__file__).resolve().parent.parent))
+        seen.add(subprocess.run([sys.executable, "-c", program], env=env, capture_output=True, text=True, check=True).stdout)
+    assert len(seen) == 1 and len(seen.pop()) > 100

@@ -90,7 +90,7 @@ def candidates(chunks: list[Chunk], min_sim: float = 0.55, max_sim: float = 0.98
     idf = {t: math.log(1 + n / c) for t, c in df.items()}
 
     def weight(tokens):
-        return {t: idf[t] for t in set(tokens) if t not in STOP}
+        return {t: idf[t] for t in sorted(set(tokens)) if t not in STOP}   # sorted: equal weights must not fall to set order
 
     weights = [weight(s.tokens) for s in sents]
     norms = [sum(w.values()) for w in weights]
