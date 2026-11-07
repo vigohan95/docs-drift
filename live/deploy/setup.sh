@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Set up the live trial on a fresh Ubuntu 24.04 machine. Run as root:
+# Set up the live trial on a fresh Debian 12 machine. Run as root:
 #
 #     bash setup.sh <domain>            # for example 203-0-113-7.sslip.io
 #
@@ -12,6 +12,11 @@ DOMAIN="${1:?usage: setup.sh <domain>}"
 REPO="https://github.com/vigohan95/docs-drift.git"
 
 export DEBIAN_FRONTEND=noninteractive
+# the instance has 512 MB of memory; a small swap file keeps apt and a busy scan from being killed
+if [ ! -f /swapfile ]; then
+  fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+  echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
 apt-get update -qq
 apt-get install -y -qq git python3 debian-keyring debian-archive-keyring apt-transport-https curl gnupg
 if ! command -v caddy >/dev/null; then
@@ -19,6 +24,12 @@ if ! command -v caddy >/dev/null; then
   curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' > /etc/apt/sources.list.d/caddy-stable.list
   apt-get update -qq
   apt-get install -y -qq caddy
+fi
+
+# Vultr's images keep ufw on with only SSH open, in addition to the cloud firewall group
+if command -v ufw >/dev/null && ufw status | grep -q 'Status: active'; then
+  ufw allow 80/tcp
+  ufw allow 443/tcp
 fi
 
 id docsdrift >/dev/null 2>&1 || useradd --system --home /var/lib/docsdrift-live --shell /usr/sbin/nologin docsdrift

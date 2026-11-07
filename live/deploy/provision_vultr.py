@@ -9,7 +9,7 @@ What it does, and nothing else:
   - reads the account balance and refuses to go on unless there is credit to cover the instance;
   - creates an SSH key entry, a firewall group (80 and 443 from anywhere, 22 from --ssh-from only) and
     one instance, all named or tagged "docsdrift-live";
-  - stops if anything named "docsdrift-live" already exists.
+  - stops if an instance named "docsdrift-live" already exists; reuses its own SSH key and firewall group from an earlier try.
 It never modifies or deletes anything, so existing instances, firewall groups and subscriptions are untouched.
 The API key is read from VULTR_ENV_FILE (a line VULTR_API_KEY=...) and never printed.
 """
@@ -25,7 +25,7 @@ import urllib.request
 from pathlib import Path
 
 LABEL = "docsdrift-live"
-REGION, PLAN, OS_NAME = "ewr", "vc2-1c-1gb", "Ubuntu 24.04 LTS x64"
+REGION, PLAN, OS_NAME = "ewr", "vc2-1c-0.5gb", "Debian 12 x64 (bookworm)"   # cheapest plan with IPv4; Ubuntu 24.04 needs 1 GB
 
 
 def api_key() -> str:
@@ -34,7 +34,7 @@ def api_key() -> str:
         sys.exit("set VULTR_ENV_FILE to a file with a VULTR_API_KEY=... line")
     for line in path.read_text(encoding="utf-8").splitlines():
         if line.startswith("VULTR_API_KEY="):
-            return line.split("=", 1)[1].strip()
+            return line.split("=", 1)[1].strip().strip("'\"")
     sys.exit("no VULTR_API_KEY in VULTR_ENV_FILE")
 
 
@@ -42,12 +42,17 @@ def call(key: str, method: str, path: str, body: dict | None = None):
     req = urllib.request.Request("https://api.vultr.com" + path, method=method,
                                  data=json.dumps(body).encode() if body is not None else None,
                                  headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(req, timeout=40) as r:
-            raw = r.read()
-            return r.status, (json.loads(raw) if raw else {})
-    except urllib.error.HTTPError as e:
-        return e.code, {"error": e.read().decode("utf-8", "replace")[:300]}
+    for attempt in range(4 if method == "GET" else 1):     # only reads are retried: a repeated POST could create twice
+        try:
+            with urllib.request.urlopen(req, timeout=40) as r:
+                raw = r.read()
+                return r.status, (json.loads(raw) if raw else {})
+        except urllib.error.HTTPError as e:
+            return e.code, {"error": e.read().decode("utf-8", "replace")[:300]}
+        except urllib.error.URLError:
+            if attempt == 3 or method != "GET":
+                raise
+            time.sleep(3)
 
 
 def main() -> int:
@@ -65,20 +70,24 @@ def main() -> int:
     balance, pending = acc["account"]["balance"], acc["account"]["pending_charges"]
     credit = -balance - pending          # Vultr shows credit as a negative balance
     print(f"account: balance {balance}, pending charges {pending} -> about ${credit:.2f} of credit left")
-    status, plans = call(key, "GET", "/v2/plans?per_page=500")
+    status, plans = call(key, "GET", "/v2/plans?per_page=500&type=all")
     plan = next(p for p in plans["plans"] if p["id"] == PLAN)
     print(f"plan {PLAN}: ${plan['monthly_cost']}/month, ${plan['hourly_cost']}/hour, in {REGION}: {REGION in plan['locations']}")
+    status, avail = call(key, "GET", f"/v2/regions/{REGION}/availability")
+    print(f"plan on sale in {REGION} right now: {PLAN in avail.get('available_plans', [])}")
     if credit < plan["monthly_cost"]:
         print("not enough credit to cover a month of this instance; stopping (nothing was created)")
         return 3
 
-    for path, field in (("/v2/instances", "instances"), ("/v2/firewalls", "firewall_groups"), ("/v2/ssh-keys", "ssh_keys")):
-        status, d = call(key, "GET", path)
-        for item in d.get(field, []):
-            name = item.get("label") or item.get("description") or item.get("name") or ""
-            if name == LABEL or LABEL in (item.get("tags") or []):
-                print(f"{field}: something named {LABEL} already exists ({item.get('id')}); stopping")
-                return 4
+    status, d = call(key, "GET", "/v2/instances")
+    for item in d.get("instances", []):
+        if item.get("label") == LABEL or LABEL in (item.get("tags") or []):
+            print(f"instance {item.get('id')} named {LABEL} already exists; stopping")
+            return 4
+    status, d = call(key, "GET", "/v2/ssh-keys")
+    ssh_id = next((k["id"] for k in d.get("ssh_keys", []) if k.get("name") == LABEL), None)
+    status, d = call(key, "GET", "/v2/firewalls")
+    fw_id = next((g["id"] for g in d.get("firewall_groups", []) if g.get("description") == LABEL), None)
     status, oses = call(key, "GET", "/v2/os?per_page=500")
     os_id = next(o["id"] for o in oses["os"] if o["name"] == OS_NAME)
     pub = Path(args.ssh_pubkey).read_text(encoding="utf-8").strip()
@@ -87,18 +96,20 @@ def main() -> int:
         print("dry run: add --create to do it")
         return 0
 
-    status, k = call(key, "POST", "/v2/ssh-keys", {"name": LABEL, "ssh_key": pub})
-    assert status in (200, 201), k
-    ssh_id = k["ssh_key"]["id"]
-    status, fw = call(key, "POST", "/v2/firewalls", {"description": LABEL})
-    assert status in (200, 201), fw
-    fw_id = fw["firewall_group"]["id"]
-    rules = [("v4", "0.0.0.0", 0, "80"), ("v4", "0.0.0.0", 0, "443"), ("v6", "::", 0, "80"), ("v6", "::", 0, "443"),
-             ("v4", args.ssh_from, 32, "22")]
-    for ip_type, subnet, size, port in rules:
-        status, r = call(key, "POST", f"/v2/firewalls/{fw_id}/rules",
-                         {"ip_type": ip_type, "protocol": "tcp", "subnet": subnet, "subnet_size": size, "port": port})
-        assert status in (200, 201), r
+    if not ssh_id:
+        status, k = call(key, "POST", "/v2/ssh-keys", {"name": LABEL, "ssh_key": pub})
+        assert status in (200, 201), k
+        ssh_id = k["ssh_key"]["id"]
+    if not fw_id:
+        status, fw = call(key, "POST", "/v2/firewalls", {"description": LABEL})
+        assert status in (200, 201), fw
+        fw_id = fw["firewall_group"]["id"]
+        rules = [("v4", "0.0.0.0", 0, "80"), ("v4", "0.0.0.0", 0, "443"), ("v6", "::", 0, "80"), ("v6", "::", 0, "443"),
+                 ("v4", args.ssh_from, 32, "22")]
+        for ip_type, subnet, size, port in rules:
+            status, r = call(key, "POST", f"/v2/firewalls/{fw_id}/rules",
+                             {"ip_type": ip_type, "protocol": "tcp", "subnet": subnet, "subnet_size": size, "port": port})
+            assert status in (200, 201), r
     status, inst = call(key, "POST", "/v2/instances", {
         "region": REGION, "plan": PLAN, "os_id": os_id, "label": LABEL, "hostname": LABEL, "tags": [LABEL],
         "sshkey_id": [ssh_id], "firewall_group_id": fw_id, "backups": "disabled", "enable_ipv6": False})
