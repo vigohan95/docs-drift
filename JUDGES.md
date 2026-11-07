@@ -48,7 +48,7 @@ Group award (Verify, Compare, or Rerank):
   endpoint did not help.
 - **Breadth (30).** All three are used, and each one's output changes what is listed or printed.
 - **Usefulness and execution (20).** 16 documentation defects in 6 real projects, each with file, line and source
-  code. Three pull requests are open upstream (see the table in the README); none is merged yet. Precision is
+  code. Three pull requests went upstream (see the table in the README): the mikro-orm maintainer approved and merged one, fixing four defects, and two are open. Precision is
   modest and stated plainly: 11 of 21 listed items were real, and 0 of 8 on projects scanned after the listing rule
   was fixed.
 - **Explanation and reproducibility (10).** Every request and response is recorded; scans replay offline; the numbers
