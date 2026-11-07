@@ -24,7 +24,8 @@ them**. Each one was checked against both passages and the project's source code
 | https://github.com/typeorm/typeorm/pull/13040 | open | 2 | ES2021 in getting-started; an `update()` example that uses a call form the code does not have |
 | https://github.com/mikro-orm/mikro-orm/pull/8617 | merged | 4 | what `em.flush()` checks; how to load SQLite extensions; the default of `Type.toJSON()`; whether `raw()` can be serialized |
 | https://github.com/rollup/rollup/pull/6643 | open | 1 | the introduction still says ES modules are not finalised in Node.js |
-| fastify/fastify | not opened yet | 6 | 5 patches and notes for 1 issue are in `upstream-patches/fastify/` |
+| https://github.com/fastify/fastify/pull/7193 | open | 5 | `request.body` in two hooks; the `HTTPMethods` list; `ReadableStream` and `Response` payloads |
+| fastify/fastify | not opened yet | 1 | notes for 1 issue are in `upstream-patches/fastify/` |
 | prometheus/prometheus | not opened yet | 1 | 1 patch in `upstream-patches/prometheus/` |
 
 Status as of 2026-11-07. The source of this table is [`review/upstream_prs.json`](review/upstream_prs.json).
