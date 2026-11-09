@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/08/0879b961c4905afa0e16",
+ "request_hash": "0879b961c4905afa0e16be09066adce39dd85f220794c50c3781c864cb1faae2",
+ "recorded_at": "2026-11-09T07:23:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1112,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "187.894175",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=431"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "text": "Every time a repeatable job is picked up for processing, the next repeatable job is added to the queue with a proper delay. Repeatable jobs are thus nothing more than delayed jobs that are added to the queue according to some settings.\n\n{% hint style=\"info\" %}\nAs Repeatable jobs are just delayed jobs, prior to BullMQ 2.0 you also need a `QueueScheduler` instance to schedule the jobs accordingly.\n\nHowever, from BullMQ 2.0 onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are two ways to specify a repeatable's job repetition pattern, either with a cron expression (using [cron-parser](https://www.npmjs.com/package/cron-parser)'s \"unix cron w/ optional seconds\" format), or specifying a fixed amount of milliseconds between repetitions.\n\n```typescript\nimport { Queue, QueueScheduler } from 'bullmq';\n\nconst myQueueScheduler = new QueueScheduler('Paint');\nconst myQueue = new Queue('Paint');\n\n// Repeat job once every day at 3:15 (am)\nawait myQueue.add(\n  'submarine',\n  { color: 'yellow' },\n  {\n    repeat: {\n      pattern: '0 15 3 * * *',\n    },\n  },\n);\n\n// Repeat job every 10 seconds but no more than 100 times\nawait myQueue.add(\n  'bird',\n  { color: 'bird' },\n  {\n    repeat: {\n      every: 10000,\n      limit: 100,\n    },\n  },\n);\n```\n\nThere are some important considerations regarding repeatable jobs:"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "text": "# Stalled\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore. For manually fetching jobs check this [pattern](https://docs.bullmq.io/patterns/manually-fetching-jobs#checking-for-stalled-jobs)\n{% endhint %}\n\nWhen a job is in an active state (i.e. it is being processed by a worker), it needs to continuously update the queue to notify that the worker is still working on the job. This mechanism prevents a worker that crashes or enters an endless loop from keeping a job in an active state forever.\n\nWhen a worker is not able to notify the queue that it is still working on a given job, that job is moved back to the waiting list, or to the failed set. We then say that the job has stalled and the queue will emit the 'stalled' event.\n\n{% hint style=\"info\" %}\nThere is not a 'stalled' state, only a 'stalled' event emitted when a job is automatically moved from _active_ to _waiting_ state.\n{% endhint %}\n\nIf a job stalls more than a predefined limit (see the [`maxStalledCount` option](https://docs.bullmq.io/api/interfaces/v6.WorkerOptions.html#maxstalledcount)), the job will be failed permanently with the error \"_job stalled more than allowable limit_\". The default is 1, as stalled jobs should be a rare occurrence, but you can increase this number if needed.\n\nIn order to avoid stalled jobs, make sure that your worker does not keep the Node.js event loop too busy. The default max stalled check duration is 30 seconds, so as long as you do not perform CPU operations exceeding that value you should not get stalled jobs.\n\nAnother way to reduce the chance of stalled jobs is using so-called \"sandboxed\" processors. In this case, the workers will spawn new separate Node.js processes, running separately from the main process.\n\n{% code title=\"main.ts\" %}\n```typescript\nimport { Worker } from 'bullmq';\n\nconst worker = new Worker('Paint', painter);\n```\n{% endcode %}\n\n{% code title=\"painter.ts\" %}\n```typescript\nexport default = (job) => {\n    // Paint something\n}\n```\n{% endcode %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/jobs/stalled.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/jobs/repeatable.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "b": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "relation": "overlapping",
+    "related": 0.994,
+    "probabilities": {
+     "same": 0.014,
+     "overlapping": 0.9736,
+     "conflicting": 0.0065,
+     "unrelated": 0.006
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0837,
+       "restated": 0.8791,
+       "elaborated": 0.0228,
+       "different": 0.0144
+      },
+      "confidence": 0.9856,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+       "quote": "However, from BullMQ 2.0 onwards, the `QueueScheduler` is not needed anymore.",
+       "start": 400,
+       "end": 477,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+       "quote": "# Stalled\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.",
+       "start": 0,
+       "end": 109,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 115,
+   "passages": 1,
+   "counterparts_ms": 68
+  },
+  "timing": {
+   "read_ms": 216,
+   "total_ms": 219
+  }
+ }
+}

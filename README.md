@@ -16,6 +16,11 @@ It was run on the documentation of **15 open-source projects** at pinned commits
 them**. Each one was checked against both passages and the project's source code, with file and line recorded in
 [`review/defects.json`](review/defects.json). The final word on each belongs to the upstream maintainers.
 
+After those measurements, two smaller runs (about 50 pairs each, on 2026-11-09) were made on undici and bullmq. They
+are not counted in the numbers below. undici listed 2 items and 1 was real, the 17th defect: H2CClient's page gives
+`keepAliveTimeoutThreshold` a default of `1e3`, the Client page and the code `2e3`. bullmq listed 1 item and it was not
+real (two pages about two different options). Both reports are in [`reports/later/`](reports/later/).
+
 ### Upstream pull requests
 
 | Pull request | Status | Defects | What it fixes |
@@ -26,9 +31,10 @@ them**. Each one was checked against both passages and the project's source code
 | https://github.com/rollup/rollup/pull/6643 | merged | 1 | the introduction still says ES modules are not finalised in Node.js |
 | https://github.com/fastify/fastify/pull/7193 | open | 5 | `request.body` in two hooks; the `HTTPMethods` list; `ReadableStream` and `Response` payloads |
 | https://github.com/prometheus/prometheus/pull/20388 | open | 1 | the XOR2 chunk format page: the start-timestamp header byte, the 128th sample, and a stray `>` |
+| https://github.com/nodejs/undici/pull/6182 | open | 1 | the `keepAliveTimeoutThreshold` default in the H2CClient page and two type files (later run) |
 | fastify/fastify | not opened yet | 1 | notes for 1 issue are in `upstream-patches/fastify/` |
 
-Status as of 2026-11-08. The source of this table is [`review/upstream_prs.json`](review/upstream_prs.json).
+Status as of 2026-11-09. The source of this table is [`review/upstream_prs.json`](review/upstream_prs.json).
 
 ### Three of the sixteen
 
@@ -38,7 +44,7 @@ Status as of 2026-11-08. The source of this table is [`review/upstream_prs.json`
 | typeorm | `repository-api.md:154` an array passed to `update()` is a list of conditions OR-ed into one query | `entity-manager-api.md:189` shows `update(User, [{ criteria, data }, ...])` running three queries | `EntityManager.ts:897` has no such call form |
 | redux-toolkit | `setupListeners.mdx:14` enables `refetchOnFocus` | `getting-started.md:184` enables `refetchOnMount` | `setupListeners.ts` handles focus and online events only |
 
-The demo page shows all sixteen side by side, with links to the pinned commits.
+The demo page shows all seventeen side by side, with links to the pinned commits.
 
 ### How often the list is right
 
@@ -60,7 +66,8 @@ list to be real, expect that to vary a lot between projects, and expect many pro
 fifteen did (vite, jest, mongoose, eslint, vitest, got, fiber, pydantic, svelte).
 
 Of the 16 defects, 10 were on the standard run's list. 3 came from reading more pairs in mikro-orm, redux-toolkit and
-typeorm. 3 surfaced in other runs without making the standard list. Each entry in `review/defects.json` says which.
+typeorm. 3 surfaced in other runs without making the standard list. The 17th came from the later undici run. Each
+entry in `review/defects.json` says which.
 
 All ten wrong items are listed with the reason in `review/labels_v2.json`. Most are sibling documents: two pages
 written from one template about different things (two middlewares, two functions, two releases).
@@ -77,7 +84,7 @@ python -m docsdrift scan ../targets/fastify --offline     # 149 pairs read, 6 fl
 python -m pytest -q                                       # 178 tests, no network
 ```
 
-Open `docs/index.html` in a browser for the page with all sixteen defects.
+Open `docs/index.html` in a browser for the page with all seventeen defects.
 
 `python scripts/fetch_targets.py` without a name fetches all 15 projects. With them in place the test suite also
 replays every project and checks that the result matches the stored report.

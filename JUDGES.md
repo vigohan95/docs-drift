@@ -48,8 +48,9 @@ Group award (Verify, Compare, or Rerank):
   Rerank and Verify find the other places. Each was ablated and the numbers are published, including where an
   endpoint did not help.
 - **Breadth (30).** All three are used, and each one's output changes what is listed or printed.
-- **Usefulness and execution (20).** 16 documentation defects in 6 real projects, each with file, line and source
-  code. Five pull requests went upstream (see the table in the README): the mikro-orm maintainer approved and merged one, fixing four defects, and four are open. Precision is
+- **Usefulness and execution (20).** 16 documentation defects in 6 of the 15 measured projects, plus 1 from a later run
+  on undici, each with file, line and source code. Seven pull requests went upstream (see the table in the README):
+  mikro-orm and rollup merged theirs, fixing five defects, and five are open. Precision is
   modest and stated plainly: 11 of 21 listed items were real, and 0 of 8 on projects scanned after the listing rule
   was fixed.
 - **Explanation and reproducibility (10).** Every request and response is recorded; scans replay offline; the numbers

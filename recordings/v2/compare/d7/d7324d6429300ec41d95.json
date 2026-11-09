@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d7/d7324d6429300ec41d95",
+ "request_hash": "d7324d6429300ec41d95ee0e914500fddfc6d96f4df6c44b1c8afbfd06c09869",
+ "recorded_at": "2026-11-09T07:23:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1003,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "40.0872",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=44,cfOrigin;dur=0,cfWorker;dur=288"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/patterns/manually-fetching-jobs.md#0",
+    "text": "# Manually processing jobs\n\nWhen a Worker is instantiated, the most common usage is to specify a process function so that the worker will automatically process the jobs that arrive to the queue.\n\nSometimes however it is useful to be able to fetch the jobs manually. Just instantiate the worker without a processor and call getNextJob to fetch the next job:\n\n```typescript\nconst worker = new Worker('my-queue');\n\n// Specify a unique token\nconst token = 'my-token';\n\nconst job = (await worker.getNextJob(token)) as Job;\n\n// Access job.data and do something with the job\n// processJob(job.data)\nif (succeeded) {\n  await job.moveToCompleted('some return value', token, false);\n} else {\n  await job.moveToFailed(new Error('my error message'), token, false);\n}\n\nawait worker.close();\n```\n\nThere is an important consideration regarding job \"locks\" when processing manually. Locks prevent workers from fetching a job that is already being processed by  another worker. The ownership of the lock is determined by the \"token\" that is sent when getting the job.\n\n{% hint style=\"info\" %}\nthe lock duration setting is called \"visibility window\" in other queue systems.\n{% endhint %}\n\nNormally a job gets locked as soon as it is fetched from the queue with a max duration of the specified `lockDuration` worker option. The default is 30 seconds but can be changed to any value easily. For example, to change it to 60 seconds:\n\n```typescript\nconst worker = new Worker('my-queue', null, { lockDuration: 60000 });\n```\n\nWhen using standard worker processors, the lock is renewed automatically after half the lock duration time has passed. However, this mechanism does not exist when processing jobs manually, so to avoid the job being moved back to the waiting list of the queue,\nyou need to make sure to process the job faster than the `lockDuration`, or manually extend the lock:\n\n```typescript\nconst job = (await worker.getNextJob(token)) as Job;\n\n// Extend the lock 30 more seconds\nawait job.extendLock(token, 30000);\n```"
+   },
+   {
+    "id": "bullmq:docs/gitbook/patterns/named-processor.md#0",
+    "text": "# Named processor\n\nWhen a Worker is instantiated, the most common usage is to specify a process function.\n\nSometimes however, it is useful to be able to specify more than one function to process a job for a specific condition:\n\n```typescript\nconst worker = new Worker(\n  'queueName',\n  async job => {\n    switch (job.name) {\n      case 'taskType1': {\n        await doSomeLogic1();\n        break;\n      }\n      case 'taskType2': {\n        await doSomeLogic2();\n        break;\n      }\n    }\n  },\n  { connection },\n);\n```\n\nYou could use a simple switch case to differentiate your logic, in this example we are using the job name.\n\n{% hint style=\"warning\" %}\nThis was a feature in the Bull package, but it creates a lot of confusion, so in order to provide an alternative, you can use this pattern. See [#297](https://github.com/taskforcesh/bullmq/issues/297) and [#69](https://github.com/taskforcesh/bullmq/issues/69) as reference\n{% endhint %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/patterns/manually-fetching-jobs.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/patterns/named-processor.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/patterns/manually-fetching-jobs.md#0",
+    "b": "bullmq:docs/gitbook/patterns/named-processor.md#0",
+    "relation": "unrelated",
+    "related": 0.287,
+    "probabilities": {
+     "same": 0.0239,
+     "overlapping": 0.2465,
+     "conflicting": 0.0166,
+     "unrelated": 0.713
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 101
+  },
+  "timing": {
+   "read_ms": 100,
+   "total_ms": 103
+  }
+ }
+}

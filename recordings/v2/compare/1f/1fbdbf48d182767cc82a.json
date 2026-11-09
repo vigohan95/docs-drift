@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1f/1fbdbf48d182767cc82a",
+ "request_hash": "1fbdbf48d182767cc82a13d292f7526723ac980b48c54eb4a2003d205477ab2e",
+ "recorded_at": "2026-11-09T07:19:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1878,
+ "response_headers": {
+  "x-clocked-credits": "11",
+  "x-clocked-model-ms": "263.003681",
+  "x-clocked-cost-usd": "0.002191",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=1135"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:README.md#14",
+    "text": "### Keep `fetch` and `FormData` together\n\nWhen you send a `FormData` body, keep `fetch` and `FormData` from the same\nimplementation.\n\nUse one of these patterns:\n\n```js\n// Built-in globals\nconst body = new FormData()\nbody.set('name', 'some')\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\n```js\n// undici module imports\nimport { fetch, FormData } from 'undici'\n\nconst body = new FormData()\nbody.set('name', 'some')\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\nIf you want the installed `undici` package to provide the globals, call\n`install()` first:\n\n```js\nimport { install } from 'undici'\n\ninstall()\n\nconst body = new FormData()\nbody.set('name', 'some')\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\n`install()` replaces the global `fetch`, `Headers`, `Response`, `Request`, and\n`FormData` implementations with undici's versions, so they all match. It also\ninstalls undici's `WebSocket`, `CloseEvent`, `ErrorEvent`, `MessageEvent`, and\n`EventSource` globals.\n\nAvoid mixing a global `FormData` with `undici.fetch()`, or `undici.FormData`\nwith the built-in global `fetch()`."
+   },
+   {
+    "id": "undici:docs/docs/best-practices/undici-vs-builtin-fetch.md#5",
+    "text": "### `undici.install()` globals\n\nIf you want the installed `undici` package to provide the globals, call\n[`install()`](../api/GlobalInstallation.md):\n\n```js\nimport { install } from 'undici'\n\ninstall()\n\nconst body = new FormData()\nbody.set('name', 'some')\nbody.set('someOtherProperty', '8000')\n\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\n`install()` replaces the global `fetch`, `Headers`, `Response`, `Request`, and\n`FormData` implementations with undici's versions, and also installs undici's\n`WebSocket`, `CloseEvent`, `ErrorEvent`, `MessageEvent`, and `EventSource`\nglobals.\n\nAvoid mixing implementations in the same request, for example:\n\n```js\nimport { fetch } from 'undici'\n\nconst body = new FormData()\n\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\n```js\nimport { FormData } from 'undici'\n\nconst body = new FormData()\n\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\nThose combinations may behave differently across Node.js and undici versions.\nUsing matching pairs keeps multipart handling predictable."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:README.md#14",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/best-practices/undici-vs-builtin-fetch.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "undici:docs/docs/best-practices/undici-vs-builtin-fetch.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "undici:README.md#14"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:README.md#14",
+    "b": "undici:docs/docs/best-practices/undici-vs-builtin-fetch.md#5",
+    "relation": "overlapping",
+    "related": 0.9985,
+    "probabilities": {
+     "same": 0.0135,
+     "overlapping": 0.9808,
+     "conflicting": 0.0041,
+     "unrelated": 0.0015
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0161,
+       "restated": 0.8841,
+       "elaborated": 0.0846,
+       "different": 0.0152
+      },
+      "confidence": 0.9848,
+      "a": {
+       "document": "undici:README.md#14",
+       "quote": "If you want the installed `undici` package to provide the globals, call",
+       "start": 507,
+       "end": 578,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/best-practices/undici-vs-builtin-fetch.md#5",
+       "quote": "### `undici.install()` globals\n\nIf you want the installed `undici` package to provide the globals, call\n[`install()`](../api/GlobalInstallation.md):\n\n```js\nimport { install } from 'undici'\n\ninstall()\n\nconst body = new FormData()\nbody.set('name', 'some')\nbody.set('someOtherProperty', '8000')\n\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\n`install()` replaces the global `fetch`, `Headers`, `Response`, `Request`, and\n`FormData` implementations with undici's versions, and also installs undici's\n`WebSocket`, `CloseEvent`, `ErrorEvent`, `MessageEvent`, and `EventSource`\nglobals.\n\nAvoid mixing implementations in the same request, for example:\n\n```js\nimport { fetch } from 'undici'\n\nconst body = new FormData()\n\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\n```js\nimport { FormData } from 'undici'\n\nconst body = new FormData()\n\nawait fetch('https://example.com', {\n  method: 'POST',\n  body\n})\n```\n\nThose combinations may behave differently across Node.js and undici versions.\nUsing matching pairs keeps multipart handling predictable.",
+       "start": 0,
+       "end": 1082,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 113,
+   "passage_reads": 1,
+   "passages_ms": 52,
+   "passages": 1,
+   "counterparts_ms": 111
+  },
+  "timing": {
+   "read_ms": 276,
+   "total_ms": 286
+  }
+ }
+}

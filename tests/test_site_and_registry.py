@@ -27,12 +27,12 @@ def test_registry_file_is_what_the_registry_script_produces():
 
 
 def test_page_shows_every_defect_with_pinned_links():
-    assert len(REG["defects"]) == 16
+    assert len(REG["defects"]) == 17
     for d in REG["defects"]:
         assert f'id="{d["id"]}"' in PAGE
         for side in ("a", "b"):
             assert d[side]["url"] in PAGE
-            assert TARGETS[d["project"]]["commit"] in d[side]["url"]
+            assert registry.target_of(d["project"])["commit"] in d[side]["url"]
 
 
 def test_defects_cover_at_least_four_projects_and_each_names_evidence():

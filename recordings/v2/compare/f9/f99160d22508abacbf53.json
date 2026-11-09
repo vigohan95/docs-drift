@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/f9/f99160d22508abacbf53",
+ "request_hash": "f99160d22508abacbf535ba2d35b950ced07b16911b1e48009e56657cd912703",
+ "recorded_at": "2026-11-09T07:23:46Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 973,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "106.697954",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=230"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "text": "Every time a repeatable job is picked up for processing, the next repeatable job is added to the queue with a proper delay. Repeatable jobs are thus nothing more than delayed jobs that are added to the queue according to some settings.\n\n{% hint style=\"info\" %}\nAs Repeatable jobs are just delayed jobs, prior to BullMQ 2.0 you also need a `QueueScheduler` instance to schedule the jobs accordingly.\n\nHowever, from BullMQ 2.0 onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are two ways to specify a repeatable's job repetition pattern, either with a cron expression (using [cron-parser](https://www.npmjs.com/package/cron-parser)'s \"unix cron w/ optional seconds\" format), or specifying a fixed amount of milliseconds between repetitions.\n\n```typescript\nimport { Queue, QueueScheduler } from 'bullmq';\n\nconst myQueueScheduler = new QueueScheduler('Paint');\nconst myQueue = new Queue('Paint');\n\n// Repeat job once every day at 3:15 (am)\nawait myQueue.add(\n  'submarine',\n  { color: 'yellow' },\n  {\n    repeat: {\n      pattern: '0 15 3 * * *',\n    },\n  },\n);\n\n// Repeat job every 10 seconds but no more than 100 times\nawait myQueue.add(\n  'bird',\n  { color: 'bird' },\n  {\n    repeat: {\n      every: 10000,\n      limit: 100,\n    },\n  },\n);\n```\n\nThere are some important considerations regarding repeatable jobs:"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "text": "# QueueScheduler\n\n{% hint style=\"danger\" %}\nThe `QueueScheduler` is deprecated from BullMQ 2.0 and onwards. The information below is only relevant for older versions.\n{% endhint %}\n\nThe `QueueScheduler` is a helper class used to manage stalled and delayed jobs for a given Queue.\n\n```typescript\nimport { QueueScheduler } from 'bullmq';\n\nconst queueScheduler = new QueueScheduler('test');\n\n// Later, when shutting down gracefully\nawait queueScheduler.close();\n```\n\nThis class automatically moves delayed jobs back to the waiting queue when it is the right time to process them. It also automatically checks for stalled jobs (i.e. detects jobs that are active but where the worker has either crashed or stopped working properly). [Stalled jobs](jobs/stalled.md) are moved back or failed depending on the settings selected when instantiating the class.\n\n{% hint style=\"info\" %}\nYou need at least one `QueueScheduler` running somewhere for a given queue if you require functionality such as delayed jobs, retries with backoff, and rate limiting.\n{% endhint %}\n\nThe reason for having this functionality in a separate class instead of in the workers (as in Bull 3.x) is because whereas you may want to have a large number of workers for parallel processing, for the scheduler you probably only want a couple of instances for each queue that requires delayed or stalled checks. One will be enough but you can have more just for redundancy.\n\n{% hint style=\"warning\" %}\nIt is ok to have as many `QueueScheduler` instances as you want, just keep in mind that every instance will perform some bookkeeping so it may create some noticeable CPU and IO usage in your Redis instances.\n{% endhint %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "b": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "relation": "overlapping",
+    "related": 0.9917,
+    "probabilities": {
+     "same": 0.0113,
+     "overlapping": 0.6654,
+     "conflicting": 0.315,
+     "unrelated": 0.0083
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 113,
+   "total_ms": 116
+  }
+ }
+}

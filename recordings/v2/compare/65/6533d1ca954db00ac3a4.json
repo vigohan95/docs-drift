@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/65/6533d1ca954db00ac3a4",
+ "request_hash": "6533d1ca954db00ac3a493fe526b11cbe7625f31fc5747ea363d341549920973",
+ "recorded_at": "2026-11-09T07:23:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 984,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.259232",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=35,cfOrigin;dur=0,cfWorker;dur=217"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#0",
+    "text": "# Repeatable\n\n{% hint style=\"danger\" %}\nNote: these APIs were deprecated from BullMQ version 5.16.0 onwards and have been **removed** in v6 in favor of [\"Job Schedulers\"](../job-schedulers/), which provide a more cohesive and more robust API for handling repeatable jobs.\n\nThe `repeat` option on `Queue.add`/`Queue.addBulk`, the `Repeat` class, and the `getRepeatableJobs`, `removeRepeatable` and `removeRepeatableByKey` methods are no longer available. The examples on this page are kept for historical reference only — use [Job Schedulers](../job-schedulers/) (`upsertJobScheduler`, `getJobSchedulers`, `removeJobScheduler`) instead. If you are upgrading an existing installation, follow the [v5 to v6 migration guide](../migrations/migrate-from-v5-to-v6.md) before deploying v6.\n{% endhint %}\n\nIn BullMQ v5, repeatable jobs were stored as a repeat configuration plus delayed jobs generated from that configuration. In BullMQ v6 this legacy model is replaced by Job Schedulers, which store scheduler metadata under scheduler keys and enqueue normal delayed jobs for each run.\n\nThe Repeatable Job configuration is not a job, so it will not show up in methods like `getJobs()`. To manage Repeatable Job configurations, use [`getRepeatableJobs()`](https://docs.bullmq.io/api/classes/v5.Queue.html#getrepeatablejobs) and similar. This also means repeated jobs do **not** participate in evaluating `jobId` uniqueness - that is, a non-repeatable job can have the same `jobId` as a Repeatable Job configuration, and two Repeatable Job configurations can have the same `jobId` as long as they have different repeat options."
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/batches.md#1",
+    "text": "## Add many jobs (`Queue.addBulk`)\n\nUse this when you already have a list of work items and each item should remain\nits own job (own retries, own events, own completion):\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nimport { Queue } from 'bullmq';\n\nconst queue = new Queue('invoices', { connection });\n\nconst jobs = await queue.addBulk([\n  { name: 'send', data: { invoiceId: 'A-100' } },\n  { name: 'send', data: { invoiceId: 'A-101' } },\n  { name: 'send', data: { invoiceId: 'A-102' } },\n]);\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nfrom bullmq import Queue\n\nqueue = Queue(\"invoices\", {\"connection\": connection})\n\njobs = await queue.addBulk([\n    {\"name\": \"send\", \"data\": {\"invoiceId\": \"A-100\"}},\n    {\"name\": \"send\", \"data\": {\"invoiceId\": \"A-101\"}},\n    {\"name\": \"send\", \"data\": {\"invoiceId\": \"A-102\"}},\n])\n```\n\n{% endtab %}\n\n{% tab title=\"Elixir\" %}\n\n```elixir\n{:ok, jobs} =\n  BullMQ.Queue.add_bulk(\n    \"invoices\",\n    [\n      {\"send\", %{invoiceId: \"A-100\"}, []},\n      {\"send\", %{invoiceId: \"A-101\"}, []},\n      {\"send\", %{invoiceId: \"A-102\"}, []}\n    ],\n    connection: :my_redis\n  )\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nusing BullMQ;\n\nvar queue = new Queue(\"invoices\", new QueueOptions { Connection = connection });\n\nvar jobs = await queue.AddBulkAsync(new (string, object?, JobsOptions?)[]\n{\n    (\"send\", new { invoiceId = \"A-100\" }, null),\n    (\"send\", new { invoiceId = \"A-101\" }, null),\n    (\"send\", new { invoiceId = \"A-102\" }, null),\n});\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/batches.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/repeatable.md#0",
+    "b": "bullmq:docs/gitbook/guide/queues/batches.md#1",
+    "relation": "unrelated",
+    "related": 0.0113,
+    "probabilities": {
+     "same": 0.0037,
+     "overlapping": 0.0034,
+     "conflicting": 0.0042,
+     "unrelated": 0.9887
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32
+  },
+  "timing": {
+   "read_ms": 32,
+   "total_ms": 34
+  }
+ }
+}

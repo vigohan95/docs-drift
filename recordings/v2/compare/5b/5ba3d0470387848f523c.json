@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5b/5ba3d0470387848f523c",
+ "request_hash": "5ba3d0470387848f523cd8c2311d727514ea528bffdb0f563624cdf6325bbb6d",
+ "recorded_at": "2026-11-09T07:23:38Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 906,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "72.375648",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=196"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "text": "# QueueScheduler\n\n{% hint style=\"danger\" %}\nThe `QueueScheduler` is deprecated from BullMQ 2.0 and onwards. The information below is only relevant for older versions.\n{% endhint %}\n\nThe `QueueScheduler` is a helper class used to manage stalled and delayed jobs for a given Queue.\n\n```typescript\nimport { QueueScheduler } from 'bullmq';\n\nconst queueScheduler = new QueueScheduler('test');\n\n// Later, when shutting down gracefully\nawait queueScheduler.close();\n```\n\nThis class automatically moves delayed jobs back to the waiting queue when it is the right time to process them. It also automatically checks for stalled jobs (i.e. detects jobs that are active but where the worker has either crashed or stopped working properly). [Stalled jobs](jobs/stalled.md) are moved back or failed depending on the settings selected when instantiating the class.\n\n{% hint style=\"info\" %}\nYou need at least one `QueueScheduler` running somewhere for a given queue if you require functionality such as delayed jobs, retries with backoff, and rate limiting.\n{% endhint %}\n\nThe reason for having this functionality in a separate class instead of in the workers (as in Bull 3.x) is because whereas you may want to have a large number of workers for parallel processing, for the scheduler you probably only want a couple of instances for each queue that requires delayed or stalled checks. One will be enough but you can have more just for redundancy.\n\n{% hint style=\"warning\" %}\nIt is ok to have as many `QueueScheduler` instances as you want, just keep in mind that every instance will perform some bookkeeping so it may create some noticeable CPU and IO usage in your Redis instances.\n{% endhint %}"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "text": "# Rate limiting\n\nBullMQ provides queue rate limiting. It is possible to configure workers so that they obey a given rate limiting option:\n\n```typescript\nimport { Worker, QueueScheduler } from 'bullmq';\n\nconst worker = new Worker('painter', async job => paintCar(job), {\n  limiter: {\n    max: 10,\n    duration: 1000,\n  },\n});\n\nconst scheduler = new QueueScheduler('painter');\n```\n\n{% hint style=\"warning\" %}\nJobs that get rate limited will actually stay in the waiting state.\n{% endhint %}\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\n{% hint style=\"info\" %}\nThe rate limiter is global, so if you have for example 10 workers for one queue with the above settings, still only 10 jobs will be processed by second.\n{% endhint %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "b": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "relation": "overlapping",
+    "related": 0.9933,
+    "probabilities": {
+     "same": 0.013,
+     "overlapping": 0.8991,
+     "conflicting": 0.0812,
+     "unrelated": 0.0067
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 52,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 79,
+   "total_ms": 81
+  }
+ }
+}

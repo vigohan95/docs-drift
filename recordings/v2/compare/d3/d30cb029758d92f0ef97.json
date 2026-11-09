@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d3/d30cb029758d92f0ef97",
+ "request_hash": "d30cb029758d92f0ef97691774a1bc14ee570cd32c9fdaba1a83578efb44efd4",
+ "recorded_at": "2026-11-09T07:23:37Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1136,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "179.028126",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=43,cfOrigin;dur=0,cfWorker;dur=375"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "text": "# Stalled\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore. For manually fetching jobs check this [pattern](https://docs.bullmq.io/patterns/manually-fetching-jobs#checking-for-stalled-jobs)\n{% endhint %}\n\nWhen a job is in an active state (i.e. it is being processed by a worker), it needs to continuously update the queue to notify that the worker is still working on the job. This mechanism prevents a worker that crashes or enters an endless loop from keeping a job in an active state forever.\n\nWhen a worker is not able to notify the queue that it is still working on a given job, that job is moved back to the waiting list, or to the failed set. We then say that the job has stalled and the queue will emit the 'stalled' event.\n\n{% hint style=\"info\" %}\nThere is not a 'stalled' state, only a 'stalled' event emitted when a job is automatically moved from _active_ to _waiting_ state.\n{% endhint %}\n\nIf a job stalls more than a predefined limit (see the [`maxStalledCount` option](https://docs.bullmq.io/api/interfaces/v6.WorkerOptions.html#maxstalledcount)), the job will be failed permanently with the error \"_job stalled more than allowable limit_\". The default is 1, as stalled jobs should be a rare occurrence, but you can increase this number if needed.\n\nIn order to avoid stalled jobs, make sure that your worker does not keep the Node.js event loop too busy. The default max stalled check duration is 30 seconds, so as long as you do not perform CPU operations exceeding that value you should not get stalled jobs.\n\nAnother way to reduce the chance of stalled jobs is using so-called \"sandboxed\" processors. In this case, the workers will spawn new separate Node.js processes, running separately from the main process.\n\n{% code title=\"main.ts\" %}\n```typescript\nimport { Worker } from 'bullmq';\n\nconst worker = new Worker('Paint', painter);\n```\n{% endcode %}\n\n{% code title=\"painter.ts\" %}\n```typescript\nexport default = (job) => {\n    // Paint something\n}\n```\n{% endcode %}"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "text": "# QueueScheduler\n\n{% hint style=\"danger\" %}\nThe `QueueScheduler` is deprecated from BullMQ 2.0 and onwards. The information below is only relevant for older versions.\n{% endhint %}\n\nThe `QueueScheduler` is a helper class used to manage stalled and delayed jobs for a given Queue.\n\n```typescript\nimport { QueueScheduler } from 'bullmq';\n\nconst queueScheduler = new QueueScheduler('test');\n\n// Later, when shutting down gracefully\nawait queueScheduler.close();\n```\n\nThis class automatically moves delayed jobs back to the waiting queue when it is the right time to process them. It also automatically checks for stalled jobs (i.e. detects jobs that are active but where the worker has either crashed or stopped working properly). [Stalled jobs](jobs/stalled.md) are moved back or failed depending on the settings selected when instantiating the class.\n\n{% hint style=\"info\" %}\nYou need at least one `QueueScheduler` running somewhere for a given queue if you require functionality such as delayed jobs, retries with backoff, and rate limiting.\n{% endhint %}\n\nThe reason for having this functionality in a separate class instead of in the workers (as in Bull 3.x) is because whereas you may want to have a large number of workers for parallel processing, for the scheduler you probably only want a couple of instances for each queue that requires delayed or stalled checks. One will be enough but you can have more just for redundancy.\n\n{% hint style=\"warning\" %}\nIt is ok to have as many `QueueScheduler` instances as you want, just keep in mind that every instance will perform some bookkeeping so it may create some noticeable CPU and IO usage in your Redis instances.\n{% endhint %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/queuescheduler.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/jobs/stalled.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "b": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+    "relation": "overlapping",
+    "related": 0.9957,
+    "probabilities": {
+     "same": 0.0089,
+     "overlapping": 0.9796,
+     "conflicting": 0.0072,
+     "unrelated": 0.0043
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0099,
+       "restated": 0.966,
+       "elaborated": 0.0114,
+       "different": 0.0127
+      },
+      "confidence": 0.9873,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+       "quote": "From BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.",
+       "start": 37,
+       "end": 109,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+       "quote": "# QueueScheduler\n\n{% hint style=\"danger\" %}\nThe `QueueScheduler` is deprecated from BullMQ 2.0 and onwards.",
+       "start": 0,
+       "end": 107,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0054,
+       "restated": 0.9785,
+       "elaborated": 0.0086,
+       "different": 0.0076
+      },
+      "confidence": 0.9924,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+       "quote": "When a job is in an active state (i.e.",
+       "start": 255,
+       "end": 293,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/queuescheduler.md#0",
+       "quote": "It also automatically checks for stalled jobs (i.e. detects jobs that are active but where the worker has either crashed or stopped working properly).",
+       "start": 577,
+       "end": 727,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 2,
+   "counterparts_ms": 74
+  },
+  "timing": {
+   "read_ms": 187,
+   "total_ms": 191
+  }
+ }
+}

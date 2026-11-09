@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/52/52dc46ec2b153211f940",
+ "request_hash": "52dc46ec2b153211f940c3bd850f86e1c19fd41b104664c3b550db9fae49d901",
+ "recorded_at": "2026-11-09T07:19:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1125,
+ "response_headers": {
+  "x-clocked-credits": "10",
+  "x-clocked-model-ms": "229.287748",
+  "x-clocked-cost-usd": "0.001992",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=398"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Agent.md#2",
+    "text": "### `new Agent([options])`\n\n<!-- YAML\nadded: v3.2.0\nchanges:\n  - version: v7.16.0\n    pr-url: https://github.com/nodejs/undici/pull/4365\n    description: Added the `maxOrigins` option to cap the number of origins.\n-->\n\n* `options` {AgentOptions} (optional) Extends {PoolOptions}.\n  * `factory` {Function} Builds the dispatcher used for a given origin. When the\n    resolved options contain `connections: 1`, the default factory creates a\n    {Client}; otherwise it creates a {Pool}. **Default:** `(origin, opts) => new Pool(origin, opts)`.\n    * `origin` {URL|string} The origin to create a dispatcher for.\n    * `opts` {Object} The resolved options for the new dispatcher.\n    * Returns: {Dispatcher}\n  * `maxOrigins` {number} Limits the total number of distinct origins that may\n    receive requests at the same time. A {MaxOriginsReachedError} is thrown when\n    a request targets a new origin once the limit is reached. When set to\n    `Infinity`, no limit is enforced. Must be a number greater than `0`.\n    **Default:** `Infinity`.\n\n`Agent` inherits all {PoolOptions} (and therefore all {ClientOptions}). Each\norigin gets a separate {Pool}, with `connections` acting as the maximum number\nof clients that pool may create.\n\n> [!NOTE]\n> For an h2-capable HTTPS origin, the per-origin pool waits for the first TLS\n> connection to finish ALPN negotiation. If the server selects h2, concurrent\n> requests share that session up to `maxConcurrentStreams`. If it selects\n> HTTP/1.1, normal connection fan-out resumes up to `connections`. See\n> {PoolOptions} and {ClientOptions} for inherited options such as `allowH2`\n> (default `true`) and `maxConcurrentStreams` (default `100`)."
+   },
+   {
+    "id": "undici:docs/docs/api/Pool.md#2",
+    "text": "### `new Pool(url[, options])`\n\n<!-- YAML\nadded: v1.0.0\n-->\n\n* `url` {URL|string} The upstream origin. It should only include the protocol,\n  hostname, and port.\n* `options` {PoolOptions} (optional) Extends {ClientOptions}, so every\n  [`Client`][] option is also accepted and forwarded to each pooled client.\n  * `factory` {Function} Creates the [`Client`][] (or other [`Dispatcher`][])\n    instances used by the pool.\n    **Default:** `(origin, opts) => new Client(origin, opts)`.\n    * `origin` {URL} The parsed upstream origin.\n    * `opts` {Object} The resolved client options.\n    * Returns: {Dispatcher}\n  * `connections` {number|null} The maximum number of [`Client`][] instances the\n    pool may create. When set to `null` the pool creates an unlimited number of\n    clients. **Default:** `null`.\n  * `clientTtl` {number|null} The amount of time, in milliseconds, before an idle\n    [`Client`][] is removed from the pool and closed. When set to `null` clients\n    are never removed based on age. **Default:** `null`.\n\nCreates a new `Pool` against `url`. If `connections` is provided it must be a\nfinite, non-negative number, otherwise an [`InvalidArgumentError`][] is thrown.\nThe `factory` must be a function, and `connect` (inherited from {ClientOptions})\nmust be a function or an object when provided.\n\nThe connection-related {ClientOptions} (`connect`, `connectTimeout`, `tls`,\n`maxCachedSessions`, `socketPath`, `autoSelectFamily`,\n`autoSelectFamilyAttemptTimeout`, `allowH2`, and `useH2c`) are used to build the\nconnector shared by every pooled client.\n\n> [!NOTE]\n> `Pool` inherits all {ClientOptions}, including `allowH2` and\n> `maxConcurrentStreams`. For an h2-capable HTTPS origin, the pool waits for\n> the first TLS connection to finish ALPN negotiation before opening more\n> clients. If the server selects h2, concurrent requests share that session up\n> to `maxConcurrentStreams`. If it selects HTTP/1.1, the pool resumes normal\n> connection fan-out up to `connections`.\n\n```mjs\nimport { Pool } from 'undici'\n\nconst pool = new Pool('http://localhost:3000', {\n  connections: 128,\n  pipelining: 1\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Agent.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/Pool.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "undici:docs/docs/api/Pool.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/Agent.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:docs/docs/api/Agent.md#2",
+    "b": "undici:docs/docs/api/Pool.md#2",
+    "relation": "overlapping",
+    "related": 0.9953,
+    "probabilities": {
+     "same": 0.0156,
+     "overlapping": 0.9701,
+     "conflicting": 0.0096,
+     "unrelated": 0.0047
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0116,
+       "restated": 0.965,
+       "elaborated": 0.0143,
+       "different": 0.0092
+      },
+      "confidence": 0.9908,
+      "a": {
+       "document": "undici:docs/docs/api/Agent.md#2",
+       "quote": "> For an h2-capable HTTPS origin, the per-origin pool waits for the first TLS",
+       "start": 1239,
+       "end": 1316,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/Pool.md#2",
+       "quote": "For an h2-capable HTTPS origin, the pool waits for\n> the first TLS connection to finish ALPN negotiation before opening more\n> clients.",
+       "start": 1666,
+       "end": 1801,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9515,
+       "restated": 0.0328,
+       "elaborated": 0.0087,
+       "different": 0.007
+      },
+      "confidence": 0.993,
+      "a": {
+       "document": "undici:docs/docs/api/Agent.md#2",
+       "quote": "If it selects",
+       "start": 1455,
+       "end": 1468,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/Pool.md#2",
+       "quote": "If the server selects h2, concurrent requests share that session up\n> to `maxConcurrentStreams`.",
+       "start": 1802,
+       "end": 1898,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0149,
+       "restated": 0.9345,
+       "elaborated": 0.0267,
+       "different": 0.0239
+      },
+      "confidence": 0.9761,
+      "a": {
+       "document": "undici:docs/docs/api/Agent.md#2",
+       "quote": "If it selects",
+       "start": 1455,
+       "end": 1468,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/Pool.md#2",
+       "quote": "If it selects HTTP/1.1, the pool resumes normal\n> connection fan-out up to `connections`.\n\n```mjs\nimport { Pool } from 'undici'\n\nconst pool = new Pool('http://localhost:3000', {\n  connections: 128,\n  pipelining: 1\n})\n```",
+       "start": 1899,
+       "end": 2119,
+       "confidence": 0.996
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 76,
+   "passage_reads": 1,
+   "passages_ms": 118,
+   "passages": 3,
+   "counterparts_ms": 87
+  },
+  "timing": {
+   "read_ms": 281,
+   "total_ms": 284
+  }
+ }
+}

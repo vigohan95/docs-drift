@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c4/c481fd7045753235767e",
+ "request_hash": "c481fd7045753235767ea52404539545f4ab430684cccd3dddf7109f8f31b87e",
+ "recorded_at": "2026-11-09T07:23:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 959,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "68.939966",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=269"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/examples/live-configuration.md#1",
+    "text": "## Every instance\n\n```typescript\nimport { Relay } from 'bullmq';\n\nconst relay = new Relay({ connection: { host: 'redis.internal', port: 6379 } });\n\nlet flags: FeatureFlags = DEFAULT_FLAGS;\nlet flagsGeneration = 0;\n\nasync function reloadFlags() {\n  const generation = ++flagsGeneration;\n  const loaded = await db.settings.get('feature-flags');\n  // Ignore reads superseded by a message or a newer reload.\n  if (generation === flagsGeneration) {\n    flags = loaded;\n  }\n}\n\nasync function loadFlags() {\n  let received = false;\n  await relay.subscribe('config.feature-flags', message => {\n    received = true;\n    flagsGeneration++;\n    flags = message.data as FeatureFlags;\n  });\n  // The retained value, if any, is delivered before subscribe() resolves.\n  if (!received) {\n    await reloadFlags();\n  }\n}\n\n// Retained messages are not delivered again after a recovery.\nrelay.on('recovered', () => {\n  void reloadFlags().catch(console.error);\n});\n\nawait loadFlags();\n\nexport const isEnabled = (flag: keyof FeatureFlags) => flags[flag];\n```"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/nodes-and-failures.md#3",
+    "text": "## Recovery\n\nA node whose lease expired notices it on its next heartbeat, even if it has\nnot been swept. It then registers again, restores all its subscriptions, and\nemits `'recovered'` before delivering further inbox messages:\n\n```typescript\nrelay.on('recovered', () => {\n  // Messages published while this node was gone were lost: resynchronize\n  // any state built from them.\n  localCache.clear();\n});\n```\n\n[Retained messages](retained-messages.md) are not delivered again on\nrecovery."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/examples/live-configuration.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/nodes-and-failures.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/relay/examples/live-configuration.md#1",
+    "b": "bullmq:docs/gitbook/guide/relay/nodes-and-failures.md#3",
+    "relation": "overlapping",
+    "related": 0.9892,
+    "probabilities": {
+     "same": 0.0175,
+     "overlapping": 0.9269,
+     "conflicting": 0.0448,
+     "unrelated": 0.0108
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 27,
+   "passage_reads": 1,
+   "passages_ms": 51,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 78,
+   "total_ms": 80
+  }
+ }
+}

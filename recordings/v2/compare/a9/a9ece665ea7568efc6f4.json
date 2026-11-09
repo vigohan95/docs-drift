@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/a9/a9ece665ea7568efc6f4",
+ "request_hash": "a9ece665ea7568efc6f49b9aa7f62c703a65a9b2602d92adcaaf33a8438b94b4",
+ "recorded_at": "2026-11-09T07:23:42Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3071,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "194.652765",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=458"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "text": "Every time a repeatable job is picked up for processing, the next repeatable job is added to the queue with a proper delay. Repeatable jobs are thus nothing more than delayed jobs that are added to the queue according to some settings.\n\n{% hint style=\"info\" %}\nAs Repeatable jobs are just delayed jobs, prior to BullMQ 2.0 you also need a `QueueScheduler` instance to schedule the jobs accordingly.\n\nHowever, from BullMQ 2.0 onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are two ways to specify a repeatable's job repetition pattern, either with a cron expression (using [cron-parser](https://www.npmjs.com/package/cron-parser)'s \"unix cron w/ optional seconds\" format), or specifying a fixed amount of milliseconds between repetitions.\n\n```typescript\nimport { Queue, QueueScheduler } from 'bullmq';\n\nconst myQueueScheduler = new QueueScheduler('Paint');\nconst myQueue = new Queue('Paint');\n\n// Repeat job once every day at 3:15 (am)\nawait myQueue.add(\n  'submarine',\n  { color: 'yellow' },\n  {\n    repeat: {\n      pattern: '0 15 3 * * *',\n    },\n  },\n);\n\n// Repeat job every 10 seconds but no more than 100 times\nawait myQueue.add(\n  'bird',\n  { color: 'bird' },\n  {\n    repeat: {\n      every: 10000,\n      limit: 100,\n    },\n  },\n);\n```\n\nThere are some important considerations regarding repeatable jobs:"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/README.md#2",
+    "text": "{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nawait queue.add('paint', { color: 'blue' }, { delay: 5000 });\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nawait queue.add(\"paint\", {\"color\": \"blue\"}, {\"delay\": 5000})\n```\n\n{% endtab %}\n\n{% tab title=\"Elixir\" %}\n\n```elixir\n{:ok, _job} = BullMQ.Queue.add(:cars, \"paint\", %{color: \"blue\"}, delay: 5000)\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nawait queue.AddAsync(\"paint\", new { color = \"blue\" }, new JobsOptions { Delay = 5000 });\n```\n\n{% endtab %}\n\n{% tab title=\"Rust\" %}\n\n```rust\nqueue\n    .add(\"paint\", serde_json::json!({\"color\": \"blue\"}))\n    .delay(std::time::Duration::from_millis(5000))\n    .await?;\n```\n\n{% endtab %}\n\n{% tab title=\"PHP\" %}\n\n```php\n<?php\n\n$queue->add('paint', ['color' => 'blue'], ['delay' => 5000]);\n```\n\n{% endtab %}\n{% endtabs %}\n\nThe job will now wait **at** **least** 5 seconds before it is processed.\n\n{% hint style=\"danger\" %}\nPrior to BullMQ 2.0, in order for delay jobs to work you need to have at least one `QueueScheduler` somewhere in your infrastructure. Read more [here](../queuescheduler.md).\n\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are many other options available such as priorities, backoff settings, lifo behaviour, remove-on-complete policies, etc. Please check the remainder of this guide for more information regarding these options."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/queues/README.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/README.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/jobs/repeatable.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "b": "bullmq:docs/gitbook/guide/queues/README.md#2",
+    "relation": "overlapping",
+    "related": 0.9951,
+    "probabilities": {
+     "same": 0.014,
+     "overlapping": 0.9753,
+     "conflicting": 0.0058,
+     "unrelated": 0.0049
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0101,
+       "restated": 0.9532,
+       "elaborated": 0.0174,
+       "different": 0.0193
+      },
+      "confidence": 0.74,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+       "quote": "As Repeatable jobs are just delayed jobs, prior to BullMQ 2.0 you also need a `QueueScheduler` instance to schedule the jobs accordingly.",
+       "start": 261,
+       "end": 398,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/queues/README.md#2",
+       "quote": "{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nawait queue.add('paint', { color: 'blue' }, { delay: 5000 });\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nawait queue.add(\"paint\", {\"color\": \"blue\"}, {\"delay\": 5000})\n```\n\n{% endtab %}\n\n{% tab title=\"Elixir\" %}\n\n```elixir\n{:ok, _job} = BullMQ.Queue.add(:cars, \"paint\", %{color: \"blue\"}, delay: 5000)\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nawait queue.AddAsync(\"paint\", new { color = \"blue\" }, new JobsOptions { Delay = 5000 });\n```\n\n{% endtab %}\n\n{% tab title=\"Rust\" %}\n\n```rust\nqueue\n    .add(\"paint\", serde_json::json!({\"color\": \"blue\"}))\n    .delay(std::time::Duration::from_millis(5000))\n    .await?;\n```\n\n{% endtab %}\n\n{% tab title=\"PHP\" %}\n\n```php\n<?php\n\n$queue->add('paint', ['color' => 'blue'], ['delay' => 5000]);\n```\n\n{% endtab %}\n{% endtabs %}\n\nThe job will now wait **at** **least** 5 seconds before it is processed.\n\n{% hint style=\"danger\" %}\nPrior to BullMQ 2.0, in order for delay jobs to work you need to have at least one `QueueScheduler` somewhere in your infrastructure.",
+       "start": 0,
+       "end": 1069,
+       "confidence": 0.74
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0169,
+       "restated": 0.9275,
+       "elaborated": 0.0295,
+       "different": 0.0262
+      },
+      "confidence": 0.9738,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+       "quote": "However, from BullMQ 2.0 onwards, the `QueueScheduler` is not needed anymore.",
+       "start": 400,
+       "end": 477,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/queues/README.md#2",
+       "quote": "Read more [here](../queuescheduler.md).\n\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are many other options available such as priorities, backoff settings, lifo behaviour, remove-on-complete policies, etc. Please check the remainder of this guide for more information regarding these options.",
+       "start": 1070,
+       "end": 1412,
+       "confidence": 0.992
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 147,
+   "passage_reads": 1,
+   "passages_ms": 81,
+   "passages": 2,
+   "counterparts_ms": 90
+  },
+  "timing": {
+   "read_ms": 318,
+   "total_ms": 321
+  }
+ }
+}

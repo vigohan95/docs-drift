@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/cf/cfeb064edc9cff662e68",
+ "request_hash": "cfeb064edc9cff662e68268e28e7e7b98180857561fe78c9da5784ed92ebdc80",
+ "recorded_at": "2026-11-09T07:23:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2109,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "117.487167",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=247"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "text": "Every time a repeatable job is picked up for processing, the next repeatable job is added to the queue with a proper delay. Repeatable jobs are thus nothing more than delayed jobs that are added to the queue according to some settings.\n\n{% hint style=\"info\" %}\nAs Repeatable jobs are just delayed jobs, prior to BullMQ 2.0 you also need a `QueueScheduler` instance to schedule the jobs accordingly.\n\nHowever, from BullMQ 2.0 onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are two ways to specify a repeatable's job repetition pattern, either with a cron expression (using [cron-parser](https://www.npmjs.com/package/cron-parser)'s \"unix cron w/ optional seconds\" format), or specifying a fixed amount of milliseconds between repetitions.\n\n```typescript\nimport { Queue, QueueScheduler } from 'bullmq';\n\nconst myQueueScheduler = new QueueScheduler('Paint');\nconst myQueue = new Queue('Paint');\n\n// Repeat job once every day at 3:15 (am)\nawait myQueue.add(\n  'submarine',\n  { color: 'yellow' },\n  {\n    repeat: {\n      pattern: '0 15 3 * * *',\n    },\n  },\n);\n\n// Repeat job every 10 seconds but no more than 100 times\nawait myQueue.add(\n  'bird',\n  { color: 'bird' },\n  {\n    repeat: {\n      every: 10000,\n      limit: 100,\n    },\n  },\n);\n```\n\nThere are some important considerations regarding repeatable jobs:"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/graceful-shutdown.md#0",
+    "text": "# Graceful shutdown\n\nBullMQ supports graceful shutdowns of workers. This is important so that we can minimize stalled jobs when a worker for some reason must be shutdown. But note that even in the event of a \"ungraceful shutdown\", the stalled mechanism in BullMQ allows for new workers to pick up stalled jobs and continue working on them.\n\n{% hint style=\"danger\" %}\nPrior to BullMQ 2.0, in order for stalled jobs to be picked up by other workers you need to have a [`QueueScheduler`](../queuescheduler.md) class running in the system.\n\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore, so the information above is only valid for older versions.\n{% endhint %}\n\nIn order to perform a shutdown just call the _**`close`**_ method:\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nawait worker.close();\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nawait worker.close()\n```\n\n{% endtab %}\n\n{% tab title=\"Elixir\" %}\n\n```elixir\n:ok = BullMQ.Worker.close(worker)\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nawait worker.CloseAsync();\n```\n\n{% endtab %}\n\n{% tab title=\"Rust\" %}\n\n```rust\nworker.close(30_000).await?;\n```\n\n{% endtab %}\n{% endtabs %}\n\nThe shutdown behavior and timeout depend on the SDK. TypeScript, Python, and .NET wait for active jobs to finish without a built-in timeout. Rust's `close(30_000)` waits for up to 30 seconds and aborts unfinished processing when the deadline expires. Elixir waits up to 30 seconds by default; pass `timeout: milliseconds` to choose another deadline, or `force: true` to skip waiting. If shutdown ends before active jobs finish, they can be recovered as stalled by other workers (when stalled-job checking is configured)."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/graceful-shutdown.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "b": "bullmq:docs/gitbook/guide/workers/graceful-shutdown.md#0",
+    "relation": "overlapping",
+    "related": 0.9923,
+    "probabilities": {
+     "same": 0.0237,
+     "overlapping": 0.9594,
+     "conflicting": 0.0091,
+     "unrelated": 0.0077
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 30,
+   "passage_reads": 1,
+   "passages_ms": 92,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 122,
+   "total_ms": 124
+  }
+ }
+}

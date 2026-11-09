@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/4e/4e3dfe01207e95dabbf1",
+ "request_hash": "4e3dfe01207e95dabbf14188092dde1af2a939a6b24f3f3f01921893b324d191",
+ "recorded_at": "2026-11-09T07:23:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 921,
+ "response_headers": {
+  "x-clocked-credits": "3",
+  "x-clocked-model-ms": "73.287041",
+  "x-clocked-cost-usd": "0.000598",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=218"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "text": "Every time a repeatable job is picked up for processing, the next repeatable job is added to the queue with a proper delay. Repeatable jobs are thus nothing more than delayed jobs that are added to the queue according to some settings.\n\n{% hint style=\"info\" %}\nAs Repeatable jobs are just delayed jobs, prior to BullMQ 2.0 you also need a `QueueScheduler` instance to schedule the jobs accordingly.\n\nHowever, from BullMQ 2.0 onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are two ways to specify a repeatable's job repetition pattern, either with a cron expression (using [cron-parser](https://www.npmjs.com/package/cron-parser)'s \"unix cron w/ optional seconds\" format), or specifying a fixed amount of milliseconds between repetitions.\n\n```typescript\nimport { Queue, QueueScheduler } from 'bullmq';\n\nconst myQueueScheduler = new QueueScheduler('Paint');\nconst myQueue = new Queue('Paint');\n\n// Repeat job once every day at 3:15 (am)\nawait myQueue.add(\n  'submarine',\n  { color: 'yellow' },\n  {\n    repeat: {\n      pattern: '0 15 3 * * *',\n    },\n  },\n);\n\n// Repeat job every 10 seconds but no more than 100 times\nawait myQueue.add(\n  'bird',\n  { color: 'bird' },\n  {\n    repeat: {\n      every: 10000,\n      limit: 100,\n    },\n  },\n);\n```\n\nThere are some important considerations regarding repeatable jobs:"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "text": "# Rate limiting\n\nBullMQ provides queue rate limiting. It is possible to configure workers so that they obey a given rate limiting option:\n\n```typescript\nimport { Worker, QueueScheduler } from 'bullmq';\n\nconst worker = new Worker('painter', async job => paintCar(job), {\n  limiter: {\n    max: 10,\n    duration: 1000,\n  },\n});\n\nconst scheduler = new QueueScheduler('painter');\n```\n\n{% hint style=\"warning\" %}\nJobs that get rate limited will actually stay in the waiting state.\n{% endhint %}\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\n{% hint style=\"info\" %}\nThe rate limiter is global, so if you have for example 10 workers for one queue with the above settings, still only 10 jobs will be processed by second.\n{% endhint %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/repeatable.md#1",
+    "b": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "relation": "overlapping",
+    "related": 0.9959,
+    "probabilities": {
+     "same": 0.0061,
+     "overlapping": 0.9829,
+     "conflicting": 0.0069,
+     "unrelated": 0.0041
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 52,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 80,
+   "total_ms": 83
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/1d/1da546154b542daa1092",
+ "request_hash": "1da546154b542daa10927cb7b350d4674d3a30077820c3d28b83edd265f66e8d",
+ "recorded_at": "2026-11-09T07:23:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 933,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "41.236608",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=38,cfOrigin;dur=0,cfWorker;dur=154"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/fifo.md#1",
+    "text": "# FIFO\n\nThe first type of job we are going to describe is the FIFO (_First-In, First-Out_) type. This is the standard type when adding jobs to a queue. The jobs are processed in the same order as they are inserted into the queue.\n\nThis order is preserved independently on the number of processors you have; however, if you have more than one worker or a concurrency factor larger than 1, even though the workers will start the jobs in order, they may be completed in a slightly different order, since some jobs may take more time to complete than others.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nimport { Queue } from 'bullmq';\n\nconst myQueue = new Queue('Paint');\n\n// Add a job that will be processed after all others\nawait myQueue.add('wall', { color: 'pink' });\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nfrom bullmq import Queue\n\nqueue = Queue('Paint')\n\n# Add a job that will be processed after all others\nawait queue.add('wall', {'color': 'pink'})\n```\n\n{% endtab %}\n\n{% tab title=\"Elixir\" %}\n\n```elixir\n# Add a job that will be processed after all others\n{:ok, _job} = BullMQ.Queue.add(\"Paint\", \"wall\", %{color: \"pink\"}, connection: :my_redis)\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nusing BullMQ;\n\nawait using var queue = new Queue(\"Paint\", new QueueOptions\n{\n    Connection = ConnectionOptions.FromString(\"localhost:6379\"),\n});\n\n// Add a job that will be processed after all others\nawait queue.AddAsync(\"wall\", new { color = \"pink\" });\n```"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/lifo.md#1",
+    "text": "# LIFO\n\nIn some cases, it is useful to process jobs in a LIFO \\(_Last-in, First-Out_\\) fashion. This means that the newest jobs added to the queue will be processed **before** the older ones.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nimport { Queue } from 'bullmq';\n\nconst myQueue = new Queue('Paint');\n\n// Add a job that will be processed before all others\nawait myQueue.add('wall', { color: 'pink' }, { lifo: true });\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nfrom bullmq import Queue\n\nqueue = Queue('Paint')\n\n# Add a job that will be processed before all others\nawait queue.add('wall', {'color': 'pink'}, {'lifo': True})\n```\n\n{% endtab %}\n\n{% tab title=\"Elixir\" %}\n\n```elixir\n# Add a job that will be processed before all others\n{:ok, _job} =\n  BullMQ.Queue.add(\"Paint\", \"wall\", %{color: \"pink\"}, connection: :my_redis, lifo: true)\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nusing BullMQ;\n\nawait using var queue = new Queue(\"Paint\", new QueueOptions\n{\n    Connection = ConnectionOptions.FromString(\"localhost:6379\"),\n});\n\n// Add a job that will be processed before all others\nawait queue.AddAsync(\"wall\", new { color = \"pink\" }, new JobsOptions { Lifo = true });\n```\n\n{% endtab %}\n\n{% tab title=\"Rust\" %}\n\n```rust\nuse bullmq::Queue;\n\nlet queue = Queue::new(\"Paint\").await?;\n\n// Add a job that will be processed before all others\nqueue\n    .add(\"wall\", serde_json::json!({ \"color\": \"pink\" }))\n    .lifo()\n    .await?;\n```\n\n{% endtab %}\n\n{% tab title=\"PHP\" %}\n\n```php\n<?php\n\nuse BullMQ\\Queue;\n\n$queue = new Queue('Paint');\n\n// Add a job that will be processed before all others\n$queue->add('wall', ['color' => 'pink'], ['lifo' => true]);\n```\n\n{% endtab %}\n{% endtabs %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/fifo.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/lifo.md#1",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/fifo.md#1",
+    "b": "bullmq:docs/gitbook/guide/jobs/lifo.md#1",
+    "relation": "unrelated",
+    "related": 0.381,
+    "probabilities": {
+     "same": 0.0283,
+     "overlapping": 0.3414,
+     "conflicting": 0.0114,
+     "unrelated": 0.619
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 48
+  },
+  "timing": {
+   "read_ms": 48,
+   "total_ms": 50
+  }
+ }
+}

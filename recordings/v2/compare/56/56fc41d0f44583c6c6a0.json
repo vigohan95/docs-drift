@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/56/56fc41d0f44583c6c6a0",
+ "request_hash": "56fc41d0f44583c6c6a07bd2616437c4c057ea1e1ad3d790fed3e152cde55c1a",
+ "recorded_at": "2026-11-09T07:23:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2089,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "195.738817",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=40,cfOrigin;dur=0,cfWorker;dur=323"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/introduction.md#1",
+    "text": "## Backends\n\nThe classes above are datastore agnostic. They delegate every operation to a _backend_, which is responsible for storing the jobs and performing all the state transitions atomically. BullMQ ships with two backends:\n\n- **Redis™** (default): works with Redis 6.2 or newer and compatible servers such as Valkey and Dragonfly, using any of the supported clients (ioredis, node-redis, Bun's Redis client or Valkey GLIDE). See [Connections](connections.md).\n- **PostgreSQL**: runs the same API on PostgreSQL 13 or newer. See [PostgreSQL backend](postgresql.md).\n\nUnless stated otherwise, the rest of this guide applies to both backends. Any difference is documented in the [feature parity](postgresql.md#feature-parity-and-limitations) section of the PostgreSQL backend."
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/backends.md#1",
+    "text": "## Redis\n\nThe default backend. It works with every Redis client BullMQ supports\n(ioredis, node-redis, Bun's Redis client and Valkey GLIDE), and with Redis\n6.2 or newer and compatible servers (Valkey, Dragonfly). Queues still run on\nRedis 5.0; only the relay needs 6.2, and checks it when it starts.\n\n```typescript\nimport { Relay } from 'bullmq';\n\nconst relay = new Relay({\n  connection: { host: 'redis.internal', port: 6379 },\n  prefix: 'bull', // default\n  namespace: 'default', // default\n});\n```\n\nYou can also pass an existing client instance as `connection`. The relay\nduplicates it for its blocking inbox reads and leaves the instance open when\nit closes.\n\n- **Inboxes** are Redis streams, read with `XREAD BLOCK`. Consumed entries are\n  removed on every heartbeat, and each inbox keeps at most `inboxMaxLength`\n  unread entries (see [Slow subscribers](messages.md#slow-subscribers)).\n- **Keys** live under `{prefix}::relay:{<namespace>}:`. The empty segment\n  after the prefix keeps them out of the queues' keys: every queue key is\n  `{prefix}:{queue name}:…` with a non-empty name, so no queue (even one\n  named `relay`) or job can ever collide with the relay. And every relay key\n  ends with a fixed word that no queue key uses, never with a node id or a\n  topic, so tools that discover queues by their keys never mistake relay keys\n  for queues.\n- **Nothing is left behind.** Every key expires on its own: a node's record\n  and inbox with its lease, the subscription index with the longest lease of\n  the namespace, and retained messages when they expire. A namespace whose\n  nodes all crashed disappears by itself, even if no other node ever sweeps\n  it. When the last node closes, only the retained messages (and the message\n  id counter) remain, until they expire."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/introduction.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/relay/backends.md#1"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/backends.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/introduction.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/introduction.md#1",
+    "b": "bullmq:docs/gitbook/guide/relay/backends.md#1",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0096,
+     "overlapping": 0.985,
+     "conflicting": 0.0035,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0093,
+       "restated": 0.9781,
+       "elaborated": 0.0076,
+       "different": 0.005
+      },
+      "confidence": 0.995,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/introduction.md#1",
+       "quote": "- **Redis™** (default): works with Redis 6.2 or newer and compatible servers such as Valkey and Dragonfly, using any of the supported clients (ioredis, node-redis, Bun's Redis client or Valkey GLIDE).",
+       "start": 229,
+       "end": 429,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/relay/backends.md#1",
+       "quote": "## Redis\n\nThe default backend.",
+       "start": 0,
+       "end": 30,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0047,
+       "restated": 0.9851,
+       "elaborated": 0.0062,
+       "different": 0.0041
+      },
+      "confidence": 0.9959,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/introduction.md#1",
+       "quote": "- **Redis™** (default): works with Redis 6.2 or newer and compatible servers such as Valkey and Dragonfly, using any of the supported clients (ioredis, node-redis, Bun's Redis client or Valkey GLIDE).",
+       "start": 229,
+       "end": 429,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/relay/backends.md#1",
+       "quote": "It works with every Redis client BullMQ supports\n(ioredis, node-redis, Bun's Redis client and Valkey GLIDE), and with Redis\n6.2 or newer and compatible servers (Valkey, Dragonfly).",
+       "start": 31,
+       "end": 211,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 104,
+   "passages": 2,
+   "counterparts_ms": 74
+  },
+  "timing": {
+   "read_ms": 203,
+   "total_ms": 207
+  }
+ }
+}

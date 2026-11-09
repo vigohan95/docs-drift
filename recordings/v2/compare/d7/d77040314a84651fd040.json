@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d7/d77040314a84651fd040",
+ "request_hash": "d77040314a84651fd040a36d43effc57de34e93b3afe6806abced3dde0c082c3",
+ "recorded_at": "2026-11-09T07:19:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 936,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "116.571424",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=254"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:README.md#25",
+    "text": "### `undici.connect([url, options]): Promise`\n\nStarts two-way communications with the requested resource using [HTTP CONNECT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT).\n\nArguments:\n\n* **url** `string | URL | UrlObject`\n* **options** [`ConnectOptions`](./docs/docs/api/Dispatcher.md#parameter-connectoptions)\n  * **dispatcher** `Dispatcher` - Default: [getGlobalDispatcher](#undicigetglobaldispatcher)\n* **callback** `(err: Error | null, data: ConnectData | null) => void` (optional)\n\nReturns a promise with the result of the `Dispatcher.connect` method.\n\nCalls `options.dispatch.connect(options)`.\n\nSee [Dispatcher.connect](./docs/docs/api/Dispatcher.md#dispatcherconnectoptions-callback) for more details."
+   },
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#3",
+    "text": "### `dispatcher.connect(options[, callback])`\n\n<!-- YAML\nadded: v4.0.0\n-->\n\n* `options` {Object}\n  * `origin` {string|URL} The origin to connect to.\n  * `path` {string} The request path.\n  * `headers` {UndiciHeaders} Request headers. **Default:** `null`.\n  * `signal` {AbortSignal|EventEmitter|null} A signal used to abort the request.\n    **Default:** `null`.\n  * `opaque` {any} An opaque value passed through to the returned `ConnectData`.\n  * `responseHeaders` {string|null} Set to `'raw'` to return the response headers\n    as a raw array instead of an object. **Default:** `null`.\n* `callback` {Function} (optional) Invoked when the connection is established.\n  * `error` {Error|null}\n  * `data` {Object}\n    * `statusCode` {number}\n    * `headers` {Object} The response headers.\n    * `socket` {Duplex} The established socket.\n    * `opaque` {any} The `opaque` value passed in `options`.\n* Returns: {Promise} A `Promise` is returned only when `callback` is omitted. It\n  resolves with the `data` object described above.\n\nStarts two-way communications with the requested resource using the\n[HTTP `CONNECT`][] method.\n\n```mjs\nimport { createServer } from 'node:http'\nimport { Client } from 'undici'\nimport { once } from 'node:events'\n\nconst server = createServer((request, response) => {\n  throw new Error('should never get here')\n}).listen()\n\nserver.on('connect', (req, socket, head) => {\n  socket.write('HTTP/1.1 200 Connection established\\r\\n\\r\\n')\n\n  let data = head.toString()\n  socket.on('data', (buf) => {\n    data += buf.toString()\n  })\n\n  socket.on('end', () => {\n    socket.end(data)\n  })\n})\n\nawait once(server, 'listening')\n\nconst client = new Client(`http://localhost:${server.address().port}`)\n\ntry {\n  const { socket } = await client.connect({ path: '/' })\n  const wanted = 'Body'\n  let data = ''\n  socket.on('data', d => { data += d })\n  socket.on('end', () => {\n    console.log(`Data received: ${data.toString()} | Data wanted: ${wanted}`)\n    client.close()\n    server.close()\n  })\n  socket.write(wanted)\n  socket.end()\n} catch (error) {}\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:README.md#25",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:README.md#25",
+    "b": "undici:docs/docs/api/Dispatcher.md#3",
+    "relation": "overlapping",
+    "related": 0.9958,
+    "probabilities": {
+     "same": 0.0107,
+     "overlapping": 0.9806,
+     "conflicting": 0.0045,
+     "unrelated": 0.0042
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 91,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 122,
+   "total_ms": 124
+  }
+ }
+}

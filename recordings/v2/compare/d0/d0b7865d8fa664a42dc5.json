@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d0/d0b7865d8fa664a42dc5",
+ "request_hash": "d0b7865d8fa664a42dc5e36c0e490f5bb6ea9709849e01def0433a1376088cf0",
+ "recorded_at": "2026-11-09T07:23:51Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3723,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "98.634942",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=219"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/examples/cancelling-jobs-on-other-workers.md#5",
+    "text": "## Limitations\n\n- **Only running jobs are cancelled.** A request for a job that is not\n  running when the workers receive it has no effect, even if the job starts\n  right after.\n- **Cancellation is cooperative.** A processor that ignores the signal runs\n  to the end.\n- **A job can finish first.** A request that arrives once the job is\n  completed has no effect.\n- **No confirmation.** `publish()` tells you how many workers received the\n  request, not whether one of them was running the job.\n- **A worker that is removed** (frozen or disconnected for longer than the\n  relay's `leaseDuration`) misses the request. By then its job has most\n  likely been moved back to the queue as stalled."
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/messages.md#3",
+    "text": "## Delivery guarantees\n\nA message is written to the inboxes of the nodes that are subscribed **at the\nmoment it is published**, in the same atomic operation that resolves the\nsubscriptions. From there:\n\n- **Brief disconnections are covered.** If a node loses its connection, the\n  messages published meanwhile wait in its inbox and are delivered when it\n  reconnects.\n- **Removed nodes lose their messages.** If a node stops renewing its lease\n  (it crashed, or was frozen for longer than `leaseDuration`), it is removed\n  with its subscriptions and inbox. See\n  [Nodes and failures](nodes-and-failures.md).\n- **A node that can't keep up loses its oldest messages.** Each inbox keeps\n  at most `inboxMaxLength` unread messages. See\n  [Slow subscribers](#slow-subscribers).\n- **Subscriptions only see what comes after them.** Subscribing does not\n  replay earlier messages, except the topic's\n  [retained message](retained-messages.md).\n\nIn other words, the Relay is for live messages. It is not a log: when a\nmessage must be processed reliably and with retries, use a queue. Queues\nprocess jobs at least once (for example, a stalled job can be processed again\nby another worker), so processors must tolerate duplicates."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/examples/cancelling-jobs-on-other-workers.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/messages.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/relay/examples/cancelling-jobs-on-other-workers.md#5",
+    "b": "bullmq:docs/gitbook/guide/relay/messages.md#3",
+    "relation": "overlapping",
+    "related": 0.932,
+    "probabilities": {
+     "same": 0.0135,
+     "overlapping": 0.8975,
+     "conflicting": 0.021,
+     "unrelated": 0.068
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 38,
+   "passage_reads": 1,
+   "passages_ms": 67,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 105,
+   "total_ms": 108
+  }
+ }
+}

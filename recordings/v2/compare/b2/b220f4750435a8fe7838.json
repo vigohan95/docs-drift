@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/b2/b220f4750435a8fe7838",
+ "request_hash": "b220f4750435a8fe7838e5252fa686d7b712ea6a89ecd1546716daafe31a17c4",
+ "recorded_at": "2026-11-09T07:23:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1019,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.932032",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=285"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/flows/remove-child-dependency.md#0",
+    "text": "# Remove Child Dependency\n\nIn some situations, you may have a parent job and need to remove the dependency of one of its children.\n\nThe pattern to solve this requirement consists on using the **removeChildDependency** method. It will make sure that if the job is the last pending child, to move its parent to _waiting_ and it won't be listed in unprocessed list of the parent.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nconst flow = new FlowProducer({ connection });\n\nconst originalTree = await flow.add({\n  name: 'root-job',\n  queueName: 'topQueueName',\n  data: {},\n  children: [\n    {\n      name,\n      data: { idx: 0, foo: 'bar' },\n      queueName: 'childrenQueueName',\n      opts: {},\n    },\n  ],\n});\n\nawait originalTree.children[0].job.removeChildDependency();\n```\n\n{% endtab %}\n\n{% tab title=\"Rust\" %}\n\n```rust\nuse bullmq::{FlowJob, FlowProducer, FlowProducerOptions, JobOptions};\nuse serde_json::json;\n\nlet flow = FlowProducer::with_options(FlowProducerOptions::new().connection(connection)).await?;\n\nlet mut original_tree = flow\n    .add(\n        FlowJob::new(\"root-job\", \"topQueueName\", json!({}))?.add_child(\n            FlowJob::new(name, \"childrenQueueName\", json!({ \"idx\": 0, \"foo\": \"bar\" }))?\n                .options(JobOptions::new()),\n        ),\n    )\n    .await?;\n\noriginal_tree.children.as_mut().unwrap()[0]\n    .job\n    .remove_child_dependency()\n    .await?;\n```\n\n{% endtab %}\n{% endtabs %}\n\n{% hint style=\"warning\" %}\nAs soon as a **child** calls this method, it will verify if it has an existing parent, if not, it'll throw an error.\n{% endhint %}\n\nFailed or completed children using this option won't generate any removal as they won't be part of unprocessed list."
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/flows/remove-dependency.md#0",
+    "text": "# Remove Dependency\n\nIn some situations, you may have a parent job and need to remove the relationship when one of its children fail.\n\nThe pattern to solve this requirement consists on using the **removeDependencyOnFailure** option. This option will make sure that when a job fails, the dependency is removed from the parent, so the parent will complete without waiting for the failed children.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nconst flow = new FlowProducer({ connection });\n\nconst originalTree = await flow.add({\n  name: 'root-job',\n  queueName: 'topQueueName',\n  data: {},\n  children: [\n    {\n      name,\n      data: { idx: 0, foo: 'bar' },\n      queueName: 'childrenQueueName',\n      opts: { removeDependencyOnFailure: true },\n      children: [\n        {\n          name,\n          data: { idx: 1, foo: 'bah' },\n          queueName: 'grandChildrenQueueName',\n        },\n        {\n          name,\n          data: { idx: 2, foo: 'baz' },\n          queueName: 'grandChildrenQueueName',\n        },\n      ],\n    },\n    {\n      name,\n      data: { idx: 3, foo: 'foo' },\n      queueName: 'childrenQueueName',\n    },\n  ],\n});\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nflow = FlowProducer({\"connection\": connection})\n\noriginalTree = await flow.add({\n    \"name\": \"root-job\",\n    \"queueName\": \"topQueueName\",\n    \"data\": {},\n    \"children\": [\n        {\n            \"name\": name,\n            \"data\": {\"idx\": 0, \"foo\": \"bar\"},\n            \"queueName\": \"childrenQueueName\",\n            \"opts\": {\"removeDependencyOnFailure\": True},\n            \"children\": [\n                {\n                    \"name\": name,\n                    \"data\": {\"idx\": 1, \"foo\": \"bah\"},\n                    \"queueName\": \"grandChildrenQueueName\",\n                },\n                {\n                    \"name\": name,\n                    \"data\": {\"idx\": 2, \"foo\": \"baz\"},\n                    \"queueName\": \"grandChildrenQueueName\",\n                },\n            ],\n        },\n        {\n            \"name\": name,\n            \"data\": {\"idx\": 3, \"foo\": \"foo\"},\n            \"queueName\": \"childrenQueueName\",\n        },\n    ],\n})\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/flows/remove-child-dependency.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/flows/remove-dependency.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/flows/remove-child-dependency.md#0",
+    "b": "bullmq:docs/gitbook/guide/flows/remove-dependency.md#0",
+    "relation": "unrelated",
+    "related": 0.0195,
+    "probabilities": {
+     "same": 0.0051,
+     "overlapping": 0.0075,
+     "conflicting": 0.0069,
+     "unrelated": 0.9805
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 134
+  },
+  "timing": {
+   "read_ms": 134,
+   "total_ms": 136
+  }
+ }
+}

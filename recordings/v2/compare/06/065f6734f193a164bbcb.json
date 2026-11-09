@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/06/065f6734f193a164bbcb",
+ "request_hash": "065f6734f193a164bbcb7919061716a53cc2781363cfba9fa729ef8499f400ce",
+ "recorded_at": "2026-11-09T07:23:35Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1052,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "180.528128",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=41,cfOrigin;dur=0,cfWorker;dur=331"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/getting-started.md#1",
+    "text": "## Subscribing\n\n```typescript\nconst subscription = await relay.subscribe('orders.*.status', message => {\n  console.log(message.topic); // 'orders.42.status'\n  console.log(message.data); // { status: 'shipped' }\n});\n```\n\nThe first argument is a topic or a pattern: `*` matches one segment and `>`\nmatches one or more trailing segments. See\n[Topics and patterns](topics-and-patterns.md).\n\nThe listener receives a `RelayMessage`:\n\n| Field      | Description                                                             |\n| ---------- | ----------------------------------------------------------------------- |\n| `topic`    | The topic the message was published on.                                 |\n| `data`     | The published value.                                                    |\n| `mid`      | Message id, unique and increasing within the namespace.                 |\n| `ts`       | Publish timestamp (ms since epoch).                                     |\n| `retained` | `true` when it is the topic's [retained message](retained-messages.md). |\n\nTo stop receiving messages:\n\n```typescript\nawait subscription.unsubscribe();\n```"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/topics-and-patterns.md#2",
+    "text": "## Patterns\n\nSubscriptions take a topic or a **pattern** with wildcards:\n\n| Wildcard | Matches                       | Allowed                  |\n| -------- | ----------------------------- | ------------------------ |\n| `*`      | Exactly one segment           | In any position          |\n| `>`      | One or more trailing segments | Only as the last segment |\n\n| Pattern            | Matches                                  | Does not match                    |\n| ------------------ | ---------------------------------------- | --------------------------------- |\n| `orders.42.status` | `orders.42.status`                       | `orders.42`, `orders.42.status.x` |\n| `orders.*.status`  | `orders.42.status`, `orders.7.status`    | `orders.42.items.status`          |\n| `orders.>`         | `orders.42`, `orders.42.status`          | `orders`                          |\n| `*.42.status`      | `orders.42.status`, `invoices.42.status` | `orders.43.status`                |\n| `tenants.acme.>`   | everything under `tenants.acme`          | `tenants.other.users`             |\n| `>`                | every topic                              |                                   |\n\nThe hierarchy only exists in the names: a message published to\n`orders.42.status` is **not** delivered to a subscription to `orders.42`.\nSubscribe to `orders.42.>` to receive everything below it.\n\nYou always **publish to a concrete topic**: wildcards are only valid in\nsubscriptions."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/getting-started.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/relay/topics-and-patterns.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/topics-and-patterns.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/relay/getting-started.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/relay/getting-started.md#1",
+    "b": "bullmq:docs/gitbook/guide/relay/topics-and-patterns.md#2",
+    "relation": "overlapping",
+    "related": 0.9989,
+    "probabilities": {
+     "same": 0.0025,
+     "overlapping": 0.9942,
+     "conflicting": 0.0023,
+     "unrelated": 0.0011
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0088,
+       "restated": 0.9247,
+       "elaborated": 0.021,
+       "different": 0.0455
+      },
+      "confidence": 0.927,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/relay/getting-started.md#1",
+       "quote": "The first argument is a topic or a pattern: `*` matches one segment and `>`",
+       "start": 220,
+       "end": 295,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/relay/topics-and-patterns.md#2",
+       "quote": "## Patterns\n\nSubscriptions take a topic or a **pattern** with wildcards:\n\n| Wildcard | Matches                       | Allowed                  |\n| -------- | ----------------------------- | ------------------------ |\n| `*`      | Exactly one segment           | In any position          |\n| `>`      | One or more trailing segments | Only as the last segment |\n\n| Pattern            | Matches                                  | Does not match                    |\n| ------------------ | ---------------------------------------- | --------------------------------- |\n| `orders.42.status` | `orders.42.status`                       | `orders.42`, `orders.42.status.x` |\n| `orders.*.status`  | `orders.42.status`, `orders.7.status`    | `orders.42.items.status`          |\n| `orders.>`         | `orders.42`, `orders.42.status`          | `orders`                          |\n| `*.42.status`      | `orders.42.status`, `invoices.42.status` | `orders.43.status`                |\n| `tenants.acme.>`   | everything under `tenants.acme`          | `tenants.other.users`             |\n| `>`                | every topic                              |                                   |\n\nThe hierarchy only exists in the names: a message published to\n`orders.42.status` is **not** delivered to a subscription to `orders.42`.\nSubscribe to `orders.42.>` to receive everything below it.\n\nYou always **publish to a concrete topic**: wildcards are only valid in\nsubscriptions.",
+       "start": 0,
+       "end": 1463,
+       "confidence": 0.927
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 28,
+   "passage_reads": 1,
+   "passages_ms": 57,
+   "passages": 1,
+   "counterparts_ms": 105
+  },
+  "timing": {
+   "read_ms": 190,
+   "total_ms": 193
+  }
+ }
+}

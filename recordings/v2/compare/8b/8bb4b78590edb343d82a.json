@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/8b/8bb4b78590edb343d82a",
+ "request_hash": "8bb4b78590edb343d82afeb4be0c59d4eae36568458916947d1e72a2ebecd18f",
+ "recorded_at": "2026-11-09T07:23:41Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1164,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "143.620646",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=267"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/sandboxed-processors.md#1",
+    "text": "# Sandboxed processors\n\nIt is also possible to define workers to run on a separate process. We call these processors _sandboxed_, because they run isolated from the rest of the code.\n\nWhen your workers perform CPU-heavy operations, they will inevitably keep the NodeJS event loop busy, which prevents BullMQ from doing job bookkeeping such as extending job locks, ultimately leading to \"stalled\" jobs.\n\nSince _sandboxed_ workers run the processor in a different process than the bookkeeping code, they will not result in stalled jobs as easily as standard workers. Make sure that you keep your concurrency factor within sane numbers for this not to happen.\n\nIn order to use a sandboxed processor, define the processor in a separate file:\n\n```typescript\nimport { SandboxedJob } from 'bullmq';\n\nmodule.exports = async (job: SandboxedJob) => {\n    // Do something with job\n};\n```\n\nand pass its path to the worker constructor:\n\n```typescript\nimport { Worker } from 'bullmq'\n\nconst processorFile = path.join(__dirname, 'my_procesor.js');\nworker = new Worker(queueName, processorFile);\n```\n\nA tutorial with code examples on how to use sandboxed processors using Typescript can be found [here](https://blog.taskforce.sh/using-typescript-with-bullmq/)."
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers.md#3",
+    "text": "## Sandboxed processors\n\nIt is also possible to define workers to run on a separate process, we call this processors for sandboxed, because they run isolated from the rest of the code.\n\nSince these workers run the processor in a different process, they will not result in stalled jobs as easily as standard workers, although it is not completely impossible if the CPUs in the system are so overload that there is no practical time for the worker to perform its bookkeeping to avoid stalling.\n\nIn order to use a sandboxed processor just define the processor in a separate file:\n\n```typescript\nimport { Job } from 'bullmq';\n\nmodule.exports = async (job: Job) {\n    // Do something with job\n};\n```\n\nand refer to it in the worker constructor:\n\n```typescript\nconst processorFile = path.join(__dirname, 'my_procesor.js');\nworker = new Worker(queueName, processorFile);\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/sandboxed-processors.md#1",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/workers.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/workers/sandboxed-processors.md#1"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/workers/sandboxed-processors.md#1",
+    "b": "bullmq:docs/gitbook/guide/workers.md#3",
+    "relation": "overlapping",
+    "related": 0.9977,
+    "probabilities": {
+     "same": 0.023,
+     "overlapping": 0.9698,
+     "conflicting": 0.0049,
+     "unrelated": 0.0023
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0048,
+       "restated": 0.9518,
+       "elaborated": 0.0385,
+       "different": 0.0048
+      },
+      "confidence": 0.9952,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/workers/sandboxed-processors.md#1",
+       "quote": "Since _sandboxed_ workers run the processor in a different process than the bookkeeping code, they will not result in stalled jobs as easily as standard workers.",
+       "start": 403,
+       "end": 564,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/workers.md#3",
+       "quote": "## Sandboxed processors\n\nIt is also possible to define workers to run on a separate process, we call this processors for sandboxed, because they run isolated from the rest of the code.\n\nSince these workers run the processor in a different process, they will not result in stalled jobs as easily as standard workers, although it is not completely impossible if the CPUs in the system are so overload that there is no practical time for the worker to perform its bookkeeping to avoid stalling.\n\nIn order to use a sandboxed processor just define the processor in a separate file:\n\n```typescript\nimport { Job } from 'bullmq';\n\nmodule.exports = async (job: Job) {\n    // Do something with job\n};\n```\n\nand refer to it in the worker constructor:\n\n```typescript\nconst processorFile = path.join(__dirname, 'my_procesor.js');\nworker = new Worker(queueName, processorFile);\n```",
+       "start": 0,
+       "end": 866,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 50,
+   "passages": 1,
+   "counterparts_ms": 76
+  },
+  "timing": {
+   "read_ms": 151,
+   "total_ms": 153
+  }
+ }
+}

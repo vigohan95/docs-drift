@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/62/62a64662991d70c06b6b",
+ "request_hash": "62a64662991d70c06b6b651c0efb473cb44ec1b7e7fbaf43a5a298cfddbeed36",
+ "recorded_at": "2026-11-09T07:19:48Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 872,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "26.841633",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=19,cfOrigin;dur=0,cfWorker;dur=196"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/DiagnosticsChannel.md#4",
+    "text": "## Event: `'undici:request:headers'`\n\n<!-- YAML\nadded: v6.3.0\n-->\n\nPublished after the response headers have been received. This includes a\nsuccessful CONNECT or protocol upgrade response.\n\n* `message` {Object}\n  * `request` {Object} The same object published by\n    [`'undici:request:create'`][].\n  * `response` {Object} The response being received.\n    * `statusCode` {number} The HTTP status code.\n    * `statusText` {string} The HTTP status message.\n    * `headers` {Buffer[]|Object} HTTP/1.1 response headers are an array of\n      buffers alternating between header name and value. HTTP/2 response\n      headers are an object.\n\n```mjs\nimport diagnosticsChannel from 'node:diagnostics_channel'\n\ndiagnosticsChannel.channel('undici:request:headers').subscribe(({ request, response }) => {\n  console.log('statusCode', response.statusCode)\n  console.log(response.statusText)\n  console.log(response.headers)\n})\n```"
+   },
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#8",
+    "text": "### `dispatcher.pipeline(options, handler)`\n\n<!-- YAML\nadded: v4.0.0\n-->\n\n* `options` {Object} Accepts every field of [`dispatcher.request()`][]'s\n  `options`, plus:\n  * `objectMode` {boolean} Set to `true` when `handler` returns an object stream.\n    **Default:** `false`.\n* `handler` {Function} Returns a `Readable` from which the result is read.\n  * `data` {Object}\n    * `statusCode` {number}\n    * `headers` {Object} The response headers.\n    * `opaque` {any} The `opaque` value passed in `options`.\n    * `body` {Readable} The response body.\n    * `context` {Object}\n  * Returns: {Readable}\n* Returns: {Duplex} A duplex stream that writes to the request and reads from the\n  response.\n\nFor easy use with [`stream.pipeline()`][]. The `handler` should return a\n`Readable` from which the result is read. Usually it returns the `body` directly,\nunless a transformation is needed based on, for example, `headers` or\n`statusCode`. The `handler` should validate the response and save any required\nstate; if there is an error, it should be thrown.\n\n```mjs\nimport { Readable, Writable, PassThrough, pipeline } from 'node:stream'\nimport { createServer } from 'node:http'\nimport { Client } from 'undici'\nimport { once } from 'node:events'\n\nconst server = createServer((request, response) => {\n  request.pipe(response)\n}).listen()\n\nawait once(server, 'listening')\n\nconst client = new Client(`http://localhost:${server.address().port}`)\n\nlet res = ''\n\npipeline(\n  new Readable({\n    read () {\n      this.push(Buffer.from('undici'))\n      this.push(null)\n    }\n  }),\n  client.pipeline({ path: '/', method: 'GET' }, ({ statusCode, headers, body }) => {\n    console.log(`response received ${statusCode}`)\n    console.log('headers', headers)\n    return pipeline(body, new PassThrough(), () => {})\n  }),\n  new Writable({\n    write (chunk, _, callback) {\n      res += chunk.toString()\n      callback()\n    },\n    final (callback) {\n      console.log(`Response pipelined to writable: ${res}`)\n      callback()\n    }\n  }),\n  error => {\n    if (error) {\n      console.error(error)\n    }\n    client.close()\n    server.close()\n  }\n)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/DiagnosticsChannel.md#4",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#8",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:docs/docs/api/DiagnosticsChannel.md#4",
+    "b": "undici:docs/docs/api/Dispatcher.md#8",
+    "relation": "unrelated",
+    "related": 0.0262,
+    "probabilities": {
+     "same": 0.0067,
+     "overlapping": 0.0103,
+     "conflicting": 0.0092,
+     "unrelated": 0.9738
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 38
+  },
+  "timing": {
+   "read_ms": 38,
+   "total_ms": 40
+  }
+ }
+}

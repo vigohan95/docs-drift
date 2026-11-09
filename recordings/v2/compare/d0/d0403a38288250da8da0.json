@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d0/d0403a38288250da8da0",
+ "request_hash": "d0403a38288250da8da0af00b62f72caa9e3d620def40dd2fc9d5bab4272228c",
+ "recorded_at": "2026-11-09T07:23:44Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1042,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "180.092476",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=16,cfOrigin;dur=0,cfWorker;dur=344"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "text": "# Stalled\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore. For manually fetching jobs check this [pattern](https://docs.bullmq.io/patterns/manually-fetching-jobs#checking-for-stalled-jobs)\n{% endhint %}\n\nWhen a job is in an active state (i.e. it is being processed by a worker), it needs to continuously update the queue to notify that the worker is still working on the job. This mechanism prevents a worker that crashes or enters an endless loop from keeping a job in an active state forever.\n\nWhen a worker is not able to notify the queue that it is still working on a given job, that job is moved back to the waiting list, or to the failed set. We then say that the job has stalled and the queue will emit the 'stalled' event.\n\n{% hint style=\"info\" %}\nThere is not a 'stalled' state, only a 'stalled' event emitted when a job is automatically moved from _active_ to _waiting_ state.\n{% endhint %}\n\nIf a job stalls more than a predefined limit (see the [`maxStalledCount` option](https://docs.bullmq.io/api/interfaces/v6.WorkerOptions.html#maxstalledcount)), the job will be failed permanently with the error \"_job stalled more than allowable limit_\". The default is 1, as stalled jobs should be a rare occurrence, but you can increase this number if needed.\n\nIn order to avoid stalled jobs, make sure that your worker does not keep the Node.js event loop too busy. The default max stalled check duration is 30 seconds, so as long as you do not perform CPU operations exceeding that value you should not get stalled jobs.\n\nAnother way to reduce the chance of stalled jobs is using so-called \"sandboxed\" processors. In this case, the workers will spawn new separate Node.js processes, running separately from the main process.\n\n{% code title=\"main.ts\" %}\n```typescript\nimport { Worker } from 'bullmq';\n\nconst worker = new Worker('Paint', painter);\n```\n{% endcode %}\n\n{% code title=\"painter.ts\" %}\n```typescript\nexport default = (job) => {\n    // Paint something\n}\n```\n{% endcode %}"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/README.md#2",
+    "text": "{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nawait queue.add('paint', { color: 'blue' }, { delay: 5000 });\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nawait queue.add(\"paint\", {\"color\": \"blue\"}, {\"delay\": 5000})\n```\n\n{% endtab %}\n\n{% tab title=\"Elixir\" %}\n\n```elixir\n{:ok, _job} = BullMQ.Queue.add(:cars, \"paint\", %{color: \"blue\"}, delay: 5000)\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nawait queue.AddAsync(\"paint\", new { color = \"blue\" }, new JobsOptions { Delay = 5000 });\n```\n\n{% endtab %}\n\n{% tab title=\"Rust\" %}\n\n```rust\nqueue\n    .add(\"paint\", serde_json::json!({\"color\": \"blue\"}))\n    .delay(std::time::Duration::from_millis(5000))\n    .await?;\n```\n\n{% endtab %}\n\n{% tab title=\"PHP\" %}\n\n```php\n<?php\n\n$queue->add('paint', ['color' => 'blue'], ['delay' => 5000]);\n```\n\n{% endtab %}\n{% endtabs %}\n\nThe job will now wait **at** **least** 5 seconds before it is processed.\n\n{% hint style=\"danger\" %}\nPrior to BullMQ 2.0, in order for delay jobs to work you need to have at least one `QueueScheduler` somewhere in your infrastructure. Read more [here](../queuescheduler.md).\n\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are many other options available such as priorities, backoff settings, lifo behaviour, remove-on-complete policies, etc. Please check the remainder of this guide for more information regarding these options."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/queues/README.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/README.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/jobs/stalled.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "b": "bullmq:docs/gitbook/guide/queues/README.md#2",
+    "relation": "overlapping",
+    "related": 0.9959,
+    "probabilities": {
+     "same": 0.0071,
+     "overlapping": 0.9833,
+     "conflicting": 0.0055,
+     "unrelated": 0.0041
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0573,
+       "restated": 0.8971,
+       "elaborated": 0.0188,
+       "different": 0.0268
+      },
+      "confidence": 0.9732,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+       "quote": "From BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.",
+       "start": 37,
+       "end": 109,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/queues/README.md#2",
+       "quote": "Read more [here](../queuescheduler.md).\n\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\nThere are many other options available such as priorities, backoff settings, lifo behaviour, remove-on-complete policies, etc. Please check the remainder of this guide for more information regarding these options.",
+       "start": 1070,
+       "end": 1412,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 32,
+   "passage_reads": 1,
+   "passages_ms": 82,
+   "passages": 2,
+   "counterparts_ms": 101
+  },
+  "timing": {
+   "read_ms": 214,
+   "total_ms": 217
+  }
+ }
+}

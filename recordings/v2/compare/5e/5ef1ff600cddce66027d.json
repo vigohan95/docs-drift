@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5e/5ef1ff600cddce66027d",
+ "request_hash": "5ef1ff600cddce66027da1a3badd9bc0f38c64931e4f63ffb231276f178cc049",
+ "recorded_at": "2026-11-09T07:19:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1247,
+ "response_headers": {
+  "x-clocked-credits": "15",
+  "x-clocked-model-ms": "354.657352",
+  "x-clocked-cost-usd": "0.002988",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=539"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Client.md#2",
+    "text": "### `new Client(url[, options])`\n\n<!-- YAML\nadded: v1.0.0\n-->\n\n* `url` {URL|string} The origin to connect to. Only the protocol, hostname, and\n  port are used.\n* `options` {Object} (optional)\n  * `bodyTimeout` {number|null} The timeout, in milliseconds, after which a\n    request times out while receiving body data. Monitors the time between\n    consecutive body chunks. Use `0` to disable it entirely. **Default:**\n    `300e3`.\n  * `headersTimeout` {number|null} The timeout, in milliseconds, the parser\n    waits to receive the complete HTTP headers before the request times out. Use\n    `0` to disable it entirely. **Default:** `300e3`.\n    HTTP/1.1 headers/body parser timeouts are not guaranteed to fire with exact\n    millisecond precision: delays up to 1000ms use native timers, while larger\n    delays use undici's lower-overhead fast timers with a target resolution\n    around 500ms.\n  * `connectTimeout` {number|null} The timeout, in milliseconds, for\n    establishing a socket connection. Use `0` to disable it entirely.\n    **Default:** `10e3`.\n  * `keepAliveTimeout` {number|null} The timeout, in milliseconds, after which a\n    socket with no active requests times out. Monitors the time between activity\n    on a connected socket. This value may be overridden by *keep-alive* hints\n    from the server. **Default:** `4e3`.\n  * `keepAliveMaxTimeout` {number|null} The maximum allowed `keepAliveTimeout`,\n    in milliseconds, when overridden by *keep-alive* hints from the server.\n    **Default:** `600e3`.\n  * `keepAliveTimeoutThreshold` {number|null} A number of milliseconds\n    subtracted from server *keep-alive* hints when overriding `keepAliveTimeout`,\n    to account for timing inaccuracies caused by e.g. transport latency.\n    **Default:** `2e3`.\n  * `maxHeaderSize` {number|null} The maximum length of request headers, in\n    bytes. **Default:** the value of Node.js' `--max-http-header-size` or\n    `16384` (16 KiB).\n  * `maxResponseSize` {number|null} The maximum length of a response body, in\n    bytes. Set to `-1` to disable it. **Default:** `-1`.\n  * `maxRequestsPerClient` {number|null} The maximum number of requests to send\n    over a single connection before the socket is reset. Use `0` to disable this\n    limit. **Default:** `null`.\n  * `localAddress` {string|null} The local IP address the socket should connect\n    from. **Default:** `null`.\n  * `pipelining` {number|null} The number of concurrent requests sent over the\n    single connection, per [RFC 7230, section 6.3.2][]. Only enable values\n    greater than `1` when the remote server is trusted. Set to `0` to disable\n    keep-alive connections. Has no effect once HTTP/2 is negotiated; see\n    `maxConcurrentStreams` for the HTTP/2 dispatch ceiling. **Default:** `1`.\n  * `connect` {Object|Function|null} Configures how connections are established.\n    Either a `ConnectOptions` object passed to the built-in\n    [`buildConnector`][] (every [`tls.connect()`][] option is accepted, plus the\n    fields below), or a custom connector function with the signature\n    `(options, callback)`. **Default:** `null`.\n    * `socketPath` {string|null} An IPC endpoint, either a Unix domain socket or\n      a Windows named pipe. **Default:** `null`.\n    * `maxCachedSessions` {number|null} The maximum number of cached TLS\n      sessions. Use `0` to disable TLS session caching. **Default:** `100`.\n    * `timeout` {number|null} The connection timeout, in milliseconds.\n      **Default:** `10e3`.\n    * `servername` {string|null} The TLS server name used for SNI."
+   },
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#5",
+    "text": "### `dispatcher.dispatch(options, handler)`\n\n<!-- YAML\nadded: v4.0.0\n-->\n\n* `options` {Object}\n  * `origin` {string|URL} The origin to dispatch the request to. Optional for a\n    dispatcher that is already bound to a single origin, such as `Client` or\n    `Pool`, which then use their own origin. Required on `Agent`, which is not\n    bound to one origin and throws an `InvalidArgumentError` when it is missing.\n  * `path` {string} The request path.\n  * `method` {string} The HTTP method, e.g. `'GET'` or `'POST'`.\n  * `body` {string|Buffer|Uint8Array|Readable|FormData|null} The request body.\n    Undici's network clients require a `FormData` body created by the same\n    undici package instance. A body from another source, including Node.js's\n    built-in `FormData`, is rejected with an `InvalidArgumentError`.\n    **Default:** `null`.\n  * `headers` {UndiciHeaders} Request headers. **Default:** `null`.\n  * `query` {Object} Query string parameters embedded into the request URL. Both\n    keys and values are encoded with `encodeURIComponent`. **Default:** `null`.\n  * `idempotent` {boolean} Whether the request can be safely retried. If `false`,\n    the request is not sent until all preceding requests in the pipeline have\n    completed. **Default:** `true` when `method` is `'HEAD'` or `'GET'`.\n  * `blocking` {boolean} Whether the response is expected to block the pipeline.\n    When `true`, further pipelining on the same connection is avoided until\n    headers have been received. **Default:** `method !== 'HEAD'`.\n  * `typeOfService` {number|null} The IP Type of Service (ToS) value for the\n    request socket. Must be an integer between `0` and `255`. **Default:** `0`.\n  * `upgrade` {boolean|string|null} Upgrades the request, e.g. to `'Websocket'`.\n    **Default:** `null`, or the request method when it is `'CONNECT'`.\n  * `headersTimeout` {number|null} The time, in milliseconds, the parser waits to\n    receive the complete HTTP headers. Defaults to 300 seconds.\n  * `bodyTimeout` {number|null} The time, in milliseconds, after which the request\n    times out while receiving body data. Monitors the time between body chunks.\n    Use `0` to disable it entirely. Defaults to 300 seconds.\n    HTTP/1.1 headers/body parser timeouts are not guaranteed to fire with exact\n    millisecond precision: delays up to 1000ms use native timers, while larger\n    delays use undici's lower-overhead fast timers with a target resolution\n    around 500ms.\n  * `reset` {boolean} Whether the request should establish a keep-alive\n    connection. **Default:** `false`.\n  * `expectContinue` {boolean} For HTTP/2, appends the `expect: 100-continue`\n    header and halts the request body until a `100 Continue` is received from the\n    remote server. **Default:** `false`.\n* `handler` {Object} A set of callbacks invoked over the request lifecycle.\n  * `onRequestStart` {Function} Invoked before the request is dispatched on the\n    socket. May be invoked multiple times when the request is retried.\n    * `controller` {DispatchController}\n    * `context` {any}\n  * `onRequestUpgrade` {Function} (optional) Invoked when the request is upgraded.\n    Required when `options.upgrade` is set or `options.method` is `'CONNECT'`.\n    * `controller` {DispatchController}\n    * `statusCode` {number}\n    * `headers` {Object}\n    * `socket` {Duplex}\n  * `onResponseStart` {Function} (optional) Invoked when the status code and\n    headers have been received. May be invoked multiple times for 1xx\n    informational responses. Not used for `upgrade` requests."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Client.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/Dispatcher.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/Client.md#2"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:docs/docs/api/Client.md#2",
+    "b": "undici:docs/docs/api/Dispatcher.md#5",
+    "relation": "overlapping",
+    "related": 0.9942,
+    "probabilities": {
+     "same": 0.0114,
+     "overlapping": 0.9744,
+     "conflicting": 0.0084,
+     "unrelated": 0.0058
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0278,
+       "restated": 0.7121,
+       "elaborated": 0.2431,
+       "different": 0.017
+      },
+      "confidence": 0.983,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "request times out while receiving body data.",
+       "start": 272,
+       "end": 316,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/Dispatcher.md#5",
+       "quote": "Defaults to 300 seconds.\n  * `bodyTimeout` {number|null} The time, in milliseconds, after which the request\n    times out while receiving body data.",
+       "start": 1955,
+       "end": 2103,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9634,
+       "restated": 0.0211,
+       "elaborated": 0.0089,
+       "different": 0.0067
+      },
+      "confidence": 0.9933,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "Monitors the time between",
+       "start": 317,
+       "end": 342,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/Dispatcher.md#5",
+       "quote": "Monitors the time between body chunks.\n    Use `0` to disable it entirely.",
+       "start": 2104,
+       "end": 2178,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 97,
+   "passage_reads": 1,
+   "passages_ms": 226,
+   "passages": 2,
+   "counterparts_ms": 86
+  },
+  "timing": {
+   "read_ms": 408,
+   "total_ms": 413
+  }
+ }
+}

@@ -1,0 +1,141 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/41/41b294264ee7b38e1409",
+ "request_hash": "41b294264ee7b38e14093f8ee77512f629c51d2d3c6d539fe49b8e7a1855b65c",
+ "recorded_at": "2026-11-09T07:23:36Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1065,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "199.992487",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=25,cfOrigin;dur=0,cfWorker;dur=325"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/auto-removal-of-jobs.md#3",
+    "text": "### Keep jobs based on their age\n\nAnother possibility is to keep jobs up to a certain age. The `removeOn` option accepts a [`KeepJobs`](https://docs.bullmq.io/api/types/v6.KeepJobs.html) object, that includes an `age` and a `count` fields. The `age` is used to specify how old jobs to keep (in seconds), and the `count` can be used to limit the total amount to keep. The `count` option is useful in cases we get an unexpected amount of jobs in a very short time, in this case we may just want to limit to a certain amount to avoid running out of memory.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nawait myQueue.add(\n  'test',\n  { foo: 'bar' },\n  {\n    removeOnComplete: {\n      age: 3600, // keep up to 1 hour\n      count: 1000, // keep up to 1000 jobs\n    },\n    removeOnFail: {\n      age: 24 * 3600, // keep up to 24 hours\n    },\n  },\n);\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nawait my_queue.add(\n    \"test\",\n    {\"foo\": \"bar\"},\n    {\n        \"removeOnComplete\": {\n            \"age\": 3600,  # keep up to 1 hour\n            \"count\": 1000,  # keep up to 1000 jobs\n        },\n        \"removeOnFail\": {\n            \"age\": 24 * 3600,  # keep up to 24 hours\n        },\n    },\n)\n```\n\n{% endtab %}\n\n{% tab title=\".NET\" %}\n\n```csharp\nawait myQueue.AddAsync(\n    \"test\",\n    new { foo = \"bar\" },\n    new JobsOptions\n    {\n        RemoveOnComplete = new KeepJobs\n        {\n            Age = 3600, // keep up to 1 hour\n            Count = 1000, // keep up to 1000 jobs\n        },\n        RemoveOnFail = new KeepJobs\n        {\n            Age = 24 * 3600, // keep up to 24 hours\n        },\n    });\n```"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/auto-removal-of-jobs.md#3",
+    "text": "### Keep jobs based on their age\n\nAnother possibility is to keep jobs up to a certain age. The `removeOn` option accepts a [`KeepJobs`](https://docs.bullmq.io/api/types/v6.KeepJobs.html) object, that includes `age`, `count`, and `limit` fields. The `age` is used to specify how old jobs to keep (in seconds), the `count` can be used to limit the total amount to keep, and the `limit` controls how many jobs are removed per cleanup iteration. The `count` option is useful in cases we get an unexpected amount of jobs in a very short time, in this case we may just want to limit to a certain amount to avoid running out of memory. The `limit` option helps control the performance impact of cleanup operations by limiting how many jobs are processed at once.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nconst myWorker = new Worker(\n  'myQueueName',\n  async job => {\n    // do some work\n  },\n  {\n    connection,\n    removeOnComplete: {\n      age: 3600, // keep up to 1 hour\n      count: 1000, // keep up to 1000 jobs\n      limit: 100, // remove up to 100 jobs per cleanup iteration\n    },\n    removeOnFail: {\n      age: 24 * 3600, // keep up to 24 hours\n      limit: 50, // remove up to 50 jobs per cleanup iteration\n    },\n  },\n);\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nfrom bullmq import Worker\n\nasync def process_job(job, token):\n    # do some work\n    pass\n\nworker = Worker(\n    'myQueueName',\n    process_job,\n    {\n        \"connection\": connection,\n        \"removeOnComplete\": {\n            \"age\": 3600,  # keep up to 1 hour\n            \"count\": 1000,  # keep up to 1000 jobs\n            \"limit\": 100,  # remove up to 100 jobs per cleanup iteration\n        },\n        \"removeOnFail\": {\n            \"age\": 24 * 3600,  # keep up to 24 hours\n            \"limit\": 50,  # remove up to 50 jobs per cleanup iteration\n        },\n    },\n)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/queues/auto-removal-of-jobs.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/workers/auto-removal-of-jobs.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/auto-removal-of-jobs.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/queues/auto-removal-of-jobs.md#3"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/queues/auto-removal-of-jobs.md#3",
+    "b": "bullmq:docs/gitbook/guide/workers/auto-removal-of-jobs.md#3",
+    "relation": "overlapping",
+    "related": 0.9987,
+    "probabilities": {
+     "same": 0.0035,
+     "overlapping": 0.9925,
+     "conflicting": 0.0027,
+     "unrelated": 0.0013
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9904,
+       "restated": 0.0032,
+       "elaborated": 0.0032,
+       "different": 0.0032
+      },
+      "confidence": 0.9968,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/queues/auto-removal-of-jobs.md#3",
+       "quote": "### Keep jobs based on their age",
+       "start": 0,
+       "end": 32,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/workers/auto-removal-of-jobs.md#3",
+       "quote": "### Keep jobs based on their age\n\nAnother possibility is to keep jobs up to a certain age.",
+       "start": 0,
+       "end": 90,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9545,
+       "restated": 0.0312,
+       "elaborated": 0.0073,
+       "different": 0.0071
+      },
+      "confidence": 0.9929,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/queues/auto-removal-of-jobs.md#3",
+       "quote": "The `count` option is useful in cases we get an unexpected amount of jobs in a very short time, in this case we may just want to limit to a certain amount to avoid running out of memory.",
+       "start": 367,
+       "end": 553,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/workers/auto-removal-of-jobs.md#3",
+       "quote": "The `count` option is useful in cases we get an unexpected amount of jobs in a very short time, in this case we may just want to limit to a certain amount to avoid running out of memory.",
+       "start": 442,
+       "end": 628,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 34,
+   "passage_reads": 1,
+   "passages_ms": 94,
+   "passages": 2,
+   "counterparts_ms": 81
+  },
+  "timing": {
+   "read_ms": 208,
+   "total_ms": 212
+  }
+ }
+}

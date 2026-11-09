@@ -20,6 +20,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from docsdrift.targets import TARGETS  # noqa: E402
+sys.path.insert(0, str(ROOT / "review"))
+import defects as registry  # noqa: E402
 
 E = html.escape
 HERO = ["fastify-onrequest-body-null", "typeorm-update-bulk-overload", "rtk-setuplisteners-refetchonmount"]
@@ -83,7 +85,7 @@ def upstream_note(d: dict, prs: dict) -> str:
 
 
 def contradiction(d: dict, prs: dict, heading: str = "h3") -> str:
-    t = TARGETS[d["project"]]
+    t = registry.target_of(d["project"])
     return f"""
 <article class="contradiction" id="{E(d['id'])}">
   <{heading}>{E(d['title'])} <span class="project">in {E(t['repo'])}</span></{heading}>
@@ -174,6 +176,9 @@ def build() -> str:
     by_id = {d["id"]: d for d in defects}
     with_defects = sorted({d["project"] for d in defects})
     none = [n for n in s["projects"] if n not in with_defects]
+    n_measured = sum(1 for d in defects if d["project"] in s["projects"])
+    n_later = len(list((ROOT / "reports" / "later").glob("*.json")))
+    later_words = f", {n_later} more scanned later" if n_later else ""
     a = s["all"]
     n_open = sum(1 for p in prs["pull_requests"] if p["status"] == "open")
     n_merged = sum(1 for p in prs["pull_requests"] if p["status"] == "merged")
@@ -213,7 +218,7 @@ def build() -> str:
   <p class="wordmark">Docs Drift</p>
   <h1>A short list of places where a project's documentation contradicts itself, with the evidence.</h1>
   <p class="lede">For maintainers. It reads a project's docs, pairs the passages that restate each other, and uses the Clocked API to pick the pairs worth a person's time. Every item shows both passages with file and line. It is a list to review, not a verdict: about half of it is real ({a['reported_true']} of {a['reported']}, {round(100 * a['reported_true'] / a['reported'])}%), and on four projects it had not seen before, none of its {s['validation']['reported']} items was ({s['validation']['reported_true']} of {s['validation']['reported']}).</p>
-  <p class="score">{a['projects']} real projects. {len(defects)} defects backed by source code. {pr_words}.</p>
+  <p class="score">{a['projects']} real projects measured{later_words}. {len(defects)} defects backed by source code. {pr_words}.</p>
 </header>
 
 <section id="try">
@@ -259,7 +264,7 @@ def build() -> str:
     <tbody>
 {project_rows(s, defects)}
     </tbody>
-    <tfoot><tr><td>All {a['projects']}</td><td></td><td class="num">{a['pairs_compared']:,}</td><td class="num">{a['raw']}</td><td class="num">{a['reported']}</td><td class="num strong">{a['reported_true']}</td><td class="num">{len(defects)}</td><td class="num">{total_credits:,.0f}</td><td></td></tr></tfoot>
+    <tfoot><tr><td>All {a['projects']}</td><td></td><td class="num">{a['pairs_compared']:,}</td><td class="num">{a['raw']}</td><td class="num">{a['reported']}</td><td class="num strong">{a['reported_true']}</td><td class="num">{n_measured}</td><td class="num">{total_credits:,.0f}</td><td></td></tr></tfoot>
   </table>
   </div>
 </section>

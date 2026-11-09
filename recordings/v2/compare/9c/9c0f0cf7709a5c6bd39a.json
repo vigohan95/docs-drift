@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9c/9c0f0cf7709a5c6bd39a",
+ "request_hash": "9c0f0cf7709a5c6bd39af00064557972e0afefe7dfa2325d8f3e984e6e6a85a3",
+ "recorded_at": "2026-11-09T07:23:32Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1239,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "21.444416",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=15,cfOrigin;dur=0,cfWorker;dur=237"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/running-a-simple-example.md#5",
+    "text": "We have now 2 services to choose from, consumer and producer. If we search for traces in the producer we will be able to see all the traces where the producer is involved:\n\n<figure><img src=\"../../.gitbook/assets/image (8).png\" alt=\"\"><figcaption></figcaption></figure>\n\nHere we can see as even though we are searching for the producer traces, we also get the consumer spans, and this is because jobs are linked between producers and consumers, so that we can trace all the way from the creation of a job to its final processing.\n\nIf we look into the consumer spans for example, there are some interesting things to see:\n\n<figure><img src=\"../../.gitbook/assets/image (9).png\" alt=\"\"><figcaption></figcaption></figure>\n\nFirst of all, note how the producer span \"addBulk myQueue\", is the root of this trace. Since this was an addBulk, it means that several jobs were added to the queue in one go, 5 in this case. So the spans created by the consumer are therefore linked to this one producer span. The consumer spans \"process myQueue\" are generated for every job that is being processed, and since we had a concurrency factor larger than 5, all 5 jobs are processed concurrently, which we can see in the spans all starting at the same time.\n\nBut we also forced the jobs to fail 1 time, so that they would be retried with a small backoff (delay), which is why we can see a \"delay myQueue\" span and then a final \"process myQueue\" span."
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/running-jaeger.md#0",
+    "text": "# Running Jaeger\n\nThe easiest way to run Jaeger is by using Docker compose. If you have docker installed, it is a matter of running this docker-compose.yaml file:\n\n```yaml\nservices:\n  jaeger:\n    image: jaegertracing/all-in-one:latest\n    container_name: BullMQ_with_opentelemetry_jaeger\n    ports:\n      - '4318:4318'\n      - '16686:16686'\n\n```\n\nNote that we need to expose 2 ports here, the first (4318) one is the endpoint to export our traces and the second one (16686) is our UI.\n\nYou can now just run this service with:\n\n```\ndocker-compose up\n```\n\nIn a few seconds the image will be up and running. You can verify that is working by opening a browser window and pointing it to [http://localhost:16686](http://localhost:16686/search)\n\nAs no traces has been created yet you will get a quite empty dashboard:\n\n<figure><img src=\"../../.gitbook/assets/image (5).png\" alt=\"\"><figcaption></figcaption></figure>"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/running-a-simple-example.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/running-jaeger.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/telemetry/running-a-simple-example.md#5",
+    "b": "bullmq:docs/gitbook/guide/telemetry/running-jaeger.md#0",
+    "relation": "unrelated",
+    "related": 0.0055,
+    "probabilities": {
+     "same": 0.002,
+     "overlapping": 0.0017,
+     "conflicting": 0.0017,
+     "unrelated": 0.9945
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 70
+  },
+  "timing": {
+   "read_ms": 70,
+   "total_ms": 72
+  }
+ }
+}

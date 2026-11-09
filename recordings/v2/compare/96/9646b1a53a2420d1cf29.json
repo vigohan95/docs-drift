@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/96/9646b1a53a2420d1cf29",
+ "request_hash": "9646b1a53a2420d1cf29089810080c931709a108a53b4ef971f9efc03c2fc240",
+ "recorded_at": "2026-11-09T07:19:34Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 3766,
+ "response_headers": {
+  "x-clocked-credits": "14",
+  "x-clocked-model-ms": "344.247011",
+  "x-clocked-cost-usd": "0.002789",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=12,cfOrigin;dur=0,cfWorker;dur=527"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#5",
+    "text": "### `dispatcher.dispatch(options, handler)`\n\n<!-- YAML\nadded: v4.0.0\n-->\n\n* `options` {Object}\n  * `origin` {string|URL} The origin to dispatch the request to. Optional for a\n    dispatcher that is already bound to a single origin, such as `Client` or\n    `Pool`, which then use their own origin. Required on `Agent`, which is not\n    bound to one origin and throws an `InvalidArgumentError` when it is missing.\n  * `path` {string} The request path.\n  * `method` {string} The HTTP method, e.g. `'GET'` or `'POST'`.\n  * `body` {string|Buffer|Uint8Array|Readable|FormData|null} The request body.\n    Undici's network clients require a `FormData` body created by the same\n    undici package instance. A body from another source, including Node.js's\n    built-in `FormData`, is rejected with an `InvalidArgumentError`.\n    **Default:** `null`.\n  * `headers` {UndiciHeaders} Request headers. **Default:** `null`.\n  * `query` {Object} Query string parameters embedded into the request URL. Both\n    keys and values are encoded with `encodeURIComponent`. **Default:** `null`.\n  * `idempotent` {boolean} Whether the request can be safely retried. If `false`,\n    the request is not sent until all preceding requests in the pipeline have\n    completed. **Default:** `true` when `method` is `'HEAD'` or `'GET'`.\n  * `blocking` {boolean} Whether the response is expected to block the pipeline.\n    When `true`, further pipelining on the same connection is avoided until\n    headers have been received. **Default:** `method !== 'HEAD'`.\n  * `typeOfService` {number|null} The IP Type of Service (ToS) value for the\n    request socket. Must be an integer between `0` and `255`. **Default:** `0`.\n  * `upgrade` {boolean|string|null} Upgrades the request, e.g. to `'Websocket'`.\n    **Default:** `null`, or the request method when it is `'CONNECT'`.\n  * `headersTimeout` {number|null} The time, in milliseconds, the parser waits to\n    receive the complete HTTP headers. Defaults to 300 seconds.\n  * `bodyTimeout` {number|null} The time, in milliseconds, after which the request\n    times out while receiving body data. Monitors the time between body chunks.\n    Use `0` to disable it entirely. Defaults to 300 seconds.\n    HTTP/1.1 headers/body parser timeouts are not guaranteed to fire with exact\n    millisecond precision: delays up to 1000ms use native timers, while larger\n    delays use undici's lower-overhead fast timers with a target resolution\n    around 500ms.\n  * `reset` {boolean} Whether the request should establish a keep-alive\n    connection. **Default:** `false`.\n  * `expectContinue` {boolean} For HTTP/2, appends the `expect: 100-continue`\n    header and halts the request body until a `100 Continue` is received from the\n    remote server. **Default:** `false`.\n* `handler` {Object} A set of callbacks invoked over the request lifecycle.\n  * `onRequestStart` {Function} Invoked before the request is dispatched on the\n    socket. May be invoked multiple times when the request is retried.\n    * `controller` {DispatchController}\n    * `context` {any}\n  * `onRequestUpgrade` {Function} (optional) Invoked when the request is upgraded.\n    Required when `options.upgrade` is set or `options.method` is `'CONNECT'`.\n    * `controller` {DispatchController}\n    * `statusCode` {number}\n    * `headers` {Object}\n    * `socket` {Duplex}\n  * `onResponseStart` {Function} (optional) Invoked when the status code and\n    headers have been received. May be invoked multiple times for 1xx\n    informational responses. Not used for `upgrade` requests."
+   },
+   {
+    "id": "undici:docs/docs/api/H2CClient.md#2",
+    "text": "### `new H2CClient(url[, options])`\n\n<!-- YAML\nadded: v7.7.0\n-->\n\n* `url` {URL|string} The origin to connect to. Should include only the protocol,\n  hostname, and port. Only the `http:` protocol is supported.\n* `options` {H2CClientOptions} (optional)\n  * `maxConcurrentStreams` {number} The maximum number of concurrent HTTP/2\n    streams for the session. The server's `SETTINGS_MAX_CONCURRENT_STREAMS` can\n    lower this limit, but not raise it. Must be a positive integer.\n    **Default:** `100`.\n  * `pipelining` {number} The number of concurrent requests multiplexed over the\n    single connection. For an `H2CClient` this is aliased to\n    `maxConcurrentStreams` and may not exceed it. Must be a positive integer.\n    **Default:** `100`.\n  * `maxHeaderSize` {number} The maximum length of request headers in bytes.\n    **Default:** Node.js' `--max-http-header-size` or `16384` (16 KiB).\n  * `headersTimeout` {number} The amount of time, in milliseconds, the parser\n    waits to receive the complete HTTP headers. **Default:** `300e3`.\n  * `connectTimeout` {number} The timeout for establishing a socket connection,\n    in milliseconds. Use `0` to disable it entirely. **Default:** `10e3`.\n  * `bodyTimeout` {number} The timeout, in milliseconds, after which a request\n    times out. Monitors the time between received body data. Use `0` to disable\n    it entirely. **Default:** `300e3`.\n  * `keepAliveTimeout` {number} The timeout, in milliseconds, after which a\n    socket without active requests times out. May be overridden by _keep-alive_\n    hints from the server. **Default:** `4e3`.\n  * `keepAliveMaxTimeout` {number} The maximum allowed `keepAliveTimeout`, in\n    milliseconds, when overridden by _keep-alive_ hints from the server.\n    **Default:** `600e3`.\n  * `keepAliveTimeoutThreshold` {number} A number of milliseconds subtracted from\n    server _keep-alive_ hints when overriding `keepAliveTimeout`, to account for\n    timing inaccuracies such as transport latency. **Default:** `1e3`.\n  * `socketPath` {string} An IPC endpoint, either a Unix domain socket or a\n    Windows named pipe. **Default:** `null`.\n  * `strictContentLength` {boolean} If `true`, an error is thrown when the\n    request `content-length` header does not match the length of the request\n    body. **Default:** `true`.\n  * `maxCachedSessions` {number} The maximum number of TLS sessions cached by the\n    built-in connector. Use `0` to disable TLS session caching. **Default:** `100`.\n  * `connect` {Object|Function} Connector options passed to `buildConnector`, or\n    a custom connector function. The `allowH2` option may not be set here.\n    **Default:** `null`.\n  * `maxRequestsPerClient` {number} The maximum number of requests to send over\n    a single connection before it is reset. Use `0` to disable this limit.\n    **Default:** `null`.\n  * `localAddress` {string} The local IP address the socket should connect from.\n  * `maxResponseSize` {number} The maximum allowed response body size in bytes.\n    Use `-1` to disable. **Default:** `-1`.\n  * `autoSelectFamily` {boolean} Enables a family autodetection algorithm that\n    loosely implements section 5 of [RFC 8305][]. Ignored if not supported by the\n    current Node.js version.\n  * `autoSelectFamilyAttemptTimeout` {number} The amount of time, in\n    milliseconds, to wait for a connection attempt to finish before trying the\n    next address when `autoSelectFamily` is enabled."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/H2CClient.md#2"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "undici:docs/docs/api/H2CClient.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/Dispatcher.md#5"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:docs/docs/api/Dispatcher.md#5",
+    "b": "undici:docs/docs/api/H2CClient.md#2",
+    "relation": "overlapping",
+    "related": 0.95,
+    "probabilities": {
+     "same": 0.0164,
+     "overlapping": 0.9068,
+     "conflicting": 0.0267,
+     "unrelated": 0.05
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0168,
+       "restated": 0.9296,
+       "elaborated": 0.0399,
+       "different": 0.0138
+      },
+      "confidence": 0.986,
+      "a": {
+       "document": "undici:docs/docs/api/Dispatcher.md#5",
+       "quote": "Monitors the time between body chunks.",
+       "start": 2104,
+       "end": 2142,
+       "confidence": 0.986
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Monitors the time between received body data.",
+       "start": 1288,
+       "end": 1333,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 1,
+   "pairs_ms": 95,
+   "passage_reads": 1,
+   "passages_ms": 251,
+   "passages": 1,
+   "counterparts_ms": 47
+  },
+  "timing": {
+   "read_ms": 393,
+   "total_ms": 398
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/41/411324c6a6c0116b2afc",
+ "request_hash": "411324c6a6c0116b2afca034acfefedf8aeb49f9abe08e2f149b5ac520f7d203",
+ "recorded_at": "2026-11-09T07:23:45Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1094,
+ "response_headers": {
+  "x-clocked-credits": "1",
+  "x-clocked-model-ms": "21.475391",
+  "x-clocked-cost-usd": "0.000199",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=34,cfOrigin;dur=0,cfWorker;dur=354"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/metrics.md#13",
+    "text": "## Exporting Metrics\n\nTo export metrics to an observability backend, you need to configure an OpenTelemetry metrics exporter. Here's an example using the OTLP exporter:\n\n```typescript\nimport {\n  MeterProvider,\n  PeriodicExportingMetricReader,\n} from '@opentelemetry/sdk-metrics';\nimport { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';\nimport { metrics } from '@opentelemetry/api';\n\n// Configure the metrics exporter\nconst metricExporter = new OTLPMetricExporter({\n  url: 'http://localhost:4318/v1/metrics',\n});\n\nconst meterProvider = new MeterProvider({\n  readers: [\n    new PeriodicExportingMetricReader({\n      exporter: metricExporter,\n      exportIntervalMillis: 10000, // Export every 10 seconds\n    }),\n  ],\n});\n\n// Set the global meter provider\nmetrics.setGlobalMeterProvider(meterProvider);\n\n// Now create your BullMQ instances with metrics enabled\nconst telemetry = new BullMQOtel({\n  tracerName: 'my-app',\n  enableMetrics: true,\n});\n```\n\n{% hint style=\"info\" %}\nMake sure to set up the meter provider before creating BullMQ instances with telemetry enabled.\n{% endhint %}"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/traces.md#19",
+    "text": "## Exporting Traces\n\nTo export traces to an observability backend, configure an OpenTelemetry trace exporter:\n\n```typescript\nimport { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';\nimport { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';\nimport { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';\nimport { trace } from '@opentelemetry/api';\n\n// Configure the trace exporter\nconst traceExporter = new OTLPTraceExporter({\n  url: 'http://localhost:4318/v1/traces',\n});\n\nconst provider = new NodeTracerProvider();\nprovider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));\nprovider.register();\n\n// Now BullMQOtel will automatically use the registered provider\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/metrics.md#13",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/telemetry/traces.md#19",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/telemetry/metrics.md#13",
+    "b": "bullmq:docs/gitbook/guide/telemetry/traces.md#19",
+    "relation": "unrelated",
+    "related": 0.0269,
+    "probabilities": {
+     "same": 0.0076,
+     "overlapping": 0.0112,
+     "conflicting": 0.0082,
+     "unrelated": 0.9731
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 117
+  },
+  "timing": {
+   "read_ms": 117,
+   "total_ms": 118
+  }
+ }
+}

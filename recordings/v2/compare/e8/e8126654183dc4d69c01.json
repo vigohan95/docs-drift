@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/e8/e8126654183dc4d69c01",
+ "request_hash": "e8126654183dc4d69c01e2d4c56f301f5a2afb43973d144152bc342d28056d20",
+ "recorded_at": "2026-11-09T07:23:40Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 944,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "87.295486",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=33,cfOrigin;dur=0,cfWorker;dur=225"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "text": "# Stalled\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore. For manually fetching jobs check this [pattern](https://docs.bullmq.io/patterns/manually-fetching-jobs#checking-for-stalled-jobs)\n{% endhint %}\n\nWhen a job is in an active state (i.e. it is being processed by a worker), it needs to continuously update the queue to notify that the worker is still working on the job. This mechanism prevents a worker that crashes or enters an endless loop from keeping a job in an active state forever.\n\nWhen a worker is not able to notify the queue that it is still working on a given job, that job is moved back to the waiting list, or to the failed set. We then say that the job has stalled and the queue will emit the 'stalled' event.\n\n{% hint style=\"info\" %}\nThere is not a 'stalled' state, only a 'stalled' event emitted when a job is automatically moved from _active_ to _waiting_ state.\n{% endhint %}\n\nIf a job stalls more than a predefined limit (see the [`maxStalledCount` option](https://docs.bullmq.io/api/interfaces/v6.WorkerOptions.html#maxstalledcount)), the job will be failed permanently with the error \"_job stalled more than allowable limit_\". The default is 1, as stalled jobs should be a rare occurrence, but you can increase this number if needed.\n\nIn order to avoid stalled jobs, make sure that your worker does not keep the Node.js event loop too busy. The default max stalled check duration is 30 seconds, so as long as you do not perform CPU operations exceeding that value you should not get stalled jobs.\n\nAnother way to reduce the chance of stalled jobs is using so-called \"sandboxed\" processors. In this case, the workers will spawn new separate Node.js processes, running separately from the main process.\n\n{% code title=\"main.ts\" %}\n```typescript\nimport { Worker } from 'bullmq';\n\nconst worker = new Worker('Paint', painter);\n```\n{% endcode %}\n\n{% code title=\"painter.ts\" %}\n```typescript\nexport default = (job) => {\n    // Paint something\n}\n```\n{% endcode %}"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "text": "# Rate limiting\n\nBullMQ provides queue rate limiting. It is possible to configure workers so that they obey a given rate limiting option:\n\n```typescript\nimport { Worker, QueueScheduler } from 'bullmq';\n\nconst worker = new Worker('painter', async job => paintCar(job), {\n  limiter: {\n    max: 10,\n    duration: 1000,\n  },\n});\n\nconst scheduler = new QueueScheduler('painter');\n```\n\n{% hint style=\"warning\" %}\nJobs that get rate limited will actually stay in the waiting state.\n{% endhint %}\n\n{% hint style=\"danger\" %}\nFrom BullMQ 2.0 and onwards, the `QueueScheduler` is not needed anymore.\n{% endhint %}\n\n{% hint style=\"info\" %}\nThe rate limiter is global, so if you have for example 10 workers for one queue with the above settings, still only 10 jobs will be processed by second.\n{% endhint %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/stalled.md#0",
+    "b": "bullmq:docs/gitbook/guide/rate-limiting.md#0",
+    "relation": "overlapping",
+    "related": 0.9948,
+    "probabilities": {
+     "same": 0.0091,
+     "overlapping": 0.9779,
+     "conflicting": 0.0078,
+     "unrelated": 0.0052
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 62,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 92,
+   "total_ms": 95
+  }
+ }
+}

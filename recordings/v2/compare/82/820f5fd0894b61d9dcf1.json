@@ -1,0 +1,80 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/82/820f5fd0894b61d9dcf1",
+ "request_hash": "820f5fd0894b61d9dcf1de7b6f02e60699122e1072d5c3851532f61a5cd38940",
+ "recorded_at": "2026-11-09T07:23:47Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 826,
+ "response_headers": {
+  "x-clocked-credits": "2",
+  "x-clocked-model-ms": "27.345312",
+  "x-clocked-cost-usd": "0.000398",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=18,cfOrigin;dur=0,cfWorker;dur=155"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#0",
+    "text": "# Repeatable\n\n{% hint style=\"danger\" %}\nNote: these APIs were deprecated from BullMQ version 5.16.0 onwards and have been **removed** in v6 in favor of [\"Job Schedulers\"](../job-schedulers/), which provide a more cohesive and more robust API for handling repeatable jobs.\n\nThe `repeat` option on `Queue.add`/`Queue.addBulk`, the `Repeat` class, and the `getRepeatableJobs`, `removeRepeatable` and `removeRepeatableByKey` methods are no longer available. The examples on this page are kept for historical reference only — use [Job Schedulers](../job-schedulers/) (`upsertJobScheduler`, `getJobSchedulers`, `removeJobScheduler`) instead. If you are upgrading an existing installation, follow the [v5 to v6 migration guide](../migrations/migrate-from-v5-to-v6.md) before deploying v6.\n{% endhint %}\n\nIn BullMQ v5, repeatable jobs were stored as a repeat configuration plus delayed jobs generated from that configuration. In BullMQ v6 this legacy model is replaced by Job Schedulers, which store scheduler metadata under scheduler keys and enqueue normal delayed jobs for each run.\n\nThe Repeatable Job configuration is not a job, so it will not show up in methods like `getJobs()`. To manage Repeatable Job configurations, use [`getRepeatableJobs()`](https://docs.bullmq.io/api/classes/v5.Queue.html#getrepeatablejobs) and similar. This also means repeated jobs do **not** participate in evaluating `jobId` uniqueness - that is, a non-repeatable job can have the same `jobId` as a Repeatable Job configuration, and two Repeatable Job configurations can have the same `jobId` as long as they have different repeat options."
+   },
+   {
+    "id": "bullmq:docs/gitbook/patterns/throttle-jobs.md#0",
+    "text": "# Throttle jobs\n\nSometimes, you may want to enqueue a job in reaction to a frequently occurring event, without running that job for _every_ event. For example, you may want to send an email to a user when they update their profile, but you don't want to send an email for every single update if they make many changes in rapid succession. \n\nYou can achieve this by setting an identical `jobId` (using `JobsOptions.jobId?: string` to override the default unique integer) so **\"identical\" jobs are considered duplicates and not added to the queue**. If you use this option, it is up to you to ensure the `jobId` is unique.\n\n{% hint style=\"warning\" %}\nHint: Be careful if using `removeOnComplete`/`removeOnFailed` options, since a removed job will not count as existing and a new job with the same job ID could be added to the queue without being detected as a duplicate.\n{% endhint %}\n\nexample:\n\n```typescript\nimport { Job, Queue, Worker } from 'bullmq';\n\nconst myQueue = new Queue('Paint');\n\nconst worker = new Worker('Paint', async (job: Job) => {\n  console.log('Do something with job');\n  return 'some value';\n});\n\nworker.on('completed', (job: Job, returnvalue: any) => {\n  console.log('worker done painting', new Date());\n});\n\nworker.on('failed', (job: Job, error: Error) => {\n  console.error('worker fail painting', job, error, new Date());\n});\n\n// Add only one job that will be delayed at least 1 second.\nmyQueue.add('house', { color: 'white' }, { delay: 1000, jobId: 'house' });\nmyQueue.add('house', { color: 'white' }, { delay: 1000, jobId: 'house' });\nmyQueue.add('house', { color: 'white' }, { delay: 1000, jobId: 'house' });\nmyQueue.add('house', { color: 'white' }, { delay: 1000, jobId: 'house' });\nmyQueue.add('house', { color: 'white' }, { delay: 1000, jobId: 'house' });\nmyQueue.add('house', { color: 'white' }, { delay: 1000, jobId: 'house' });\nmyQueue.add('house', { color: 'white' }, { delay: 1000, jobId: 'house' });\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/patterns/throttle-jobs.md#0",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/jobs/repeatable.md#0",
+    "b": "bullmq:docs/gitbook/patterns/throttle-jobs.md#0",
+    "relation": "unrelated",
+    "related": 0.0168,
+    "probabilities": {
+     "same": 0.005,
+     "overlapping": 0.0055,
+     "conflicting": 0.0063,
+     "unrelated": 0.9832
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31
+  },
+  "timing": {
+   "read_ms": 31,
+   "total_ms": 32
+  }
+ }
+}

@@ -1,0 +1,489 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/9f/9fda9e2a8941ad87e39f",
+ "request_hash": "9fda9e2a8941ad87e39f672ce50d95ea84f6b09b1550dc9d0fd08f72295f3135",
+ "recorded_at": "2026-11-09T07:19:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2558,
+ "response_headers": {
+  "x-clocked-credits": "29",
+  "x-clocked-model-ms": "718.625917",
+  "x-clocked-cost-usd": "0.005777",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=1551"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Client.md#2",
+    "text": "### `new Client(url[, options])`\n\n<!-- YAML\nadded: v1.0.0\n-->\n\n* `url` {URL|string} The origin to connect to. Only the protocol, hostname, and\n  port are used.\n* `options` {Object} (optional)\n  * `bodyTimeout` {number|null} The timeout, in milliseconds, after which a\n    request times out while receiving body data. Monitors the time between\n    consecutive body chunks. Use `0` to disable it entirely. **Default:**\n    `300e3`.\n  * `headersTimeout` {number|null} The timeout, in milliseconds, the parser\n    waits to receive the complete HTTP headers before the request times out. Use\n    `0` to disable it entirely. **Default:** `300e3`.\n    HTTP/1.1 headers/body parser timeouts are not guaranteed to fire with exact\n    millisecond precision: delays up to 1000ms use native timers, while larger\n    delays use undici's lower-overhead fast timers with a target resolution\n    around 500ms.\n  * `connectTimeout` {number|null} The timeout, in milliseconds, for\n    establishing a socket connection. Use `0` to disable it entirely.\n    **Default:** `10e3`.\n  * `keepAliveTimeout` {number|null} The timeout, in milliseconds, after which a\n    socket with no active requests times out. Monitors the time between activity\n    on a connected socket. This value may be overridden by *keep-alive* hints\n    from the server. **Default:** `4e3`.\n  * `keepAliveMaxTimeout` {number|null} The maximum allowed `keepAliveTimeout`,\n    in milliseconds, when overridden by *keep-alive* hints from the server.\n    **Default:** `600e3`.\n  * `keepAliveTimeoutThreshold` {number|null} A number of milliseconds\n    subtracted from server *keep-alive* hints when overriding `keepAliveTimeout`,\n    to account for timing inaccuracies caused by e.g. transport latency.\n    **Default:** `2e3`.\n  * `maxHeaderSize` {number|null} The maximum length of request headers, in\n    bytes. **Default:** the value of Node.js' `--max-http-header-size` or\n    `16384` (16 KiB).\n  * `maxResponseSize` {number|null} The maximum length of a response body, in\n    bytes. Set to `-1` to disable it. **Default:** `-1`.\n  * `maxRequestsPerClient` {number|null} The maximum number of requests to send\n    over a single connection before the socket is reset. Use `0` to disable this\n    limit. **Default:** `null`.\n  * `localAddress` {string|null} The local IP address the socket should connect\n    from. **Default:** `null`.\n  * `pipelining` {number|null} The number of concurrent requests sent over the\n    single connection, per [RFC 7230, section 6.3.2][]. Only enable values\n    greater than `1` when the remote server is trusted. Set to `0` to disable\n    keep-alive connections. Has no effect once HTTP/2 is negotiated; see\n    `maxConcurrentStreams` for the HTTP/2 dispatch ceiling. **Default:** `1`.\n  * `connect` {Object|Function|null} Configures how connections are established.\n    Either a `ConnectOptions` object passed to the built-in\n    [`buildConnector`][] (every [`tls.connect()`][] option is accepted, plus the\n    fields below), or a custom connector function with the signature\n    `(options, callback)`. **Default:** `null`.\n    * `socketPath` {string|null} An IPC endpoint, either a Unix domain socket or\n      a Windows named pipe. **Default:** `null`.\n    * `maxCachedSessions` {number|null} The maximum number of cached TLS\n      sessions. Use `0` to disable TLS session caching. **Default:** `100`.\n    * `timeout` {number|null} The connection timeout, in milliseconds.\n      **Default:** `10e3`.\n    * `servername` {string|null} The TLS server name used for SNI."
+   },
+   {
+    "id": "undici:docs/docs/api/H2CClient.md#2",
+    "text": "### `new H2CClient(url[, options])`\n\n<!-- YAML\nadded: v7.7.0\n-->\n\n* `url` {URL|string} The origin to connect to. Should include only the protocol,\n  hostname, and port. Only the `http:` protocol is supported.\n* `options` {H2CClientOptions} (optional)\n  * `maxConcurrentStreams` {number} The maximum number of concurrent HTTP/2\n    streams for the session. The server's `SETTINGS_MAX_CONCURRENT_STREAMS` can\n    lower this limit, but not raise it. Must be a positive integer.\n    **Default:** `100`.\n  * `pipelining` {number} The number of concurrent requests multiplexed over the\n    single connection. For an `H2CClient` this is aliased to\n    `maxConcurrentStreams` and may not exceed it. Must be a positive integer.\n    **Default:** `100`.\n  * `maxHeaderSize` {number} The maximum length of request headers in bytes.\n    **Default:** Node.js' `--max-http-header-size` or `16384` (16 KiB).\n  * `headersTimeout` {number} The amount of time, in milliseconds, the parser\n    waits to receive the complete HTTP headers. **Default:** `300e3`.\n  * `connectTimeout` {number} The timeout for establishing a socket connection,\n    in milliseconds. Use `0` to disable it entirely. **Default:** `10e3`.\n  * `bodyTimeout` {number} The timeout, in milliseconds, after which a request\n    times out. Monitors the time between received body data. Use `0` to disable\n    it entirely. **Default:** `300e3`.\n  * `keepAliveTimeout` {number} The timeout, in milliseconds, after which a\n    socket without active requests times out. May be overridden by _keep-alive_\n    hints from the server. **Default:** `4e3`.\n  * `keepAliveMaxTimeout` {number} The maximum allowed `keepAliveTimeout`, in\n    milliseconds, when overridden by _keep-alive_ hints from the server.\n    **Default:** `600e3`.\n  * `keepAliveTimeoutThreshold` {number} A number of milliseconds subtracted from\n    server _keep-alive_ hints when overriding `keepAliveTimeout`, to account for\n    timing inaccuracies such as transport latency. **Default:** `1e3`.\n  * `socketPath` {string} An IPC endpoint, either a Unix domain socket or a\n    Windows named pipe. **Default:** `null`.\n  * `strictContentLength` {boolean} If `true`, an error is thrown when the\n    request `content-length` header does not match the length of the request\n    body. **Default:** `true`.\n  * `maxCachedSessions` {number} The maximum number of TLS sessions cached by the\n    built-in connector. Use `0` to disable TLS session caching. **Default:** `100`.\n  * `connect` {Object|Function} Connector options passed to `buildConnector`, or\n    a custom connector function. The `allowH2` option may not be set here.\n    **Default:** `null`.\n  * `maxRequestsPerClient` {number} The maximum number of requests to send over\n    a single connection before it is reset. Use `0` to disable this limit.\n    **Default:** `null`.\n  * `localAddress` {string} The local IP address the socket should connect from.\n  * `maxResponseSize` {number} The maximum allowed response body size in bytes.\n    Use `-1` to disable. **Default:** `-1`.\n  * `autoSelectFamily` {boolean} Enables a family autodetection algorithm that\n    loosely implements section 5 of [RFC 8305][]. Ignored if not supported by the\n    current Node.js version.\n  * `autoSelectFamilyAttemptTimeout` {number} The amount of time, in\n    milliseconds, to wait for a connection attempt to finish before trying the\n    next address when `autoSelectFamily` is enabled."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Client.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/H2CClient.md#2"
+    ],
+    "conflicts": [
+     "undici:docs/docs/api/H2CClient.md#2"
+    ]
+   },
+   {
+    "id": "undici:docs/docs/api/H2CClient.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/Client.md#2"
+    ],
+    "conflicts": [
+     "undici:docs/docs/api/Client.md#2"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:docs/docs/api/Client.md#2",
+    "b": "undici:docs/docs/api/H2CClient.md#2",
+    "relation": "overlapping",
+    "related": 0.994,
+    "probabilities": {
+     "same": 0.0143,
+     "overlapping": 0.9124,
+     "conflicting": 0.0673,
+     "unrelated": 0.006
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0063,
+       "restated": 0.9822,
+       "elaborated": 0.0065,
+       "different": 0.005
+      },
+      "confidence": 0.947,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "Only the protocol, hostname, and",
+       "start": 110,
+       "end": 142,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Should include only the protocol,\n  hostname, and port.",
+       "start": 113,
+       "end": 168,
+       "confidence": 0.947
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0142,
+       "restated": 0.921,
+       "elaborated": 0.0363,
+       "different": 0.0285
+      },
+      "confidence": 0.95,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "* `maxHeaderSize` {number|null} The maximum length of request headers, in",
+       "start": 1773,
+       "end": 1846,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Must be a positive integer.\n    **Default:** `100`.\n  * `maxHeaderSize` {number} The maximum length of request headers in bytes.\n    **Default:** Node.js' `--max-http-header-size` or `16384` (16 KiB).\n  * `headersTimeout` {number} The amount of time, in milliseconds, the parser\n    waits to receive the complete HTTP headers.",
+       "start": 691,
+       "end": 1017,
+       "confidence": 0.95
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0138,
+       "restated": 0.9448,
+       "elaborated": 0.0305,
+       "different": 0.0109
+      },
+      "confidence": 0.9891,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "* `connectTimeout` {number|null} The timeout, in milliseconds, for",
+       "start": 896,
+       "end": 962,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `300e3`.\n  * `connectTimeout` {number} The timeout for establishing a socket connection,\n    in milliseconds.",
+       "start": 1018,
+       "end": 1140,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.718,
+       "restated": 0.1142,
+       "elaborated": 0.0867,
+       "different": 0.081
+      },
+      "confidence": 0.919,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "Use `0` to disable it entirely.",
+       "start": 1001,
+       "end": 1032,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Use `0` to disable it entirely.",
+       "start": 1141,
+       "end": 1172,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0215,
+       "restated": 0.8519,
+       "elaborated": 0.1076,
+       "different": 0.019
+      },
+      "confidence": 0.981,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "* `connectTimeout` {number|null} The timeout, in milliseconds, for",
+       "start": 896,
+       "end": 962,
+       "confidence": 0.996
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `10e3`.\n  * `bodyTimeout` {number} The timeout, in milliseconds, after which a request\n    times out.",
+       "start": 1173,
+       "end": 1287,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0117,
+       "restated": 0.9379,
+       "elaborated": 0.0383,
+       "different": 0.0121
+      },
+      "confidence": 0.9879,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "Monitors the time between",
+       "start": 317,
+       "end": 342,
+       "confidence": 0.997
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Monitors the time between received body data.",
+       "start": 1288,
+       "end": 1333,
+       "confidence": 0.999
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.6879,
+       "restated": 0.1685,
+       "elaborated": 0.0778,
+       "different": 0.0657
+      },
+      "confidence": 0.9343,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "Use `0` to disable it entirely.",
+       "start": 1001,
+       "end": 1032,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Use `0` to disable\n    it entirely.",
+       "start": 1334,
+       "end": 1369,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0107,
+       "restated": 0.9643,
+       "elaborated": 0.0172,
+       "different": 0.0078
+      },
+      "confidence": 0.9922,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "* `headersTimeout` {number|null} The timeout, in milliseconds, the parser",
+       "start": 432,
+       "end": 505,
+       "confidence": 0.998
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `300e3`.\n  * `keepAliveTimeout` {number} The timeout, in milliseconds, after which a\n    socket without active requests times out.",
+       "start": 1370,
+       "end": 1513,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0232,
+       "restated": 0.9554,
+       "elaborated": 0.0122,
+       "different": 0.0092
+      },
+      "confidence": 0.9908,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "This value may be overridden by *keep-alive* hints",
+       "start": 1247,
+       "end": 1297,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "May be overridden by _keep-alive_\n    hints from the server.",
+       "start": 1514,
+       "end": 1574,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0315,
+       "restated": 0.8037,
+       "elaborated": 0.0757,
+       "different": 0.0891
+      },
+      "confidence": 0.591,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "**Default:** the value of Node.js' `--max-http-header-size` or",
+       "start": 1858,
+       "end": 1920,
+       "confidence": 0.675
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `1e3`.\n  * `socketPath` {string} An IPC endpoint, either a Unix domain socket or a\n    Windows named pipe.",
+       "start": 1986,
+       "end": 2105,
+       "confidence": 0.591
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.033,
+       "restated": 0.8555,
+       "elaborated": 0.0693,
+       "different": 0.0423
+      },
+      "confidence": 0.9577,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "* `socketPath` {string|null} An IPC endpoint, either a Unix domain socket or",
+       "start": 3108,
+       "end": 3184,
+       "confidence": 0.978
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `true`.\n  * `maxCachedSessions` {number} The maximum number of TLS sessions cached by the\n    built-in connector.",
+       "start": 2289,
+       "end": 2415,
+       "confidence": 0.996
+      }
+     },
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.8488,
+       "restated": 0.1247,
+       "elaborated": 0.0123,
+       "different": 0.0142
+      },
+      "confidence": 0.9858,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "Use `0` to disable TLS session caching.",
+       "start": 3323,
+       "end": 3362,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Use `0` to disable TLS session caching.",
+       "start": 2416,
+       "end": 2455,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0171,
+       "restated": 0.8736,
+       "elaborated": 0.0733,
+       "different": 0.036
+      },
+      "confidence": 0.714,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "* `connect` {Object|Function|null} Configures how connections are established.",
+       "start": 2767,
+       "end": 2845,
+       "confidence": 0.714
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `100`.\n  * `connect` {Object|Function} Connector options passed to `buildConnector`, or\n    a custom connector function.",
+       "start": 2456,
+       "end": 2589,
+       "confidence": 0.991
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0156,
+       "restated": 0.9406,
+       "elaborated": 0.0288,
+       "different": 0.015
+      },
+      "confidence": 0.973,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "Use `0` to disable this",
+       "start": 2215,
+       "end": 2238,
+       "confidence": 0.973
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "Use `0` to disable this limit.\n    **Default:** `null`.\n  * `localAddress` {string} The local IP address the socket should connect from.\n  * `maxResponseSize` {number} The maximum allowed response body size in bytes.\n    Use `-1` to disable.",
+       "start": 2781,
+       "end": 3022,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": [
+     {
+      "kind": "value",
+      "kinds": {
+       "value": 0.9308,
+       "date_or_version": 0.0118,
+       "rule_or_condition": 0.0082,
+       "scope": 0.0313,
+       "name": 0.0103,
+       "no_conflict": 0.0075
+      },
+      "confidence": 0.9925,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "**Default:** `2e3`.",
+       "start": 1751,
+       "end": 1770,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `4e3`.\n  * `keepAliveMaxTimeout` {number} The maximum allowed `keepAliveTimeout`, in\n    milliseconds, when overridden by _keep-alive_ hints from the server.\n    **Default:** `600e3`.\n  * `keepAliveTimeoutThreshold` {number} A number of milliseconds subtracted from\n    server _keep-alive_ hints when overriding `keepAliveTimeout`, to account for\n    timing inaccuracies such as transport latency.",
+       "start": 1575,
+       "end": 1985,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "value",
+      "kinds": {
+       "value": 0.5012,
+       "date_or_version": 0.0292,
+       "rule_or_condition": 0.0214,
+       "scope": 0.3787,
+       "name": 0.0358,
+       "no_conflict": 0.0336
+      },
+      "confidence": 0.9664,
+      "a": {
+       "document": "undici:docs/docs/api/Client.md#2",
+       "quote": "**Default:** `2e3`.",
+       "start": 1751,
+       "end": 1770,
+       "confidence": 0.996
+      },
+      "b": {
+       "document": "undici:docs/docs/api/H2CClient.md#2",
+       "quote": "**Default:** `1e3`.\n  * `socketPath` {string} An IPC endpoint, either a Unix domain socket or a\n    Windows named pipe.",
+       "start": 1986,
+       "end": 2105,
+       "confidence": 0.999
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 151,
+   "passage_reads": 1,
+   "passages_ms": 349,
+   "passages": 19,
+   "counterparts_ms": 655,
+   "kinds_ms": 150
+  },
+  "timing": {
+   "read_ms": 1304,
+   "total_ms": 1310
+  }
+ }
+}

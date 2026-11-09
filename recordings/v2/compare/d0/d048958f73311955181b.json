@@ -1,0 +1,117 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/d0/d048958f73311955181b",
+ "request_hash": "d048958f73311955181b7305800b034ad884a10287e04e5cb5c5d3a4e53f64b6",
+ "recorded_at": "2026-11-09T07:23:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1054,
+ "response_headers": {
+  "x-clocked-credits": "8",
+  "x-clocked-model-ms": "183.918812",
+  "x-clocked-cost-usd": "0.001594",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=22,cfOrigin;dur=0,cfWorker;dur=336"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/getting-started.md#0",
+    "text": "## Creating a relay\n\nCreate one `Relay` per process. It uses the same connection options as\nqueues and workers, and it is safe to share it between all the code of that\nprocess.\n\n{% tabs %}\n{% tab title=\"Redis\" %}\n\n```typescript\nimport { Relay } from 'bullmq';\n\nconst relay = new Relay({\n  connection: { host: 'localhost', port: 6379 },\n});\n\nawait relay.waitUntilReady();\n```\n\n{% endtab %}\n{% tab title=\"PostgreSQL\" %}\n\n```typescript\nimport { Relay, createPostgresRelayBackend } from 'bullmq';\n\nconst relay = new Relay({\n  connection: {\n    connectionString: 'postgres://user:password@localhost:5432/app',\n    migrate: true, // or run the migrations yourself, see below\n  },\n  backend: createPostgresRelayBackend,\n});\n\nawait relay.waitUntilReady();\n```\n\n{% endtab %}\n{% endtabs %}\n\n`waitUntilReady()` resolves once the node is registered and reading its\ninbox. You don't have to await it: `subscribe` and `publish` wait for it.\n\nOn Redis, the relay requires Redis 6.2 or newer (or a compatible server).\nOn PostgreSQL, it requires the `0004_relay` migration, for its tables and\nfunctions. Run your migrations as usual (see the\n[PostgreSQL backend](../postgresql.md#migrations) guide) after upgrading\nBullMQ, or pass `migrate: true` as above.\n\nIf you supply an existing `pg.Pool`, set `max >= 2`: the relay holds one\nconnection for `LISTEN` and needs another for commands. Allow one listener\nconnection per relay sharing that pool, plus capacity for queries. A pool\nconfiguration object can use `max: 1`, since its listener connects separately."
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/reference.md#3",
+    "text": "## Methods\n\n| Method                              | Returns                       | Description                                                                      |\n| ----------------------------------- | ----------------------------- | -------------------------------------------------------------------------------- |\n| `subscribe(pattern, listener)`      | `Promise<RelaySubscription>`  | Subscribes to a topic or pattern. Exact topics get their retained message first. |\n| `publish(topic, data, { retain? })` | `Promise<RelayPublishResult>` | Publishes on a concrete topic. `retain` in ms keeps it as the retained message.  |\n| `deleteRetained(topic)`             | `Promise<boolean>`            | Deletes a topic's retained message; `false` if it had none.                      |\n| `waitUntilReady()`                  | `Promise<void>`               | Resolves once the node is registered and reading its inbox.                      |\n| `close()`                           | `Promise<void>`               | Unregisters the node and closes its connections. Idempotent.                     |\n\n`RelaySubscription`: `{ pattern, unsubscribe(): Promise<void> }`.\n\n`retain` must be a non-negative safe integer in milliseconds. Omit it or use\n`0` to publish without retention.\n\n`RelayPublishResult`: `{ mid, nodes, endpoints }`, the message id and how\nmany nodes and subscriptions it was delivered to.\n\n`RelayMessage<T>`: `{ topic, data: T, mid, ts, retained }`."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/getting-started.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/relay/reference.md#3"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/relay/reference.md#3",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/relay/getting-started.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/relay/getting-started.md#0",
+    "b": "bullmq:docs/gitbook/guide/relay/reference.md#3",
+    "relation": "overlapping",
+    "related": 0.9963,
+    "probabilities": {
+     "same": 0.0064,
+     "overlapping": 0.9854,
+     "conflicting": 0.0045,
+     "unrelated": 0.0037
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.9794,
+       "restated": 0.01,
+       "elaborated": 0.0062,
+       "different": 0.0043
+      },
+      "confidence": 0.9957,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/relay/getting-started.md#0",
+       "quote": "`waitUntilReady()` resolves once the node is registered and reading its",
+       "start": 781,
+       "end": 852,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/relay/reference.md#3",
+       "quote": "|\n| `waitUntilReady()`                  | `Promise<void>`               | Resolves once the node is registered and reading its inbox.",
+       "start": 785,
+       "end": 918,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 31,
+   "passage_reads": 1,
+   "passages_ms": 94,
+   "passages": 1,
+   "counterparts_ms": 69
+  },
+  "timing": {
+   "read_ms": 194,
+   "total_ms": 198
+  }
+ }
+}

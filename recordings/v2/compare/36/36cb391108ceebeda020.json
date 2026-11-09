@@ -1,0 +1,120 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/36/36cb391108ceebeda020",
+ "request_hash": "36cb391108ceebeda0209264212e9e120405cb1d96533e6a55f1ef94afaaf5f1",
+ "recorded_at": "2026-11-09T07:23:50Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1136,
+ "response_headers": {
+  "x-clocked-credits": "6",
+  "x-clocked-model-ms": "137.370689",
+  "x-clocked-cost-usd": "0.001195",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=256"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/connections.md#15",
+    "text": "### Queue\n\nAlso note that simple Queue instance used for managing the queue such as adding jobs, pausing, using getters, etc. usually has different requirements from the worker.\n\nFor example, say that you are adding jobs to a queue as the result of a call to an HTTP endpoint - producer service. The caller of this endpoint cannot wait forever if the connection to Redis happens to be down when this call is made. Therefore the `maxRetriesPerRequest` setting should either be left at its default (which currently is 20) or set it to another value, maybe 1 so that the user gets an error quickly and can retry later.\n\nOn the other hand, if you are adding jobs inside a Worker processor, this process is expected to happen in the background - consumer service. In this case you can share the same connection.\n\nFor more details, refer to the [persistent connections](https://docs.bullmq.io/bull/patterns/persistent-connections) page.\n\n{% hint style=\"danger\" %}\nWhen using ioredis connections, be careful not to use the \"keyPrefix\" option in [ioredis](https://redis.github.io/ioredis/interfaces/CommonRedisOptions.html#keyPrefix) as this option is not compatible with BullMQ, which provides its own key prefixing mechanism by using [prefix](https://docs.bullmq.io/api/interfaces/v6.QueueOptions.html#prefix) option.\n{% endhint %}\n\nIf you can afford many connections, by all means just use them. Redis connections have quite low overhead, so you should not need to care about reusing connections unless your service provider imposes hard limitations.\n\n{% hint style=\"danger\" %}\nMake sure that your redis instance has the setting\n\n`maxmemory-policy=noeviction`\n\nin order to avoid automatic removal of keys which would cause unexpected errors in BullMQ\n{% endhint %}"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/going-to-production.md#5",
+    "text": "#### `maxRetriesPerRequest`\n\nThis option sets a limit on the number of times a retry on a failed request will be performed. For `Worker`s using ioredis, it is important to set this option to **`null`**. Otherwise, the exceptions raised by Redis when calling certain commands could break the worker functionality. When instantiating a `Worker` this option will always be set to `null` by default, but it could be overridden, either if passing an existing ioredis instance or by passing a different value for this option when instantiating the `Worker`. In both cases BullMQ will output a warning; please make sure to address this warning as it can have several unintended consequences."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/connections.md#15",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "bullmq:docs/gitbook/guide/going-to-production.md#5"
+    ]
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/going-to-production.md#5",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": [
+     "bullmq:docs/gitbook/guide/connections.md#15"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/connections.md#15",
+    "b": "bullmq:docs/gitbook/guide/going-to-production.md#5",
+    "relation": "conflicting",
+    "related": 0.9864,
+    "probabilities": {
+     "same": 0.0089,
+     "overlapping": 0.4307,
+     "conflicting": 0.5467,
+     "unrelated": 0.0136
+    },
+    "duplicates": [],
+    "conflicts": [
+     {
+      "kind": "scope",
+      "kinds": {
+       "value": 0.0023,
+       "date_or_version": 0.002,
+       "rule_or_condition": 0.0043,
+       "scope": 0.9856,
+       "name": 0.0028,
+       "no_conflict": 0.0029
+      },
+      "confidence": 0.9971,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/connections.md#15",
+       "quote": "Therefore the `maxRetriesPerRequest` setting should either be left at its default (which currently is 20) or set it to another value, maybe 1 so that the user gets an error quickly and can retry later.",
+       "start": 414,
+       "end": 615,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/going-to-production.md#5",
+       "quote": "For `Worker`s using ioredis, it is important to set this option to **`null`**.",
+       "start": 124,
+       "end": 202,
+       "confidence": 0.998
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 25,
+   "passage_reads": 1,
+   "passages_ms": 56,
+   "passages": 1,
+   "counterparts_ms": 47,
+   "kinds_ms": 17
+  },
+  "timing": {
+   "read_ms": 145,
+   "total_ms": 149
+  }
+ }
+}

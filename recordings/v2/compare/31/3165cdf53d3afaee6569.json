@@ -1,0 +1,85 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/31/3165cdf53d3afaee6569",
+ "request_hash": "3165cdf53d3afaee6569b07d79938f2117ed825be23494574aa2d116484af4e5",
+ "recorded_at": "2026-11-09T07:19:30Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 1957,
+ "response_headers": {
+  "x-clocked-credits": "5",
+  "x-clocked-model-ms": "106.168516",
+  "x-clocked-cost-usd": "0.000996",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=944"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#3",
+    "text": "### `dispatcher.connect(options[, callback])`\n\n<!-- YAML\nadded: v4.0.0\n-->\n\n* `options` {Object}\n  * `origin` {string|URL} The origin to connect to.\n  * `path` {string} The request path.\n  * `headers` {UndiciHeaders} Request headers. **Default:** `null`.\n  * `signal` {AbortSignal|EventEmitter|null} A signal used to abort the request.\n    **Default:** `null`.\n  * `opaque` {any} An opaque value passed through to the returned `ConnectData`.\n  * `responseHeaders` {string|null} Set to `'raw'` to return the response headers\n    as a raw array instead of an object. **Default:** `null`.\n* `callback` {Function} (optional) Invoked when the connection is established.\n  * `error` {Error|null}\n  * `data` {Object}\n    * `statusCode` {number}\n    * `headers` {Object} The response headers.\n    * `socket` {Duplex} The established socket.\n    * `opaque` {any} The `opaque` value passed in `options`.\n* Returns: {Promise} A `Promise` is returned only when `callback` is omitted. It\n  resolves with the `data` object described above.\n\nStarts two-way communications with the requested resource using the\n[HTTP `CONNECT`][] method.\n\n```mjs\nimport { createServer } from 'node:http'\nimport { Client } from 'undici'\nimport { once } from 'node:events'\n\nconst server = createServer((request, response) => {\n  throw new Error('should never get here')\n}).listen()\n\nserver.on('connect', (req, socket, head) => {\n  socket.write('HTTP/1.1 200 Connection established\\r\\n\\r\\n')\n\n  let data = head.toString()\n  socket.on('data', (buf) => {\n    data += buf.toString()\n  })\n\n  socket.on('end', () => {\n    socket.end(data)\n  })\n})\n\nawait once(server, 'listening')\n\nconst client = new Client(`http://localhost:${server.address().port}`)\n\ntry {\n  const { socket } = await client.connect({ path: '/' })\n  const wanted = 'Body'\n  let data = ''\n  socket.on('data', d => { data += d })\n  socket.on('end', () => {\n    console.log(`Data received: ${data.toString()} | Data wanted: ${wanted}`)\n    client.close()\n    server.close()\n  })\n  socket.write(wanted)\n  socket.end()\n} catch (error) {}\n```"
+   },
+   {
+    "id": "undici:docs/docs/api/H2CClient.md#6",
+    "text": "### `h2cClient.connect(options[, callback])`\n\n<!-- YAML\nadded: v7.7.0\n-->\n\n* `options` {Object}\n  * `path` {string}\n  * `headers` {Object} (optional) **Default:** `null`.\n  * `signal` {AbortSignal|EventEmitter|null} (optional) **Default:** `null`.\n  * `opaque` {any} (optional) An opaque value passed through to the returned\n    connect data.\n  * `responseHeaders` {string|null} (optional) Set to `'raw'` to return the\n    response headers as a raw array instead of an object. **Default:** `null`.\n* `callback` {Function} (optional) Invoked with `(err, data)` once the connection\n  is established. If omitted, a `Promise` is returned instead.\n* Returns: {Promise|undefined} A `Promise` resolving to the connect data, when\n  `callback` is not provided.\n\nStarts an HTTP `CONNECT` request. See [`dispatcher.connect(options[, callback])`][]."
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "clean",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Dispatcher.md#3",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   },
+   {
+    "id": "undici:docs/docs/api/H2CClient.md#6",
+    "duplicates": [],
+    "overlaps": [],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:docs/docs/api/Dispatcher.md#3",
+    "b": "undici:docs/docs/api/H2CClient.md#6",
+    "relation": "overlapping",
+    "related": 0.9857,
+    "probabilities": {
+     "same": 0.0122,
+     "overlapping": 0.9627,
+     "conflicting": 0.0108,
+     "unrelated": 0.0143
+    },
+    "duplicates": [],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 235,
+   "passage_reads": 1,
+   "passages_ms": 472,
+   "passages": 0
+  },
+  "timing": {
+   "read_ms": 707,
+   "total_ms": 710
+  }
+ }
+}

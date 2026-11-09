@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SEARCHED = "2026-11-07"
+SEARCHED = "2026-11-07"  # undici: 2026-11-09
 
 DEFECTS = [
     # ------------------------------------------------------------------ fastify
@@ -220,12 +220,39 @@ DEFECTS = [
         "findings": ["c4746c62b4"],
         "patch": "rollup/01-introduction-es-modules-support.patch",
     },
+    # ------------------------------------------------------------------ undici (later run)
+    {
+        "id": "undici-keepalive-threshold-default", "project": "undici",
+        "title": "The default of keepAliveTimeoutThreshold",
+        "a": {"path": "docs/docs/api/Client.md", "lines": [66, 69],
+              "quote": "  * `keepAliveTimeoutThreshold` {number|null} A number of milliseconds\n    subtracted from server *keep-alive* hints when overriding `keepAliveTimeout`,\n    to account for timing inaccuracies caused by e.g. transport latency.\n    **Default:** `2e3`."},
+        "b": {"path": "docs/docs/api/H2CClient.md", "lines": [80, 82],
+              "quote": "  * `keepAliveTimeoutThreshold` {number} A number of milliseconds subtracted from\n    server _keep-alive_ hints when overriding `keepAliveTimeout`, to account for\n    timing inaccuracies such as transport latency. **Default:** `1e3`."},
+        "wrong": "b",
+        "source": "lib/dispatcher/client.js:311 uses 2e3 when the option is unset, and H2CClient passes it through unchanged; #3145 changed it from 1e3. types/client.d.ts:61 and types/h2c-client.d.ts:43 also still said 1e3. The same PR fixes the H2CClient pipelining default in types/h2c-client.d.ts:47, found while checking.",
+        "found_by": "later run on 2026-11-09, outside the measured 15 projects (47 pairs read): /compare flagged it; the checks did not run because the run's credit cap was reached",
+        "findings": [], "later_findings": ["e493661deb"], "report": "reports/later/undici.json",
+        "patch_note": "Fixed directly in the upstream pull request.",
+    },
 ]
+
+# Projects scanned after the measurements, with the commit each defect is pinned to. They are not demo
+# targets and are not counted in review/summary.json.
+LATER = {
+    "undici": {"repo": "nodejs/undici", "commit": "691eb164daad1daff297c98b87494bdd92bcc3b3"},
+}
+
+
+def target_of(project: str) -> dict:
+    from docsdrift.targets import TARGETS
+    return TARGETS.get(project) or LATER[project]
+
 
 UPSTREAM_SEARCH = (
     f"Searched each upstream repository's issues and pull requests on {SEARCHED} (gh search, read-only) "
     "for the file name and the key terms of each defect. No open or closed issue or PR about any of them was found. "
-    "typeorm PR #12025 is the merged PR that introduced the update example."
+    "typeorm PR #12025 is the merged PR that introduced the update example. "
+    "undici was searched on 2026-11-09: open PR #6172 fixes a different line of the same option list, nothing about this default."
 )
 
 
@@ -255,9 +282,8 @@ def check() -> int:
 
 def entries():
     out = []
-    from docsdrift.targets import TARGETS
     for d in DEFECTS:
-        t = TARGETS[d["project"]]
+        t = target_of(d["project"])
         e = dict(d)
         e["repo"], e["commit"] = t["repo"], t["commit"]
         for side in ("a", "b"):

@@ -1,0 +1,189 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/48/480181ce69d001dc3d8b",
+ "request_hash": "480181ce69d001dc3d8b0210de601847435da310fc9c1f769515e8f504119161",
+ "recorded_at": "2026-11-09T07:23:43Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2281,
+ "response_headers": {
+  "x-clocked-credits": "9",
+  "x-clocked-model-ms": "216.770559",
+  "x-clocked-cost-usd": "0.001793",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=20,cfOrigin;dur=0,cfWorker;dur=353"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/README.md#0",
+    "text": "# Workers\n\nWorkers are the actual instances that perform some job based on the jobs that are added in the queue. A worker is equivalent to a \"message\" receiver in a traditional message queue. The worker's duty is to complete the job. If it succeeds, the job will be moved to the \"completed\" status. If the worker throws an exception during its processing, the job will automatically be moved to the \"failed\" status.\n\n{% hint style=\"info\" %}\nFailed jobs can be automatically retried, see [Retrying failing jobs](../retrying-failing-jobs.md)\n{% endhint %}\n\nA worker is instantiated with the `Worker` class, and the work itself will be performed in the _process function_. Process functions are meant to be asynchronous, using either the `async` keyword or returning a promise.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nimport { Worker, Job } from 'bullmq';\n\nconst worker = new Worker(queueName, async (job: Job) => {\n  // Optionally report some progress\n  await job.updateProgress(42);\n\n  // Optionally sending an object as progress\n  await job.updateProgress({ foo: 'bar' });\n\n  // Do something with job\n  return 'some value';\n});\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nfrom bullmq import Worker\n\nasync def process(job, token):\n    # Optionally report some progress\n    await job.updateProgress(42)\n\n    # Optionally sending an object as progress\n    await job.updateProgress({\"foo\": \"bar\"})\n\n    # Do something with job\n    return \"some value\"\n\nworker = Worker(queue_name, process)\n```"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers.md#0",
+    "text": "# Workers\n\nWorkers are the actual instances that perform some job based on the jobs that are added in the queue. A worker is equivalent to a \"message\" receiver in a traditional message queue. The worker duty is to complete the job, if it succeeds the job will be moved to the \"completed\" status. If the worker throws an exception during its processing, the job will automatically be moved to the \"failed\" status.\n\n{% hint style=\"info\" %}\nFailed jobs can be automatically retried, see [Retrying failing jobs](retrying-failing-jobs.md)\n{% endhint %}\n\nA worker is instantiated with the Worker class, and the work itself will be performed in the process function. Process functions are meant to be asynchronous so either use the \"async\" keyword or return a promise.\n\n```typescript\nimport { Worker, Job } from 'bullmq';\n\nconst worker = new Worker(queueName, async (job: Job) => {\n  // Do something with job\n  return 'some value';\n});\n```\n\nNote that a processor can optionally return a value. This value can be retrieved either by getting the job and accessing the \"returnvalue\" property or by listening to the \"completed\" event:\n\n```typescript\nworker.on('completed', (job: Job, returnvalue: any) => {\n  // Do something with the return value.\n});\n```\n\nInside the worker process function it is also possible to emit progress events. Calling \"job.progress\" you can specify a number or an object if you have more complex needs. The \"progress\" event can be listened in the same way as the \"completed\" event:"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/workers/README.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/workers.md#0"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/workers.md#0",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/workers/README.md#0"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/workers/README.md#0",
+    "b": "bullmq:docs/gitbook/guide/workers.md#0",
+    "relation": "overlapping",
+    "related": 0.9982,
+    "probabilities": {
+     "same": 0.0038,
+     "overlapping": 0.9913,
+     "conflicting": 0.0031,
+     "unrelated": 0.0018
+    },
+    "duplicates": [
+     {
+      "kind": "verbatim",
+      "kinds": {
+       "verbatim": 0.9916,
+       "restated": 0.0034,
+       "elaborated": 0.0028,
+       "different": 0.0021
+      },
+      "confidence": 0.9979,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/workers/README.md#0",
+       "quote": "A worker is equivalent to a \"message\" receiver in a traditional message queue.",
+       "start": 113,
+       "end": 191,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/workers.md#0",
+       "quote": "A worker is equivalent to a \"message\" receiver in a traditional message queue.",
+       "start": 113,
+       "end": 191,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0072,
+       "restated": 0.9829,
+       "elaborated": 0.0057,
+       "different": 0.0043
+      },
+      "confidence": 0.9957,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/workers/README.md#0",
+       "quote": "The worker's duty is to complete the job.",
+       "start": 192,
+       "end": 233,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/workers.md#0",
+       "quote": "The worker duty is to complete the job, if it succeeds the job will be moved to the \"completed\" status.",
+       "start": 192,
+       "end": 295,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0088,
+       "restated": 0.9799,
+       "elaborated": 0.0066,
+       "different": 0.0046
+      },
+      "confidence": 0.9954,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/workers/README.md#0",
+       "quote": "If the worker throws an exception during its processing, the job will automatically be moved to the \"failed\" status.",
+       "start": 299,
+       "end": 415,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/workers.md#0",
+       "quote": "If the worker throws an exception during its processing, the job will automatically be moved to the \"failed\" status.\n\n{% hint style=\"info\" %}\nFailed jobs can be automatically retried, see [Retrying failing jobs](retrying-failing-jobs.md)\n{% endhint %}\n\nA worker is instantiated with the Worker class, and the work itself will be performed in the process function.",
+       "start": 296,
+       "end": 659,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0147,
+       "restated": 0.7778,
+       "elaborated": 0.1403,
+       "different": 0.0672
+      },
+      "confidence": 0.9328,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/workers/README.md#0",
+       "quote": "Process functions are meant to be asynchronous, using either the `async` keyword or returning a promise.",
+       "start": 670,
+       "end": 774,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/workers.md#0",
+       "quote": "Process functions are meant to be asynchronous so either use the \"async\" keyword or return a promise.\n\n```typescript\nimport { Worker, Job } from 'bullmq';\n\nconst worker = new Worker(queueName, async (job: Job) => {\n  // Do something with job\n  return 'some value';\n});\n```\n\nNote that a processor can optionally return a value.",
+       "start": 660,
+       "end": 986,
+       "confidence": 0.988
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 33,
+   "passage_reads": 1,
+   "passages_ms": 93,
+   "passages": 5,
+   "counterparts_ms": 100
+  },
+  "timing": {
+   "read_ms": 225,
+   "total_ms": 229
+  }
+ }
+}

@@ -1,0 +1,199 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/c5/c53c37fb1321dcc88e8c",
+ "request_hash": "c53c37fb1321dcc88e8c14a31815683c86d3be7403dd97f1fe9ea529c884f22b",
+ "recorded_at": "2026-11-09T07:19:31Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2399,
+ "response_headers": {
+  "x-clocked-credits": "17",
+  "x-clocked-model-ms": "403.289028",
+  "x-clocked-cost-usd": "0.003386",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=21,cfOrigin;dur=0,cfWorker;dur=1454"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Interceptors.md#5",
+    "text": "## `interceptors.redirect([opts])`\n\nFollows HTTP redirects (3xx responses) automatically.\n\n**Parameters**\n\n* `opts` {Object} (optional)\n  * `maxRedirections` {number} Maximum number of redirects to follow. Passing\n    `0` disables redirect following entirely. **Default:** `undefined`\n    (inherits from the per-request `maxRedirections` option).\n  * `throwOnMaxRedirect` {boolean} When `true`, throws an error when a\n    redirect would be followed but the redirect limit has been reached, instead\n    of returning that redirect response. A non-redirect response after exactly\n    `maxRedirections` redirects is returned normally. **Default:** `false`.\n  * `stripHeadersOnRedirect` {string[]} List of header names to remove from\n    the request when following any redirect. **Default:** `[]`.\n  * `stripHeadersOnCrossOriginRedirect` {string[]} List of header names to\n    remove from the request when following a cross-origin redirect (i.e. the\n    redirect target has a different origin). Useful for stripping\n    `Authorization` on cross-origin hops. **Default:** `[]`.\n\nPer-request override: any of the four options above can also be set directly\non the dispatch options to override the interceptor defaults for a specific\nrequest.\n\n**Returns:** {Dispatcher.DispatcherComposeInterceptor}\n\n**Example**\n\n```js\nimport { Agent, interceptors } from 'undici'\n\nconst agent = new Agent().compose(\n  interceptors.redirect({\n    maxRedirections: 10,\n    throwOnMaxRedirect: true,\n    stripHeadersOnCrossOriginRedirect: ['authorization', 'cookie']\n  })\n)\n```\n\n---"
+   },
+   {
+    "id": "undici:docs/docs/api/RedirectHandler.md#2",
+    "text": "### `new RedirectHandler(dispatch, maxRedirections, opts, handler)`\n\n<!-- YAML\nadded: v4.0.0\n-->\n\n* `dispatch` {Function} The dispatch function used to issue the original request\n  and every subsequent redirect. Called as `dispatch(options, handler)`.\n* `maxRedirections` {number|null} The maximum number of redirects to follow. Must\n  be a non-negative integer or `null`. When `null` or `0`, no redirects are\n  followed and redirect responses are passed through to the wrapped `handler`.\n* `opts` {DispatchOptions} The dispatch options for the request. In addition to\n  the standard dispatch options, the following redirect-specific fields are\n  recognized:\n  * `throwOnMaxRedirect` {boolean} When `true`, an error is thrown when a\n    redirect would be followed but `maxRedirections` has been reached, instead of\n    returning that redirect response. A non-redirect response after exactly\n    `maxRedirections` redirects is returned normally. **Default:** `false`.\n  * `stripHeadersOnRedirect` {string[]} Header names to remove from the request on\n    every redirect hop. **Default:** `null`.\n  * `stripHeadersOnCrossOriginRedirect` {string[]} Additional header names to\n    remove from the request when a redirect points to a different origin.\n    **Default:** `null`.\n* `handler` {DispatchHandler} The downstream handler that receives the lifecycle\n  callbacks for the final response.\n\nThrows an [`InvalidArgumentError`][] when `maxRedirections` is not a non-negative\ninteger, when `throwOnMaxRedirect` is not a boolean, or when either\n`stripHeadersOnRedirect` or `stripHeadersOnCrossOriginRedirect` is not an array of\nheader-name strings.\n\n```mjs\nimport { Client, RedirectHandler } from 'undici'\n\nconst client = new Client('http://example.com')\nconst dispatch = client.dispatch.bind(client)\n\nconst handler = new RedirectHandler(dispatch, 5, {\n  method: 'GET',\n  path: '/',\n  origin: 'http://example.com',\n}, {\n  onRequestStart () {},\n  onResponseStart (controller, statusCode, headers) {\n    console.log(statusCode)\n  },\n  onResponseData (controller, chunk) {},\n  onResponseEnd () {},\n})\n\ndispatch({ method: 'GET', path: '/', origin: 'http://example.com' }, handler)\n```"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "conflicts",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "undici:docs/docs/api/Interceptors.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/RedirectHandler.md#2"
+    ],
+    "conflicts": [
+     "undici:docs/docs/api/RedirectHandler.md#2"
+    ]
+   },
+   {
+    "id": "undici:docs/docs/api/RedirectHandler.md#2",
+    "duplicates": [],
+    "overlaps": [
+     "undici:docs/docs/api/Interceptors.md#5"
+    ],
+    "conflicts": [
+     "undici:docs/docs/api/Interceptors.md#5"
+    ]
+   }
+  ],
+  "pairs": [
+   {
+    "a": "undici:docs/docs/api/Interceptors.md#5",
+    "b": "undici:docs/docs/api/RedirectHandler.md#2",
+    "relation": "overlapping",
+    "related": 0.9903,
+    "probabilities": {
+     "same": 0.0143,
+     "overlapping": 0.9099,
+     "conflicting": 0.0662,
+     "unrelated": 0.0097
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0076,
+       "restated": 0.9749,
+       "elaborated": 0.009,
+       "different": 0.0085
+      },
+      "confidence": 0.9915,
+      "a": {
+       "document": "undici:docs/docs/api/Interceptors.md#5",
+       "quote": "* `throwOnMaxRedirect` {boolean} When `true`, throws an error when a",
+       "start": 349,
+       "end": 417,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/RedirectHandler.md#2",
+       "quote": "In addition to\n  the standard dispatch options, the following redirect-specific fields are\n  recognized:\n  * `throwOnMaxRedirect` {boolean} When `true`, an error is thrown when a\n    redirect would be followed but `maxRedirections` has been reached, instead of\n    returning that redirect response.",
+       "start": 554,
+       "end": 852,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.5004,
+       "restated": 0.475,
+       "elaborated": 0.0127,
+       "different": 0.0119
+      },
+      "confidence": 0.9881,
+      "a": {
+       "document": "undici:docs/docs/api/Interceptors.md#5",
+       "quote": "A non-redirect response after exactly",
+       "start": 539,
+       "end": 576,
+       "confidence": 1
+      },
+      "b": {
+       "document": "undici:docs/docs/api/RedirectHandler.md#2",
+       "quote": "A non-redirect response after exactly\n    `maxRedirections` redirects is returned normally.",
+       "start": 853,
+       "end": 944,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0245,
+       "restated": 0.8447,
+       "elaborated": 0.0313,
+       "different": 0.0994
+      },
+      "confidence": 0.9006,
+      "a": {
+       "document": "undici:docs/docs/api/Interceptors.md#5",
+       "quote": "* `throwOnMaxRedirect` {boolean} When `true`, throws an error when a",
+       "start": 349,
+       "end": 417,
+       "confidence": 0.993
+      },
+      "b": {
+       "document": "undici:docs/docs/api/RedirectHandler.md#2",
+       "quote": "**Default:** `false`.\n  * `stripHeadersOnRedirect` {string[]} Header names to remove from the request on\n    every redirect hop.",
+       "start": 945,
+       "end": 1073,
+       "confidence": 0.995
+      }
+     }
+    ],
+    "conflicts": [
+     {
+      "kind": "scope",
+      "kinds": {
+       "value": 0.0854,
+       "date_or_version": 0.0189,
+       "rule_or_condition": 0.1942,
+       "scope": 0.6502,
+       "name": 0.0248,
+       "no_conflict": 0.0265
+      },
+      "confidence": 0.723,
+      "a": {
+       "document": "undici:docs/docs/api/Interceptors.md#5",
+       "quote": "**Default:** `[]`.",
+       "start": 774,
+       "end": 792,
+       "confidence": 0.723
+      },
+      "b": {
+       "document": "undici:docs/docs/api/RedirectHandler.md#2",
+       "quote": "**Default:** `false`.\n  * `stripHeadersOnRedirect` {string[]} Header names to remove from the request on\n    every redirect hop.",
+       "start": 945,
+       "end": 1073,
+       "confidence": 0.997
+      }
+     }
+    ]
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [
+   0
+  ],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 174,
+   "passage_reads": 1,
+   "passages_ms": 142,
+   "passages": 4,
+   "counterparts_ms": 392,
+   "kinds_ms": 525
+  },
+  "timing": {
+   "read_ms": 1233,
+   "total_ms": 1243
+  }
+ }
+}

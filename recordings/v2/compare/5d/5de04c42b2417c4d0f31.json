@@ -1,0 +1,165 @@
+{
+ "endpoint": "compare",
+ "tag": "v2/compare/5d/5de04c42b2417c4d0f31",
+ "request_hash": "5de04c42b2417c4d0f314b7f82f77c714693d5eac32041a2a669960ba6292ad1",
+ "recorded_at": "2026-11-09T07:23:39Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 2201,
+ "response_headers": {
+  "x-clocked-credits": "11",
+  "x-clocked-model-ms": "251.533125",
+  "x-clocked-cost-usd": "0.002191",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=10,cfOrigin;dur=0,cfWorker;dur=388"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/job-schedulers/repeat-strategies.md#8",
+    "text": "### Custom Strategy\n\nIt is possible to define a different strategy to schedule repeatable jobs. The idea is that the repeat strategy, based on a pattern and the latest job's milliseconds, return the next desired timestamp. Although not used in the following example, you could have different behaviours on your repeat strategies based on the current job's name if you want to. However note that **only** **one** repeatStrategy can be defined for a given queue.\n\nFor example we can create a custom one for [RRULE](https://jkbrzt.github.io/rrule/) like this:\n\n```typescript\nimport { Queue, Worker } from 'bullmq';\nimport { rrulestr } from 'rrule';\n\nconst settings = {\n  repeatStrategy: (millis: number, opts: RepeatOptions, _jobName: string) => {\n    const currentDate =\n      opts.startDate && new Date(opts.startDate) > new Date(millis)\n        ? new Date(opts.startDate)\n        : new Date(millis);\n\n    const rrule = rrulestr(opts.pattern);\n\n    if (rrule.origOptions.count && !rrule.origOptions.dtstart) {\n      throw new Error('DTSTART must be defined to use COUNT with rrule');\n    }\n\n    const next_occurrence = rrule.after(currentDate, false);\n    return next_occurrence?.getTime();\n  },\n};\n\nconst myQueue = new Queue('Paint', { settings });\n\n// Repeat job every 10 seconds\nawait myQueue.upsertJobScheduler(\n  'collibris',\n  {\n    pattern: 'RRULE:FREQ=SECONDLY;INTERVAL=10;WKST=MO',\n  },\n  {\n    data: { color: 'green' },\n  },\n);\n\n// Repeat job every 20 seconds\nawait myQueue.upsertJobScheduler(\n  'pingeons',\n  {\n    pattern: 'RRULE:FREQ=SECONDLY;INTERVAL=20;WKST=MO',\n  },\n  {\n    data: { color: 'gray' },\n  },\n);\n\nconst worker = new Worker(\n  'Paint',\n  async () => {\n    doSomething();\n  },\n  { settings },\n);\n```\n\n{% hint style=\"danger\" %}\nAs you may have noticed, the repeat strategy setting should be provided in **both** the Queue and Worker classes. The reason we need it in both places is that when we first add the job to the Queue, we need to calculate when the next iteration will occur. After that, the Worker takes over, and we use the settings configured in the Worker.\n{% endhint %}"
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#5",
+    "text": "### Repeat Strategy\n\nBy default, we are using [cron-parser](https://www.npmjs.com/package/cron-parser) in the default repeat strategy for cron expressions.\n\nIt is possible to define a different strategy to schedule repeatable jobs. For example we can create a custom one for RRULE:\n\n```typescript\nimport { Queue, QueueScheduler, Worker } from 'bullmq';\nimport { rrulestr } from 'rrule';\n\nconst settings = {\n  repeatStrategy: (millis, opts) => {\n    const currentDate =\n      opts.startDate && new Date(opts.startDate) > new Date(millis)\n        ? new Date(opts.startDate)\n        : new Date(millis);\n    const rrule = rrulestr(opts.pattern);\n    if (rrule.origOptions.count && !rrule.origOptions.dtstart) {\n      throw new Error('DTSTART must be defined to use COUNT with rrule');\n    }\n\n    const next_occurrence = rrule.after(currentDate, false);\n    return next_occurrence?.getTime();\n  },\n};\n\nconst myQueueScheduler = new QueueScheduler('Paint');\nconst myQueue = new Queue('Paint', { settings });\n\n// Repeat job every 10 seconds\nawait myQueue.add(\n  'bird',\n  { color: 'green' },\n  {\n    repeat: {\n      pattern: 'RRULE:FREQ=SECONDLY;INTERVAL=;WKST=MO',\n    },\n    jobId: 'colibri',\n  },\n);\n\nawait myQueue.add(\n  'bird',\n  { color: 'gray' },\n  {\n    repeat: {\n      pattern: 'RRULE:FREQ=SECONDLY;INTERVAL=;WKST=MO',\n    },\n    jobId: 'pigeon',\n  },\n);\n\nconst worker = new Worker(\n  'Paint',\n  async () => {\n    doSomething();\n  },\n  { settings },\n);\n```\n\n{% hint style=\"warning\" %}\nAs you may notice, the repeat strategy setting should be provided in `Queue` and `Worker` classes. The reason we need in **both** places is because the first time we add the job to the `Queue` we need to calculate when is the next iteration, but after that the `Worker` takes over and we use the worker settings.\n{% endhint %}\n\n{% hint style=\"info\" %}\nThe repeat strategy function receives an optional `jobName` third parameter.\n{% endhint %}"
+   }
+  ],
+  "evidence": "flagged",
+  "instructions": "The documents are sections of the documentation of ONE open-source project at one commit. Report a conflict only when two sections make incompatible statements about the SAME option, flag, default value, limit, version requirement, or behavior, for the same product version and scope. These are NOT conflicts: values of different options; example values in code samples that merely override a default; statements explicitly scoped to an older version or to migration history; one section giving more detail than the other; different defaults that the text ties to different contexts (per-route vs global, dev vs build, agent mode vs server mode)."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "verdict": "overlaps",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "evidence": "flagged",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/job-schedulers/repeat-strategies.md#8",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/jobs/repeatable.md#5"
+    ],
+    "conflicts": []
+   },
+   {
+    "id": "bullmq:docs/gitbook/guide/jobs/repeatable.md#5",
+    "duplicates": [],
+    "overlaps": [
+     "bullmq:docs/gitbook/guide/job-schedulers/repeat-strategies.md#8"
+    ],
+    "conflicts": []
+   }
+  ],
+  "pairs": [
+   {
+    "a": "bullmq:docs/gitbook/guide/job-schedulers/repeat-strategies.md#8",
+    "b": "bullmq:docs/gitbook/guide/jobs/repeatable.md#5",
+    "relation": "overlapping",
+    "related": 0.998,
+    "probabilities": {
+     "same": 0.0065,
+     "overlapping": 0.9878,
+     "conflicting": 0.0038,
+     "unrelated": 0.002
+    },
+    "duplicates": [
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.05,
+       "restated": 0.7742,
+       "elaborated": 0.1492,
+       "different": 0.0267
+      },
+      "confidence": 0.9733,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/job-schedulers/repeat-strategies.md#8",
+       "quote": "For example we can create a custom one for [RRULE](https://jkbrzt.github.io/rrule/) like this:",
+       "start": 462,
+       "end": 556,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/jobs/repeatable.md#5",
+       "quote": "For example we can create a custom one for RRULE:\n\n```typescript\nimport { Queue, QueueScheduler, Worker } from 'bullmq';\nimport { rrulestr } from 'rrule';\n\nconst settings = {\n  repeatStrategy: (millis, opts) => {\n    const currentDate =\n      opts.startDate && new Date(opts.startDate) > new Date(millis)\n        ?",
+       "start": 232,
+       "end": 546,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0274,
+       "restated": 0.8871,
+       "elaborated": 0.0688,
+       "different": 0.0168
+      },
+      "confidence": 0.9832,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/job-schedulers/repeat-strategies.md#8",
+       "quote": "```typescript",
+       "start": 558,
+       "end": 571,
+       "confidence": 0.999
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/jobs/repeatable.md#5",
+       "quote": "new Date(opts.startDate)\n        : new Date(millis);\n    const rrule = rrulestr(opts.pattern);\n    if (rrule.origOptions.count && !rrule.origOptions.dtstart) {\n      throw new Error('DTSTART must be defined to use COUNT with rrule');\n    }\n\n    const next_occurrence = rrule.after(currentDate, false);\n    return next_occurrence?.getTime();\n  },\n};\n\nconst myQueueScheduler = new QueueScheduler('Paint');\nconst myQueue = new Queue('Paint', { settings });\n\n// Repeat job every 10 seconds\nawait myQueue.add(\n  'bird',\n  { color: 'green' },\n  {\n    repeat: {\n      pattern: 'RRULE:FREQ=SECONDLY;INTERVAL=;WKST=MO',\n    },\n    jobId: 'colibri',\n  },\n);\n\nawait myQueue.add(\n  'bird',\n  { color: 'gray' },\n  {\n    repeat: {\n      pattern: 'RRULE:FREQ=SECONDLY;INTERVAL=;WKST=MO',\n    },\n    jobId: 'pigeon',\n  },\n);\n\nconst worker = new Worker(\n  'Paint',\n  async () => {\n    doSomething();\n  },\n  { settings },\n);\n```\n\n{% hint style=\"warning\" %}\nAs you may notice, the repeat strategy setting should be provided in `Queue` and `Worker` classes.",
+       "start": 547,
+       "end": 1584,
+       "confidence": 1
+      }
+     },
+     {
+      "kind": "restated",
+      "kinds": {
+       "verbatim": 0.0176,
+       "restated": 0.931,
+       "elaborated": 0.0427,
+       "different": 0.0087
+      },
+      "confidence": 0.9913,
+      "a": {
+       "document": "bullmq:docs/gitbook/guide/job-schedulers/repeat-strategies.md#8",
+       "quote": "The reason we need it in both places is that when we first add the job to the Queue, we need to calculate when the next iteration will occur.",
+       "start": 1866,
+       "end": 2007,
+       "confidence": 1
+      },
+      "b": {
+       "document": "bullmq:docs/gitbook/guide/jobs/repeatable.md#5",
+       "quote": "The reason we need in **both** places is because the first time we add the job to the `Queue` we need to calculate when is the next iteration, but after that the `Worker` takes over and we use the worker settings.\n{% endhint %}\n\n{% hint style=\"info\" %}\nThe repeat strategy function receives an optional `jobName` third parameter.\n{% endhint %}",
+       "start": 1585,
+       "end": 1928,
+       "confidence": 1
+      }
+     }
+    ],
+    "conflicts": []
+   }
+  ],
+  "duplicates": [],
+  "overlaps": [
+   0
+  ],
+  "conflicts": [],
+  "related_pairs": [
+   0
+  ],
+  "stages": {
+   "pairs_reread": 0,
+   "pairs_ms": 35,
+   "passage_reads": 1,
+   "passages_ms": 95,
+   "passages": 4,
+   "counterparts_ms": 132
+  },
+  "timing": {
+   "read_ms": 261,
+   "total_ms": 265
+  }
+ }
+}

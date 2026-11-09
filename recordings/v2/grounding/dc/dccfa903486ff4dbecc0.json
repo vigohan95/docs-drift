@@ -1,0 +1,76 @@
+{
+ "endpoint": "grounding",
+ "tag": "v2/grounding/dc/dccfa903486ff4dbecc0",
+ "request_hash": "dccfa903486ff4dbecc00989a4319c2e2daff0963ede78ba7144637910446c71",
+ "recorded_at": "2026-11-09T07:23:53Z",
+ "status": 200,
+ "attempts": 1,
+ "round_trip_ms": 995,
+ "response_headers": {
+  "x-clocked-credits": "4",
+  "x-clocked-model-ms": "87.697279",
+  "x-clocked-cost-usd": "0.000797",
+  "x-clocked-cost-basis": "reference",
+  "x-clocked-transport": "door:east",
+  "server-timing": "cfEdge;dur=17,cfOrigin;dur=0,cfWorker;dur=274"
+ },
+ "request": {
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/flows/remove-dependency.md#0",
+    "text": "# Remove Dependency\n\nIn some situations, you may have a parent job and need to remove the relationship when one of its children fail.\n\nThe pattern to solve this requirement consists on using the **removeDependencyOnFailure** option. This option will make sure that when a job fails, the dependency is removed from the parent, so the parent will complete without waiting for the failed children.\n\n{% tabs %}\n{% tab title=\"TypeScript\" %}\n\n```typescript\nconst flow = new FlowProducer({ connection });\n\nconst originalTree = await flow.add({\n  name: 'root-job',\n  queueName: 'topQueueName',\n  data: {},\n  children: [\n    {\n      name,\n      data: { idx: 0, foo: 'bar' },\n      queueName: 'childrenQueueName',\n      opts: { removeDependencyOnFailure: true },\n      children: [\n        {\n          name,\n          data: { idx: 1, foo: 'bah' },\n          queueName: 'grandChildrenQueueName',\n        },\n        {\n          name,\n          data: { idx: 2, foo: 'baz' },\n          queueName: 'grandChildrenQueueName',\n        },\n      ],\n    },\n    {\n      name,\n      data: { idx: 3, foo: 'foo' },\n      queueName: 'childrenQueueName',\n    },\n  ],\n});\n```\n\n{% endtab %}\n\n{% tab title=\"Python\" %}\n\n```python\nflow = FlowProducer({\"connection\": connection})\n\noriginalTree = await flow.add({\n    \"name\": \"root-job\",\n    \"queueName\": \"topQueueName\",\n    \"data\": {},\n    \"children\": [\n        {\n            \"name\": name,\n            \"data\": {\"idx\": 0, \"foo\": \"bar\"},\n            \"queueName\": \"childrenQueueName\",\n            \"opts\": {\"removeDependencyOnFailure\": True},\n            \"children\": [\n                {\n                    \"name\": name,\n                    \"data\": {\"idx\": 1, \"foo\": \"bah\"},\n                    \"queueName\": \"grandChildrenQueueName\",\n                },\n                {\n                    \"name\": name,\n                    \"data\": {\"idx\": 2, \"foo\": \"baz\"},\n                    \"queueName\": \"grandChildrenQueueName\",\n                },\n            ],\n        },\n        {\n            \"name\": name,\n            \"data\": {\"idx\": 3, \"foo\": \"foo\"},\n            \"queueName\": \"childrenQueueName\",\n        },\n    ],\n})\n```"
+   }
+  ],
+  "answer": "opts: { ignoreDependencyOnFailure: true }, children: [ { name, data: { idx: 1, foo: 'bah' }, queueName: 'grandChildrenQueueName', }, { name, data: { idx: 2, foo: 'baz' }, queueName: 'grandChildrenQueueName', }, ], }, { name, data: { idx: 3, foo: 'foo' }, queueName: 'childrenQueueName',",
+  "claims": [
+   "opts: { ignoreDependencyOnFailure: true }, children: [ { name, data: { idx: 1, foo: 'bah' }, queueName: 'grandChildrenQueueName', }, { name, data: { idx: 2, foo: 'baz' }, queueName: 'grandChildrenQueueName', }, ], }, { name, data: { idx: 3, foo: 'foo' }, queueName: 'childrenQueueName',"
+  ],
+  "evidence": "all",
+  "instructions": "The statement and the source are two sections of the same project's documentation at the same version. Mark the statement contradicted only when the source states an incompatible value, version, limit, name or rule for the same thing in the same scope. If the source is about a different option, hook, function, package or version, the statement is not stated, not contradicted. An example value in a code sample that overrides a default does not contradict the default."
+ },
+ "response": {
+  "model": "clocked-1.0",
+  "grounded": 0.008,
+  "ungrounded": 0.992,
+  "verdict": "contradicted",
+  "threshold": 0.5,
+  "instructions_used": "custom",
+  "documents": [
+   {
+    "id": "bullmq:docs/gitbook/guide/flows/remove-dependency.md#0",
+    "share": 0,
+    "share_of_answer": 0.008,
+    "claims": []
+   }
+  ],
+  "claims": [
+   {
+    "claim": "opts: { ignoreDependencyOnFailure: true }, children: [ { name, data: { idx: 1, foo: 'bah' }, queueName: 'grandChildrenQueueName', }, { name, data: { idx: 2, foo: 'baz' }, queueName: 'grandChildrenQueueName', }, ], }, { name, data: { idx: 3, foo: 'foo' }, queueName: 'childrenQueueName',",
+    "kind": "claim",
+    "counted": true,
+    "weight": 1,
+    "supported": 0.008,
+    "contradicted": 0.9399,
+    "not_stated": 0.0453,
+    "not_a_claim": 0.0067,
+    "verdict": "contradicted",
+    "sources": {
+     "bullmq:docs/gitbook/guide/flows/remove-dependency.md#0": 1
+    },
+    "source": null
+   }
+  ],
+  "unsupported_claims": [
+   0
+  ],
+  "not_claims": [],
+  "weakest_claim": {
+   "index": 0,
+   "supported": 0.008
+  },
+  "timing": {
+   "read_ms": 94,
+   "total_ms": 96
+  }
+ }
+}
