@@ -17,7 +17,7 @@ in `server.py`. All of it is tested offline (`tests/test_live_service.py`).
 
 This is the second instance. The first one (`45-76-12-121.sslip.io`, started 2026-11-07) was removed from the hosting
 account on 2026-11-09 at 17:19 UTC, and the page showed recorded answers only until this one was built with the same
-files on 2026-11-10 at 16:50 UTC. The first instance's ledger went with its disk: it had spent at least 427 of its
+files on 2026-11-10 at 16:36 UTC. The first instance's ledger went with its disk: it had spent at least 427 of its
 3,500 credits, and the exact figure is not known. For that reason this instance runs with `LIVE_BUDGET=1500`, which
 stays inside the account's 20,000 credits even if the first one had spent its whole budget.
 
