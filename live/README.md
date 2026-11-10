@@ -12,14 +12,20 @@ A small HTTP service that lets a visitor of the demo page run the real pipeline 
 Standard library only. The logic and the limits are in `service.py`, the GitHub reader in `github.py`, the HTTP front
 in `server.py`. All of it is tested offline (`tests/test_live_service.py`).
 
-**Status: running** at `https://45-76-12-121.sslip.io` (`/api/status` shows the budget), called by the demo page.
+**Status: running** at `https://140-82-43-53.sslip.io` (`/api/status` shows the budget), called by the demo page.
 `review/live.json` holds the address; with an empty address the page shows only the recorded answers of its examples.
+
+This is the second instance. The first one (`45-76-12-121.sslip.io`, started 2026-11-07) was removed from the hosting
+account on 2026-11-09 at 17:19 UTC, and the page showed recorded answers only until this one was built with the same
+files on 2026-11-10 at 16:50 UTC. The first instance's ledger went with its disk: it had spent at least 427 of its
+3,500 credits, and the exact figure is not known. For that reason this instance runs with `LIVE_BUDGET=1500`, which
+stays inside the account's 20,000 credits even if the first one had spent its whole budget.
 
 ## Limits
 
 | What | Limit |
 |---|---|
-| Total credits the service may spend | 3,500 (`LIVE_BUDGET`), read from its own ledger before every request |
+| Total credits the service may spend | 3,500 (`LIVE_BUDGET`) by default, 1,500 on the running instance; read from its own ledger before every request |
 | One pair check | at most 60 credits |
 | One repository scan | at most 300 credits, 24 pairs, 150 seconds |
 | Per address | 10 pair checks and 2 scans per hour |
@@ -67,7 +73,8 @@ recorded Clocked answers (no key, no credits).
   the account's credit does not cover a month.
 - `setup.sh <ip-with-dashes>.sslip.io`: swap, Caddy (which gets the certificate), the service under systemd as an
   unprivileged user.
-- Then add `CLOCKED_API_KEY=...` to `/etc/docsdrift-live.env` (mode 600), restart, put the address in `review/live.json`
+- Then add `CLOCKED_API_KEY=...` to `/etc/docsdrift-live.env` (mode 600), set `LIVE_BUDGET` there if it should differ
+  from the default, restart, put the address in `review/live.json`
   and run `python scripts/build_site.py`.
 
 The instance is the cheapest plan with an IPv4 address (`vc2-1c-0.5gb`, 1 CPU, 512 MB). That plan cannot take Ubuntu

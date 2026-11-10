@@ -24,7 +24,7 @@ credits on the projects measured.
 
 The "Try it live" block at the top of the demo page runs the same pipeline on real calls: paste two passages (or use
 one of three real pairs) to see what `/compare` in both orders and `/grounding` each concluded, or give a public
-GitHub repository to scan. It has a budget of 3,500 credits and allows 10 pair checks and 2 scans per hour per
+GitHub repository to scan. It has a budget of 1,500 credits and allows 10 pair checks and 2 scans per hour per
 address, and a scan reads at most 24 pairs, so it finds less than the command line tool. The page shows the credits
 left; if the budget is used up or the service is down, the examples show recorded answers and the page says so. The
 service and its limits are in `live/`.
