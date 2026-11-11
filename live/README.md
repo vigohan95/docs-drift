@@ -12,14 +12,16 @@ A small HTTP service that lets a visitor of the demo page run the real pipeline 
 Standard library only. The logic and the limits are in `service.py`, the GitHub reader in `github.py`, the HTTP front
 in `server.py`. All of it is tested offline (`tests/test_live_service.py`).
 
-**Status: running** at `https://140-82-43-53.sslip.io` (`/api/status` shows the budget), called by the demo page.
+**Status: running** at `https://108-61-82-7.sslip.io` (`/api/status` shows the budget), called by the demo page.
 `review/live.json` holds the address; with an empty address the page shows only the recorded answers of its examples.
 
-This is the second instance. The first one (`45-76-12-121.sslip.io`, started 2026-11-07) was removed from the hosting
-account on 2026-11-09 at 17:19 UTC, and the page showed recorded answers only until this one was built with the same
-files on 2026-11-10 at 16:36 UTC. The first instance's ledger went with its disk: it had spent at least 427 of its
-3,500 credits, and the exact figure is not known. For that reason this instance runs with `LIVE_BUDGET=1500`, which
-stays inside the account's 20,000 credits even if the first one had spent its whole budget.
+This is the third instance. The first one (`45-76-12-121.sslip.io`, started 2026-11-07) was removed from the hosting
+account on 2026-11-09 at 17:19 UTC. The second (built 2026-11-10 at 16:36 UTC with the same files) was removed on
+2026-11-11 at 00:28 UTC by a cleanup job of another project in the same hosting account, which deleted servers it did
+not own; that job has been fixed. This one was built with the same files on 2026-11-11 at 01:05 UTC, and the page
+showed recorded answers only in each gap. Both ledgers went with their disks. The Clocked account balance shows what
+they spent: 444 credits together (427 known for the first at its last reading, 17 for the second). This instance runs
+with `LIVE_BUDGET=1500`, which stays inside the 4,650 credits the account had left when it was started.
 
 ## Limits
 
